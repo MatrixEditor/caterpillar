@@ -14,6 +14,12 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from __future__ import annotations
 
+import operator
+
+from typing import Callable, Any, Union
+from dataclasses import dataclass
+
+
 from caterpillar.abc import _ContextLambda, _ContextLike
 
 
@@ -50,8 +56,164 @@ class Context(_ContextLike):
             return root
 
 
-# TODO: insert ExprMixin to support operations
-class ContextPath(_ContextLambda):
+class ExprMixin:
+    """
+    A mixin class providing methods for creating binary and unary expressions.
+    """
+
+    def __add__(self, other) -> ExprMixin:
+        return BinaryExpression(operator.add, self, other)
+
+    def __sub__(self, other) -> ExprMixin:
+        return BinaryExpression(operator.sub, self, other)
+
+    def __mul__(self, other) -> ExprMixin:
+        return BinaryExpression(operator.mul, self, other)
+
+    def __floordiv__(self, other) -> ExprMixin:
+        return BinaryExpression(operator.floordiv, self, other)
+
+    def __truediv__(self, other) -> ExprMixin:
+        return BinaryExpression(operator.truediv, self, other)
+
+    def __mod__(self, other) -> ExprMixin:
+        return BinaryExpression(operator.mod, self, other)
+
+    def __pow__(self, other) -> ExprMixin:
+        return BinaryExpression(operator.pow, self, other)
+
+    def __xor__(self, other) -> ExprMixin:
+        return BinaryExpression(operator.xor, self, other)
+
+    def __and__(self, other) -> ExprMixin:
+        return BinaryExpression(operator.and_, self, other)
+
+    def __or__(self, other) -> ExprMixin:
+        return BinaryExpression(operator.or_, self, other)
+
+    def __rshift__(self, other) -> ExprMixin:
+        return BinaryExpression(operator.rshift, self, other)
+
+    def __lshift__(self, other) -> ExprMixin:
+        return BinaryExpression(operator.lshift, self, other)
+
+    __div__ = __truediv__
+
+    def __radd__(self, other) -> ExprMixin:
+        return BinaryExpression(operator.add, other, self)
+
+    def __rsub__(self, other) -> ExprMixin:
+        return BinaryExpression(operator.sub, other, self)
+
+    def __rmul__(self, other) -> ExprMixin:
+        return BinaryExpression(operator.mul, other, self)
+
+    def __rfloordiv__(self, other) -> ExprMixin:
+        return BinaryExpression(operator.floordiv, other, self)
+
+    def __rtruediv__(self, other) -> ExprMixin:
+        return BinaryExpression(operator.truediv, other, self)
+
+    def __rmod__(self, other) -> ExprMixin:
+        return BinaryExpression(operator.mod, other, self)
+
+    def __rpow__(self, other) -> ExprMixin:
+        return BinaryExpression(operator.pow, other, self)
+
+    def __rxor__(self, other) -> ExprMixin:
+        return BinaryExpression(operator.xor, other, self)
+
+    def __rand__(self, other) -> ExprMixin:
+        return BinaryExpression(operator.and_, other, self)
+
+    def __ror__(self, other) -> ExprMixin:
+        return BinaryExpression(operator.or_, other, self)
+
+    def __rrshift__(self, other) -> ExprMixin:
+        return BinaryExpression(operator.rshift, other, self)
+
+    def __rlshift__(self, other) -> ExprMixin:
+        return BinaryExpression(operator.lshift, other, self)
+
+
+
+    def __neg__(self) -> ExprMixin:
+        return UnaryExpression("neg", operator.neg, self)
+
+    def __pos__(self) -> ExprMixin:
+        return UnaryExpression("pos", operator.pos, self)
+
+    def __invert__(self) -> ExprMixin:
+        return UnaryExpression("invert", operator.not_, self)
+
+    def __contains__(self, other) -> ExprMixin:
+        return BinaryExpression(operator.contains, self, other)
+
+    def __gt__(self, other) -> ExprMixin:
+        return BinaryExpression(operator.gt, self, other)
+
+    def __ge__(self, other) -> ExprMixin:
+        return BinaryExpression(operator.ge, self, other)
+
+    def __lt__(self, other) -> ExprMixin:
+        return BinaryExpression(operator.lt, self, other)
+
+    def __le__(self, other) -> ExprMixin:
+        return BinaryExpression(operator.le, self, other)
+
+    def __eq__(self, other) -> ExprMixin:
+        return BinaryExpression(operator.eq, self, other)
+
+    def __ne__(self, other) -> ExprMixin:
+        return BinaryExpression(operator.ne, self, other)
+
+
+@dataclass(frozen=True, repr=False)
+class BinaryExpression(ExprMixin, _ContextLambda):
+    """
+    Represents a binary expression.
+
+    :param operand: The binary operator function.
+    :param left: The left operand.
+    :param right: The right operand.
+    """
+
+    operand: Callable[[Any, Any], Any]
+    left: Union[Any, _ContextLambda]
+    right: Union[Any, _ContextLambda]
+
+    def __call__(self, context: Context, **kwds):
+        lhs = self.left(context, **kwds) if callable(self.left) else self.left
+        rhs = self.right(context, **kwds) if callable(self.right) else self.right
+        return self.operand(lhs, rhs)
+
+    def __repr__(self) -> str:
+        return f"<{self.operand.__name__} left={self.left!r} right={self.right!r}>"
+
+
+@dataclass(frozen=True)
+class UnaryExpression:
+    """
+    Represents a unary expression.
+
+    :param name: The name of the unary operator.
+    :param operand: The unary operator function.
+    :param value: The operand.
+    """
+
+    name: str
+    operand: Callable[[Any], Any]
+    value: Union[Any, _ContextLambda]
+
+    def __call__(self, context: Context, **kwds):
+        value = self.value(context, **kwds) if callable(self.value) else self.value
+        return self.operand(value)
+
+    def __repr__(self) -> str:
+        return f"<{self.operand.__name__} value={self.value!r}>"
+
+
+class ContextPath(ExprMixin, _ContextLambda):
     """
     Represents a lambda function for retrieving a value from a Context based on a specified path.
     """

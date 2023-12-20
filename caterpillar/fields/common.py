@@ -79,7 +79,13 @@ class FormatField(FieldStruct):
         :param stream: The output stream.
         :param context: The current context.
         """
-        values = obj if isinstance(obj, list) else [obj]
+        if obj is None:
+            values = []
+        else:
+            values = obj if isinstance(obj, list) else [obj]
+
+        if len(values) == 0 and not self.is_padding():
+            return
         data = pack(self.get_format(context), *values)
         stream.write(data)
 
@@ -103,8 +109,13 @@ class FormatField(FieldStruct):
         :param context: The current context.
         :return: The unpacked value.
         """
-        size = self.__size__(context)
-        value = unpack(self.get_format(context), stream.read(size))
+        length = context._field.length(context)
+        if length == 0 and context._field.is_seq():
+            # REVISIT: maybe add factory here
+            return []
+
+        fmt = self.get_format(context, length or 1)
+        value = unpack(fmt, stream.read(calcsize(fmt)))
         if not context._field.is_seq():
             if len(value) == 0:
                 value = None
@@ -123,7 +134,7 @@ class FormatField(FieldStruct):
         """
         return list(self.unpack_single(stream, context))
 
-    def get_format(self, context: _ContextLike) -> str:
+    def get_format(self, context: _ContextLike, length: int = None) -> str:
         """
         Get the format string for the field.
 
@@ -133,7 +144,10 @@ class FormatField(FieldStruct):
         field: Field = context._field
 
         order = field.order
-        dim = field.length(context) or 1
+        if length is None:
+            dim = field.length(context) or 1
+        else:
+            dim = length
         return f"{order.ch}{dim}{self.text}"
 
     def is_padding(self) -> bool:

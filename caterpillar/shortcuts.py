@@ -20,4 +20,5 @@ from ._base import DISCARD_CONST, DISCARD_UNNAMED, UNION, REPLACE_TYPES
 from .context import ContextPath
 from .byteorder import LittleEndian as le, BigEndian as be
 
-this = ContextPath()
+this = ContextPath("_obj")
+ctx = ContextPath()

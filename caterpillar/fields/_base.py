@@ -32,15 +32,7 @@ from caterpillar.context import Context
 
 @dataclass(frozen=True)
 class Flag:
-    """
-    Simple customizable user-flag.
-
-    Attributes:
-        name (str): The name of this flag.
-
-    Methods:
-        __hash__: Custom hash method based on the flag's name.
-    """
+    """Simple customizable user-flag."""
 
     name: str
     """The name of this flag"""
@@ -326,7 +318,7 @@ class Field(_StructLike):
         except StructException as exc:
             # Any exception leads to a default value if configured
             value = self.default
-            if value != INVALID_DEFAULT:
+            if value == INVALID_DEFAULT:
                 raise exc
         # Update the position on the current context
         context._pos = stream.tell()
@@ -503,7 +495,8 @@ class FieldStruct(FieldMixin, _StructLike):
         if not isinstance(seq, Iterable):
             raise TypeError(f"Expected iterable sequence, got {type(seq)}")
 
-        count = field.length(context)
+        # REVISIT: when to use field.length(context)
+        count = len(seq)
 
         # Special elements '_index' and '_length' can be referenced within
         # the new context. The '_pos' attribute will be adjusted automatically.

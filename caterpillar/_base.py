@@ -32,9 +32,16 @@ from caterpillar.byteorder import (
     BYTEORDER_FIELD,
     get_system_arch,
 )
-from caterpillar.exception import ValidationError
+from caterpillar.exception import ValidationError, StructException
 
-from caterpillar.fields import Field, Flag, INVALID_DEFAULT, ConstBytes, ConstString
+from caterpillar.fields import (
+    Field,
+    Flag,
+    INVALID_DEFAULT,
+    ConstBytes,
+    ConstString,
+    KEEP_POSITION,
+)
 
 
 STRUCT_FIELD = "__struct__"
@@ -124,11 +131,12 @@ class Struct(_StructLike):
 
         # these fields will be set or used while processing the model type
         self._member_map_ = {}
-        self.fields = []
+        self.fields: List[Field] = []
         # Process all fields in the model
         self._process_model()
         self.model = dataclass(self.model, kw_only=True)
         setattr(self.model, STRUCT_FIELD, self)
+        setattr(self.model, "__class_getitem__", lambda dim: Field(self, amount=dim))
 
     def is_union(self) -> bool:
         """
@@ -237,7 +245,7 @@ class Struct(_StructLike):
 
         if field is None:
             raise ValidationError(
-                f"Field {name!r} could not be created: {str(annotation)!r}"
+                f"Field {name!r} could not be created: {annotation!r}"
             )
 
         field.default = default
@@ -274,17 +282,13 @@ class Struct(_StructLike):
 
         return max(sizes) if self.is_union() else sum(sizes)
 
-    def __unpack__(self, stream: _StreamType, context: _ContextLike) -> Optional[Any]:
-        """
-        Unpack the struct from the stream.
-
-        :param stream: The stream to unpack from.
-        :param context: The context of the struct.
-        :return: The unpacked object.
-        """
+    def unpack_one(self, stream: _StreamType, context: _ContextLike) -> Optional[Any]:
+        # At first, we define the object context where the parsed values
+        # will be stored
         init_data: Dict[str, Any] = {}
+        context._obj = Context(_parent=context)
+
         base_path = context._path
-        this_context = Context(_parent=context, _io=stream, _path=base_path)
         start = stream.tell()
         max_size = 0
 
@@ -292,10 +296,10 @@ class Struct(_StructLike):
             pos = stream.tell()
             name = field.get_name()
             # The context path has to be changed accordingly
-            this_context._path = ".".join([base_path, name])
-            result = field.__unpack__(stream, this_context)
-            context[name] = result
+            context._path = ".".join([base_path, name])
+            result = field.__unpack__(stream, context)
             # the object's data shouldn't include removed fields
+            context._obj[name] = result
             if name in self._member_map_:
                 init_data[name] = result
 
@@ -313,28 +317,102 @@ class Struct(_StructLike):
             stream.seek(start + max_size)
         return obj
 
+    def __unpack__(self, stream: _StreamType, context: _ContextLike) -> Optional[Any]:
+        """
+        Unpack the struct from the stream.
+
+        :param stream: The stream to unpack from.
+        :param context: The context of the struct.
+        :return: The unpacked object.
+        """
+        base_path = context._path
+        this_context = Context(_parent=context, _io=stream, _path=base_path)
+        # See __pack__ for more information
+        field: Optional[Field] = context.get("_field")
+        if field and field.is_seq():
+            length: int = field.length(context)  # use parent context here
+            values = []  # always list (maybe add factory)
+
+            this_context._length = length
+            this_context._lst = values
+            this_context._field = field
+            # REVISIT: add _pos to context
+            for i in range(length):
+                this_context._index = i
+                value = self.unpack_one(stream, this_context)
+                values.append(value)
+            return values
+
+        return self.unpack_one(stream, this_context)
+
+    def pack_one(self, obj: Any, stream: _StreamType, context: _ContextLike) -> None:
+        is_union = self.is_union()
+        max_size = 0
+        union_field: Optional[_StructLike] = None
+        base_path: str = context._path
+
+        for field in self.fields:
+            # The name has to be set (important for current context)
+            name = field.get_name()
+            if name is None:
+                raise StructException(f"Could not measure a field's name: {field!r}")
+
+            if is_union:
+                # Union is only applicable for non-dynamic structs
+                size: int = field.__size__(context)
+                if size > max_size:
+                    max_size = size
+                    union_field = field
+            else:
+                # Default behaviour: let the field write its content to the stream.
+                context._path = ".".join([base_path, name])
+                if name in self._member_map_:
+                    value = getattr(obj, name, None)
+                else:
+                    # REVISIT: this line might not be necessary if const fields alredy
+                    # use their internal value.
+                    value = field.default if field.default != INVALID_DEFAULT else None
+                field.__pack__(value, stream, context)
+
+        if is_union:
+            if union_field is None:
+                raise StructException(
+                    f"Invalid union config: no fields declared! path={context._path!r}"
+                )
+
+            name = union_field.get_name()
+            context._path = ".".join([base_path, "<value>"])
+            # REVISIT: are constant values allowed here? + name validation?
+            union_field.__pack__(getattr(obj, name), stream, context)
+
     def __pack__(self, obj: Any, stream: _StreamType, context: _ContextLike) -> None:
         # REVISIT: code cleanup
         base_path = context._path
-        this_context = Context(_parent=context, _io=stream, _path=base_path)
+        this_context = Context(_parent=context, _io=stream, _path=base_path, _obj=obj)
         max_size = 0
 
-        if not self.is_union():
-            for field in self.fields:
-                name = getattr(field, "__name__")
-                this_context._path = ".".join([base_path, name])
-                value = getattr(obj, name, None) if name in self._member_map_ else []
-                field.__pack__(value, stream, this_context)
+        is_union = self.is_union()
+        # As structs can be used in field definitions a field will call this struct
+        # and could potentially be a sequence. Therefore, we have to check whether we
+        # should unpack multiple objects.
+        field: Optional[Field] = context.get("_field")
+        if field and field.is_seq():
+            # Treat the 'obj' as a sequence/iterable
+            if not isinstance(obj, Iterable):
+                raise TypeError(f"Expected iterable sequence, got {type(obj)}")
 
+            data = list(obj)
+            this_context._length = len(data)
+            this_context._field = field
+            for i, elem in enumerate(data):
+                # The path will contain an additional hint on what element is processed
+                # at the moment.
+                this_context._index = i
+                this_context._path = ".".join([base_path, str(i)])
+                this_context._obj = elem
+                self.pack_one(elem, stream, this_context)
         else:
-            # REVISIT: This is time consuming, we should cache the member's sise
-            fields = {
-                f.__size__(this_context): (f, n) for n, f in self._member_map_.items()
-            }
-            max_size = max(fields)
-            field, name = fields[max_size]
-            this_context._path = ".".join([base_path, name])
-            field.__pack__(getattr(obj, name), stream, this_context)
+            self.pack_one(obj, stream, this_context)
 
 
 def _make_struct(

@@ -12,7 +12,7 @@
 Caterpillar is a Python 3.12+ library to pack and unpack structurized binary data. It
 enhances the capabilities of [Python Struct](https://docs.python.org/3/library/struct.html)
 by enabling direct class declaration. More information about the different configuration
-options will be added in the future.
+options will be added in the future. A brief introduction can be found [here >](docs/INTRO.md).
 
 ## Installation
 
@@ -45,7 +45,7 @@ class Image:
     As this library uses annotations to define the struct's we can use a constant
     value mark this field as a constant.
 
-    > [!NOTE]
+    > [!TIP]
     > Only ``bytes``, ``str`` values can be assigned to constant fields (**currently**)
 
 * **(2)**:
