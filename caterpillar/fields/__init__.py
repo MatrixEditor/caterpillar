@@ -51,4 +51,8 @@ from .common import (
     double,
     void_ptr,
 )
+from .varint import (
+    VarInt,
+    VARINT_LSB
+)
 

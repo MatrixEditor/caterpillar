@@ -117,17 +117,24 @@ class Struct(_StructLike):
     Additional options specifying what to include in the final class.
     """
 
+    field_options: Set[Flag]
+    """
+    Global field flags that will be applied on all fields.
+    """
+
     def __init__(
         self,
         model: type,
         order: Optional[ByteOrder] = None,
         arch: Optional[Arch] = None,
         options: Iterable[Flag] = None,
+        field_options: Iterable[Flag] = None,
     ) -> None:
         self.model = model
         self.arch = arch
         self.order = order
         self.options = set(options or [])
+        self.field_options = set(field_options or [])
 
         # these fields will be set or used while processing the model type
         self._member_map_ = {}
@@ -251,6 +258,7 @@ class Struct(_StructLike):
         field.default = default
         field.order = self.order or field.order
         field.arch = self.arch or field.arch
+        field.flags.update(self.field_options)
         return field
 
     def add_field(self, name: str, field: Field, included: bool = False) -> None:
@@ -420,6 +428,7 @@ def _make_struct(
     options: Iterable[Flag],
     order: Optional[ByteOrder] = None,
     arch: Optional[Arch] = None,
+    field_options: Iterable[Flag] = None,
 ) -> type:
     """
     Helper function to create a Struct class.
@@ -431,7 +440,9 @@ def _make_struct(
 
     :return: The created Struct class.
     """
-    _ = Struct(cls, order=order, arch=arch, options=options)
+    _ = Struct(
+        cls, order=order, arch=arch, options=options, field_options=field_options
+    )
     return cls
 
 
@@ -439,9 +450,10 @@ def struct(
     cls: type = None,
     /,
     *,
-    options: Iterable[Flag] = (),
+    options: Iterable[Flag] = None,
     order: Optional[ByteOrder] = None,
     arch: Optional[Arch] = None,
+    field_options: Iterable[Flag] = None,
 ):
     """
     Decorator to create a Struct class.
@@ -455,10 +467,14 @@ def struct(
     """
 
     def wrap(cls):
-        return _make_struct(cls, options=options, order=order, arch=arch)
+        return _make_struct(
+            cls, options=options, order=order, arch=arch, field_options=field_options
+        )
 
     if cls is not None:
-        return _make_struct(cls, options=options, order=order, arch=arch)
+        return _make_struct(
+            cls, options=options, order=order, arch=arch, field_options=field_options
+        )
 
     return wrap
 
@@ -467,9 +483,10 @@ def union(
     cls: type = None,
     /,
     *,
-    options: Iterable[Flag] = (),
+    options: Iterable[Flag] = None,
     order: Optional[ByteOrder] = None,
     arch: Optional[Arch] = None,
+    field_options: Iterable[Flag] = None,
 ):
     """
     Decorator to create a Union class.
@@ -481,13 +498,17 @@ def union(
 
     :return: The created Union class or a wrapper function if cls is not provided.
     """
-    options = set(list(options) + [UNION])
+    options = set(list(options or []) + [UNION])
 
     def wrap(cls):
-        return _make_struct(cls, options=options, order=order, arch=arch)
+        return _make_struct(
+            cls, options=options, order=order, arch=arch, field_options=field_options
+        )
 
     if cls is not None:
-        return _make_struct(cls, options=options, order=order, arch=arch)
+        return _make_struct(
+            cls, options=options, order=order, arch=arch, field_options=field_options
+        )
 
     return wrap
 

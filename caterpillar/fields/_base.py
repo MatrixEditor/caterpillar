@@ -30,6 +30,11 @@ from caterpillar.exception import DynamicSizeError, StructException, OptionError
 from caterpillar.context import Context
 
 
+def singleton(cls):
+    """Simple wrapper to enable singleton structs."""
+    return cls()
+
+
 @dataclass(frozen=True)
 class Flag:
     """Simple customizable user-flag."""

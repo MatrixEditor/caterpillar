@@ -48,3 +48,6 @@ class UnsupportedOperation(StructException):
 
     This can be used when attempting an operation that is not supported or allowed in the context of structs.
     """
+
+class InvalidValueError(StructException):
+    pass
