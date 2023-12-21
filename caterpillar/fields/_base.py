@@ -42,6 +42,7 @@ from caterpillar.options import (
     F_DYNAMIC,
     F_KEEP_POSITION,
     F_SEQUENTIAL,
+    F_OFFSET_OVERRIDE,
     Flag,
 )
 
@@ -383,6 +384,8 @@ class Field(_StructLike):
         # REVISIT: maybe check whether this stream supports .seek()
         has_offset = start != fallback
         if has_offset:
+            # TODO: implement F_OFFSET_OVERRIDE
+
             # We write the current field into a temporary memory buffer
             # and add it after all processing hasbeen finished.
             base_stream = stream

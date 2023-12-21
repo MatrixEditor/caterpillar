@@ -1,6 +1,6 @@
 # Introduction
 
-`caterpillar` is a powerful python frameworkdesigned to effortlessly navigate through structured binary data. This framework operates as a declarative parser and builder, streamlining the handling of binary data through the utilization of standard Python class definitions and annotations. Below are the key functions of this library:
+`caterpillar` is a powerful python framework designed to navigate through structured binary data. This framework operates as a declarative parser and builder, streamlining the handling of binary data through the utilization of standard Python class definitions and annotations. Below are the key functions of this library:
 
 * Pack and unpack classes to and from binary data
 * Structs support union processing as well
@@ -68,19 +68,20 @@ git clone https://github.com/MatrixEditor/caterpillar.git && pip install -e cate
 
 ## Supported Options
 
-Explore the list of natively supported options (or those proposed to be supported) within `caterpillar`:
+Explore the list of natively supported options (or those proposed to be supported) within `caterpillar`. All code snippets were taken from the [nibarchive](/examples/nibarchive.py) example.
 
 ### Constant Values
 
 Constant values can be seamlessly integrated into your data structures in two ways:
 
 ```python
-@struct
-class Format:
-    signature: b"HDR"
-    magic: "FOO"
-    # or by using a custom type
-    const: Const(0x1234, uint32)
+@struct(order=LittleEndian)
+class NIBHeader:
+    # Here we define a constant value, which will raise an exception
+    # upon a different parsed value.
+    magic: b"NIBArchive"
+    # we could also use ConstBytes directly
+    magic: ConstBytes(b"NIBArchive") or Const(b"NIBArchive", Bytes(10))
 ```
 
 > [!NOTE]
@@ -89,30 +90,104 @@ class Format:
 
 ### Structs
 
+Integrating structs or classes marked with `@struct` into your binary data processing is straightforward. Here's an example:
+
+```python
+@struct(order=LittleEndian)
+class NIBClassName:
+    length: VarInt
+    extras_count: VarInt
+    # This struct will remove all extra null-bytes padding
+    name: CString(this.length)
+    # Arrays can be created just like this:
+    extras: int32[this.extras_count]
+```
+
+Note: While custom struct classes support array creation, some modifiers listed below are not currently implemented (at least for now).
+
+### Bitfields
+
 *TODO*
+
+### Enums
+
+Utilize the standard `enum` module to incorporate enumeration classes using a special struct:
+
+```python
+class ValueType(enum.Enum): ...
+
+@struct(order=LittleEndian)
+class NIBValue:
+    key: VarInt
+    # NOTE the use of a default value; otherwise None would be set.
+    type: Enum(ValueType, uint8, default=ValueType.UNKNOWN)
+```
+
 
 ## Modifiers
 
-### Endian
+Modifiers in `caterpillar` enhance code readability by assigning unique operators to specific field
+configurations. Let's explore the available modifiers and their applications:
+
+## Endianness `+`
+
+Configure the byte order of fields using the `+` modifier. It can be applied class-wide or to individual fields:
+
+```python
+@struct(order=BigEndian)  # class-wide for all fields
+class Format:
+    foo: le + uint8  # or for each field
+```
+
+For more details on available endian encodings, refer to the [Python documentation on struct](https://docs.python.org/3/library/struct.html).
+
+## Condition `//` Modifier
 
 *TODO*
 
-### Condition `//`
+## Switch `>>` Modifier
 
-*TODO*
+Implement a switch field using the right shift operator. It accepts a dictionary with the corresponding value-struct mapping or a context function:
 
-### Switch `>>`
+```python
+@struct(order=LittleEndian)
+class NIBValue:
+    key: VarInt
+    type: Enum(ValueType, uint8, ValueType.UNKNOWN)
+    value: Field(this.type) >> {
+        ValueType.INT8: int8,
+        ValueType.INT16: int16,
+        # ... other mappings ...
+        DEFAULT_OPTION: Computed(ctx._value), # ctx-Context has to be used here
+    }
+```
 
-*TODO* (not stable, under construction)
+## Offset `@` Modifier
 
-### Offset `@`
+Jump to specific addresses during processing with the `@` operator. Useful for nested structs and navigating within the binary data:
 
-*TODO*
+```python
+@struct(order=LittleEndian)
+class NIBArchive:
+    header: NIBHeader
+    objects: NIBObject[this.header.object_count] @ this.header.offset_objects
+```
+
+> ![CAUTION]
+> If packing a very large object with offset-defined fields, consider using a temporary file to avoid excessive memory usage during processing. (set `use_tempfile` to True in `unpack`)
 
 ### Flags `|` and `^`
 
-*TODO*
+Flags
 
 ### Sequence `[]`
 
 *TODO*
+
+## Context
+
+*TODO*
+
+### Object-Context `this`
+
+### Processing-Context `ctx`

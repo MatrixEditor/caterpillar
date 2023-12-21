@@ -147,7 +147,7 @@ class NIBArchive:
 
     # All following fields are marked with '@': The parser will jump temporarily
     # to the position specified after the operator. Use | F_KEEP_POSITION to
-    # continue parsing
+    # continue parsing at the resulting position
     objects: NIBObject[this.header.object_count] @ this.header.offset_objects
     keys: NIBKey[this.header.key_count] @ this.header.offset_keys
     values: NIBValue[this.header.value_count] @ this.header.offset_values

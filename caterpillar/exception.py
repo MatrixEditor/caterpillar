@@ -49,8 +49,20 @@ class UnsupportedOperation(StructException):
     This can be used when attempting an operation that is not supported or allowed in the context of structs.
     """
 
+
 class InvalidValueError(StructException):
-    pass
+    """
+    An exception raised for invalid configuration values.
+    """
+
 
 class StreamError(StructException):
-    pass
+    """
+    An exception raised for read and write issues.
+    """
+
+
+class DelegationError(StructException):
+    """
+    An exception used if underlying calls fail.
+    """

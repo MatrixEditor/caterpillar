@@ -22,6 +22,7 @@ from typing import Dict, Any, Optional, Union, Callable
 _StreamType = IOBase
 _StreamFactory = Callable[[], _StreamType]
 
+
 class _ContextLike(dict):
     """
     A dictionary-like object used as a context for packing and unpacking.
@@ -82,10 +83,22 @@ class _SupportsSize(ABC):
         pass
 
 
-class _StructLike(_SupportsPack, _SupportsUnpack, _SupportsSize):
+class _StructLike:
     """
     An abstract base class for struct-like objects that can be packed, unpacked, and have a size.
     """
+
+    @abstractmethod
+    def __size__(self, context: _ContextLike) -> int:
+        pass
+
+    @abstractmethod
+    def __unpack__(self, stream: _StreamType, context: _ContextLike):
+        pass
+
+    @abstractmethod
+    def __pack__(self, obj, stream: _StreamType, context: _ContextLike) -> None:
+        pass
 
     def __type__(self) -> Optional[type]:
         pass
@@ -134,14 +147,14 @@ def hasstruct(obj: Any) -> bool:
     return bool(getattr(obj, STRUCT_FIELD, None))
 
 
-def getstruct(obj: Any) -> _StructLike:
+def getstruct(obj: Any, __default: Any = None) -> _StructLike:
     """
     Get the structure attribute of the given object.
 
     :param obj: The object to get the structure attribute from.
     :return: The structure attribute of the object.
     """
-    return getattr(obj, STRUCT_FIELD)
+    return getattr(obj, STRUCT_FIELD, __default)
 
 
 def typeof(struct: Union[_StructLike, _ContainsStruct]) -> type:

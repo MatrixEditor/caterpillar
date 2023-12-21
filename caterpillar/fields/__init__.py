@@ -55,4 +55,10 @@ from .varint import (
     VarInt,
     VARINT_LSB
 )
-
+from .compression import (
+    Compressed,
+    ZLibCompressed,
+    Bz2Compressed,
+    LZMACompressed,
+    LZOCompressed
+)

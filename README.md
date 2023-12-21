@@ -6,7 +6,7 @@
 ![Status](https://img.shields.io:/static/v1?label=Status&message=🚧&color=teal)
 
 > [!WARNING]
-> This projectis stell in beta/testing phase. Expect bugs and errors while using this
+> This project is stell in beta/testing phase. Expect bugs and errors while using this
 > library.
 
 Caterpillar is a Python 3.12+ library to pack and unpack structurized binary data. It
