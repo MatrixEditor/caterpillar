@@ -18,9 +18,18 @@
 # from __future__ import annotations
 import enum
 import sys
+import tempfile
 
 from caterpillar.fields import *
-from caterpillar.shortcuts import struct, this, unpack_file, opt, LittleEndian, ctx, pack_file
+from caterpillar.shortcuts import (
+    struct,
+    this,
+    unpack_file,
+    opt,
+    LittleEndian,
+    ctx,
+    pack_file,
+)
 
 try:
     # colorized + structured output
@@ -151,5 +160,4 @@ class NIBArchive:
 
 
 obj = unpack_file(NIBArchive, sys.argv[1])
-
-pack_file(obj, "out.nib")
+pack_file(obj, sys.argv[2], use_tempfile=True)

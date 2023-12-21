@@ -25,6 +25,7 @@ from caterpillar.abc import _ContextLambda, _ContextLike
 
 CTX_PARENT = "_parent"
 CTX_OBJECT = "_obj"
+CTX_OFFSETS = "_offsets"
 CTX_STREAM = "_io"
 
 
@@ -64,7 +65,10 @@ class Context(_ContextLike):
         current = self
         while CTX_PARENT in current:
             # dict-like access is much faster
-            current = current[CTX_PARENT]
+            parent = current[CTX_PARENT]
+            if parent is None:
+                break
+            current = parent
         return current
 
 

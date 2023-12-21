@@ -16,11 +16,11 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from io import IOBase
-from typing import Dict, Any, Optional, Union
+from typing import Dict, Any, Optional, Union, Callable
 
 #: Type alias for IOBase to indicate a stream type
 _StreamType = IOBase
-
+_StreamFactory = Callable[[], _StreamType]
 
 class _ContextLike(dict):
     """

@@ -141,7 +141,7 @@ class Field(_StructLike):
         # NOTE: we use a custom init method to automatically set flags
         self.struct = struct
         self.order = order
-        self.flags = (flags or set([F_KEEP_POSITION]))
+        self.flags = flags or set([F_KEEP_POSITION])
         self.flags.update(GLOBAL_FIELD_FLAGS)
 
         self.arch = arch or get_system_arch()
@@ -368,7 +368,7 @@ class Field(_StructLike):
         :raises TypeError: if the value is not iterable but this field is marked
                            to be sequential
         """
-        if not self.is_enabled(context) or callable(self.struct):
+        if not self.is_enabled(context):
             # Disabled fields or context lambdas won't pack any data
             return
 
@@ -383,12 +383,21 @@ class Field(_StructLike):
         # REVISIT: maybe check whether this stream supports .seek()
         has_offset = start != fallback
         if has_offset:
+            # We write the current field into a temporary memory buffer
+            # and add it after all processing hasbeen finished.
+            base_stream = stream
             stream = BytesIO()
+            context._io = stream
 
-        if not self.options:
+        if self.options is None and not callable(self.struct):
             struct.__pack__(obj, stream, context)
         else:
-            struct: _StructLike = self.get_struct(obj, context)
+            if not callable(self.struct):
+                raise StructException(
+                    "Attepmt was made to use switch without context lambda!"
+                )
+            value = self.struct(context)
+            struct: _StructLike = self.get_struct(value, context)
             struct.__pack__(obj, stream, context)
 
         if not self.has_flag(F_KEEP_POSITION) and not has_offset:
@@ -397,8 +406,8 @@ class Field(_StructLike):
 
         if has_offset:
             # Place the stream into the internal offset map
-            raise NotImplemented
-
+            context.root()._offsets[start] = stream.getbuffer()
+            context._io = base_stream
 
     def __size__(self, context: _ContextLike) -> int:
         """Calculates the size of this field.

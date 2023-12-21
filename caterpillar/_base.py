@@ -16,6 +16,7 @@ import inspect
 import re
 import sys
 
+from tempfile import TemporaryFile
 from io import BytesIO, IOBase
 from typing import Optional, Union
 from typing import List, Dict, Any
@@ -29,6 +30,7 @@ from caterpillar.abc import (
     _StreamType,
     _ContainsStruct,
     _ContextLambda,
+    _StreamFactory,
     hasstruct,
     getstruct,
     STRUCT_FIELD,
@@ -529,6 +531,7 @@ def pack_into(
     obj: Union[Any, _ContainsStruct],
     buffer: _StreamType,
     struct: Optional[_StructLike] = None,
+    use_tempfile: bool = False,
     **kwds,
 ) -> None:
     """
@@ -542,19 +545,44 @@ def pack_into(
     :return: None
     """
 
+    offsets: Dict[int, memoryview] = OrderedDict()
     context = Context(
-        _parent=None, _path="<root>", _io=buffer, _pos=0, **kwds
+        _parent=None, _path="<root>", _pos=0, _offsets=offsets, **kwds
     )
     if struct is None:
         struct = getstruct(obj)
-    struct.__pack__(obj, buffer, context)
 
+    start = 0
+    if use_tempfile:
+        # NOTE: this implementation is exprimental - use this option with caution.
+        with TemporaryFile() as stream:
+            context._io = stream
+            struct.__pack__(obj, stream, context)
+
+            for offset, value in offsets.items():
+                stream.seek(start)
+                buffer.write(stream.read(offset - start))
+                buffer.write(value)
+                start = offset
+    else:
+        # Default implementation: We use an in-memory buffer to store all packed
+        # elements and then apply all offset-packed objects.
+        stream = BytesIO()
+        context._io = stream
+        struct.__pack__(obj, stream, context)
+
+        content = stream.getbuffer()
+        for offset, value in offsets.items():
+            buffer.write(content[start:offset])
+            buffer.write(value)
+            start = offset
 
 
 def pack_file(
     obj: Union[Any, _ContainsStruct],
     filename: str,
     struct: Optional[_StructLike] = None,
+    use_tempfile: bool = False,
     **kwds,
 ) -> None:
     """
@@ -568,7 +596,7 @@ def pack_file(
     :return: None
     """
     with open(filename, "wb") as fp:
-        pack_into(obj, fp, struct, **kwds)
+        pack_into(obj, fp, struct, use_tempfile, **kwds)
 
 
 def unpack(
