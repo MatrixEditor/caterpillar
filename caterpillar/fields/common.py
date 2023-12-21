@@ -25,7 +25,7 @@ from caterpillar.abc import (
     _ContextLambda,
     _EnumLike,
 )
-from caterpillar.exception import ValidationError, UnsupportedOperation
+from caterpillar.exception import ValidationError, UnsupportedOperation, StructException
 
 from ._base import Field, FieldStruct
 
@@ -115,7 +115,11 @@ class FormatField(FieldStruct):
             return []
 
         fmt = self.get_format(context, length or 1)
-        value = unpack(fmt, stream.read(calcsize(fmt)))
+        try:
+            value = unpack(fmt, stream.read(calcsize(fmt)))
+        except ValueError as exc:
+            raise StructException(f"unpack() - Error at {context._path}") from exc
+
         if not context._field.is_seq():
             if len(value) == 0:
                 value = None
@@ -306,7 +310,9 @@ class Enum(Transformer):
     A specialized Transformer for encoding and decoding enumeration values.
     """
 
-    def __init__(self, model: _EnumLike, struct: _StructLike) -> None:
+    def __init__(
+        self, model: _EnumLike, struct: _StructLike, default: Optional[_EnumLike] = None
+    ) -> None:
         """
         Initialize the Enum transformer with an enumeration model and a wrapped _StructLike object.
 
@@ -315,6 +321,7 @@ class Enum(Transformer):
         """
         super().__init__(struct)
         self.model = model
+        self.default = default
 
     def encode(self, obj: Any, context: _ContextLike) -> Any:
         """
@@ -340,7 +347,7 @@ class Enum(Transformer):
         """
         by_name = self.model._member_map_.get(parsed)
         by_value = self.model._value2member_map_.get(parsed)
-        return by_name or by_value
+        return by_name or by_value or self.default
 
 
 class Bytes(FieldStruct):
@@ -464,6 +471,56 @@ class String(Bytes):
         return super().unpack_single(stream, context).decode(self.encoding)
 
 
+class CString(Bytes):
+    """
+    A specialized field for handling string data that ends with ``\\0x00``.
+    """
+
+    def __init__(
+        self, length: Union[int, _ContextLambda], encoding: Optional[str] = None
+    ) -> None:
+        """
+        Initialize the String field with a fixed length or a length determined by a context lambda.
+
+        :param length: The fixed length or a context lambda to determine the length dynamically.
+        :param encoding: The encoding to use for string encoding/decoding (default is UTF-8).
+        """
+        super().__init__(length)
+        self.encoding = encoding or "utf-8"
+
+    def __type__(self) -> type:
+        """
+        Return the type associated with this String field.
+
+        :return: The type (str).
+        """
+        return str
+
+    def pack_single(self, obj: str, stream: _StreamType, context: _ContextLike) -> None:
+        """
+        Pack a single string into the stream.
+
+        :param obj: The string to pack.
+        :param stream: The output stream.
+        :param context: The current context.
+        """
+        length = self.__size__(context)
+        obj_length = len(obj)
+        payload = obj.encode(self.encoding) + b"\x00"*(length - obj_length)
+        super().pack_single(payload, stream, context)
+
+    def unpack_single(self, stream: _StreamType, context: _ContextLike) -> Any:
+        """
+        Unpack a single string from the stream.
+
+        :param stream: The input stream.
+        :param context: The current context.
+        :return: The unpacked string.
+        """
+        value: str = super().unpack_single(stream, context).decode(self.encoding)
+        return value.rstrip("\x00")
+
+
 class ConstString(Const):
     """
     A specialized constant field for handling string values.
@@ -477,7 +534,7 @@ class ConstString(Const):
         :param encoding: The encoding to use for string encoding (default is UTF-8).
         """
         struct = String(len(value), encoding)
-        super().__init__(value.encode(struct.encoding), encoding)
+        super().__init__(value.encode(struct.encoding), struct)
 
 
 class ConstBytes(Const):
@@ -492,3 +549,28 @@ class ConstBytes(Const):
         :param value: The constant bytes value.
         """
         super().__init__(value, Bytes(len(value)))
+
+
+class Computed(FieldStruct):
+    def __init__(self, value: Union[_ConstType, _ContextLambda]) -> None:
+        self.value = value
+
+    def __type__(self) -> type:
+        return Any if callable(self.value) else type(self.value)
+
+    def __pack__(self, obj: Any, stream: _StreamType, context: _ContextLike) -> None:
+        pass
+
+    def __size__(self, context: _ContextLike) -> int:
+        return 0
+
+    def __unpack__(self, stream: _StreamType, context: _ContextLike) -> Any:
+        return self.value(context) if callable(self.value) else self.value
+
+    def pack_single(self, obj: Any, stream: _StreamType, context: _ContextLike) -> None:
+        # No need for an implementation
+        pass
+
+    def unpack_single(self, stream: _StreamType, context: _ContextLike) -> None:
+        # No need for an implementation
+        pass

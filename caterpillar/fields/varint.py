@@ -17,7 +17,7 @@ from __future__ import annotations
 from typing import Any
 
 from caterpillar.abc import _StreamType, _ContextLike
-from caterpillar.exception import InvalidValueError, DynamicSizeError
+from caterpillar.exception import InvalidValueError, DynamicSizeError, StreamError
 from caterpillar.byteorder import LittleEndian
 
 from ._base import FieldStruct, Flag, singleton
@@ -113,7 +113,10 @@ class VarInt(FieldStruct):
 
         while True:
             # Note tha unpack operation here to retrieve one byte only
-            (value,) = stream.read(1)
+            try:
+                (value,) = stream.read(1)
+            except ValueError as exc:
+                raise StreamError(context._path) from exc
             data.append(value & 0x7F)
             if value & 0x80 == lb:
                 # The "low_byte" here is taken from the field's configuration

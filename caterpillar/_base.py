@@ -12,19 +12,28 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-from __future__ import annotations
-
 import inspect
 import re
+import sys
 
 from io import BytesIO, IOBase
 from typing import Optional, Union
 from typing import List, Dict, Any
 from typing import Set, Iterable
+from collections import OrderedDict
 from dataclasses import dataclass
 
-from caterpillar.abc import _StructLike, _ContextLike, _StreamType, _ContainsStruct
-from caterpillar.context import Context
+from caterpillar.abc import (
+    _StructLike,
+    _ContextLike,
+    _StreamType,
+    _ContainsStruct,
+    _ContextLambda,
+    hasstruct,
+    getstruct,
+    STRUCT_FIELD,
+)
+from caterpillar.context import Context, CTX_OFFSETS
 from caterpillar.byteorder import (
     SysNative,
     ByteOrder,
@@ -33,44 +42,17 @@ from caterpillar.byteorder import (
     get_system_arch,
 )
 from caterpillar.exception import ValidationError, StructException
-
-from caterpillar.fields import (
-    Field,
+from caterpillar.options import (
+    S_DISCARD_CONST,
+    S_DISCARD_UNNAMED,
+    S_EVAL_ANNOTATIONS,
+    S_REPLACE_TYPES,
+    S_UNION,
     Flag,
-    INVALID_DEFAULT,
-    ConstBytes,
-    ConstString,
-    KEEP_POSITION,
+    GLOBAL_STRUCT_OPTIONS,
+    GLOBAL_UNION_OPTIONS,
 )
-
-
-STRUCT_FIELD = "__struct__"
-
-
-def hasstruct(obj: Any) -> bool:
-    """
-    Check if the given object has a structure attribute.
-
-    :param obj: The object to check.
-    :return: True if the object has a structure attribute, else False.
-    """
-    return bool(getattr(obj, STRUCT_FIELD, None))
-
-
-def getstruct(obj: Any) -> Struct:
-    """
-    Get the structure attribute of the given object.
-
-    :param obj: The object to get the structure attribute from.
-    :return: The structure attribute of the object.
-    """
-    return getattr(obj, STRUCT_FIELD)
-
-
-DISCARD_UNNAMED = Flag("discard_unnamed")
-DISCARD_CONST = Flag("discard_const")
-UNION = Flag("union")
-REPLACE_TYPES = Flag("replace_types")
+from caterpillar.fields import *
 
 
 @dataclass(init=False)
@@ -134,6 +116,10 @@ class Struct(_StructLike):
         self.arch = arch
         self.order = order
         self.options = set(options or [])
+        # Add additional options based on the struct's type
+        self.options.update(
+            GLOBAL_UNION_OPTIONS if self.is_union() else GLOBAL_STRUCT_OPTIONS
+        )
         self.field_options = set(field_options or [])
 
         # these fields will be set or used while processing the model type
@@ -151,7 +137,7 @@ class Struct(_StructLike):
 
         :return: True if the struct is a union, else False.
         """
-        return self.has_option(UNION)
+        return self.has_option(S_UNION)
 
     def has_option(self, option: Flag) -> bool:
         """
@@ -170,11 +156,11 @@ class Struct(_StructLike):
         :param default: The default value of the field.
         :return: True if the field should be included, else False.
         """
-        if self.has_option(DISCARD_UNNAMED):
+        if self.has_option(S_DISCARD_UNNAMED):
             if re.match(r"^_[0-9]*$", name):
                 return False
 
-        if self.has_option(DISCARD_CONST):
+        if self.has_option(S_DISCARD_CONST):
             if default != INVALID_DEFAULT:
                 return False
 
@@ -184,16 +170,19 @@ class Struct(_StructLike):
         """
         Process all fields in the model.
         """
-        annotations = inspect.get_annotations(self.model)
-        removables = []
+        eval_str = self.has_option(S_EVAL_ANNOTATIONS)
+        # The why is desribed in detail here: https://docs.python.org/3/howto/annotations.html
+        #
+        annotations = inspect.get_annotations(self.model, eval_str=eval_str)
 
+        removables = []
         for name, annotation in annotations.items():
             # Process each field and its annotation. In addition, fields with a name in
             # the form of '_[0-9]*' will be removed (if enabled)
             default = getattr(self.model, name, INVALID_DEFAULT)
             # constant values that are not in the form of fields, structs or types should
             # be wrapped into constant values. For more information, see _process_field
-            if isinstance(annotation, (int, str, bytes)):
+            if isinstance(annotation, bytes):
                 default = annotation
                 setattr(self.model, name, default)
 
@@ -204,7 +193,7 @@ class Struct(_StructLike):
             field = self._process_field(name, annotation, default)
             # we call add_field to safely add the created field
             self.add_field(name, field, is_included)
-            if self.has_option(REPLACE_TYPES):
+            if self.has_option(S_REPLACE_TYPES):
                 # This way we re-annotate all fields in the current model
                 self.model.__annotations__[name] = field.get_type()
 
@@ -246,6 +235,8 @@ class Struct(_StructLike):
             struct = ConstString(annotation)
         elif isinstance(annotation, bytes):
             struct = ConstBytes(annotation)
+        elif isinstance(annotation, _ContextLambda):
+            struct = annotation
 
         if struct is not None:
             field = Field(struct, order, arch=arch, default=default)
@@ -347,6 +338,8 @@ class Struct(_StructLike):
             # REVISIT: add _pos to context
             for i in range(length):
                 this_context._index = i
+                if self.model.__name__ == "NIBValue":
+                    pass
                 value = self.unpack_one(stream, this_context)
                 values.append(value)
             return values
@@ -498,7 +491,7 @@ def union(
 
     :return: The created Union class or a wrapper function if cls is not provided.
     """
-    options = set(list(options or []) + [UNION])
+    options = set(list(options or []) + [S_UNION])
 
     def wrap(cls):
         return _make_struct(
@@ -548,10 +541,14 @@ def pack_into(
 
     :return: None
     """
-    context = Context(_parent=None, _path="<root>", _io=buffer, _pos=0, **kwds)
+
+    context = Context(
+        _parent=None, _path="<root>", _io=buffer, _pos=0, **kwds
+    )
     if struct is None:
         struct = getstruct(obj)
     struct.__pack__(obj, buffer, context)
+
 
 
 def pack_file(

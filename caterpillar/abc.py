@@ -16,7 +16,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from io import IOBase
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Union
 
 #: Type alias for IOBase to indicate a stream type
 _StreamType = IOBase
@@ -35,6 +35,10 @@ class _ContextLike(dict):
 
     @abstractmethod
     def __getattribute__(self, key: str):
+        pass
+
+    @abstractmethod
+    def root(self) -> Optional[_ContextLike]:
         pass
 
 
@@ -114,3 +118,38 @@ class _Switch(ABC):
     @abstractmethod
     def __call__(self, value: Any, context: _ContextLike, **kwds) -> _StructLike:
         pass
+
+
+# TODO: place this somewhere else
+STRUCT_FIELD = "__struct__"
+
+
+def hasstruct(obj: Any) -> bool:
+    """
+    Check if the given object has a structure attribute.
+
+    :param obj: The object to check.
+    :return: True if the object has a structure attribute, else False.
+    """
+    return bool(getattr(obj, STRUCT_FIELD, None))
+
+
+def getstruct(obj: Any) -> _StructLike:
+    """
+    Get the structure attribute of the given object.
+
+    :param obj: The object to get the structure attribute from.
+    :return: The structure attribute of the object.
+    """
+    return getattr(obj, STRUCT_FIELD)
+
+
+def typeof(struct: Union[_StructLike, _ContainsStruct]) -> type:
+    if hasstruct(struct):
+        struct = getstruct(struct)
+
+    __type__ = getattr(struct, "__type__", None)
+    if not __type__:
+        return Any
+    # this function must return a type
+    return __type__() or Any

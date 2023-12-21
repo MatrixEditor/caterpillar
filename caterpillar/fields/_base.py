@@ -17,17 +17,33 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from abc import abstractmethod
 from typing import Self, Union, Set, Any, Dict, Optional, Iterable, List
-
+from io import BytesIO
 from caterpillar.abc import (
     _StructLike,
     _ContextLambda,
     _Switch,
     _StreamType,
     _ContextLike,
+    hasstruct,
+    getstruct,
+    typeof,
 )
 from caterpillar.byteorder import ByteOrder, SysNative, Arch, get_system_arch, byteorder
-from caterpillar.exception import DynamicSizeError, StructException, OptionError
+from caterpillar.exception import (
+    DynamicSizeError,
+    StructException,
+    OptionError,
+    ValidationError,
+    InvalidValueError,
+)
 from caterpillar.context import Context
+from caterpillar.options import (
+    GLOBAL_FIELD_FLAGS,
+    F_DYNAMIC,
+    F_KEEP_POSITION,
+    F_SEQUENTIAL,
+    Flag,
+)
 
 
 def singleton(cls):
@@ -35,29 +51,9 @@ def singleton(cls):
     return cls()
 
 
-@dataclass(frozen=True)
-class Flag:
-    """Simple customizable user-flag."""
-
-    name: str
-    """The name of this flag"""
-
-    def __hash__(self) -> int:
-        """
-        Custom hash method based on the flag's name.
-
-        :return: The hash value.
-        """
-        return hash(self.name)
-
-
-# Instances of the Flag class representing different system-flags
-KEEP_POSITION = Flag("keep_position")
-DYNAMIC = Flag("dynamic")
-SEQUENTIAL = Flag("sequential")
-
 # Constant representing an invalid default value
 INVALID_DEFAULT = object()
+DEFAULT_OPTION = None
 
 
 @dataclass(init=False)
@@ -145,7 +141,9 @@ class Field(_StructLike):
         # NOTE: we use a custom init method to automatically set flags
         self.struct = struct
         self.order = order
-        self.flags = flags or set([KEEP_POSITION])
+        self.flags = (flags or set([F_KEEP_POSITION]))
+        self.flags.update(GLOBAL_FIELD_FLAGS)
+
         self.arch = arch or get_system_arch()
         # this will unset KEEP_POSITION if configured
         self.__matmul__(offset)
@@ -182,19 +180,19 @@ class Field(_StructLike):
         self.offset = offset
         # This operation automatically removes the "keep_position"
         # flag. It has to be set manually.
-        if self.has_flag(KEEP_POSITION) and self.offset != -1:
-            self.flags.remove(KEEP_POSITION)
+        if self.has_flag(F_KEEP_POSITION) and self.offset != -1:
+            self.flags.remove(F_KEEP_POSITION)
         return self
 
     def __getitem__(self, dim: Union[_ContextLambda, int]) -> Self:
         self._verify_context_value(dim, int)
         self.amount = dim
         if self.amount != 0:
-            self.flags.add(SEQUENTIAL)
+            self.flags.add(F_SEQUENTIAL)
         return self
 
     def __rshift__(self, switch: Union[_Switch, dict]) -> Self:
-        if not isinstance(switch, dict) or not callable(switch):
+        if not isinstance(switch, dict) and not callable(switch):
             raise TypeError(f"Expected a valid switch context, got {type(switch)}")
 
         self.options = switch
@@ -211,7 +209,7 @@ class Field(_StructLike):
         :return: whether this field is sequental
         :rtype: bool
         """
-        return self.has_flag(SEQUENTIAL)
+        return self.has_flag(F_SEQUENTIAL)
 
     def is_enabled(self, context: _ContextLike) -> bool:
         """Evaluates the condition of this field.
@@ -264,9 +262,20 @@ class Field(_StructLike):
         if isinstance(self.options, dict):
             if value not in self.options:
                 raise OptionError(f"Option {str(value)!r} not found!")
-            return self.options[value]
 
-        return self.options(value, context)
+            struct = self.options.get(value) or self.options.get(DEFAULT_OPTION)
+        else:
+            struct = self.options(value, context)
+
+        if struct is None:
+            # The struct must be non-null
+            raise InvalidValueError(
+                f"Could not find switch value for: {value!r} at {context._path}"
+            )
+
+        if hasstruct(struct):
+            return getstruct(struct)
+        return struct
 
     def get_offset(self, context: _ContextLike) -> int:
         """Returns the offset position of this field"""
@@ -278,11 +287,12 @@ class Field(_StructLike):
         :return: the annotation type
         :rtype: type
         """
-        __type__ = getattr(self.struct, "__type__", None)
-        if not __type__:
-            return Any
-        # this function must return a type
-        return __type__() or Any
+        if not self.options:
+            return typeof(self.struct)
+
+        # We construct a Union type hint as an alternative:
+        types = [typeof(s) for s in self.options.values()]
+        return Union[*types]
 
     def get_name(self) -> Optional[str]:
         return getattr(self, "__name__", None)
@@ -305,34 +315,35 @@ class Field(_StructLike):
             # handling the result of this function should be treated carefully
             return None
 
-        # Context functions should be executed with top priority
-        if callable(self.struct):
-            return self.struct(context)
+        if not callable(self.struct):
+            fallback = stream.tell()
+            offset = self.get_offset(context)
+            start = offset if offset >= 0 else fallback
 
-        fallback = stream.tell()
-        offset = self.get_offset(context)
-        start = offset if offset >= 0 else fallback
-
-        context._field = self
-        # Switch is applicable AFTER we parsed the first value
-        stream.seek(start)
-        try:
-            value = self.struct.__unpack__(stream, context)
-            if not self.has_flag(KEEP_POSITION):
-                stream.seek(fallback)
-        except StructException as exc:
-            # Any exception leads to a default value if configured
-            value = self.default
-            if value == INVALID_DEFAULT:
-                raise exc
-        # Update the position on the current context
-        context._pos = stream.tell()
+            context._field = self
+            # Switch is applicable AFTER we parsed the first value
+            stream.seek(start)
+            try:
+                value = self.struct.__unpack__(stream, context)
+                if not self.has_flag(F_KEEP_POSITION):
+                    stream.seek(fallback)
+            except StructException as exc:
+                # Any exception leads to a default value if configured
+                value = self.default
+                if value == INVALID_DEFAULT or isinstance(exc, ValidationError):
+                    raise exc
+            # Update the position on the current context
+            context._pos = stream.tell()
+        else:
+            # Context functions should be executed with top priority
+            value = self.struct(context)
 
         # unpack using switch
-        if self.options:
+        if self.options is not None:
             struct: _StructLike = self.get_struct(value, context)
             # The "keep_position" flag is not applicable here. Configure a field to keep the
             # position afterward.
+            context._value = value
             return struct.__unpack__(stream, context)
 
         return value
@@ -370,16 +381,24 @@ class Field(_StructLike):
         context._field = self
 
         # REVISIT: maybe check whether this stream supports .seek()
-        stream.seek(start)
+        has_offset = start != fallback
+        if has_offset:
+            stream = BytesIO()
+
         if not self.options:
             struct.__pack__(obj, stream, context)
         else:
             struct: _StructLike = self.get_struct(obj, context)
             struct.__pack__(obj, stream, context)
 
-        if not self.has_flag(KEEP_POSITION):
+        if not self.has_flag(F_KEEP_POSITION) and not has_offset:
             # The position shouldn't be persisted reset the stream
             stream.seek(fallback)
+
+        if has_offset:
+            # Place the stream into the internal offset map
+            raise NotImplemented
+
 
     def __size__(self, context: _ContextLike) -> int:
         """Calculates the size of this field.
@@ -401,7 +420,7 @@ class Field(_StructLike):
             return 0
 
         # 2. Next, dynamic fields does not store a size
-        if self.has_flag(DYNAMIC):
+        if self.has_flag(F_DYNAMIC):
             raise DynamicSizeError(f"Dynamic size at {context._path!r}.")
 
         context._field = self

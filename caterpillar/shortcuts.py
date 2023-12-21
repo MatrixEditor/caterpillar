@@ -15,10 +15,11 @@
 from ._base import pack, pack_file, pack_into
 from ._base import unpack, unpack_file
 from ._base import struct, union
-from ._base import DISCARD_CONST, DISCARD_UNNAMED, UNION, REPLACE_TYPES
 
-from .context import ContextPath
-from .byteorder import LittleEndian as le, BigEndian as be
+from .context import ContextPath, this, ctx
+from .byteorder import LittleEndian, BigEndian
 
-this = ContextPath("_obj")
-ctx = ContextPath()
+from . import options as opt
+
+
+

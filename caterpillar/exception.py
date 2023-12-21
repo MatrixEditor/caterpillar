@@ -51,3 +51,6 @@ class UnsupportedOperation(StructException):
 
 class InvalidValueError(StructException):
     pass
+
+class StreamError(StructException):
+    pass

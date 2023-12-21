@@ -17,10 +17,8 @@ from ._base import (
     Field,
     FieldMixin,
     FieldStruct,
-    KEEP_POSITION,
-    DYNAMIC,
-    SEQUENTIAL,
     INVALID_DEFAULT,
+    DEFAULT_OPTION
 )
 from .common import (
     FormatField,
@@ -31,6 +29,8 @@ from .common import (
     Enum,
     String,
     Bytes,
+    Computed,
+    CString,
     padding,
     char,
     boolean,

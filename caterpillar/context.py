@@ -23,6 +23,11 @@ from dataclasses import dataclass
 from caterpillar.abc import _ContextLambda, _ContextLike
 
 
+CTX_PARENT = "_parent"
+CTX_OBJECT = "_obj"
+CTX_STREAM = "_io"
+
+
 class Context(_ContextLike):
     """Represents a context object with attribute-style access."""
 
@@ -54,6 +59,13 @@ class Context(_ContextLike):
                 root = getattr(root, path[i])
 
             return root
+
+    def root(self) -> _ContextLike:
+        current = self
+        while CTX_PARENT in current:
+            # dict-like access is much faster
+            current = current[CTX_PARENT]
+        return current
 
 
 class ExprMixin:
@@ -134,8 +146,6 @@ class ExprMixin:
 
     def __rlshift__(self, other) -> ExprMixin:
         return BinaryExpression(operator.lshift, other, self)
-
-
 
     def __neg__(self) -> ExprMixin:
         return UnaryExpression("neg", operator.neg, self)
@@ -265,3 +275,7 @@ class ContextPath(ExprMixin, _ContextLambda):
         :return: A string representation of the path.
         """
         return self.path
+
+
+this = ContextPath(CTX_OBJECT)
+ctx = ContextPath()
