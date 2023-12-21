@@ -141,11 +141,11 @@ class Format:
 
 For more details on available endian encodings, refer to the [Python documentation on struct](https://docs.python.org/3/library/struct.html).
 
-## Condition `//` Modifier
+## Condition `//`
 
 *TODO*
 
-## Switch `>>` Modifier
+## Switch `>>`
 
 Implement a switch field using the right shift operator. It accepts a dictionary with the corresponding value-struct mapping or a context function:
 
@@ -162,7 +162,7 @@ class NIBValue:
     }
 ```
 
-## Offset `@` Modifier
+## Offset `@`
 
 Jump to specific addresses during processing with the `@` operator. Useful for nested structs and navigating within the binary data:
 
@@ -173,7 +173,7 @@ class NIBArchive:
     objects: NIBObject[this.header.object_count] @ this.header.offset_objects
 ```
 
-> ![CAUTION]
+> [!CAUTION]
 > If packing a very large object with offset-defined fields, consider using a temporary file to avoid excessive memory usage during processing. (set `use_tempfile` to True in `unpack`)
 
 ### Flags `|` and `^`
