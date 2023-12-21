@@ -187,6 +187,8 @@ float64 = FormatField("d", float)
 double = float64
 
 void_ptr = FormatField("P", int)
+unsigned = uint32
+signed = int32
 
 _ConstType = Union[str, bytes, Any]
 

@@ -13,29 +13,25 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import inspect
-import re
-import sys
 
 from tempfile import TemporaryFile
 from io import BytesIO, IOBase
 from typing import Optional, Union
-from typing import List, Dict, Any
-from typing import Set, Iterable
+from typing import Dict, Any, Iterable
 from collections import OrderedDict
 from dataclasses import dataclass
 
 from caterpillar.abc import (
     _StructLike,
-    _ContextLike,
     _StreamType,
     _ContainsStruct,
     _ContextLambda,
-    _StreamFactory,
+    _ContextLike,
     hasstruct,
     getstruct,
     STRUCT_FIELD,
 )
-from caterpillar.context import Context, CTX_OFFSETS
+from caterpillar.context import Context
 from caterpillar.byteorder import (
     SysNative,
     ByteOrder,
@@ -43,10 +39,8 @@ from caterpillar.byteorder import (
     BYTEORDER_FIELD,
     get_system_arch,
 )
-from caterpillar.exception import ValidationError, StructException
+from caterpillar.exception import ValidationError
 from caterpillar.options import (
-    S_DISCARD_CONST,
-    S_DISCARD_UNNAMED,
     S_EVAL_ANNOTATIONS,
     S_REPLACE_TYPES,
     S_UNION,
@@ -54,11 +48,13 @@ from caterpillar.options import (
     GLOBAL_STRUCT_OPTIONS,
     GLOBAL_UNION_OPTIONS,
 )
-from caterpillar.fields import *
+from caterpillar.fields import Field, INVALID_DEFAULT, ConstString, ConstBytes
+
+from ._base import Sequence
 
 
 @dataclass(init=False)
-class Struct(_StructLike):
+class Struct(Sequence):
     """
     Represents a structured data model for serialization and deserialization.
 
@@ -66,15 +62,6 @@ class Struct(_StructLike):
     :param order: Optional byte order for the fields in the structure.
     :param arch: Global architecture definition (will be inferred on all fields).
     :param options: Additional options specifying what to include in the final class.
-    """
-
-    fields: List[Field]
-    """A list of all fields defined in this struct.
-
-    This attribute stores the fields in an *ordered* collection, whereby ordered
-    means, relative to their initial class declaration position. These fields can
-    be modified using ``add_field``, ``del_field`` or the operators ``+`` and
-    ``-``.
     """
 
     model: type
@@ -86,26 +73,6 @@ class Struct(_StructLike):
     # An internal field that maps the field names of all class attributes to their
     # corresponding struct fields.
 
-    order: Optional[ByteOrder]
-    """
-    Optional configuration value for the byte order of a field.__annotations__
-    """
-
-    arch: Optional[Arch]
-    """
-    Global architecture definition (will be inferred on all fields)
-    """
-
-    options: Set[Flag]
-    """
-    Additional options specifying what to include in the final class.
-    """
-
-    field_options: Set[Flag]
-    """
-    Global field flags that will be applied on all fields.
-    """
-
     def __init__(
         self,
         model: type,
@@ -115,58 +82,18 @@ class Struct(_StructLike):
         field_options: Iterable[Flag] = None,
     ) -> None:
         self.model = model
-        self.arch = arch
-        self.order = order
-        self.options = set(options or [])
+        super().__init__(
+            order=order, arch=arch, options=options, field_options=field_options
+        )
         # Add additional options based on the struct's type
         self.options.update(
             GLOBAL_UNION_OPTIONS if self.is_union() else GLOBAL_STRUCT_OPTIONS
         )
-        self.field_options = set(field_options or [])
-
-        # these fields will be set or used while processing the model type
-        self._member_map_ = {}
-        self.fields: List[Field] = []
         # Process all fields in the model
         self._process_model()
         self.model = dataclass(self.model, kw_only=True)
         setattr(self.model, STRUCT_FIELD, self)
         setattr(self.model, "__class_getitem__", lambda dim: Field(self, amount=dim))
-
-    def is_union(self) -> bool:
-        """
-        Check if the struct is a union.
-
-        :return: True if the struct is a union, else False.
-        """
-        return self.has_option(S_UNION)
-
-    def has_option(self, option: Flag) -> bool:
-        """
-        Check if the struct has a specific option.
-
-        :param option: The option to check.
-        :return: True if the struct has the specified option, else False.
-        """
-        return option in self.options
-
-    def _included(self, name: str, default: Optional[Any]) -> bool:
-        """
-        Check if a field with the given name should be included.
-
-        :param name: The name of the field.
-        :param default: The default value of the field.
-        :return: True if the field should be included, else False.
-        """
-        if self.has_option(S_DISCARD_UNNAMED):
-            if re.match(r"^_[0-9]*$", name):
-                return False
-
-        if self.has_option(S_DISCARD_CONST):
-            if default != INVALID_DEFAULT:
-                return False
-
-        return True
 
     def _process_model(self) -> None:
         """
@@ -174,7 +101,6 @@ class Struct(_StructLike):
         """
         eval_str = self.has_option(S_EVAL_ANNOTATIONS)
         # The why is desribed in detail here: https://docs.python.org/3/howto/annotations.html
-        #
         annotations = inspect.get_annotations(self.model, eval_str=eval_str)
 
         removables = []
@@ -218,7 +144,7 @@ class Struct(_StructLike):
 
         order = getattr(annotation, BYTEORDER_FIELD, self.order or SysNative)
         arch = self.arch or get_system_arch()
-
+        # TODO: register factories
         if isinstance(annotation, Field):
             field = annotation
         elif isinstance(annotation, _StructLike):
@@ -232,7 +158,6 @@ class Struct(_StructLike):
                 struct = getstruct(annotation)
             else:
                 struct = Struct(annotation, order=self.order, arch=self.arch)
-            # TODO: handle ENUM types
         elif isinstance(annotation, str):
             struct = ConstString(annotation)
         elif isinstance(annotation, bytes):
@@ -254,168 +179,12 @@ class Struct(_StructLike):
         field.flags.update(self.field_options)
         return field
 
-    def add_field(self, name: str, field: Field, included: bool = False) -> None:
-        """
-        Add a field to the struct.
-
-        :param name: The name of the field.
-        :param field: The field to add.
-        :param included: True if the field should be included, else False.
-        """
-        self.fields.append(field)
-        setattr(field, "__name__", name)
-        if included:
-            self._member_map_[name] = field
-
-    # I/O operations
-    def __size__(self, context: _ContextLike) -> int:
-        """
-        Get the size of the struct.
-
-        :param context: The context of the struct.
-        :return: The size of the struct.
-        """
-        sizes = []
-        base_path = context._path
-        for field in self.fields:
-            context._path = ".".join([base_path, field.get_name()])
-            sizes.append(field.__size__(context))
-
-        return max(sizes) if self.is_union() else sum(sizes)
-
     def unpack_one(self, stream: _StreamType, context: _ContextLike) -> Optional[Any]:
-        # At first, we define the object context where the parsed values
-        # will be stored
-        init_data: Dict[str, Any] = {}
-        context._obj = Context(_parent=context)
+        init_data = super().unpack_one(stream, context)
+        return self.model(**init_data)
 
-        base_path = context._path
-        start = stream.tell()
-        max_size = 0
-
-        for field in self.fields:
-            pos = stream.tell()
-            name = field.get_name()
-            # The context path has to be changed accordingly
-            context._path = ".".join([base_path, name])
-            result = field.__unpack__(stream, context)
-            # the object's data shouldn't include removed fields
-            context._obj[name] = result
-            if name in self._member_map_:
-                init_data[name] = result
-
-            if self.is_union():
-                # This union implementation will cover the max size
-                max_size = max(max_size, stream.tell() - pos)
-                stream.seek(start)
-
-        # As referenced above, we can simply pass all fields here, because we've eliminated
-        # all default values to enable required field definitions AFTER optional fields with
-        # default values have been defined.
-        obj = self.model(**init_data)
-        if self.is_union():
-            # Reset the stream position
-            stream.seek(start + max_size)
-        return obj
-
-    def __unpack__(self, stream: _StreamType, context: _ContextLike) -> Optional[Any]:
-        """
-        Unpack the struct from the stream.
-
-        :param stream: The stream to unpack from.
-        :param context: The context of the struct.
-        :return: The unpacked object.
-        """
-        base_path = context._path
-        this_context = Context(_parent=context, _io=stream, _path=base_path)
-        # See __pack__ for more information
-        field: Optional[Field] = context.get("_field")
-        if field and field.is_seq():
-            length: int = field.length(context)  # use parent context here
-            values = []  # always list (maybe add factory)
-
-            this_context._length = length
-            this_context._lst = values
-            this_context._field = field
-            # REVISIT: add _pos to context
-            for i in range(length):
-                this_context._index = i
-                if self.model.__name__ == "NIBValue":
-                    pass
-                value = self.unpack_one(stream, this_context)
-                values.append(value)
-            return values
-
-        return self.unpack_one(stream, this_context)
-
-    def pack_one(self, obj: Any, stream: _StreamType, context: _ContextLike) -> None:
-        is_union = self.is_union()
-        max_size = 0
-        union_field: Optional[_StructLike] = None
-        base_path: str = context._path
-
-        for field in self.fields:
-            # The name has to be set (important for current context)
-            name = field.get_name()
-            if name is None:
-                raise StructException(f"Could not measure a field's name: {field!r}")
-
-            if is_union:
-                # Union is only applicable for non-dynamic structs
-                size: int = field.__size__(context)
-                if size > max_size:
-                    max_size = size
-                    union_field = field
-            else:
-                # Default behaviour: let the field write its content to the stream.
-                context._path = ".".join([base_path, name])
-                if name in self._member_map_:
-                    value = getattr(obj, name, None)
-                else:
-                    # REVISIT: this line might not be necessary if const fields alredy
-                    # use their internal value.
-                    value = field.default if field.default != INVALID_DEFAULT else None
-                field.__pack__(value, stream, context)
-
-        if is_union:
-            if union_field is None:
-                raise StructException(
-                    f"Invalid union config: no fields declared! path={context._path!r}"
-                )
-
-            name = union_field.get_name()
-            context._path = ".".join([base_path, "<value>"])
-            # REVISIT: are constant values allowed here? + name validation?
-            union_field.__pack__(getattr(obj, name), stream, context)
-
-    def __pack__(self, obj: Any, stream: _StreamType, context: _ContextLike) -> None:
-        # REVISIT: code cleanup
-        base_path = context._path
-        this_context = Context(_parent=context, _io=stream, _path=base_path, _obj=obj)
-        max_size = 0
-
-        is_union = self.is_union()
-        # As structs can be used in field definitions a field will call this struct
-        # and could potentially be a sequence. Therefore, we have to check whether we
-        # should unpack multiple objects.
-        field: Optional[Field] = context.get("_field")
-        if field and field.is_seq():
-            # Treat the 'obj' as a sequence/iterable
-            if not isinstance(obj, Iterable):
-                raise TypeError(f"Expected iterable sequence, got {type(obj)}")
-
-            data = list(obj)
-            this_context._length = len(data)
-            this_context._field = field
-            for i, elem in enumerate(data):
-                # The path will contain an additional hint on what element is processed
-                # at the moment.
-                this_context._index = i
-                this_context._path = ".".join([base_path, str(i)])
-                this_context._obj = elem
-                self.pack_one(elem, stream, this_context)
-        else:
-            self.pack_one(obj, stream, this_context)
+    def get_value(self, obj: Any, name: str, field: Field) -> Optional[Any]:
+        return getattr(obj, name, None)
 
 
 def _make_struct(
@@ -546,9 +315,7 @@ def pack_into(
     """
 
     offsets: Dict[int, memoryview] = OrderedDict()
-    context = Context(
-        _parent=None, _path="<root>", _pos=0, _offsets=offsets, **kwds
-    )
+    context = Context(_parent=None, _path="<root>", _pos=0, _offsets=offsets, **kwds)
     if struct is None:
         struct = getstruct(obj)
 

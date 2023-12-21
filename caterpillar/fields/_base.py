@@ -127,6 +127,11 @@ class Field(_StructLike):
     The configured default value.
     """
 
+    bits: Union[_ContextLambda, int, None]
+    """
+    The configured amount of bits this field takes.
+    """
+
     def __init__(
         self,
         struct: Union[_StructLike, _ContextLambda],
@@ -138,12 +143,14 @@ class Field(_StructLike):
         condition: Union[_ContextLambda, bool] = True,
         arch: Arch = None,
         default: Optional[Any] = INVALID_DEFAULT,
+        bits: Union[_ContextLambda, int, None] = None,
     ) -> None:
         # NOTE: we use a custom init method to automatically set flags
         self.struct = struct
         self.order = order
         self.flags = flags or set([F_KEEP_POSITION])
         self.flags.update(GLOBAL_FIELD_FLAGS)
+        self.bits = bits
 
         self.arch = arch or get_system_arch()
         # this will unset KEEP_POSITION if configured
@@ -202,6 +209,11 @@ class Field(_StructLike):
     def __floordiv__(self, condition: Union[_ContextLambda, bool]) -> Self:
         self._verify_context_value(condition, bool)
         self.condition = condition
+        return self
+
+    def __rsub__(self, bits: Union[_ContextLambda, int]) -> Self:
+        self._verify_context_value(bits, int)
+        self.bits = bits
         return self
 
     def is_seq(self) -> bool:
@@ -476,6 +488,9 @@ class FieldMixin:
 
     def __set_byteorder__(self, order: ByteOrder) -> Field:
         return Field(self, order=order)
+
+    def __rsub__(self, bits: Union[_ContextLambda, int]) -> Field:
+        return Field(self, byteorder(self), bits=bits)
 
 
 class FieldStruct(FieldMixin, _StructLike):

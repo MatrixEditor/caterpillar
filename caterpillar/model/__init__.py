@@ -12,14 +12,14 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-from .model import pack, pack_file, pack_into
-from .model import unpack, unpack_file
-from .model import struct, union
-
-from .context import ContextPath, this, ctx
-from .byteorder import LittleEndian, BigEndian
-
-from . import options as opt
-
-
-
+from ._base import Sequence
+from ._struct import (
+    Struct,
+    struct,
+    union,
+    unpack,
+    unpack_file,
+    pack,
+    pack_into,
+    pack_file,
+)
