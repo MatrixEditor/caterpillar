@@ -24,6 +24,8 @@ from caterpillar.abc import (
     _StreamType,
     _ContextLambda,
     _EnumLike,
+    _GreedyType,
+    isgreedy,
 )
 from caterpillar.exception import ValidationError, UnsupportedOperation, StructException
 
@@ -100,7 +102,10 @@ class FormatField(FieldStruct):
         :param stream: The output stream.
         :param context: The current context.
         """
-        self.pack_single(seq, stream, context)
+        if not isgreedy(context._field.length(context)):
+            self.pack_single(seq, stream, context)
+        else:
+            super().pack_seq(seq, stream, context)
 
     def unpack_single(self, stream: _StreamType, context: _ContextLike) -> Any:
         """
@@ -110,18 +115,20 @@ class FormatField(FieldStruct):
         :param context: The current context.
         :return: The unpacked value.
         """
-        length = context._field.length(context)
-        if length == 0 and context._field.is_seq():
+        field: Field = context._field
+        length = field.length(context)
+        if length == 0 and field.is_seq():
             # REVISIT: maybe add factory here
             return []
 
-        fmt = self.get_format(context, length or 1)
+        greedy = isgreedy(length)
+        fmt = self.get_format(context, length or 1 if not greedy else 1)
         try:
             value = unpack(fmt, stream.read(calcsize(fmt)))
         except ValueError as exc:
             raise StructException(f"unpack() - Error at {context._path}") from exc
 
-        if not context._field.is_seq():
+        if not field.is_seq() or greedy:
             if len(value) == 0:
                 value = None
             else:
@@ -137,7 +144,10 @@ class FormatField(FieldStruct):
         :param context: The current context.
         :return: A list of unpacked values.
         """
-        return list(self.unpack_single(stream, context))
+        if not isgreedy(context._field.length(context)):
+            return list(self.unpack_single(stream, context))
+        else:
+            return super().unpack_seq(stream, context)
 
     def get_format(self, context: _ContextLike, length: int = None) -> str:
         """
@@ -151,6 +161,8 @@ class FormatField(FieldStruct):
         order = field.order
         if length is None:
             dim = field.length(context) or 1
+            if isgreedy(dim):
+                dim = 1
         else:
             dim = length
         return f"{order.ch}{dim}{self.text}"

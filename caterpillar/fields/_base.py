@@ -14,6 +14,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from __future__ import annotations
 
+import itertools
+
 from dataclasses import dataclass, field
 from abc import abstractmethod
 from typing import Self, Union, Set, Any, Dict, Optional, Iterable, List
@@ -24,9 +26,11 @@ from caterpillar.abc import (
     _Switch,
     _StreamType,
     _ContextLike,
+    _GreedyType,
     hasstruct,
     getstruct,
     typeof,
+    isgreedy,
 )
 from caterpillar.byteorder import ByteOrder, SysNative, Arch, get_system_arch, byteorder
 from caterpillar.exception import (
@@ -42,7 +46,6 @@ from caterpillar.options import (
     F_DYNAMIC,
     F_KEEP_POSITION,
     F_SEQUENTIAL,
-    F_OFFSET_OVERRIDE,
     Flag,
 )
 
@@ -98,7 +101,7 @@ class Field(_StructLike):
         An automatic flag that indicates this field stores a sequential struct.
     """
 
-    amount: Union[_ContextLambda, int]
+    amount: Union[_ContextLambda, int, _GreedyType]
     """
     A constant or dynamic value to represent the amount of structs. Zero indicates
     there are no sequence types associated with this field.
@@ -192,8 +195,8 @@ class Field(_StructLike):
             self.flags.remove(F_KEEP_POSITION)
         return self
 
-    def __getitem__(self, dim: Union[_ContextLambda, int]) -> Self:
-        self._verify_context_value(dim, int)
+    def __getitem__(self, dim: Union[_ContextLambda, int, _GreedyType]) -> Self:
+        self._verify_context_value(dim, (_GreedyType, int))
         self.amount = dim
         if self.amount != 0:
             self.flags.add(F_SEQUENTIAL)
@@ -244,17 +247,17 @@ class Field(_StructLike):
         """
         return flag in self.flags
 
-    def length(self, context: _ContextLike) -> None:
+    def length(self, context: _ContextLike) -> Union[int, _GreedyType]:
         """Calculates the sequence length of this field.
 
         :param context: the context on which to operate
         :type context: _ContextLike
         :raises DynamicSizeError: if this field has a dynamic size
         :return: the number of elements
-        :rtype: int
+        :rtype: Union[int, _GreedyType]
         """
         try:
-            if isinstance(self.amount, int):
+            if isinstance(self.amount, (int, _GreedyType)):
                 return self.amount
 
             return self.amount(context)
@@ -454,6 +457,8 @@ class Field(_StructLike):
         count = 1
         if self.is_seq():
             count = self.length(context)
+            if isinstance(count, _GreedyType):
+                raise DynamicSizeError("Greedy field does not have a fixed size!")
 
         size = self.struct.__size__(context)
         return count * size
@@ -577,13 +582,16 @@ class FieldStruct(FieldMixin, _StructLike):
             _parent=context, _io=stream, _length=count, _lst=values, _field=field
         )
         seq._pos = stream.tell()
-        for i in range(count):
-            seq._index = i
-            value = self.unpack_single(stream, seq)
-            # TODO: maybe add callback handler here
-            values.append(value)
-            seq._pos = stream.tell()
-
+        is_greedy = isgreedy(count)
+        for i in range(count) if not is_greedy else itertools.count():
+            try:
+                seq._index = i
+                values.append(self.unpack_single(stream, seq))
+                seq._pos = stream.tell()
+            except Exception as exc:
+                if is_greedy:
+                    break
+                raise StructException from exc
         return values
 
     # implementation

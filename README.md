@@ -6,7 +6,7 @@
 ![Status](https://img.shields.io:/static/v1?label=Status&message=🚧&color=teal)
 
 > [!WARNING]
-> This project is stell in beta/testing phase. Expect bugs and errors while using this
+> This project is stell in beta/testing phase. Expect bugs, naming changes and errors while using this
 > library.
 
 Caterpillar is a Python 3.12+ library to pack and unpack structurized binary data. It
@@ -77,7 +77,7 @@ file format only using python classes. *It has never been easier!*
         # Other structs can be referenced as simple as this
         header: NIBHeader
 
-        # All following field is marked with '@': The parser will jump temporarily
+        # this field is marked with '@': The parser will jump temporarily
         # to the position specified after the operator. Use | F_KEEP_POSITION to
         # continue parsing from the resulting position
         # --- other fields snipped out ---

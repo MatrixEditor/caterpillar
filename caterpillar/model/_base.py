@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import re
+import itertools
 
 from typing import Optional, Callable
 from typing import List, Dict, Any
@@ -24,7 +25,7 @@ from caterpillar.abc import (
     _ContextLike,
     _StreamType,
     getstruct,
-    hasstruct,
+    _GreedyType,
     _ContextLambda,
 )
 from caterpillar.context import Context
@@ -44,6 +45,7 @@ from caterpillar.options import (
     Flag,
 )
 from caterpillar.fields import Field, INVALID_DEFAULT, ConstBytes, ConstString
+
 
 @dataclass(init=False)
 class Sequence(_StructLike):
@@ -308,6 +310,7 @@ class Sequence(_StructLike):
         :return: The unpacked object.
         """
         base_path = context._path
+        # REVISIT: the name 'this_context' is misleading here
         this_context = Context(_parent=context, _io=stream, _path=base_path)
         # See __pack__ for more information
         field: Optional[Field] = context.get("_field")
@@ -318,11 +321,16 @@ class Sequence(_StructLike):
             this_context._length = length
             this_context._lst = values
             this_context._field = field
-            # REVISIT: add _pos to context
-            for i in range(length):
-                this_context._index = i
-                value = self.unpack_one(stream, this_context)
-                values.append(value)
+            # REVISIT: add _pos to context AND this code should be shipped to a general method
+            is_greedy = isinstance(length, _GreedyType)
+            for i in range(length) if not is_greedy else itertools.count():
+                try:
+                    this_context._index = i
+                    values.append(self.unpack_one(stream, this_context))
+                except Exception as exc:
+                    if is_greedy:
+                        break
+                    raise StructException from exc
             return values
 
         return self.unpack_one(stream, this_context)

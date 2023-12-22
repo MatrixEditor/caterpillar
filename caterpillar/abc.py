@@ -22,6 +22,7 @@ from typing import Dict, Any, Optional, Union, Callable
 _StreamType = IOBase
 _StreamFactory = Callable[[], _StreamType]
 
+_GreedyType = type(...)
 
 class _ContextLike(dict):
     """
@@ -166,3 +167,7 @@ def typeof(struct: Union[_StructLike, _ContainsStruct]) -> type:
         return Any
     # this function must return a type
     return __type__() or Any
+
+
+def isgreedy(obj) -> bool:
+    return isinstance(obj, _GreedyType)
