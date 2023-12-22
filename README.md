@@ -23,52 +23,87 @@ pip install git+https://github.com/MatrixEditor/caterpillar.git
 
 ## Starting Point
 
-Let's start off with a simple example: Consider we wan't do define our own file format
-that stores blobs of data. We can simply re-create the structure of our file format
-using python classes:
+Let's start off with a simple example (The full code is available in the `examples/` directory):
+Write a parser for the [NIBArchive](https://github.com/matsmattsson/nibsqueeze/blob/master/NibArchive.md)
+file format only using python classes. *It has never been easier!*
 
-```python
-from caterpillar.shortcuts import struct, be, this
-from caterpillar.fields import * #(0)
+1. Step: Create the header struct
+    ```python
+    from caterpillar.fields import *
+    from caterpillar.shortcuts import struct, LittleEndian
 
-@struct
-class Image:
-    signature: b'HDR'        # (1)
-    length: be + uint16      # (2), be := BigEndian
-    data: Bytes(this.length) # (3)
-```
+    @struct(order=LittleEndian)
+    class NIBHeader:
+        # Here we define a constant value, which will raise an exception
+        # upon a different parsed value.
+        magic: b"NIBArchive"
 
-* **(0)**:
-    A wildcard import should be used if there would be too many single imports
+        # Primitive types can be used just like this
+        unknown_1: int32
+        unknown_2: int32
+        # ...
+        value_count: int32
+        offset_values: int32
+        # --- other fields omitted ---
+    ```
 
-* **(1)**:
-    As this library uses annotations to define the struct's we can use a constant
-    value mark this field as a constant.
+2. Step: We want to parse all values, so let's to define its corresponding struct:
+    ```python
+    @struct(order=LittleEndian)
+    class NIBValue:
+        key: VarInt
+        # NOTE the use of a default value; otherwise None would be set.
+        type: Enum(ValueType, uint8, ValueType.UNKNOWN)
+        # The field below describes a simple switch-case structure.
+        value: Field(this.type) >> {
+            ValueType.INT8: int8,
+            ValueType.INT16: int16,
+            # --- other options ---
+            ValueType.OBJECT_REF: int32,
+            # The following line shows how to manually return the parsed value (in
+            # this case it would be the result of this.type). NOTE that the value
+            # is only stored temporarily in the current context (not this-context).
+            #
+            # If this option is not specified and none of the above matched the input,
+            # an exception will be thrown.
+            DEFAULT_OPTION: Computed(ctx._value),
+        }
+    ```
 
-    > [!TIP]
-    > Only ``bytes``, ``str`` values can be assigned to constant fields (**currently**)
+3. Step: Define the final file structure
+    ```python
+    @struct(order=LittleEndian)
+    class NIBArchive:
+        # Other structs can be referenced as simple as this
+        header: NIBHeader
 
-* **(2)**:
-    All integer types are defined without any endian configuration. You can simply add
-    an endian type which may impact the way the field's value will be unpacked from the
-    data stream.
+        # All following field is marked with '@': The parser will jump temporarily
+        # to the position specified after the operator. Use | F_KEEP_POSITION to
+        # continue parsing from the resulting position
+        # --- other fields snipped out ---
+        values: NIBValue[this.header.value_count] @ this.header.offset_values
+    ```
 
-* **(3)**:
-    Using the struct ``Bytes`` together with a context lambda, we can define a dynamic
-    sized struct. Note that the size can't be calculated of this class.
+4. Step: pack and unpack files
+    ```python
+    from caterpillar.shortcuts import pack_file, unpack_file
 
-This class can be used to pack and unpack data directly:
-```python
-from caterpillar.shortcuts import pack, unpack
+    # parse files
+    obj: NIBArchive = unpack_file(NIBArchive, "/path/to/file.nib")
+    # pack files: Note the use of 'use_tempfile' here. It will first
+    # write everything into a temporary file and ceopy it later on.
+    pack_file(obj, "/path/to/destination.nib", use_tempfile=True)
+    ```
 
-obj = Image(length=10, data=[i for i in range(10)])
-data = pack(obj)
-obj: Image = unpack(Image, data)
-```
 
-### Options
+## Other Approaches
 
-*TODO*
+A list of similar approaches to parsing structured binary data with Python can be taken from below:
+
+* [construct](https://github.com/construct/construct)
+* [kaitai_struct](https://github.com/kaitai-io/kaitai_struct)
+* [hachoir](https://hachoir.readthedocs.io/en/latest/)
+* [mrcrowbar](https://github.com/moralrecordings/mrcrowbar)
 
 ## License
 

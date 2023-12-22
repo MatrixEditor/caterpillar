@@ -206,7 +206,7 @@ class Transformer(FieldStruct):
         :param struct: The _StructLike object to be wrapped.
         """
         self.struct = struct
-        self.__bits__ = self.struct.__bits__
+        self.__bits__ = getattr(self.struct, "__bits__", None)
 
     def __type__(self) -> type:
         """
@@ -510,7 +510,7 @@ class CString(Bytes):
         """
         length = self.__size__(context)
         obj_length = len(obj)
-        payload = obj.encode(self.encoding) + b"\x00"*(length - obj_length)
+        payload = obj.encode(self.encoding) + b"\x00" * (length - obj_length)
         super().pack_single(payload, stream, context)
 
     def unpack_single(self, stream: _StreamType, context: _ContextLike) -> Any:
@@ -578,6 +578,7 @@ class Computed(FieldStruct):
     def unpack_single(self, stream: _StreamType, context: _ContextLike) -> None:
         # No need for an implementation
         pass
+
 
 class Pass(FieldStruct):
     def __type__(self) -> type:

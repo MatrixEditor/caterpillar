@@ -14,33 +14,44 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import re
 
-from typing import Optional
+from typing import Optional, Callable
 from typing import List, Dict, Any
-from typing import Set, Iterable
+from typing import Set, Iterable, Union
 from dataclasses import dataclass
 
 from caterpillar.abc import (
     _StructLike,
     _ContextLike,
     _StreamType,
+    getstruct,
+    hasstruct,
+    _ContextLambda,
 )
 from caterpillar.context import Context
 from caterpillar.byteorder import (
     ByteOrder,
     Arch,
+    get_system_arch,
+    BYTEORDER_FIELD,
+    SysNative,
 )
-from caterpillar.exception import StructException
+from caterpillar.exception import StructException, ValidationError
 from caterpillar.options import (
     S_DISCARD_CONST,
     S_DISCARD_UNNAMED,
     S_UNION,
+    S_REPLACE_TYPES,
     Flag,
 )
-from caterpillar.fields import Field, INVALID_DEFAULT
-
+from caterpillar.fields import Field, INVALID_DEFAULT, ConstBytes, ConstString
 
 @dataclass(init=False)
 class Sequence(_StructLike):
+    model: Any
+    """
+    Specifies the target class/dictionary used as the base model.
+    """
+
     fields: List[Field]
     """A list of all fields defined in this struct.
 
@@ -72,22 +83,23 @@ class Sequence(_StructLike):
 
     def __init__(
         self,
-        fields: Optional[Dict[str, Field]] = None,
+        model: Optional[Dict[str, Field]] = None,
         order: Optional[ByteOrder] = None,
         arch: Optional[Arch] = None,
         options: Iterable[Flag] = None,
         field_options: Iterable[Flag] = None,
     ) -> None:
+        self.model = model
         self.arch = arch
         self.order = order
         self.options = set(options or [])
         self.field_options = set(field_options or [])
 
         # these fields will be set or used while processing the model type
-        self._member_map_ = fields or {}
-        self.fields: List[Field] = list((fields or {}).values())
+        self._member_map_: Dict[str, Field] = {}
+        self.fields: List[Field] = []
         # Process all fields in the model
-        self._process_fields()
+        self._process_model()
 
     def has_option(self, option: Flag) -> bool:
         """
@@ -116,8 +128,108 @@ class Sequence(_StructLike):
 
         return True
 
-    def _process_fields(self) -> None:
+    def _set_default(self, name: str, value: Any) -> None:
         pass
+
+    def _replace_type(self, name: str, type_: type) -> None:
+        pass
+
+    def _remove_from_model(self, name: str) -> None:
+        pass
+
+    def _process_model(self) -> None:
+        """
+        Process all fields in the model.
+        """
+        removables = []
+        annotations = self._prepare_fields()
+        for name, annotation in annotations.items():
+            # Process each field and its annotation. In addition, fields with a name in
+            # the form of '_[0-9]*' will be removed (if enabled)
+            default = getattr(self.model, name, INVALID_DEFAULT)
+            # constant values that are not in the form of fields, structs or types should
+            # be wrapped into constant values. For more information, see _process_field
+            if isinstance(annotation, bytes):
+                default = annotation
+                self._set_default(name, default)
+
+            is_included = self._included(name, default, annotation)
+            if not is_included:
+                removables.append(name)
+
+            field = self._process_field(name, annotation, default)
+            # we call add_field to safely add the created field
+            self.add_field(name, field, is_included)
+            if self.has_option(S_REPLACE_TYPES):
+                # This way we re-annotate all fields in the current model
+                self._replace_type(name, field.get_type())
+
+        for name in removables:
+            self._remove_from_model(name)
+
+    def _prepare_fields(self) -> Dict[str, Any]:
+        return self.model
+
+    def _process_annotation(
+        self, annotation: Any, default: Optional[Any], order: ByteOrder, arch: Arch
+    ) -> Union[_StructLike, Field]:
+        match annotation:
+            case Field():
+                return annotation
+            # As Field is a direct subclass of _StructLike, we have to put this check
+            # below this one.
+            case _StructLike():
+                return Field(annotation, order, arch=arch, default=default)
+            case type():
+                return getstruct(annotation)
+            case str():
+                return ConstString(annotation)
+            case bytes():
+                return ConstBytes(annotation)
+            case _ContextLambda():
+                return annotation
+            case dict():
+                # anonymous inner sequence
+                return Sequence(model=annotation, order=self.order, arch=self.arch)
+            case _:
+                # callables are treates as context lambdas
+                if callable(annotation):
+                    return annotation
+
+    def _process_field(
+        self, name: str, annotation: Any, default: Optional[Any]
+    ) -> Field:
+        """
+        Process a field in the model.
+
+        :param name: The name of the field.
+        :param annotation: The annotation of the field.
+        :param default: The default value of the field.
+        :return: The processed field.
+        """
+        field: Field = None
+        struct: _StructLike = None
+
+        order = getattr(annotation, BYTEORDER_FIELD, self.order or SysNative)
+        arch = self.arch or get_system_arch()
+        result = self._process_annotation(annotation, default, order, arch)
+        if isinstance(result, Field):
+            field = result
+        else:
+            struct = result
+
+        if struct is not None:
+            field = Field(struct, order, arch=arch, default=default)
+
+        if field is None:
+            raise ValidationError(
+                f"Field {name!r} could not be created: {annotation!r}"
+            )
+        field.default = default
+        field.order = self.order or field.order
+        field.arch = self.arch or field.arch
+        field.flags.update(self.field_options)
+        return field
 
     def add_field(self, name: str, field: Field, included: bool = False) -> None:
         """

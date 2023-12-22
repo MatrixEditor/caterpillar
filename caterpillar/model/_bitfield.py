@@ -147,7 +147,6 @@ class Bitfield(Struct):
             elif annotation == 1:
                 struct = boolean
             if annotation != 0:
-                pos = self._abs_bit_pos + annotation
                 width = annotation
             else:
                 # Special case: a zero indicates we have to start a new byte. To
@@ -302,7 +301,7 @@ class Bitfield(Struct):
                     raise DelegationError(
                         f"Field {name!r} does not support to-int conversio!"
                     ) from exc
-            # REVISIT: is this cheating?`
+            # REVISIT: is this cheating?
             stream.write(value.to_bytes(group.size // 8, byteorder=order))
 
 def _make_bitfield(

@@ -26,35 +26,24 @@ from caterpillar.abc import (
     _StructLike,
     _StreamType,
     _ContainsStruct,
-    _ContextLambda,
     _ContextLike,
     hasstruct,
     getstruct,
     STRUCT_FIELD,
 )
 from caterpillar.context import Context
-from caterpillar.byteorder import (
-    SysNative,
-    ByteOrder,
-    Arch,
-    BYTEORDER_FIELD,
-    get_system_arch,
-)
-from caterpillar.exception import ValidationError
+from caterpillar.byteorder import ByteOrder, Arch
 from caterpillar.options import (
     S_EVAL_ANNOTATIONS,
-    S_REPLACE_TYPES,
     S_UNION,
     Flag,
     GLOBAL_STRUCT_OPTIONS,
     GLOBAL_UNION_OPTIONS,
 )
-from caterpillar.fields import Field, INVALID_DEFAULT, ConstString, ConstBytes
-
+from caterpillar.fields import Field
 from ._base import Sequence
 
 
-@dataclass(init=False)
 class Struct(Sequence):
     """
     Represents a structured data model for serialization and deserialization.
@@ -63,11 +52,6 @@ class Struct(Sequence):
     :param order: Optional byte order for the fields in the structure.
     :param arch: Global architecture definition (will be inferred on all fields).
     :param options: Additional options specifying what to include in the final class.
-    """
-
-    model: type
-    """
-    Specifies the target class used as the base model.
     """
 
     # _member_map_: Dict[str, Field]
@@ -82,103 +66,34 @@ class Struct(Sequence):
         options: Iterable[Flag] = None,
         field_options: Iterable[Flag] = None,
     ) -> None:
-        self.model = model
         super().__init__(
-            order=order, arch=arch, options=options, field_options=field_options
+            model=model,
+            order=order,
+            arch=arch,
+            options=options,
+            field_options=field_options,
         )
         # Add additional options based on the struct's type
         self.options.update(
             GLOBAL_UNION_OPTIONS if self.is_union() else GLOBAL_STRUCT_OPTIONS
         )
-        # Process all fields in the model
-        self._process_model()
         self.model = dataclass(self.model, kw_only=True)
         setattr(self.model, STRUCT_FIELD, self)
         setattr(self.model, "__class_getitem__", lambda dim: Field(self, amount=dim))
 
-    def _process_model(self) -> None:
-        """
-        Process all fields in the model.
-        """
+    def _prepare_fields(self) -> Dict[str, Any]:
         eval_str = self.has_option(S_EVAL_ANNOTATIONS)
         # The why is desribed in detail here: https://docs.python.org/3/howto/annotations.html
-        annotations = inspect.get_annotations(self.model, eval_str=eval_str)
+        return inspect.get_annotations(self.model, eval_str=eval_str)
 
-        removables = []
-        for name, annotation in annotations.items():
-            # Process each field and its annotation. In addition, fields with a name in
-            # the form of '_[0-9]*' will be removed (if enabled)
-            default = getattr(self.model, name, INVALID_DEFAULT)
-            # constant values that are not in the form of fields, structs or types should
-            # be wrapped into constant values. For more information, see _process_field
-            if isinstance(annotation, bytes):
-                default = annotation
-                setattr(self.model, name, default)
+    def _set_default(self, name: str, value: Any) -> None:
+        setattr(self.model, name, value)
 
-            is_included = self._included(name, default, annotation)
-            if not is_included:
-                removables.append(name)
+    def _replace_type(self, name: str, type_: type) -> None:
+        self.model.__annotations__[name] = type_
 
-            field = self._process_field(name, annotation, default)
-            # we call add_field to safely add the created field
-            self.add_field(name, field, is_included)
-            if self.has_option(S_REPLACE_TYPES):
-                # This way we re-annotate all fields in the current model
-                self.model.__annotations__[name] = field.get_type()
-
-        for name in removables:
-            self.model.__annotations__.pop(name)
-
-    def _process_field(
-        self, name: str, annotation: Any, default: Optional[Any]
-    ) -> Field:
-        """
-        Process a field in the model.
-
-        :param name: The name of the field.
-        :param annotation: The annotation of the field.
-        :param default: The default value of the field.
-        :return: The processed field.
-        """
-        field: Field = None
-        struct: _StructLike = None
-
-        order = getattr(annotation, BYTEORDER_FIELD, self.order or SysNative)
-        arch = self.arch or get_system_arch()
-        # TODO: register factories
-        if isinstance(annotation, Field):
-            field = annotation
-        elif isinstance(annotation, _StructLike):
-            # As Field is a direct subclass of _StructLike, we have to put this check
-            # below this one.
-            field = Field(annotation, order, arch=arch, default=default)
-        elif isinstance(annotation, type):
-            # types should be handled separately
-            struct: _StructLike = None
-            if hasstruct(annotation):
-                struct = getstruct(annotation)
-            else:
-                struct = Struct(annotation, order=self.order, arch=self.arch)
-        elif isinstance(annotation, str):
-            struct = ConstString(annotation)
-        elif isinstance(annotation, bytes):
-            struct = ConstBytes(annotation)
-        elif isinstance(annotation, _ContextLambda):
-            struct = annotation
-
-        if struct is not None:
-            field = Field(struct, order, arch=arch, default=default)
-
-        if field is None:
-            raise ValidationError(
-                f"Field {name!r} could not be created: {annotation!r}"
-            )
-
-        field.default = default
-        field.order = self.order or field.order
-        field.arch = self.arch or field.arch
-        field.flags.update(self.field_options)
-        return field
+    def _remove_from_model(self, name: str) -> None:
+        self.model.__annotations__.pop(name)
 
     def unpack_one(self, stream: _StreamType, context: _ContextLike) -> Optional[Any]:
         init_data = super().unpack_one(stream, context)
@@ -332,7 +247,7 @@ def pack_into(
                 buffer.write(stream.read(offset - start))
                 buffer.write(value)
                 start = offset
-            else:
+            if len(offsets) == 0:
                 stream.seek(0)
                 copyfileobj(stream, buffer)
 
@@ -348,7 +263,7 @@ def pack_into(
             buffer.write(content[start:offset])
             buffer.write(value)
             start = offset
-        else:
+        if len(offsets) == 0:
             buffer.write(content)
 
 

@@ -15,13 +15,13 @@ class Format:
     b3  : 3 - int8 = 1  # default value is applied -> REVISIT: necessary?
     _1  : 3             # unnamed padding to the rest of the byte
 
-
+print(Format.__struct__)
 obj = unpack(Format, b"\x01\x01")
 print(obj)
 # prints: Format(b1=True, b2='1', b3=0, _1=0)
 # because:       0000000100000001
 # breakdown is:  \_/\_/\/\_____/|
-#                 u b3 b2   a   b0
+#                 u b3 b2   a   b1
 # where 'u' marks unused bits (the field name starts with an underscore and
 # contains only numbers). The field named '_' is a special definition for
 # alignment, missing bits will be added automatically (marked with 'a' in

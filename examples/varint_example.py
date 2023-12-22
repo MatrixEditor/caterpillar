@@ -1,5 +1,5 @@
 from caterpillar.fields.varint import VarInt, VARINT_LSB
-from caterpillar.shortcuts import pack, unpack, be, le
+from caterpillar.shortcuts import pack, unpack, BigEndian as be, LittleEndian as le
 
 try:
     from rich import print

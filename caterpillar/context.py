@@ -52,7 +52,10 @@ class Context(_ContextLike):
             return object.__getattribute__(self, key)
         except AttributeError:
             if "." not in key:
-                return self[key]  # Raises an error if the key is not found
+                try:
+                    return self[key]  # Raises an error if the key is not found
+                except KeyError:
+                    raise AttributeError(key)
 
             path = key.split(".")
             root = self[path[0]]
