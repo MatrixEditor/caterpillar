@@ -47,6 +47,9 @@ GLOBAL_UNION_OPTIONS: Set[Flag] = set()
 #: Default field flags that will be applied on **all** fields.
 GLOBAL_FIELD_FLAGS: Set[Flag] = set()
 
+#: Default field flags that will be applied on **all** bit-fields.
+GLOBAL_BITFIELD_FLAGS: Set[Flag] = set()
+
 
 def configure(base: Set[Flag], *flags: Flag) -> None:
     """

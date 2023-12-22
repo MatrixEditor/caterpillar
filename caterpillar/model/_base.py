@@ -98,7 +98,7 @@ class Sequence(_StructLike):
         """
         return option in self.options
 
-    def _included(self, name: str, default: Optional[Any]) -> bool:
+    def _included(self, name: str, default: Optional[Any], annotation: Any) -> bool:
         """
         Check if a field with the given name should be included.
 
@@ -158,7 +158,7 @@ class Sequence(_StructLike):
     def unpack_one(self, stream: _StreamType, context: _ContextLike) -> Optional[Any]:
         # At first, we define the object context where the parsed values
         # will be stored
-        init_data: Dict[str, Any] = {}
+        init_data: Dict[str, Any] = Context()
         context._obj = Context(_parent=context)
 
         base_path = context._path

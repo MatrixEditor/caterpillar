@@ -15,6 +15,7 @@
 from .model import pack, pack_file, pack_into
 from .model import unpack, unpack_file
 from .model import struct, union
+from .model import bitfield
 
 from .context import ContextPath, this, ctx
 from .byteorder import LittleEndian, BigEndian

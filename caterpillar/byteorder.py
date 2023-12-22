@@ -92,14 +92,14 @@ SysNative = ByteOrder(
 )
 
 
-def byteorder(obj) -> ByteOrder:
+def byteorder(obj, default: ByteOrder = None) -> ByteOrder:
     """
     Get the byte order of an object, defaulting to SysNative if not explicitly set.
 
     :param obj: The object to retrieve the byte order from.
     :return: The byte order of the object.
     """
-    return getattr(obj, BYTEORDER_FIELD, SysNative)
+    return getattr(obj, BYTEORDER_FIELD, default or SysNative)
 
 
 @dataclass(frozen=True)

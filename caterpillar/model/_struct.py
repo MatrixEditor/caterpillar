@@ -20,6 +20,7 @@ from typing import Optional, Union
 from typing import Dict, Any, Iterable
 from collections import OrderedDict
 from dataclasses import dataclass
+from shutil import copyfileobj
 
 from caterpillar.abc import (
     _StructLike,
@@ -114,7 +115,7 @@ class Struct(Sequence):
                 default = annotation
                 setattr(self.model, name, default)
 
-            is_included = self._included(name, default)
+            is_included = self._included(name, default, annotation)
             if not is_included:
                 removables.append(name)
 
@@ -331,6 +332,10 @@ def pack_into(
                 buffer.write(stream.read(offset - start))
                 buffer.write(value)
                 start = offset
+            else:
+                stream.seek(0)
+                copyfileobj(stream, buffer)
+
     else:
         # Default implementation: We use an in-memory buffer to store all packed
         # elements and then apply all offset-packed objects.
@@ -343,6 +348,8 @@ def pack_into(
             buffer.write(content[start:offset])
             buffer.write(value)
             start = offset
+        else:
+            buffer.write(content)
 
 
 def pack_file(

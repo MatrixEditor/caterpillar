@@ -23,3 +23,7 @@ from ._struct import (
     pack_into,
     pack_file,
 )
+from ._bitfield import (
+    Bitfield,
+    bitfield
+)

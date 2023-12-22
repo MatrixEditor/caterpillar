@@ -129,7 +129,7 @@ class Field(_StructLike):
 
     bits: Union[_ContextLambda, int, None]
     """
-    The configured amount of bits this field takes.
+    The configured bits.
     """
 
     def __init__(

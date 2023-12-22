@@ -44,6 +44,7 @@ class FormatField(FieldStruct):
         """
         self.text = ch
         self.type_ = type_
+        self.__bits__ = calcsize(self.text)
 
     def __repr__(self) -> str:
         """
@@ -205,6 +206,7 @@ class Transformer(FieldStruct):
         :param struct: The _StructLike object to be wrapped.
         """
         self.struct = struct
+        self.__bits__ = self.struct.__bits__
 
     def __type__(self) -> type:
         """
@@ -568,6 +570,27 @@ class Computed(FieldStruct):
 
     def __unpack__(self, stream: _StreamType, context: _ContextLike) -> Any:
         return self.value(context) if callable(self.value) else self.value
+
+    def pack_single(self, obj: Any, stream: _StreamType, context: _ContextLike) -> None:
+        # No need for an implementation
+        pass
+
+    def unpack_single(self, stream: _StreamType, context: _ContextLike) -> None:
+        # No need for an implementation
+        pass
+
+class Pass(FieldStruct):
+    def __type__(self) -> type:
+        return type(None)
+
+    def __pack__(self, obj: Any, stream: _StreamType, context: _ContextLike) -> None:
+        pass
+
+    def __size__(self, context: _ContextLike) -> int:
+        return 0
+
+    def __unpack__(self, stream: _StreamType, context: _ContextLike) -> Any:
+        return None
 
     def pack_single(self, obj: Any, stream: _StreamType, context: _ContextLike) -> None:
         # No need for an implementation

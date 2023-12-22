@@ -30,6 +30,7 @@ from .common import (
     String,
     Bytes,
     Computed,
+    Pass,
     CString,
     padding,
     char,

@@ -1,6 +1,6 @@
 # Introduction
 
-`caterpillar` is a powerful python framework designed to navigate through structured binary data. This framework operates as a declarative parser and builder, streamlining the handling of binary data through the utilization of standard Python class definitions and annotations. Below are the key functions of this library:
+`caterpillar` is a powerful python framework designed to navigate through structured binary data. This framework operates as a declarative parser and builder using standard Python class definitions and annotations. Below are the key functions of this library:
 
 * Pack and unpack classes to and from binary data
 * Structs support union processing as well
@@ -15,8 +15,6 @@
 ## Example
 
 In `caterpillar`, a `Struct` represents a collection of both named and unnamed fields.
-This powerful feature facilitates the seamless organization and manipulation of
-structured binary data.
 
 ```python
 @struct(order=BigEndian)
@@ -72,7 +70,7 @@ Explore the list of natively supported options (or those proposed to be supporte
 
 ### Constant Values
 
-Constant values can be seamlessly integrated into your data structures in two ways:
+Constant values can be integrated into your data structures in two ways:
 
 ```python
 @struct(order=LittleEndian)
@@ -126,8 +124,8 @@ class NIBValue:
 
 ## Modifiers
 
-Modifiers in `caterpillar` enhance code readability by assigning unique operators to specific field
-configurations. Let's explore the available modifiers and their applications:
+Modifiers in `caterpillar` enhance code readability by assigning unique operators to specific
+field configurations.
 
 ## Endianness `+`
 
