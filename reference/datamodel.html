@@ -281,8 +281,8 @@ for the explicit definition of dynamic structs, the option to raise a <code clas
 is provided.</p>
 </dd></dl>
 
-<section id="customising-the-struct-s-type">
-<h4><span class="section-number">2.2.1.1. </span>Customising the struct’s type<a class="headerlink" href="#customising-the-struct-s-type" title="Link to this heading">#</a></h4>
+<section id="customizing-the-struct-s-type">
+<h4><span class="section-number">2.2.1.1. </span>Customizing the struct’s type<a class="headerlink" href="#customizing-the-struct-s-type" title="Link to this heading">#</a></h4>
 <dl class="py method">
 <dt class="sig sig-object py" id="object.__type__">
 <span class="sig-prename descclassname"><span class="pre">object.</span></span><span class="sig-name descname"><span class="pre">__type__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#object.__type__" title="Link to this definition">#</a></dt>
@@ -295,7 +295,7 @@ type, with the default being <code class="code docutils literal notranslate"><sp
 <p>The implementation of the <a class="reference internal" href="#object.__type__" title="object.__type__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__type__()</span></code></a> method is optional and,
 therefore, not mandatory as per the library’s specifications.</p>
 </div>
-<p>The following example demonstrates the use of the <a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html">sphinx-autodoc</a> tool to document
+<p>The following example demonstrates the use of the <a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html">sphinx-autodoc</a> extension to document
 struct classes with the <code class="code docutils literal notranslate"><span class="pre">S_REPLACE_TYPE</span></code> option enabled. Only documented members
 are displayed.</p>
 <div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">autoclass</span><span class="p">::</span> examples.nibarchive.NIBHeader()
@@ -319,33 +319,77 @@ are displayed.</p>
 automatic creation of constructors.</p>
 </dd></dl>
 
-<p><em>TODO</em></p>
+</section>
+<section id="struct-containers">
+<h4><span class="section-number">2.2.1.2. </span>Struct containers<a class="headerlink" href="#struct-containers" title="Link to this heading">#</a></h4>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="object.__struct__">
-<span class="sig-prename descclassname"><span class="pre">object.</span></span><span class="sig-name descname"><span class="pre">__struct__</span></span><a class="headerlink" href="#object.__struct__" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="class.__struct__">
+<span class="sig-prename descclassname"><span class="pre">class.</span></span><span class="sig-name descname"><span class="pre">__struct__</span></span><a class="headerlink" href="#class.__struct__" title="Link to this definition">#</a></dt>
+<dd><p>All models annotated with either <code class="code docutils literal notranslate"><span class="pre">&#64;struct</span></code> or <code class="code docutils literal notranslate"><span class="pre">&#64;bitfield</span></code> fall into the
+category of <em>struct containers</em>. These containers store the additional class attribute
+<a class="reference internal" href="#class.__struct__" title="class.__struct__"><code class="xref py py-func docutils literal notranslate"><span class="pre">__struct__()</span></code></a>.</p>
+<p>Internally, any types utilizing this attribute can be employed within a struct, bitfield,
+or sequence definition. The type of the stored value must be a subclass of <code class="xref py py-class docutils literal notranslate"><span class="pre">_StructLike</span></code>.</p>
+</dd></dl>
 
+</section>
+</section>
+<section id="bitfield-specific-methods">
+<h3><span class="section-number">2.2.2. </span>BitField specific methods<a class="headerlink" href="#bitfield-specific-methods" title="Link to this heading">#</a></h3>
+<p>The introduced <code class="xref py py-class docutils literal notranslate"><span class="pre">BitField</span></code> class is special in many different ways. One key
+attribute is its fixed size. To determine the size of a struct, it leverages a special
+member, which can be either a function or an attribute.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="object.__bits__">
 <span class="sig-prename descclassname"><span class="pre">object.</span></span><span class="sig-name descname"><span class="pre">__bits__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#object.__bits__" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Called to measure the bit count of the current object. <a class="reference internal" href="#object.__bits__" title="object.__bits__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__bits__()</span></code></a>
+serves as the sole requirement for the defined fields in the current implementation
+of the <code class="xref py py-class docutils literal notranslate"><span class="pre">BitField</span></code> class.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This class member can also be expressed as an attribute. The library automatically
+adapts to the appropriate representation based on the context.</p>
+</div>
+</dd></dl>
 
+</section>
+<section id="customizing-the-object-s-byteorder">
+<h3><span class="section-number">2.2.3. </span>Customizing the object’s byteorder<a class="headerlink" href="#customizing-the-object-s-byteorder" title="Link to this heading">#</a></h3>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="object.__byteorder__">
 <span class="sig-prename descclassname"><span class="pre">object.</span></span><span class="sig-name descname"><span class="pre">__byteorder__</span></span><a class="headerlink" href="#object.__byteorder__" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>The byteorder of a struct can be temporarily configured using the corresponding
+operator. It is important to note that this attribute is utilized internally and
+should not be used elsewhere.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span> <span class="o">=</span> <span class="n">BigEndian</span> <span class="o">|</span> <span class="n">struct</span> <span class="c1"># Automatically sets __byteorder__</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="object.__set_byteorder__">
 <span class="sig-prename descclassname"><span class="pre">object.</span></span><span class="sig-name descname"><span class="pre">__set_byteorder__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">byteorder</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#object.__set_byteorder__" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>In contrast to the attribute <a class="reference internal" href="#object.__byteorder__" title="object.__byteorder__"><code class="xref py py-attr docutils literal notranslate"><span class="pre">__byteorder__</span></code></a>, the <a class="reference internal" href="#object.__set_byteorder__" title="object.__set_byteorder__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__set_byteorder__()</span></code></a>
+method is invoked to apply the current byteorder to a struct. The default behavior,
+as described in <code class="xref py py-class docutils literal notranslate"><span class="pre">FieldMixin</span></code>, is to return a new <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code> instance with
+the byteorder applied. Note the use of another operator here.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">BigEndian</span> <span class="o">+</span> <span class="n">struct</span>
+</pre></div>
+</div>
+</dd></dl>
 
+</section>
+<section id="modifying-fields">
+<h3><span class="section-number">2.2.4. </span>Modifying fields<a class="headerlink" href="#modifying-fields" title="Link to this heading">#</a></h3>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="field.__name__">
 <span class="sig-prename descclassname"><span class="pre">field.</span></span><span class="sig-name descname"><span class="pre">__name__</span></span><a class="headerlink" href="#field.__name__" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>The name of a regular field is not explicitly specified in a typical attribute but is
+instead set using a dedicated one. This naming convention is automatically applied by
+all default <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> implementations. The name can be retrieved through the
+use of <code class="code docutils literal notranslate"><span class="pre">field.get_name()</span></code>.</p>
+</dd></dl>
 
-</section>
 </section>
 </section>
 </section>
@@ -412,17 +456,29 @@ automatic creation of constructors.</p>
 <li><a class="reference internal" href="#object.__pack__"><code class="docutils literal notranslate"><span class="pre">object.__pack__()</span></code></a></li>
 <li><a class="reference internal" href="#object.__unpack__"><code class="docutils literal notranslate"><span class="pre">object.__unpack__()</span></code></a></li>
 <li><a class="reference internal" href="#object.__size__"><code class="docutils literal notranslate"><span class="pre">object.__size__()</span></code></a></li>
-<li><a class="reference internal" href="#customising-the-struct-s-type">2.2.1.1. Customising the struct’s type</a><ul>
+<li><a class="reference internal" href="#customizing-the-struct-s-type">2.2.1.1. Customizing the struct’s type</a><ul>
 <li><a class="reference internal" href="#object.__type__"><code class="docutils literal notranslate"><span class="pre">object.__type__()</span></code></a></li>
 <li><a class="reference internal" href="#examples.nibarchive.object.NIBHeader"><code class="docutils literal notranslate"><span class="pre">object.NIBHeader</span></code></a></li>
 <li><a class="reference internal" href="#examples.nibarchive.object.NIBHeader.NIBHeader.magic"><code class="docutils literal notranslate"><span class="pre">object.NIBHeader.NIBHeader.magic</span></code></a></li>
-<li><a class="reference internal" href="#object.__struct__"><code class="docutils literal notranslate"><span class="pre">object.__struct__</span></code></a></li>
-<li><a class="reference internal" href="#object.__bits__"><code class="docutils literal notranslate"><span class="pre">object.__bits__()</span></code></a></li>
-<li><a class="reference internal" href="#object.__byteorder__"><code class="docutils literal notranslate"><span class="pre">object.__byteorder__</span></code></a></li>
-<li><a class="reference internal" href="#object.__set_byteorder__"><code class="docutils literal notranslate"><span class="pre">object.__set_byteorder__()</span></code></a></li>
-<li><a class="reference internal" href="#field.__name__"><code class="docutils literal notranslate"><span class="pre">field.__name__</span></code></a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#struct-containers">2.2.1.2. Struct containers</a><ul>
+<li><a class="reference internal" href="#class.__struct__"><code class="docutils literal notranslate"><span class="pre">class.__struct__</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#bitfield-specific-methods">2.2.2. BitField specific methods</a><ul>
+<li><a class="reference internal" href="#object.__bits__"><code class="docutils literal notranslate"><span class="pre">object.__bits__()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#customizing-the-object-s-byteorder">2.2.3. Customizing the object’s byteorder</a><ul>
+<li><a class="reference internal" href="#object.__byteorder__"><code class="docutils literal notranslate"><span class="pre">object.__byteorder__</span></code></a></li>
+<li><a class="reference internal" href="#object.__set_byteorder__"><code class="docutils literal notranslate"><span class="pre">object.__set_byteorder__()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#modifying-fields">2.2.4. Modifying fields</a><ul>
+<li><a class="reference internal" href="#field.__name__"><code class="docutils literal notranslate"><span class="pre">field.__name__</span></code></a></li>
 </ul>
 </li>
 </ul>
