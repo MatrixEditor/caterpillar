@@ -163,5 +163,6 @@ class NIBArchive:
 
 
 # print(NIBArchive.__struct__.fields)
-# obj = unpack_file(NIBArchive, sys.argv[1])
-# pack_file(obj, sys.argv[2], use_tempfile=True)
+if __name__ == '__main__':
+    obj = unpack_file(NIBArchive, sys.argv[1])
+    pack_file(obj, sys.argv[2], use_tempfile=True)

@@ -147,7 +147,8 @@ def hasstruct(obj: Any) -> bool:
     :param obj: The object to check.
     :return: True if the object has a structure attribute, else False.
     """
-    return bool(getattr(obj, STRUCT_FIELD, None))
+    cls_dict = getattr(obj.__class__ if not isinstance(obj, type) else obj, "__dict__")
+    return STRUCT_FIELD in cls_dict
 
 
 def getstruct(obj: Any, __default: Any = None) -> _StructLike:
@@ -157,7 +158,8 @@ def getstruct(obj: Any, __default: Any = None) -> _StructLike:
     :param obj: The object to get the structure attribute from.
     :return: The structure attribute of the object.
     """
-    return getattr(obj, STRUCT_FIELD, __default)
+    cls_dict = getattr(obj.__class__ if not isinstance(obj, type) else obj, "__dict__")
+    return cls_dict[STRUCT_FIELD]
 
 
 def typeof(struct: Union[_StructLike, _ContainsStruct]) -> type:

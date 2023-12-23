@@ -86,6 +86,7 @@ class Struct(Sequence):
         return self.model
 
     def _prepare_fields(self) -> Dict[str, Any]:
+        # TODO: inheritance
         eval_str = self.has_option(S_EVAL_ANNOTATIONS)
         # The why is desribed in detail here: https://docs.python.org/3/howto/annotations.html
         return inspect.get_annotations(self.model, eval_str=eval_str)

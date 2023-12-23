@@ -13,9 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import re
-import itertools
 
-from typing import Optional, Callable
+from typing import Optional
 from typing import List, Dict, Any
 from typing import Set, Iterable, Union
 from dataclasses import dataclass
@@ -25,7 +24,6 @@ from caterpillar.abc import (
     _ContextLike,
     _StreamType,
     getstruct,
-    _GreedyType,
     _ContextLambda,
 )
 from caterpillar.context import Context
@@ -44,12 +42,12 @@ from caterpillar.options import (
     S_REPLACE_TYPES,
     Flag,
 )
-from caterpillar.fields import Field, INVALID_DEFAULT, ConstBytes, ConstString
+from caterpillar.fields import Field, INVALID_DEFAULT, ConstBytes, ConstString, FieldMixin
 from caterpillar._common import unpack_seq, pack_seq
 
 
 @dataclass(init=False)
-class Sequence(_StructLike):
+class Sequence(_StructLike, FieldMixin):
     model: Any
     """
     Specifies the target class/dictionary used as the base model.

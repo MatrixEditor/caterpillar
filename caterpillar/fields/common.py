@@ -417,7 +417,7 @@ class Bytes(FieldStruct):
         size = self.__size__(context)
         return stream.read(size) if not isgreedy(size) else stream.read()
 
-    def __class_getitem__(self, dim: int) -> None:
+    def __class_getitem__(cls, dim: int) -> None:
         """
         Class method to raise an UnsupportedOperation when attempting to use multiple sequences.
 
@@ -537,6 +537,7 @@ class ConstString(Const):
         """
         struct = String(len(value), encoding)
         super().__init__(value.encode(struct.encoding), struct)
+        self.__bits__ = len(value) * 8
 
 
 class ConstBytes(Const):
@@ -551,11 +552,13 @@ class ConstBytes(Const):
         :param value: The constant bytes value.
         """
         super().__init__(value, Bytes(len(value)))
+        self.__bits__ = len(value) * 8
 
 
 class Computed(FieldStruct):
     def __init__(self, value: Union[_ConstType, _ContextLambda]) -> None:
         self.value = value
+        self.__bits__ = 0
 
     def __type__(self) -> type:
         return Any if callable(self.value) else type(self.value)
@@ -579,6 +582,9 @@ class Computed(FieldStruct):
 
 
 class Pass(FieldStruct):
+    def __bits__(self) -> int:
+        return 0
+
     def __type__(self) -> type:
         return type(None)
 

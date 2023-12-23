@@ -305,7 +305,8 @@ class Field(_StructLike):
         :rtype: type
         """
         if not self.options:
-            return typeof(self.struct)
+            type_ = typeof(self.struct)
+            return type_ if not self.is_seq() else List[type_]
 
         # We construct a Union type hint as an alternative:
         types = [typeof(s) for s in self.options.values()]
