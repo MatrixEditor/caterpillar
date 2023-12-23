@@ -25,6 +25,11 @@ Operators
 
 
 
+.. function:: sequence.__add__(self, sequence)
 
+.. function:: sequence.__iadd__(self, sequence)
 
+.. function:: sequence.__sub__(self, sequence)
+
+.. function:: sequence.__isub__(self, sequence)
 

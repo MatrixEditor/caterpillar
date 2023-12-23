@@ -33,6 +33,26 @@ objects. There are three possible types of structs:
     provide a modular approach for extending the library. Consideration of partial
     structs is essential when aiming to extend the capabilities of this framework.
 
+Special Types
+=============
+
+Greedy
+------
+
+*TODO*
+
+Context
+-------
+
+*TODO*
+
+Context lambda
+^^^^^^^^^^^^^^
+
+Context path
+^^^^^^^^^^^^
+
+
 
 Special method names
 ====================

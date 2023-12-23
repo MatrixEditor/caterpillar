@@ -232,14 +232,31 @@ structs is essential when aiming to extend the capabilities of this framework.</
 </li>
 </ul>
 </section>
+<section id="special-types">
+<h2><span class="section-number">2.2. </span>Special Types<a class="headerlink" href="#special-types" title="Link to this heading">#</a></h2>
+<section id="greedy">
+<h3><span class="section-number">2.2.1. </span>Greedy<a class="headerlink" href="#greedy" title="Link to this heading">#</a></h3>
+<p><em>TODO</em></p>
+</section>
+<section id="context">
+<h3><span class="section-number">2.2.2. </span>Context<a class="headerlink" href="#context" title="Link to this heading">#</a></h3>
+<p><em>TODO</em></p>
+<section id="context-lambda">
+<h4><span class="section-number">2.2.2.1. </span>Context lambda<a class="headerlink" href="#context-lambda" title="Link to this heading">#</a></h4>
+</section>
+<section id="context-path">
+<h4><span class="section-number">2.2.2.2. </span>Context path<a class="headerlink" href="#context-path" title="Link to this heading">#</a></h4>
+</section>
+</section>
+</section>
 <section id="special-method-names">
-<h2><span class="section-number">2.2. </span>Special method names<a class="headerlink" href="#special-method-names" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">2.3. </span>Special method names<a class="headerlink" href="#special-method-names" title="Link to this heading">#</a></h2>
 <p>A class can either extend <code class="xref py py-class docutils literal notranslate"><span class="pre">_StructLike</span></code> or implement the special methods needed
 to act as a struct. The subsequent sections provide an overview of all special methods
 and attributes introduced by this library. Further insights into extending structs with
 custom operators can be found in  <a class="reference internal" href="operators.html#operators"><span class="std std-ref">Operators</span></a>.</p>
 <section id="emulating-struct-types">
-<h3><span class="section-number">2.2.1. </span>Emulating Struct Types<a class="headerlink" href="#emulating-struct-types" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">2.3.1. </span>Emulating Struct Types<a class="headerlink" href="#emulating-struct-types" title="Link to this heading">#</a></h3>
 <dl class="py method">
 <dt class="sig sig-object py" id="object.__pack__">
 <span class="sig-prename descclassname"><span class="pre">object.</span></span><span class="sig-name descname"><span class="pre">__pack__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stream</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#object.__pack__" title="Link to this definition">#</a></dt>
@@ -282,7 +299,7 @@ is provided.</p>
 </dd></dl>
 
 <section id="customizing-the-struct-s-type">
-<h4><span class="section-number">2.2.1.1. </span>Customizing the struct’s type<a class="headerlink" href="#customizing-the-struct-s-type" title="Link to this heading">#</a></h4>
+<h4><span class="section-number">2.3.1.1. </span>Customizing the struct’s type<a class="headerlink" href="#customizing-the-struct-s-type" title="Link to this heading">#</a></h4>
 <dl class="py method">
 <dt class="sig sig-object py" id="object.__type__">
 <span class="sig-prename descclassname"><span class="pre">object.</span></span><span class="sig-name descname"><span class="pre">__type__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#object.__type__" title="Link to this definition">#</a></dt>
@@ -321,7 +338,7 @@ automatic creation of constructors.</p>
 
 </section>
 <section id="struct-containers">
-<h4><span class="section-number">2.2.1.2. </span>Struct containers<a class="headerlink" href="#struct-containers" title="Link to this heading">#</a></h4>
+<h4><span class="section-number">2.3.1.2. </span>Struct containers<a class="headerlink" href="#struct-containers" title="Link to this heading">#</a></h4>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="class.__struct__">
 <span class="sig-prename descclassname"><span class="pre">class.</span></span><span class="sig-name descname"><span class="pre">__struct__</span></span><a class="headerlink" href="#class.__struct__" title="Link to this definition">#</a></dt>
@@ -335,7 +352,7 @@ or sequence definition. The type of the stored value must be a subclass of <code
 </section>
 </section>
 <section id="bitfield-specific-methods">
-<h3><span class="section-number">2.2.2. </span>BitField specific methods<a class="headerlink" href="#bitfield-specific-methods" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">2.3.2. </span>BitField specific methods<a class="headerlink" href="#bitfield-specific-methods" title="Link to this heading">#</a></h3>
 <p>The introduced <code class="xref py py-class docutils literal notranslate"><span class="pre">BitField</span></code> class is special in many different ways. One key
 attribute is its fixed size. To determine the size of a struct, it leverages a special
 member, which can be either a function or an attribute.</p>
@@ -354,7 +371,7 @@ adapts to the appropriate representation based on the context.</p>
 
 </section>
 <section id="customizing-the-object-s-byteorder">
-<h3><span class="section-number">2.2.3. </span>Customizing the object’s byteorder<a class="headerlink" href="#customizing-the-object-s-byteorder" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">2.3.3. </span>Customizing the object’s byteorder<a class="headerlink" href="#customizing-the-object-s-byteorder" title="Link to this heading">#</a></h3>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="object.__byteorder__">
 <span class="sig-prename descclassname"><span class="pre">object.</span></span><span class="sig-name descname"><span class="pre">__byteorder__</span></span><a class="headerlink" href="#object.__byteorder__" title="Link to this definition">#</a></dt>
@@ -380,7 +397,7 @@ the byteorder applied. Note the use of another operator here.</p>
 
 </section>
 <section id="modifying-fields">
-<h3><span class="section-number">2.2.4. </span>Modifying fields<a class="headerlink" href="#modifying-fields" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">2.3.4. </span>Modifying fields<a class="headerlink" href="#modifying-fields" title="Link to this heading">#</a></h3>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="field.__name__">
 <span class="sig-prename descclassname"><span class="pre">field.</span></span><span class="sig-name descname"><span class="pre">__name__</span></span><a class="headerlink" href="#field.__name__" title="Link to this definition">#</a></dt>
@@ -451,33 +468,42 @@ use of <code class="code docutils literal notranslate"><span class="pre">field.g
             <ul>
 <li><a class="reference internal" href="#">2. Data Model</a><ul>
 <li><a class="reference internal" href="#structs-sequences-and-fields">2.1. Structs, Sequences and Fields</a></li>
-<li><a class="reference internal" href="#special-method-names">2.2. Special method names</a><ul>
-<li><a class="reference internal" href="#emulating-struct-types">2.2.1. Emulating Struct Types</a><ul>
+<li><a class="reference internal" href="#special-types">2.2. Special Types</a><ul>
+<li><a class="reference internal" href="#greedy">2.2.1. Greedy</a></li>
+<li><a class="reference internal" href="#context">2.2.2. Context</a><ul>
+<li><a class="reference internal" href="#context-lambda">2.2.2.1. Context lambda</a></li>
+<li><a class="reference internal" href="#context-path">2.2.2.2. Context path</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#special-method-names">2.3. Special method names</a><ul>
+<li><a class="reference internal" href="#emulating-struct-types">2.3.1. Emulating Struct Types</a><ul>
 <li><a class="reference internal" href="#object.__pack__"><code class="docutils literal notranslate"><span class="pre">object.__pack__()</span></code></a></li>
 <li><a class="reference internal" href="#object.__unpack__"><code class="docutils literal notranslate"><span class="pre">object.__unpack__()</span></code></a></li>
 <li><a class="reference internal" href="#object.__size__"><code class="docutils literal notranslate"><span class="pre">object.__size__()</span></code></a></li>
-<li><a class="reference internal" href="#customizing-the-struct-s-type">2.2.1.1. Customizing the struct’s type</a><ul>
+<li><a class="reference internal" href="#customizing-the-struct-s-type">2.3.1.1. Customizing the struct’s type</a><ul>
 <li><a class="reference internal" href="#object.__type__"><code class="docutils literal notranslate"><span class="pre">object.__type__()</span></code></a></li>
 <li><a class="reference internal" href="#examples.nibarchive.object.NIBHeader"><code class="docutils literal notranslate"><span class="pre">object.NIBHeader</span></code></a></li>
 <li><a class="reference internal" href="#examples.nibarchive.object.NIBHeader.NIBHeader.magic"><code class="docutils literal notranslate"><span class="pre">object.NIBHeader.NIBHeader.magic</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#struct-containers">2.2.1.2. Struct containers</a><ul>
+<li><a class="reference internal" href="#struct-containers">2.3.1.2. Struct containers</a><ul>
 <li><a class="reference internal" href="#class.__struct__"><code class="docutils literal notranslate"><span class="pre">class.__struct__</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a class="reference internal" href="#bitfield-specific-methods">2.2.2. BitField specific methods</a><ul>
+<li><a class="reference internal" href="#bitfield-specific-methods">2.3.2. BitField specific methods</a><ul>
 <li><a class="reference internal" href="#object.__bits__"><code class="docutils literal notranslate"><span class="pre">object.__bits__()</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#customizing-the-object-s-byteorder">2.2.3. Customizing the object’s byteorder</a><ul>
+<li><a class="reference internal" href="#customizing-the-object-s-byteorder">2.3.3. Customizing the object’s byteorder</a><ul>
 <li><a class="reference internal" href="#object.__byteorder__"><code class="docutils literal notranslate"><span class="pre">object.__byteorder__</span></code></a></li>
 <li><a class="reference internal" href="#object.__set_byteorder__"><code class="docutils literal notranslate"><span class="pre">object.__set_byteorder__()</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#modifying-fields">2.2.4. Modifying fields</a><ul>
+<li><a class="reference internal" href="#modifying-fields">2.3.4. Modifying fields</a><ul>
 <li><a class="reference internal" href="#field.__name__"><code class="docutils literal notranslate"><span class="pre">field.__name__</span></code></a></li>
 </ul>
 </li>
