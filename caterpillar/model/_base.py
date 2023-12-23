@@ -14,26 +14,17 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import re
 
-from typing import Optional
+from typing import Optional, Self
 from typing import List, Dict, Any
 from typing import Set, Iterable, Union
 from dataclasses import dataclass
 
-from caterpillar.abc import (
-    _StructLike,
-    _ContextLike,
-    _StreamType,
-    getstruct,
-    _ContextLambda,
-)
+from caterpillar.abc import _StructLike, _ContextLike
+from caterpillar.abc import _StreamType, _ContextLambda
+from caterpillar.abc import getstruct
 from caterpillar.context import Context
-from caterpillar.byteorder import (
-    ByteOrder,
-    Arch,
-    get_system_arch,
-    BYTEORDER_FIELD,
-    SysNative,
-)
+from caterpillar.byteorder import BYTEORDER_FIELD, ByteOrder, SysNative
+from caterpillar.byteorder import Arch, get_system_arch
 from caterpillar.exception import StructException, ValidationError
 from caterpillar.options import (
     S_DISCARD_CONST,
@@ -42,7 +33,13 @@ from caterpillar.options import (
     S_REPLACE_TYPES,
     Flag,
 )
-from caterpillar.fields import Field, INVALID_DEFAULT, ConstBytes, ConstString, FieldMixin
+from caterpillar.fields import (
+    Field,
+    INVALID_DEFAULT,
+    ConstBytes,
+    ConstString,
+    FieldMixin,
+)
 from caterpillar._common import unpack_seq, pack_seq
 
 
@@ -101,6 +98,25 @@ class Sequence(_StructLike, FieldMixin):
         self.fields: List[Field] = []
         # Process all fields in the model
         self._process_model()
+
+    def __add__(self, sequence: "Sequence") -> Self:
+        # We will try to import all fields from the given sequence
+        for field in sequence.fields:
+            name = field.get_name()
+            is_included = name and name in sequence._member_map_
+            self.add_field(name, field, is_included)
+        return self
+
+    def __sub__(self, sequence: "Sequence") -> Self:
+        # By default, we are only removing existing fields.
+        for field in sequence.fields:
+            name = field.get_name()
+            if field in self.fields or (name and name in self._member_map_):
+                self.del_field(name, field)
+        return self
+
+    __iadd__ = __add__
+    __isub__ = __sub__
 
     def __type__(self) -> type:
         return dict
@@ -247,6 +263,19 @@ class Sequence(_StructLike, FieldMixin):
         setattr(field, "__name__", name)
         if included:
             self._member_map_[name] = field
+
+    def del_field(self, name: str, field: Field) -> None:
+        """
+        Remomves a field from this struct.
+
+        :param name: The name of the field.
+        :param field: The field to remove.
+        """
+        self._member_map_.pop(name, default=None)
+        self.fields.remove(field)
+
+    def get_members(self) -> Dict[str, Field]:
+        return self._member_map_.copy()
 
     def is_union(self) -> bool:
         """

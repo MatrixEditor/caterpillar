@@ -14,10 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from __future__ import annotations
 
-import itertools
-
-from dataclasses import dataclass, field
-from abc import abstractmethod
+from dataclasses import dataclass
 from typing import Self, Union, Set, Any, Dict, Optional, Iterable, List
 from io import BytesIO
 from caterpillar.abc import (
@@ -30,7 +27,6 @@ from caterpillar.abc import (
     hasstruct,
     getstruct,
     typeof,
-    isgreedy,
 )
 from caterpillar.byteorder import ByteOrder, SysNative, Arch, get_system_arch, byteorder
 from caterpillar.exception import (
@@ -40,7 +36,6 @@ from caterpillar.exception import (
     ValidationError,
     InvalidValueError,
 )
-from caterpillar.context import Context
 from caterpillar.options import (
     GLOBAL_FIELD_FLAGS,
     F_DYNAMIC,

@@ -22,15 +22,9 @@ from collections import OrderedDict
 from dataclasses import dataclass
 from shutil import copyfileobj
 
-from caterpillar.abc import (
-    _StructLike,
-    _StreamType,
-    _ContainsStruct,
-    _ContextLike,
-    hasstruct,
-    getstruct,
-    STRUCT_FIELD,
-)
+from caterpillar.abc import getstruct, hasstruct, STRUCT_FIELD
+from caterpillar.abc import _StructLike, _StreamType
+from caterpillar.abc import _ContainsStruct, _ContextLike
 from caterpillar.context import Context
 from caterpillar.byteorder import ByteOrder, Arch
 from caterpillar.options import (
@@ -86,7 +80,17 @@ class Struct(Sequence):
         return self.model
 
     def _prepare_fields(self) -> Dict[str, Any]:
-        # TODO: inheritance
+        # We will inspect all base classes in reverse order and selectively
+        # utilize classes that store a struct instance. Beginning at position
+        # -1, concluding at 0, and using a step size of -1:
+        for candidate in self.model.__mro__[-1:0:-1]:
+            if hasstruct(candidate):
+                # Importing all fields instead of the entire struct.
+                # The default behavior on importing structs is implemented
+                # by the Sequence class.
+                struct = getstruct(candidate)
+                self += struct
+
         eval_str = self.has_option(S_EVAL_ANNOTATIONS)
         # The why is desribed in detail here: https://docs.python.org/3/howto/annotations.html
         return inspect.get_annotations(self.model, eval_str=eval_str)

@@ -98,6 +98,11 @@ class Bitfield(Struct):
         del self._abs_bit_pos
         del self._current_group
 
+    def __add__(self, other: "BitField") -> Self:
+        if not isinstance(other, Bitfield):
+            raise ValidationError(f"Attempted to add a non-bitfield struct to a bitfield! (type={type(other)})")
+        return super(Struct, self).__add__(other)
+
     def _process_field(
         self, name: str, annotation: Any, default: Optional[Any]
     ) -> Field:

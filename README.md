@@ -14,6 +14,14 @@ enhances the capabilities of [Python Struct](https://docs.python.org/3/library/s
 by enabling direct class declaration. More information about the different configuration
 options will be added in the future. A brief introduction can be found [here >](docs/INTRO.md).
 
+*Caterpillar* is able to:
+
+* Pack and unpack data just from processing Python class definitions (including support for bitfields with a c++ like syntax!),
+* apply a wide range of data types (with endianess and architecture configuration),
+* dynamically adapt structs based on their inheritance layout,
+* inserts proper types into the class definition to support documentation and
+* it helps you to create cleaner and more concise code.
+
 ## Installation
 
 Simply use pip to install the package:
