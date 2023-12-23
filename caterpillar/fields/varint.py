@@ -19,6 +19,7 @@ from typing import Any
 from caterpillar.abc import _StreamType, _ContextLike
 from caterpillar.exception import InvalidValueError, DynamicSizeError, StreamError
 from caterpillar.byteorder import LittleEndian
+from caterpillar.context import CTX_FIELD
 
 from ._base import FieldStruct, Flag, singleton
 
@@ -57,7 +58,7 @@ class VarInt(FieldStruct):
     def bit_config(self, context: _ContextLike) -> tuple:
         high_bit = 1 << 7
         low_bit = 0
-        if context._field.has_flag(VARINT_LSB):
+        if context[CTX_FIELD].has_flag(VARINT_LSB):
             high_bit = 0
             low_bit = 1 << 7
         return high_bit, low_bit
@@ -76,7 +77,7 @@ class VarInt(FieldStruct):
         if obj < 0:
             raise InvalidValueError("Invalid negative value for VarInt encoding!")
 
-        order = context._field.order
+        order = context[CTX_FIELD].order
         is_little = order == LittleEndian
 
         hb, lb = self.bit_config(context)
@@ -109,14 +110,14 @@ class VarInt(FieldStruct):
         data = []
         _, lb = self.bit_config(context)
         shift = 0
-        is_little = context._field.order == LittleEndian
+        is_little = context[CTX_FIELD].order == LittleEndian
 
         while True:
             # Note tha unpack operation here to retrieve one byte only
             try:
                 (value,) = stream.read(1)
             except ValueError as exc:
-                raise StreamError(context._path) from exc
+                raise StreamError("Can't read stream!", context) from exc
             data.append(value & 0x7F)
             if value & 0x80 == lb:
                 # The "low_byte" here is taken from the field's configuration

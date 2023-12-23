@@ -43,7 +43,7 @@ from caterpillar.fields import (
     Pass,
 )
 from caterpillar.exception import ValidationError, DelegationError
-from caterpillar.context import Context
+from caterpillar.context import Context, CTX_PATH, CTX_OBJECT
 
 from ._struct import Struct
 
@@ -100,7 +100,9 @@ class Bitfield(Struct):
 
     def __add__(self, other: "BitField") -> Self:
         if not isinstance(other, Bitfield):
-            raise ValidationError(f"Attempted to add a non-bitfield struct to a bitfield! (type={type(other)})")
+            raise ValidationError(
+                f"Attempted to add a non-bitfield struct to a bitfield! (type={type(other)})"
+            )
         return super(Struct, self).__add__(other)
 
     def _process_field(
@@ -241,8 +243,8 @@ class Bitfield(Struct):
         # At first, we define the object context where the parsed values
         # will be stored
         init_data: Dict[str, Any] = Context()
-        context._obj = Context(_parent=context)
-        base_path = context._path
+        context[CTX_OBJECT] = Context(_parent=context)
+        base_path = context[CTX_PATH]
 
         for i, group in enumerate(self.groups):
             # each group specifies the fields we are about to unpack. But first, we have
@@ -252,7 +254,7 @@ class Bitfield(Struct):
 
             for bit_info, field in group.fields.items():
                 name: str = field.get_name()
-                context._path = ".".join([base_path, f"<{i}>", name])
+                context[CTX_PATH] = ".".join([base_path, f"<{i}>", name])
                 pos, width = bit_info
                 # The field should be ignored if it is not within the
                 # member map (this usually means we have a padding field)
@@ -276,7 +278,7 @@ class Bitfield(Struct):
         return obj
 
     def pack_one(self, obj: Any, stream: _StreamType, context: _ContextLike) -> None:
-        base_path: str = context._path
+        base_path: str = context[CTX_PATH]
         for i, group in enumerate(self.groups):
             # The same applies here, but we convert all values to int instead of reading
             # them from the stream
@@ -285,7 +287,7 @@ class Bitfield(Struct):
             for bit_info, field in group.fields.items():
                 # Setup the field's context
                 name: str = field.get_name()
-                context._path = ".".join([base_path, f"({i})", name])
+                context[CTX_PATH] = ".".join([base_path, f"({i})", name])
                 pos, width = bit_info
                 # Padding is translated into zeros
                 if name not in self._member_map_:
@@ -306,6 +308,7 @@ class Bitfield(Struct):
                     ) from exc
             # REVISIT: is this cheating?
             stream.write(value.to_bytes(group.size // 8, byteorder=order))
+
 
 def _make_bitfield(
     cls: type,

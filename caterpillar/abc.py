@@ -42,7 +42,8 @@ class _ContextLike(dict):
         pass
 
     @abstractmethod
-    def root(self) -> Optional[_ContextLike]:
+    @property
+    def _root(self) -> Optional[_ContextLike]:
         pass
 
 
@@ -128,7 +129,8 @@ class _EnumLike(Protocol):
 
 class _Switch(Protocol):
     """
-    An abstract base class for a switch-like object that generates a _StructLike based on a value and context.
+    An abstract base class for a switch-like object that generates a _StructLike
+    based on a value and context.
     """
 
     @abstractmethod

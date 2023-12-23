@@ -17,8 +17,15 @@ import itertools
 from typing import List, Any, Union, Iterable
 
 from caterpillar.abc import _GreedyType, _StreamType, _ContextLike, isgreedy
-from caterpillar.context import Context
-from caterpillar.exception import Stop, StructException
+from caterpillar.context import (
+    Context,
+    CTX_PATH,
+    CTX_FIELD,
+    CTX_POS,
+    CTX_INDEX,
+    CTX_OBJECT,
+)
+from caterpillar.exception import Stop, StructException, InvalidValueError
 
 
 def unpack_seq(stream: _StreamType, context: _ContextLike, unpack_one) -> List[Any]:
@@ -31,11 +38,11 @@ def unpack_seq(stream: _StreamType, context: _ContextLike, unpack_one) -> List[A
     :return: a list of unpacked elements
     :rtype: List[Any]
     """
-    field = context._field
+    field = context[CTX_FIELD]
     assert field and field.is_seq()
 
     length: Union[int, _GreedyType] = field.length(context)
-    base_path = context._path
+    base_path = context[CTX_PATH]
     # Special elements '_index' and '_length' can be referenced within
     # the new context. The '_pos' attribute will be adjusted automatically.
     values = []  # always list (maybe add factory)
@@ -43,13 +50,13 @@ def unpack_seq(stream: _StreamType, context: _ContextLike, unpack_one) -> List[A
         _parent=context, _io=stream, _length=length, _lst=values, _field=field
     )
     greedy = isgreedy(length)
-    seq_context._pos = stream.tell()
+    seq_context[CTX_POS] = stream.tell()
     for i in range(length) if not greedy else itertools.count():
         try:
-            seq_context._path = ".".join([base_path, str(i)])
-            seq_context._index = i
+            seq_context[CTX_PATH] = ".".join([base_path, str(i)])
+            seq_context[CTX_INDEX] = i
             values.append(unpack_one(stream, seq_context))
-            seq_context._pos = stream.tell()
+            seq_context[CTX_POS] = stream.tell()
         except Stop:
             break
         except Exception as exc:
@@ -70,13 +77,13 @@ def pack_seq(
     :type stream: _StreamType
     :param context: the current operation context
     :type context: _ContextLike
-    :raises TypeError: if the input object is not iterable
+    :raises InvalidValueError: if the input object is not iterable
     """
-    field = context._field
-    base_path = context._path
+    field = context[CTX_FIELD]
+    base_path = context[CTX_PATH]
     # Treat the 'obj' as a sequence/iterable
     if not isinstance(seq, Iterable):
-        raise TypeError(f"Expected iterable sequence, got {type(seq)}")
+        raise InvalidValueError(f"Expected iterable sequence, got {type(seq)}", context)
 
     # REVISIT: when to use field.length(context)
     count = len(seq)
@@ -84,12 +91,12 @@ def pack_seq(
     # Special elements '_index' and '_length' can be referenced within
     # the new context. The '_pos' attribute will be adjusted automatically.
     seq_context = Context(_parent=context, _io=stream, _length=count, _field=field)
-    seq_context._pos = stream.tell()
+    seq_context[CTX_POS] = stream.tell()
     for i, elem in enumerate(seq):
         # The path will contain an additional hint on what element is processed
         # at the moment.
-        seq_context._index = i
-        seq_context._path = ".".join([base_path, str(i)])
-        seq_context._obj = elem
+        seq_context[CTX_INDEX] = i
+        seq_context[CTX_PATH] = ".".join([base_path, str(i)])
+        seq_context[CTX_OBJECT] = elem
         pack_one(elem, stream, seq_context)
-        seq_context._pos = stream.tell()
+        seq_context[CTX_POS] = stream.tell()

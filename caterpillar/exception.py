@@ -17,6 +17,11 @@
 class StructException(Exception):
     """Base class for all struct-related exceptions"""
 
+    def __init__(self, message: str, context: dict = None) -> None:
+        super().__init__(message)
+        if context:
+            self.add_note(f"Context-Path: {context['path']}")
+
 
 class DynamicSizeError(StructException):
     """
@@ -66,6 +71,7 @@ class DelegationError(StructException):
     """
     An exception used if underlying calls fail.
     """
+
 
 class Stop(StructException):
     """Stops the current parsing process"""

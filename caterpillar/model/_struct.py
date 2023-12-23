@@ -25,7 +25,7 @@ from shutil import copyfileobj
 from caterpillar.abc import getstruct, hasstruct, STRUCT_FIELD
 from caterpillar.abc import _StructLike, _StreamType
 from caterpillar.abc import _ContainsStruct, _ContextLike
-from caterpillar.context import Context
+from caterpillar.context import Context, CTX_STREAM
 from caterpillar.byteorder import ByteOrder, Arch
 from caterpillar.options import (
     S_EVAL_ANNOTATIONS,
@@ -248,7 +248,7 @@ def pack_into(
     if use_tempfile:
         # NOTE: this implementation is exprimental - use this option with caution.
         with TemporaryFile() as stream:
-            context._io = stream
+            context[CTX_STREAM] = stream
             struct.__pack__(obj, stream, context)
 
             for offset, value in offsets.items():
@@ -264,7 +264,7 @@ def pack_into(
         # Default implementation: We use an in-memory buffer to store all packed
         # elements and then apply all offset-packed objects.
         stream = BytesIO()
-        context._io = stream
+        context[CTX_STREAM] = stream
         struct.__pack__(obj, stream, context)
 
         content = stream.getbuffer()

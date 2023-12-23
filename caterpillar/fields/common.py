@@ -27,7 +27,7 @@ from caterpillar.abc import (
     isgreedy,
 )
 from caterpillar.exception import ValidationError, UnsupportedOperation, StructException
-
+from caterpillar.context import CTX_FIELD
 from ._base import Field, FieldStruct
 
 
@@ -101,7 +101,7 @@ class FormatField(FieldStruct):
         :param stream: The output stream.
         :param context: The current context.
         """
-        if not isgreedy(context._field.length(context)):
+        if not isgreedy(context[CTX_FIELD].length(context)):
             self.pack_single(seq, stream, context)
         else:
             super().pack_seq(seq, stream, context)
@@ -114,7 +114,7 @@ class FormatField(FieldStruct):
         :param context: The current context.
         :return: The unpacked value.
         """
-        field: Field = context._field
+        field: Field = context[CTX_FIELD]
         length = field.length(context)
         if length == 0 and field.is_seq():
             # REVISIT: maybe add factory here
@@ -125,7 +125,7 @@ class FormatField(FieldStruct):
         try:
             value = unpack(fmt, stream.read(calcsize(fmt)))
         except ValueError as exc:
-            raise StructException(f"unpack() - Error at {context._path}") from exc
+            raise StructException("Could not unpack from stream!", context) from exc
 
         if not field.is_seq() or greedy:
             if len(value) == 0:
@@ -143,7 +143,7 @@ class FormatField(FieldStruct):
         :param context: The current context.
         :return: A list of unpacked values.
         """
-        if not isgreedy(context._field.length(context)):
+        if not isgreedy(context[CTX_FIELD].length(context)):
             return list(self.unpack_single(stream, context))
 
         return super().unpack_seq(stream, context)
@@ -155,7 +155,7 @@ class FormatField(FieldStruct):
         :param context: The current context.
         :return: The format string.
         """
-        field: Field = context._field
+        field: Field = context[CTX_FIELD]
         order = field.order
         if length is None:
             dim = field.length(context) or 1
@@ -314,7 +314,7 @@ class Const(Transformer):
         """
         if parsed != self.value:
             raise ValidationError(
-                f"Expected {str(self.value)}, got {str(parsed)} in {context._path}"
+                f"Expected {str(self.value)}, got {str(parsed)}", context
             )
         return self.value
 
@@ -349,7 +349,7 @@ class Enum(Transformer):
         if isinstance(obj, _EnumType):
             return obj.value
 
-        raise ValidationError(f"Expected enum type, got {type(obj)}")
+        raise ValidationError(f"Expected enum type, got {type(obj)}", context)
 
     def decode(self, parsed: Any, context: _ContextLike) -> Any:
         """

@@ -43,6 +43,9 @@ from caterpillar.options import (
     F_SEQUENTIAL,
     Flag,
 )
+from caterpillar.context import CTX_OFFSETS, CTX_STREAM
+from caterpillar.context import CTX_FIELD, CTX_POS
+from caterpillar.context import CTX_VALUE
 from caterpillar._common import unpack_seq, pack_seq
 
 
@@ -258,7 +261,7 @@ class Field(_StructLike):
 
             return self.amount(context)
         except Exception as exc:
-            raise DynamicSizeError(f"Dynamic size at {context._path!r}.") from exc
+            raise DynamicSizeError("Dynamic sized field!", context) from exc
 
     def get_struct(self, value: Any, context: _ContextLike) -> _StructLike:
         """Returns the struct from stored options.
@@ -273,7 +276,7 @@ class Field(_StructLike):
         # treat 'value' as the key of specified options
         if isinstance(self.options, dict):
             if value not in self.options:
-                raise OptionError(f"Option {str(value)!r} not found!")
+                raise OptionError(f"Option {str(value)!r} not found!", context)
 
             struct = self.options.get(value) or self.options.get(DEFAULT_OPTION)
         else:
@@ -282,7 +285,7 @@ class Field(_StructLike):
         if struct is None:
             # The struct must be non-null
             raise InvalidValueError(
-                f"Could not find switch value for: {value!r} at {context._path}"
+                f"Could not find switch value for: {value!r}", context
             )
 
         if hasstruct(struct):
@@ -333,7 +336,7 @@ class Field(_StructLike):
             offset = self.get_offset(context)
             start = offset if offset >= 0 else fallback
 
-            context._field = self
+            context[CTX_FIELD] = self
             # Switch is applicable AFTER we parsed the first value
             stream.seek(start)
             try:
@@ -346,7 +349,7 @@ class Field(_StructLike):
                 if value == INVALID_DEFAULT or isinstance(exc, ValidationError):
                     raise exc
             # Update the position on the current context
-            context._pos = stream.tell()
+            context[CTX_POS] = stream.tell()
         else:
             # Context functions should be executed with top priority
             value = self.struct(context)
@@ -356,7 +359,7 @@ class Field(_StructLike):
             struct: _StructLike = self.get_struct(value, context)
             # The "keep_position" flag is not applicable here. Configure a field to keep the
             # position afterward.
-            context._value = value
+            context[CTX_VALUE] = value
             return struct.__unpack__(stream, context)
 
         return value
@@ -391,8 +394,7 @@ class Field(_StructLike):
         start = offset if offset >= 0 else fallback
         struct = self.struct
 
-        context._field = self
-
+        context[CTX_FIELD] = self
         # REVISIT: maybe check whether this stream supports .seek()
         has_offset = start != fallback
         if has_offset:
@@ -402,14 +404,14 @@ class Field(_StructLike):
             # and add it after all processing hasbeen finished.
             base_stream = stream
             stream = BytesIO()
-            context._io = stream
+            context[CTX_STREAM] = stream
 
         if self.options is None and not callable(self.struct):
             struct.__pack__(obj, stream, context)
         else:
             if not callable(self.struct):
                 raise StructException(
-                    "Attepmt was made to use switch without context lambda!"
+                    "Attepmt was made to use switch without context lambda!", context
                 )
             value = self.struct(context)
             struct: _StructLike = self.get_struct(value, context)
@@ -421,8 +423,8 @@ class Field(_StructLike):
 
         if has_offset:
             # Place the stream into the internal offset map
-            context.root()._offsets[start] = stream.getbuffer()
-            context._io = base_stream
+            context._root[CTX_OFFSETS][start] = stream.getbuffer()
+            context[CTX_STREAM] = base_stream
 
     def __size__(self, context: _ContextLike) -> int:
         """Calculates the size of this field.
@@ -445,9 +447,9 @@ class Field(_StructLike):
 
         # 2. Next, dynamic fields does not store a size
         if self.has_flag(F_DYNAMIC):
-            raise DynamicSizeError(f"Dynamic size at {context._path!r}.")
+            raise DynamicSizeError("Dynamic sized field!", context)
 
-        context._field = self
+        context[CTX_FIELD] = self
 
         # 3. We should gather the element count if this field stores
         # a sequential element
@@ -455,9 +457,23 @@ class Field(_StructLike):
         if self.is_seq():
             count = self.length(context)
             if isinstance(count, _GreedyType):
-                raise DynamicSizeError("Greedy field does not have a fixed size!")
+                raise DynamicSizeError(
+                    "Greedy field does not have a fixed size!", context
+                )
 
-        size = self.struct.__size__(context)
+        struct = self.struct
+        if self.options:
+            if not callable(self.struct):
+                raise DynamicSizeError(
+                    "Switch statement without ContextLambda is danymic sized!", context
+                )
+            try:
+                value = self.struct(context)
+            except Exception as exc:
+                raise DynamicSizeError("Dynamic sized switch field!", context) from exc
+            struct = self.get_struct(value, context)
+
+        size = struct.__size__(context)
         return count * size
 
 
@@ -546,7 +562,7 @@ class FieldStruct(FieldMixin, _StructLike):
         :param stream: The output stream.
         :param context: The current operation context.
         """
-        field: Field = context._field
+        field: Field = context[CTX_FIELD]
         func = self.pack_single
         if field.is_seq():
             func = self.pack_seq
@@ -561,7 +577,7 @@ class FieldStruct(FieldMixin, _StructLike):
         :param context: The current operation context.
         :return: The unpacked data.
         """
-        field: Field = context._field
+        field: Field = context[CTX_FIELD]
         if field.is_seq():
             return self.unpack_seq(stream, context)
 

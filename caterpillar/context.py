@@ -27,6 +27,11 @@ CTX_PARENT = "_parent"
 CTX_OBJECT = "_obj"
 CTX_OFFSETS = "_offsets"
 CTX_STREAM = "_io"
+CTX_FIELD = "_field"
+CTX_VALUE = "_value"
+CTX_POS = "_pos"
+CTX_INDEX = "_index"
+CTX_PATH = "_path"
 
 
 class Context(_ContextLike):
@@ -64,7 +69,8 @@ class Context(_ContextLike):
 
             return root
 
-    def root(self) -> _ContextLike:
+    @property
+    def _root(self) -> _ContextLike:
         current = self
         while CTX_PARENT in current:
             # dict-like access is much faster
