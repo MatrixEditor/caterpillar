@@ -24,7 +24,6 @@ from caterpillar.abc import (
     _StreamType,
     _ContextLambda,
     _EnumLike,
-    _GreedyType,
     isgreedy,
 )
 from caterpillar.exception import ValidationError, UnsupportedOperation, StructException
@@ -146,8 +145,8 @@ class FormatField(FieldStruct):
         """
         if not isgreedy(context._field.length(context)):
             return list(self.unpack_single(stream, context))
-        else:
-            return super().unpack_seq(stream, context)
+
+        return super().unpack_seq(stream, context)
 
     def get_format(self, context: _ContextLike, length: int = None) -> str:
         """
@@ -157,7 +156,6 @@ class FormatField(FieldStruct):
         :return: The format string.
         """
         field: Field = context._field
-
         order = field.order
         if length is None:
             dim = field.length(context) or 1
@@ -417,19 +415,7 @@ class Bytes(FieldStruct):
         :return: The unpacked bytes object.
         """
         size = self.__size__(context)
-        return stream.read(size)
-
-    def get_format(self, context: _ContextLike) -> str:
-        """
-        Get the format string associated with this Bytes field.
-
-        :param context: The current context.
-        :return: The format string.
-        """
-        field: Field = context._field
-        order = field.order
-        dim = self.__size__(context)
-        return f"{order.ch}{dim}s"
+        return stream.read(size) if not isgreedy(size) else stream.read()
 
     def __class_getitem__(self, dim: int) -> None:
         """

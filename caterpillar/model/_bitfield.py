@@ -65,9 +65,7 @@ class BitFieldGroup:
     fields: Dict[BitTuple, Field] = dcfield(default_factory=dict)
 
 
-@dataclass(init=False)
 class Bitfield(Struct):
-    model: type
     groups: List[BitFieldGroup]
 
     def __init__(

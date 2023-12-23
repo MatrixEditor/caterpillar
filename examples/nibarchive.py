@@ -44,9 +44,12 @@ opt.set_field_flags(VARINT_LSB)
 
 @struct(order=LittleEndian)
 class NIBHeader:
+    """Example class doc comment"""
+
     # Here we define a constant value, which will raise an exception
     # upon a different parsed value.
     magic: b"NIBArchive"
+    """example field doc comment"""
 
     # Primitive types can be used just like this
     unknown_1: int32
@@ -160,5 +163,5 @@ class NIBArchive:
 
 
 # print(NIBArchive.__struct__.fields)
-obj = unpack_file(NIBArchive, sys.argv[1])
-pack_file(obj, sys.argv[2], use_tempfile=True)
+# obj = unpack_file(NIBArchive, sys.argv[1])
+# pack_file(obj, sys.argv[2], use_tempfile=True)

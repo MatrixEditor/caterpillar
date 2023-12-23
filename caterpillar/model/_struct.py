@@ -66,6 +66,10 @@ class Struct(Sequence):
         options: Iterable[Flag] = None,
         field_options: Iterable[Flag] = None,
     ) -> None:
+        options = options or set()
+        options.update(
+            GLOBAL_UNION_OPTIONS if S_UNION in options else GLOBAL_STRUCT_OPTIONS
+        )
         super().__init__(
             model=model,
             order=order,
@@ -74,12 +78,12 @@ class Struct(Sequence):
             field_options=field_options,
         )
         # Add additional options based on the struct's type
-        self.options.update(
-            GLOBAL_UNION_OPTIONS if self.is_union() else GLOBAL_STRUCT_OPTIONS
-        )
         self.model = dataclass(self.model, kw_only=True)
         setattr(self.model, STRUCT_FIELD, self)
         setattr(self.model, "__class_getitem__", lambda dim: Field(self, amount=dim))
+
+    def __type__(self) -> type:
+        return self.model
 
     def _prepare_fields(self) -> Dict[str, Any]:
         eval_str = self.has_option(S_EVAL_ANNOTATIONS)

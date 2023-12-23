@@ -48,6 +48,7 @@ from caterpillar.options import (
     F_SEQUENTIAL,
     Flag,
 )
+from caterpillar._common import unpack_seq, pack_seq
 
 
 def singleton(cls):
@@ -512,7 +513,6 @@ class FieldStruct(FieldMixin, _StructLike):
     retrieved using the :class:`Field` instance within the context.
     """
 
-    @abstractmethod
     def pack_single(self, obj: Any, stream: _StreamType, context: _ContextLike) -> None:
         """
         Abstract method to pack a single element.
@@ -521,8 +521,8 @@ class FieldStruct(FieldMixin, _StructLike):
         :param stream: The output stream.
         :param context: The current operation context.
         """
+        raise NotImplementedError
 
-    @abstractmethod
     def unpack_single(self, stream: _StreamType, context: _ContextLike) -> None:
         """
         Abstract method to unpack a single element.
@@ -531,68 +531,15 @@ class FieldStruct(FieldMixin, _StructLike):
         :param context: The current operation context.
         :return: The unpacked element.
         """
+        raise NotImplementedError
 
     def pack_seq(
         self, seq: Iterable, stream: _StreamType, context: _ContextLike
     ) -> None:
-        """Generic function to pack sequenced elements.
-
-        :param seq: the iterable of elements
-        :type seq: Iterable
-        :param stream: the output stream
-        :type stream: _StreamType
-        :param context: the current operation context
-        :type context: _ContextLike
-        :raises TypeError: if the input object is not iterable
-        """
-        field: Field = context._field
-
-        # Treat the 'obj' as a sequence/iterable
-        if not isinstance(seq, Iterable):
-            raise TypeError(f"Expected iterable sequence, got {type(seq)}")
-
-        # REVISIT: when to use field.length(context)
-        count = len(seq)
-
-        # Special elements '_index' and '_length' can be referenced within
-        # the new context. The '_pos' attribute will be adjusted automatically.
-        seq_context = Context(_parent=context, _io=stream, _length=count, _field=field)
-        seq_context._pos = stream.tell()
-        for i, elem in enumerate(seq):
-            seq_context._index = i
-            self.pack_single(elem, stream, seq)
-            seq_context._pos = stream.tell()
+        pack_seq(seq, stream, context, self.unpack_single)
 
     def unpack_seq(self, stream: _StreamType, context: _ContextLike) -> List[Any]:
-        """Generic function to unpack sequenced elements.
-
-        :param stream: the input stream
-        :type stream: _StreamType
-        :param context: the current context
-        :type context: _ContextLike
-        :return: a list of unpacked elements
-        :rtype: List[Any]
-        """
-        field: Field = context._field
-        count = field.length(context)
-        # Special elements '_index' and '_length' can be referenced within
-        # the new context. The '_pos' attribute will be adjusted automatically.
-        values = []
-        seq = Context(
-            _parent=context, _io=stream, _length=count, _lst=values, _field=field
-        )
-        seq._pos = stream.tell()
-        is_greedy = isgreedy(count)
-        for i in range(count) if not is_greedy else itertools.count():
-            try:
-                seq._index = i
-                values.append(self.unpack_single(stream, seq))
-                seq._pos = stream.tell()
-            except Exception as exc:
-                if is_greedy:
-                    break
-                raise StructException from exc
-        return values
+        return unpack_seq(stream, context, self.unpack_single)
 
     # implementation
     def __pack__(self, obj: Any, stream: _StreamType, context: _ContextLike) -> None:

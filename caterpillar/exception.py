@@ -66,3 +66,6 @@ class DelegationError(StructException):
     """
     An exception used if underlying calls fail.
     """
+
+class Stop(StructException):
+    """Stops the current parsing process"""

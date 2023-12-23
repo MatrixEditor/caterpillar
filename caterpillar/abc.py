@@ -16,6 +16,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from io import IOBase
+from typing import Protocol
 from typing import Dict, Any, Optional, Union, Callable
 
 #: Type alias for IOBase to indicate a stream type
@@ -23,6 +24,7 @@ _StreamType = IOBase
 _StreamFactory = Callable[[], _StreamType]
 
 _GreedyType = type(...)
+
 
 class _ContextLike(dict):
     """
@@ -54,7 +56,7 @@ class _ContextLambda(ABC):
         pass
 
 
-class _SupportsPack(ABC):
+class _SupportsPack(Protocol):
     """
     An abstract base class for objects that support packing data into a binary stream.
     """
@@ -64,7 +66,7 @@ class _SupportsPack(ABC):
         pass
 
 
-class _SupportsUnpack(ABC):
+class _SupportsUnpack(Protocol):
     """
     An abstract base class for objects that support unpacking data from a binary stream.
     """
@@ -74,7 +76,7 @@ class _SupportsUnpack(ABC):
         pass
 
 
-class _SupportsSize(ABC):
+class _SupportsSize(Protocol):
     """
     An abstract base class for objects that support determining the size of packed data.
     """
@@ -105,7 +107,7 @@ class _StructLike:
         pass
 
 
-class _ContainsStruct(ABC):
+class _ContainsStruct(Protocol):
     """
     An abstract base class indicating that a class contains a _StructLike object.
     """
@@ -113,7 +115,7 @@ class _ContainsStruct(ABC):
     __struct__: _StructLike
 
 
-class _EnumLike(ABC):
+class _EnumLike(Protocol):
     """
     An abstract base class for enum-like objects with a value, name, and mappings.
     """
@@ -124,7 +126,7 @@ class _EnumLike(ABC):
     _value2member_map_: Dict[Any, _EnumLike]
 
 
-class _Switch(ABC):
+class _Switch(Protocol):
     """
     An abstract base class for a switch-like object that generates a _StructLike based on a value and context.
     """

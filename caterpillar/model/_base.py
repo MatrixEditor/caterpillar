@@ -45,6 +45,7 @@ from caterpillar.options import (
     Flag,
 )
 from caterpillar.fields import Field, INVALID_DEFAULT, ConstBytes, ConstString
+from caterpillar._common import unpack_seq, pack_seq
 
 
 @dataclass(init=False)
@@ -102,6 +103,9 @@ class Sequence(_StructLike):
         self.fields: List[Field] = []
         # Process all fields in the model
         self._process_model()
+
+    def __type__(self) -> type:
+        return dict
 
     def has_option(self, option: Flag) -> bool:
         """
@@ -315,24 +319,7 @@ class Sequence(_StructLike):
         # See __pack__ for more information
         field: Optional[Field] = context.get("_field")
         if field and field.is_seq():
-            length: int = field.length(context)  # use parent context here
-            values = []  # always list (maybe add factory)
-
-            this_context._length = length
-            this_context._lst = values
-            this_context._field = field
-            # REVISIT: add _pos to context AND this code should be shipped to a general method
-            is_greedy = isinstance(length, _GreedyType)
-            for i in range(length) if not is_greedy else itertools.count():
-                try:
-                    this_context._index = i
-                    values.append(self.unpack_one(stream, this_context))
-                except Exception as exc:
-                    if is_greedy:
-                        break
-                    raise StructException from exc
-            return values
-
+            return unpack_seq(stream, context, self.unpack_one)
         return self.unpack_one(stream, this_context)
 
     def get_value(self, obj: Any, name: str, field: Field) -> Optional[Any]:
@@ -382,30 +369,13 @@ class Sequence(_StructLike):
             union_field.__pack__(value, stream, context)
 
     def __pack__(self, obj: Any, stream: _StreamType, context: _ContextLike) -> None:
-        # REVISIT: code cleanup
-        base_path = context._path
-        this_context = Context(_parent=context, _io=stream, _path=base_path, _obj=obj)
-        max_size = 0
-
         is_union = self.is_union()
         # As structs can be used in field definitions a field will call this struct
         # and could potentially be a sequence. Therefore, we have to check whether we
         # should unpack multiple objects.
         field: Optional[Field] = context.get("_field")
         if field and field.is_seq():
-            # Treat the 'obj' as a sequence/iterable
-            if not isinstance(obj, Iterable):
-                raise TypeError(f"Expected iterable sequence, got {type(obj)}")
-
-            data = list(obj)
-            this_context._length = len(data)
-            this_context._field = field
-            for i, elem in enumerate(data):
-                # The path will contain an additional hint on what element is processed
-                # at the moment.
-                this_context._index = i
-                this_context._path = ".".join([base_path, str(i)])
-                this_context._obj = elem
-                self.pack_one(elem, stream, this_context)
+            pack_seq(obj, stream, context, self.pack_one)
         else:
-            self.pack_one(obj, stream, this_context)
+            ctx = Context(_parent=context, _io=stream, _path=context._path, _obj=obj)
+            self.pack_one(obj, stream, ctx)
