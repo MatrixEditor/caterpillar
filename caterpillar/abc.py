@@ -41,8 +41,8 @@ class _ContextLike(dict):
     def __getattribute__(self, key: str):
         pass
 
-    @abstractmethod
     @property
+    @abstractmethod
     def _root(self) -> Optional[_ContextLike]:
         pass
 

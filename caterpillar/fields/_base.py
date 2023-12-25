@@ -56,7 +56,7 @@ def singleton(cls):
 
 # Constant representing an invalid default value
 INVALID_DEFAULT = object()
-DEFAULT_OPTION = None
+DEFAULT_OPTION = object()
 
 
 @dataclass(init=False)

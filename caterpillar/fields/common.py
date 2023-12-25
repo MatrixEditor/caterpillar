@@ -45,7 +45,7 @@ class FormatField(FieldStruct):
         """
         self.text = ch
         self.type_ = type_
-        self.__bits__ = calcsize(self.text)
+        self.__bits__ = calcsize(self.text) * 8
 
     def __repr__(self) -> str:
         """
@@ -479,7 +479,9 @@ class CString(Bytes):
     """
 
     def __init__(
-        self, length: Union[int, _ContextLambda], encoding: Optional[str] = None
+        self,
+        length: Union[int, _ContextLambda, None] = None,
+        encoding: Optional[str] = None,
     ) -> None:
         """
         Initialize the String field with a fixed length or a length determined by a context lambda.
@@ -487,7 +489,7 @@ class CString(Bytes):
         :param length: The fixed length or a context lambda to determine the length dynamically.
         :param encoding: The encoding to use for string encoding/decoding (default is UTF-8).
         """
-        super().__init__(length)
+        super().__init__(length or ...)
         self.encoding = encoding or "utf-8"
 
     def __type__(self) -> type:
@@ -506,9 +508,12 @@ class CString(Bytes):
         :param stream: The output stream.
         :param context: The current context.
         """
-        length = self.__size__(context)
-        obj_length = len(obj)
-        payload = obj.encode(self.encoding) + b"\x00" * (length - obj_length)
+        if not isgreedy(self.length):
+            length = self.__size__(context)
+            obj_length = len(obj)
+            payload = obj.encode(self.encoding) + b"\x00" * (length - obj_length)
+        else:
+            payload = obj.encode(self.encoding) + b"\x00"
         super().pack_single(payload, stream, context)
 
     def unpack_single(self, stream: _StreamType, context: _ContextLike) -> Any:
@@ -519,8 +524,20 @@ class CString(Bytes):
         :param context: The current context.
         :return: The unpacked string.
         """
-        value: str = super().unpack_single(stream, context).decode(self.encoding)
-        return value.rstrip("\x00")
+        if isgreedy(self.length):
+            # Parse actual C-String
+            data = []
+            while True:
+                value = stream.read(1)
+                if not value:
+                    break
+                data.append(*value)
+                if data[-1] == 0:
+                    break
+            value = bytes(data)
+        else:
+            value: str = super().unpack_single(stream, context)
+        return value.decode(self.encoding).rstrip("\x00")
 
 
 class ConstString(Const):

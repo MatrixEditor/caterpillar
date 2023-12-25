@@ -92,7 +92,7 @@ class Struct(Sequence):
                 self += struct
 
         eval_str = self.has_option(S_EVAL_ANNOTATIONS)
-        # The why is desribed in detail here: https://docs.python.org/3/howto/annotations.html
+        # The why is described in detail here: https://docs.python.org/3/howto/annotations.html
         return inspect.get_annotations(self.model, eval_str=eval_str)
 
     def _set_default(self, name: str, value: Any) -> None:

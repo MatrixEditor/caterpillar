@@ -51,11 +51,15 @@ BitTuple = Tuple[int, int]
 
 
 BITS_ATTR = "__bits__"
+SIGNED_ATTR = "__signed__"
 
 
 def getbits(obj: Any) -> int:
     __bits__ = getattr(obj, BITS_ATTR)
     return __bits__() if callable(__bits__) else __bits__
+
+def issigned(obj: Any) -> bool:
+    return bool(getattr(obj, SIGNED_ATTR, None))
 
 
 @dataclass(frozen=True)
