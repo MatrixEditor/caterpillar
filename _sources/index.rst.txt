@@ -28,7 +28,8 @@ to write complex structures in a compact and readable manner.
    class Format:
       magic: b"Foo"                       # constant values
       name: CString(...)                  # C-String without a fixed length
-      num_entries: uint32                 # simple field definition
+      value: le + uint16                  # little endian encoding
+      num_entries: be + uint32            # simple field definition + big endian encoding
       entries: CString[this.num_entries]  # arrays just like that
 
 .. admonition:: Hold up, wait a minute!
@@ -39,16 +40,16 @@ to write complex structures in a compact and readable manner.
 Working with defined classes is as straightforward as working with normal classes. *All
 constant values are created automatically!*
 
->>> obj = Format(name="Hello, World!", num_entries=1, entries=["Bar"])
+>>> obj = Format(name="Hello, World!", value=1, num_entries=1, entries=["Bar"])
 >>> print(obj)
-Format(magic=b'Foo', name='Hello, World!', num_entries=1, entries=['Bar'])
+Format(magic=b'Foo', name='Hello, World!', value=1, num_entries=1, entries=['Bar'])
 
 Packing and unpacking have never been easier:
 
 >>> pack(obj)
-b'FooHello, World!\x00\x01\x00\x00\x00Bar\x00'
->>> unpack(Format, b'FooHello, World!\x00\x01\x00\x00\x00Bar\x00')
-Format(magic=b'Foo', name='Hello, World!', num_entries=1, entries=['Bar'])
+b'FooHello, World!\x00\x01\x00\x00\x00\x00\x00\x00\x01Bar\x00'
+>>> unpack(Format, _)
+Format(magic=b'Foo', name='Hello, World!', value=1, num_entries=1, entries=['Bar'])
 
 .. admonition:: What about documentation?
 
