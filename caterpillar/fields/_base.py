@@ -314,7 +314,7 @@ class Field(_StructLike):
         return getattr(self, "__name__", None)
 
     # IO related stuff
-    def __unpack__(self, stream: _StreamType, context: _ContextLike) -> Optional[Any]:
+    def __unpack__(self, context: _ContextLike) -> Optional[Any]:
         """Reads packed data from the given stream.
 
         This method returns nothing if this field is disabled and applies switch if
@@ -327,6 +327,7 @@ class Field(_StructLike):
         :return: the parsed data
         :rtype: Optional[Any]
         """
+        stream: _StreamType = context[CTX_STREAM]
         if not self.is_enabled(context):
             # handling the result of this function should be treated carefully
             return None
@@ -340,7 +341,7 @@ class Field(_StructLike):
             # Switch is applicable AFTER we parsed the first value
             stream.seek(start)
             try:
-                value = self.struct.__unpack__(stream, context)
+                value = self.struct.__unpack__(context)
                 if not self.has_flag(F_KEEP_POSITION):
                     stream.seek(fallback)
             except StructException as exc:
@@ -360,11 +361,11 @@ class Field(_StructLike):
             # The "keep_position" flag is not applicable here. Configure a field to keep the
             # position afterward.
             context[CTX_VALUE] = value
-            return struct.__unpack__(stream, context)
+            return struct.__unpack__(context)
 
         return value
 
-    def __pack__(self, obj: Any, stream: _StreamType, context: _ContextLike) -> None:
+    def __pack__(self, obj: Any, context: _ContextLike) -> None:
         """Writes the given object to the provided stream.
 
         There are several options associated with this function. First, disabled
@@ -384,6 +385,7 @@ class Field(_StructLike):
         :raises TypeError: if the value is not iterable but this field is marked
                            to be sequential
         """
+        stream: _StreamType = context[CTX_STREAM]
         if not self.is_enabled(context):
             # Disabled fields or context lambdas won't pack any data
             return
@@ -407,7 +409,7 @@ class Field(_StructLike):
             context[CTX_STREAM] = stream
 
         if self.options is None and not callable(self.struct):
-            struct.__pack__(obj, stream, context)
+            struct.__pack__(obj, context)
         else:
             if not callable(self.struct):
                 raise StructException(
@@ -415,7 +417,7 @@ class Field(_StructLike):
                 )
             value = self.struct(context)
             struct: _StructLike = self.get_struct(value, context)
-            struct.__pack__(obj, stream, context)
+            struct.__pack__(obj, context)
 
         if not self.has_flag(F_KEEP_POSITION) and not has_offset:
             # The position shouldn't be persisted reset the stream
@@ -525,7 +527,7 @@ class FieldStruct(FieldMixin, _StructLike):
     retrieved using the :class:`Field` instance within the context.
     """
 
-    def pack_single(self, obj: Any, stream: _StreamType, context: _ContextLike) -> None:
+    def pack_single(self, obj: Any, context: _ContextLike) -> None:
         """
         Abstract method to pack a single element.
 
@@ -535,7 +537,7 @@ class FieldStruct(FieldMixin, _StructLike):
         """
         raise NotImplementedError
 
-    def unpack_single(self, stream: _StreamType, context: _ContextLike) -> None:
+    def unpack_single(self, context: _ContextLike) -> None:
         """
         Abstract method to unpack a single element.
 
@@ -545,16 +547,14 @@ class FieldStruct(FieldMixin, _StructLike):
         """
         raise NotImplementedError
 
-    def pack_seq(
-        self, seq: Iterable, stream: _StreamType, context: _ContextLike
-    ) -> None:
-        pack_seq(seq, stream, context, self.unpack_single)
+    def pack_seq(self, seq: Iterable, context: _ContextLike) -> None:
+        pack_seq(seq, context, self.unpack_single)
 
-    def unpack_seq(self, stream: _StreamType, context: _ContextLike) -> List[Any]:
-        return unpack_seq(stream, context, self.unpack_single)
+    def unpack_seq(self, context: _ContextLike) -> List[Any]:
+        return unpack_seq(context, self.unpack_single)
 
     # implementation
-    def __pack__(self, obj: Any, stream: _StreamType, context: _ContextLike) -> None:
+    def __pack__(self, obj: Any, context: _ContextLike) -> None:
         """
         Pack data based on whether the field is sequential or not.
 
@@ -567,9 +567,9 @@ class FieldStruct(FieldMixin, _StructLike):
         if field.is_seq():
             func = self.pack_seq
 
-        func(obj, stream, context)
+        func(obj, context)
 
-    def __unpack__(self, stream: _StreamType, context: _ContextLike) -> Any:
+    def __unpack__(self, context: _ContextLike) -> Any:
         """
         Unpack data based on whether the field is sequential or not.
 
@@ -579,9 +579,9 @@ class FieldStruct(FieldMixin, _StructLike):
         """
         field: Field = context[CTX_FIELD]
         if field.is_seq():
-            return self.unpack_seq(stream, context)
+            return self.unpack_seq(context)
 
-        return self.unpack_single(stream, context)
+        return self.unpack_single(context)
 
     def __repr__(self) -> str:
         """

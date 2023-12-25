@@ -16,7 +16,7 @@ import itertools
 
 from typing import List, Any, Union, Iterable
 
-from caterpillar.abc import _GreedyType, _StreamType, _ContextLike, isgreedy
+from caterpillar.abc import _GreedyType, _ContextLike, isgreedy
 from caterpillar.context import (
     Context,
     CTX_PATH,
@@ -24,11 +24,12 @@ from caterpillar.context import (
     CTX_POS,
     CTX_INDEX,
     CTX_OBJECT,
+    CTX_STREAM,
 )
 from caterpillar.exception import Stop, StructException, InvalidValueError
 
 
-def unpack_seq(stream: _StreamType, context: _ContextLike, unpack_one) -> List[Any]:
+def unpack_seq(context: _ContextLike, unpack_one) -> List[Any]:
     """Generic function to unpack sequenced elements.
 
     :param stream: the input stream
@@ -38,6 +39,7 @@ def unpack_seq(stream: _StreamType, context: _ContextLike, unpack_one) -> List[A
     :return: a list of unpacked elements
     :rtype: List[Any]
     """
+    stream = context[CTX_STREAM]
     field = context[CTX_FIELD]
     assert field and field.is_seq()
 
@@ -55,20 +57,18 @@ def unpack_seq(stream: _StreamType, context: _ContextLike, unpack_one) -> List[A
         try:
             seq_context[CTX_PATH] = ".".join([base_path, str(i)])
             seq_context[CTX_INDEX] = i
-            values.append(unpack_one(stream, seq_context))
+            values.append(unpack_one(seq_context))
             seq_context[CTX_POS] = stream.tell()
         except Stop:
             break
         except Exception as exc:
             if greedy:
                 break
-            raise StructException from exc
+            raise StructException(str(exc), context) from exc
     return values
 
 
-def pack_seq(
-    seq: List[Any], stream: _StreamType, context: _ContextLike, pack_one
-) -> None:
+def pack_seq(seq: List[Any], context: _ContextLike, pack_one) -> None:
     """Generic function to pack sequenced elements.
 
     :param seq: the iterable of elements
@@ -79,6 +79,7 @@ def pack_seq(
     :type context: _ContextLike
     :raises InvalidValueError: if the input object is not iterable
     """
+    stream = context[CTX_STREAM]
     field = context[CTX_FIELD]
     base_path = context[CTX_PATH]
     # Treat the 'obj' as a sequence/iterable
@@ -98,5 +99,5 @@ def pack_seq(
         seq_context[CTX_INDEX] = i
         seq_context[CTX_PATH] = ".".join([base_path, str(i)])
         seq_context[CTX_OBJECT] = elem
-        pack_one(elem, stream, seq_context)
+        pack_one(elem, seq_context)
         seq_context[CTX_POS] = stream.tell()

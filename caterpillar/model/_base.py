@@ -22,7 +22,7 @@ from dataclasses import dataclass
 from caterpillar.abc import _StructLike, _ContextLike
 from caterpillar.abc import _StreamType, _ContextLambda
 from caterpillar.abc import getstruct
-from caterpillar.context import Context, CTX_PATH, CTX_OBJECT
+from caterpillar.context import Context, CTX_PATH, CTX_OBJECT, CTX_STREAM
 from caterpillar.byteorder import BYTEORDER_FIELD, ByteOrder, SysNative
 from caterpillar.byteorder import Arch, get_system_arch
 from caterpillar.exception import StructException, ValidationError
@@ -300,9 +300,10 @@ class Sequence(_StructLike, FieldMixin):
 
         return max(sizes) if self.is_union() else sum(sizes)
 
-    def unpack_one(self, stream: _StreamType, context: _ContextLike) -> Optional[Any]:
+    def unpack_one(self, context: _ContextLike) -> Optional[Any]:
         # At first, we define the object context where the parsed values
         # will be stored
+        stream: _StreamType = context[CTX_STREAM]
         init_data: Dict[str, Any] = Context()
         context[CTX_OBJECT] = Context(_parent=context)
 
@@ -315,7 +316,7 @@ class Sequence(_StructLike, FieldMixin):
             name = field.get_name()
             # The context path has to be changed accordingly
             context[CTX_PATH] = ".".join([base_path, name])
-            result = field.__unpack__(stream, context)
+            result = field.__unpack__(context)
             # the object's data shouldn't include removed fields
             context[CTX_OBJECT][name] = result
             if name in self._member_map_:
@@ -332,7 +333,7 @@ class Sequence(_StructLike, FieldMixin):
             stream.seek(start + max_size)
         return obj
 
-    def __unpack__(self, stream: _StreamType, context: _ContextLike) -> Optional[Any]:
+    def __unpack__(self, context: _ContextLike) -> Optional[Any]:
         """
         Unpack the struct from the stream.
 
@@ -342,19 +343,19 @@ class Sequence(_StructLike, FieldMixin):
         """
         base_path = context[CTX_PATH]
         # REVISIT: the name 'this_context' is misleading here
-        this_context = Context(_parent=context, _io=stream, _path=base_path)
+        this_context = Context(
+            _parent=context, _io=context[CTX_STREAM], _path=base_path
+        )
         # See __pack__ for more information
         field: Optional[Field] = context.get("_field")
         if field and field.is_seq():
-            return unpack_seq(stream, context, self.unpack_one)
-        return self.unpack_one(stream, this_context)
+            return unpack_seq(context, self.unpack_one)
+        return self.unpack_one(this_context)
 
     def get_value(self, obj: Any, name: str, field: Field) -> Optional[Any]:
         return obj.get(name, None)
 
-    def pack_one(
-        self, obj: Dict[str, Any], stream: _StreamType, context: _ContextLike
-    ) -> None:
+    def pack_one(self, obj: Dict[str, Any], context: _ContextLike) -> None:
         is_union = self.is_union()
         max_size = 0
         union_field: Optional[_StructLike] = None
@@ -364,7 +365,9 @@ class Sequence(_StructLike, FieldMixin):
             # The name has to be set (important for current context)
             name = field.get_name()
             if name is None:
-                raise StructException(f"Could not measure a field's name: {field!r}", context)
+                raise StructException(
+                    f"Could not measure a field's name: {field!r}", context
+                )
 
             if is_union:
                 # Union is only applicable for non-dynamic structs
@@ -381,27 +384,29 @@ class Sequence(_StructLike, FieldMixin):
                     # REVISIT: this line might not be necessary if const fields alredy
                     # use their internal value.
                     value = field.default if field.default != INVALID_DEFAULT else None
-                field.__pack__(value, stream, context)
+                field.__pack__(value, context)
 
         if is_union:
             if union_field is None:
                 raise StructException(
-                    f"Invalid union config: no fields declared!", context
+                    "Invalid union config: no fields declared!", context
                 )
 
             name = union_field.get_name()
             context[CTX_PATH] = ".".join([base_path, "<value>"])
             # REVISIT: are constant values allowed here? + name validation?
             value = self.get_value(obj, name, union_field)
-            union_field.__pack__(value, stream, context)
+            union_field.__pack__(value, context)
 
-    def __pack__(self, obj: Any, stream: _StreamType, context: _ContextLike) -> None:
+    def __pack__(self, obj: Any, context: _ContextLike) -> None:
         # As structs can be used in field definitions a field will call this struct
         # and could potentially be a sequence. Therefore, we have to check whether we
         # should unpack multiple objects.
         field: Optional[Field] = context.get("_field")
         if field and field.is_seq():
-            pack_seq(obj, stream, context, self.pack_one)
+            pack_seq(obj, context, self.pack_one)
         else:
-            ctx = Context(_parent=context, _io=stream, _path=context[CTX_PATH], _obj=obj)
-            self.pack_one(obj, stream, ctx)
+            ctx = Context(
+                _parent=context, _io=context[CTX_STREAM], _path=context[CTX_PATH], _obj=obj
+            )
+            self.pack_one(obj, ctx)

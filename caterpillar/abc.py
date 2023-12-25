@@ -63,7 +63,7 @@ class _SupportsPack(Protocol):
     """
 
     @abstractmethod
-    def __pack__(self, obj, stream: _StreamType, context: _ContextLike) -> None:
+    def __pack__(self, obj: Any, context: _ContextLike) -> None:
         pass
 
 
@@ -73,7 +73,7 @@ class _SupportsUnpack(Protocol):
     """
 
     @abstractmethod
-    def __unpack__(self, stream: _StreamType, context: _ContextLike):
+    def __unpack__(self, context: _ContextLike):
         pass
 
 
@@ -97,11 +97,11 @@ class _StructLike:
         pass
 
     @abstractmethod
-    def __unpack__(self, stream: _StreamType, context: _ContextLike):
+    def __unpack__(self, context: _ContextLike):
         pass
 
     @abstractmethod
-    def __pack__(self, obj, stream: _StreamType, context: _ContextLike) -> None:
+    def __pack__(self, obj: Any, context: _ContextLike) -> None:
         pass
 
     def __type__(self) -> Optional[type]:

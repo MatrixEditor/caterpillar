@@ -27,7 +27,7 @@ from caterpillar.abc import (
     isgreedy,
 )
 from caterpillar.exception import ValidationError, UnsupportedOperation, StructException
-from caterpillar.context import CTX_FIELD
+from caterpillar.context import CTX_FIELD, CTX_STREAM
 from ._base import Field, FieldStruct
 
 
@@ -73,7 +73,7 @@ class FormatField(FieldStruct):
         """
         return calcsize(self.get_format(context))
 
-    def pack_single(self, obj: Any, stream: _StreamType, context: _ContextLike) -> None:
+    def pack_single(self, obj: Any, context: _ContextLike) -> None:
         """
         Pack a single value into the stream.
 
@@ -81,6 +81,7 @@ class FormatField(FieldStruct):
         :param stream: The output stream.
         :param context: The current context.
         """
+        stream: _StreamType = context[CTX_STREAM]
         if obj is None:
             values = []
         else:
@@ -91,29 +92,26 @@ class FormatField(FieldStruct):
         data = pack(self.get_format(context), *values)
         stream.write(data)
 
-    def pack_seq(
-        self, seq: Sequence, stream: _StreamType, context: _ContextLike
-    ) -> None:
+    def pack_seq(self, seq: Sequence, context: _ContextLike) -> None:
         """
         Pack a sequence of values into the stream.
 
         :param seq: The sequence of values.
-        :param stream: The output stream.
         :param context: The current context.
         """
         if not isgreedy(context[CTX_FIELD].length(context)):
-            self.pack_single(seq, stream, context)
+            self.pack_single(seq, context)
         else:
-            super().pack_seq(seq, stream, context)
+            super().pack_seq(seq, context)
 
-    def unpack_single(self, stream: _StreamType, context: _ContextLike) -> Any:
+    def unpack_single(self, context: _ContextLike) -> Any:
         """
         Unpack a single value from the stream.
 
-        :param stream: The input stream.
         :param context: The current context.
         :return: The unpacked value.
         """
+        stream: _StreamType = context[CTX_STREAM]
         field: Field = context[CTX_FIELD]
         length = field.length(context)
         if length == 0 and field.is_seq():
@@ -135,18 +133,17 @@ class FormatField(FieldStruct):
 
         return value
 
-    def unpack_seq(self, stream: _StreamType, context: _ContextLike) -> List[Any]:
+    def unpack_seq(self, context: _ContextLike) -> List[Any]:
         """
         Unpack a sequence of values from the stream.
 
-        :param stream: The input stream.
         :param context: The current context.
         :return: A list of unpacked values.
         """
         if not isgreedy(context[CTX_FIELD].length(context)):
-            return list(self.unpack_single(stream, context))
+            return list(self.unpack_single(context))
 
-        return super().unpack_seq(stream, context)
+        return super().unpack_seq(context)
 
     def get_format(self, context: _ContextLike, length: int = None) -> str:
         """
@@ -255,26 +252,24 @@ class Transformer(FieldStruct):
         """
         return parsed
 
-    def pack_single(self, obj: Any, stream: _StreamType, context: _ContextLike) -> None:
+    def pack_single(self, obj: Any, context: _ContextLike) -> None:
         """
         Pack a single value into the stream using encoding.
 
         :param obj: The original data to be encoded and packed.
-        :param stream: The output stream.
         :param context: The current context.
         """
         value = self.encode(obj, context)
-        self.struct.__pack__(value, stream, context)
+        self.struct.__pack__(value, context)
 
-    def unpack_single(self, stream: _StreamType, context: _ContextLike) -> Any:
+    def unpack_single(self, context: _ContextLike) -> Any:
         """
         Unpack a single value from the stream and decode it.
 
-        :param stream: The input stream.
         :param context: The current context.
         :return: The decoded data.
         """
-        value = self.struct.__unpack__(stream, context)
+        value = self.struct.__unpack__(context)
         return self.decode(value, context)
 
 
@@ -394,37 +389,25 @@ class Bytes(FieldStruct):
         """
         return self.length(context) if callable(self.length) else self.length
 
-    def pack_single(
-        self, obj: bytes, stream: _StreamType, context: _ContextLike
-    ) -> None:
+    def pack_single(self, obj: bytes, context: _ContextLike) -> None:
         """
         Pack a single bytes object into the stream.
 
         :param obj: The bytes object to pack.
-        :param stream: The output stream.
         :param context: The current context.
         """
-        stream.write(obj)
+        context[CTX_STREAM].write(obj)
 
-    def unpack_single(self, stream: _StreamType, context: _ContextLike) -> Any:
+    def unpack_single(self, context: _ContextLike) -> Any:
         """
         Unpack a single bytes object from the stream.
 
-        :param stream: The input stream.
         :param context: The current context.
         :return: The unpacked bytes object.
         """
+        stream: _StreamType = context[CTX_STREAM]
         size = self.__size__(context)
         return stream.read(size) if not isgreedy(size) else stream.read()
-
-    def __class_getitem__(cls, dim: int) -> None:
-        """
-        Class method to raise an UnsupportedOperation when attempting to use multiple sequences.
-
-        :param dim: The dimension (length) of the sequence.
-        :raises UnsupportedOperation: Multiple sequences not allowed!
-        """
-        raise UnsupportedOperation("Multiple sequences not allowed!")
 
 
 class String(Bytes):
@@ -452,25 +435,23 @@ class String(Bytes):
         """
         return str
 
-    def pack_single(self, obj: str, stream: _StreamType, context: _ContextLike) -> None:
+    def pack_single(self, obj: str, context: _ContextLike) -> None:
         """
         Pack a single string into the stream.
 
         :param obj: The string to pack.
-        :param stream: The output stream.
         :param context: The current context.
         """
-        super().pack_single(obj.encode(self.encoding), stream, context)
+        super().pack_single(obj.encode(self.encoding), context)
 
-    def unpack_single(self, stream: _StreamType, context: _ContextLike) -> Any:
+    def unpack_single(self, context: _ContextLike) -> Any:
         """
         Unpack a single string from the stream.
 
-        :param stream: The input stream.
         :param context: The current context.
         :return: The unpacked string.
         """
-        return super().unpack_single(stream, context).decode(self.encoding)
+        return super().unpack_single(context).decode(self.encoding)
 
 
 class CString(Bytes):
@@ -500,12 +481,11 @@ class CString(Bytes):
         """
         return str
 
-    def pack_single(self, obj: str, stream: _StreamType, context: _ContextLike) -> None:
+    def pack_single(self, obj: str, context: _ContextLike) -> None:
         """
         Pack a single string into the stream.
 
         :param obj: The string to pack.
-        :param stream: The output stream.
         :param context: The current context.
         """
         if not isgreedy(self.length):
@@ -514,18 +494,18 @@ class CString(Bytes):
             payload = obj.encode(self.encoding) + b"\x00" * (length - obj_length)
         else:
             payload = obj.encode(self.encoding) + b"\x00"
-        super().pack_single(payload, stream, context)
+        super().pack_single(payload, context)
 
-    def unpack_single(self, stream: _StreamType, context: _ContextLike) -> Any:
+    def unpack_single(self, context: _ContextLike) -> Any:
         """
         Unpack a single string from the stream.
 
-        :param stream: The input stream.
         :param context: The current context.
         :return: The unpacked string.
         """
         if isgreedy(self.length):
             # Parse actual C-String
+            stream: _StreamType = context[CTX_STREAM]
             data = []
             while True:
                 value = stream.read(1)
@@ -536,7 +516,7 @@ class CString(Bytes):
                     break
             value = bytes(data)
         else:
-            value: str = super().unpack_single(stream, context)
+            value: str = super().unpack_single(context)
         return value.decode(self.encoding).rstrip("\x00")
 
 
@@ -580,20 +560,20 @@ class Computed(FieldStruct):
     def __type__(self) -> type:
         return Any if callable(self.value) else type(self.value)
 
-    def __pack__(self, obj: Any, stream: _StreamType, context: _ContextLike) -> None:
+    def __pack__(self, obj: Any, context: _ContextLike) -> None:
         pass
 
     def __size__(self, context: _ContextLike) -> int:
         return 0
 
-    def __unpack__(self, stream: _StreamType, context: _ContextLike) -> Any:
+    def __unpack__(self, context: _ContextLike) -> Any:
         return self.value(context) if callable(self.value) else self.value
 
-    def pack_single(self, obj: Any, stream: _StreamType, context: _ContextLike) -> None:
+    def pack_single(self, obj: Any, context: _ContextLike) -> None:
         # No need for an implementation
         pass
 
-    def unpack_single(self, stream: _StreamType, context: _ContextLike) -> None:
+    def unpack_single(self, context: _ContextLike) -> None:
         # No need for an implementation
         pass
 
@@ -605,19 +585,19 @@ class Pass(FieldStruct):
     def __type__(self) -> type:
         return type(None)
 
-    def __pack__(self, obj: Any, stream: _StreamType, context: _ContextLike) -> None:
+    def __pack__(self, obj: Any, context: _ContextLike) -> None:
         pass
 
     def __size__(self, context: _ContextLike) -> int:
         return 0
 
-    def __unpack__(self, stream: _StreamType, context: _ContextLike) -> Any:
+    def __unpack__(self, context: _ContextLike) -> Any:
         return None
 
-    def pack_single(self, obj: Any, stream: _StreamType, context: _ContextLike) -> None:
+    def pack_single(self, obj: Any, context: _ContextLike) -> None:
         # No need for an implementation
         pass
 
-    def unpack_single(self, stream: _StreamType, context: _ContextLike) -> None:
+    def unpack_single(self, context: _ContextLike) -> None:
         # No need for an implementation
         pass

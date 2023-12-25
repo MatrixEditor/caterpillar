@@ -12,11 +12,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-from typing import Optional, Any, Union, Dict
-from typing import Iterable, Iterator, Tuple
+from typing import Optional, Any, Dict
+from typing import Iterable, Tuple
 from typing import Self, List
 from dataclasses import dataclass, field as dcfield
-from functools import cached_property
 
 from caterpillar.abc import _StructLike, _ContextLike, _StreamType, typeof
 from caterpillar.byteorder import (
@@ -43,7 +42,7 @@ from caterpillar.fields import (
     Pass,
 )
 from caterpillar.exception import ValidationError, DelegationError
-from caterpillar.context import Context, CTX_PATH, CTX_OBJECT
+from caterpillar.context import Context, CTX_PATH, CTX_OBJECT, CTX_STREAM
 
 from ._struct import Struct
 
@@ -243,9 +242,10 @@ class Bitfield(Struct):
         # The size of a bitfield is alsways static
         return self._length
 
-    def unpack_one(self, stream: _StreamType, context: _ContextLike) -> Optional[Any]:
+    def unpack_one(self, context: _ContextLike) -> Optional[Any]:
         # At first, we define the object context where the parsed values
         # will be stored
+        stream: _StreamType = context[CTX_STREAM]
         init_data: Dict[str, Any] = Context()
         context[CTX_OBJECT] = Context(_parent=context)
         base_path = context[CTX_PATH]
@@ -281,7 +281,8 @@ class Bitfield(Struct):
         obj = self.model(**init_data)
         return obj
 
-    def pack_one(self, obj: Any, stream: _StreamType, context: _ContextLike) -> None:
+    def pack_one(self, obj: Any, context: _ContextLike) -> None:
+        stream: _StreamType = context[CTX_STREAM]
         base_path: str = context[CTX_PATH]
         for i, group in enumerate(self.groups):
             # The same applies here, but we convert all values to int instead of reading

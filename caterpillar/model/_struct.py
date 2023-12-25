@@ -104,8 +104,8 @@ class Struct(Sequence):
     def _remove_from_model(self, name: str) -> None:
         self.model.__annotations__.pop(name)
 
-    def unpack_one(self, stream: _StreamType, context: _ContextLike) -> Optional[Any]:
-        init_data = super().unpack_one(stream, context)
+    def unpack_one(self, context: _ContextLike) -> Optional[Any]:
+        init_data = super().unpack_one(context)
         return self.model(**init_data)
 
     def get_value(self, obj: Any, name: str, field: Field) -> Optional[Any]:
@@ -249,7 +249,7 @@ def pack_into(
         # NOTE: this implementation is exprimental - use this option with caution.
         with TemporaryFile() as stream:
             context[CTX_STREAM] = stream
-            struct.__pack__(obj, stream, context)
+            struct.__pack__(obj, context)
 
             for offset, value in offsets.items():
                 stream.seek(start)
@@ -265,7 +265,7 @@ def pack_into(
         # elements and then apply all offset-packed objects.
         stream = BytesIO()
         context[CTX_STREAM] = stream
-        struct.__pack__(obj, stream, context)
+        struct.__pack__(obj, context)
 
         content = stream.getbuffer()
         for offset, value in offsets.items():
@@ -317,7 +317,7 @@ def unpack(
     if hasstruct(struct):
         struct = getstruct(struct)
 
-    return struct.__unpack__(stream, context)
+    return struct.__unpack__(context)
 
 
 def unpack_file(

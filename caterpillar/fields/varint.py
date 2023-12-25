@@ -19,7 +19,7 @@ from typing import Any
 from caterpillar.abc import _StreamType, _ContextLike
 from caterpillar.exception import InvalidValueError, DynamicSizeError, StreamError
 from caterpillar.byteorder import LittleEndian
-from caterpillar.context import CTX_FIELD
+from caterpillar.context import CTX_FIELD, CTX_STREAM
 
 from ._base import FieldStruct, Flag, singleton
 
@@ -63,12 +63,11 @@ class VarInt(FieldStruct):
             low_bit = 1 << 7
         return high_bit, low_bit
 
-    def pack_single(self, obj: int, stream: _StreamType, context: _ContextLike) -> None:
+    def pack_single(self, obj: int, context: _ContextLike) -> None:
         """
         Pack a single value into the stream.
 
         :param obj: The value to pack.
-        :param stream: The output stream.
         :param context: The current context.
         """
         if obj is None:
@@ -77,6 +76,7 @@ class VarInt(FieldStruct):
         if obj < 0:
             raise InvalidValueError("Invalid negative value for VarInt encoding!")
 
+        stream: _StreamType = context[CTX_STREAM]
         order = context[CTX_FIELD].order
         is_little = order == LittleEndian
 
@@ -99,7 +99,7 @@ class VarInt(FieldStruct):
         # Just write all bytes to the stream
         stream.write(bytes(data))
 
-    def unpack_single(self, stream: _StreamType, context: _ContextLike) -> Any:
+    def unpack_single(self, context: _ContextLike) -> Any:
         """
         Unpack a single value from the stream.
 
@@ -107,6 +107,7 @@ class VarInt(FieldStruct):
         :param context: The current context.
         :return: The unpacked value.
         """
+        stream: _StreamType = context[CTX_STREAM]
         data = []
         _, lb = self.bit_config(context)
         shift = 0
