@@ -280,7 +280,81 @@ example.
 Context
 -------
 
-The context is
+The context is another core element of this framework, utilized to store all relevant variables needed during the
+process of packing or unpacking objects. The top-level :meth:`unpack` and :meth:`pack` methods are designed to
+create the context themselves with some pre-defined (internal) fields.
+
+.. admonition:: Implementation Note
+
+    :class:`Context` objects are essentially :code:`dict` objects with enhanced capabilities. Therefore, all
+    operations supported on dictionaries are applicable.
+
+The context enables special attribute-like access using :code:`getattr` if the attribute wasn't defined in the
+instance directly. All custom attributes are stored in the dictionary representation of the instance.
+
+.. attribute:: CTX_PARENT
+    :value: "_parent"
+
+    All :class:`Context` instances *SHOULD* contain a reference to the parent context. If the returned reference is
+    :code:`None`, it can be assumed that the current context is the root context. If this attribute is set, it
+    *MUST* point to a :class:`Context` instance.
+
+.. attribute:: CTX_OBJECT
+    :value: "_obj"
+
+    When packing or unpacking objects, the current object attributes are stored within the *object* context. This
+    is a special context that allows access to previously parsed fields or attributes of the input object. To
+    minimize the number of calls using this attribute, a shortcut named :code:`this` was defined, which
+    automatically inserts a path to the object context.
+
+
+.. attribute:: CTX_STREAM
+    :value: "_io"
+
+    The input or output stream *MUST* be set in each context instance to prevent access errors on missing stream
+    objects.
+
+    .. seealso::
+        Discussion on `Github <https://github.com/MatrixEditor/caterpillar/discussions/1>`_ why this attribute has
+        to be set in every context instance.
+
+.. attribute:: CTX_PATH
+    :value: "_path"
+
+    Although it is optional to provide the current parsing or building path, it is *recommended*. All nesting
+    structures implement a behavior that automatically adds a sub-path while packing or unpacking. Special
+    names are :code:`"<root>"` for the starting path and :code:`"<NUMBER>"` for greedy sequence elements.
+
+.. attribute:: CTX_FIELD
+    :value: "_field"
+
+    In case a struct is linked to a field, the :class:`Field` instance will always set this context variable
+    to be accessible from within the underlying struct.
+
+
+.. attribute:: CTX_INDEX
+    :value: "_index"
+
+    When packing or unpacking collections of elements, the current working index is given under this context
+    variable. This variable is set only in this specific situation.
+
+
+.. attribute:: CTX_VALUE
+    :value: "_value"
+
+    In case a switch-case statement is activated in a field, the context will receive the parsed value in this
+    context variable temporarily.
+
+.. attribute:: CTX_POS
+    :value: "_pos"
+
+    Currently undefined.
+
+.. attribute:: CTX_OFFSETS
+    :value: "_offsets"
+
+    **Internal use only:** This special member is only set in the root context and stores all packed objects that
+    should be placed at an offset position.
 
 .. _context_lambda:
 
@@ -302,7 +376,7 @@ custom operators can be found in  :ref:`operators`.
 Emulating Struct Types
 ----------------------
 
-.. method:: object.__pack__(self, obj, stream, context)
+.. method:: object.__pack__(self, obj, context)
 
     Invoked to serialize the given object into an output stream, :meth:`~object.__pack__`
     is designed to implement the behavior necessary for packing a collection of elements
@@ -322,16 +396,22 @@ Emulating Struct Types
     Its purpose is to dictate how input objects are written to the stream. It is crucial
     to note that the outcome of this function is ignored.
 
-.. method:: object.__unpack__(self, stream, context)
+    .. versionchanged:: beta
+        The *stream* parameter has been removed and was instead moved into the context.
 
-    Called to desersialize objects from an input stream. The result of :meth:`~object.__unpack__`
-    won't be ignored.
+.. method:: object.__unpack__(self, context)
+
+    Called to desersialize objects from an input stream (the stream is stored in the given context).
+    The result of :meth:`~object.__unpack__` is not going to be ignored.
 
     Every implementation is tasked with the decision of whether to support the deserialization
     of multiple elements concurrently. By default, the :class:`Field` class stores all essential
     attributes required to determine the length of elements set for unpacking. The :meth:`~__unpack__`
     method is activated through the :code:`unpack()` operation, integrated with the default
     struct classes — namely, :class:`Sequence`, :class:`Struct`, and :class:`Field`.
+
+    .. versionchanged:: beta
+        The *stream* parameter has been removed and was instead moved into the context.
 
 .. method:: object.__size__(self, context)
 

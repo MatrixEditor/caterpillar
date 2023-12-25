@@ -475,7 +475,87 @@ example.</p>
 </section>
 <section id="context">
 <h3><span class="section-number">2.2.4. </span>Context<a class="headerlink" href="#context" title="Link to this heading">#</a></h3>
-<p>The context is</p>
+<p>The context is another core element of this framework, utilized to store all relevant variables needed during the
+process of packing or unpacking objects. The top-level <code class="xref py py-meth docutils literal notranslate"><span class="pre">unpack()</span></code> and <code class="xref py py-meth docutils literal notranslate"><span class="pre">pack()</span></code> methods are designed to
+create the context themselves with some pre-defined (internal) fields.</p>
+<div class="admonition-implementation-note admonition">
+<p class="admonition-title">Implementation Note</p>
+<p><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code> objects are essentially <code class="code docutils literal notranslate"><span class="pre">dict</span></code> objects with enhanced capabilities. Therefore, all
+operations supported on dictionaries are applicable.</p>
+</div>
+<p>The context enables special attribute-like access using <code class="code docutils literal notranslate"><span class="pre">getattr</span></code> if the attribute wasn’t defined in the
+instance directly. All custom attributes are stored in the dictionary representation of the instance.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="CTX_PARENT">
+<span class="sig-name descname"><span class="pre">CTX_PARENT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&quot;_parent&quot;</span></em><a class="headerlink" href="#CTX_PARENT" title="Link to this definition">#</a></dt>
+<dd><p>All <code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code> instances <em>SHOULD</em> contain a reference to the parent context. If the returned reference is
+<code class="code docutils literal notranslate"><span class="pre">None</span></code>, it can be assumed that the current context is the root context. If this attribute is set, it
+<em>MUST</em> point to a <code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="CTX_OBJECT">
+<span class="sig-name descname"><span class="pre">CTX_OBJECT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&quot;_obj&quot;</span></em><a class="headerlink" href="#CTX_OBJECT" title="Link to this definition">#</a></dt>
+<dd><p>When packing or unpacking objects, the current object attributes are stored within the <em>object</em> context. This
+is a special context that allows access to previously parsed fields or attributes of the input object. To
+minimize the number of calls using this attribute, a shortcut named <code class="code docutils literal notranslate"><span class="pre">this</span></code> was defined, which
+automatically inserts a path to the object context.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="CTX_STREAM">
+<span class="sig-name descname"><span class="pre">CTX_STREAM</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&quot;_io&quot;</span></em><a class="headerlink" href="#CTX_STREAM" title="Link to this definition">#</a></dt>
+<dd><p>The input or output stream <em>MUST</em> be set in each context instance to prevent access errors on missing stream
+objects.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>Discussion on <a class="reference external" href="https://github.com/MatrixEditor/caterpillar/discussions/1">Github</a> why this attribute has
+to be set in every context instance.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="CTX_PATH">
+<span class="sig-name descname"><span class="pre">CTX_PATH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&quot;_path&quot;</span></em><a class="headerlink" href="#CTX_PATH" title="Link to this definition">#</a></dt>
+<dd><p>Although it is optional to provide the current parsing or building path, it is <em>recommended</em>. All nesting
+structures implement a behavior that automatically adds a sub-path while packing or unpacking. Special
+names are <code class="code docutils literal notranslate"><span class="pre">&quot;&lt;root&gt;&quot;</span></code> for the starting path and <code class="code docutils literal notranslate"><span class="pre">&quot;&lt;NUMBER&gt;&quot;</span></code> for greedy sequence elements.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="CTX_FIELD">
+<span class="sig-name descname"><span class="pre">CTX_FIELD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&quot;_field&quot;</span></em><a class="headerlink" href="#CTX_FIELD" title="Link to this definition">#</a></dt>
+<dd><p>In case a struct is linked to a field, the <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code> instance will always set this context variable
+to be accessible from within the underlying struct.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="CTX_INDEX">
+<span class="sig-name descname"><span class="pre">CTX_INDEX</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&quot;_index&quot;</span></em><a class="headerlink" href="#CTX_INDEX" title="Link to this definition">#</a></dt>
+<dd><p>When packing or unpacking collections of elements, the current working index is given under this context
+variable. This variable is set only in this specific situation.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="CTX_VALUE">
+<span class="sig-name descname"><span class="pre">CTX_VALUE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&quot;_value&quot;</span></em><a class="headerlink" href="#CTX_VALUE" title="Link to this definition">#</a></dt>
+<dd><p>In case a switch-case statement is activated in a field, the context will receive the parsed value in this
+context variable temporarily.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="CTX_POS">
+<span class="sig-name descname"><span class="pre">CTX_POS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&quot;_pos&quot;</span></em><a class="headerlink" href="#CTX_POS" title="Link to this definition">#</a></dt>
+<dd><p>Currently undefined.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="CTX_OFFSETS">
+<span class="sig-name descname"><span class="pre">CTX_OFFSETS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&quot;_offsets&quot;</span></em><a class="headerlink" href="#CTX_OFFSETS" title="Link to this definition">#</a></dt>
+<dd><p><strong>Internal use only:</strong> This special member is only set in the root context and stores all packed objects that
+should be placed at an offset position.</p>
+</dd></dl>
+
 <section id="context-lambda">
 <span id="id3"></span><h4><span class="section-number">2.2.4.1. </span>Context lambda<a class="headerlink" href="#context-lambda" title="Link to this heading">#</a></h4>
 </section>
@@ -494,7 +574,7 @@ custom operators can be found in  <a class="reference internal" href="operators.
 <h3><span class="section-number">2.3.1. </span>Emulating Struct Types<a class="headerlink" href="#emulating-struct-types" title="Link to this heading">#</a></h3>
 <dl class="py method">
 <dt class="sig sig-object py" id="object.__pack__">
-<span class="sig-prename descclassname"><span class="pre">object.</span></span><span class="sig-name descname"><span class="pre">__pack__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stream</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#object.__pack__" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">object.</span></span><span class="sig-name descname"><span class="pre">__pack__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#object.__pack__" title="Link to this definition">#</a></dt>
 <dd><p>Invoked to serialize the given object into an output stream, <a class="reference internal" href="#object.__pack__" title="object.__pack__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__pack__()</span></code></a>
 is designed to implement the behavior necessary for packing a collection of elements
 or a single element. Accordingly, the input obj may be an <code class="code docutils literal notranslate"><span class="pre">Iterable</span></code> or a
@@ -509,18 +589,24 @@ input verification is implemented by the corresponding class.</p>
 <p><a class="reference internal" href="#object.__pack__" title="object.__pack__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__pack__()</span></code></a> is invoked by the <code class="code docutils literal notranslate"><span class="pre">pack()</span></code> method defined within this library.
 Its purpose is to dictate how input objects are written to the stream. It is crucial
 to note that the outcome of this function is ignored.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version beta: </span>The <em>stream</em> parameter has been removed and was instead moved into the context.</p>
+</div>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="object.__unpack__">
-<span class="sig-prename descclassname"><span class="pre">object.</span></span><span class="sig-name descname"><span class="pre">__unpack__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stream</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#object.__unpack__" title="Link to this definition">#</a></dt>
-<dd><p>Called to desersialize objects from an input stream. The result of <a class="reference internal" href="#object.__unpack__" title="object.__unpack__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__unpack__()</span></code></a>
-won’t be ignored.</p>
+<span class="sig-prename descclassname"><span class="pre">object.</span></span><span class="sig-name descname"><span class="pre">__unpack__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#object.__unpack__" title="Link to this definition">#</a></dt>
+<dd><p>Called to desersialize objects from an input stream (the stream is stored in the given context).
+The result of <a class="reference internal" href="#object.__unpack__" title="object.__unpack__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__unpack__()</span></code></a> is not going to be ignored.</p>
 <p>Every implementation is tasked with the decision of whether to support the deserialization
 of multiple elements concurrently. By default, the <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code> class stores all essential
 attributes required to determine the length of elements set for unpacking. The <a class="reference internal" href="#object.__unpack__" title="object.__unpack__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__unpack__()</span></code></a>
 method is activated through the <code class="code docutils literal notranslate"><span class="pre">unpack()</span></code> operation, integrated with the default
 struct classes — namely, <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Struct</span></code>, and <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code>.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version beta: </span>The <em>stream</em> parameter has been removed and was instead moved into the context.</p>
+</div>
 </dd></dl>
 
 <dl class="py method">
@@ -713,6 +799,15 @@ use of <code class="code docutils literal notranslate"><span class="pre">field.g
 <li><a class="reference internal" href="#field">2.2.2. Field</a></li>
 <li><a class="reference internal" href="#greedy">2.2.3. Greedy</a></li>
 <li><a class="reference internal" href="#context">2.2.4. Context</a><ul>
+<li><a class="reference internal" href="#CTX_PARENT"><code class="docutils literal notranslate"><span class="pre">CTX_PARENT</span></code></a></li>
+<li><a class="reference internal" href="#CTX_OBJECT"><code class="docutils literal notranslate"><span class="pre">CTX_OBJECT</span></code></a></li>
+<li><a class="reference internal" href="#CTX_STREAM"><code class="docutils literal notranslate"><span class="pre">CTX_STREAM</span></code></a></li>
+<li><a class="reference internal" href="#CTX_PATH"><code class="docutils literal notranslate"><span class="pre">CTX_PATH</span></code></a></li>
+<li><a class="reference internal" href="#CTX_FIELD"><code class="docutils literal notranslate"><span class="pre">CTX_FIELD</span></code></a></li>
+<li><a class="reference internal" href="#CTX_INDEX"><code class="docutils literal notranslate"><span class="pre">CTX_INDEX</span></code></a></li>
+<li><a class="reference internal" href="#CTX_VALUE"><code class="docutils literal notranslate"><span class="pre">CTX_VALUE</span></code></a></li>
+<li><a class="reference internal" href="#CTX_POS"><code class="docutils literal notranslate"><span class="pre">CTX_POS</span></code></a></li>
+<li><a class="reference internal" href="#CTX_OFFSETS"><code class="docutils literal notranslate"><span class="pre">CTX_OFFSETS</span></code></a></li>
 <li><a class="reference internal" href="#context-lambda">2.2.4.1. Context lambda</a></li>
 <li><a class="reference internal" href="#context-path">2.2.4.2. Context path</a></li>
 </ul>
