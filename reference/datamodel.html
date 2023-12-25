@@ -157,10 +157,16 @@
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installing/index.html">Installation</a></li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">Caterpillar’s Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Caterpillar’s Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="baseclasses.html">1. Abstract Base Classes</a></li>
 <li class="toctree-l2 current current-page"><a class="current reference internal" href="#">2. Data Model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="operators.html">3. Operators</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial/index.html">Tutorial to Caterpillar</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../library/index.html">Library</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of Library</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../library/options.html">1. Options</a></li>
 </ul>
 </li>
 </ul>
@@ -558,9 +564,45 @@ should be placed at an offset position.</p>
 
 <section id="context-lambda">
 <span id="id3"></span><h4><span class="section-number">2.2.4.1. </span>Context lambda<a class="headerlink" href="#context-lambda" title="Link to this heading">#</a></h4>
+<p>Dynamic sized structs are supported by this library using the power of so-called <em>context lambdas</em>. This library
+introduces a special callable <code class="xref py py-class docutils literal notranslate"><span class="pre">_ContextLambda</span></code>, that takes a <code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code> instance and returns the
+desired result. To mimic a <em>context lambda</em>, the <code class="xref py py-meth docutils literal notranslate"><span class="pre">__call__()</span></code> method has to be implemented.</p>
+<p>Dynamic-sized structs are supported by this library using the power of so-called <em>context lambdas</em>. This library
+introduces a special callable <code class="xref py py-class docutils literal notranslate"><span class="pre">_ContextLambda</span></code> that takes a <code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code> instance and returns the #
+desired result. To mimic a <em>context lambda</em>, the <code class="xref py py-meth docutils literal notranslate"><span class="pre">__call__()</span></code> method has to be implemented.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="object.__call__">
+<span class="sig-prename descclassname"><span class="pre">object.</span></span><span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#object.__call__" title="Link to this definition">#</a></dt>
+<dd><p>This library does not distinguish between callable objects and <em>context lambdas</em>. They are treated as the
+same class (this aspect is under subject to changes).</p>
+</dd></dl>
+
 </section>
 <section id="context-path">
 <h4><span class="section-number">2.2.4.2. </span>Context path<a class="headerlink" href="#context-path" title="Link to this heading">#</a></h4>
+<p>The path of a context is a specialized form of a <a class="reference internal" href="#context-lambda"><span class="std std-ref">Context lambda</span></a> and supports lazy evaluation of most
+operators (conditional ones excluded). Once called, they try to retrieve the requested value from within
+the given <code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code> instance. Below is a list of default paths designed to provide a relatively easy
+way to access the context variables.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ctx">
+<span class="sig-name descname"><span class="pre">ctx</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&quot;&quot;</span></em><a class="headerlink" href="#ctx" title="Link to this definition">#</a></dt>
+<dd><p>This special path acts as a wrapper to access all variables within the top-level <code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code> object.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="this">
+<span class="sig-name descname"><span class="pre">this</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&quot;_obj&quot;</span></em><a class="headerlink" href="#this" title="Link to this definition">#</a></dt>
+<dd><p>As described before, a special <em>object context</em> is created when packing or unpacking structs that store
+more than one field.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="parent">
+<span class="sig-name descname"><span class="pre">parent</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&quot;_parent._obj&quot;</span></em><a class="headerlink" href="#parent" title="Link to this definition">#</a></dt>
+<dd><p>A shortcut to access the object context of the parent context.</p>
+</dd></dl>
+
 </section>
 </section>
 </section>
@@ -808,8 +850,16 @@ use of <code class="code docutils literal notranslate"><span class="pre">field.g
 <li><a class="reference internal" href="#CTX_VALUE"><code class="docutils literal notranslate"><span class="pre">CTX_VALUE</span></code></a></li>
 <li><a class="reference internal" href="#CTX_POS"><code class="docutils literal notranslate"><span class="pre">CTX_POS</span></code></a></li>
 <li><a class="reference internal" href="#CTX_OFFSETS"><code class="docutils literal notranslate"><span class="pre">CTX_OFFSETS</span></code></a></li>
-<li><a class="reference internal" href="#context-lambda">2.2.4.1. Context lambda</a></li>
-<li><a class="reference internal" href="#context-path">2.2.4.2. Context path</a></li>
+<li><a class="reference internal" href="#context-lambda">2.2.4.1. Context lambda</a><ul>
+<li><a class="reference internal" href="#object.__call__"><code class="docutils literal notranslate"><span class="pre">object.__call__()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#context-path">2.2.4.2. Context path</a><ul>
+<li><a class="reference internal" href="#ctx"><code class="docutils literal notranslate"><span class="pre">ctx</span></code></a></li>
+<li><a class="reference internal" href="#this"><code class="docutils literal notranslate"><span class="pre">this</span></code></a></li>
+<li><a class="reference internal" href="#parent"><code class="docutils literal notranslate"><span class="pre">parent</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

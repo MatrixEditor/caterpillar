@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Caterpillar’s Reference" href="reference/index.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Installation" href="installing/index.html" />
 
     <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
         <title>Caterpillar 1.0.0 documentation</title>
@@ -135,7 +135,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -157,10 +157,16 @@
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="installing/index.html">Installation</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="reference/index.html">Caterpillar’s Reference</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Caterpillar’s Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="reference/baseclasses.html">1. Abstract Base Classes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference/datamodel.html">2. Data Model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference/operators.html">3. Operators</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/index.html">Tutorial to Caterpillar</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="library/index.html">Library</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of Library</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="library/options.html">1. Options</a></li>
 </ul>
 </li>
 </ul>
@@ -191,7 +197,7 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
@@ -199,18 +205,66 @@
         <article role="main">
           <section id="welcome-to-caterpillar-s-documentation">
 <h1>Welcome to Caterpillar’s documentation!<a class="headerlink" href="#welcome-to-caterpillar-s-documentation" title="Link to this heading">#</a></h1>
-<div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="reference/index.html">Caterpillar’s Reference</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="reference/baseclasses.html">1. Abstract Base Classes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference/datamodel.html">2. Data Model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference/operators.html">3. Operators</a></li>
-</ul>
-</li>
-</ul>
+<p><em>caterpillar</em> is a powerful python framework designed to navigate through structured
+binary data. This framework operates as a declarative parser and builder using standard
+Python class definitions and annotations.</p>
+<div class="admonition caution">
+<p class="admonition-title">Caution</p>
+<p>Before using this library, be aware that the current status is “beta/testing”. Therefore,
+expect bugs and undocumented issues. Additionally, the documentation is a WIP.</p>
 </div>
-<p><em>TODO</em></p>
+<section id="whetting-your-appetite">
+<h2>Whetting Your Appetite<a class="headerlink" href="#whetting-your-appetite" title="Link to this heading">#</a></h2>
+<p>If you’re involved in reverse engineering or working with custom or proprietary file
+formats, there often comes a need to structure data in a way that is both easy and
+efficient.</p>
+<p>🐛 lets you define standard structs with a fixed size while also supporting dynamic
+structs that adjust their size based on the current context. This framework enables you
+to write complex structures in a compact and readable manner.</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">Simple example of a custom struct</span><a class="headerlink" href="#id1" title="Link to this code">#</a></div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
+<span class="k">class</span> <span class="nc">Format</span><span class="p">:</span>
+   <span class="n">magic</span><span class="p">:</span> <span class="sa">b</span><span class="s2">&quot;Foo&quot;</span>                       <span class="c1"># constant values</span>
+   <span class="n">name</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>                  <span class="c1"># C-String without a fixed length</span>
+   <span class="n">num_entries</span><span class="p">:</span> <span class="n">uint32</span>                 <span class="c1"># simple field definition</span>
+   <span class="n">entries</span><span class="p">:</span> <span class="n">CString</span><span class="p">[</span><span class="n">this</span><span class="o">.</span><span class="n">num_entries</span><span class="p">]</span>  <span class="c1"># arrays just like that</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition-hold-up-wait-a-minute admonition">
+<p class="admonition-title">Hold up, wait a minute!</p>
+<p>How does this even work? Is this still Python? Answers to these questions and more are given
+in the general <span class="xref std std-ref">introduction</span>.</p>
+</div>
+<p>Working with defined classes is as straightforward as working with normal classes. <em>All
+constant values are created automatically!</em></p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span> <span class="o">=</span> <span class="n">Format</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Hello, World!&quot;</span><span class="p">,</span> <span class="n">num_entries</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">entries</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Bar&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+<span class="go">Format(magic=b&#39;Foo&#39;, name=&#39;Hello, World!&#39;, num_entries=1, entries=[&#39;Bar&#39;])</span>
+</pre></div>
+</div>
+<p>Packing and unpacking have never been easier:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+<span class="go">b&#39;FooHello, World!\x00\x01\x00\x00\x00Bar\x00&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">Format</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;FooHello, World!</span><span class="se">\x00\x01\x00\x00\x00</span><span class="s1">Bar</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="go">Format(magic=b&#39;Foo&#39;, name=&#39;Hello, World!&#39;, num_entries=1, entries=[&#39;Bar&#39;])</span>
+</pre></div>
+</div>
+<div class="admonition-what-about-documentation admonition">
+<p class="admonition-title">What about documentation?</p>
+<p>There are specialized options created only for documentation purposes, so you don’t
+have to worry about documenting fields. Just apply the documentation as usual.</p>
+</div>
+</section>
+<section id="where-to-start">
+<h2>Where to start?<a class="headerlink" href="#where-to-start" title="Link to this heading">#</a></h2>
+<p>It is recommended to take a look at the explanation of the internal <a class="reference internal" href="reference/datamodel.html#datamodel"><span class="std std-ref">Data Model</span></a> to get
+in touch with all forms of structs. Additionally, there’s a detailed documentation on
+what configuration options can be used. Alternatively you can follow the <a class="reference internal" href="tutorial/index.html#tutorial-index"><span class="std std-ref">Tutorial to Caterpillar</span></a>.</p>
+<div class="toctree-wrapper compound">
+</div>
+</section>
 </section>
 <section id="indices-and-tables">
 <h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading">#</a></h1>
@@ -226,12 +280,12 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="reference/index.html">
+          <a class="next-page" href="installing/index.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Caterpillar’s Reference</div>
+                <div class="title">Installation</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
@@ -254,8 +308,29 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Welcome to Caterpillar’s documentation!</a><ul>
+<li><a class="reference internal" href="#whetting-your-appetite">Whetting Your Appetite</a></li>
+<li><a class="reference internal" href="#where-to-start">Where to start?</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
