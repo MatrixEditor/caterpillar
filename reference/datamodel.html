@@ -199,7 +199,6 @@
         <article role="main">
           <section id="data-model">
 <span id="datamodel"></span><h1><span class="section-number">2. </span>Data Model<a class="headerlink" href="#data-model" title="Link to this heading">#</a></h1>
-<p><em>TODO: add documentation and behaviour explanation</em></p>
 <section id="structs-sequences-and-fields">
 <span id="objects"></span><h2><span class="section-number">2.1. </span>Structs, Sequences and Fields<a class="headerlink" href="#structs-sequences-and-fields" title="Link to this heading">#</a></h2>
 <p><em class="dfn">Structs</em> serve as the foundation of this library. All data within the framework
@@ -232,20 +231,256 @@ structs is essential when aiming to extend the capabilities of this framework.</
 </li>
 </ul>
 </section>
-<section id="special-types">
-<h2><span class="section-number">2.2. </span>Special Types<a class="headerlink" href="#special-types" title="Link to this heading">#</a></h2>
+<section id="standard-types">
+<h2><span class="section-number">2.2. </span>Standard Types<a class="headerlink" href="#standard-types" title="Link to this heading">#</a></h2>
+<p>Below is a list of types provided by <em>Caterpillar</em>. These types are designed to maintain
+compatibility with older versions of the library, making them particularly important.</p>
+<section id="sequence">
+<h3><span class="section-number">2.2.1. </span>Sequence<a class="headerlink" href="#sequence" title="Link to this heading">#</a></h3>
+<p>As previously explained, a sequence functions independently of fields. The library introduces
+the <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> as a named finite collection of <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code> objects. A <em>Sequence</em>
+operates on a model, which is a string-to-field mapping by default. Later, we will discuss
+the distinctions between a <em>Sequence</em> and a <em>Struct</em> regarding the model representation.</p>
+<p>A sequence definition entails the specification of a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> object by directly
+indicating the model to use. Inheritance poses a challenge with sequences, as they are not
+designed to operate on a type hierarchy. The default instantiation with all default options
+involves passing the dictionary with all fields directly:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Format</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">({</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="n">uint8</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="n">uint32</span><span class="p">})</span>
+</pre></div>
+</div>
+<div class="admonition-programmers-note admonition">
+<p class="admonition-title">Programmers Note:</p>
+<p>All sequence types introduced by this library can also store so-called <em>unnamed</em> fields.
+These fields are not visible in the unpacked result and are automatically packed, removing
+concerns about them when the option <code class="docutils literal notranslate"><span class="pre">S_DISCARD_UNNAMED</span></code> is active. Their names usually
+begin with an underscore and must solely contain numbers (e.g., <code class="code docutils literal notranslate"><span class="pre">_123</span></code>).</p>
+</div>
+<p>The sequence follows the <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code> configuration model, allowing sequence and
+field-related options to be set. As mentioned earlier, the <code class="docutils literal notranslate"><span class="pre">S_DISCARD_UNNAMED</span></code> option can
+be used for example to exclude all unnamed fields from the final representation. A complete
+list of all configuration options and their impact can be found in <a class="reference internal" href="../library/options.html#options"><span class="std std-ref">Options</span></a>.</p>
+<p>All sequences store a configurable <code class="xref py py-class docutils literal notranslate"><span class="pre">ByteOrder</span></code> and <code class="xref py py-class docutils literal notranslate"><span class="pre">Arch</span></code> as architecture,
+which are passed to <strong>all</strong> fields in the current model. For more information on why these
+classes are not specified as an enum class, please refer to <span class="xref std std-ref">byteorder</span>.</p>
+<p>Inheritance in sequences is intricate, as a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> is constructed from a dictionary
+of elements. We can attempt to simulate a chain of extended <em>base sequences</em> using the
+concatenation of two sequences. The <a class="reference internal" href="operators.html#sequence.__add__" title="sequence.__add__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__add__()</span></code></a> method will <em>import</em> all fields
+from the other specified sequence. The only disadvantage is the placement required by the
+operator. For instance:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">BaseFormat</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">({</span><span class="s2">&quot;magic&quot;</span><span class="p">:</span> <span class="sa">b</span><span class="s2">&quot;MAGIC&quot;</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="n">uint8</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Format</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">({</span><span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="n">uint32</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">:</span> <span class="n">uint16</span><span class="p">})</span> <span class="o">+</span> <span class="n">BaseFormat</span>
+</pre></div>
+</div>
+<p>will result in the following field order:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">Format</span><span class="o">.</span><span class="n">get_members</span><span class="p">())</span>
+<span class="go">[&#39;b&#39;, &#39;c&#39;, &#39;magic&#39;, &#39;a&#39;]</span>
+</pre></div>
+</div>
+<p>which is not the intended order. The correct order should be <code class="code docutils literal notranslate"><span class="pre">['magic',</span> <span class="pre">'a',</span> <span class="pre">'b',</span> <span class="pre">'c']</span></code>.
+This can be achieved by using the <code class="code docutils literal notranslate"><span class="pre">BaseFormat</span></code> instance as the first operand.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This will alter the <em>BaseFormat</em> sequence, making it unusable elsewhere as the <em>base</em> for
+all sub-sequences. Therefore, it is not recommended to use inheritance within sequences.
+The <code class="xref py py-class docutils literal notranslate"><span class="pre">Struct</span></code> class resolves this issue with ease.</p>
+</div>
+<p>Nesting sequences is allowed by default and can be achieved by incorporating another
+<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> into the model. It is important to note that <em>nesting</em> is distinct from
+<em>inheritance</em>, adding an additional layer of packing and unpacking.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Format</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">({</span><span class="s2">&quot;other&quot;</span><span class="p">:</span> <span class="n">BaseFormat</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="n">uint32</span><span class="p">})</span>
+</pre></div>
+</div>
+<section id="struct">
+<h4><span class="section-number">2.2.1.1. </span>Struct<a class="headerlink" href="#struct" title="Link to this heading">#</a></h4>
+<p>A <em>struct</em> describes a finite collection of named fields. In contrast to a <em>sequence</em>, a <em>struct</em>
+utilizes Python classes as its model. The annotation feature in Python enables the definition of
+custom types as annotations, enabling this special struct class to create a model solely based on
+class annotations. Additionally, it generates a <code class="docutils literal notranslate"><span class="pre">dataclass</span></code> of the provided model, offering a
+standardized string representation.</p>
+<p>Several differences exist between a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> and a <code class="xref py py-class docutils literal notranslate"><span class="pre">Struct</span></code>, with the most
+significant ones highlighted below:</p>
+<div class="table-wrapper colwidths-given docutils container" id="id5">
+<table class="docutils align-default" id="id5">
+<caption><span class="caption-text">Behaviour of structs and sequences</span><a class="headerlink" href="#id5" title="Link to this table">#</a></caption>
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 37.5%" />
+<col style="width: 37.5%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head stub"></th>
+<th class="head"><p>Sequence</p></th>
+<th class="head"><p>Struct</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><th class="stub"><p>Model Type</p></th>
+<td><p>dict</p></td>
+<td><p>type</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>Inheritance</p></th>
+<td><p>No</p></td>
+<td><p>Yes</p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>Attribute Access</p></th>
+<td><p><code class="code docutils literal notranslate"><span class="pre">x[&quot;name&quot;]</span></code></p></td>
+<td><p><code class="code docutils literal notranslate"><span class="pre">getattr(x,</span> <span class="pre">&quot;name&quot;,</span> <span class="pre">None)</span></code></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>Unpacked Type (also needed to pack)</p></th>
+<td><p>dict <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>*<span class="fn-bracket">]</span></a></p></td>
+<td><p>instance of model</p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>Documentation</p></th>
+<td><p>No</p></td>
+<td><p>Yes</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id2" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">*</a><span class="fn-bracket">]</span></span>
+<p>The unpacked values are stored inside a <code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code> instance, a direct subclass of a dictionary.</p>
+</aside>
+</aside>
+<p>As evident from the comparison, the <code class="xref py py-class docutils literal notranslate"><span class="pre">Struct</span></code> class introduces new features such as
+inheritance and documentation support. It’s crucial to note that inheritance uses
+struct types exclusively.</p>
+<p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> class implements a specific process for creating an internal representation
+of the given model. The <code class="xref py py-class docutils literal notranslate"><span class="pre">Struct</span></code> class enhances this process by handling default values, replacing
+types for documentation purposes, or removing annotation fields directly from the model. Additionally,
+this class adds <a class="reference internal" href="#class.__struct__" title="class.__struct__"><code class="xref py py-attr docutils literal notranslate"><span class="pre">__struct__</span></code></a> to the model afterward.</p>
+<div class="admonition-implementation-note admonition">
+<p class="admonition-title">Implementation Note</p>
+<p>If you decide to use the <code class="docutils literal notranslate"><span class="pre">annotation</span></code> feature from the <code class="docutils literal notranslate"><span class="pre">__future__</span></code> module, it is necessary to
+enable <code class="xref py py-attr docutils literal notranslate"><span class="pre">S_EVAL_ANNOTATIONS</span></code> since it “<a class="reference external" href="https://docs.python.org/3/howto/annotations.html#manually-un-stringizing-stringized-annotations">Stringizes</a>” all annotations. <code class="docutils literal notranslate"><span class="pre">inspect</span></code> then
+evaluates all strings, introducing a potential security risk. Exercise with caution when evaluating code!</p>
+</div>
+<p>Specifying structs is as simple as defining <a class="reference external" href="https://docs.python.org/3/reference/compound_stmts.html#class">Python Classes</a>:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@struct</span>
+<span class="gp">... </span><span class="k">class</span> <span class="nc">BaseFormat</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">magic</span><span class="p">:</span> <span class="sa">b</span><span class="s2">&quot;MAGIC&quot;</span>
+<span class="gp">... </span>    <span class="n">a</span><span class="p">:</span> <span class="n">uint8</span>
+<span class="gp">...</span>
+</pre></div>
+</div>
+<p>Internally, a representation with all required fields and their corresponding names is
+created. As <code class="code docutils literal notranslate"><span class="pre">b&quot;MAGIC&quot;</span></code> or <code class="code docutils literal notranslate"><span class="pre">uint8</span></code> are instances of types, the type replacement
+for documentation purposes should be enabled, as shown in <a class="reference internal" href="#struct-type"><span class="std std-ref">Customizing the struct’s type</span></a>.</p>
+<p>As described above, this class introduces an easy-to-use inheritance system using the method
+resolution order of Python:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@struct</span>
+<span class="gp">... </span><span class="k">class</span> <span class="nc">Format</span><span class="p">(</span><span class="n">BaseFormat</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">b</span><span class="p">:</span> <span class="n">uint32</span>
+<span class="gp">... </span>    <span class="n">c</span><span class="p">:</span> <span class="n">uint16</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">Format</span><span class="o">.</span><span class="n">__struct__</span><span class="o">.</span><span class="n">get_members</span><span class="p">())</span>
+<span class="go">[&#39;magic&#39;, &#39;a&#39;, &#39;b&#39;, &#39;c&#39;]</span>
+</pre></div>
+</div>
+<div class="admonition-programmers-note admonition">
+<p class="admonition-title">Programmers Note</p>
+<p>As the <code class="xref py py-class docutils literal notranslate"><span class="pre">Struct</span></code> class is a direct subclass of <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>, nesting is supported
+by default. That means, so-called <em>anonymous inner</em> structs can be defined within a class
+definition.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@struct</span>
+<span class="gp">... </span><span class="k">class</span> <span class="nc">Format</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">a</span><span class="p">:</span> <span class="n">uint32</span>
+<span class="gp">... </span>    <span class="n">b</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;c&quot;</span><span class="p">:</span> <span class="n">uint8</span><span class="p">}</span>
+<span class="gp">...</span>
+</pre></div>
+</div>
+<p>It is not recommended to use this technique as the inner structs can’t be used anywhere else.
+Anonymous inner union definitions are tricky and are not officially supported yet. There are
+workarounds to that problem, which are discussed in the API documentation of <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>.</p>
+</div>
+</section>
+<section id="union">
+<h4><span class="section-number">2.2.1.2. </span>Union<a class="headerlink" href="#union" title="Link to this heading">#</a></h4>
+<p>Internally constructing unions in the library poses challenges. The current implementation uses
+the predefined behavior of the <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> class for union types. It selects the field with
+the greatest length as its representational size. <em>Unions</em>, much like <em>BitFields</em>, must store a static
+size. In essence, they behave similarly to C unions.</p>
+</section>
+<section id="bitfield">
+<h4><span class="section-number">2.2.1.3. </span>BitField<a class="headerlink" href="#bitfield" title="Link to this heading">#</a></h4>
+<p>A <em>BitField</em>, despite its name suggesting a field of bits, is a powerful structure designed for
+detailed byte inspection. Similar to other structures, it is a finite collection of named fields. This
+section will introduce potential challenges associated with the implementation of a <code class="xref py py-class docutils literal notranslate"><span class="pre">BitField</span></code>
+and explains its behavior.</p>
+<div class="admonition caution">
+<p class="admonition-title">Caution</p>
+<p>This class is still experimental, and caution is advised. For a list of known disadvantages or
+problems, refer to the information provided below.</p>
+</div>
+<p>As described before, a <em>BitField</em> can inspect single bits of parsed bytes. Its internal model is built
+up on a special function or attribute, namely <a class="reference internal" href="#object.__bits__" title="object.__bits__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__bits__()</span></code></a>. Therefore, a bitfield as a
+pre-defined length and will always have a length that can be represented in bytes. The <code class="xref py py-class docutils literal notranslate"><span class="pre">BitField</span></code>
+class not only stores the existing model representation with a name-to-field mapping and a collection
+of all fields, but introduces a special organisation class: <code class="xref py py-class docutils literal notranslate"><span class="pre">BitFieldGroup</span></code>.</p>
+<p>As mentioned earlier, a <em>BitField</em> allows the inspection of individual bits within parsed bytes. Its
+internal model relies on a special function or attribute, namely <a class="reference internal" href="#object.__bits__" title="object.__bits__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__bits__()</span></code></a>. Consequently,
+a bitfield has a predefined length and will always possess a length that can be represented in bytes.</p>
+<p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">BitField</span></code> class not only stores the existing model representation with a name-to-field
+mapping and a collection of all fields but also introduces a special organizational class:
+<code class="xref py py-class docutils literal notranslate"><span class="pre">BitFieldGroup</span></code>. Each group defines its bit size, the absolute bit position in the bitfield,
+and a mapping of fields to their relative bit position in the current group, along with the field’s
+width. In the following example, three groups are created:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@bitfield</span>
+<span class="gp">... </span><span class="k">class</span> <span class="nc">Format</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">a</span> <span class="p">:</span> <span class="n">uint8</span>           <span class="c1"># Group 1, pos=0, size=8</span>
+<span class="gp">... </span>    <span class="n">_</span> <span class="p">:</span> <span class="mi">0</span>               <span class="c1"># Group 2, pos=8, size=8</span>
+<span class="gp">... </span>    <span class="n">b</span> <span class="p">:</span> <span class="mi">15</span> <span class="o">-</span> <span class="n">uint16</span>     <span class="c1"># \</span>
+<span class="gp">... </span>    <span class="n">c</span> <span class="p">:</span> <span class="mi">1</span>               <span class="c1">#  \ Group 3, pos=16, size=16</span>
+<span class="gp">...</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">a</span></code>: The first field creates a group with a size of eight bits at position zero.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">_</span></code>: Next, a zero-sized field indicates that padding until the end of the current byte should be
+added. As we start from bit position <code class="docutils literal notranslate"><span class="pre">0</span></code>, one byte will be filled with zeros.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">b</span></code>: The third field only uses 15 bits of a 16-bit wide field (2 bytes inferred using <code class="code docutils literal notranslate"><span class="pre">uint16</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">c</span></code>: The last field uses the final bit of our current group.</p></li>
+</ul>
+<p><em>TODO: describe process of collecting fields, packing and unpacking</em></p>
+</section>
+</section>
+<section id="field">
+<h3><span class="section-number">2.2.2. </span>Field<a class="headerlink" href="#field" title="Link to this heading">#</a></h3>
+<p>The next core element of this library is the <em>Field</em>. It serves as a context storage to store configuration data
+about a struct. Even sequences and structs can be used as fields. The process is straightforward: each custom operator
+creates an instance of a <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code> with the applied configuration value. Most of the time, this value can be
+static or a <a class="reference internal" href="#context-lambda"><span class="std std-ref">Context lambda</span></a>. A field implements basic behavior that should not be duplicated, such as
+conditional execution, exception handling with default values, and support for a built-in switch-case structure.</p>
+<p>As mentioned earlier, some primitive structs depend on being linked to a <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code>. This is because all
+configuration elements are stored in a <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code> instance rather than in the target struct instance. More
+information about each supported configuration can be found in <a class="reference internal" href="operators.html#operators"><span class="std std-ref">Operators</span></a>.</p>
+</section>
 <section id="greedy">
-<h3><span class="section-number">2.2.1. </span>Greedy<a class="headerlink" href="#greedy" title="Link to this heading">#</a></h3>
-<p><em>TODO</em></p>
+<h3><span class="section-number">2.2.3. </span>Greedy<a class="headerlink" href="#greedy" title="Link to this heading">#</a></h3>
+<p>This library provides direct support for <em>greedy</em> parsing. Leveraging Python’s syntactic features, this special form
+of parsing is enabled using the <a class="reference external" href="https://docs.python.org/3/library/constants.html#Ellipsis">Ellipsis</a> (<code class="code docutils literal notranslate"><span class="pre">...</span></code>). All previously introduced structs implement greedy parsing
+when enabled.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">uint8</span><span class="p">[</span><span class="o">...</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>This special type can be used in places where a length has to be specified. Therefore, it can be applied to all array
+<code class="code docutils literal notranslate"><span class="pre">[]</span></code> declarations and constructors that take the length as an input argument, such as <code class="xref py py-class docutils literal notranslate"><span class="pre">CString</span></code>, for
+example.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">CString</span><span class="p">(</span><span class="o">...</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;abcd</span><span class="se">\x00</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="go">&#39;abcd&#39;</span>
+</pre></div>
+</div>
 </section>
 <section id="context">
-<h3><span class="section-number">2.2.2. </span>Context<a class="headerlink" href="#context" title="Link to this heading">#</a></h3>
-<p><em>TODO</em></p>
+<h3><span class="section-number">2.2.4. </span>Context<a class="headerlink" href="#context" title="Link to this heading">#</a></h3>
+<p>The context is</p>
 <section id="context-lambda">
-<h4><span class="section-number">2.2.2.1. </span>Context lambda<a class="headerlink" href="#context-lambda" title="Link to this heading">#</a></h4>
+<span id="id3"></span><h4><span class="section-number">2.2.4.1. </span>Context lambda<a class="headerlink" href="#context-lambda" title="Link to this heading">#</a></h4>
 </section>
 <section id="context-path">
-<h4><span class="section-number">2.2.2.2. </span>Context path<a class="headerlink" href="#context-path" title="Link to this heading">#</a></h4>
+<h4><span class="section-number">2.2.4.2. </span>Context path<a class="headerlink" href="#context-path" title="Link to this heading">#</a></h4>
 </section>
 </section>
 </section>
@@ -265,10 +500,10 @@ is designed to implement the behavior necessary for packing a collection of elem
 or a single element. Accordingly, the input obj may be an <code class="code docutils literal notranslate"><span class="pre">Iterable</span></code> or a
 singular element.</p>
 <p>The absence of a standardized implementation for deserializing a collection of elements
-is deliberate, enhancing the library’s adaptability. For example, all instances of the
-<code class="xref py py-class docutils literal notranslate"><span class="pre">FormatField</span></code> utilize the Python library <a class="reference external" href="https://docs.python.org/3/library/struct.html">struct</a> internally to pack and unpack
-data. To optimize execution times, a collection of elements is packed and unpacked in a
-single call, rather than handling each element individually.</p>
+is deliberate. For example, all instances of the <code class="xref py py-class docutils literal notranslate"><span class="pre">FormatField</span></code> utilize the Python
+library <a class="reference external" href="https://docs.python.org/3/library/struct.html">struct</a> internally to pack and unpack data. To optimize execution times, a
+collection of elements is packed and unpacked in a single call, rather than handling each
+element individually.</p>
 <p>The context must incorporate specific members, mentioned in <span class="xref std std-ref">context</span>. Any data
 input verification is implemented by the corresponding class.</p>
 <p><a class="reference internal" href="#object.__pack__" title="object.__pack__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__pack__()</span></code></a> is invoked by the <code class="code docutils literal notranslate"><span class="pre">pack()</span></code> method defined within this library.
@@ -299,7 +534,7 @@ is provided.</p>
 </dd></dl>
 
 <section id="customizing-the-struct-s-type">
-<h4><span class="section-number">2.3.1.1. </span>Customizing the struct’s type<a class="headerlink" href="#customizing-the-struct-s-type" title="Link to this heading">#</a></h4>
+<span id="struct-type"></span><h4><span class="section-number">2.3.1.1. </span>Customizing the struct’s type<a class="headerlink" href="#customizing-the-struct-s-type" title="Link to this heading">#</a></h4>
 <dl class="py method">
 <dt class="sig sig-object py" id="object.__type__">
 <span class="sig-prename descclassname"><span class="pre">object.</span></span><span class="sig-name descname"><span class="pre">__type__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#object.__type__" title="Link to this definition">#</a></dt>
@@ -320,6 +555,18 @@ are displayed.</p>
 </pre></div>
 </div>
 <p>Will be displayed as:</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="examples.nibarchive.object.NIBHeader">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NIBHeader</span></span><a class="headerlink" href="#examples.nibarchive.object.NIBHeader" title="Link to this definition">#</a></dt>
+<dd><p>Example class doc comment</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="examples.nibarchive.object.NIBHeader.NIBHeader.magic">
+<span class="sig-prename descclassname"><span class="pre">NIBHeader.</span></span><span class="sig-name descname"><span class="pre">magic</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bytes</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">b'NIBArchive'</span></em><a class="headerlink" href="#examples.nibarchive.object.NIBHeader.NIBHeader.magic" title="Link to this definition">#</a></dt>
+<dd><p>example field doc comment</p>
+</dd></dl>
+
+</dd></dl>
+
 <p>In this illustration, the extra parentheses at the end are included to prevent the
 automatic creation of constructors.</p>
 </dd></dl>
@@ -456,11 +703,18 @@ use of <code class="code docutils literal notranslate"><span class="pre">field.g
             <ul>
 <li><a class="reference internal" href="#">2. Data Model</a><ul>
 <li><a class="reference internal" href="#structs-sequences-and-fields">2.1. Structs, Sequences and Fields</a></li>
-<li><a class="reference internal" href="#special-types">2.2. Special Types</a><ul>
-<li><a class="reference internal" href="#greedy">2.2.1. Greedy</a></li>
-<li><a class="reference internal" href="#context">2.2.2. Context</a><ul>
-<li><a class="reference internal" href="#context-lambda">2.2.2.1. Context lambda</a></li>
-<li><a class="reference internal" href="#context-path">2.2.2.2. Context path</a></li>
+<li><a class="reference internal" href="#standard-types">2.2. Standard Types</a><ul>
+<li><a class="reference internal" href="#sequence">2.2.1. Sequence</a><ul>
+<li><a class="reference internal" href="#struct">2.2.1.1. Struct</a></li>
+<li><a class="reference internal" href="#union">2.2.1.2. Union</a></li>
+<li><a class="reference internal" href="#bitfield">2.2.1.3. BitField</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#field">2.2.2. Field</a></li>
+<li><a class="reference internal" href="#greedy">2.2.3. Greedy</a></li>
+<li><a class="reference internal" href="#context">2.2.4. Context</a><ul>
+<li><a class="reference internal" href="#context-lambda">2.2.4.1. Context lambda</a></li>
+<li><a class="reference internal" href="#context-path">2.2.4.2. Context path</a></li>
 </ul>
 </li>
 </ul>
@@ -472,6 +726,8 @@ use of <code class="code docutils literal notranslate"><span class="pre">field.g
 <li><a class="reference internal" href="#object.__size__"><code class="docutils literal notranslate"><span class="pre">object.__size__()</span></code></a></li>
 <li><a class="reference internal" href="#customizing-the-struct-s-type">2.3.1.1. Customizing the struct’s type</a><ul>
 <li><a class="reference internal" href="#object.__type__"><code class="docutils literal notranslate"><span class="pre">object.__type__()</span></code></a></li>
+<li><a class="reference internal" href="#examples.nibarchive.object.NIBHeader"><code class="docutils literal notranslate"><span class="pre">object.NIBHeader</span></code></a></li>
+<li><a class="reference internal" href="#examples.nibarchive.object.NIBHeader.NIBHeader.magic"><code class="docutils literal notranslate"><span class="pre">object.NIBHeader.NIBHeader.magic</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#struct-containers">2.3.1.2. Struct containers</a><ul>

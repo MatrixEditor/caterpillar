@@ -4,8 +4,6 @@
 Data Model
 **********
 
-*TODO: add documentation and behaviour explanation*
-
 .. _objects:
 
 Structs, Sequences and Fields
@@ -33,25 +31,264 @@ objects. There are three possible types of structs:
     provide a modular approach for extending the library. Consideration of partial
     structs is essential when aiming to extend the capabilities of this framework.
 
-Special Types
-=============
+Standard Types
+==============
+
+Below is a list of types provided by *Caterpillar*. These types are designed to maintain
+compatibility with older versions of the library, making them particularly important.
+
+Sequence
+--------
+
+As previously explained, a sequence functions independently of fields. The library introduces
+the :class:`Sequence` as a named finite collection of :class:`Field` objects. A *Sequence*
+operates on a model, which is a string-to-field mapping by default. Later, we will discuss
+the distinctions between a *Sequence* and a *Struct* regarding the model representation.
+
+A sequence definition entails the specification of a :class:`Sequence` object by directly
+indicating the model to use. Inheritance poses a challenge with sequences, as they are not
+designed to operate on a type hierarchy. The default instantiation with all default options
+involves passing the dictionary with all fields directly:
+
+>>> Format = Sequence({"a": uint8, "b": uint32})
+
+.. admonition:: Programmers Note:
+
+    All sequence types introduced by this library can also store so-called *unnamed* fields.
+    These fields are not visible in the unpacked result and are automatically packed, removing
+    concerns about them when the option ``S_DISCARD_UNNAMED`` is active. Their names usually
+    begin with an underscore and must solely contain numbers (e.g., :code:`_123`).
+
+The sequence follows the :class:`Field` configuration model, allowing sequence and
+field-related options to be set. As mentioned earlier, the ``S_DISCARD_UNNAMED`` option can
+be used for example to exclude all unnamed fields from the final representation. A complete
+list of all configuration options and their impact can be found in :ref:`options`.
+
+All sequences store a configurable :class:`ByteOrder` and :class:`Arch` as architecture,
+which are passed to **all** fields in the current model. For more information on why these
+classes are not specified as an enum class, please refer to :ref:`byteorder`.
+
+Inheritance in sequences is intricate, as a :class:`Sequence` is constructed from a dictionary
+of elements. We can attempt to simulate a chain of extended *base sequences* using the
+concatenation of two sequences. The :meth:`~sequence.__add__` method will *import* all fields
+from the other specified sequence. The only disadvantage is the placement required by the
+operator. For instance:
+
+>>> BaseFormat = Sequence({"magic": b"MAGIC", "a": uint8})
+>>> Format = Sequence({"b": uint32, "c": uint16}) + BaseFormat
+
+will result in the following field order:
+
+>>> list(Format.get_members())
+['b', 'c', 'magic', 'a']
+
+which is not the intended order. The correct order should be :code:`['magic', 'a', 'b', 'c']`.
+This can be achieved by using the :code:`BaseFormat` instance as the first operand.
+
+.. warning::
+    This will alter the *BaseFormat* sequence, making it unusable elsewhere as the *base* for
+    all sub-sequences. Therefore, it is not recommended to use inheritance within sequences.
+    The :class:`Struct` class resolves this issue with ease.
+
+Nesting sequences is allowed by default and can be achieved by incorporating another
+:class:`Sequence` into the model. It is important to note that *nesting* is distinct from
+*inheritance*, adding an additional layer of packing and unpacking.
+
+>>> Format = Sequence({"other": BaseFormat, "b": uint32})
+
+
+Struct
+^^^^^^
+
+A *struct* describes a finite collection of named fields. In contrast to a *sequence*, a *struct*
+utilizes Python classes as its model. The annotation feature in Python enables the definition of
+custom types as annotations, enabling this special struct class to create a model solely based on
+class annotations. Additionally, it generates a ``dataclass`` of the provided model, offering a
+standardized string representation.
+
+Several differences exist between a :class:`Sequence` and a :class:`Struct`, with the most
+significant ones highlighted below:
+
+
+.. list-table:: Behaviour of structs and sequences
+    :header-rows: 1
+    :widths: 10, 15, 15
+    :stub-columns: 1
+
+    * -
+      - Sequence
+      - Struct
+    * - Model Type
+      - dict
+      - type
+    * - Inheritance
+      - No
+      - Yes
+    * - Attribute Access
+      - :code:`x["name"]`
+      - :code:`getattr(x, "name", None)`
+    * - Unpacked Type (also needed to pack)
+      - dict [*]_
+      - instance of model
+    * - Documentation
+      - No
+      - Yes
+
+
+.. [*] The unpacked values are stored inside a :class:`Context` instance, a direct subclass of a dictionary.
+
+As evident from the comparison, the :class:`Struct` class introduces new features such as
+inheritance and documentation support. It's crucial to note that inheritance uses
+struct types exclusively.
+
+The :class:`Sequence` class implements a specific process for creating an internal representation
+of the given model. The :class:`Struct` class enhances this process by handling default values, replacing
+types for documentation purposes, or removing annotation fields directly from the model. Additionally,
+this class adds :attr:`~class.__struct__` to the model afterward.
+
+.. admonition:: Implementation Note
+
+    If you decide to use the ``annotation`` feature from the ``__future__`` module, it is necessary to
+    enable :attr:`~options.S_EVAL_ANNOTATIONS` since it "`Stringizes`_" all annotations. ``inspect`` then
+    evaluates all strings, introducing a potential security risk. Exercise with caution when evaluating code!
+
+Specifying structs is as simple as defining `Python Classes`_:
+
+>>> @struct
+... class BaseFormat:
+...     magic: b"MAGIC"
+...     a: uint8
+...
+
+Internally, a representation with all required fields and their corresponding names is
+created. As :code:`b"MAGIC"` or :code:`uint8` are instances of types, the type replacement
+for documentation purposes should be enabled, as shown in :ref:`struct_type`.
+
+As described above, this class introduces an easy-to-use inheritance system using the method
+resolution order of Python:
+
+>>> @struct
+... class Format(BaseFormat):
+...     b: uint32
+...     c: uint16
+...
+>>> list(Format.__struct__.get_members())
+['magic', 'a', 'b', 'c']
+
+.. admonition:: Programmers Note
+
+    As the :class:`Struct` class is a direct subclass of :class:`Sequence`, nesting is supported
+    by default. That means, so-called *anonymous inner* structs can be defined within a class
+    definition.
+
+    >>> @struct
+    ... class Format:
+    ...     a: uint32
+    ...     b: {"c": uint8}
+    ...
+
+    It is not recommended to use this technique as the inner structs can't be used anywhere else.
+    Anonymous inner union definitions are tricky and are not officially supported yet. There are
+    workarounds to that problem, which are discussed in the API documentation of :class:`Sequence`.
+
+
+Union
+^^^^^
+
+Internally constructing unions in the library poses challenges. The current implementation uses
+the predefined behavior of the :class:`Sequence` class for union types. It selects the field with
+the greatest length as its representational size. *Unions*, much like *BitFields*, must store a static
+size. In essence, they behave similarly to C unions.
+
+
+BitField
+^^^^^^^^
+
+A *BitField*, despite its name suggesting a field of bits, is a powerful structure designed for
+detailed byte inspection. Similar to other structures, it is a finite collection of named fields. This
+section will introduce potential challenges associated with the implementation of a :class:`BitField`
+and explains its behavior.
+
+.. caution::
+    This class is still experimental, and caution is advised. For a list of known disadvantages or
+    problems, refer to the information provided below.
+
+As described before, a *BitField* can inspect single bits of parsed bytes. Its internal model is built
+up on a special function or attribute, namely :meth:`~object.__bits__`. Therefore, a bitfield as a
+pre-defined length and will always have a length that can be represented in bytes. The :class:`BitField`
+class not only stores the existing model representation with a name-to-field mapping and a collection
+of all fields, but introduces a special organisation class: :class:`BitFieldGroup`.
+
+As mentioned earlier, a *BitField* allows the inspection of individual bits within parsed bytes. Its
+internal model relies on a special function or attribute, namely :meth:`~object.__bits__`. Consequently,
+a bitfield has a predefined length and will always possess a length that can be represented in bytes.
+
+The :class:`BitField` class not only stores the existing model representation with a name-to-field
+mapping and a collection of all fields but also introduces a special organizational class:
+:class:`BitFieldGroup`. Each group defines its bit size, the absolute bit position in the bitfield,
+and a mapping of fields to their relative bit position in the current group, along with the field's
+width. In the following example, three groups are created:
+
+>>> @bitfield
+... class Format:
+...     a : uint8           # Group 1, pos=0, size=8
+...     _ : 0               # Group 2, pos=8, size=8
+...     b : 15 - uint16     # \
+...     c : 1               #  \ Group 3, pos=16, size=16
+...
+
+- ``a``: The first field creates a group with a size of eight bits at position zero.
+- ``_``: Next, a zero-sized field indicates that padding until the end of the current byte should be
+  added. As we start from bit position ``0``, one byte will be filled with zeros.
+- ``b``: The third field only uses 15 bits of a 16-bit wide field (2 bytes inferred using :code:`uint16`)
+- ``c``: The last field uses the final bit of our current group.
+
+*TODO: describe process of collecting fields, packing and unpacking*
+
+
+Field
+-----
+
+The next core element of this library is the *Field*. It serves as a context storage to store configuration data
+about a struct. Even sequences and structs can be used as fields. The process is straightforward: each custom operator
+creates an instance of a :class:`Field` with the applied configuration value. Most of the time, this value can be
+static or a :ref:`context_lambda`. A field implements basic behavior that should not be duplicated, such as
+conditional execution, exception handling with default values, and support for a built-in switch-case structure.
+
+As mentioned earlier, some primitive structs depend on being linked to a :class:`Field`. This is because all
+configuration elements are stored in a :class:`Field` instance rather than in the target struct instance. More
+information about each supported configuration can be found in :ref:`operators`.
+
 
 Greedy
 ------
 
-*TODO*
+This library provides direct support for *greedy* parsing. Leveraging Python's syntactic features, this special form
+of parsing is enabled using the `Ellipsis`_ (:code:`...`). All previously introduced structs implement greedy parsing
+when enabled.
+
+>>> field = uint8[...]
+
+This special type can be used in places where a length has to be specified. Therefore, it can be applied to all array
+:code:`[]` declarations and constructors that take the length as an input argument, such as :class:`CString`, for
+example.
+
+>>> field = Field(CString(...))
+>>> unpack(field, b"abcd\x00")
+'abcd'
 
 Context
 -------
 
-*TODO*
+The context is
+
+.. _context_lambda:
 
 Context lambda
 ^^^^^^^^^^^^^^
 
 Context path
 ^^^^^^^^^^^^
-
 
 
 Special method names
@@ -73,10 +310,10 @@ Emulating Struct Types
     singular element.
 
     The absence of a standardized implementation for deserializing a collection of elements
-    is deliberate, enhancing the library's adaptability. For example, all instances of the
-    :class:`FormatField` utilize the Python library `struct`_ internally to pack and unpack
-    data. To optimize execution times, a collection of elements is packed and unpacked in a
-    single call, rather than handling each element individually.
+    is deliberate. For example, all instances of the :class:`FormatField` utilize the Python
+    library `struct`_ internally to pack and unpack data. To optimize execution times, a
+    collection of elements is packed and unpacked in a single call, rather than handling each
+    element individually.
 
     The context must incorporate specific members, mentioned in :ref:`context`. Any data
     input verification is implemented by the corresponding class.
@@ -103,6 +340,9 @@ Emulating Struct Types
     :class:`_ContextLambda`, offering support for dynamically sized structs. Furthermore,
     for the explicit definition of dynamic structs, the option to raise a :class:`DynamicSizeError`
     is provided.
+
+
+.. _struct_type:
 
 Customizing the struct's type
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -203,3 +443,6 @@ Modifying fields
 
 .. _struct: https://docs.python.org/3/library/struct.html
 .. _sphinx-autodoc: https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html
+.. _Stringizes: https://docs.python.org/3/howto/annotations.html#manually-un-stringizing-stringized-annotations
+.. _Python Classes: https://docs.python.org/3/reference/compound_stmts.html#class
+.. _Ellipsis: https://docs.python.org/3/library/constants.html#Ellipsis
