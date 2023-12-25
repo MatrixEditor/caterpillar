@@ -26,7 +26,7 @@ from caterpillar.abc import (
     _EnumLike,
     isgreedy,
 )
-from caterpillar.exception import ValidationError, UnsupportedOperation, StructException
+from caterpillar.exception import ValidationError, StructException, InvalidValueError
 from caterpillar.context import CTX_FIELD, CTX_STREAM
 from ._base import Field, FieldStruct
 
@@ -182,10 +182,9 @@ int16 = FormatField("h", int)
 uint16 = FormatField("H", int)
 int32 = FormatField("i", int)
 uint32 = FormatField("I", int)
-int64 = FormatField("l", int)
-uint64 = FormatField("L", int)
-int128 = FormatField("q", int)
-uint128 = FormatField("Q", int)
+int64 = FormatField("q", int)
+uint64 = FormatField("Q", int)
+
 
 ssize_t = FormatField("n", int)
 size_t = FormatField("N", int)
@@ -355,8 +354,18 @@ class Enum(Transformer):
         :return: The corresponding enumeration value.
         """
         by_name = self.model._member_map_.get(parsed)
+        if by_name is not None:
+            return by_name
+
         by_value = self.model._value2member_map_.get(parsed)
-        return by_name or by_value or self.default
+        if by_value is not None:
+            return by_value
+
+        if self.default is None:
+            raise InvalidValueError(
+                f"Could not find enum for value {parsed!r}", context
+            )
+        return self.default
 
 
 class Bytes(FieldStruct):

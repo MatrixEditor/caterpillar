@@ -292,3 +292,4 @@ class ContextPath(ExprMixin, _ContextLambda):
 
 this = ContextPath(CTX_OBJECT)
 ctx = ContextPath()
+parent = ContextPath(".".join([CTX_PARENT, CTX_OBJECT]))

@@ -37,7 +37,6 @@ from caterpillar.fields import (
     uint16,
     uint32,
     uint64,
-    uint128,
     boolean,
     Pass,
 )
@@ -150,8 +149,6 @@ class Bitfield(Struct):
                 struct = uint32
             elif 32 < annotation <= 64:
                 struct = uint64
-            elif 64 < annotation <= 128:
-                struct = uint128
             elif annotation == 1:
                 struct = boolean
             if annotation != 0:

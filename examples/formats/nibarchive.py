@@ -18,7 +18,6 @@
 # from __future__ import annotations
 import enum
 import sys
-import tempfile
 
 from caterpillar.fields import *
 from caterpillar.shortcuts import (

@@ -444,12 +444,12 @@ Customizing the struct's type
 
     .. code-block:: rst
 
-        .. autoclass:: examples.nibarchive.NIBHeader()
+        .. autoclass:: examples.formats.nibarchive.NIBHeader()
             :members:
 
     Will be displayed as:
 
-    .. autoclass:: examples.nibarchive.NIBHeader()
+    .. autoclass:: examples.formats.nibarchive.NIBHeader()
         :members:
         :no-undoc-members:
 

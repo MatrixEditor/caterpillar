@@ -43,8 +43,6 @@ from .common import (
     uint32,
     int64,
     uint64,
-    int128,
-    uint128,
     ssize_t,
     size_t,
     float32,

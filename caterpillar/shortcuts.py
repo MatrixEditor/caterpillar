@@ -17,7 +17,7 @@ from .model import unpack, unpack_file
 from .model import struct, union
 from .model import bitfield, Sequence as Seq
 
-from .context import ContextPath, this, ctx
+from .context import ContextPath, this, ctx, parent
 from .byteorder import LittleEndian, BigEndian
 
 from . import options as opt

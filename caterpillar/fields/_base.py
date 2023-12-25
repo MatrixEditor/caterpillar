@@ -275,10 +275,10 @@ class Field(_StructLike):
         """
         # treat 'value' as the key of specified options
         if isinstance(self.options, dict):
-            if value not in self.options:
+            if value not in self.options and DEFAULT_OPTION not in self.options:
                 raise OptionError(f"Option {str(value)!r} not found!", context)
 
-            struct = self.options.get(value) or self.options.get(DEFAULT_OPTION)
+            struct = self.options.get(value, None) or self.options.get(DEFAULT_OPTION)
         else:
             struct = self.options(value, context)
 
@@ -548,7 +548,7 @@ class FieldStruct(FieldMixin, _StructLike):
         raise NotImplementedError
 
     def pack_seq(self, seq: Iterable, context: _ContextLike) -> None:
-        pack_seq(seq, context, self.unpack_single)
+        pack_seq(seq, context, self.pack_single)
 
     def unpack_seq(self, context: _ContextLike) -> List[Any]:
         return unpack_seq(context, self.unpack_single)
