@@ -361,9 +361,43 @@ instance directly. All custom attributes are stored in the dictionary representa
 Context lambda
 ^^^^^^^^^^^^^^
 
+Dynamic sized structs are supported by this library using the power of so-called *context lambdas*. This library
+introduces a special callable :class:`_ContextLambda`, that takes a :class:`Context` instance and returns the
+desired result. To mimic a *context lambda*, the :meth:`__call__` method has to be implemented.
+
+Dynamic-sized structs are supported by this library using the power of so-called *context lambdas*. This library
+introduces a special callable :class:`_ContextLambda` that takes a :class:`Context` instance and returns the #
+desired result. To mimic a *context lambda*, the :meth:`__call__` method has to be implemented.
+
+.. function:: object.__call__(self, context)
+
+    This library does not distinguish between callable objects and *context lambdas*. They are treated as the
+    same class (this aspect is under subject to changes).
+
+
 Context path
 ^^^^^^^^^^^^
 
+The path of a context is a specialized form of a :ref:`context_lambda` and supports lazy evaluation of most
+operators (conditional ones excluded). Once called, they try to retrieve the requested value from within
+the given :class:`Context` instance. Below is a list of default paths designed to provide a relatively easy
+way to access the context variables.
+
+.. attribute:: ctx
+    :value: ""
+
+    This special path acts as a wrapper to access all variables within the top-level :class:`Context` object.
+
+.. attribute:: this
+    :value: "_obj"
+
+    As described before, a special *object context* is created when packing or unpacking structs that store
+    more than one field.
+
+.. attribute:: parent
+    :value: "_parent._obj"
+
+    A shortcut to access the object context of the parent context.
 
 Special method names
 ====================

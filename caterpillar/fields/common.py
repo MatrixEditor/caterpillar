@@ -528,6 +528,8 @@ class CString(Bytes):
             value: str = super().unpack_single(context)
         return value.decode(self.encoding).rstrip("\x00")
 
+    def __class_getitem__(cls, dim) -> Field:
+        return CString(...)[dim]
 
 class ConstString(Const):
     """

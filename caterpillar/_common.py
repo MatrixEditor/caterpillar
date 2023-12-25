@@ -16,7 +16,7 @@ import itertools
 
 from typing import List, Any, Union, Iterable
 
-from caterpillar.abc import _GreedyType, _ContextLike, isgreedy
+from caterpillar.abc import _GreedyType, _ContextLike, isgreedy, _StreamType
 from caterpillar.context import (
     Context,
     CTX_PATH,
@@ -59,6 +59,11 @@ def unpack_seq(context: _ContextLike, unpack_one) -> List[Any]:
             seq_context[CTX_INDEX] = i
             values.append(unpack_one(seq_context))
             seq_context[CTX_POS] = stream.tell()
+
+            # NOTE: we introduce this check to reduce time when unpacking
+            # a greedy range of elements.
+            if greedy and iseof(stream):
+                break
         except Stop:
             break
         except Exception as exc:
@@ -101,3 +106,17 @@ def pack_seq(seq: List[Any], context: _ContextLike, pack_one) -> None:
         seq_context[CTX_OBJECT] = elem
         pack_one(elem, seq_context)
         seq_context[CTX_POS] = stream.tell()
+
+
+def iseof(stream: _StreamType) -> bool:
+    """
+    Check if the stream is at the end of the file.
+
+    :param _StreamType stream: The input stream.
+    :return: True if the stream is at the end of the file, False otherwise.
+    :rtype: bool
+    """
+    pos = stream.tell()
+    eof = not stream.read(1)
+    stream.seek(pos)
+    return eof
