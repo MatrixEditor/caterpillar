@@ -32,6 +32,7 @@ from .common import (
     Computed,
     Pass,
     CString,
+    Prefixed,
     padding,
     char,
     boolean,

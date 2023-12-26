@@ -24,6 +24,7 @@ _StreamType = IOBase
 _StreamFactory = Callable[[], _StreamType]
 
 _GreedyType = type(...)
+_PrefixedType = slice
 
 
 class _ContextLike(dict):
@@ -177,3 +178,6 @@ def typeof(struct: Union[_StructLike, _ContainsStruct]) -> type:
 
 def isgreedy(obj) -> bool:
     return isinstance(obj, _GreedyType)
+
+def isprefixed(obj) -> bool:
+    return isinstance(obj, _PrefixedType)

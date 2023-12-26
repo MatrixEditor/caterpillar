@@ -16,7 +16,7 @@ import itertools
 
 from typing import List, Any, Union, Iterable
 
-from caterpillar.abc import _GreedyType, _ContextLike, isgreedy, _StreamType
+from caterpillar.abc import _GreedyType, _ContextLike, isgreedy, _StreamType, isprefixed
 from caterpillar.context import (
     Context,
     CTX_PATH,
@@ -26,7 +26,24 @@ from caterpillar.context import (
     CTX_OBJECT,
     CTX_STREAM,
 )
+from caterpillar.options import F_SEQUENTIAL
 from caterpillar.exception import Stop, StructException, InvalidValueError
+
+
+class WithoutFlag:
+    def __init__(self, context: _ContextLike, flag) -> None:
+        self.context = context
+        self.field = context[CTX_FIELD]
+        self.flag = flag
+
+    def __enter__(self) -> None:
+        self.field ^= self.flag
+
+    def __exit__(self, exc_type, exc_value, traceback) -> None:
+        self.field |= self.flag
+        # We have to apply the right field as instance of the Field class
+        # might set their own value into the context.
+        self.context[CTX_FIELD] = self.field
 
 
 def unpack_seq(context: _ContextLike, unpack_one) -> List[Any]:
@@ -49,10 +66,28 @@ def unpack_seq(context: _ContextLike, unpack_one) -> List[Any]:
     # the new context. The '_pos' attribute will be adjusted automatically.
     values = []  # always list (maybe add factory)
     seq_context = Context(
-        _parent=context, _io=stream, _length=length, _lst=values, _field=field
+        _parent=context,
+        _io=stream,
+        _length=length,
+        _lst=values,
+        _field=field,
+        _obj=context.get(CTX_OBJECT),
     )
     greedy = isgreedy(length)
+    prefixed = isprefixed(length)
     seq_context[CTX_POS] = stream.tell()
+    if prefixed:
+        # We have to temporarily remove the array status from the parsing field
+        with WithoutFlag(context, F_SEQUENTIAL):
+            field.amount = 1
+            new_length = length.start.__unpack__(context)
+            field.amount, length = length, new_length
+
+        if not isinstance(length, int):
+            raise InvalidValueError(
+                f"Prefix struct returned non-integer: {length!r}", context
+            )
+
     for i in range(length) if not greedy else itertools.count():
         try:
             seq_context[CTX_PATH] = ".".join([base_path, str(i)])
@@ -93,10 +128,24 @@ def pack_seq(seq: List[Any], context: _ContextLike, pack_one) -> None:
 
     # REVISIT: when to use field.length(context)
     count = len(seq)
+    length = field.amount
+    if isprefixed(length):
+        struct = length.start
+        # We have to temporatily alter the field's values,
+        with WithoutFlag(context, F_SEQUENTIAL):
+            field.amount = 1
+            struct.__pack__(count, context)
+            field.amount = length
 
     # Special elements '_index' and '_length' can be referenced within
     # the new context. The '_pos' attribute will be adjusted automatically.
-    seq_context = Context(_parent=context, _io=stream, _length=count, _field=field)
+    seq_context = Context(
+        _parent=context,
+        _io=stream,
+        _length=count,
+        _field=field,
+        _obj=context.get(CTX_OBJECT),
+    )
     seq_context[CTX_POS] = stream.tell()
     for i, elem in enumerate(seq):
         # The path will contain an additional hint on what element is processed

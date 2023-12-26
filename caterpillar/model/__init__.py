@@ -24,6 +24,7 @@ from ._struct import (
     pack_file,
 )
 from ._bitfield import (
-    Bitfield,
-    bitfield
+    BitField,
+    bitfield,
+    BitFieldGroup
 )

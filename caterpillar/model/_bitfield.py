@@ -67,7 +67,7 @@ class BitFieldGroup:
     fields: Dict[BitTuple, Field] = dcfield(default_factory=dict)
 
 
-class Bitfield(Struct):
+class BitField(Struct):
     groups: List[BitFieldGroup]
 
     def __init__(
@@ -101,7 +101,7 @@ class Bitfield(Struct):
         del self._current_group
 
     def __add__(self, other: "BitField") -> Self:
-        if not isinstance(other, Bitfield):
+        if not isinstance(other, BitField):
             raise ValidationError(
                 f"Attempted to add a non-bitfield struct to a bitfield! (type={type(other)})"
             )
@@ -319,7 +319,7 @@ def _make_bitfield(
     arch: Optional[Arch] = None,
     field_options: Iterable[Flag] = None,
 ) -> type:
-    _ = Bitfield(
+    _ = BitField(
         cls, order=order, arch=arch, options=options, field_options=field_options
     )
     return cls

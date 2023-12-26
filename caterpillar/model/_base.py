@@ -45,6 +45,8 @@ from caterpillar._common import unpack_seq, pack_seq
 
 @dataclass(init=False)
 class Sequence(_StructLike, FieldMixin):
+    """Default implementation for a sequence of fields."""
+
     model: Any
     """
     Specifies the target class/dictionary used as the base model.

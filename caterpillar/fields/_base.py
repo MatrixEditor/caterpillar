@@ -24,6 +24,7 @@ from caterpillar.abc import (
     _StreamType,
     _ContextLike,
     _GreedyType,
+    _PrefixedType,
     hasstruct,
     getstruct,
     typeof,
@@ -100,7 +101,7 @@ class Field(_StructLike):
         An automatic flag that indicates this field stores a sequential struct.
     """
 
-    amount: Union[_ContextLambda, int, _GreedyType]
+    amount: Union[_ContextLambda, int, _GreedyType, _PrefixedType]
     """
     A constant or dynamic value to represent the amount of structs. Zero indicates
     there are no sequence types associated with this field.
@@ -140,7 +141,7 @@ class Field(_StructLike):
         order: ByteOrder = SysNative,
         offset: Union[_ContextLambda, int] = -1,
         flags: Set[Flag] = None,
-        amount: Union[_ContextLambda, int] = 0,
+        amount: Union[_ContextLambda, int, _PrefixedType] = 0,
         options: Union[_Switch, Dict[Any, _StructLike], None] = None,
         condition: Union[_ContextLambda, bool] = True,
         arch: Arch = None,
@@ -195,7 +196,7 @@ class Field(_StructLike):
         return self
 
     def __getitem__(self, dim: Union[_ContextLambda, int, _GreedyType]) -> Self:
-        self._verify_context_value(dim, (_GreedyType, int))
+        self._verify_context_value(dim, (_GreedyType, int, _PrefixedType))
         self.amount = dim
         if self.amount != 0:
             self.flags.add(F_SEQUENTIAL)
@@ -217,6 +218,17 @@ class Field(_StructLike):
         self._verify_context_value(bits, int)
         self.bits = bits
         return self
+
+    def __set_byteorder__(self, order: ByteOrder) -> Self:
+        self.order = order
+        return self
+
+    __ixor__ = __xor__
+    __ior__ = __or__
+    __ifloordiv__ = __floordiv__
+    __irshift__ = __rshift__
+    __imatmul__ = __matmul__
+    __isub__ = __rsub__
 
     def is_seq(self) -> bool:
         """Returns whether this field is sequential.
@@ -256,7 +268,7 @@ class Field(_StructLike):
         :rtype: Union[int, _GreedyType]
         """
         try:
-            if isinstance(self.amount, (int, _GreedyType)):
+            if isinstance(self.amount, (int, _GreedyType, _PrefixedType)):
                 return self.amount
 
             return self.amount(context)

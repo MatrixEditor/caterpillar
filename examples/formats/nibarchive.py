@@ -76,13 +76,9 @@ class NIBClassName:
     extras: int32[this.extras_count]
 
 
-@struct(order=LittleEndian)
-class NIBKey:
-    length: VarInt
-    # Note that the returned string instance here may contain extra null-bytes
-    # at the end.
-    name: String(this.length)
-
+# Note that the returned string instance here may contain extra null-bytes
+# at the end.
+NIBKey = Prefixed(VarInt, "utf-8")
 
 class ValueType(enum.Enum):
     UNKNOWN = -1
@@ -99,11 +95,9 @@ class ValueType(enum.Enum):
     OBJECT_REF = 10
 
 
-@struct(order=LittleEndian)
-class NIBData:
-    length: VarInt
-    # The raw data is just copied from the stream.
-    data: Bytes(this.length)
+# The raw data is just copied from the stream. If we don't specify an
+# encoding, the raw bytes or copied.
+NIBData = Prefixed(VarInt)
 
 
 @struct(order=LittleEndian)
@@ -164,4 +158,5 @@ class NIBArchive:
 # print(NIBArchive.__struct__.fields)
 if __name__ == '__main__':
     obj = unpack_file(NIBArchive, sys.argv[1])
+    print(obj)
     pack_file(obj, sys.argv[2], use_tempfile=True)

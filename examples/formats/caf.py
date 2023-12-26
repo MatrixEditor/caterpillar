@@ -97,8 +97,8 @@ class CAFInformation:
 class CAFStringsChunk:
     # A simple prefixed field where we use a reference to an already parsed value
     # as the length.
-    num_entries: uint32
-    strings: CAFInformation[this.num_entries]
+    # num_entries: uint32
+    strings: CAFInformation[uint32::]
 
 
 @struct(order=BigEndian)

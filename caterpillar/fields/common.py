@@ -26,8 +26,14 @@ from caterpillar.abc import (
     _EnumLike,
     isgreedy,
 )
-from caterpillar.exception import ValidationError, StructException, InvalidValueError
+from caterpillar.exception import (
+    ValidationError,
+    StructException,
+    InvalidValueError,
+    DynamicSizeError,
+)
 from caterpillar.context import CTX_FIELD, CTX_STREAM
+from caterpillar.options import F_SEQUENTIAL
 from ._base import Field, FieldStruct
 
 
@@ -531,6 +537,7 @@ class CString(Bytes):
     def __class_getitem__(cls, dim) -> Field:
         return CString(...)[dim]
 
+
 class ConstString(Const):
     """
     A specialized constant field for handling string values.
@@ -612,3 +619,56 @@ class Pass(FieldStruct):
     def unpack_single(self, context: _ContextLike) -> None:
         # No need for an implementation
         pass
+
+
+class Prefixed(FieldStruct):
+    def __init__(self, prefix: Optional[_StructLike] = None, encoding: Optional[str] = None):
+        self.encoding = encoding
+        self.prefix = prefix or uint32
+
+    def __type__(self) -> type:
+        return bytes if not self.encoding else str
+
+    def __size__(self, context: _ContextLike) -> int:
+        """
+        Calculate the size of the Prefixed field.
+
+        :param context: The current context.
+        :return: The size of the Bytes field.
+        """
+        raise DynamicSizeError("Prefixed does not store a size", context)
+
+    def pack_single(self, obj: bytes, context: _ContextLike) -> None:
+        """
+        Pack a single bytes object into the stream.
+
+        :param obj: The bytes object to pack.
+        :param context: The current context.
+        """
+        self.prefix.__pack__(len(obj), context)
+        if self.encoding:
+            obj = obj.encode(self.encoding)
+        context[CTX_STREAM].write(obj)
+
+    def unpack_single(self, context: _ContextLike) -> Any:
+        """
+        Unpack a single bytes object from the stream.
+
+        :param context: The current context.
+        :return: The unpacked bytes object.
+        """
+        field: Field = context[CTX_FIELD]
+        is_seq = field.is_seq()
+        if is_seq:
+            # We have to remove the sequence status temporarily
+            field ^= F_SEQUENTIAL
+
+        size = self.prefix.unpack_single(context)
+        data = context[CTX_STREAM].read(size)
+        if self.encoding:
+            data = data.decode(self.encoding)
+
+        # The status has to be added again
+        if is_seq:
+            field |= F_SEQUENTIAL
+        return data
