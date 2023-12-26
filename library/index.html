@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="1. Options" href="options.html" /><link rel="prev" title="Tutorial to Caterpillar" href="../tutorial/index.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="1. Struct Model" href="model.html" /><link rel="prev" title="3. Operators" href="../reference/operators.html" />
 
     <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
         <title>Library - Caterpillar 1.0.0 documentation</title>
@@ -158,17 +158,19 @@
   <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../installing/index.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial/index.html">Tutorial to Caterpillar</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../reference/index.html">Caterpillar’s Reference</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Caterpillar’s Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../reference/baseclasses.html">1. Abstract Base Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/introduction.html">1. Introduction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../reference/datamodel.html">2. Data Model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../reference/operators.html">3. Operators</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorial/index.html">Tutorial to Caterpillar</a></li>
 <li class="toctree-l1 current has-children current-page"><a class="current reference internal" href="#">Library</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of Library</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="options.html">1. Options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.html">1. Struct Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="options.html">2. Options</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Development</a></li>
 </ul>
 
 </div>
@@ -207,7 +209,22 @@
 <span id="library-index"></span><h1>Library<a class="headerlink" href="#library" title="Link to this heading">#</a></h1>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="options.html">1. Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model.html">1. Struct Model</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="model.html#caterpillar.model.Sequence"><code class="docutils literal notranslate"><span class="pre">Sequence</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.html#caterpillar.model.Struct"><code class="docutils literal notranslate"><span class="pre">Struct</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.html#caterpillar.model.struct"><code class="docutils literal notranslate"><span class="pre">struct()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.html#caterpillar.model.union"><code class="docutils literal notranslate"><span class="pre">union()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.html#caterpillar.model.pack"><code class="docutils literal notranslate"><span class="pre">pack()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.html#caterpillar.model.pack_into"><code class="docutils literal notranslate"><span class="pre">pack_into()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.html#caterpillar.model.pack_file"><code class="docutils literal notranslate"><span class="pre">pack_file()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.html#caterpillar.model.unpack"><code class="docutils literal notranslate"><span class="pre">unpack()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.html#caterpillar.model.unpack_file"><code class="docutils literal notranslate"><span class="pre">unpack_file()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.html#caterpillar.model.BitFieldGroup"><code class="docutils literal notranslate"><span class="pre">BitFieldGroup</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.html#caterpillar.model.BitField"><code class="docutils literal notranslate"><span class="pre">BitField</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.html#caterpillar.model.bitfield"><code class="docutils literal notranslate"><span class="pre">bitfield()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="options.html">2. Options</a></li>
 </ul>
 </div>
 </section>
@@ -217,23 +234,23 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="options.html">
+          <a class="next-page" href="model.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title"><span class="section-number">1. </span>Options</div>
+                <div class="title"><span class="section-number">1. </span>Struct Model</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="../tutorial/index.html">
+          <a class="prev-page" href="../reference/operators.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Tutorial to Caterpillar</div>
+                <div class="title"><span class="section-number">3. </span>Operators</div>
                 
               </div>
             </a>

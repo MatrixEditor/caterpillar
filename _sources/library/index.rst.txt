@@ -8,4 +8,5 @@ Library
    :maxdepth: 2
    :numbered:
 
+   model.rst
    options.rst

@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="2. Data Model" href="datamodel.html" /><link rel="prev" title="Caterpillar’s Reference" href="index.html" />
 
     <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
-        <title>Introduction - Caterpillar 1.0.0 documentation</title>
+        <title>1. Introduction - Caterpillar 1.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=135e06be" />
     <link rel="stylesheet" type="text/css" href="../_static/tabs.css?v=4c969af8" />
@@ -135,7 +135,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -156,19 +156,21 @@
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../installing/index.html">Installation</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="index.html">Caterpillar’s Reference</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Caterpillar’s Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="baseclasses.html">1. Abstract Base Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial/index.html">Tutorial to Caterpillar</a></li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">Caterpillar’s Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Caterpillar’s Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">1. Introduction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="datamodel.html">2. Data Model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="operators.html">3. Operators</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorial/index.html">Tutorial to Caterpillar</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../library/index.html">Library</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of Library</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../library/options.html">1. Options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../library/model.html">1. Struct Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../library/options.html">2. Options</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Development</a></li>
 </ul>
 
 </div>
@@ -197,14 +199,78 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main">
           <section id="introduction">
-<h1>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">#</a></h1>
+<span id="id1"></span><h1><span class="section-number">1. </span>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">#</a></h1>
+<p>The “library reference” contains several different documents describing the core model of this framework. After
+the tutorial, you are now able to dive deeper into the functionalities of this library.</p>
+<div class="admonition-what-exactly-is-a-caterpillar admonition">
+<p class="admonition-title">What exactly is a <em>caterpillar</em>?</p>
+<p>Caterpillars (ˈ/k æ t ə rp ɪ l ə r - 🐛) are the wormlike larva of a butterfly or moth. <a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>
+Just as caterpillars undergo a metamorphosis, <em>caterpillar</em> facilitates the metamorphosis of data structures
+into runtime objects.</p>
+</div>
+<p>This document aims to address burning questions regarding design and availability. It provides an overview of the
+aspects covered by this framework and those that it doesn’t. In general, this library was designed to enhance the
+process of reverse engineering binary structures using readable and shareable code. The use of <em>“static”</em> <a class="footnote-reference brackets" href="#id5" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>
+class definitions delivers advantages but also brings up some problems that we need to discuss.</p>
+<section id="why-use-caterpillar">
+<h2><span class="section-number">1.1. </span>Why use Caterpillar?<a class="headerlink" href="#why-use-caterpillar" title="Link to this heading">#</a></h2>
+<p>There are several reasons to incorporate this library into your code. Some of the scenarios where Caterpillar can
+be beneficial include:</p>
+<ul class="simple">
+<li><p><strong>Quick Reverse Engineering</strong>: When you need to rapidly reverse engineer a binary structure.</p></li>
+<li><p><strong>Creating Presentable Binary Structures</strong>: When there’s a task to create a binary structure, and the result should be presentable.</p></li>
+<li><p><strong>Exploration in Python</strong>: When you want to experiment and play around in Python.</p></li>
+</ul>
+<p>The biggest advantage of <em>Caterpillar</em> is the lack of external dependencies (though extensions can be integrated using
+dependencies). Additionally, the minimal lines of code required to define structures speak for themselves, as
+demonstrated in the following example from <cite>examples/formats/caf</cite>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span>
+<span class="linenos"> 2</span><span class="k">class</span> <span class="nc">CAFChunk</span><span class="p">:</span>
+<span class="linenos"> 3</span>    <span class="n">chunk_header</span><span class="p">:</span> <span class="n">CAFChunkHeader</span>
+<span class="linenos"> 4</span>    <span class="n">data</span><span class="p">:</span> <span class="n">Field</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">chunk_header</span><span class="o">.</span><span class="n">chunk_type</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="p">{</span>
+<span class="linenos"> 5</span>        <span class="sa">b</span><span class="s2">&quot;desc&quot;</span><span class="p">:</span> <span class="n">CAFAudioFormat</span><span class="p">,</span>
+<span class="linenos"> 6</span>        <span class="sa">b</span><span class="s2">&quot;info&quot;</span><span class="p">:</span> <span class="n">CAFStringsChunk</span><span class="p">,</span>
+<span class="linenos"> 7</span>        <span class="sa">b</span><span class="s2">&quot;pakt&quot;</span><span class="p">:</span> <span class="n">CAFPacketTable</span><span class="p">,</span>
+<span class="linenos"> 8</span>        <span class="sa">b</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">CAFData</span><span class="p">,</span>
+<span class="linenos"> 9</span>        <span class="sa">b</span><span class="s2">&quot;free&quot;</span><span class="p">:</span> <span class="n">padding</span><span class="p">[</span><span class="n">this</span><span class="o">.</span><span class="n">chunk_header</span><span class="o">.</span><span class="n">chunk_size</span><span class="p">],</span>
+<span class="linenos">10</span>        <span class="n">DEFAULT_OPTION</span><span class="p">:</span> <span class="n">Bytes</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">chunk_header</span><span class="o">.</span><span class="n">chunk_size</span><span class="p">),</span>
+<span class="linenos">11</span>    <span class="p">}</span>
+</pre></div>
+</div>
+<section id="how-does-this-even-work">
+<h3><span class="section-number">1.1.1. </span>How does this even work?<a class="headerlink" href="#how-does-this-even-work" title="Link to this heading">#</a></h3>
+<p><em>Caterpillar</em> utilizes Python’s annotations to build its model from processing class definitions. With the use
+of Python 3.12, there are no conflicts in using annotations for defining fields.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
+<span class="k">class</span> <span class="nc">Format</span><span class="p">:</span>
+    <span class="c1"># &lt;name&gt; : &lt;field&gt; [ = &lt;default_value&gt; ]</span>
+</pre></div>
+</div>
+<p>By using annotations, we can simply define a default value if desired, eliminating the need to make the code
+more complex by using assignments.</p>
+</section>
+</section>
+<section id="pros-cons">
+<h2><span class="section-number">1.2. </span>Pros &amp; Cons<a class="headerlink" href="#pros-cons" title="Link to this heading">#</a></h2>
+<p><em>TODO</em></p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id4" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">1</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://en.wikipedia.org/wiki/Caterpillar">https://en.wikipedia.org/wiki/Caterpillar</a></p>
+</aside>
+<aside class="footnote brackets" id="id5" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">2</a><span class="fn-bracket">]</span></span>
+<p>Event structs generated from class models are extensible in some degree.</p>
+</aside>
+</aside>
+</section>
 </section>
 
         </article>
@@ -212,8 +278,26 @@
       <footer>
         
         <div class="related-pages">
-          
-          
+          <a class="next-page" href="datamodel.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title"><span class="section-number">2. </span>Data Model</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="index.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Caterpillar’s Reference</div>
+                
+              </div>
+            </a>
         </div>
         <div class="bottom-of-page">
           <div class="left-details">
@@ -232,8 +316,31 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">1. Introduction</a><ul>
+<li><a class="reference internal" href="#why-use-caterpillar">1.1. Why use Caterpillar?</a><ul>
+<li><a class="reference internal" href="#how-does-this-even-work">1.1.1. How does this even work?</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pros-cons">1.2. Pros &amp; Cons</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

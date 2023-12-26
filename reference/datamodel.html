@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="3. Operators" href="operators.html" /><link rel="prev" title="1. Abstract Base Classes" href="baseclasses.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="3. Operators" href="operators.html" /><link rel="prev" title="1. Introduction" href="introduction.html" />
 
     <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
         <title>2. Data Model - Caterpillar 1.0.0 documentation</title>
@@ -158,17 +158,19 @@
   <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../installing/index.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial/index.html">Tutorial to Caterpillar</a></li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">Caterpillar’s Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Caterpillar’s Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="baseclasses.html">1. Abstract Base Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html">1. Introduction</a></li>
 <li class="toctree-l2 current current-page"><a class="current reference internal" href="#">2. Data Model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="operators.html">3. Operators</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorial/index.html">Tutorial to Caterpillar</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../library/index.html">Library</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of Library</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../library/options.html">1. Options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../library/model.html">1. Struct Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../library/options.html">2. Options</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Development</a></li>
 </ul>
 
 </div>
@@ -479,8 +481,17 @@ example.</p>
 </pre></div>
 </div>
 </section>
+<section id="prefixed">
+<h3><span class="section-number">2.2.4. </span>Prefixed<a class="headerlink" href="#prefixed" title="Link to this heading">#</a></h3>
+<p>In addition to greedy parsing, this library supports prefixed packing and unpacking as well. With <em>prefixed</em>, we refer
+to the length of an array of elements that should be parsed. In this library, the <code class="code docutils literal notranslate"><span class="pre">slice</span></code> class is to achieve a
+prefix option.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">CString</span><span class="p">[</span><span class="n">uint32</span><span class="p">::]</span>
+</pre></div>
+</div>
+</section>
 <section id="context">
-<h3><span class="section-number">2.2.4. </span>Context<a class="headerlink" href="#context" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">2.2.5. </span>Context<a class="headerlink" href="#context" title="Link to this heading">#</a></h3>
 <p>The context is another core element of this framework, utilized to store all relevant variables needed during the
 process of packing or unpacking objects. The top-level <code class="xref py py-meth docutils literal notranslate"><span class="pre">unpack()</span></code> and <code class="xref py py-meth docutils literal notranslate"><span class="pre">pack()</span></code> methods are designed to
 create the context themselves with some pre-defined (internal) fields.</p>
@@ -563,7 +574,7 @@ should be placed at an offset position.</p>
 </dd></dl>
 
 <section id="context-lambda">
-<span id="id3"></span><h4><span class="section-number">2.2.4.1. </span>Context lambda<a class="headerlink" href="#context-lambda" title="Link to this heading">#</a></h4>
+<span id="id3"></span><h4><span class="section-number">2.2.5.1. </span>Context lambda<a class="headerlink" href="#context-lambda" title="Link to this heading">#</a></h4>
 <p>Dynamic sized structs are supported by this library using the power of so-called <em>context lambdas</em>. This library
 introduces a special callable <code class="xref py py-class docutils literal notranslate"><span class="pre">_ContextLambda</span></code>, that takes a <code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code> instance and returns the
 desired result. To mimic a <em>context lambda</em>, the <code class="xref py py-meth docutils literal notranslate"><span class="pre">__call__()</span></code> method has to be implemented.</p>
@@ -579,7 +590,7 @@ same class (this aspect is under subject to changes).</p>
 
 </section>
 <section id="context-path">
-<h4><span class="section-number">2.2.4.2. </span>Context path<a class="headerlink" href="#context-path" title="Link to this heading">#</a></h4>
+<h4><span class="section-number">2.2.5.2. </span>Context path<a class="headerlink" href="#context-path" title="Link to this heading">#</a></h4>
 <p>The path of a context is a specialized form of a <a class="reference internal" href="#context-lambda"><span class="std std-ref">Context lambda</span></a> and supports lazy evaluation of most
 operators (conditional ones excluded). Once called, they try to retrieve the requested value from within
 the given <code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code> instance. Below is a list of default paths designed to provide a relatively easy
@@ -788,14 +799,14 @@ use of <code class="code docutils literal notranslate"><span class="pre">field.g
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="baseclasses.html">
+          <a class="prev-page" href="introduction.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title"><span class="section-number">1. </span>Abstract Base Classes</div>
+                <div class="title"><span class="section-number">1. </span>Introduction</div>
                 
               </div>
             </a>
@@ -840,7 +851,8 @@ use of <code class="code docutils literal notranslate"><span class="pre">field.g
 </li>
 <li><a class="reference internal" href="#field">2.2.2. Field</a></li>
 <li><a class="reference internal" href="#greedy">2.2.3. Greedy</a></li>
-<li><a class="reference internal" href="#context">2.2.4. Context</a><ul>
+<li><a class="reference internal" href="#prefixed">2.2.4. Prefixed</a></li>
+<li><a class="reference internal" href="#context">2.2.5. Context</a><ul>
 <li><a class="reference internal" href="#CTX_PARENT"><code class="docutils literal notranslate"><span class="pre">CTX_PARENT</span></code></a></li>
 <li><a class="reference internal" href="#CTX_OBJECT"><code class="docutils literal notranslate"><span class="pre">CTX_OBJECT</span></code></a></li>
 <li><a class="reference internal" href="#CTX_STREAM"><code class="docutils literal notranslate"><span class="pre">CTX_STREAM</span></code></a></li>
@@ -850,11 +862,11 @@ use of <code class="code docutils literal notranslate"><span class="pre">field.g
 <li><a class="reference internal" href="#CTX_VALUE"><code class="docutils literal notranslate"><span class="pre">CTX_VALUE</span></code></a></li>
 <li><a class="reference internal" href="#CTX_POS"><code class="docutils literal notranslate"><span class="pre">CTX_POS</span></code></a></li>
 <li><a class="reference internal" href="#CTX_OFFSETS"><code class="docutils literal notranslate"><span class="pre">CTX_OFFSETS</span></code></a></li>
-<li><a class="reference internal" href="#context-lambda">2.2.4.1. Context lambda</a><ul>
+<li><a class="reference internal" href="#context-lambda">2.2.5.1. Context lambda</a><ul>
 <li><a class="reference internal" href="#object.__call__"><code class="docutils literal notranslate"><span class="pre">object.__call__()</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#context-path">2.2.4.2. Context path</a><ul>
+<li><a class="reference internal" href="#context-path">2.2.5.2. Context path</a><ul>
 <li><a class="reference internal" href="#ctx"><code class="docutils literal notranslate"><span class="pre">ctx</span></code></a></li>
 <li><a class="reference internal" href="#this"><code class="docutils literal notranslate"><span class="pre">this</span></code></a></li>
 <li><a class="reference internal" href="#parent"><code class="docutils literal notranslate"><span class="pre">parent</span></code></a></li>

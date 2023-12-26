@@ -277,6 +277,15 @@ example.
 >>> unpack(field, b"abcd\x00")
 'abcd'
 
+Prefixed
+--------
+
+In addition to greedy parsing, this library supports prefixed packing and unpacking as well. With *prefixed*, we refer
+to the length of an array of elements that should be parsed. In this library, the :code:`slice` class is to achieve a
+prefix option.
+
+>>> field = CString[uint32::]
+
 Context
 -------
 

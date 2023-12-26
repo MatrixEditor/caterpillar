@@ -29,8 +29,7 @@ to write complex structures in a compact and readable manner.
       magic: b"Foo"                       # constant values
       name: CString(...)                  # C-String without a fixed length
       value: le + uint16                  # little endian encoding
-      num_entries: be + uint32            # simple field definition + big endian encoding
-      entries: CString[this.num_entries]  # arrays just like that
+      entries: be + CString[uint32::]     # arrays with big-endian prefixed length
 
 .. admonition:: Hold up, wait a minute!
 
@@ -40,16 +39,16 @@ to write complex structures in a compact and readable manner.
 Working with defined classes is as straightforward as working with normal classes. *All
 constant values are created automatically!*
 
->>> obj = Format(name="Hello, World!", value=1, num_entries=1, entries=["Bar"])
+>>> obj = Format(name="Hello, World!", value=10, entries=["Bar", "Baz"])
 >>> print(obj)
-Format(magic=b'Foo', name='Hello, World!', value=1, num_entries=1, entries=['Bar'])
+Format(magic=b'Foo', name='Hello, World!', value=10, entries=['Bar', 'Baz'])
 
 Packing and unpacking have never been easier:
 
 >>> pack(obj)
-b'FooHello, World!\x00\x01\x00\x00\x00\x00\x00\x00\x01Bar\x00'
+b'FooHello, World!\x00\n\x00\x00\x00\x00\x02Bar\x00Baz\x00'
 >>> unpack(Format, _)
-Format(magic=b'Foo', name='Hello, World!', value=1, num_entries=1, entries=['Bar'])
+Format(magic=b'Foo', name='Hello, World!', value=10, entries=['Bar', 'Baz'])
 
 .. admonition:: What about documentation?
 
@@ -70,9 +69,10 @@ what configuration options can be used. Alternatively you can follow the :ref:`t
    :caption: Contents:
 
    installing/index.rst
-   reference/index.rst
    tutorial/index.rst
+   reference/index.rst
    library/index.rst
+   development/index.rst
 
 
 

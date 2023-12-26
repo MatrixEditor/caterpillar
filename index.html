@@ -158,17 +158,19 @@
   <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="installing/index.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/index.html">Tutorial to Caterpillar</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="reference/index.html">Caterpillar’s Reference</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Caterpillar’s Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="reference/baseclasses.html">1. Abstract Base Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/introduction.html">1. Introduction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference/datamodel.html">2. Data Model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference/operators.html">3. Operators</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="tutorial/index.html">Tutorial to Caterpillar</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="library/index.html">Library</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of Library</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="library/options.html">1. Options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="library/model.html">1. Struct Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="library/options.html">2. Options</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="development/index.html">Development</a></li>
 </ul>
 
 </div>
@@ -228,28 +230,27 @@ to write complex structures in a compact and readable manner.</p>
    <span class="n">magic</span><span class="p">:</span> <span class="sa">b</span><span class="s2">&quot;Foo&quot;</span>                       <span class="c1"># constant values</span>
    <span class="n">name</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>                  <span class="c1"># C-String without a fixed length</span>
    <span class="n">value</span><span class="p">:</span> <span class="n">le</span> <span class="o">+</span> <span class="n">uint16</span>                  <span class="c1"># little endian encoding</span>
-   <span class="n">num_entries</span><span class="p">:</span> <span class="n">be</span> <span class="o">+</span> <span class="n">uint32</span>            <span class="c1"># simple field definition + big endian encoding</span>
-   <span class="n">entries</span><span class="p">:</span> <span class="n">CString</span><span class="p">[</span><span class="n">this</span><span class="o">.</span><span class="n">num_entries</span><span class="p">]</span>  <span class="c1"># arrays just like that</span>
+   <span class="n">entries</span><span class="p">:</span> <span class="n">be</span> <span class="o">+</span> <span class="n">CString</span><span class="p">[</span><span class="n">uint32</span><span class="p">::]</span>     <span class="c1"># arrays with big-endian prefixed length</span>
 </pre></div>
 </div>
 </div>
 <div class="admonition-hold-up-wait-a-minute admonition">
 <p class="admonition-title">Hold up, wait a minute!</p>
 <p>How does this even work? Is this still Python? Answers to these questions and more are given
-in the general <span class="xref std std-ref">introduction</span>.</p>
+in the general <a class="reference internal" href="reference/introduction.html#introduction"><span class="std std-ref">Introduction</span></a>.</p>
 </div>
 <p>Working with defined classes is as straightforward as working with normal classes. <em>All
 constant values are created automatically!</em></p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span> <span class="o">=</span> <span class="n">Format</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Hello, World!&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_entries</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">entries</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Bar&quot;</span><span class="p">])</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span> <span class="o">=</span> <span class="n">Format</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Hello, World!&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">entries</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Bar&quot;</span><span class="p">,</span> <span class="s2">&quot;Baz&quot;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
-<span class="go">Format(magic=b&#39;Foo&#39;, name=&#39;Hello, World!&#39;, value=1, num_entries=1, entries=[&#39;Bar&#39;])</span>
+<span class="go">Format(magic=b&#39;Foo&#39;, name=&#39;Hello, World!&#39;, value=10, entries=[&#39;Bar&#39;, &#39;Baz&#39;])</span>
 </pre></div>
 </div>
 <p>Packing and unpacking have never been easier:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
-<span class="go">b&#39;FooHello, World!\x00\x01\x00\x00\x00\x00\x00\x00\x01Bar\x00&#39;</span>
+<span class="go">b&#39;FooHello, World!\x00\n\x00\x00\x00\x00\x02Bar\x00Baz\x00&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">Format</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span>
-<span class="go">Format(magic=b&#39;Foo&#39;, name=&#39;Hello, World!&#39;, value=1, num_entries=1, entries=[&#39;Bar&#39;])</span>
+<span class="go">Format(magic=b&#39;Foo&#39;, name=&#39;Hello, World!&#39;, value=10, entries=[&#39;Bar&#39;, &#39;Baz&#39;])</span>
 </pre></div>
 </div>
 <div class="admonition-what-about-documentation admonition">
