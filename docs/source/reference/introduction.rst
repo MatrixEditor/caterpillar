@@ -40,13 +40,16 @@ demonstrated in the following example from `examples/formats/caf`:
 
     @struct(order=BigEndian)
     class CAFChunk:
+        # Include other structs just like that
         chunk_header: CAFChunkHeader
+        # Built-in support for switch-case structures
         data: Field(this.chunk_header.chunk_type) >> {
             b"desc": CAFAudioFormat,
             b"info": CAFStringsChunk,
             b"pakt": CAFPacketTable,
             b"data": CAFData,
             b"free": padding[this.chunk_header.chunk_size],
+            # the fallback struct given with a default option
             DEFAULT_OPTION: Bytes(this.chunk_header.chunk_size),
         }
 
@@ -81,4 +84,4 @@ Pros & Cons
 .. |c4| unicode:: U+0259
 
 .. [1] https://en.wikipedia.org/wiki/Caterpillar
-.. [2] Event structs generated from class models are extensible in some degree.
+.. [2] Even structs generated from class models are extensible in some degree.

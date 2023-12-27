@@ -487,6 +487,7 @@ class CString(Bytes):
         self,
         length: Union[int, _ContextLambda, None] = None,
         encoding: Optional[str] = None,
+        pad: Union[str, int, None] = None,
     ) -> None:
         """
         Initialize the String field with a fixed length or a length determined by a context lambda.
@@ -496,6 +497,9 @@ class CString(Bytes):
         """
         super().__init__(length or ...)
         self.encoding = encoding or "utf-8"
+        self.pad = pad or 0
+        if isinstance(self.pad, str):
+            self.pad = ord(self.pad)
 
     def __type__(self) -> type:
         """
@@ -512,12 +516,13 @@ class CString(Bytes):
         :param obj: The string to pack.
         :param context: The current context.
         """
+        pad = chr(self.pad).encode()
         if not isgreedy(self.length):
             length = self.__size__(context)
             obj_length = len(obj)
-            payload = obj.encode(self.encoding) + b"\x00" * (length - obj_length)
+            payload = obj.encode(self.encoding) + pad * (length - obj_length)
         else:
-            payload = obj.encode(self.encoding) + b"\x00"
+            payload = obj.encode(self.encoding) + pad
         super().pack_single(payload, context)
 
     def unpack_single(self, context: _ContextLike) -> Any:
@@ -536,12 +541,12 @@ class CString(Bytes):
                 if not value:
                     break
                 data.append(*value)
-                if data[-1] == 0:
+                if data[-1] == self.pad:
                     break
             value = bytes(data)
         else:
             value: bytes = super().unpack_single(context)
-        return value.decode(self.encoding).rstrip("\x00")
+        return value.decode(self.encoding).rstrip(chr(self.pad))
 
     def __class_getitem__(cls, dim) -> Field:
         return CString(...)[dim]
@@ -631,7 +636,9 @@ class Pass(FieldStruct):
 
 
 class Prefixed(FieldStruct):
-    def __init__(self, prefix: Optional[_StructLike] = None, encoding: Optional[str] = None):
+    def __init__(
+        self, prefix: Optional[_StructLike] = None, encoding: Optional[str] = None
+    ):
         self.encoding = encoding
         self.prefix = prefix or uint32
 

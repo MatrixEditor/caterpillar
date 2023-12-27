@@ -41,11 +41,11 @@ Sequence
 --------
 
 As previously explained, a sequence functions independently of fields. The library introduces
-the :class:`Sequence` as a named finite collection of :class:`Field` objects. A *Sequence*
+the :class:`~caterpillar.model.Sequence` as a named finite collection of :class:`Field` objects. A *Sequence*
 operates on a model, which is a string-to-field mapping by default. Later, we will discuss
 the distinctions between a *Sequence* and a *Struct* regarding the model representation.
 
-A sequence definition entails the specification of a :class:`Sequence` object by directly
+A sequence definition entails the specification of a :class:`~caterpillar.model.Sequence` object by directly
 indicating the model to use. Inheritance poses a challenge with sequences, as they are not
 designed to operate on a type hierarchy. The default instantiation with all default options
 involves passing the dictionary with all fields directly:
@@ -68,7 +68,7 @@ All sequences store a configurable :class:`ByteOrder` and :class:`Arch` as archi
 which are passed to **all** fields in the current model. For more information on why these
 classes are not specified as an enum class, please refer to :ref:`byteorder`.
 
-Inheritance in sequences is intricate, as a :class:`Sequence` is constructed from a dictionary
+Inheritance in sequences is intricate, as a :class:`~caterpillar.model.Sequence` is constructed from a dictionary
 of elements. We can attempt to simulate a chain of extended *base sequences* using the
 concatenation of two sequences. The :meth:`~sequence.__add__` method will *import* all fields
 from the other specified sequence. The only disadvantage is the placement required by the
@@ -88,10 +88,10 @@ This can be achieved by using the :code:`BaseFormat` instance as the first opera
 .. warning::
     This will alter the *BaseFormat* sequence, making it unusable elsewhere as the *base* for
     all sub-sequences. Therefore, it is not recommended to use inheritance within sequences.
-    The :class:`Struct` class resolves this issue with ease.
+    The :class:`~caterpillar.model.Struct` class resolves this issue with ease.
 
 Nesting sequences is allowed by default and can be achieved by incorporating another
-:class:`Sequence` into the model. It is important to note that *nesting* is distinct from
+:class:`~caterpillar.model.Sequence` into the model. It is important to note that *nesting* is distinct from
 *inheritance*, adding an additional layer of packing and unpacking.
 
 >>> Format = Sequence({"other": BaseFormat, "b": uint32})
@@ -106,8 +106,8 @@ custom types as annotations, enabling this special struct class to create a mode
 class annotations. Additionally, it generates a ``dataclass`` of the provided model, offering a
 standardized string representation.
 
-Several differences exist between a :class:`Sequence` and a :class:`Struct`, with the most
-significant ones highlighted below:
+Several differences exist between a :class:`~caterpillar.model.Sequence` and a
+:class:`~caterpillar.model.Struct`, with the most significant ones highlighted below:
 
 
 .. list-table:: Behaviour of structs and sequences
@@ -137,12 +137,12 @@ significant ones highlighted below:
 
 .. [*] The unpacked values are stored inside a :class:`Context` instance, a direct subclass of a dictionary.
 
-As evident from the comparison, the :class:`Struct` class introduces new features such as
+As evident from the comparison, the :class:`~caterpillar.model.Struct` class introduces new features such as
 inheritance and documentation support. It's crucial to note that inheritance uses
 struct types exclusively.
 
-The :class:`Sequence` class implements a specific process for creating an internal representation
-of the given model. The :class:`Struct` class enhances this process by handling default values, replacing
+The :class:`~caterpillar.model.Sequence` class implements a specific process for creating an internal representation
+of the given model. The :class:`~caterpillar.model.Struct` class enhances this process by handling default values, replacing
 types for documentation purposes, or removing annotation fields directly from the model. Additionally,
 this class adds :attr:`~class.__struct__` to the model afterward.
 
@@ -177,7 +177,7 @@ resolution order of Python:
 
 .. admonition:: Programmers Note
 
-    As the :class:`Struct` class is a direct subclass of :class:`Sequence`, nesting is supported
+    As the :class:`~caterpillar.model.Struct` class is a direct subclass of :class:`~caterpillar.model.Sequence`, nesting is supported
     by default. That means, so-called *anonymous inner* structs can be defined within a class
     definition.
 
@@ -189,14 +189,14 @@ resolution order of Python:
 
     It is not recommended to use this technique as the inner structs can't be used anywhere else.
     Anonymous inner union definitions are tricky and are not officially supported yet. There are
-    workarounds to that problem, which are discussed in the API documentation of :class:`Sequence`.
+    workarounds to that problem, which are discussed in the API documentation of :class:`~caterpillar.model.Sequence`.
 
 
 Union
 ^^^^^
 
 Internally constructing unions in the library poses challenges. The current implementation uses
-the predefined behavior of the :class:`Sequence` class for union types. It selects the field with
+the predefined behavior of the :class:`~caterpillar.model.Sequence` class for union types. It selects the field with
 the greatest length as its representational size. *Unions*, much like *BitFields*, must store a static
 size. In essence, they behave similarly to C unions.
 
@@ -206,26 +206,20 @@ BitField
 
 A *BitField*, despite its name suggesting a field of bits, is a powerful structure designed for
 detailed byte inspection. Similar to other structures, it is a finite collection of named fields. This
-section will introduce potential challenges associated with the implementation of a :class:`BitField`
+section will introduce potential challenges associated with the implementation of a :class:`~caterpillar.model.BitField`
 and explains its behavior.
 
 .. caution::
     This class is still experimental, and caution is advised. For a list of known disadvantages or
     problems, refer to the information provided below.
 
-As described before, a *BitField* can inspect single bits of parsed bytes. Its internal model is built
-up on a special function or attribute, namely :meth:`~object.__bits__`. Therefore, a bitfield as a
-pre-defined length and will always have a length that can be represented in bytes. The :class:`BitField`
-class not only stores the existing model representation with a name-to-field mapping and a collection
-of all fields, but introduces a special organisation class: :class:`BitFieldGroup`.
-
 As mentioned earlier, a *BitField* allows the inspection of individual bits within parsed bytes. Its
 internal model relies on a special function or attribute, namely :meth:`~object.__bits__`. Consequently,
 a bitfield has a predefined length and will always possess a length that can be represented in bytes.
 
-The :class:`BitField` class not only stores the existing model representation with a name-to-field
+The :class:`~caterpillar.model.BitField` class not only stores the existing model representation with a name-to-field
 mapping and a collection of all fields but also introduces a special organizational class:
-:class:`BitFieldGroup`. Each group defines its bit size, the absolute bit position in the bitfield,
+:class:`~caterpillar.model.BitFieldGroup`. Each group defines its bit size, the absolute bit position in the bitfield,
 and a mapping of fields to their relative bit position in the current group, along with the field's
 width. In the following example, three groups are created:
 
@@ -259,6 +253,7 @@ As mentioned earlier, some primitive structs depend on being linked to a :class:
 configuration elements are stored in a :class:`Field` instance rather than in the target struct instance. More
 information about each supported configuration can be found in :ref:`operators`.
 
+.. _greedy:
 
 Greedy
 ------
@@ -277,6 +272,8 @@ example.
 >>> unpack(field, b"abcd\x00")
 'abcd'
 
+.. _prefixed:
+
 Prefixed
 --------
 
@@ -290,7 +287,7 @@ Context
 -------
 
 The context is another core element of this framework, utilized to store all relevant variables needed during the
-process of packing or unpacking objects. The top-level :meth:`unpack` and :meth:`pack` methods are designed to
+process of packing or unpacking objects. The top-level :meth:`~caterpillar.model.unpack` and :meth:`~caterpillar.model.pack` methods are designed to
 create the context themselves with some pre-defined (internal) fields.
 
 .. admonition:: Implementation Note
@@ -451,7 +448,7 @@ Emulating Struct Types
     of multiple elements concurrently. By default, the :class:`Field` class stores all essential
     attributes required to determine the length of elements set for unpacking. The :meth:`~__unpack__`
     method is activated through the :code:`unpack()` operation, integrated with the default
-    struct classes — namely, :class:`Sequence`, :class:`Struct`, and :class:`Field`.
+    struct classes — namely, :class:`~caterpillar.model.Sequence`, :class:`~caterpillar.model.Struct`, and :class:`Field`.
 
     .. versionchanged:: beta
         The *stream* parameter has been removed and was instead moved into the context.
@@ -516,7 +513,7 @@ Struct containers
 BitField specific methods
 -------------------------
 
-The introduced :class:`BitField` class is special in many different ways. One key
+The introduced :class:`~caterpillar.model.BitField` class is special in many different ways. One key
 attribute is its fixed size. To determine the size of a struct, it leverages a special
 member, which can be either a function or an attribute.
 
@@ -524,7 +521,7 @@ member, which can be either a function or an attribute.
 
     Called to measure the bit count of the current object. :meth:`~object.__bits__`
     serves as the sole requirement for the defined fields in the current implementation
-    of the :class:`BitField` class.
+    of the :class:`~caterpillar.model.BitField` class.
 
     .. note::
         This class member can also be expressed as an attribute. The library automatically
@@ -560,7 +557,7 @@ Modifying fields
 
     The name of a regular field is not explicitly specified in a typical attribute but is
     instead set using a dedicated one. This naming convention is automatically applied by
-    all default :class:`Sequence` implementations. The name can be retrieved through the
+    all default :class:`~caterpillar.model.Sequence` implementations. The name can be retrieved through the
     use of :code:`field.get_name()`.
 
 

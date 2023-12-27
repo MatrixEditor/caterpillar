@@ -33,7 +33,7 @@ to write complex structures in a compact and readable manner.
 
 .. admonition:: Hold up, wait a minute!
 
-   How does this even work? Is this still Python? Answers to these questions and more are given
+   How does this even work? Is this still Python? Answers to these questions are given
    in the general :ref:`introduction`.
 
 Working with defined classes is as straightforward as working with normal classes. *All

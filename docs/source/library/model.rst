@@ -4,6 +4,8 @@
 Struct Model
 ************
 
+*TODO*
+
 .. autoclass:: caterpillar.model.Sequence
     :members:
 
