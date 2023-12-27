@@ -208,16 +208,142 @@
           <section id="operators">
 <span id="id1"></span><h1><span class="section-number">3. </span>Operators<a class="headerlink" href="#operators" title="Link to this heading">#</a></h1>
 <p><em>TODO: describe all supported operators</em></p>
+<p><em>Caterpillar</em> supports various operators for <a class="reference internal" href="../library/model.html#caterpillar.model.Sequence" title="caterpillar.model.Sequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>,
+<a class="reference internal" href="../library/model.html#caterpillar.model.Struct" title="caterpillar.model.Struct"><code class="xref py py-class docutils literal notranslate"><span class="pre">Struct</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code>, and custom struct implementations
+<a class="footnote-reference brackets" href="#id3" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. This section provides an overview of the operators that can be used with
+structs, including special context operations.</p>
+<section id="struct-operators">
+<h2><span class="section-number">3.1. </span>Struct operators<a class="headerlink" href="#struct-operators" title="Link to this heading">#</a></h2>
+<p>All functions described below return a new <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code> instance if not already
+called on a field object.</p>
 <dl class="py function">
-<dt class="sig sig-object py" id="field.__getitem__">
-<span class="sig-prename descclassname"><span class="pre">field.</span></span><span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#field.__getitem__" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="struct.__getitem__">
+<span class="sig-prename descclassname"><span class="pre">struct.</span></span><span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#struct.__getitem__" title="Link to this definition">#</a></dt>
+<dd><p>This function acts as an array definition and supports different kinds of length
+types.</p>
+<dl>
+<dt>Static (<code class="docutils literal notranslate"><span class="pre">int</span></code>)</dt><dd><p>A constant value is used to mark static arrays with a fixed length. Float
+values are not accepted.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">array</span> <span class="o">=</span> <span class="n">uint8</span><span class="p">[</span><span class="mi">100</span><span class="p">]</span>
+</pre></div>
+</div>
+</dd>
+<dt>Dynamic (<code class="xref py py-class docutils literal notranslate"><span class="pre">_ContextLambda</span></code>)</dt><dd><p>A callable function may be used to return the length as an integer. If you choose
+not to use a context value, the provided callable function must take the <code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code>
+instance as its first argument.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">array</span> <span class="o">=</span> <span class="n">uint8</span><span class="p">[</span><span class="n">this</span><span class="o">.</span><span class="n">length</span><span class="p">]</span> <span class="c1"># where this.length would store 100</span>
+</pre></div>
+</div>
+</dd>
+<dt><a class="reference internal" href="datamodel.html#greedy"><span class="std std-ref">Greedy</span></a> (<code class="xref py py-class docutils literal notranslate"><span class="pre">_GreedyType</span></code>)</dt><dd><p>Used when the amount of elements to be unpacked is unknown. The struct tries to
+unpack an object of the given type and stops either on EOF or if an exception
+is thrown.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">array</span> <span class="o">=</span> <span class="n">uint8</span><span class="p">[</span><span class="o">...</span><span class="p">]</span>
+</pre></div>
+</div>
+</dd>
+<dt><a class="reference internal" href="datamodel.html#prefixed"><span class="std std-ref">Prefixed</span></a> (<code class="xref py py-class docutils literal notranslate"><span class="pre">_PrefixedType</span></code>, <code class="code docutils literal notranslate"><span class="pre">slice</span></code>)</dt><dd><p>In cases where there are length-prefixed structures and you don’t want to store the
+length in an extra variable, you can use <code class="xref py py-class docutils literal notranslate"><span class="pre">Prefixed</span></code> to improve packing data.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prefixed_array</span> <span class="o">=</span> <span class="n">CString</span><span class="p">[</span><span class="n">uint8</span><span class="p">::]</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function is applicable to all classes annotated with <code class="code docutils literal notranslate"><span class="pre">&#64;struct</span></code> or
+<code class="code docutils literal notranslate"><span class="pre">&#64;bitfield</span></code>.</p>
+</div>
+</dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="field.__rshift__">
-<span class="sig-prename descclassname"><span class="pre">field.</span></span><span class="sig-name descname"><span class="pre">__rshift__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#field.__rshift__" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="struct.__rshift__">
+<span class="sig-prename descclassname"><span class="pre">struct.</span></span><span class="sig-name descname"><span class="pre">__rshift__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#struct.__rshift__" title="Link to this definition">#</a></dt>
+<dd><p>Invoked to apply a set of options to a <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code>. This function changes the behavior
+of a struct. It unpacks a value using the field’s underlying struct and passes it directly
+into the given options to retrieve the final struct.</p>
+<p>The described behavior has a limitation: if the underlying struct is not a <code class="xref py py-class docutils literal notranslate"><span class="pre">_ContextLambda</span></code>,
+there is no possibility of packing an object back to binary data because the initial value is not
+known.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">foo</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="p">{</span>
+<span class="gp">... </span>    <span class="s2">&quot;bar&quot;</span><span class="p">:</span> <span class="n">uint16</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;baz&quot;</span><span class="p">:</span> <span class="n">uint32</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">}</span>
+</pre></div>
+</div>
+<p>You can also include a default option using <code class="xref py py-attr docutils literal notranslate"><span class="pre">DEFAULT_OPTION</span></code> from within the
+<code class="code docutils literal notranslate"><span class="pre">fields</span></code> submodule.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">foo</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="p">{</span>
+<span class="gp">... </span>    <span class="s2">&quot;bar&quot;</span><span class="p">:</span> <span class="n">uint16</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">DEFAULT_OPTION</span><span class="p">:</span> <span class="n">ctx</span><span class="o">.</span><span class="n">_value</span>
+<span class="gp">... </span><span class="p">}</span>
+</pre></div>
+</div>
+<p>The previously parsed value is accessible from within the current context, not the
+current object context.</p>
+</dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="struct.__matmul__">
+<span class="sig-prename descclassname"><span class="pre">struct.</span></span><span class="sig-name descname"><span class="pre">__matmul__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#struct.__matmul__" title="Link to this definition">#</a></dt>
+<dd><p>Another special operator (<code class="code docutils literal notranslate"><span class="pre">&#64;</span></code>) is used to re-position the current field to a specified offset
+position, where the offset can be static or dynamic.</p>
+<p>When unpacking objects from a stream, the reader will temporarily jump to the given offset. Using the
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">F_KEEP_POSITION</span></code> option, the reader will continue parsing at the resulting position.</p>
+<p>Packing is tricky as we don’t want to lose any data when jumping to an offset position. Internally, a
+dictionary with offset-data mappings is created and will be applied when all normal fields have been
+written to the stream. Alternatively, there is an option to firstly write everything into a temporary
+file and copy the final result into the given stream.</p>
+<dl>
+<dt>Static (<code class="code docutils literal notranslate"><span class="pre">int</span></code>)</dt><dd><p>Integer values are accepted to be static, and therefore the default behaviour is applied.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">uint8</span> <span class="o">@</span> <span class="mh">0x1234</span>
+</pre></div>
+</div>
+</dd>
+<dt>Dynamic (<code class="xref py py-class docutils literal notranslate"><span class="pre">_ContextLambda</span></code>)</dt><dd><p>Callables and context lambdas are accepted as well.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">uint8</span> <span class="o">@</span> <span class="n">this</span><span class="o">.</span><span class="n">offset</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<div class="admonition caution">
+<p class="admonition-title">Caution</p>
+<p>This operator is not applicable on raw struct classes. Therefore, the class has to be turned into
+a field first. A shortcut can help you with that.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">caterpillar.fields</span> <span class="kn">import</span> <span class="n">Field</span> <span class="k">as</span> <span class="n">_</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="n">Format</span><span class="p">)</span> <span class="o">@</span> <span class="mh">0x1233</span>
+</pre></div>
+</div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="struct.__floordiv__">
+<span class="sig-prename descclassname"><span class="pre">struct.</span></span><span class="sig-name descname"><span class="pre">__floordiv__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">condition</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#struct.__floordiv__" title="Link to this definition">#</a></dt>
+<dd><p><em>Experimental.</em> Invoked to link the current field or struct with a certain condition,
+which can be either a static boolean value or a context lambda.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">uint8</span> <span class="o">//</span> <span class="p">(</span><span class="n">lenof</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">array</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition-developer-s-note admonition">
+<p class="admonition-title">Developer’s note</p>
+<p>This feature is proposed to be replaced by an if-else structure chain in the future.</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="struct.__rsub__">
+<span class="sig-prename descclassname"><span class="pre">struct.</span></span><span class="sig-name descname"><span class="pre">__rsub__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#struct.__rsub__" title="Link to this definition">#</a></dt>
+<dd><p>Invoked to specify the amount of bits this field uses. (Only applicable in classes decorated with
+<code class="code docutils literal notranslate"><span class="pre">&#64;bitfield</span></code>)</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">-</span> <span class="n">uint8</span>   <span class="c1"># 3 of 8 bits are used</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<section id="field-specific-operations">
+<h2><span class="section-number">3.2. </span>Field specific operations<a class="headerlink" href="#field-specific-operations" title="Link to this heading">#</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="field.__xor__">
 <span class="sig-prename descclassname"><span class="pre">field.</span></span><span class="sig-name descname"><span class="pre">__xor__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flag</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#field.__xor__" title="Link to this definition">#</a></dt>
@@ -228,26 +354,9 @@
 <span class="sig-prename descclassname"><span class="pre">field.</span></span><span class="sig-name descname"><span class="pre">__or__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flag</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#field.__or__" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
-<dl class="py function">
-<dt class="sig sig-object py" id="field.__matmul__">
-<span class="sig-prename descclassname"><span class="pre">field.</span></span><span class="sig-name descname"><span class="pre">__matmul__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#field.__matmul__" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="field.__floordiv__">
-<span class="sig-prename descclassname"><span class="pre">field.</span></span><span class="sig-name descname"><span class="pre">__floordiv__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">condition</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#field.__floordiv__" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="field.__rsub__">
-<span class="sig-prename descclassname"><span class="pre">field.</span></span><span class="sig-name descname"><span class="pre">__rsub__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#field.__rsub__" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="model.__class_getitem__">
-<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">__class_getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.__class_getitem__" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
+</section>
+<section id="sequence-specific-operators">
+<h2><span class="section-number">3.3. </span>Sequence specific operators<a class="headerlink" href="#sequence-specific-operators" title="Link to this heading">#</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="sequence.__add__">
 <span class="sig-prename descclassname"><span class="pre">sequence.</span></span><span class="sig-name descname"><span class="pre">__add__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sequence.__add__" title="Link to this definition">#</a></dt>
@@ -268,6 +377,22 @@
 <span class="sig-prename descclassname"><span class="pre">sequence.</span></span><span class="sig-name descname"><span class="pre">__isub__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sequence.__isub__" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
+</section>
+<section id="context-specific-operations">
+<h2><span class="section-number">3.4. </span>Context specific operations<a class="headerlink" href="#context-specific-operations" title="Link to this heading">#</a></h2>
+<section id="context-path">
+<h3><span class="section-number">3.4.1. </span>Context path<a class="headerlink" href="#context-path" title="Link to this heading">#</a></h3>
+</section>
+<section id="context-lambda">
+<h3><span class="section-number">3.4.2. </span>Context lambda<a class="headerlink" href="#context-lambda" title="Link to this heading">#</a></h3>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id3" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">1</a><span class="fn-bracket">]</span></span>
+<p>Custom implementations must extend <code class="xref py py-class docutils literal notranslate"><span class="pre">FieldMixin</span></code> class.</p>
+</aside>
+</aside>
+</section>
+</section>
 </section>
 
         </article>
@@ -326,18 +451,31 @@
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">3. Operators</a><ul>
-<li><a class="reference internal" href="#field.__getitem__"><code class="docutils literal notranslate"><span class="pre">field.__getitem__()</span></code></a></li>
-<li><a class="reference internal" href="#field.__rshift__"><code class="docutils literal notranslate"><span class="pre">field.__rshift__()</span></code></a></li>
+<li><a class="reference internal" href="#struct-operators">3.1. Struct operators</a><ul>
+<li><a class="reference internal" href="#struct.__getitem__"><code class="docutils literal notranslate"><span class="pre">struct.__getitem__()</span></code></a></li>
+<li><a class="reference internal" href="#struct.__rshift__"><code class="docutils literal notranslate"><span class="pre">struct.__rshift__()</span></code></a></li>
+<li><a class="reference internal" href="#struct.__matmul__"><code class="docutils literal notranslate"><span class="pre">struct.__matmul__()</span></code></a></li>
+<li><a class="reference internal" href="#struct.__floordiv__"><code class="docutils literal notranslate"><span class="pre">struct.__floordiv__()</span></code></a></li>
+<li><a class="reference internal" href="#struct.__rsub__"><code class="docutils literal notranslate"><span class="pre">struct.__rsub__()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#field-specific-operations">3.2. Field specific operations</a><ul>
 <li><a class="reference internal" href="#field.__xor__"><code class="docutils literal notranslate"><span class="pre">field.__xor__()</span></code></a></li>
 <li><a class="reference internal" href="#field.__or__"><code class="docutils literal notranslate"><span class="pre">field.__or__()</span></code></a></li>
-<li><a class="reference internal" href="#field.__matmul__"><code class="docutils literal notranslate"><span class="pre">field.__matmul__()</span></code></a></li>
-<li><a class="reference internal" href="#field.__floordiv__"><code class="docutils literal notranslate"><span class="pre">field.__floordiv__()</span></code></a></li>
-<li><a class="reference internal" href="#field.__rsub__"><code class="docutils literal notranslate"><span class="pre">field.__rsub__()</span></code></a></li>
-<li><a class="reference internal" href="#model.__class_getitem__"><code class="docutils literal notranslate"><span class="pre">model.__class_getitem__()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sequence-specific-operators">3.3. Sequence specific operators</a><ul>
 <li><a class="reference internal" href="#sequence.__add__"><code class="docutils literal notranslate"><span class="pre">sequence.__add__()</span></code></a></li>
 <li><a class="reference internal" href="#sequence.__iadd__"><code class="docutils literal notranslate"><span class="pre">sequence.__iadd__()</span></code></a></li>
 <li><a class="reference internal" href="#sequence.__sub__"><code class="docutils literal notranslate"><span class="pre">sequence.__sub__()</span></code></a></li>
 <li><a class="reference internal" href="#sequence.__isub__"><code class="docutils literal notranslate"><span class="pre">sequence.__isub__()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#context-specific-operations">3.4. Context specific operations</a><ul>
+<li><a class="reference internal" href="#context-path">3.4.1. Context path</a></li>
+<li><a class="reference internal" href="#context-lambda">3.4.2. Context lambda</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

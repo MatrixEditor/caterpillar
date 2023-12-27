@@ -233,15 +233,18 @@ dependencies). Additionally, the minimal lines of code required to define struct
 demonstrated in the following example from <cite>examples/formats/caf</cite>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span>
 <span class="linenos"> 2</span><span class="k">class</span> <span class="nc">CAFChunk</span><span class="p">:</span>
-<span class="linenos"> 3</span>    <span class="n">chunk_header</span><span class="p">:</span> <span class="n">CAFChunkHeader</span>
-<span class="linenos"> 4</span>    <span class="n">data</span><span class="p">:</span> <span class="n">Field</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">chunk_header</span><span class="o">.</span><span class="n">chunk_type</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="p">{</span>
-<span class="linenos"> 5</span>        <span class="sa">b</span><span class="s2">&quot;desc&quot;</span><span class="p">:</span> <span class="n">CAFAudioFormat</span><span class="p">,</span>
-<span class="linenos"> 6</span>        <span class="sa">b</span><span class="s2">&quot;info&quot;</span><span class="p">:</span> <span class="n">CAFStringsChunk</span><span class="p">,</span>
-<span class="linenos"> 7</span>        <span class="sa">b</span><span class="s2">&quot;pakt&quot;</span><span class="p">:</span> <span class="n">CAFPacketTable</span><span class="p">,</span>
-<span class="linenos"> 8</span>        <span class="sa">b</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">CAFData</span><span class="p">,</span>
-<span class="linenos"> 9</span>        <span class="sa">b</span><span class="s2">&quot;free&quot;</span><span class="p">:</span> <span class="n">padding</span><span class="p">[</span><span class="n">this</span><span class="o">.</span><span class="n">chunk_header</span><span class="o">.</span><span class="n">chunk_size</span><span class="p">],</span>
-<span class="linenos">10</span>        <span class="n">DEFAULT_OPTION</span><span class="p">:</span> <span class="n">Bytes</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">chunk_header</span><span class="o">.</span><span class="n">chunk_size</span><span class="p">),</span>
-<span class="linenos">11</span>    <span class="p">}</span>
+<span class="linenos"> 3</span>    <span class="c1"># Include other structs just like that</span>
+<span class="linenos"> 4</span>    <span class="n">chunk_header</span><span class="p">:</span> <span class="n">CAFChunkHeader</span>
+<span class="linenos"> 5</span>    <span class="c1"># Built-in support for switch-case structures</span>
+<span class="linenos"> 6</span>    <span class="n">data</span><span class="p">:</span> <span class="n">Field</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">chunk_header</span><span class="o">.</span><span class="n">chunk_type</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="p">{</span>
+<span class="linenos"> 7</span>        <span class="sa">b</span><span class="s2">&quot;desc&quot;</span><span class="p">:</span> <span class="n">CAFAudioFormat</span><span class="p">,</span>
+<span class="linenos"> 8</span>        <span class="sa">b</span><span class="s2">&quot;info&quot;</span><span class="p">:</span> <span class="n">CAFStringsChunk</span><span class="p">,</span>
+<span class="linenos"> 9</span>        <span class="sa">b</span><span class="s2">&quot;pakt&quot;</span><span class="p">:</span> <span class="n">CAFPacketTable</span><span class="p">,</span>
+<span class="linenos">10</span>        <span class="sa">b</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">CAFData</span><span class="p">,</span>
+<span class="linenos">11</span>        <span class="sa">b</span><span class="s2">&quot;free&quot;</span><span class="p">:</span> <span class="n">padding</span><span class="p">[</span><span class="n">this</span><span class="o">.</span><span class="n">chunk_header</span><span class="o">.</span><span class="n">chunk_size</span><span class="p">],</span>
+<span class="linenos">12</span>        <span class="c1"># the fallback struct given with a default option</span>
+<span class="linenos">13</span>        <span class="n">DEFAULT_OPTION</span><span class="p">:</span> <span class="n">Bytes</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">chunk_header</span><span class="o">.</span><span class="n">chunk_size</span><span class="p">),</span>
+<span class="linenos">14</span>    <span class="p">}</span>
 </pre></div>
 </div>
 <section id="how-does-this-even-work">
@@ -267,7 +270,7 @@ more complex by using assignments.</p>
 </aside>
 <aside class="footnote brackets" id="id5" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">2</a><span class="fn-bracket">]</span></span>
-<p>Event structs generated from class models are extensible in some degree.</p>
+<p>Even structs generated from class models are extensible in some degree.</p>
 </aside>
 </aside>
 </section>
