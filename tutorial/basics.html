@@ -9,7 +9,7 @@
         <title>2. Basic Concepts - Caterpillar 1.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=135e06be" />
-    <link rel="stylesheet" type="text/css" href="../_static/tabs.css?v=4c969af8" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=36a5483c" />
     
     
@@ -135,7 +135,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -204,7 +204,7 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
@@ -212,6 +212,111 @@
         <article role="main">
           <section id="basic-concepts">
 <span id="basics"></span><h1><span class="section-number">2. </span>Basic Concepts<a class="headerlink" href="#basic-concepts" title="Link to this heading">#</a></h1>
+<p>In this section, we’ll explore some common techniques used in binary file formats, setting
+the stage for more advanced topics in the next chapter.</p>
+<section id="standard-types">
+<h2><span class="section-number">2.1. </span>Standard Types<a class="headerlink" href="#standard-types" title="Link to this heading">#</a></h2>
+<section id="enumerations">
+<h3><span class="section-number">2.1.1. </span>Enumerations<a class="headerlink" href="#enumerations" title="Link to this heading">#</a></h3>
+<p>Enums are essential when working with binary file formats, and <em>caterpillar</em> integrates
+standard Python enumerations - classes extending  <code class="code docutils literal notranslate"><span class="pre">enum.Enum</span></code> - with ease.</p>
+<p>Let’s revisit <a class="reference external" href="https://www.w3.org/TR/png/#11pHYs">pHYS</a> chunk to add an enum to the
+last field.</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">Simple enumeration in a struct definition</span><a class="headerlink" href="#id1" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">enum</span>
+
+<span class="k">class</span> <span class="nc">PHYSUnit</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">IntEnum</span><span class="p">):</span> <span class="c1"># &lt;-- the enum value doesn&#39;t have to be int</span>
+    <span class="n">UNKNOWN</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">METRE</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span>         <span class="c1"># &lt;-- same as before</span>
+<span class="k">class</span> <span class="nc">PHYSChunk</span><span class="p">:</span>
+    <span class="n">pixels_per_unit_x</span><span class="p">:</span> <span class="n">uint32</span>
+    <span class="n">pixels_per_unit_y</span><span class="p">:</span> <span class="n">uint32</span>
+    <span class="n">unit</span><span class="p">:</span> <span class="n">Enum</span><span class="p">(</span><span class="n">PHYSUnit</span><span class="p">,</span> <span class="n">uint8</span><span class="p">)</span>  <span class="c1"># &lt;-- now we have an auto-enumeration</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>It’s worth noting that a default value can be specified for the field as a fallback. If
+none is provided, and an unpacked value not in the enumeration is encountered, an error
+will be triggered.</p>
+</div>
+</section>
+<section id="arrays-lists">
+<h3><span class="section-number">2.1.2. </span>Arrays/Lists<a class="headerlink" href="#arrays-lists" title="Link to this heading">#</a></h3>
+<p>Binary formats often require storing multiple objects of the same type sequentially. <em>Caterpillar</em>
+simplifies this with item access for defining arrays of static or dynamic size.</p>
+<p>We started with the <a class="reference external" href="https://www.w3.org/TR/png/#11PLTE">PLTE</a> chunk, which stores three-byte
+sequences. We can define an array of RGB objects as follows:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">PLTEChunk</span> <span class="o">=</span> <span class="n">RGB</span><span class="p">[</span><span class="n">this</span><span class="o">.</span><span class="n">length</span> <span class="o">/</span> <span class="mi">3</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Since this chunk has only one field, the array specifier is used to make it a list type. The
+length is calculated based on the chunk’s length field divided by three because the RGB class
+occupies three bytes.</p>
+</section>
+<section id="strings">
+<h3><span class="section-number">2.1.3. </span>Strings<a class="headerlink" href="#strings" title="Link to this heading">#</a></h3>
+<p>String handling is integral to binary formats, and Caterpillar introduces various utility strings
+to facilitate this.</p>
+<section id="cstring">
+<h4><span class="section-number">2.1.3.1. </span>CString<a class="headerlink" href="#cstring" title="Link to this heading">#</a></h4>
+<p>The CString in this library extends beyond a mere reference to C strings. It provides
+additional functionality, as demonstrated in the structure of the next chunk.</p>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">The <a class="reference external" href="https://www.w3.org/TR/png/#11tEXt">tEXt</a> chunk structure</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
+<span class="k">class</span> <span class="nc">TEXTChunk</span><span class="p">:</span>
+    <span class="c1"># dynamic sized string that ends with a null-byte</span>
+    <span class="n">keyword</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;ISO-8859-1&quot;</span><span class="p">)</span>
+    <span class="c1"># static sized string based on the current context. some notes:</span>
+    <span class="c1">#   - parent.length is the current chunkt&#39;s length</span>
+    <span class="c1">#   - lenof(...) is the runtime length of the context variable</span>
+    <span class="c1">#   - 1 because of the extra null-byte that is stripped from keyword</span>
+    <span class="n">text</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;ISO-8859-1&quot;</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="n">parent</span><span class="o">.</span><span class="n">length</span> <span class="o">-</span> <span class="n">lenof</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">keword</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition-exercise admonition">
+<p class="admonition-title">Exercise</p>
+<p>You are now ready to implement the <a class="reference external" href="https://www.w3.org/TR/png/#11iTXt">iTXt</a> chunk. Try it yourself!</p>
+<details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-icon"><svg version="1.1" width="1.0em" height="1.0em" class="sd-octicon sd-octicon-check" viewBox="0 0 16 16" aria-hidden="true"><path fill-rule="evenodd" d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path></svg></span>Solution<div class="sd-summary-down docutils">
+<svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-down" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M5.22 8.72a.75.75 0 000 1.06l6.25 6.25a.75.75 0 001.06 0l6.25-6.25a.75.75 0 00-1.06-1.06L12 14.44 6.28 8.72a.75.75 0 00-1.06 0z"></path></svg></div>
+<div class="sd-summary-up docutils">
+<svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-up" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M18.78 15.28a.75.75 0 000-1.06l-6.25-6.25a.75.75 0 00-1.06 0l-6.25 6.25a.75.75 0 101.06 1.06L12 9.56l5.72 5.72a.75.75 0 001.06 0z"></path></svg></div>
+</summary><div class="sd-summary-content sd-card-body docutils">
+<p class="sd-card-text">This solution serves as an example and isn’t the only way to approach it!</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
+<span class="k">class</span> <span class="nc">ITXTChunk</span><span class="p">:</span>
+    <span class="n">keyword</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+    <span class="n">compression_flag</span><span class="p">:</span> <span class="n">uint8</span>
+    <span class="c1"># we actually don&#39;t need an Enum here</span>
+    <span class="n">compression_method</span><span class="p">:</span> <span class="n">uint8</span>
+    <span class="n">language_tag</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;ASCII&quot;</span><span class="p">)</span>
+    <span class="n">translated_keyword</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+    <span class="c1"># length is calculated with parent.length - len(keyword)+len(b&quot;\x00&quot;) - ...</span>
+    <span class="n">text</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span>
+        <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span>
+        <span class="n">length</span><span class="o">=</span><span class="n">parent</span><span class="o">.</span><span class="n">length</span> <span class="o">-</span> <span class="n">lenof</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">translated_keyword</span><span class="p">)</span> <span class="o">-</span> <span class="n">lenof</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">keyword</span><span class="p">)</span> <span class="o">-</span> <span class="mi">5</span><span class="p">,</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</details></div>
+<p>You can also apply your own termination character, for example:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">CString</span><span class="p">(</span><span class="n">pad</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\x0A</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This struct will use a space as the termination character and strip all trailing
+padding bytes.</p>
+</section>
+</section>
+</section>
 </section>
 
         </article>
@@ -257,8 +362,35 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">2. Basic Concepts</a><ul>
+<li><a class="reference internal" href="#standard-types">2.1. Standard Types</a><ul>
+<li><a class="reference internal" href="#enumerations">2.1.1. Enumerations</a></li>
+<li><a class="reference internal" href="#arrays-lists">2.1.2. Arrays/Lists</a></li>
+<li><a class="reference internal" href="#strings">2.1.3. Strings</a><ul>
+<li><a class="reference internal" href="#cstring">2.1.3.1. CString</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
@@ -267,6 +399,6 @@
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/furo.js?v=32e29ea5"></script>
-    <script src="../_static/tabs.js?v=3ee01567"></script>
+    <script src="../_static/design-tabs.js?v=36754332"></script>
     </body>
 </html>

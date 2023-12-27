@@ -9,7 +9,7 @@
         <title>1. First Steps - Caterpillar 1.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=135e06be" />
-    <link rel="stylesheet" type="text/css" href="../_static/tabs.css?v=4c969af8" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=36a5483c" />
     
     
@@ -212,21 +212,25 @@
         <article role="main">
           <section id="first-steps">
 <span id="id1"></span><h1><span class="section-number">1. </span>First Steps<a class="headerlink" href="#first-steps" title="Link to this heading">#</a></h1>
-<p>In this section, we present illustrative examples designed to provide a relaxed introduction to
-<em>caterpillar</em>, avoiding getting into technical details. Most of the code snippets are interactive,
-utilizing interpreter prompts. To reproduce the examples, simply input everything <em>after</em> the
-prompt.</p>
+<p>In this section, we present examples designed to provide a relaxed introduction to <em>caterpillar</em>,
+avoiding getting into technical details yet. Most of the code snippets are using interpreter
+prompts. To reproduce the examples, simply input everything <em>after</em> the prompt.</p>
 <p>In the context of this tutorial, we focus on the implementation of the <a class="reference external" href="https://www.w3.org/TR/png/">PNG</a>
-format. While we won’t delve into every available chunk, you’re encouraged to explore and implement
+file format. While we won’t list every available chunk, you’re encouraged to explore and implement
 additional chunks independently.</p>
 <p>The PNG format organizes data into chunks, each following a common format. The global chunk
 definition will be introduced later due to the impossibility of forward declarations in Python. <a class="footnote-reference brackets" href="#id3" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>*<span class="fn-bracket">]</span></a></p>
 <aside class="footnote-list brackets">
 <aside class="footnote brackets" id="id3" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">*</a><span class="fn-bracket">]</span></span>
-<p>While it’s technically possible to define the <span class="xref std std-ref">pngchunk</span> class here, let’s save that for later.</p>
+<p>It’s technically possible to define the <span class="xref std std-ref">pngchunk</span> class here, but let’s save that for later.</p>
 </aside>
 </aside>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Assume that each code block starts with an import of all fields and the struct function from
+<code class="code docutils literal notranslate"><span class="pre">caterpillar.model</span></code>.</p>
+</div>
 <section id="defining-structs">
 <h2><span class="section-number">1.1. </span>Defining structs<a class="headerlink" href="#defining-structs" title="Link to this heading">#</a></h2>
 <p>Given the important role of structs in this library, let’s start by understanding their definition. Our
@@ -234,7 +238,10 @@ starting point is the <a class="reference external" href="https://www.w3.org/TR/
 for its data.</p>
 <div class="literal-block-wrapper docutils container" id="id4">
 <div class="code-block-caption"><span class="caption-text">RGB struct for the PLTE chunk</span><a class="headerlink" href="#id4" title="Link to this code">#</a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>         <span class="c1"># &lt;-- just decorate the class with the struct() function</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">caterpillar.model</span> <span class="kn">import</span> <span class="n">struct</span>    <span class="c1"># &lt;-- these imports are important</span>
+<span class="kn">from</span> <span class="nn">caterpillar.fields</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="nd">@struct</span>         <span class="c1"># &lt;-- just decorate the class with the struct() function</span>
 <span class="k">class</span> <span class="nc">RGB</span><span class="p">:</span>
     <span class="n">r</span><span class="p">:</span> <span class="n">uint8</span>    <span class="c1"># &lt;-- a field can be defined just like this</span>
     <span class="n">g</span><span class="p">:</span> <span class="n">uint8</span>
@@ -244,7 +251,7 @@ for its data.</p>
 </div>
 <p>With this simple annotation, the struct class becomes universally applicable. You can
 integrate it into other struct definitions or instantiate objects of the class.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span> <span class="o">=</span> <span class="n">RGB</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span> <span class="o">=</span> <span class="n">RGB</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="admonition note">
@@ -252,6 +259,89 @@ integrate it into other struct definitions or instantiate objects of the class.<
 <p>Classes using the <code class="code docutils literal notranslate"><span class="pre">struct</span></code> decorator exclusively accept keywords in the final constructor,
 supporting standard field definitions <em>after</em> fields with default values.</p>
 </div>
+<p>Wow, thats it? That was less than expected? Let’s move directly to working with the defined class.</p>
+</section>
+<section id="working-with-structs">
+<h2><span class="section-number">1.2. </span>Working with structs<a class="headerlink" href="#working-with-structs" title="Link to this heading">#</a></h2>
+<p>Instantiating an object of your class involves providing all <strong>required</strong> fields as keyword
+arguments. Defaults or constant values are automatically applied, removing concerns about them.</p>
+<section id="packing-data">
+<h3><span class="section-number">1.2.1. </span>Packing data<a class="headerlink" href="#packing-data" title="Link to this heading">#</a></h3>
+<p>This library packing and unpacking is similar to Python’s <a class="reference external" href="https://docs.python.org/3/library/struct.html">struct</a>
+module. In order to pack data, we need a struct and an input object. When packing data, a struct and an input
+object are needed.</p>
+<p>Thanks to the RGB class encapsulating its struct instance, explicitly stating the struct to use
+becomes unnecessary.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span> <span class="o">=</span> <span class="n">RGB</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="c1"># equivalent to pack(obj, RGB)</span>
+<span class="go">b&#39;\x01\x02\x03&#39;</span>
+</pre></div>
+</div>
+</section>
+<section id="unpacking-data">
+<h3><span class="section-number">1.2.2. </span>Unpacking data<a class="headerlink" href="#unpacking-data" title="Link to this heading">#</a></h3>
+<p>Recreating data from binary streams is as easy as serializing objects. Here, providing the struct directly
+or our struct class is necessary.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">RGB</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x01\x02\x03</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="go">RGB(r=1, g=2, b=3)</span>
+</pre></div>
+</div>
+<p>And no, we’re not done yet - we’ve just wrapped up the warm-up!</p>
+</section>
+</section>
+<section id="configuring-structs">
+<h2><span class="section-number">1.3. </span>Configuring structs<a class="headerlink" href="#configuring-structs" title="Link to this heading">#</a></h2>
+<p>Now, let’s take a look at another chunk from the PNG format: <a class="reference external" href="https://www.w3.org/TR/png/#11pHYs">pHYS</a>. It
+specifies two four-byte unsigned integers. Given that PNG files encode numbers in <em>big-endian</em>, we must
+configure the struct to correctly decode these integer fields.</p>
+<div class="admonition-what-is-endianess admonition">
+<p class="admonition-title">What is <em>endianess</em>?</p>
+<p>You might find these resources helpful: <a class="reference external" href="https://developer.mozilla.org/en-US/docs/Glossary/Endianness">Mozilla Docs</a>,
+<a class="reference external" href="https://stackoverflow.com/questions/21449/types-of-endianness">StackOverflow</a> or
+<a class="reference external" href="https://en.wikipedia.org/wiki/Endianness">Wikipedia</a></p>
+</div>
+<div class="literal-block-wrapper docutils container" id="id5">
+<div class="code-block-caption"><span class="caption-text">Configuring a struct-wide endianess</span><a class="headerlink" href="#id5" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span>        <span class="c1"># &lt;-- extra argument to apply the order to all fields.</span>
+<span class="k">class</span> <span class="nc">PHYSChunk</span><span class="p">:</span>
+    <span class="n">pixels_per_unit_x</span><span class="p">:</span> <span class="n">uint32</span>   <span class="c1"># &lt;-- same definition as above</span>
+    <span class="n">pixels_per_unit_y</span><span class="p">:</span> <span class="n">uint32</span>
+    <span class="n">unit</span><span class="p">:</span> <span class="n">uint8</span>                 <span class="c1"># &lt;-- endianess meaningless, only one byte</span>
+</pre></div>
+</div>
+</div>
+<p>If your structs depend on the architecture associated with the binary, you can also specify a
+struct-wide <code class="xref py py-class docutils literal notranslate"><span class="pre">Arch</span></code>.</p>
+<div class="admonition-exercise admonition">
+<p class="admonition-title">Exercise</p>
+<p>Try to implement the struct for the <a class="reference external" href="https://www.w3.org/TR/png/#11tIME">tIME</a> chunk.</p>
+<details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-icon"><svg version="1.1" width="1.0em" height="1.0em" class="sd-octicon sd-octicon-check" viewBox="0 0 16 16" aria-hidden="true"><path fill-rule="evenodd" d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path></svg></span>Solution<div class="sd-summary-down docutils">
+<svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-down" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M5.22 8.72a.75.75 0 000 1.06l6.25 6.25a.75.75 0 001.06 0l6.25-6.25a.75.75 0 00-1.06-1.06L12 14.44 6.28 8.72a.75.75 0 00-1.06 0z"></path></svg></div>
+<div class="sd-summary-up docutils">
+<svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-up" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M18.78 15.28a.75.75 0 000-1.06l-6.25-6.25a.75.75 0 00-1.06 0l-6.25 6.25a.75.75 0 101.06 1.06L12 9.56l5.72 5.72a.75.75 0 001.06 0z"></path></svg></div>
+</summary><div class="sd-summary-content sd-card-body docutils">
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-text">Example implementation</span><a class="headerlink" href="#id6" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">TimeChunk</span><span class="p">:</span>
+    <span class="n">year</span><span class="p">:</span> <span class="n">uint16</span>        <span class="c1"># &lt;-- we could also use: BigEndian + uint16</span>
+    <span class="n">month</span><span class="p">:</span> <span class="n">uint8</span>
+    <span class="n">day</span><span class="p">:</span> <span class="n">uint8</span>
+    <span class="n">hour</span><span class="p">:</span> <span class="n">uint8</span>
+    <span class="n">minute</span><span class="p">:</span> <span class="n">uint8</span>
+    <span class="n">second</span><span class="p">:</span> <span class="n">uint8</span>
+</pre></div>
+</div>
+</div>
+</div>
+</details></div>
+</section>
+<section id="next-steps">
+<h2><span class="section-number">1.4. </span>Next Steps<a class="headerlink" href="#next-steps" title="Link to this heading">#</a></h2>
+<p>With the fundamentals of defining and using structs, we’re ready to start more advanced topics. The
+upcoming sections will explore basic structs, array definitions, enum inclusion, and much more.</p>
 </section>
 </section>
 
@@ -312,6 +402,13 @@ supporting standard field definitions <em>after</em> fields with default values.
             <ul>
 <li><a class="reference internal" href="#">1. First Steps</a><ul>
 <li><a class="reference internal" href="#defining-structs">1.1. Defining structs</a></li>
+<li><a class="reference internal" href="#working-with-structs">1.2. Working with structs</a><ul>
+<li><a class="reference internal" href="#packing-data">1.2.1. Packing data</a></li>
+<li><a class="reference internal" href="#unpacking-data">1.2.2. Unpacking data</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#configuring-structs">1.3. Configuring structs</a></li>
+<li><a class="reference internal" href="#next-steps">1.4. Next Steps</a></li>
 </ul>
 </li>
 </ul>
@@ -327,6 +424,6 @@ supporting standard field definitions <em>after</em> fields with default values.
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/furo.js?v=32e29ea5"></script>
-    <script src="../_static/tabs.js?v=3ee01567"></script>
+    <script src="../_static/design-tabs.js?v=36754332"></script>
     </body>
 </html>
