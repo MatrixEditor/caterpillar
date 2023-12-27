@@ -243,6 +243,8 @@ def pack_into(
     context = Context(_parent=None, _path="<root>", _pos=0, _offsets=offsets, **kwds)
     if struct is None:
         struct = getstruct(obj)
+    elif hasstruct(struct):
+        struct = getstruct(struct)
 
     start = 0
     if use_tempfile:

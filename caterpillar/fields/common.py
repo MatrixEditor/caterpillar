@@ -32,7 +32,7 @@ from caterpillar.exception import (
 )
 from caterpillar.context import CTX_FIELD, CTX_STREAM
 from caterpillar.options import F_SEQUENTIAL
-from ._base import Field, FieldStruct
+from ._base import Field, FieldStruct, INVALID_DEFAULT
 
 
 class FormatField(FieldStruct):
@@ -323,7 +323,10 @@ class Enum(Transformer):
     """
 
     def __init__(
-        self, model: _EnumLike, struct: _StructLike, default: Optional[_EnumLike] = None
+        self,
+        model: _EnumLike,
+        struct: _StructLike,
+        default: Optional[_EnumLike] = INVALID_DEFAULT,
     ) -> None:
         """
         Initialize the Enum transformer with an enumeration model and a wrapped _StructLike object.
@@ -334,6 +337,9 @@ class Enum(Transformer):
         super().__init__(struct)
         self.model = model
         self.default = default
+
+    def __type__(self) -> type:
+        return self.model
 
     def encode(self, obj: Any, context: _ContextLike) -> Any:
         """
@@ -365,15 +371,18 @@ class Enum(Transformer):
         if by_value is not None:
             return by_value
 
-        if self.default is None:
+        default = self.default or context[CTX_FIELD].default
+        if default == INVALID_DEFAULT:
             raise InvalidValueError(
                 f"Could not find enum for value {parsed!r}", context
             )
-        return self.default
+        return default
 
 
 class Memory(FieldStruct):
-    def __init__(self, length: Union[int, _ContextLambda], encoding: Optional[str] = None) -> None:
+    def __init__(
+        self, length: Union[int, _ContextLambda], encoding: Optional[str] = None
+    ) -> None:
         self.length = length
         self.encoding = encoding or "utf-8"
 
