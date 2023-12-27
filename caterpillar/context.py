@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import operator
 
-from typing import Callable, Any, Union
+from typing import Callable, Any, Union, Self
 from dataclasses import dataclass
 
 
@@ -248,16 +248,29 @@ class ContextPath(ExprMixin, _ContextLambda):
         :param path: The path to use when retrieving a value from a Context.
         """
         self.path = path
+        self._ops_ = []
+        self.call_kwargs = None
+        self.getitem_args = None
 
-    def __call__(self, context: Context, **kwds):
+    def __call__(self, context: Context = None, **kwds):
         """
         Calls the lambda function to retrieve a value from a Context.
 
         :param context: The Context from which to retrieve the value.
-        :param kwds: Additional keyword arguments (ignored in this implementation).
+        :param kwds: Additional keyword arguments.
         :return: The value retrieved from the Context based on the path.
         """
-        return getattr(context, self.path)
+        if context is None:
+            self._ops_.append((operator.call, (), kwds))
+            return self
+        value = getattr(context, self.path)
+        for operation, args, kwargs in self._ops_:
+            value = operation(value, *args, **kwargs)
+        return value
+
+    def __getitem__(self, key) -> Self:
+        self._ops_.append((operator.getitem, (key), {}))
+        return self
 
     def __getattribute__(self, key: str) -> ContextPath:
         """
@@ -279,7 +292,12 @@ class ContextPath(ExprMixin, _ContextLambda):
 
         :return: A string representation.
         """
-        return f"<Path {self.path!r}>"
+        value = f"<Path {self.path!r}"
+        if self.call_kwargs is not None:
+            value = f"{value}(**{self.call_kwargs})"
+        elif self.getitem_args is not None:
+            value = f"{value}[{self.getitem_args}]"
+        return value + ">"
 
     def __str__(self) -> str:
         """
@@ -288,6 +306,28 @@ class ContextPath(ExprMixin, _ContextLambda):
         :return: A string representation of the path.
         """
         return self.path
+
+    @property
+    def parent(self) -> ContextPath:
+        path = f"{CTX_PARENT}.{CTX_OBJECT}"
+        if not self.path:
+            return ContextPath(path)
+        return ContextPath(".".join([self.path, path]))
+
+
+class ContextLength(ExprMixin, _ContextLambda):
+    def __init__(self, path: ContextPath) -> None:
+        self.path = path
+
+    def __call__(self, context: Context = None, **kwds):
+        """
+        Calls the lambda function to retrieve a value from a Context.
+
+        :param context: The Context from which to retrieve the value.
+        :param kwds: Additional keyword arguments (ignored in this implementation).
+        :return: The value retrieved from the Context based on the path.
+        """
+        return len(self.path(context))
 
 
 this = ContextPath(CTX_OBJECT)

@@ -199,7 +199,7 @@ class Sequence(_StructLike, FieldMixin):
             case Field():
                 return annotation
             # As Field is a direct subclass of _StructLike, we have to put this check
-            # below this one.
+            # below the Field one.
             case _StructLike():
                 return Field(annotation, order, arch=arch, default=default)
             case type():

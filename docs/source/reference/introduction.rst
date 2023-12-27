@@ -24,11 +24,11 @@ Why use Caterpillar?
 --------------------
 
 There are several reasons to incorporate this library into your code. Some of the scenarios where Caterpillar can
-be beneficial include:
+be beneficial including
 
 - **Quick Reverse Engineering**: When you need to rapidly reverse engineer a binary structure.
 - **Creating Presentable Binary Structures**: When there's a task to create a binary structure, and the result should be presentable.
-- **Exploration in Python**: When you want to experiment and play around in Python.
+- **Have some fun**: or when you just want to experiment and play around in Python.
 
 
 The biggest advantage of *Caterpillar* is the lack of external dependencies (though extensions can be integrated using

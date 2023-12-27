@@ -29,6 +29,7 @@ from .common import (
     Enum,
     String,
     Bytes,
+    Memory,
     Computed,
     Pass,
     CString,

@@ -76,12 +76,7 @@ class CAFData:
     edit_count: uint32
     # The parent object can be referenced with a simple shortcut that accesses
     # the direct parent object context.
-    data: Bytes(parent.chunk_header.chunk_size - 4)
-
-
-# @struct(order=BigEndian)
-# class CAFFree:
-#     _:
+    data: Memory(parent.chunk_header.chunk_size - 4)
 
 
 @struct(order=BigEndian)
@@ -144,8 +139,9 @@ class CAFChunk:
         # In order to save memory space, we can define a simple padding that inserts
         # the missing data automatically
         b"free": padding[this.chunk_header.chunk_size],
-        # just use the constant
-        DEFAULT_OPTION: Bytes(this.chunk_header.chunk_size),
+        # NOTE: we use the special struct 'Memory' here as it makes the output more
+        # clear (bytes would consume unnecessary decoding time)
+        DEFAULT_OPTION: Memory(this.chunk_header.chunk_size),
     }
 
 

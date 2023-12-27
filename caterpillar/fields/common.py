@@ -374,26 +374,12 @@ class Enum(Transformer):
         return self.default
 
 
-class Bytes(FieldStruct):
-    """
-    A specialized FieldStruct for handling byte sequences.
-    """
-
+class Memory(FieldStruct):
     def __init__(self, length: Union[int, _ContextLambda]) -> None:
-        """
-        Initialize the Bytes field with a fixed length or a length determined by a context lambda.
-
-        :param length: The fixed length or a context lambda to determine the length dynamically.
-        """
         self.length = length
 
     def __type__(self) -> type:
-        """
-        Return the type associated with this Bytes field.
-
-        :return: The type (bytes).
-        """
-        return bytes
+        return memoryview
 
     def __size__(self, context: _ContextLike) -> int:
         """
@@ -404,16 +390,16 @@ class Bytes(FieldStruct):
         """
         return self.length(context) if callable(self.length) else self.length
 
-    def pack_single(self, obj: bytes, context: _ContextLike) -> None:
+    def pack_single(self, obj: Union[memoryview, bytes], context: _ContextLike) -> None:
         """
         Pack a single bytes object into the stream.
 
         :param obj: The bytes object to pack.
         :param context: The current context.
         """
-        context[CTX_STREAM].write(obj)
+        context[CTX_STREAM].write(bytes(obj))
 
-    def unpack_single(self, context: _ContextLike) -> Any:
+    def unpack_single(self, context: _ContextLike) -> memoryview:
         """
         Unpack a single bytes object from the stream.
 
@@ -422,7 +408,30 @@ class Bytes(FieldStruct):
         """
         stream: _StreamType = context[CTX_STREAM]
         size = self.__size__(context)
-        return stream.read(size) if not isgreedy(size) else stream.read()
+        return memoryview(stream.read(size) if not isgreedy(size) else stream.read())
+
+
+class Bytes(Memory):
+    """
+    A specialized FieldStruct for handling byte sequences.
+    """
+
+    def __type__(self) -> type:
+        """
+        Return the type associated with this Bytes field.
+
+        :return: The type (bytes).
+        """
+        return bytes
+
+    def unpack_single(self, context: _ContextLike) -> Any:
+        """
+        Unpack a single bytes object from the stream.
+
+        :param context: The current context.
+        :return: The unpacked bytes object.
+        """
+        return bytes(super().unpack_single(context))
 
 
 class String(Bytes):
@@ -531,7 +540,7 @@ class CString(Bytes):
                     break
             value = bytes(data)
         else:
-            value: str = super().unpack_single(context)
+            value: bytes = super().unpack_single(context)
         return value.decode(self.encoding).rstrip("\x00")
 
     def __class_getitem__(cls, dim) -> Field:
