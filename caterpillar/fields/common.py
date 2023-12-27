@@ -12,8 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-from __future__ import annotations
-
 from struct import calcsize, pack, unpack
 from typing import Sequence, Any, Optional, Union, List
 from enum import Enum as _EnumType
@@ -375,8 +373,9 @@ class Enum(Transformer):
 
 
 class Memory(FieldStruct):
-    def __init__(self, length: Union[int, _ContextLambda]) -> None:
+    def __init__(self, length: Union[int, _ContextLambda], encoding: Optional[str] = None) -> None:
         self.length = length
+        self.encoding = encoding or "utf-8"
 
     def __type__(self) -> type:
         return memoryview
@@ -397,7 +396,9 @@ class Memory(FieldStruct):
         :param obj: The bytes object to pack.
         :param context: The current context.
         """
-        context[CTX_STREAM].write(bytes(obj))
+        if isinstance(obj, str):
+            obj = obj.encode(self.encoding)
+        context[CTX_STREAM].write(obj)
 
     def unpack_single(self, context: _ContextLike) -> memoryview:
         """
@@ -439,18 +440,6 @@ class String(Bytes):
     A specialized field for handling string data.
     """
 
-    def __init__(
-        self, length: Union[int, _ContextLambda], encoding: Optional[str] = None
-    ) -> None:
-        """
-        Initialize the String field with a fixed length or a length determined by a context lambda.
-
-        :param length: The fixed length or a context lambda to determine the length dynamically.
-        :param encoding: The encoding to use for string encoding/decoding (default is UTF-8).
-        """
-        super().__init__(length)
-        self.encoding = encoding or "utf-8"
-
     def __type__(self) -> type:
         """
         Return the type associated with this String field.
@@ -458,15 +447,6 @@ class String(Bytes):
         :return: The type (str).
         """
         return str
-
-    def pack_single(self, obj: str, context: _ContextLike) -> None:
-        """
-        Pack a single string into the stream.
-
-        :param obj: The string to pack.
-        :param context: The current context.
-        """
-        super().pack_single(obj.encode(self.encoding), context)
 
     def unpack_single(self, context: _ContextLike) -> Any:
         """

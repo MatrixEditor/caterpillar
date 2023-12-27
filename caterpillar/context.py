@@ -292,12 +292,10 @@ class ContextPath(ExprMixin, _ContextLambda):
 
         :return: A string representation.
         """
-        value = f"<Path {self.path!r}"
-        if self.call_kwargs is not None:
-            value = f"{value}(**{self.call_kwargs})"
-        elif self.getitem_args is not None:
-            value = f"{value}[{self.getitem_args}]"
-        return value + ">"
+        extra = []
+        for operation, args, kwargs in self._ops_:
+            extra.append(f"{operation.__name__} args={args!r} kwargs={kwargs!r}")
+        return f"<Path {self.path!r} {', '.join(extra)}>"
 
     def __str__(self) -> str:
         """

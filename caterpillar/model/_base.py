@@ -273,7 +273,7 @@ class Sequence(_StructLike, FieldMixin):
         :param name: The name of the field.
         :param field: The field to remove.
         """
-        self._member_map_.pop(name, default=None)
+        self._member_map_.pop(name, None)
         self.fields.remove(field)
 
     def get_members(self) -> Dict[str, Field]:

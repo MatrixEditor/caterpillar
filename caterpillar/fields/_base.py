@@ -12,8 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-from __future__ import annotations
-
 from dataclasses import dataclass
 from typing import Self, Union, Set, Any, Dict, Optional, Iterable, List
 from io import BytesIO
@@ -413,7 +411,6 @@ class Field(_StructLike):
         has_offset = start != fallback
         if has_offset:
             # TODO: implement F_OFFSET_OVERRIDE
-
             # We write the current field into a temporary memory buffer
             # and add it after all processing hasbeen finished.
             base_stream = stream

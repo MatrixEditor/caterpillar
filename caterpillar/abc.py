@@ -12,8 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-from __future__ import annotations
-
 from abc import ABC, abstractmethod
 from io import IOBase
 from typing import Protocol
@@ -44,7 +42,7 @@ class _ContextLike(dict):
 
     @property
     @abstractmethod
-    def _root(self) -> Optional[_ContextLike]:
+    def _root(self) -> Optional["_ContextLike"]:
         pass
 
 
@@ -124,8 +122,8 @@ class _EnumLike(Protocol):
 
     value: Any
     name: str
-    _member_map_: Dict[str, _EnumLike]
-    _value2member_map_: Dict[Any, _EnumLike]
+    _member_map_: Dict[str, "_EnumLike"]
+    _value2member_map_: Dict[Any, "_EnumLike"]
 
 
 class _Switch(Protocol):
