@@ -18,4 +18,5 @@ out of the box.
     it enables developer mode.
 
 
-If you wish to contribute to this project, make sure you follow the :ref:`contribution`.
+If you wish to contribute to this project, make sure you follow the :ref:`contribution`. This
+library is especially designed for Python 3.12 and prior versions are still subject to approval.
