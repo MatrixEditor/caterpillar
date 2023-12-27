@@ -136,37 +136,94 @@ called on a field object.
 Field specific operations
 -------------------------
 
-
-
-.. function:: field.__xor__(self, flag)
+The following methods are specifically designed for fields and will only affect those. Even though these
+operations are also supported on sequence objects, only the returning :class:`Field` object will be affected.
 
 .. function:: field.__or__(self, flag)
+.. function:: field.__ior__(self, flag)
+
+    With the logical OR operation, a so-called :class:`Flag` can be set. Some flags are defined globally, and
+    their meaning is described in :ref:`options`.
+
+    >>> field = uint8 | F_KEEP_POSITION
+
+.. function:: field.__xor__(self, flag)
+.. function:: field.__ixor__(self, flag)
+
+    The logical XOR operation is designed to remove a flag/option from the specified field.
+
+    >>> field = uint8 ^ F_KEEP_POSITION
 
 
 Sequence specific operators
 ---------------------------
 
-.. function:: sequence.__add__(self, sequence)
+The following functions have been implemented to provide a user-friendly interface for
+extending :class:`~caterpillar.model.Sequence` objects. All subclasses inherit this
+functionality as well.
 
+.. function:: sequence.__add__(self, sequence)
 .. function:: sequence.__iadd__(self, sequence)
 
-.. function:: sequence.__sub__(self, sequence)
+    Called to *import* all fields from the given sequence into this instance. Note that the
+    fields will be added to the *end* of the current field list.
 
+    >>> seq = Sequence({"a": uint8}) + Sequence({"b": uint8})
+
+.. function:: sequence.__sub__(self, sequence)
 .. function:: sequence.__isub__(self, sequence)
 
+    Invoked to remove all fields in this sequence that are also stored in the given
+    sequence. This operation does not alter the used model but only affects the
+    internal model representation.
+
+    >>> seq = Sequence({"a": uint8, "b": uint8}) - Sequence({"b": uint8})
 
 Context specific operations
 ---------------------------
 
+The :class:`Context` implements attribute-like access on top of a dictionary, where the requested
+path is resolved recursively. For instance, the path :code:`"foo.bar.baz"` will be split into
+three parts and then :code:`getattr` is called until the final element has been reached or an
+error occurs.
+
+To enhance the facilities of a :class:`Context` instance, there are special classes with even more
+special operations.
 
 Context path
 ^^^^^^^^^^^^
 
-Context lambda
-^^^^^^^^^^^^^^
+The context path takes a special place, as it can provide lazy execution of almost all operators
+on definition. Its attribute-access model results in a new :class:`ContextPath` instance.
+
+>>> path = ContextPath("foo").bar.baz
+<Path 'foo.bar.baz'>
+
+To enable list-like access and function calls, there are special methods:
+
+.. function:: path.__call__(self, **kwargs)
+
+    Calling the path without the context instance results in a special state. The path
+    stores the keyword arguments given in the call and executes them after retrieving
+    the value from the context.
+
+    >>> path = this.foo.bar(x=19)
+    <Path '_obj.foo.bar' call args=() kwargs={'x': 19}>
 
 
+.. function:: path.__getitem__(self, key)
+
+    This method has the same effect on the path, as it stores the key argument and executes the
+    :meth:`!__getitem__` method on the retrieved value afterward.
+
+    >>> path = this.foo.bar(x=19)[10]
+    <Path '_obj.foo.bar' call args=() kwargs={'x': 19}, getitem args=10 kwargs={}>
 
 
-.. [1] Custom implementations must extend :class:`FieldMixin` class.
+.. admonition::: Developer's note
 
+    The current implementation of :class:`ContextPath` does not allow function calls or list-like
+    access between path elements. These special states can only be applied at the end of a path.
+
+
+.. [1] Custom implementations must extend :class:`FieldMixin` class to be able to use special operators.

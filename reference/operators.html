@@ -158,14 +158,19 @@
   <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../installing/index.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorial/index.html">Tutorial to Caterpillar</a></li>
-<li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">Caterpillar’s Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Caterpillar’s Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../tutorial/index.html">Tutorial to Caterpillar</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Tutorial to Caterpillar</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial/first_steps.html">1. First Steps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial/basics.html">2. Basic Concepts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial/advanced.html">3. Advanced Concepts</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">Caterpillar’s Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of Caterpillar’s Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="introduction.html">1. Introduction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="datamodel.html">2. Data Model</a></li>
 <li class="toctree-l2 current current-page"><a class="current reference internal" href="#">3. Operators</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../library/index.html">Library</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of Library</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../library/index.html">Library</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of Library</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../library/model.html">1. Struct Model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../library/options.html">2. Options</a></li>
 </ul>
@@ -344,19 +349,43 @@ which can be either a static boolean value or a context lambda.</p>
 </section>
 <section id="field-specific-operations">
 <h2><span class="section-number">3.2. </span>Field specific operations<a class="headerlink" href="#field-specific-operations" title="Link to this heading">#</a></h2>
+<p>The following methods are specifically designed for fields and will only affect those. Even though these
+operations are also supported on sequence objects, only the returning <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code> object will be affected.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="field.__or__">
+<span class="sig-prename descclassname"><span class="pre">field.</span></span><span class="sig-name descname"><span class="pre">__or__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flag</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#field.__or__" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="field.__ior__">
+<span class="sig-prename descclassname"><span class="pre">field.</span></span><span class="sig-name descname"><span class="pre">__ior__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flag</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#field.__ior__" title="Link to this definition">#</a></dt>
+<dd><p>With the logical OR operation, a so-called <code class="xref py py-class docutils literal notranslate"><span class="pre">Flag</span></code> can be set. Some flags are defined globally, and
+their meaning is described in <a class="reference internal" href="../library/options.html#options"><span class="std std-ref">Options</span></a>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">uint8</span> <span class="o">|</span> <span class="n">F_KEEP_POSITION</span>
+</pre></div>
+</div>
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="field.__xor__">
 <span class="sig-prename descclassname"><span class="pre">field.</span></span><span class="sig-name descname"><span class="pre">__xor__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flag</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#field.__xor__" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="field.__or__">
-<span class="sig-prename descclassname"><span class="pre">field.</span></span><span class="sig-name descname"><span class="pre">__or__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flag</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#field.__or__" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="field.__ixor__">
+<span class="sig-prename descclassname"><span class="pre">field.</span></span><span class="sig-name descname"><span class="pre">__ixor__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flag</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#field.__ixor__" title="Link to this definition">#</a></dt>
+<dd><p>The logical XOR operation is designed to remove a flag/option from the specified field.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">uint8</span> <span class="o">^</span> <span class="n">F_KEEP_POSITION</span>
+</pre></div>
+</div>
+</dd></dl>
 
 </section>
 <section id="sequence-specific-operators">
 <h2><span class="section-number">3.3. </span>Sequence specific operators<a class="headerlink" href="#sequence-specific-operators" title="Link to this heading">#</a></h2>
+<p>The following functions have been implemented to provide a user-friendly interface for
+extending <a class="reference internal" href="../library/model.html#caterpillar.model.Sequence" title="caterpillar.model.Sequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a> objects. All subclasses inherit this
+functionality as well.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="sequence.__add__">
 <span class="sig-prename descclassname"><span class="pre">sequence.</span></span><span class="sig-name descname"><span class="pre">__add__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sequence.__add__" title="Link to this definition">#</a></dt>
@@ -365,7 +394,12 @@ which can be either a static boolean value or a context lambda.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="sequence.__iadd__">
 <span class="sig-prename descclassname"><span class="pre">sequence.</span></span><span class="sig-name descname"><span class="pre">__iadd__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sequence.__iadd__" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Called to <em>import</em> all fields from the given sequence into this instance. Note that the
+fields will be added to the <em>end</em> of the current field list.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">seq</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">({</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="n">uint8</span><span class="p">})</span> <span class="o">+</span> <span class="n">Sequence</span><span class="p">({</span><span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="n">uint8</span><span class="p">})</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="sequence.__sub__">
@@ -375,20 +409,59 @@ which can be either a static boolean value or a context lambda.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="sequence.__isub__">
 <span class="sig-prename descclassname"><span class="pre">sequence.</span></span><span class="sig-name descname"><span class="pre">__isub__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sequence.__isub__" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Invoked to remove all fields in this sequence that are also stored in the given
+sequence. This operation does not alter the used model but only affects the
+internal model representation.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">seq</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">({</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="n">uint8</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="n">uint8</span><span class="p">})</span> <span class="o">-</span> <span class="n">Sequence</span><span class="p">({</span><span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="n">uint8</span><span class="p">})</span>
+</pre></div>
+</div>
+</dd></dl>
 
 </section>
 <section id="context-specific-operations">
 <h2><span class="section-number">3.4. </span>Context specific operations<a class="headerlink" href="#context-specific-operations" title="Link to this heading">#</a></h2>
+<p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code> implements attribute-like access on top of a dictionary, where the requested
+path is resolved recursively. For instance, the path <code class="code docutils literal notranslate"><span class="pre">&quot;foo.bar.baz&quot;</span></code> will be split into
+three parts and then <code class="code docutils literal notranslate"><span class="pre">getattr</span></code> is called until the final element has been reached or an
+error occurs.</p>
+<p>To enhance the facilities of a <code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code> instance, there are special classes with even more
+special operations.</p>
 <section id="context-path">
 <h3><span class="section-number">3.4.1. </span>Context path<a class="headerlink" href="#context-path" title="Link to this heading">#</a></h3>
-</section>
-<section id="context-lambda">
-<h3><span class="section-number">3.4.2. </span>Context lambda<a class="headerlink" href="#context-lambda" title="Link to this heading">#</a></h3>
+<p>The context path takes a special place, as it can provide lazy execution of almost all operators
+on definition. Its attribute-access model results in a new <code class="xref py py-class docutils literal notranslate"><span class="pre">ContextPath</span></code> instance.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">ContextPath</span><span class="p">(</span><span class="s2">&quot;foo&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">bar</span><span class="o">.</span><span class="n">baz</span>
+<span class="go">&lt;Path &#39;foo.bar.baz&#39;&gt;</span>
+</pre></div>
+</div>
+<p>To enable list-like access and function calls, there are special methods:</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="path.__call__">
+<span class="sig-prename descclassname"><span class="pre">path.</span></span><span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#path.__call__" title="Link to this definition">#</a></dt>
+<dd><p>Calling the path without the context instance results in a special state. The path
+stores the keyword arguments given in the call and executes them after retrieving
+the value from the context.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">this</span><span class="o">.</span><span class="n">foo</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">19</span><span class="p">)</span>
+<span class="go">&lt;Path &#39;_obj.foo.bar&#39; call args=() kwargs={&#39;x&#39;: 19}&gt;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="path.__getitem__">
+<span class="sig-prename descclassname"><span class="pre">path.</span></span><span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#path.__getitem__" title="Link to this definition">#</a></dt>
+<dd><p>This method has the same effect on the path, as it stores the key argument and executes the
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">__getitem__()</span></code> method on the retrieved value afterward.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">this</span><span class="o">.</span><span class="n">foo</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">19</span><span class="p">)[</span><span class="mi">10</span><span class="p">]</span>
+<span class="go">&lt;Path &#39;_obj.foo.bar&#39; call args=() kwargs={&#39;x&#39;: 19}, getitem args=10 kwargs={}&gt;</span>
+</pre></div>
+</div>
+</dd></dl>
+
 <aside class="footnote-list brackets">
 <aside class="footnote brackets" id="id3" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">1</a><span class="fn-bracket">]</span></span>
-<p>Custom implementations must extend <code class="xref py py-class docutils literal notranslate"><span class="pre">FieldMixin</span></code> class.</p>
+<p>Custom implementations must extend <code class="xref py py-class docutils literal notranslate"><span class="pre">FieldMixin</span></code> class to be able to use special operators.</p>
 </aside>
 </aside>
 </section>
@@ -460,8 +533,10 @@ which can be either a static boolean value or a context lambda.</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#field-specific-operations">3.2. Field specific operations</a><ul>
-<li><a class="reference internal" href="#field.__xor__"><code class="docutils literal notranslate"><span class="pre">field.__xor__()</span></code></a></li>
 <li><a class="reference internal" href="#field.__or__"><code class="docutils literal notranslate"><span class="pre">field.__or__()</span></code></a></li>
+<li><a class="reference internal" href="#field.__ior__"><code class="docutils literal notranslate"><span class="pre">field.__ior__()</span></code></a></li>
+<li><a class="reference internal" href="#field.__xor__"><code class="docutils literal notranslate"><span class="pre">field.__xor__()</span></code></a></li>
+<li><a class="reference internal" href="#field.__ixor__"><code class="docutils literal notranslate"><span class="pre">field.__ixor__()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#sequence-specific-operators">3.3. Sequence specific operators</a><ul>
@@ -472,8 +547,11 @@ which can be either a static boolean value or a context lambda.</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#context-specific-operations">3.4. Context specific operations</a><ul>
-<li><a class="reference internal" href="#context-path">3.4.1. Context path</a></li>
-<li><a class="reference internal" href="#context-lambda">3.4.2. Context lambda</a></li>
+<li><a class="reference internal" href="#context-path">3.4.1. Context path</a><ul>
+<li><a class="reference internal" href="#path.__call__"><code class="docutils literal notranslate"><span class="pre">path.__call__()</span></code></a></li>
+<li><a class="reference internal" href="#path.__getitem__"><code class="docutils literal notranslate"><span class="pre">path.__getitem__()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
