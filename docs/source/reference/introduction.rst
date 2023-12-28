@@ -111,7 +111,7 @@ Construct. The files used in the benchmark are provided below:
         .. literalinclude:: ./snippets/comparison_1_hachoir.py
                 :language: python
 
-    .. tab-item:: mrcrwobar
+    .. tab-item:: mrcrowbar
 
         .. literalinclude:: ./snippets/comparison_1_mrcrowbar.py
                 :language: python
@@ -123,6 +123,10 @@ and Construct show similar performance in their initial form. The compilation fe
 Construct makes it comparable to Kaitai, but since compilation is not a primary goal of
 *caterpillar*, these results are not considered.
 
+.. note::
+    All tests have been performed on a Windows VM with the latest stable python implementation (
+    :code:`Python 3.12.1 (tags/v3.12.1:2305ca5) [MSC v.1937 64 bit (AMD64)] on win32`)
+
 .. tab-set::
 
     .. tab-item:: caterpillar
@@ -132,8 +136,8 @@ Construct makes it comparable to Kaitai, but since compilation is not a primary 
 
             (venv-3.12.1)> python3 ./examples/comparison/comparison_1_caterpillar.py ./blob
             Timeit measurements:
-            unpack 0.0115265591 sec/call        # +- 0.0004 sec
-            pack   0.0104318993 sec/call        # +- 0.0002 sec
+            unpack 0.0106435117 sec/call
+            pack   0.0088008424 sec/call
 
     .. tab-item:: construct
 
@@ -167,10 +171,10 @@ Construct makes it comparable to Kaitai, but since compilation is not a primary 
             Parsing measurements:
             default  0.0260070809 sec/call
 
-    .. tab-item:: mrcrwobar
+    .. tab-item:: mrcrowbar
 
         .. code-block:: console
-            :caption: mrcrwobar
+            :caption: mrcrowbar
 
             (venv-3.12.1)> python3 ./examples/comparison/comparison_1_mrcrowbar.py ./blob
             Parsing measurements:
@@ -179,13 +183,13 @@ Construct makes it comparable to Kaitai, but since compilation is not a primary 
             Building measurements:
             default  0.0898006975 sec/call
 
-In this benchmark, *caterpillar* demonstrates a performance advantage, being approximately :bdg-success:`19.76%`
-faster in unpacking data and approximately :bdg-success:`18.36%` faster in packing data compared to Construct
+In this benchmark, *caterpillar* demonstrates a performance advantage, being approximately :bdg-success:`25.91%`
+faster in unpacking data and approximately :bdg-success:`31.12%` faster in packing data compared to Construct
 (*not compiled*).
 
 In the **compiled** Construct test, *caterpillar* shows a performance difference compared to Construct. Specifically,
-*caterpillar* is approximately :bdg-danger:`34.48%` slower in unpacking data and approximately
-:bdg-warning:`4.76%` slower in packing data. It's important to note that these figures reflect a trade-off between
+*caterpillar* is approximately :bdg-danger:`24.18%` slower in unpacking data, but approximately
+:bdg-success:`11.61%` **faster** in packing data. It's important to note that these figures reflect a trade-off between
 performance and other considerations such as simplicity and ease of use.
 
 

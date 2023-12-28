@@ -12,10 +12,16 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-from typing import Protocol, Union
+from typing import Protocol, Union, Callable
 
-from caterpillar.abc import _ContextLike, _StructLike, _ContainsStruct, getstruct
-from .common import Transformer
+from caterpillar.abc import (
+    _ContextLike,
+    _StructLike,
+    _ContainsStruct,
+    getstruct,
+    hasstruct,
+)
+from .common import Transformer, Bytes
 
 
 class _Compressor(Protocol):
@@ -47,7 +53,9 @@ class Compressed(Transformer):
         :param length: The length of the transformer.
         :type length: Union[_ContextLambda, Any]
         """
-        super().__init__(getstruct(struct, struct))
+        if hasstruct(struct):
+            struct = getstruct(struct)
+        super().__init__(struct)
         self.compressor = compressor
 
     def encode(self, obj: bytes, context: _ContextLike) -> bytes:
@@ -77,14 +85,23 @@ class Compressed(Transformer):
         return self.compressor.decompress(parsed)
 
 
+_LengthOrStruct = Union[_ContainsStruct, _StructLike, Callable, int]
+
+
+def compressed(lib: _Compressor, obj: _LengthOrStruct) -> _StructLike:
+    if callable(obj) or isinstance(obj, int):
+        obj = Bytes(obj)
+    return Compressed(lib, obj)
+
+
 try:
     import zlib
 
-    def ZLibCompressed(struct: Union[_ContainsStruct, _StructLike]):
+    def ZLibCompressed(obj: _LengthOrStruct):
         """
         Create a struct representing zlib compression.
         """
-        return Compressed(zlib, struct)
+        return compressed(zlib, obj)
 
 except ImportError:
     ZLibCompressed = None
@@ -92,11 +109,11 @@ except ImportError:
 try:
     import bz2
 
-    def Bz2Compressed(struct: Union[_ContainsStruct, _StructLike]):
+    def Bz2Compressed(obj: _LengthOrStruct):
         """
         Create a struct representing bz2 compression.
         """
-        return Compressed(bz2, struct)
+        return compressed(bz2, obj)
 
 except ImportError:
     Bz2Compressed = None
@@ -104,11 +121,11 @@ except ImportError:
 try:
     import lzma
 
-    def LZMACompressed(struct: Union[_ContainsStruct, _StructLike]):
+    def LZMACompressed(obj: _LengthOrStruct):
         """
         Create a struct representing lzma compression.
         """
-        return Compressed(lzma, struct)
+        return compressed(lzma, obj)
 
 except ImportError:
     LZMACompressed = None
@@ -117,11 +134,11 @@ try:
     # install package manuall with pip install lzallright
     import lzallright
 
-    def LZOCompressed(struct: Union[_ContainsStruct, _StructLike]):
+    def LZOCompressed(obj: _LengthOrStruct):
         """
         Create a struct representing LZO compression.
         """
-        return Compressed(lzallright.LZOCompressor(), struct)
+        return compressed(lzallright.LZOCompressor(), obj)
 
 except ImportError:
     LZOCompressed = None

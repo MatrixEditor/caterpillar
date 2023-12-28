@@ -14,6 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from struct import calcsize, pack, unpack
 from typing import Sequence, Any, Optional, Union, List
+from types import NoneType
 from enum import Enum as _EnumType
 
 from caterpillar.abc import (
@@ -51,6 +52,7 @@ class FormatField(FieldStruct):
         self.text = ch
         self.type_ = type_
         self.__bits__ = calcsize(self.text) * 8
+        self._padding_ = self.text == "x"
 
     def __repr__(self) -> str:
         """
@@ -58,7 +60,7 @@ class FormatField(FieldStruct):
 
         :return: A string representation.
         """
-        type_repr = self.type_.__name__ if not self.is_padding() else "padding"
+        type_repr = self.type_.__name__ if not self.is_padding else "padding"
         return f"<{self.__class__.__name__}({type_repr}) {self.text!r}>"
 
     def __type__(self) -> type:
@@ -86,16 +88,24 @@ class FormatField(FieldStruct):
         :param stream: The output stream.
         :param context: The current context.
         """
-        stream: _StreamType = context[CTX_STREAM]
-        if obj is None:
-            values = []
-        else:
-            values = obj if isinstance(obj, list) else [obj]
-
-        if len(values) == 0 and not self.is_padding():
+        if obj is None and not self._padding_:
             return
-        data = pack(self.get_format(context), *values)
-        stream.write(data)
+
+        fmt = self.get_format(context)
+        if self._padding_:
+            data = pack(fmt)
+        else:
+            # NOTE: we write every single branch to reduce the
+            # time this method takes
+            # pylint: disable-next=unidiomatic-typecheck
+            if type(obj) is list:
+                if len(obj) == 0:
+                    return
+                # Unfortunately, we have to use the *unpack operation here
+                data = pack(fmt, *obj)
+            else:
+                data = pack(fmt, obj)
+        context[CTX_STREAM].write(data)
 
     def pack_seq(self, seq: Sequence, context: _ContextLike) -> None:
         """
@@ -116,24 +126,9 @@ class FormatField(FieldStruct):
         :param context: The current context.
         :return: The unpacked value.
         """
-        length = context[CTX_FIELD].length(context)
-        if length == 0 and context[CTX_SEQ]:
-            # REVISIT: maybe add factory here
-            return []
-
-        greedy = length is Ellipsis
-        fmt = self.get_format(context, length or 1 if not greedy else 1)
-        try:
-            value = unpack(fmt, context[CTX_STREAM].read(calcsize(fmt)))
-        except ValueError as exc:
-            raise StructException("Could not unpack from stream!", context) from exc
-
-        if not context[CTX_SEQ] or greedy:
-            if len(value) == 0:
-                value = None
-            else:
-                value, *_ = value
-        return value
+        fmt = self.get_format(context)
+        value = unpack(fmt, context[CTX_STREAM].read(calcsize(fmt)))
+        return value[0] if value else None
 
     def unpack_seq(self, context: _ContextLike) -> List[Any]:
         """
@@ -142,10 +137,17 @@ class FormatField(FieldStruct):
         :param context: The current context.
         :return: A list of unpacked values.
         """
-        if context[CTX_FIELD].length(context) is not Ellipsis:
-            return list(self.unpack_single(context))
+        # We don't want to call .length() here as it would
+        # consume extra time
+        length = context[CTX_FIELD].amount
+        if length == 0:
+            return []  # maybe add factory
 
-        return super().unpack_seq(context)
+        if length is Ellipsis:
+            return super().unpack_seq(context)
+
+        fmt = self.get_format(context)
+        return list(unpack(fmt, context[CTX_STREAM].read(calcsize(fmt))))
 
     def get_format(self, context: _ContextLike, length: int = None) -> str:
         """
@@ -161,7 +163,7 @@ class FormatField(FieldStruct):
             if dim is Ellipsis:
                 dim = 1
         else:
-            dim = length
+            dim = length or 1
         return f"{order.ch}{dim}{self.text}"
 
     def is_padding(self) -> bool:
@@ -170,11 +172,11 @@ class FormatField(FieldStruct):
 
         :return: True if the field is padding, False otherwise.
         """
-        return self.text == "x"
+        return self._padding_
 
 
 # Instances of FormatField with specific format specifiers
-padding = FormatField("x", None)
+padding = FormatField("x", NoneType)
 char = FormatField("c", str)
 boolean = FormatField("?", bool)
 
@@ -502,12 +504,13 @@ class CString(Bytes):
         :param context: The current context.
         """
         pad = chr(self.pad).encode()
+        encoded = obj.encode(self.encoding)
         if self.length is not Ellipsis:
             length = self.__size__(context)
             obj_length = len(obj)
-            payload = obj.encode(self.encoding) + pad * (length - obj_length)
+            payload = encoded + pad * (length - obj_length)
         else:
-            payload = obj.encode(self.encoding) + pad
+            payload = encoded + pad
         super().pack_single(payload, context)
 
     def unpack_single(self, context: _ContextLike) -> Any:
@@ -517,20 +520,21 @@ class CString(Bytes):
         :param context: The current context.
         :return: The unpacked string.
         """
+        raw_pad = self.pad.to_bytes(1, byteorder='big')
         if self.length is Ellipsis:
             # Parse actual C-String
             stream: _StreamType = context[CTX_STREAM]
-            data = []
+            data = bytearray()
             while True:
                 value = stream.read(1)
-                if not value:
+                if not value or value == raw_pad:
                     break
-                data.append(*value)
-                if data[-1] == self.pad:
-                    break
+                data += value
             value = bytes(data)
         else:
-            value: bytes = super().unpack_single(context)
+            length = self.length(context) if callable(self.length) else self.length
+            value: bytes = context[CTX_STREAM].read(length)
+
         return value.decode(self.encoding).rstrip(chr(self.pad))
 
     def __class_getitem__(cls, dim) -> Field:
@@ -647,11 +651,18 @@ class Prefixed(FieldStruct):
         :param obj: The bytes object to pack.
         :param context: The current context.
         """
-        with WithoutContextVar(context, CTX_SEQ, False):
-            self.prefix.__pack__(len(obj), context)
+        field: Field = context[CTX_FIELD]
+        is_seq = context[CTX_SEQ]
+        if is_seq:
+            # We have to remove the sequence status temporarily
+            field ^= F_SEQUENTIAL
+        self.prefix.__pack__(len(obj), context)
 
         if self.encoding:
             obj = obj.encode(self.encoding)
+        # The status has to be added again
+        if is_seq:
+            field |= F_SEQUENTIAL
         context[CTX_STREAM].write(obj)
 
     def unpack_single(self, context: _ContextLike) -> Any:
@@ -661,20 +672,18 @@ class Prefixed(FieldStruct):
         :param context: The current context.
         :return: The unpacked bytes object.
         """
-        field: Field = context[CTX_FIELD]
         is_seq = context[CTX_SEQ]
         if is_seq:
             # We have to remove the sequence status temporarily
-            field ^= F_SEQUENTIAL
+            context[CTX_SEQ] = False
 
-        size = self.prefix.unpack_single(context)
+        size = self.prefix.__unpack__(context)
         data = context[CTX_STREAM].read(size)
         if self.encoding:
             data = data.decode(self.encoding)
 
         # The status has to be added again
-        if is_seq:
-            field |= F_SEQUENTIAL
+        context[CTX_SEQ] = is_seq
         return data
 
 
@@ -694,13 +703,13 @@ class Int(FieldStruct):
     def pack_single(self, obj: int, context: _ContextLike) -> None:
         order = context[CTX_FIELD].order
         byteorder = "little" if order == LittleEndian else "big"
-        size = self.__size__(context)
+        size = self.bits // 8
         context[CTX_STREAM].write(obj.to_bytes(size, byteorder, signed=self.signed))
 
     def unpack_single(self, context: _ContextLike) -> memoryview:
         order = context[CTX_FIELD].order
         byteorder = "little" if order == LittleEndian else "big"
-        size = self.__size__(context)
+        size = self.bits // 8
         return int.from_bytes(
             context[CTX_STREAM].read(size), byteorder, signed=self.signed
         )

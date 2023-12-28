@@ -42,6 +42,9 @@ A list of similar approaches to parsing structured binary data with Python can b
 * [hachoir](https://hachoir.readthedocs.io/en/latest/)
 * [mrcrowbar](https://github.com/moralrecordings/mrcrowbar)
 
+The documentation also provides a [Comparison](https://matrixeditor.github.io/caterpillar/reference/introduction.html#comparison)
+to these approaches.
+
 ## License
 
 Distributed under the GNU General Public License (V3). See [License](LICENSE) for more information.

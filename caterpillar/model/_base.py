@@ -39,6 +39,7 @@ from caterpillar.fields import (
     ConstBytes,
     ConstString,
     FieldMixin,
+    Const,
 )
 from caterpillar._common import unpack_seq, pack_seq
 
@@ -154,6 +155,24 @@ class Sequence(_StructLike, FieldMixin):
     def _set_default(self, name: str, value: Any) -> None:
         pass
 
+    def _process_default(self, name, annotation: Any) -> Any:
+        default = getattr(self.model, name, INVALID_DEFAULT)
+        # constant values that are not in the form of fields, structs or types should
+        # be wrapped into constant values. For more information, see _process_field
+        if isinstance(annotation, Field):
+            annotation = annotation.struct
+
+        match annotation:
+            case bytes() | str():
+                default = annotation
+            # Make it possible to define custom constants
+            case Const():
+                default = annotation.value
+
+        if default != INVALID_DEFAULT:
+            self._set_default(name, default)
+        return default
+
     def _replace_type(self, name: str, type_: type) -> None:
         pass
 
@@ -169,13 +188,7 @@ class Sequence(_StructLike, FieldMixin):
         for name, annotation in annotations.items():
             # Process each field and its annotation. In addition, fields with a name in
             # the form of '_[0-9]*' will be removed (if enabled)
-            default = getattr(self.model, name, INVALID_DEFAULT)
-            # constant values that are not in the form of fields, structs or types should
-            # be wrapped into constant values. For more information, see _process_field
-            if isinstance(annotation, bytes):
-                default = annotation
-                self._set_default(name, default)
-
+            default = self._process_default(name, annotation)
             is_included = self._included(name, default, annotation)
             if not is_included:
                 removables.append(name)
@@ -354,7 +367,6 @@ class Sequence(_StructLike, FieldMixin):
         return obj.get(name, None)
 
     def pack_one(self, obj: Dict[str, Any], context: _ContextLike) -> None:
-        is_union = self.is_union
         max_size = 0
         union_field: Optional[_StructLike] = None
         base_path: str = context[CTX_PATH]
@@ -362,7 +374,7 @@ class Sequence(_StructLike, FieldMixin):
         for field in self.fields:
             # The name has to be set (important for current context)
             name = field.__name__
-            if is_union:
+            if self.is_union:
                 # Union is only applicable for non-dynamic structs
                 size: int = field.__size__(context)
                 if size > max_size:
@@ -379,7 +391,7 @@ class Sequence(_StructLike, FieldMixin):
                     value = field.default if field.default != INVALID_DEFAULT else None
                 field.__pack__(value, context)
 
-        if is_union:
+        if self.is_union:
             if union_field is None:
                 raise StructException(
                     "Invalid union config: no fields declared!", context
@@ -400,6 +412,9 @@ class Sequence(_StructLike, FieldMixin):
             pack_seq(obj, context, self.pack_one)
         else:
             ctx = Context(
-                _parent=context, _io=context[CTX_STREAM], _path=context[CTX_PATH], _obj=obj
+                _parent=context,
+                _io=context[CTX_STREAM],
+                _path=context[CTX_PATH],
+                _obj=obj,
             )
             self.pack_one(obj, ctx)

@@ -61,11 +61,25 @@ def issigned(obj: Any) -> bool:
     return bool(getattr(obj, SIGNED_ATTR, None))
 
 
-@dataclass(frozen=True)
+@dataclass(init=False)
 class BitFieldGroup:
     size: int
     pos: int
+    fmt: str
     fields: Dict[BitTuple, Field] = dcfield(default_factory=dict)
+
+    def __init__(self, size: int, pos: int, fields: Dict = None) -> None:
+        self.size = size
+        self.pos = pos
+        self.fields = fields or {}
+        if 8 < size <= 16:
+            self.fmt = "H"
+        elif 16 < size <= 32:
+            self.fmt = "I"
+        elif 32 < size <= 64:
+            self.fmt = "Q"
+        else:
+            self.fmt = "B"
 
 
 class BitField(Struct):
@@ -95,7 +109,7 @@ class BitField(Struct):
         # Add additional options based on the struct's type
         self.options.difference_update(GLOBAL_STRUCT_OPTIONS, GLOBAL_UNION_OPTIONS)
         self.options.update(GLOBAL_BITFIELD_FLAGS)
-        self._length = self._abs_bit_pos
+        self.__bits__ = sum(map(lambda x: x.size, self.groups))
 
         del self._bit_pos
         del self._abs_bit_pos
@@ -240,7 +254,7 @@ class BitField(Struct):
 
     def __size__(self, context: _ContextLike) -> int:
         # The size of a bitfield is alsways static
-        return self._length
+        return self.__bits__ // 8
 
     def unpack_one(self, context: _ContextLike) -> Optional[Any]:
         # At first, we define the object context where the parsed values
@@ -248,57 +262,54 @@ class BitField(Struct):
         init_data: Dict[str, Any] = Context()
         context[CTX_OBJECT] = Context(_parent=context)
         base_path = context[CTX_PATH]
-        order = "little" if self.order == LittleEndian else "big"
-
+        data = memoryview(context[CTX_STREAM].read(self.__bits__ // 8))
         for i, group in enumerate(self.groups):
             # each group specifies the fields we are about to unpack. But first, we have
             # to read the bits from the stream
-            value = int.from_bytes(
-                context[CTX_STREAM].read(group.size // 8), byteorder=order
-            )
-
+            start = group.pos // 8
+            value = data[start : start + group.size // 8].cast(group.fmt)[0]
             for bit_info, field in reversed(group.fields.items()):
                 name: str = field.__name__
-                context[CTX_PATH] = f"{base_path}.<{i}>.{name}"
-                bit_pos, width, factory = bit_info
                 # The field should be ignored if it is not within the
                 # member map (this usually means we have a padding field)
                 if name not in self._member_map_:
                     continue
 
+                context[CTX_PATH] = f"{base_path}.<{i}>.{name}"
+                bit_pos, width, factory = bit_info
                 low_mask = (1 << width) - 1
                 if width == 1:
                     field_value = bool(value & low_mask << bit_pos)
                 else:
                     shift = max(bit_pos + 1 - width, 0)
                     field_value: int = (value >> shift) & low_mask
-                    if factory not in (type(None), Any):
+                    if factory is not None:
                         field_value = factory(field_value)
-
                 # Finally, apply the new value
                 init_data[name] = field_value
 
-        obj = self.model(**init_data)
-        return obj
+        return self.model(**init_data)
 
     def pack_one(self, obj: Any, context: _ContextLike) -> None:
+        # REVISIT: this function is very time consuming. should be do something
+        # about that?
         stream: _StreamType = context[CTX_STREAM]
         base_path: str = context[CTX_PATH]
+        order = "little" if self.order == LittleEndian else "big"
         for i, group in enumerate(self.groups):
             # The same applies here, but we convert all values to int instead of reading
             # them from the stream
-            order = "little" if self.order == LittleEndian else "big"
             value = 0
             for bit_info, field in reversed(group.fields.items()):
                 # Setup the field's context
                 name: str = field.__name__
-                context[CTX_PATH] = ".".join([base_path, f"({i})", name])
+                context[CTX_PATH] = f"{base_path}.({i}).{name}"
                 bit_pos, width, _ = bit_info
                 # Padding is translated into zeros
                 if name not in self._member_map_:
                     continue
 
-                field_value = self.get_value(obj, name, field) or 0
+                field_value = getattr(obj, name, 0) or 0
                 shift = bit_pos + 1 - width
                 # Here's the tricky part: we have to convert all values to int
                 # without knowing their type. We make use of Python's data model,
@@ -310,7 +321,7 @@ class BitField(Struct):
                     value |= int(field_value) << shift
                 except NotImplementedError as exc:
                     raise DelegationError(
-                        f"Field {name!r} does not support to-int conversio!"
+                        f"Field {name!r} does not support to-int conversion!"
                     ) from exc
             # REVISIT: is this cheating?
             stream.write(value.to_bytes(group.size // 8, byteorder=order))

@@ -24,7 +24,7 @@ from shutil import copyfileobj
 
 from caterpillar.abc import getstruct, hasstruct, STRUCT_FIELD
 from caterpillar.abc import _StructLike, _StreamType
-from caterpillar.abc import _ContainsStruct, _ContextLike
+from caterpillar.abc import _ContainsStruct, _ContextLike, _SupportsSize
 from caterpillar.context import Context, CTX_STREAM
 from caterpillar.byteorder import ByteOrder, Arch
 from caterpillar.options import (
@@ -337,3 +337,11 @@ def unpack_file(
     """
     with open(filename, "rb") as fp:
         return unpack(struct, fp, **kwds)
+
+
+def sizeof(obj: Union[_StructLike, _ContainsStruct, _SupportsSize], **kwds) -> int:
+    context = Context(_parent=None, _path="<root>", **kwds)
+    struct_ = obj
+    if hasstruct(struct_):
+        struct_ = getstruct(struct_)
+    return struct_.__size__(context)

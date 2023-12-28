@@ -344,14 +344,17 @@ class Field(_StructLike):
             # Disabled fields or context lambdas won't pack any data
             return
 
+        # Using this inlined version of self.is_seq(), qe reduce the amount of
+        # calls made to the method and save A LOT of time.
         # pylint: disable-next=protected-access
         context[CTX_SEQ] = F_SEQUENTIAL._hash_ in self.flags
         # pylint: disable-next=protected-access
         keep_pos = F_KEEP_POSITION._hash_ in self.flags
-        if not callable(self.struct):
+        if not callable(self.struct):  # REVISIT: maybe hardcode this
             if not keep_pos:
                 fallback = stream.tell()
 
+            # as above: we save A LOT of time inlining self.get_offset
             offset = self.offset(context) if callable(self.offset) else self.offset
             if offset >= 0:
                 stream.seek(offset)
@@ -405,22 +408,23 @@ class Field(_StructLike):
         """
         # TODO: revisit code
         stream: _StreamType = context[CTX_STREAM]
-        if self.condition is not True:
-            if not self.is_enabled(context):
-                # Disabled fields or context lambdas won't pack any data
-                return
+        if self.condition is not True and not self.is_enabled(context):
+            # Disabled fields or context lambdas won't pack any data
+            return
 
-        # Setup parsing by specifying the start and end positions
-        fallback = stream.tell()
-        offset = self.get_offset(context)
-        start = offset if offset >= 0 else fallback
-        struct = self.struct
+        # as above: we save A LOT of time inlining self.get_offset
+        offset = self.offset(context) if callable(self.offset) else self.offset
+        # pylint: disable-next=protected-access
+        keep_pos = F_KEEP_POSITION._hash_ in self.flags
 
         context[CTX_FIELD] = self
         # pylint: disable-next=protected-access
         context[CTX_SEQ] = F_SEQUENTIAL._hash_ in self.flags
         # REVISIT: maybe check whether this stream supports .seek()
-        has_offset = start != fallback
+        if not keep_pos:
+            fallback = stream.tell()
+
+        has_offset = offset >= 0
         if has_offset:
             # TODO: implement F_OFFSET_OVERRIDE
             # We write the current field into a temporary memory buffer
@@ -429,24 +433,26 @@ class Field(_StructLike):
             stream = BytesIO()
             context[CTX_STREAM] = stream
 
-        if self.options is None and not callable(self.struct):
-            struct.__pack__(obj, context)
+        is_lambda = callable(self.struct)
+        if self.options is None and not is_lambda:
+            self.struct.__pack__(obj, context)
         else:
-            if not callable(self.struct):
+            if not is_lambda:
                 raise StructException(
                     "Attepmt was made to use switch without context lambda!", context
                 )
             value = self.struct(context)
-            struct: _StructLike = self.get_struct(value, context)
-            struct.__pack__(obj, context)
+            if self.options is not None:
+                struct: _StructLike = self.get_struct(value, context)
+                struct.__pack__(obj, context)
 
-        if not self.has_flag(F_KEEP_POSITION) and not has_offset:
+        if not has_offset and not keep_pos:
             # The position shouldn't be persisted reset the stream
             stream.seek(fallback)
 
         if has_offset:
             # Place the stream into the internal offset map
-            context._root[CTX_OFFSETS][start] = stream.getbuffer()
+            context._root[CTX_OFFSETS][fallback] = stream.getbuffer()
             context[CTX_STREAM] = base_stream
 
     def __size__(self, context: _ContextLike) -> int:
@@ -584,11 +590,7 @@ class FieldStruct(FieldMixin, _StructLike):
         :param stream: The output stream.
         :param context: The current operation context.
         """
-        func = self.pack_single
-        if context[CTX_SEQ]:
-            func = self.pack_seq
-
-        func(obj, context)
+        (self.pack_single if not context[CTX_SEQ] else self.pack_seq)(obj, context)
 
     def __unpack__(self, context: _ContextLike) -> Any:
         """

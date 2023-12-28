@@ -22,6 +22,7 @@ from ._struct import (
     pack,
     pack_into,
     pack_file,
+    sizeof
 )
 from ._bitfield import (
     BitField,
