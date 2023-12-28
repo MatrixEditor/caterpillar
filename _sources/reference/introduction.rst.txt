@@ -69,12 +69,93 @@ of Python 3.12, there are no conflicts in using annotations for defining fields.
 By using annotations, we can simply define a default value if desired, eliminating the need to make the code
 more complex by using assignments.
 
+
 Pros & Cons
 -----------
 
 *TODO*
 
+Comparison
+----------
 
+*TODO: add links*
+
+Here, we present a comparison of Caterpillar with Construct and Kaitai using the struct
+from the initial benchmark in the `construct-docs`_ repository as a base.Since Kaitai's
+generated code can only parse a format and not build it, the comparison is focused on
+Construct. The files used in the benchmark are provided below:
+
+.. tab-set::
+
+    .. tab-item:: caterpillar
+
+        .. literalinclude:: ./snippets/comparison_1_caterpillar.py
+            :language: python
+
+        .. note::
+            It actually makes no time-related difference if we define the :code:`Format` field directly or put it into
+            a struct class.
+
+    .. tab-item:: construct
+
+        .. literalinclude:: ./snippets/comparison_1_construct.py
+            :language: python
+
+    .. tab-item:: kaitai
+
+        .. literalinclude:: ./snippets/comparison_kaitai.ksy
+            :language: yaml
+
+
+The test involved one thousand iterations of packing and unpacking the structure. Kaitai
+scores with the fastest time since it directly reads all data from the stream. *caterpillar*
+and Construct show similar performance in their initial form. The compilation feature of
+Construct makes it comparable to Kaitai, but since compilation is not a primary goal of
+*caterpillar*, these results are not considered.
+
+.. tab-set::
+
+    .. tab-item:: caterpillar
+
+        .. code-block:: console
+            :caption: caterpillar
+
+            (venv-3.12.1)> python3 ./examples/comparison/comparison_1_caterpillar.py ./blob
+            Timeit measurements:
+            unpack 0.0115265591 sec/call        # +- 0.0004 sec
+            pack   0.0104318993 sec/call        # +- 0.0002 sec
+
+    .. tab-item:: construct
+
+       .. code-block:: console
+            :caption: Construct
+
+            (venv-3.12.1)> python3 ./examples/comparison/comparison_1_construct.py ./blob
+            Parsing measurements:
+            default  0.0143656098 sec/call
+            compiled 0.0085707553 sec/call
+
+            Building measurements:
+            default  0.0127780359 sec/call
+            compiled 0.0099577958 sec/call
+
+    .. tab-item:: kaitai
+
+        .. code-block:: console
+            :caption: kaitai
+
+            (venv-3.12.1)> python3 ./examples/comparison/comparison_1_kaitai.py ./blob
+            Parsing measurements:
+            default  0.0034705456 sec/call
+
+In this benchmark, *caterpillar* demonstrates a performance advantage, being approximately :bdg-success:`19.76%`
+faster in unpacking data and approximately :bdg-success:`18.36%` faster in packing data compared to Construct
+(*not compiled*).
+
+In the **compiled** Construct test, *caterpillar* shows a performance difference compared to Construct. Specifically,
+*caterpillar* is approximately :bdg-danger:`34.48%` slower in unpacking data and approximately
+:bdg-warning:`4.76%` slower in packing data. It's important to note that these figures reflect a trade-off between
+performance and other considerations such as simplicity and ease of use.
 
 
 .. |c0| unicode:: U+02C8
@@ -85,3 +166,6 @@ Pros & Cons
 
 .. [1] https://en.wikipedia.org/wiki/Caterpillar
 .. [2] Even structs generated from class models are extensible in some degree.
+
+
+.. _construct-docs: https://construct.readthedocs.io/en/latest/compilation.html#comparison-with-kaitai-struct

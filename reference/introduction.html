@@ -268,6 +268,185 @@ more complex by using assignments.</p>
 <section id="pros-cons">
 <h2><span class="section-number">1.2. </span>Pros &amp; Cons<a class="headerlink" href="#pros-cons" title="Link to this heading">#</a></h2>
 <p><em>TODO</em></p>
+</section>
+<section id="comparison">
+<h2><span class="section-number">1.3. </span>Comparison<a class="headerlink" href="#comparison" title="Link to this heading">#</a></h2>
+<p><em>TODO: add links</em></p>
+<p>Here, we present a comparison of Caterpillar with Construct and Kaitai using the struct
+from the initial benchmark in the <a class="reference external" href="https://construct.readthedocs.io/en/latest/compilation.html#comparison-with-kaitai-struct">construct-docs</a> repository as a base.Since Kaitai’s
+generated code can only parse a format and not build it, the comparison is focused on
+Construct. The files used in the benchmark are provided below:</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
+</input><label class="sd-tab-label" for="sd-tab-item-0">
+caterpillar</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">caterpillar.shortcuts</span> <span class="kn">import</span> <span class="n">struct</span><span class="p">,</span> <span class="n">LittleEndian</span><span class="p">,</span> <span class="n">bitfield</span><span class="p">,</span> <span class="n">unpack</span><span class="p">,</span> <span class="n">pack</span>
+<span class="kn">from</span> <span class="nn">caterpillar.fields</span> <span class="kn">import</span> <span class="n">uint8</span><span class="p">,</span> <span class="n">UInt</span><span class="p">,</span> <span class="n">CString</span><span class="p">,</span> <span class="n">Prefixed</span><span class="p">,</span> <span class="n">uint32</span>
+
+
+<span class="nd">@bitfield</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">LittleEndian</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">Flags</span><span class="p">:</span>
+    <span class="n">bool1</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">num4</span><span class="p">:</span> <span class="mi">3</span>
+    <span class="c1"># padding is generated automatically</span>
+
+
+<span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">LittleEndian</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">Item</span><span class="p">:</span>
+    <span class="n">num1</span><span class="p">:</span> <span class="n">uint8</span>
+    <span class="n">num2</span><span class="p">:</span> <span class="n">UInt</span><span class="p">(</span><span class="mi">24</span><span class="p">)</span>
+    <span class="n">flags</span><span class="p">:</span> <span class="n">Flags</span>
+    <span class="n">fixedarray1</span><span class="p">:</span> <span class="n">uint8</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+    <span class="n">name1</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+    <span class="n">name2</span><span class="p">:</span> <span class="n">Prefixed</span><span class="p">(</span><span class="n">uint8</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+
+
+<span class="n">Format</span> <span class="o">=</span> <span class="n">LittleEndian</span> <span class="o">+</span> <span class="n">Item</span><span class="p">[</span><span class="n">uint32</span><span class="p">::]</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>It actually makes no time-related difference if we define the <code class="code docutils literal notranslate"><span class="pre">Format</span></code> field directly or put it into
+a struct class.</p>
+</div>
+</div>
+<input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
+</input><label class="sd-tab-label" for="sd-tab-item-1">
+construct</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">construct</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">d</span> <span class="o">=</span> <span class="n">Struct</span><span class="p">(</span>
+    <span class="s2">&quot;count&quot;</span> <span class="o">/</span> <span class="n">Int32ul</span><span class="p">,</span>
+    <span class="s2">&quot;items&quot;</span>
+    <span class="o">/</span> <span class="n">Array</span><span class="p">(</span>
+        <span class="n">this</span><span class="o">.</span><span class="n">count</span><span class="p">,</span>
+        <span class="n">Struct</span><span class="p">(</span>
+            <span class="s2">&quot;num1&quot;</span> <span class="o">/</span> <span class="n">Int8ul</span><span class="p">,</span>
+            <span class="s2">&quot;num2&quot;</span> <span class="o">/</span> <span class="n">Int24ul</span><span class="p">,</span>
+            <span class="s2">&quot;flags&quot;</span>
+            <span class="o">/</span> <span class="n">BitStruct</span><span class="p">(</span>
+                <span class="s2">&quot;bool1&quot;</span> <span class="o">/</span> <span class="n">Flag</span><span class="p">,</span>
+                <span class="s2">&quot;num4&quot;</span> <span class="o">/</span> <span class="n">BitsInteger</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>
+                <span class="n">Padding</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;fixedarray1&quot;</span> <span class="o">/</span> <span class="n">Array</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">Int8ul</span><span class="p">),</span>
+            <span class="s2">&quot;name1&quot;</span> <span class="o">/</span> <span class="n">CString</span><span class="p">(</span><span class="s2">&quot;utf8&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;name2&quot;</span> <span class="o">/</span> <span class="n">PascalString</span><span class="p">(</span><span class="n">Int8ul</span><span class="p">,</span> <span class="s2">&quot;utf8&quot;</span><span class="p">),</span>
+        <span class="p">),</span>
+    <span class="p">),</span>
+<span class="p">)</span>
+<span class="n">d_compiled</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">compile</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<input id="sd-tab-item-2" name="sd-tab-set-0" type="radio">
+</input><label class="sd-tab-label" for="sd-tab-item-2">
+kaitai</label><div class="sd-tab-content docutils">
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">meta</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">comparison_1_kaitai</span>
+<span class="w">  </span><span class="nt">encoding</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">utf-8</span>
+<span class="w">  </span><span class="nt">endian</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">le</span>
+<span class="nt">seq</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">count</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">u4</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">items</span>
+<span class="w">    </span><span class="nt">repeat</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">expr</span>
+<span class="w">    </span><span class="nt">repeat-expr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">count</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">item</span>
+<span class="nt">types</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">item</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">seq</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">num1</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">u1</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">num2_lo</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">u2</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">num2_hi</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">u1</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flags</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flags</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fixedarray1</span>
+<span class="w">        </span><span class="nt">repeat</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">expr</span>
+<span class="w">        </span><span class="nt">repeat-expr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">u1</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">name1</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">strz</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">len_name2</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">u1</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">name2</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
+<span class="w">        </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">len_name2</span>
+<span class="w">    </span><span class="nt">instances</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">num2</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;num2_hi</span><span class="nv"> </span><span class="s">&lt;&lt;</span><span class="nv"> </span><span class="s">16</span><span class="nv"> </span><span class="s">|</span><span class="nv"> </span><span class="s">num2_lo&#39;</span>
+<span class="w">    </span><span class="nt">types</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">flags</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">seq</span><span class="p">:</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bool1</span>
+<span class="w">            </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">b1</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">num4</span>
+<span class="w">            </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">b3</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">padding</span>
+<span class="w">            </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">b4</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The test involved one thousand iterations of packing and unpacking the structure. Kaitai
+scores with the fastest time since it directly reads all data from the stream. <em>caterpillar</em>
+and Construct show similar performance in their initial form. The compilation feature of
+Construct makes it comparable to Kaitai, but since compilation is not a primary goal of
+<em>caterpillar</em>, these results are not considered.</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-3" name="sd-tab-set-1" type="radio">
+</input><label class="sd-tab-label" for="sd-tab-item-3">
+caterpillar</label><div class="sd-tab-content docutils">
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-text">caterpillar</span><a class="headerlink" href="#id6" title="Link to this code">#</a></div>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(venv-3.12.1)</span><span class="go">&gt; python3 ./examples/comparison/comparison_1_caterpillar.py ./blob</span>
+<span class="go">Timeit measurements:</span>
+<span class="go">unpack 0.0115265591 sec/call        # +- 0.0004 sec</span>
+<span class="go">pack   0.0104318993 sec/call        # +- 0.0002 sec</span>
+</pre></div>
+</div>
+</div>
+</div>
+<input id="sd-tab-item-4" name="sd-tab-set-1" type="radio">
+</input><label class="sd-tab-label" for="sd-tab-item-4">
+construct</label><div class="sd-tab-content docutils">
+<div class="literal-block-wrapper docutils container" id="id7">
+<div class="code-block-caption"><span class="caption-text">Construct</span><a class="headerlink" href="#id7" title="Link to this code">#</a></div>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(venv-3.12.1)</span><span class="go">&gt; python3 ./examples/comparison/comparison_1_construct.py ./blob</span>
+<span class="go">Parsing measurements:</span>
+<span class="go">default  0.0143656098 sec/call</span>
+<span class="go">compiled 0.0085707553 sec/call</span>
+
+<span class="go">Building measurements:</span>
+<span class="go">default  0.0127780359 sec/call</span>
+<span class="go">compiled 0.0099577958 sec/call</span>
+</pre></div>
+</div>
+</div>
+</div>
+<input id="sd-tab-item-5" name="sd-tab-set-1" type="radio">
+</input><label class="sd-tab-label" for="sd-tab-item-5">
+kaitai</label><div class="sd-tab-content docutils">
+<div class="literal-block-wrapper docutils container" id="id8">
+<div class="code-block-caption"><span class="caption-text">kaitai</span><a class="headerlink" href="#id8" title="Link to this code">#</a></div>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(venv-3.12.1)</span><span class="go">&gt; python3 ./examples/comparison/comparison_1_kaitai.py ./blob</span>
+<span class="go">Parsing measurements:</span>
+<span class="go">default  0.0034705456 sec/call</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<p>In this benchmark, <em>caterpillar</em> demonstrates a performance advantage, being approximately <span class="sd-sphinx-override sd-badge sd-bg-success sd-bg-text-success">19.76%</span>
+faster in unpacking data and approximately <span class="sd-sphinx-override sd-badge sd-bg-success sd-bg-text-success">18.36%</span> faster in packing data compared to Construct
+(<em>not compiled</em>).</p>
+<p>In the <strong>compiled</strong> Construct test, <em>caterpillar</em> shows a performance difference compared to Construct. Specifically,
+<em>caterpillar</em> is approximately <span class="sd-sphinx-override sd-badge sd-bg-danger sd-bg-text-danger">34.48%</span> slower in unpacking data and approximately
+<span class="sd-sphinx-override sd-badge sd-bg-warning sd-bg-text-warning">4.76%</span> slower in packing data. It’s important to note that these figures reflect a trade-off between
+performance and other considerations such as simplicity and ease of use.</p>
 <aside class="footnote-list brackets">
 <aside class="footnote brackets" id="id4" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">1</a><span class="fn-bracket">]</span></span>
@@ -342,6 +521,7 @@ more complex by using assignments.</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#pros-cons">1.2. Pros &amp; Cons</a></li>
+<li><a class="reference internal" href="#comparison">1.3. Comparison</a></li>
 </ul>
 </li>
 </ul>
