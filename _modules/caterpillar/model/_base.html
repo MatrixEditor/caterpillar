@@ -250,6 +250,7 @@
     <span class="n">ConstBytes</span><span class="p">,</span>
     <span class="n">ConstString</span><span class="p">,</span>
     <span class="n">FieldMixin</span><span class="p">,</span>
+    <span class="n">Const</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">caterpillar._common</span> <span class="kn">import</span> <span class="n">unpack_seq</span><span class="p">,</span> <span class="n">pack_seq</span>
 
@@ -370,6 +371,24 @@
     <span class="k">def</span> <span class="nf">_set_default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">pass</span>
 
+    <span class="k">def</span> <span class="nf">_process_default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">annotation</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="n">default</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">INVALID_DEFAULT</span><span class="p">)</span>
+        <span class="c1"># constant values that are not in the form of fields, structs or types should</span>
+        <span class="c1"># be wrapped into constant values. For more information, see _process_field</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">annotation</span><span class="p">,</span> <span class="n">Field</span><span class="p">):</span>
+            <span class="n">annotation</span> <span class="o">=</span> <span class="n">annotation</span><span class="o">.</span><span class="n">struct</span>
+
+        <span class="k">match</span> <span class="n">annotation</span><span class="p">:</span>
+            <span class="k">case</span> <span class="nb">bytes</span><span class="p">()</span> <span class="o">|</span> <span class="nb">str</span><span class="p">():</span>
+                <span class="n">default</span> <span class="o">=</span> <span class="n">annotation</span>
+            <span class="c1"># Make it possible to define custom constants</span>
+            <span class="k">case</span> <span class="n">Const</span><span class="p">():</span>
+                <span class="n">default</span> <span class="o">=</span> <span class="n">annotation</span><span class="o">.</span><span class="n">value</span>
+
+        <span class="k">if</span> <span class="n">default</span> <span class="o">!=</span> <span class="n">INVALID_DEFAULT</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_default</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">default</span>
+
     <span class="k">def</span> <span class="nf">_replace_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">type_</span><span class="p">:</span> <span class="nb">type</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">pass</span>
 
@@ -385,13 +404,7 @@
         <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">annotation</span> <span class="ow">in</span> <span class="n">annotations</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="c1"># Process each field and its annotation. In addition, fields with a name in</span>
             <span class="c1"># the form of &#39;_[0-9]*&#39; will be removed (if enabled)</span>
-            <span class="n">default</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">INVALID_DEFAULT</span><span class="p">)</span>
-            <span class="c1"># constant values that are not in the form of fields, structs or types should</span>
-            <span class="c1"># be wrapped into constant values. For more information, see _process_field</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">annotation</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
-                <span class="n">default</span> <span class="o">=</span> <span class="n">annotation</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_set_default</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span>
-
+            <span class="n">default</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_default</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">annotation</span><span class="p">)</span>
             <span class="n">is_included</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_included</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">default</span><span class="p">,</span> <span class="n">annotation</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">is_included</span><span class="p">:</span>
                 <span class="n">removables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
@@ -576,7 +589,6 @@
         <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">pack_one</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">is_union</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_union</span>
         <span class="n">max_size</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">union_field</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">_StructLike</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">base_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_PATH</span><span class="p">]</span>
@@ -584,7 +596,7 @@
         <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">:</span>
             <span class="c1"># The name has to be set (important for current context)</span>
             <span class="n">name</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="vm">__name__</span>
-            <span class="k">if</span> <span class="n">is_union</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_union</span><span class="p">:</span>
                 <span class="c1"># Union is only applicable for non-dynamic structs</span>
                 <span class="n">size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">__size__</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">size</span> <span class="o">&gt;</span> <span class="n">max_size</span><span class="p">:</span>
@@ -601,7 +613,7 @@
                     <span class="n">value</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">default</span> <span class="k">if</span> <span class="n">field</span><span class="o">.</span><span class="n">default</span> <span class="o">!=</span> <span class="n">INVALID_DEFAULT</span> <span class="k">else</span> <span class="kc">None</span>
                 <span class="n">field</span><span class="o">.</span><span class="n">__pack__</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">is_union</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_union</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">union_field</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">StructException</span><span class="p">(</span>
                     <span class="s2">&quot;Invalid union config: no fields declared!&quot;</span><span class="p">,</span> <span class="n">context</span>
@@ -622,7 +634,10 @@
             <span class="n">pack_seq</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pack_one</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">ctx</span> <span class="o">=</span> <span class="n">Context</span><span class="p">(</span>
-                <span class="n">_parent</span><span class="o">=</span><span class="n">context</span><span class="p">,</span> <span class="n">_io</span><span class="o">=</span><span class="n">context</span><span class="p">[</span><span class="n">CTX_STREAM</span><span class="p">],</span> <span class="n">_path</span><span class="o">=</span><span class="n">context</span><span class="p">[</span><span class="n">CTX_PATH</span><span class="p">],</span> <span class="n">_obj</span><span class="o">=</span><span class="n">obj</span>
+                <span class="n">_parent</span><span class="o">=</span><span class="n">context</span><span class="p">,</span>
+                <span class="n">_io</span><span class="o">=</span><span class="n">context</span><span class="p">[</span><span class="n">CTX_STREAM</span><span class="p">],</span>
+                <span class="n">_path</span><span class="o">=</span><span class="n">context</span><span class="p">[</span><span class="n">CTX_PATH</span><span class="p">],</span>
+                <span class="n">_obj</span><span class="o">=</span><span class="n">obj</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pack_one</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">ctx</span><span class="p">)</span></div>
 

@@ -17,6 +17,37 @@ the stage for more advanced topics in the next chapter.
 Standard Types
 --------------
 
+Numbers
+^^^^^^^
+
+When dealing with binary data, numbers play a crucial role. Besides the default integer types
+(e.g., uint8, uint16, etc.), *caterpillar* introduces some special integer formats. The default
+types include:
+
+* Unsigned (:code:`u...`) and signed: :attr:`int8`, :attr:`int16`, :attr:`int32` and :attr:`int64`
+* Floating point: :attr:`float32` and :attr:`float64` aka :attr:`double`
+
+Custom-sized integer
+~~~~~~~~~~~~~~~~~~~~
+
+It's also possible to use integers with a custom size (in bits). However, it's important to note
+that you have to define the struct with the bit count, and internally, only the occupied bytes
+will be used. For example:
+
+>>> field = F(Int(24))      # three-byte signed integer
+
+>>> field = F(UInt(40))     # five-byte unsigned integer
+
+
+Variable-sized integer
+~~~~~~~~~~~~~~~~~~~~~~
+
+The built-in struct :class:`VarInt` supports parsing and building integers with variable length. Its
+documentation provides a detailed explanation of all different configurations.
+
+>>> field = F(VarInt)
+
+
 Enumerations
 ^^^^^^^^^^^^
 
@@ -163,6 +194,146 @@ If direct access to the bytes is what you need, the :class:`Bytes` struct comes 
 converts the :code:`memoryview` to :code:`bytes`. Additionally, as mentioned earlier, you can
 use the :class:`Prefixed` class to unpack bytes of a prefixed size.
 
+>>> field = F(Bytes(5)) # static, dynamic and greedy size allowed
 
 
+With the gained knowledge, let's implement the struct for the `fDAT <https://www.w3.org/TR/png/#fdAT-chunk>`_
+chunk of our PNG format. It should look like this:
 
+.. code-block:: python
+    :caption: Implementation for the frame data chunk
+
+    @struct(order=BigEndian)                    # <-- endianess as usual
+    class FDATChunk:
+        sequence_number: uint32
+        # We rather use a memory instance here instead of Bytes()
+        frame_data: Memory(parent.length - 4)
+
+.. admonition:: Challenge
+
+    If you feel ready for a more advanced structure, try implementing the
+    `zTXt <https://www.w3.org/TR/png/#11zTXt>`_ chunk for compressed textual data.
+
+    .. dropdown:: Solution
+
+        .. code-block:: python
+            :caption: Sample implementation of the *zTXt* chunk
+
+            @struct                             # <-- actually, we don't need a specific byteorder
+            class ZTXTChunk:
+                keyword: CString(...)           # <-- variable length
+                compression_method: uint8
+                # Okay, we haven't introduced this struct yet, but Memory() or Bytes()
+                # would heve been okay, too.
+                text: ZLibCompressed(parent.length - lenof(this.keyword) - 1)
+
+
+Padding
+^^^^^^^
+
+In certain scenarios, you may need to apply padding to your structs. *caterpillar* doesn't
+store any data associated with paddings. If you need to retain the content of a padding,
+you can use :class:`Bytes` or :class:`Memory` again. For example:
+
+>>> field = padding[10]  # padding always with a length
+
+
+.. tip::
+    That was a lot of input to take, time for a coffee break! |coffee|
+
+Standard Structs
+----------------
+
+We still have some important struct types to discuss to start defining *complex* structs.
+
+Constants
+^^^^^^^^^
+
+Proprietary file formats or binary formats often store `magic bytes <https://www.garykessler.net/library/file_sigs.html>`_
+usually at the start of the data stream. Constant values will be validated against the parsed
+data and will be applied to the class automatically, eliminating the need to write them into
+the constructor every time.
+
+Currently, there are three different types of constant structs:
+
+ConstBytes
+~~~~~~~~~~
+
+These constants can be defined implicitly by annotating a field in a struct class with bytes.
+For example, in the case of starting the *main* PNG struct:
+
+.. code-block:: python
+    :caption: Starting the *main* PNG struct
+
+    @struct(order=BigEndian) # <-- will be relevant later on
+    class PNG:
+        magic: b"\x89PNG\x0D\x0A\x1A\x0A"
+        # other fields will be defined at the end of this tutorial.
+
+ConstString
+~~~~~~~~~~~
+
+This struct type is essentially the same as :class:`ConstBytes` but uses a string value
+for validation.
+
+Const
+~~~~~
+
+Raw constant values require a struct to be defined to parse or build the value.
+For example:
+
+>>> field = F(Const(0xbeef, uint32))
+
+
+Compression
+^^^^^^^^^^^
+
+This library also supports default compression formats like *zlib*, *lzma*, *bz2* and, if
+installed via pip, *lzo* (using :code:`lzallright`).
+
+>>> field = ZLibCompressed(100) # length or struct here applicable
+
+Specials
+^^^^^^^^
+
+Computed
+~~~~~~~~
+
+A runtime computed variable that does not pack any data.
+
+>>> struct = Computed(this.foobar) # context lambda or constant value
+
+.. admonition:: Challenge
+
+    Implement the `gAMA <https://www.w3.org/TR/png/#11gAMA>`_ chunk for our PNG format and use
+    a :class:`Computed` struct to calculate the real gamma value.
+
+    .. dropdown:: Solution
+
+        .. code-block:: python
+            :caption: Example implementation of the *gAMA* chunk
+
+            @struct(order=BigEndian)    # <-- same as usual
+            class GAMAChunk:
+                gamma: uint32
+                gamma_value: Computed(this.gamma / 100000)
+
+        .. note::
+            Question: Do we really need to introduce the gamma_value using a :class:`Computed` struct here
+            or can we just define a method?
+
+Pass
+~~~~
+
+In case nothing should be done, just use :class:`Pass`.
+
+.. raw:: html
+
+    <hr>
+
+
+.. important::
+    Congratulations! You have successfully mastered the basics of *caterpillar*! Are you
+    ready for the next level? Brace yourself for some breathtaking action!
+
+.. |coffee| unicode:: U+2615

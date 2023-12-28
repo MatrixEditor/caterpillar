@@ -425,7 +425,7 @@ hachoir</label><div class="sd-tab-content docutils">
 </div>
 <input id="sd-tab-item-4" name="sd-tab-set-0" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-4">
-mrcrwobar</label><div class="sd-tab-content docutils">
+mrcrowbar</label><div class="sd-tab-content docutils">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mrcrowbar.fields</span> <span class="kn">import</span> <span class="n">Bits8</span><span class="p">,</span> <span class="n">UInt24_LE</span><span class="p">,</span> <span class="n">UInt32_LE</span><span class="p">,</span> <span class="n">BlockField</span><span class="p">,</span> <span class="n">UInt8</span>
 <span class="kn">from</span> <span class="nn">mrcrowbar.models</span> <span class="kn">import</span> <span class="n">Block</span><span class="p">,</span> <span class="n">CString</span><span class="p">,</span> <span class="n">CStringN</span>
 <span class="kn">from</span> <span class="nn">mrcrowbar.refs</span> <span class="kn">import</span> <span class="n">Ref</span>
@@ -454,6 +454,11 @@ scores with the fastest time since it directly reads all data from the stream. <
 and Construct show similar performance in their initial form. The compilation feature of
 Construct makes it comparable to Kaitai, but since compilation is not a primary goal of
 <em>caterpillar</em>, these results are not considered.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>All tests have been performed on a Windows VM with the latest stable python implementation (
+<code class="code docutils literal notranslate"><span class="pre">Python</span> <span class="pre">3.12.1</span> <span class="pre">(tags/v3.12.1:2305ca5)</span> <span class="pre">[MSC</span> <span class="pre">v.1937</span> <span class="pre">64</span> <span class="pre">bit</span> <span class="pre">(AMD64)]</span> <span class="pre">on</span> <span class="pre">win32</span></code>)</p>
+</div>
 <div class="sd-tab-set docutils">
 <input checked="checked" id="sd-tab-item-5" name="sd-tab-set-1" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-5">
@@ -462,8 +467,8 @@ caterpillar</label><div class="sd-tab-content docutils">
 <div class="code-block-caption"><span class="caption-text">caterpillar</span><a class="headerlink" href="#id6" title="Link to this code">#</a></div>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(venv-3.12.1)</span><span class="go">&gt; python3 ./examples/comparison/comparison_1_caterpillar.py ./blob</span>
 <span class="go">Timeit measurements:</span>
-<span class="go">unpack 0.0115265591 sec/call        # +- 0.0004 sec</span>
-<span class="go">pack   0.0104318993 sec/call        # +- 0.0002 sec</span>
+<span class="go">unpack 0.0106435117 sec/call</span>
+<span class="go">pack   0.0088008424 sec/call</span>
 </pre></div>
 </div>
 </div>
@@ -511,9 +516,9 @@ hachoir</label><div class="sd-tab-content docutils">
 </div>
 <input id="sd-tab-item-9" name="sd-tab-set-1" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-9">
-mrcrwobar</label><div class="sd-tab-content docutils">
+mrcrowbar</label><div class="sd-tab-content docutils">
 <div class="literal-block-wrapper docutils container" id="id10">
-<div class="code-block-caption"><span class="caption-text">mrcrwobar</span><a class="headerlink" href="#id10" title="Link to this code">#</a></div>
+<div class="code-block-caption"><span class="caption-text">mrcrowbar</span><a class="headerlink" href="#id10" title="Link to this code">#</a></div>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(venv-3.12.1)</span><span class="go">&gt; python3 ./examples/comparison/comparison_1_mrcrowbar.py ./blob</span>
 <span class="go">Parsing measurements:</span>
 <span class="go">default  0.0555872261 sec/call</span>
@@ -525,12 +530,12 @@ mrcrwobar</label><div class="sd-tab-content docutils">
 </div>
 </div>
 </div>
-<p>In this benchmark, <em>caterpillar</em> demonstrates a performance advantage, being approximately <span class="sd-sphinx-override sd-badge sd-bg-success sd-bg-text-success">19.76%</span>
-faster in unpacking data and approximately <span class="sd-sphinx-override sd-badge sd-bg-success sd-bg-text-success">18.36%</span> faster in packing data compared to Construct
+<p>In this benchmark, <em>caterpillar</em> demonstrates a performance advantage, being approximately <span class="sd-sphinx-override sd-badge sd-bg-success sd-bg-text-success">25.91%</span>
+faster in unpacking data and approximately <span class="sd-sphinx-override sd-badge sd-bg-success sd-bg-text-success">31.12%</span> faster in packing data compared to Construct
 (<em>not compiled</em>).</p>
 <p>In the <strong>compiled</strong> Construct test, <em>caterpillar</em> shows a performance difference compared to Construct. Specifically,
-<em>caterpillar</em> is approximately <span class="sd-sphinx-override sd-badge sd-bg-danger sd-bg-text-danger">34.48%</span> slower in unpacking data and approximately
-<span class="sd-sphinx-override sd-badge sd-bg-warning sd-bg-text-warning">4.76%</span> slower in packing data. It’s important to note that these figures reflect a trade-off between
+<em>caterpillar</em> is approximately <span class="sd-sphinx-override sd-badge sd-bg-danger sd-bg-text-danger">24.18%</span> slower in unpacking data, but approximately
+<span class="sd-sphinx-override sd-badge sd-bg-success sd-bg-text-success">11.61%</span> <strong>faster</strong> in packing data. It’s important to note that these figures reflect a trade-off between
 performance and other considerations such as simplicity and ease of use.</p>
 <aside class="footnote-list brackets">
 <aside class="footnote brackets" id="id4" role="doc-footnote">

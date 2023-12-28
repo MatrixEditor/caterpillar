@@ -225,8 +225,38 @@ objects:</p>
 </div>
 <section id="standard-types">
 <h2><span class="section-number">2.1. </span>Standard Types<a class="headerlink" href="#standard-types" title="Link to this heading">#</a></h2>
+<section id="numbers">
+<h3><span class="section-number">2.1.1. </span>Numbers<a class="headerlink" href="#numbers" title="Link to this heading">#</a></h3>
+<p>When dealing with binary data, numbers play a crucial role. Besides the default integer types
+(e.g., uint8, uint16, etc.), <em>caterpillar</em> introduces some special integer formats. The default
+types include:</p>
+<ul class="simple">
+<li><p>Unsigned (<code class="code docutils literal notranslate"><span class="pre">u...</span></code>) and signed: <code class="xref py py-attr docutils literal notranslate"><span class="pre">int8</span></code>, <code class="xref py py-attr docutils literal notranslate"><span class="pre">int16</span></code>, <code class="xref py py-attr docutils literal notranslate"><span class="pre">int32</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">int64</span></code></p></li>
+<li><p>Floating point: <code class="xref py py-attr docutils literal notranslate"><span class="pre">float32</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">float64</span></code> aka <code class="xref py py-attr docutils literal notranslate"><span class="pre">double</span></code></p></li>
+</ul>
+<section id="custom-sized-integer">
+<h4><span class="section-number">2.1.1.1. </span>Custom-sized integer<a class="headerlink" href="#custom-sized-integer" title="Link to this heading">#</a></h4>
+<p>It’s also possible to use integers with a custom size (in bits). However, it’s important to note
+that you have to define the struct with the bit count, and internally, only the occupied bytes
+will be used. For example:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">F</span><span class="p">(</span><span class="n">Int</span><span class="p">(</span><span class="mi">24</span><span class="p">))</span>      <span class="c1"># three-byte signed integer</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">F</span><span class="p">(</span><span class="n">UInt</span><span class="p">(</span><span class="mi">40</span><span class="p">))</span>     <span class="c1"># five-byte unsigned integer</span>
+</pre></div>
+</div>
+</section>
+<section id="variable-sized-integer">
+<h4><span class="section-number">2.1.1.2. </span>Variable-sized integer<a class="headerlink" href="#variable-sized-integer" title="Link to this heading">#</a></h4>
+<p>The built-in struct <code class="xref py py-class docutils literal notranslate"><span class="pre">VarInt</span></code> supports parsing and building integers with variable length. Its
+documentation provides a detailed explanation of all different configurations.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">F</span><span class="p">(</span><span class="n">VarInt</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
 <section id="enumerations">
-<h3><span class="section-number">2.1.1. </span>Enumerations<a class="headerlink" href="#enumerations" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">2.1.2. </span>Enumerations<a class="headerlink" href="#enumerations" title="Link to this heading">#</a></h3>
 <p>Enums are essential when working with binary file formats, and <em>caterpillar</em> integrates
 standard Python enumerations - classes extending  <code class="code docutils literal notranslate"><span class="pre">enum.Enum</span></code> - with ease.</p>
 <p>Let’s revisit <a class="reference external" href="https://www.w3.org/TR/png/#11pHYs">pHYS</a> chunk to add an enum to the
@@ -255,7 +285,7 @@ will be triggered.</p>
 </div>
 </section>
 <section id="arrays-lists">
-<h3><span class="section-number">2.1.2. </span>Arrays/Lists<a class="headerlink" href="#arrays-lists" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">2.1.3. </span>Arrays/Lists<a class="headerlink" href="#arrays-lists" title="Link to this heading">#</a></h3>
 <p>Binary formats often require storing multiple objects of the same type sequentially. <em>Caterpillar</em>
 simplifies this with item access for defining arrays of static or dynamic size.</p>
 <p>We started with the <a class="reference external" href="https://www.w3.org/TR/png/#11PLTE">PLTE</a> chunk, which stores three-byte
@@ -268,9 +298,9 @@ length is calculated based on the chunk’s length field divided by three becaus
 occupies three bytes.</p>
 </section>
 <section id="string-types">
-<h3><span class="section-number">2.1.3. </span>String Types<a class="headerlink" href="#string-types" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">2.1.4. </span>String Types<a class="headerlink" href="#string-types" title="Link to this heading">#</a></h3>
 <section id="cstring">
-<h4><span class="section-number">2.1.3.1. </span>CString<a class="headerlink" href="#cstring" title="Link to this heading">#</a></h4>
+<h4><span class="section-number">2.1.4.1. </span>CString<a class="headerlink" href="#cstring" title="Link to this heading">#</a></h4>
 <p>The CString in this library extends beyond a mere reference to C strings. It provides
 additional functionality, as demonstrated in the structure of the next chunk.</p>
 <div class="literal-block-wrapper docutils container" id="id2">
@@ -323,7 +353,7 @@ additional functionality, as demonstrated in the structure of the next chunk.</p
 padding bytes.</p>
 </section>
 <section id="string">
-<h4><span class="section-number">2.1.3.2. </span>String<a class="headerlink" href="#string" title="Link to this heading">#</a></h4>
+<h4><span class="section-number">2.1.4.2. </span>String<a class="headerlink" href="#string" title="Link to this heading">#</a></h4>
 <p>Besides special the special <em>c strings</em> there’s a default <code class="xref py py-class docutils literal notranslate"><span class="pre">String</span></code> class that implements
 the basic behaviour of a string. It’s crucial to specify the length for this struct.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span> <span class="o">=</span> <span class="n">String</span><span class="p">(</span><span class="mi">100</span> <span class="ow">or</span> <span class="n">this</span><span class="o">.</span><span class="n">length</span><span class="p">)</span> <span class="c1"># static integer or context lambda</span>
@@ -331,7 +361,7 @@ the basic behaviour of a string. It’s crucial to specify the length for this s
 </div>
 </section>
 <section id="prefixed">
-<h4><span class="section-number">2.1.3.3. </span>Prefixed<a class="headerlink" href="#prefixed" title="Link to this heading">#</a></h4>
+<h4><span class="section-number">2.1.4.3. </span>Prefixed<a class="headerlink" href="#prefixed" title="Link to this heading">#</a></h4>
 <p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">Prefixed</span></code> class introduces so-called <em>Pascal strings</em> for raw bytes and strings. If no
 encoding is specified, the returned value will be of type <code class="code docutils literal notranslate"><span class="pre">bytes</span></code>. This class reads a length
 using the given struct and then retrieves the corresponding number of bytes from the stream returned
@@ -346,9 +376,9 @@ by that struct.</p>
 </section>
 </section>
 <section id="byte-sequences">
-<h3><span class="section-number">2.1.4. </span>Byte Sequences<a class="headerlink" href="#byte-sequences" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">2.1.5. </span>Byte Sequences<a class="headerlink" href="#byte-sequences" title="Link to this heading">#</a></h3>
 <section id="memory">
-<h4><span class="section-number">2.1.4.1. </span>Memory<a class="headerlink" href="#memory" title="Link to this heading">#</a></h4>
+<h4><span class="section-number">2.1.5.1. </span>Memory<a class="headerlink" href="#memory" title="Link to this heading">#</a></h4>
 <p>When dealing with data that can be stored in memory and you intend to print out your
 unpacked object, the <code class="xref py py-class docutils literal notranslate"><span class="pre">Memory</span></code> struct is recommended.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">F</span><span class="p">(</span><span class="n">Memory</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span> <span class="c1"># static size; dynamic size is allowed too</span>
@@ -360,10 +390,156 @@ unpacked object, the <code class="xref py py-class docutils literal notranslate"
 </div>
 </section>
 <section id="bytes">
-<h4><span class="section-number">2.1.4.2. </span>Bytes<a class="headerlink" href="#bytes" title="Link to this heading">#</a></h4>
+<h4><span class="section-number">2.1.5.2. </span>Bytes<a class="headerlink" href="#bytes" title="Link to this heading">#</a></h4>
 <p>If direct access to the bytes is what you need, the <code class="xref py py-class docutils literal notranslate"><span class="pre">Bytes</span></code> struct comes in handy. It
 converts the <code class="code docutils literal notranslate"><span class="pre">memoryview</span></code> to <code class="code docutils literal notranslate"><span class="pre">bytes</span></code>. Additionally, as mentioned earlier, you can
 use the <code class="xref py py-class docutils literal notranslate"><span class="pre">Prefixed</span></code> class to unpack bytes of a prefixed size.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">F</span><span class="p">(</span><span class="n">Bytes</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span> <span class="c1"># static, dynamic and greedy size allowed</span>
+</pre></div>
+</div>
+<p>With the gained knowledge, let’s implement the struct for the <a class="reference external" href="https://www.w3.org/TR/png/#fdAT-chunk">fDAT</a>
+chunk of our PNG format. It should look like this:</p>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">Implementation for the frame data chunk</span><a class="headerlink" href="#id3" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span>                    <span class="c1"># &lt;-- endianess as usual</span>
+<span class="k">class</span> <span class="nc">FDATChunk</span><span class="p">:</span>
+    <span class="n">sequence_number</span><span class="p">:</span> <span class="n">uint32</span>
+    <span class="c1"># We rather use a memory instance here instead of Bytes()</span>
+    <span class="n">frame_data</span><span class="p">:</span> <span class="n">Memory</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">length</span> <span class="o">-</span> <span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition-challenge admonition">
+<p class="admonition-title">Challenge</p>
+<p>If you feel ready for a more advanced structure, try implementing the
+<a class="reference external" href="https://www.w3.org/TR/png/#11zTXt">zTXt</a> chunk for compressed textual data.</p>
+<details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+Solution<div class="sd-summary-down docutils">
+<svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-down" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M5.22 8.72a.75.75 0 000 1.06l6.25 6.25a.75.75 0 001.06 0l6.25-6.25a.75.75 0 00-1.06-1.06L12 14.44 6.28 8.72a.75.75 0 00-1.06 0z"></path></svg></div>
+<div class="sd-summary-up docutils">
+<svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-up" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M18.78 15.28a.75.75 0 000-1.06l-6.25-6.25a.75.75 0 00-1.06 0l-6.25 6.25a.75.75 0 101.06 1.06L12 9.56l5.72 5.72a.75.75 0 001.06 0z"></path></svg></div>
+</summary><div class="sd-summary-content sd-card-body docutils">
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">Sample implementation of the <em>zTXt</em> chunk</span><a class="headerlink" href="#id4" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>                             <span class="c1"># &lt;-- actually, we don&#39;t need a specific byteorder</span>
+<span class="k">class</span> <span class="nc">ZTXTChunk</span><span class="p">:</span>
+    <span class="n">keyword</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>           <span class="c1"># &lt;-- variable length</span>
+    <span class="n">compression_method</span><span class="p">:</span> <span class="n">uint8</span>
+    <span class="c1"># Okay, we haven&#39;t introduced this struct yet, but Memory() or Bytes()</span>
+    <span class="c1"># would heve been okay, too.</span>
+    <span class="n">text</span><span class="p">:</span> <span class="n">ZLibCompressed</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">length</span> <span class="o">-</span> <span class="n">lenof</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">keyword</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</details></div>
+</section>
+</section>
+<section id="padding">
+<h3><span class="section-number">2.1.6. </span>Padding<a class="headerlink" href="#padding" title="Link to this heading">#</a></h3>
+<p>In certain scenarios, you may need to apply padding to your structs. <em>caterpillar</em> doesn’t
+store any data associated with paddings. If you need to retain the content of a padding,
+you can use <code class="xref py py-class docutils literal notranslate"><span class="pre">Bytes</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">Memory</span></code> again. For example:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">padding</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span>  <span class="c1"># padding always with a length</span>
+</pre></div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>That was a lot of input to take, time for a coffee break! ☕</p>
+</div>
+</section>
+</section>
+<section id="standard-structs">
+<h2><span class="section-number">2.2. </span>Standard Structs<a class="headerlink" href="#standard-structs" title="Link to this heading">#</a></h2>
+<p>We still have some important struct types to discuss to start defining <em>complex</em> structs.</p>
+<section id="constants">
+<h3><span class="section-number">2.2.1. </span>Constants<a class="headerlink" href="#constants" title="Link to this heading">#</a></h3>
+<p>Proprietary file formats or binary formats often store <a class="reference external" href="https://www.garykessler.net/library/file_sigs.html">magic bytes</a>
+usually at the start of the data stream. Constant values will be validated against the parsed
+data and will be applied to the class automatically, eliminating the need to write them into
+the constructor every time.</p>
+<p>Currently, there are three different types of constant structs:</p>
+<section id="constbytes">
+<h4><span class="section-number">2.2.1.1. </span>ConstBytes<a class="headerlink" href="#constbytes" title="Link to this heading">#</a></h4>
+<p>These constants can be defined implicitly by annotating a field in a struct class with bytes.
+For example, in the case of starting the <em>main</em> PNG struct:</p>
+<div class="literal-block-wrapper docutils container" id="id5">
+<div class="code-block-caption"><span class="caption-text">Starting the <em>main</em> PNG struct</span><a class="headerlink" href="#id5" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span> <span class="c1"># &lt;-- will be relevant later on</span>
+<span class="k">class</span> <span class="nc">PNG</span><span class="p">:</span>
+    <span class="n">magic</span><span class="p">:</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x89</span><span class="s2">PNG</span><span class="se">\x0D\x0A\x1A\x0A</span><span class="s2">&quot;</span>
+    <span class="c1"># other fields will be defined at the end of this tutorial.</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="conststring">
+<h4><span class="section-number">2.2.1.2. </span>ConstString<a class="headerlink" href="#conststring" title="Link to this heading">#</a></h4>
+<p>This struct type is essentially the same as <code class="xref py py-class docutils literal notranslate"><span class="pre">ConstBytes</span></code> but uses a string value
+for validation.</p>
+</section>
+<section id="const">
+<h4><span class="section-number">2.2.1.3. </span>Const<a class="headerlink" href="#const" title="Link to this heading">#</a></h4>
+<p>Raw constant values require a struct to be defined to parse or build the value.
+For example:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">F</span><span class="p">(</span><span class="n">Const</span><span class="p">(</span><span class="mh">0xbeef</span><span class="p">,</span> <span class="n">uint32</span><span class="p">))</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="compression">
+<h3><span class="section-number">2.2.2. </span>Compression<a class="headerlink" href="#compression" title="Link to this heading">#</a></h3>
+<p>This library also supports default compression formats like <em>zlib</em>, <em>lzma</em>, <em>bz2</em> and, if
+installed via pip, <em>lzo</em> (using <code class="code docutils literal notranslate"><span class="pre">lzallright</span></code>).</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">ZLibCompressed</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span> <span class="c1"># length or struct here applicable</span>
+</pre></div>
+</div>
+</section>
+<section id="specials">
+<h3><span class="section-number">2.2.3. </span>Specials<a class="headerlink" href="#specials" title="Link to this heading">#</a></h3>
+<section id="computed">
+<h4><span class="section-number">2.2.3.1. </span>Computed<a class="headerlink" href="#computed" title="Link to this heading">#</a></h4>
+<p>A runtime computed variable that does not pack any data.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span> <span class="o">=</span> <span class="n">Computed</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">foobar</span><span class="p">)</span> <span class="c1"># context lambda or constant value</span>
+</pre></div>
+</div>
+<div class="admonition-challenge admonition">
+<p class="admonition-title">Challenge</p>
+<p>Implement the <a class="reference external" href="https://www.w3.org/TR/png/#11gAMA">gAMA</a> chunk for our PNG format and use
+a <code class="xref py py-class docutils literal notranslate"><span class="pre">Computed</span></code> struct to calculate the real gamma value.</p>
+<details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+Solution<div class="sd-summary-down docutils">
+<svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-down" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M5.22 8.72a.75.75 0 000 1.06l6.25 6.25a.75.75 0 001.06 0l6.25-6.25a.75.75 0 00-1.06-1.06L12 14.44 6.28 8.72a.75.75 0 00-1.06 0z"></path></svg></div>
+<div class="sd-summary-up docutils">
+<svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-up" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M18.78 15.28a.75.75 0 000-1.06l-6.25-6.25a.75.75 0 00-1.06 0l-6.25 6.25a.75.75 0 101.06 1.06L12 9.56l5.72 5.72a.75.75 0 001.06 0z"></path></svg></div>
+</summary><div class="sd-summary-content sd-card-body docutils">
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-text">Example implementation of the <em>gAMA</em> chunk</span><a class="headerlink" href="#id6" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span>    <span class="c1"># &lt;-- same as usual</span>
+<span class="k">class</span> <span class="nc">GAMAChunk</span><span class="p">:</span>
+    <span class="n">gamma</span><span class="p">:</span> <span class="n">uint32</span>
+    <span class="n">gamma_value</span><span class="p">:</span> <span class="n">Computed</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">gamma</span> <span class="o">/</span> <span class="mi">100000</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p class="sd-card-text">Question: Do we really need to introduce the gamma_value using a <code class="xref py py-class docutils literal notranslate"><span class="pre">Computed</span></code> struct here
+or can we just define a method?</p>
+</div>
+</div>
+</details></div>
+</section>
+<section id="pass">
+<h4><span class="section-number">2.2.3.2. </span>Pass<a class="headerlink" href="#pass" title="Link to this heading">#</a></h4>
+<p>In case nothing should be done, just use <code class="xref py py-class docutils literal notranslate"><span class="pre">Pass</span></code>.</p>
+<hr><div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Congratulations! You have successfully mastered the basics of <em>caterpillar</em>! Are you
+ready for the next level? Brace yourself for some breathtaking action!</p>
+</div>
 </section>
 </section>
 </section>
@@ -426,17 +602,38 @@ use the <code class="xref py py-class docutils literal notranslate"><span class=
             <ul>
 <li><a class="reference internal" href="#">2. Basic Concepts</a><ul>
 <li><a class="reference internal" href="#standard-types">2.1. Standard Types</a><ul>
-<li><a class="reference internal" href="#enumerations">2.1.1. Enumerations</a></li>
-<li><a class="reference internal" href="#arrays-lists">2.1.2. Arrays/Lists</a></li>
-<li><a class="reference internal" href="#string-types">2.1.3. String Types</a><ul>
-<li><a class="reference internal" href="#cstring">2.1.3.1. CString</a></li>
-<li><a class="reference internal" href="#string">2.1.3.2. String</a></li>
-<li><a class="reference internal" href="#prefixed">2.1.3.3. Prefixed</a></li>
+<li><a class="reference internal" href="#numbers">2.1.1. Numbers</a><ul>
+<li><a class="reference internal" href="#custom-sized-integer">2.1.1.1. Custom-sized integer</a></li>
+<li><a class="reference internal" href="#variable-sized-integer">2.1.1.2. Variable-sized integer</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#byte-sequences">2.1.4. Byte Sequences</a><ul>
-<li><a class="reference internal" href="#memory">2.1.4.1. Memory</a></li>
-<li><a class="reference internal" href="#bytes">2.1.4.2. Bytes</a></li>
+<li><a class="reference internal" href="#enumerations">2.1.2. Enumerations</a></li>
+<li><a class="reference internal" href="#arrays-lists">2.1.3. Arrays/Lists</a></li>
+<li><a class="reference internal" href="#string-types">2.1.4. String Types</a><ul>
+<li><a class="reference internal" href="#cstring">2.1.4.1. CString</a></li>
+<li><a class="reference internal" href="#string">2.1.4.2. String</a></li>
+<li><a class="reference internal" href="#prefixed">2.1.4.3. Prefixed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#byte-sequences">2.1.5. Byte Sequences</a><ul>
+<li><a class="reference internal" href="#memory">2.1.5.1. Memory</a></li>
+<li><a class="reference internal" href="#bytes">2.1.5.2. Bytes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#padding">2.1.6. Padding</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#standard-structs">2.2. Standard Structs</a><ul>
+<li><a class="reference internal" href="#constants">2.2.1. Constants</a><ul>
+<li><a class="reference internal" href="#constbytes">2.2.1.1. ConstBytes</a></li>
+<li><a class="reference internal" href="#conststring">2.2.1.2. ConstString</a></li>
+<li><a class="reference internal" href="#const">2.2.1.3. Const</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#compression">2.2.2. Compression</a></li>
+<li><a class="reference internal" href="#specials">2.2.3. Specials</a><ul>
+<li><a class="reference internal" href="#computed">2.2.3.1. Computed</a></li>
+<li><a class="reference internal" href="#pass">2.2.3.2. Pass</a></li>
 </ul>
 </li>
 </ul>
