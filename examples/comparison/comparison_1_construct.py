@@ -1,7 +1,3 @@
-import timeit
-import sys
-
-from rich import print
 from construct import *
 
 d = Struct(
@@ -47,19 +43,28 @@ d_compiled = d.compile()
 # with open("blob", "wb") as f:
 #     f.write(data)
 
-with open(sys.argv[1], "rb") as fp:
-    data = fp.read()
+if __name__ == "__main__":
+    import sys
+    import timeit
 
-obj = d.parse(data)
-time = timeit.timeit(lambda: d.parse(data), number=1000) / 1000
-time_compiled = timeit.timeit(lambda: d_compiled.parse(data), number=1000) / 1000
-print("[bold]Parsing measurements:[/]")
-print(f"[bold]default[/]  {time:.10f} sec/call")
-print(f"[bold]compiled[/] {time_compiled:.10f} sec/call\n")
+    try:
+        from rich import print
+    except ImportError:
+        pass
 
-btime = timeit.timeit(lambda: d.build(obj), number=1000) / 1000
-btime_compiled = timeit.timeit(lambda: d_compiled.build(obj), number=1000) / 1000
+    with open(sys.argv[1], "rb") as fp:
+        data = fp.read()
 
-print("[bold]Building measurements:[/]")
-print(f"[bold]default[/]  {btime:.10f} sec/call")
-print(f"[bold]compiled[/] {btime_compiled:.10f} sec/call")
+    obj = d.parse(data)
+    time = timeit.timeit(lambda: d.parse(data), number=1000) / 1000
+    time_compiled = timeit.timeit(lambda: d_compiled.parse(data), number=1000) / 1000
+    print("[bold]Parsing measurements:[/]")
+    print(f"[bold]default[/]  {time:.10f} sec/call")
+    print(f"[bold]compiled[/] {time_compiled:.10f} sec/call\n")
+
+    btime = timeit.timeit(lambda: d.build(obj), number=1000) / 1000
+    btime_compiled = timeit.timeit(lambda: d_compiled.build(obj), number=1000) / 1000
+
+    print("[bold]Building measurements:[/]")
+    print(f"[bold]default[/]  {btime:.10f} sec/call")
+    print(f"[bold]compiled[/] {btime_compiled:.10f} sec/call")

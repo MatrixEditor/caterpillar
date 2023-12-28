@@ -1,8 +1,3 @@
-import sys
-import timeit
-
-from rich import print
-
 from caterpillar.shortcuts import struct, LittleEndian, bitfield, unpack, pack
 from caterpillar.fields import uint8, UInt, CString, Prefixed, uint32
 
@@ -31,13 +26,22 @@ class Item:
 
 Format = LittleEndian + Item[uint32::]
 
-with open(sys.argv[1], "rb") as fp:
-    data = fp.read()
+if __name__ == '__main__':
+    import sys
+    import timeit
 
-obj = unpack(Format, data)
-time = timeit.timeit(lambda: unpack(Format, data), number=1000) / 1000
-print("[bold]Timeit measurements:[/]")
-print(f"[bold]unpack[/] {time:.10f} sec/call")
+    try:
+        from rich import print
+    except ImportError:
+        pass
 
-ptime = timeit.timeit(lambda: pack(obj, Format), number=1000) / 1000
-print(f"[bold]pack[/]   {ptime:.10f} sec/call")
+    with open(sys.argv[1], "rb") as fp:
+        data = fp.read()
+
+    obj = unpack(Format, data)
+    time = timeit.timeit(lambda: unpack(Format, data), number=1000) / 1000
+    print("[bold]Timeit measurements:[/]")
+    print(f"[bold]unpack[/] {time:.10f} sec/call")
+
+    ptime = timeit.timeit(lambda: pack(obj, Format), number=1000) / 1000
+    print(f"[bold]pack[/]   {ptime:.10f} sec/call")

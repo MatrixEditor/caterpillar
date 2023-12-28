@@ -1,10 +1,5 @@
 # This is a generated file! Please edit source .ksy file and use kaitai-struct-compiler to rebuild
-
-import timeit
-import sys
 import kaitaistruct
-
-from rich import print
 from kaitaistruct import KaitaiStruct, KaitaiStream, BytesIO
 
 
@@ -67,10 +62,18 @@ class Comparison1Kaitai(KaitaiStruct):
             return getattr(self, '_m_num2', None)
 
 
+if __name__ == '__main__':
+    import sys
+    import timeit
 
-with open(sys.argv[1], "rb") as fp:
-    data = fp.read()
+    try:
+        from rich import print
+    except ImportError:
+        pass
 
-time = timeit.timeit(lambda: Comparison1Kaitai.from_bytes(data), number=1000) / 1000
-print("[bold]Parsing measurements:[/]")
-print(f"[bold]default[/]  {time:.10f} sec/call")
+    with open(sys.argv[1], "rb") as fp:
+        data = fp.read()
+
+    time = timeit.timeit(lambda: Comparison1Kaitai.from_bytes(data), number=1000) / 1000
+    print("[bold]Parsing measurements:[/]")
+    print(f"[bold]default[/]  {time:.10f} sec/call")
