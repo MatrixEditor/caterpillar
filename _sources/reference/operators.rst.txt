@@ -109,8 +109,8 @@ called on a field object.
         This operator is not applicable on raw struct classes. Therefore, the class has to be turned into
         a field first. A shortcut can help you with that.
 
-        >>> from caterpillar.fields import Field as _
-        >>> field = _(Format) @ 0x1233
+        >>> from caterpillar.shortcuts import F
+        >>> field = F(Format) @ 0x1233
 
 
 .. function:: struct.__floordiv__(self, condition)

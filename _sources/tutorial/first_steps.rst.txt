@@ -60,7 +60,7 @@ arguments. Defaults or constant values are automatically applied, removing conce
 Packing data
 ^^^^^^^^^^^^
 
-This library packing and unpacking is similar to Python's `struct <https://docs.python.org/3/library/struct.html>`_
+This library's packing and unpacking is similar to Python's `struct <https://docs.python.org/3/library/struct.html>`_
 module. In order to pack data, we need a struct and an input object. When packing data, a struct and an input
 object are needed.
 
@@ -108,9 +108,10 @@ configure the struct to correctly decode these integer fields.
 If your structs depend on the architecture associated with the binary, you can also specify a
 struct-wide :class:`Arch`.
 
-.. admonition:: Exercise
+.. admonition:: Challenge
 
-    Try to implement the struct for the `tIME <https://www.w3.org/TR/png/#11tIME>`_ chunk.
+    You can try to implement the struct for the `tIME <https://www.w3.org/TR/png/#11tIME>`_ chunk
+    as a challenge.
 
     .. dropdown:: Solution
         :icon: check
@@ -119,13 +120,15 @@ struct-wide :class:`Arch`.
             :caption: Example implementation
 
             @struct(order=BigEndian)
-            class TimeChunk:
+            class TIMEChunk:
                 year: uint16        # <-- we could also use: BigEndian + uint16
                 month: uint8
                 day: uint8
                 hour: uint8
                 minute: uint8
                 second: uint8
+
+    Note that we can integrate this truct later on.
 
 Next Steps
 ----------

@@ -267,7 +267,7 @@ supporting standard field definitions <em>after</em> fields with default values.
 arguments. Defaults or constant values are automatically applied, removing concerns about them.</p>
 <section id="packing-data">
 <h3><span class="section-number">1.2.1. </span>Packing data<a class="headerlink" href="#packing-data" title="Link to this heading">#</a></h3>
-<p>This library packing and unpacking is similar to Python’s <a class="reference external" href="https://docs.python.org/3/library/struct.html">struct</a>
+<p>This library’s packing and unpacking is similar to Python’s <a class="reference external" href="https://docs.python.org/3/library/struct.html">struct</a>
 module. In order to pack data, we need a struct and an input object. When packing data, a struct and an input
 object are needed.</p>
 <p>Thanks to the RGB class encapsulating its struct instance, explicitly stating the struct to use
@@ -312,9 +312,10 @@ configure the struct to correctly decode these integer fields.</p>
 </div>
 <p>If your structs depend on the architecture associated with the binary, you can also specify a
 struct-wide <code class="xref py py-class docutils literal notranslate"><span class="pre">Arch</span></code>.</p>
-<div class="admonition-exercise admonition">
-<p class="admonition-title">Exercise</p>
-<p>Try to implement the struct for the <a class="reference external" href="https://www.w3.org/TR/png/#11tIME">tIME</a> chunk.</p>
+<div class="admonition-challenge admonition">
+<p class="admonition-title">Challenge</p>
+<p>You can try to implement the struct for the <a class="reference external" href="https://www.w3.org/TR/png/#11tIME">tIME</a> chunk
+as a challenge.</p>
 <details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
 <summary class="sd-summary-title sd-card-header">
 <span class="sd-summary-icon"><svg version="1.1" width="1.0em" height="1.0em" class="sd-octicon sd-octicon-check" viewBox="0 0 16 16" aria-hidden="true"><path fill-rule="evenodd" d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path></svg></span>Solution<div class="sd-summary-down docutils">
@@ -325,7 +326,7 @@ struct-wide <code class="xref py py-class docutils literal notranslate"><span cl
 <div class="literal-block-wrapper docutils container" id="id6">
 <div class="code-block-caption"><span class="caption-text">Example implementation</span><a class="headerlink" href="#id6" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">TimeChunk</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">TIMEChunk</span><span class="p">:</span>
     <span class="n">year</span><span class="p">:</span> <span class="n">uint16</span>        <span class="c1"># &lt;-- we could also use: BigEndian + uint16</span>
     <span class="n">month</span><span class="p">:</span> <span class="n">uint8</span>
     <span class="n">day</span><span class="p">:</span> <span class="n">uint8</span>
@@ -336,7 +337,8 @@ struct-wide <code class="xref py py-class docutils literal notranslate"><span cl
 </div>
 </div>
 </div>
-</details></div>
+</details><p>Note that we can integrate this truct later on.</p>
+</div>
 </section>
 <section id="next-steps">
 <h2><span class="section-number">1.4. </span>Next Steps<a class="headerlink" href="#next-steps" title="Link to this heading">#</a></h2>
