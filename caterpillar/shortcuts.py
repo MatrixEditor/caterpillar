@@ -20,6 +20,8 @@ from .model import bitfield, Sequence as Seq
 from .context import ContextPath, this, ctx, parent, ContextLength as lenof
 from .byteorder import LittleEndian, BigEndian
 
+from .fields import Field as F
+
 from . import options as opt
 
 

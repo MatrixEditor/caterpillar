@@ -16,16 +16,19 @@ class Format:
     _1  : 3             # unnamed padding to the rest of the byte
 
 print(Format.__struct__)
-obj = unpack(Format, b"\x01\x01")
+obj = unpack(Format, b"\x80\x80")
 print(obj)
-# prints: Format(b1=True, b2='1', b3=0, _1=0)
-# because:       0000000100000001
-# breakdown is:  \_/\_/\/\_____/|
-#                 u b3 b2   a   b1
+# prints: Format(b1=True, b2='2', b3=0, _1=0)
+# real_pos:      0123456701234567
+# bit_pos:       7654321076543210
+#                ---------------- # right to left
+# because:       1000000010000000
+# breakdown is:  |\_____/\/\_/\_/
+#                b1  a   b2 b3 u
 # where 'u' marks unused bits (the field name starts with an underscore and
 # contains only numbers). The field named '_' is a special definition for
 # alignment, missing bits will be added automatically (marked with 'a' in
 # breakdown).
 
 print(pack(obj))
-# prints: b'\x01\x01'
+# prints: b'\x80\x80'

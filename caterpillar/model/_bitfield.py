@@ -251,9 +251,10 @@ class BitField(Struct):
             # each group specifies the fields we are about to unpack. But first, we have
             # to read the bits from the stream
             order = "little" if self.order == LittleEndian else "big"
-            value = int.from_bytes(stream.read(group.size // 8), byteorder=order)
+            data = stream.read(group.size // 8)
+            value = int.from_bytes(data, byteorder=order)
 
-            for bit_info, field in group.fields.items():
+            for bit_info, field in reversed(group.fields.items()):
                 name: str = field.get_name()
                 context[CTX_PATH] = ".".join([base_path, f"<{i}>", name])
                 pos, width = bit_info
@@ -262,12 +263,15 @@ class BitField(Struct):
                 if name not in self._member_map_:
                     continue
 
+                # The position must be swapped in bit-representation
+                bit_pos = max(7 - pos, 0)
                 low_mask = (1 << width) - 1
                 if width == 1:
-                    mask = low_mask << pos
+                    mask = low_mask << bit_pos
                     init_data[name] = bool(value & mask)
                 else:
-                    field_value: int = (value >> pos) & low_mask
+                    shift = max(bit_pos + 1 - width, 0)
+                    field_value: int = (value >> shift) & low_mask
                     factory = typeof(field.struct)
                     if factory not in (type(None), Any):
                         field_value = factory(field_value)
@@ -286,7 +290,7 @@ class BitField(Struct):
             # them from the stream
             order = "little" if self.order == LittleEndian else "big"
             value = 0
-            for bit_info, field in group.fields.items():
+            for bit_info, field in reversed(group.fields.items()):
                 # Setup the field's context
                 name: str = field.get_name()
                 context[CTX_PATH] = ".".join([base_path, f"({i})", name])
@@ -296,6 +300,8 @@ class BitField(Struct):
                     continue
 
                 field_value = self.get_value(obj, name, field) or 0
+                bit_pos = max(7 - pos, 0)
+                shift = bit_pos + 1 - width
                 # Here's the tricky part: we have to convert all values to int
                 # without knowing their type. We make use of Python's data model,
                 # which defines a function particularly for this use-case: __int__
@@ -303,7 +309,7 @@ class BitField(Struct):
                 # See https://docs.python.org/3/reference/datamodel.html#object.__int__
                 try:
                     # REVISIT: what about the field's width
-                    value |= int(field_value) << pos
+                    value |= int(field_value) << shift
                 except NotImplementedError as exc:
                     raise DelegationError(
                         f"Field {name!r} does not support to-int conversio!"
