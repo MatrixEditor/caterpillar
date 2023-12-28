@@ -144,6 +144,7 @@ def pack_seq(seq: List[Any], context: _ContextLike, pack_one) -> None:
         _length=count,
         _field=field,
         _obj=context.get(CTX_OBJECT),
+        _is_seq=True
     )
     seq_context[CTX_POS] = stream.tell()
     for i, elem in enumerate(seq):

@@ -150,7 +150,7 @@ Memory
 When dealing with data that can be stored in memory and you intend to print out your
 unpacked object, the :class:`Memory` struct is recommended.
 
->>> m = F(Memory(5)) # static size, dynamix size is allowed too
+>>> m = F(Memory(5)) # static size; dynamic size is allowed too
 >>> pack(bytes([i for i in range(5)], m))
 b'\x00\x01\x02\x03\x04'
 >>> unpack(m, _)

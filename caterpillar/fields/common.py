@@ -33,6 +33,7 @@ from caterpillar.context import CTX_FIELD, CTX_STREAM, CTX_SEQ
 from caterpillar.options import F_SEQUENTIAL
 from caterpillar.byteorder import LittleEndian
 from ._base import Field, FieldStruct, INVALID_DEFAULT, singleton
+from .._common import WithoutContextVar
 
 
 class FormatField(FieldStruct):
@@ -132,7 +133,6 @@ class FormatField(FieldStruct):
                 value = None
             else:
                 value, *_ = value
-
         return value
 
     def unpack_seq(self, context: _ContextLike) -> List[Any]:
@@ -502,7 +502,7 @@ class CString(Bytes):
         :param context: The current context.
         """
         pad = chr(self.pad).encode()
-        if self.length is Ellipsis:
+        if self.length is not Ellipsis:
             length = self.__size__(context)
             obj_length = len(obj)
             payload = obj.encode(self.encoding) + pad * (length - obj_length)
@@ -647,7 +647,9 @@ class Prefixed(FieldStruct):
         :param obj: The bytes object to pack.
         :param context: The current context.
         """
-        self.prefix.__pack__(len(obj), context)
+        with WithoutContextVar(context, CTX_SEQ, False):
+            self.prefix.__pack__(len(obj), context)
+
         if self.encoding:
             obj = obj.encode(self.encoding)
         context[CTX_STREAM].write(obj)
