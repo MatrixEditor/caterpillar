@@ -174,8 +174,5 @@ def typeof(struct: Union[_StructLike, _ContainsStruct]) -> type:
     return __type__() or Any
 
 
-def isgreedy(obj) -> bool:
-    return isinstance(obj, _GreedyType)
-
 def isprefixed(obj) -> bool:
-    return isinstance(obj, _PrefixedType)
+    return type(obj) is _PrefixedType

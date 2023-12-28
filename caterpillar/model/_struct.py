@@ -105,8 +105,7 @@ class Struct(Sequence):
         self.model.__annotations__.pop(name)
 
     def unpack_one(self, context: _ContextLike) -> Optional[Any]:
-        init_data = super().unpack_one(context)
-        return self.model(**init_data)
+        return self.model(**super().unpack_one(context))
 
     def get_value(self, obj: Any, name: str, field: Field) -> Optional[Any]:
         return getattr(obj, name, None)

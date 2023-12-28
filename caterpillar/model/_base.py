@@ -22,7 +22,7 @@ from dataclasses import dataclass
 from caterpillar.abc import _StructLike, _ContextLike
 from caterpillar.abc import _StreamType, _ContextLambda
 from caterpillar.abc import getstruct
-from caterpillar.context import Context, CTX_PATH, CTX_OBJECT, CTX_STREAM
+from caterpillar.context import Context, CTX_PATH, CTX_OBJECT, CTX_STREAM, CTX_SEQ
 from caterpillar.byteorder import BYTEORDER_FIELD, ByteOrder, SysNative
 from caterpillar.byteorder import Arch, get_system_arch
 from caterpillar.exception import StructException, ValidationError
@@ -100,11 +100,12 @@ class Sequence(_StructLike, FieldMixin):
         self.fields: List[Field] = []
         # Process all fields in the model
         self._process_model()
+        self.is_union = S_UNION in self.options
 
     def __add__(self, sequence: "Sequence") -> Self:
         # We will try to import all fields from the given sequence
         for field in sequence.fields:
-            name = field.get_name()
+            name = field.__name__
             is_included = name and name in sequence._member_map_
             self.add_field(name, field, is_included)
         return self
@@ -112,7 +113,7 @@ class Sequence(_StructLike, FieldMixin):
     def __sub__(self, sequence: "Sequence") -> Self:
         # By default, we are only removing existing fields.
         for field in sequence.fields:
-            name = field.get_name()
+            name = field.__name__
             if field in self.fields or (name and name in self._member_map_):
                 self.del_field(name, field)
         return self
@@ -279,14 +280,6 @@ class Sequence(_StructLike, FieldMixin):
     def get_members(self) -> Dict[str, Field]:
         return self._member_map_.copy()
 
-    def is_union(self) -> bool:
-        """
-        Check if the struct is a union.
-
-        :return: True if the struct is a union, else False.
-        """
-        return self.has_option(S_UNION)
-
     def __size__(self, context: _ContextLike) -> int:
         """
         Get the size of the struct.
@@ -297,10 +290,10 @@ class Sequence(_StructLike, FieldMixin):
         sizes = []
         base_path = context[CTX_PATH]
         for field in self.fields:
-            context[CTX_PATH] = ".".join([base_path, field.get_name()])
+            context[CTX_PATH] = f"{base_path}.{field.__name__}"
             sizes.append(field.__size__(context))
 
-        return max(sizes) if self.is_union() else sum(sizes)
+        return max(sizes) if self.is_union else sum(sizes)
 
     def unpack_one(self, context: _ContextLike) -> Optional[Any]:
         # At first, we define the object context where the parsed values
@@ -310,27 +303,30 @@ class Sequence(_StructLike, FieldMixin):
         context[CTX_OBJECT] = Context(_parent=context)
 
         base_path = context[CTX_PATH]
-        start = stream.tell()
-        max_size = 0
+        if self.is_union:
+            start = stream.tell()
+            max_size = 0
 
         for field in self.fields:
-            pos = stream.tell()
-            name = field.get_name()
+            if self.is_union:
+                pos = stream.tell()
+
+            name = field.__name__
             # The context path has to be changed accordingly
-            context[CTX_PATH] = ".".join([base_path, name])
+            context[CTX_PATH] = f"{base_path}.{name}"
             result = field.__unpack__(context)
             # the object's data shouldn't include removed fields
             context[CTX_OBJECT][name] = result
             if name in self._member_map_:
                 init_data[name] = result
 
-            if self.is_union():
+            if self.is_union:
                 # This union implementation will cover the max size
                 max_size = max(max_size, stream.tell() - pos)
                 stream.seek(start)
 
         obj = init_data
-        if self.is_union():
+        if self.is_union:
             # Reset the stream position
             stream.seek(start + max_size)
         return obj
@@ -350,7 +346,7 @@ class Sequence(_StructLike, FieldMixin):
         )
         # See __pack__ for more information
         field: Optional[Field] = context.get("_field")
-        if field and field.is_seq():
+        if field and context[CTX_SEQ]:
             return unpack_seq(context, self.unpack_one)
         return self.unpack_one(this_context)
 
@@ -358,19 +354,14 @@ class Sequence(_StructLike, FieldMixin):
         return obj.get(name, None)
 
     def pack_one(self, obj: Dict[str, Any], context: _ContextLike) -> None:
-        is_union = self.is_union()
+        is_union = self.is_union
         max_size = 0
         union_field: Optional[_StructLike] = None
         base_path: str = context[CTX_PATH]
 
         for field in self.fields:
             # The name has to be set (important for current context)
-            name = field.get_name()
-            if name is None:
-                raise StructException(
-                    f"Could not measure a field's name: {field!r}", context
-                )
-
+            name = field.__name__
             if is_union:
                 # Union is only applicable for non-dynamic structs
                 size: int = field.__size__(context)
@@ -379,7 +370,7 @@ class Sequence(_StructLike, FieldMixin):
                     union_field = field
             else:
                 # Default behaviour: let the field write its content to the stream.
-                context[CTX_PATH] = ".".join([base_path, name])
+                context[CTX_PATH] = f"{base_path}.{name}"
                 if name in self._member_map_:
                     value = self.get_value(obj, name, field)
                 else:
@@ -394,7 +385,7 @@ class Sequence(_StructLike, FieldMixin):
                     "Invalid union config: no fields declared!", context
                 )
 
-            name = union_field.get_name()
+            name = union_field.__name__
             context[CTX_PATH] = ".".join([base_path, "<value>"])
             # REVISIT: are constant values allowed here? + name validation?
             value = self.get_value(obj, name, union_field)
@@ -405,7 +396,7 @@ class Sequence(_StructLike, FieldMixin):
         # and could potentially be a sequence. Therefore, we have to check whether we
         # should unpack multiple objects.
         field: Optional[Field] = context.get("_field")
-        if field and field.is_seq():
+        if field and field[CTX_SEQ]:
             pack_seq(obj, context, self.pack_one)
         else:
             ctx = Context(

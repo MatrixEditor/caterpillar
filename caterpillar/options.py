@@ -17,7 +17,7 @@ from dataclasses import dataclass
 from typing import Any, Optional, Set, Union
 
 
-@dataclass(frozen=True)
+@dataclass(init=False)
 class Flag:
     """Simple customizable user-flag."""
 
@@ -29,13 +29,18 @@ class Flag:
     Optional configuration value.
     """
 
+    def __init__(self, name: str, value: Optional[Any] = None) -> None:
+        self.name = name
+        self.value = value
+        self._hash_ = hash(name)
+
     def __hash__(self) -> int:
         """
         Custom hash method based on the flag's name.
 
         :return: The hash value.
         """
-        return hash(self.name)
+        return self._hash_
 
 
 #: Defaults that will be applied to **all** structs.

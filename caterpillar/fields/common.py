@@ -22,7 +22,6 @@ from caterpillar.abc import (
     _StreamType,
     _ContextLambda,
     _EnumLike,
-    isgreedy,
 )
 from caterpillar.exception import (
     ValidationError,
@@ -30,8 +29,9 @@ from caterpillar.exception import (
     InvalidValueError,
     DynamicSizeError,
 )
-from caterpillar.context import CTX_FIELD, CTX_STREAM
+from caterpillar.context import CTX_FIELD, CTX_STREAM, CTX_SEQ
 from caterpillar.options import F_SEQUENTIAL
+from caterpillar.byteorder import LittleEndian
 from ._base import Field, FieldStruct, INVALID_DEFAULT
 
 
@@ -103,7 +103,7 @@ class FormatField(FieldStruct):
         :param seq: The sequence of values.
         :param context: The current context.
         """
-        if not isgreedy(context[CTX_FIELD].length(context)):
+        if context[CTX_FIELD].length(context) is not Ellipsis:
             self.pack_single(seq, context)
         else:
             super().pack_seq(seq, context)
@@ -115,21 +115,19 @@ class FormatField(FieldStruct):
         :param context: The current context.
         :return: The unpacked value.
         """
-        stream: _StreamType = context[CTX_STREAM]
-        field: Field = context[CTX_FIELD]
-        length = field.length(context)
-        if length == 0 and field.is_seq():
+        length = context[CTX_FIELD].length(context)
+        if length == 0 and context[CTX_SEQ]:
             # REVISIT: maybe add factory here
             return []
 
-        greedy = isgreedy(length)
+        greedy = length is Ellipsis
         fmt = self.get_format(context, length or 1 if not greedy else 1)
         try:
-            value = unpack(fmt, stream.read(calcsize(fmt)))
+            value = unpack(fmt, context[CTX_STREAM].read(calcsize(fmt)))
         except ValueError as exc:
             raise StructException("Could not unpack from stream!", context) from exc
 
-        if not field.is_seq() or greedy:
+        if not context[CTX_SEQ] or greedy:
             if len(value) == 0:
                 value = None
             else:
@@ -144,7 +142,7 @@ class FormatField(FieldStruct):
         :param context: The current context.
         :return: A list of unpacked values.
         """
-        if not isgreedy(context[CTX_FIELD].length(context)):
+        if context[CTX_FIELD].length(context) is not Ellipsis:
             return list(self.unpack_single(context))
 
         return super().unpack_seq(context)
@@ -160,7 +158,7 @@ class FormatField(FieldStruct):
         order = field.order
         if length is None:
             dim = field.length(context) or 1
-            if isgreedy(dim):
+            if dim is Ellipsis:
                 dim = 1
         else:
             dim = length
@@ -198,8 +196,6 @@ float64 = FormatField("d", float)
 double = float64
 
 void_ptr = FormatField("P", int)
-unsigned = uint32
-signed = int32
 
 _ConstType = Union[str, bytes, Any]
 
@@ -418,7 +414,7 @@ class Memory(FieldStruct):
         """
         stream: _StreamType = context[CTX_STREAM]
         size = self.__size__(context)
-        return memoryview(stream.read(size) if not isgreedy(size) else stream.read())
+        return memoryview(stream.read(size) if size is not Ellipsis else stream.read())
 
 
 class Bytes(Memory):
@@ -506,7 +502,7 @@ class CString(Bytes):
         :param context: The current context.
         """
         pad = chr(self.pad).encode()
-        if not isgreedy(self.length):
+        if self.length is Ellipsis:
             length = self.__size__(context)
             obj_length = len(obj)
             payload = obj.encode(self.encoding) + pad * (length - obj_length)
@@ -521,7 +517,7 @@ class CString(Bytes):
         :param context: The current context.
         :return: The unpacked string.
         """
-        if isgreedy(self.length):
+        if self.length is Ellipsis:
             # Parse actual C-String
             stream: _StreamType = context[CTX_STREAM]
             data = []
@@ -663,7 +659,7 @@ class Prefixed(FieldStruct):
         :return: The unpacked bytes object.
         """
         field: Field = context[CTX_FIELD]
-        is_seq = field.is_seq()
+        is_seq = context[CTX_SEQ]
         if is_seq:
             # We have to remove the sequence status temporarily
             field ^= F_SEQUENTIAL
@@ -677,3 +673,36 @@ class Prefixed(FieldStruct):
         if is_seq:
             field |= F_SEQUENTIAL
         return data
+
+
+class Int(FieldStruct):
+    def __init__(self, bits: int, signed: bool = True) -> None:
+        self.signed = signed
+        self.bits = bits
+        if not isinstance(bits, int):
+            raise ValueError(f"Invalid int size: {bits!r} - expected int")
+
+    def __type__(self) -> type:
+        return int
+
+    def __size__(self, context: _ContextLike) -> int:
+        return self.bits // 8
+
+    def pack_single(self, obj: int, context: _ContextLike) -> None:
+        order = context[CTX_FIELD].order
+        byteorder = "little" if order == LittleEndian else "big"
+        size = self.__size__(context)
+        context[CTX_STREAM].write(obj.to_bytes(size, byteorder, signed=self.signed))
+
+    def unpack_single(self, context: _ContextLike) -> memoryview:
+        order = context[CTX_FIELD].order
+        byteorder = "little" if order == LittleEndian else "big"
+        size = self.__size__(context)
+        return int.from_bytes(
+            context[CTX_STREAM].read(size), byteorder, signed=self.signed
+        )
+
+
+class UInt(Int):
+    def __init__(self, bits: int) -> None:
+        super().__init__(bits, signed=False)

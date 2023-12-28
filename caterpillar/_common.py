@@ -16,7 +16,7 @@ import itertools
 
 from typing import List, Any, Union, Iterable
 
-from caterpillar.abc import _GreedyType, _ContextLike, isgreedy, _StreamType, isprefixed
+from caterpillar.abc import _GreedyType, _ContextLike, _StreamType, isprefixed
 from caterpillar.context import (
     Context,
     CTX_PATH,
@@ -25,22 +25,24 @@ from caterpillar.context import (
     CTX_INDEX,
     CTX_OBJECT,
     CTX_STREAM,
+    CTX_SEQ
 )
-from caterpillar.options import F_SEQUENTIAL
 from caterpillar.exception import Stop, StructException, InvalidValueError
 
 
-class WithoutFlag:
-    def __init__(self, context: _ContextLike, flag) -> None:
+class WithoutContextVar:
+    def __init__(self, context: _ContextLike, name, value) -> None:
         self.context = context
+        self.old_value = context[name]
+        self.value = value
+        self.name = name
         self.field = context[CTX_FIELD]
-        self.flag = flag
 
     def __enter__(self) -> None:
-        self.field ^= self.flag
+        self.context[self.name] = self.value
 
     def __exit__(self, exc_type, exc_value, traceback) -> None:
-        self.field |= self.flag
+        self.context[self.name] = self.old_value
         # We have to apply the right field as instance of the Field class
         # might set their own value into the context.
         self.context[CTX_FIELD] = self.field
@@ -58,7 +60,7 @@ def unpack_seq(context: _ContextLike, unpack_one) -> List[Any]:
     """
     stream = context[CTX_STREAM]
     field = context[CTX_FIELD]
-    assert field and field.is_seq()
+    assert field and context[CTX_SEQ]
 
     length: Union[int, _GreedyType] = field.length(context)
     base_path = context[CTX_PATH]
@@ -72,13 +74,13 @@ def unpack_seq(context: _ContextLike, unpack_one) -> List[Any]:
         _lst=values,
         _field=field,
         _obj=context.get(CTX_OBJECT),
+        _pos=context.get(CTX_POS)
     )
-    greedy = isgreedy(length)
+    greedy = length is Ellipsis
     prefixed = isprefixed(length)
-    seq_context[CTX_POS] = stream.tell()
     if prefixed:
         # We have to temporarily remove the array status from the parsing field
-        with WithoutFlag(context, F_SEQUENTIAL):
+        with WithoutContextVar(context, CTX_SEQ, False):
             field.amount = 1
             new_length = length.start.__unpack__(context)
             field.amount, length = length, new_length
@@ -90,7 +92,7 @@ def unpack_seq(context: _ContextLike, unpack_one) -> List[Any]:
 
     for i in range(length) if not greedy else itertools.count():
         try:
-            seq_context[CTX_PATH] = ".".join([base_path, str(i)])
+            seq_context[CTX_PATH] = f"{base_path}.{i}"
             seq_context[CTX_INDEX] = i
             values.append(unpack_one(seq_context))
             seq_context[CTX_POS] = stream.tell()
@@ -122,17 +124,13 @@ def pack_seq(seq: List[Any], context: _ContextLike, pack_one) -> None:
     stream = context[CTX_STREAM]
     field = context[CTX_FIELD]
     base_path = context[CTX_PATH]
-    # Treat the 'obj' as a sequence/iterable
-    if not isinstance(seq, Iterable):
-        raise InvalidValueError(f"Expected iterable sequence, got {type(seq)}", context)
-
     # REVISIT: when to use field.length(context)
     count = len(seq)
     length = field.amount
     if isprefixed(length):
         struct = length.start
         # We have to temporatily alter the field's values,
-        with WithoutFlag(context, F_SEQUENTIAL):
+        with WithoutContextVar(context, CTX_SEQ, False):
             field.amount = 1
             struct.__pack__(count, context)
             field.amount = length

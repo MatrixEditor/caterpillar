@@ -45,7 +45,7 @@ from caterpillar.context import Context, CTX_PATH, CTX_OBJECT, CTX_STREAM
 
 from ._struct import Struct
 
-BitTuple = Tuple[int, int]
+BitTuple = Tuple[int, int, type]
 
 
 BITS_ATTR = "__bits__"
@@ -55,6 +55,7 @@ SIGNED_ATTR = "__signed__"
 def getbits(obj: Any) -> int:
     __bits__ = getattr(obj, BITS_ATTR)
     return __bits__() if callable(__bits__) else __bits__
+
 
 def issigned(obj: Any) -> bool:
     return bool(getattr(obj, SIGNED_ATTR, None))
@@ -213,7 +214,9 @@ class BitField(Struct):
             self.groups.append(group)
             self._bit_pos = 0
 
-        group.fields[(self._bit_pos, width)] = field
+        type_ = typeof(field.struct)
+        bit_pos = max(group.size - 1 - self._bit_pos, 0)
+        group.fields[(bit_pos, width, type_)] = field
         self._bit_pos += width
         self._abs_bit_pos += width
         return field
@@ -242,42 +245,38 @@ class BitField(Struct):
     def unpack_one(self, context: _ContextLike) -> Optional[Any]:
         # At first, we define the object context where the parsed values
         # will be stored
-        stream: _StreamType = context[CTX_STREAM]
         init_data: Dict[str, Any] = Context()
         context[CTX_OBJECT] = Context(_parent=context)
         base_path = context[CTX_PATH]
+        order = "little" if self.order == LittleEndian else "big"
 
         for i, group in enumerate(self.groups):
             # each group specifies the fields we are about to unpack. But first, we have
             # to read the bits from the stream
-            order = "little" if self.order == LittleEndian else "big"
-            data = stream.read(group.size // 8)
-            value = int.from_bytes(data, byteorder=order)
+            value = int.from_bytes(
+                context[CTX_STREAM].read(group.size // 8), byteorder=order
+            )
 
             for bit_info, field in reversed(group.fields.items()):
-                name: str = field.get_name()
-                context[CTX_PATH] = ".".join([base_path, f"<{i}>", name])
-                pos, width = bit_info
+                name: str = field.__name__
+                context[CTX_PATH] = f"{base_path}.<{i}>.{name}"
+                bit_pos, width, factory = bit_info
                 # The field should be ignored if it is not within the
                 # member map (this usually means we have a padding field)
                 if name not in self._member_map_:
                     continue
 
-                # The position must be swapped in bit-representation
-                bit_pos = max(7 - pos, 0)
                 low_mask = (1 << width) - 1
                 if width == 1:
-                    mask = low_mask << bit_pos
-                    init_data[name] = bool(value & mask)
+                    field_value = bool(value & low_mask << bit_pos)
                 else:
                     shift = max(bit_pos + 1 - width, 0)
                     field_value: int = (value >> shift) & low_mask
-                    factory = typeof(field.struct)
                     if factory not in (type(None), Any):
                         field_value = factory(field_value)
 
-                    # Finally, apply the new value
-                    init_data[name] = field_value
+                # Finally, apply the new value
+                init_data[name] = field_value
 
         obj = self.model(**init_data)
         return obj
@@ -292,15 +291,14 @@ class BitField(Struct):
             value = 0
             for bit_info, field in reversed(group.fields.items()):
                 # Setup the field's context
-                name: str = field.get_name()
+                name: str = field.__name__
                 context[CTX_PATH] = ".".join([base_path, f"({i})", name])
-                pos, width = bit_info
+                bit_pos, width, _ = bit_info
                 # Padding is translated into zeros
                 if name not in self._member_map_:
                     continue
 
                 field_value = self.get_value(obj, name, field) or 0
-                bit_pos = max(7 - pos, 0)
                 shift = bit_pos + 1 - width
                 # Here's the tricky part: we have to convert all values to int
                 # without knowing their type. We make use of Python's data model,

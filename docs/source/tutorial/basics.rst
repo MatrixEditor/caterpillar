@@ -7,6 +7,13 @@ Basic Concepts
 In this section, we'll explore some common techniques used in binary file formats, setting
 the stage for more advanced topics in the next chapter.
 
+.. attention::
+    Some examples using the interpreter prompts make use of a shortcut to define :class:`Field`
+    objects:
+
+    >>> from caterpillar.shortcuts import F
+    >>> field = F(uint8)
+
 Standard Types
 --------------
 
@@ -56,11 +63,8 @@ length is calculated based on the chunk's length field divided by three because 
 occupies three bytes.
 
 
-Strings
-^^^^^^^
-
-String handling is integral to binary formats, and Caterpillar introduces various utility strings
-to facilitate this.
+String Types
+^^^^^^^^^^^^
 
 CString
 ~~~~~~~
@@ -81,7 +85,7 @@ additional functionality, as demonstrated in the structure of the next chunk.
         #   - 1 because of the extra null-byte that is stripped from keyword
         text: CString(encoding="ISO-8859-1", length=parent.length - lenof(this.keword) - 1)
 
-.. admonition:: Exercise
+.. admonition:: Challenge
 
     You are now ready to implement the `iTXt <https://www.w3.org/TR/png/#11iTXt>`_ chunk. Try it yourself!
 
@@ -108,14 +112,56 @@ additional functionality, as demonstrated in the structure of the next chunk.
 
 You can also apply your own termination character, for example:
 
->>> field = CString(pad="\x0A")
+>>> struct = CString(pad="\x0A")
 
 This struct will use a space as the termination character and strip all trailing
 padding bytes.
 
+String
+~~~~~~
+
+Besides special the special *c strings* there's a default :class:`String` class that implements
+the basic behaviour of a string. It's crucial to specify the length for this struct.
+
+>>> struct = String(100 or this.length) # static integer or context lambda
 
 
+Prefixed
+~~~~~~~~
 
+The :class:`Prefixed` class introduces so-called *Pascal strings* for raw bytes and strings. If no
+encoding is specified, the returned value will be of type :code:`bytes`. This class reads a length
+using the given struct and then retrieves the corresponding number of bytes from the stream returned
+by that struct.
+
+>>> field = F(Prefixed(uint8, encoding="utf-8"))
+>>> pack("Hello, World!", field)
+b'\rHello, World!'
+>>> unpack(field, _)
+'Hello, World!'
+
+
+Byte Sequences
+^^^^^^^^^^^^^^
+
+Memory
+~~~~~~
+
+When dealing with data that can be stored in memory and you intend to print out your
+unpacked object, the :class:`Memory` struct is recommended.
+
+>>> m = F(Memory(5)) # static size, dynamix size is allowed too
+>>> pack(bytes([i for i in range(5)], m))
+b'\x00\x01\x02\x03\x04'
+>>> unpack(m, _)
+<memory at 0x00000204FDFA4411>
+
+Bytes
+~~~~~
+
+If direct access to the bytes is what you need, the :class:`Bytes` struct comes in handy. It
+converts the :code:`memoryview` to :code:`bytes`. Additionally, as mentioned earlier, you can
+use the :class:`Prefixed` class to unpack bytes of a prefixed size.
 
 
 

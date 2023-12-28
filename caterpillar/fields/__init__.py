@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from ._base import (
-    Flag,
     Field,
     FieldMixin,
     FieldStruct,
@@ -34,6 +33,8 @@ from .common import (
     Pass,
     CString,
     Prefixed,
+    Int,
+    UInt,
     padding,
     char,
     boolean,

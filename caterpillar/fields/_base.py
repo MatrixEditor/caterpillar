@@ -44,7 +44,7 @@ from caterpillar.options import (
 )
 from caterpillar.context import CTX_OFFSETS, CTX_STREAM
 from caterpillar.context import CTX_FIELD, CTX_POS
-from caterpillar.context import CTX_VALUE
+from caterpillar.context import CTX_VALUE, CTX_SEQ
 from caterpillar._common import unpack_seq, pack_seq
 
 
@@ -83,7 +83,7 @@ class Field(_StructLike):
     The minus one indicates that no offset has been associated with this field.
     """
 
-    flags: Set[Flag]
+    flags: Dict[int, Flag]
     """
     Additional options that can be enabled using the logical OR operator ``|``.
 
@@ -149,8 +149,7 @@ class Field(_StructLike):
         # NOTE: we use a custom init method to automatically set flags
         self.struct = struct
         self.order = order
-        self.flags = flags or set([F_KEEP_POSITION])
-        self.flags.update(GLOBAL_FIELD_FLAGS)
+        self.flags = {hash(x): x for x in flags or set([F_KEEP_POSITION])}
         self.bits = bits
 
         self.arch = arch or get_system_arch()
@@ -177,11 +176,11 @@ class Field(_StructLike):
         if not isinstance(flag, Flag):
             raise TypeError(f"Expected a flag, got {type(flag)}")
 
-        self.flags.add(flag)
+        self.flags[hash(flag)] = flag
         return self
 
     def __xor__(self, flag: Flag) -> Self:  # remove flags:
-        self.flags.remove(flag)
+        self.flags.pop(hash(flag), None)
         return self
 
     def __matmul__(self, offset: Union[_ContextLambda, int]) -> Self:
@@ -189,15 +188,16 @@ class Field(_StructLike):
         self.offset = offset
         # This operation automatically removes the "keep_position"
         # flag. It has to be set manually.
-        if self.has_flag(F_KEEP_POSITION) and self.offset != -1:
-            self.flags.remove(F_KEEP_POSITION)
+        if self.offset != -1:
+            self.flags.pop(F_KEEP_POSITION, None)
         return self
 
     def __getitem__(self, dim: Union[_ContextLambda, int, _GreedyType]) -> Self:
         self._verify_context_value(dim, (_GreedyType, int, _PrefixedType))
         self.amount = dim
         if self.amount != 0:
-            self.flags.add(F_SEQUENTIAL)
+            # pylint: disable-next=protected-access
+            self.flags[F_SEQUENTIAL._hash_] = F_SEQUENTIAL
         return self
 
     def __rshift__(self, switch: Union[_Switch, dict]) -> Self:
@@ -234,7 +234,8 @@ class Field(_StructLike):
         :return: whether this field is sequental
         :rtype: bool
         """
-        return self.has_flag(F_SEQUENTIAL)
+        # pylint: disable-next=protected-access
+        return F_SEQUENTIAL._hash_ in self.flags
 
     def is_enabled(self, context: _ContextLike) -> bool:
         """Evaluates the condition of this field.
@@ -254,9 +255,10 @@ class Field(_StructLike):
         :return: true if this flag has been found
         :rtype: bool
         """
-        return flag in self.flags
+        # pylint: disable-next=protected-access
+        return flag._hash_ in self.flags or flag in GLOBAL_FIELD_FLAGS
 
-    def length(self, context: _ContextLike) -> Union[int, _GreedyType]:
+    def length(self, context: _ContextLike) -> Union[int, _GreedyType, _PrefixedType]:
         """Calculates the sequence length of this field.
 
         :param context: the context on which to operate
@@ -338,21 +340,27 @@ class Field(_StructLike):
         :rtype: Optional[Any]
         """
         stream: _StreamType = context[CTX_STREAM]
-        if not self.is_enabled(context):
-            # handling the result of this function should be treated carefully
-            return None
+        if self.condition is not True and not self.is_enabled(context):
+            # Disabled fields or context lambdas won't pack any data
+            return
 
+        # pylint: disable-next=protected-access
+        context[CTX_SEQ] = F_SEQUENTIAL._hash_ in self.flags
+        # pylint: disable-next=protected-access
+        keep_pos = F_KEEP_POSITION._hash_ in self.flags
         if not callable(self.struct):
-            fallback = stream.tell()
-            offset = self.get_offset(context)
-            start = offset if offset >= 0 else fallback
+            if not keep_pos:
+                fallback = stream.tell()
+
+            offset = self.offset(context) if callable(self.offset) else self.offset
+            if offset >= 0:
+                stream.seek(offset)
 
             context[CTX_FIELD] = self
             # Switch is applicable AFTER we parsed the first value
-            stream.seek(start)
             try:
                 value = self.struct.__unpack__(context)
-                if not self.has_flag(F_KEEP_POSITION):
+                if not keep_pos:
                     stream.seek(fallback)
             except StructException as exc:
                 # Any exception leads to a default value if configured
@@ -395,10 +403,12 @@ class Field(_StructLike):
         :raises TypeError: if the value is not iterable but this field is marked
                            to be sequential
         """
+        # TODO: revisit code
         stream: _StreamType = context[CTX_STREAM]
-        if not self.is_enabled(context):
-            # Disabled fields or context lambdas won't pack any data
-            return
+        if self.condition is not True:
+            if not self.is_enabled(context):
+                # Disabled fields or context lambdas won't pack any data
+                return
 
         # Setup parsing by specifying the start and end positions
         fallback = stream.tell()
@@ -461,11 +471,12 @@ class Field(_StructLike):
             raise DynamicSizeError("Dynamic sized field!", context)
 
         context[CTX_FIELD] = self
+        context[CTX_SEQ] = self.is_seq()
 
         # 3. We should gather the element count if this field stores
         # a sequential element
         count = 1
-        if self.is_seq():
+        if context[CTX_SEQ]:
             count = self.length(context)
             if isinstance(count, _GreedyType):
                 raise DynamicSizeError(
@@ -571,9 +582,8 @@ class FieldStruct(FieldMixin, _StructLike):
         :param stream: The output stream.
         :param context: The current operation context.
         """
-        field: Field = context[CTX_FIELD]
         func = self.pack_single
-        if field.is_seq():
+        if context[CTX_SEQ]:
             func = self.pack_seq
 
         func(obj, context)
@@ -586,10 +596,8 @@ class FieldStruct(FieldMixin, _StructLike):
         :param context: The current operation context.
         :return: The unpacked data.
         """
-        field: Field = context[CTX_FIELD]
-        if field.is_seq():
+        if context[CTX_SEQ]:
             return self.unpack_seq(context)
-
         return self.unpack_single(context)
 
     def __repr__(self) -> str:
