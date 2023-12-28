@@ -106,6 +106,16 @@ Construct. The files used in the benchmark are provided below:
         .. literalinclude:: ./snippets/comparison_kaitai.ksy
             :language: yaml
 
+    .. tab-item:: hachoir
+
+        .. literalinclude:: ./snippets/comparison_1_hachoir.py
+                :language: python
+
+    .. tab-item:: mrcrwobar
+
+        .. literalinclude:: ./snippets/comparison_1_mrcrowbar.py
+                :language: python
+
 
 The test involved one thousand iterations of packing and unpacking the structure. Kaitai
 scores with the fastest time since it directly reads all data from the stream. *caterpillar*
@@ -147,6 +157,27 @@ Construct makes it comparable to Kaitai, but since compilation is not a primary 
             (venv-3.12.1)> python3 ./examples/comparison/comparison_1_kaitai.py ./blob
             Parsing measurements:
             default  0.0034705456 sec/call
+
+    .. tab-item:: hachoir
+
+        .. code-block:: console
+            :caption: hachoir
+
+            (venv-3.12.1)> python3 ./examples/comparison/comparison_1_hachoir.py ./blob
+            Parsing measurements:
+            default  0.0260070809 sec/call
+
+    .. tab-item:: mrcrwobar
+
+        .. code-block:: console
+            :caption: mrcrwobar
+
+            (venv-3.12.1)> python3 ./examples/comparison/comparison_1_mrcrowbar.py ./blob
+            Parsing measurements:
+            default  0.0555872261 sec/call
+
+            Building measurements:
+            default  0.0898006975 sec/call
 
 In this benchmark, *caterpillar* demonstrates a performance advantage, being approximately :bdg-success:`19.76%`
 faster in unpacking data and approximately :bdg-success:`18.36%` faster in packing data compared to Construct

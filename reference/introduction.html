@@ -390,6 +390,64 @@ kaitai</label><div class="sd-tab-content docutils">
 </pre></div>
 </div>
 </div>
+<input id="sd-tab-item-3" name="sd-tab-set-0" type="radio">
+</input><label class="sd-tab-label" for="sd-tab-item-3">
+hachoir</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hachoir.field</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">hachoir.stream</span> <span class="kn">import</span> <span class="n">StringInputStream</span>
+<span class="kn">from</span> <span class="nn">hachoir.core.bits</span> <span class="kn">import</span> <span class="n">LITTLE_ENDIAN</span>
+
+
+<span class="k">class</span> <span class="nc">Entry</span><span class="p">(</span><span class="n">FieldSet</span><span class="p">):</span>
+    <span class="n">endian</span> <span class="o">=</span> <span class="n">LITTLE_ENDIAN</span>
+
+    <span class="k">def</span> <span class="nf">createFields</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">yield</span> <span class="n">UInt8</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;num1&quot;</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">UInt24</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;num2&quot;</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">Bit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;bool1&quot;</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">Bits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;num4&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">PaddingBits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="n">UInt8</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;fixedarray[]&quot;</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">CString</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;name1&quot;</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">PascalString8</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;name2&quot;</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">Format</span><span class="p">(</span><span class="n">Parser</span><span class="p">):</span>
+    <span class="n">endian</span> <span class="o">=</span> <span class="n">LITTLE_ENDIAN</span>
+
+    <span class="k">def</span> <span class="nf">createFields</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">yield</span> <span class="n">UInt32</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;count&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;count&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="n">Entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;entry[]&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<input id="sd-tab-item-4" name="sd-tab-set-0" type="radio">
+</input><label class="sd-tab-label" for="sd-tab-item-4">
+mrcrwobar</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mrcrowbar.fields</span> <span class="kn">import</span> <span class="n">Bits8</span><span class="p">,</span> <span class="n">UInt24_LE</span><span class="p">,</span> <span class="n">UInt32_LE</span><span class="p">,</span> <span class="n">BlockField</span><span class="p">,</span> <span class="n">UInt8</span>
+<span class="kn">from</span> <span class="nn">mrcrowbar.models</span> <span class="kn">import</span> <span class="n">Block</span><span class="p">,</span> <span class="n">CString</span><span class="p">,</span> <span class="n">CStringN</span>
+<span class="kn">from</span> <span class="nn">mrcrowbar.refs</span> <span class="kn">import</span> <span class="n">Ref</span>
+
+
+<span class="k">class</span> <span class="nc">Entry</span><span class="p">(</span><span class="n">Block</span><span class="p">):</span>
+    <span class="n">num1</span> <span class="o">=</span> <span class="n">UInt8</span><span class="p">()</span>
+    <span class="n">num2</span> <span class="o">=</span> <span class="n">UInt24_LE</span><span class="p">()</span>
+    <span class="n">bool1</span> <span class="o">=</span> <span class="n">Bits8</span><span class="p">(</span><span class="mh">0x0004</span><span class="p">,</span> <span class="n">bits</span><span class="o">=</span><span class="mb">0b10000000</span><span class="p">,</span> <span class="n">endian</span><span class="o">=</span><span class="s2">&quot;little&quot;</span><span class="p">)</span>
+    <span class="n">num4</span> <span class="o">=</span> <span class="n">Bits8</span><span class="p">(</span><span class="mh">0x0004</span><span class="p">,</span> <span class="n">bits</span><span class="o">=</span><span class="mb">0b01110000</span><span class="p">,</span> <span class="n">endian</span><span class="o">=</span><span class="s2">&quot;little&quot;</span><span class="p">)</span>
+    <span class="n">fixedarray1</span> <span class="o">=</span> <span class="n">UInt8</span><span class="p">(</span><span class="mh">0x0005</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">name1</span> <span class="o">=</span> <span class="n">CString</span><span class="p">(</span><span class="mh">0x0008</span><span class="p">)</span>
+    <span class="n">name2</span> <span class="o">=</span> <span class="n">CString</span><span class="p">(</span><span class="n">length_field</span><span class="o">=</span><span class="n">UInt8</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">Format</span><span class="p">(</span><span class="n">Block</span><span class="p">):</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="n">UInt32_LE</span><span class="p">(</span><span class="mh">0x0000</span><span class="p">)</span>
+    <span class="n">entries</span> <span class="o">=</span> <span class="n">BlockField</span><span class="p">(</span><span class="n">Entry</span><span class="p">,</span> <span class="mh">0x0004</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="n">Ref</span><span class="p">(</span><span class="s2">&quot;count&quot;</span><span class="p">))</span>
+
+</pre></div>
+</div>
+</div>
 </div>
 <p>The test involved one thousand iterations of packing and unpacking the structure. Kaitai
 scores with the fastest time since it directly reads all data from the stream. <em>caterpillar</em>
@@ -397,8 +455,8 @@ and Construct show similar performance in their initial form. The compilation fe
 Construct makes it comparable to Kaitai, but since compilation is not a primary goal of
 <em>caterpillar</em>, these results are not considered.</p>
 <div class="sd-tab-set docutils">
-<input checked="checked" id="sd-tab-item-3" name="sd-tab-set-1" type="radio">
-</input><label class="sd-tab-label" for="sd-tab-item-3">
+<input checked="checked" id="sd-tab-item-5" name="sd-tab-set-1" type="radio">
+</input><label class="sd-tab-label" for="sd-tab-item-5">
 caterpillar</label><div class="sd-tab-content docutils">
 <div class="literal-block-wrapper docutils container" id="id6">
 <div class="code-block-caption"><span class="caption-text">caterpillar</span><a class="headerlink" href="#id6" title="Link to this code">#</a></div>
@@ -410,8 +468,8 @@ caterpillar</label><div class="sd-tab-content docutils">
 </div>
 </div>
 </div>
-<input id="sd-tab-item-4" name="sd-tab-set-1" type="radio">
-</input><label class="sd-tab-label" for="sd-tab-item-4">
+<input id="sd-tab-item-6" name="sd-tab-set-1" type="radio">
+</input><label class="sd-tab-label" for="sd-tab-item-6">
 construct</label><div class="sd-tab-content docutils">
 <div class="literal-block-wrapper docutils container" id="id7">
 <div class="code-block-caption"><span class="caption-text">Construct</span><a class="headerlink" href="#id7" title="Link to this code">#</a></div>
@@ -427,14 +485,41 @@ construct</label><div class="sd-tab-content docutils">
 </div>
 </div>
 </div>
-<input id="sd-tab-item-5" name="sd-tab-set-1" type="radio">
-</input><label class="sd-tab-label" for="sd-tab-item-5">
+<input id="sd-tab-item-7" name="sd-tab-set-1" type="radio">
+</input><label class="sd-tab-label" for="sd-tab-item-7">
 kaitai</label><div class="sd-tab-content docutils">
 <div class="literal-block-wrapper docutils container" id="id8">
 <div class="code-block-caption"><span class="caption-text">kaitai</span><a class="headerlink" href="#id8" title="Link to this code">#</a></div>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(venv-3.12.1)</span><span class="go">&gt; python3 ./examples/comparison/comparison_1_kaitai.py ./blob</span>
 <span class="go">Parsing measurements:</span>
 <span class="go">default  0.0034705456 sec/call</span>
+</pre></div>
+</div>
+</div>
+</div>
+<input id="sd-tab-item-8" name="sd-tab-set-1" type="radio">
+</input><label class="sd-tab-label" for="sd-tab-item-8">
+hachoir</label><div class="sd-tab-content docutils">
+<div class="literal-block-wrapper docutils container" id="id9">
+<div class="code-block-caption"><span class="caption-text">hachoir</span><a class="headerlink" href="#id9" title="Link to this code">#</a></div>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(venv-3.12.1)</span><span class="go">&gt; python3 ./examples/comparison/comparison_1_hachoir.py ./blob</span>
+<span class="go">Parsing measurements:</span>
+<span class="go">default  0.0260070809 sec/call</span>
+</pre></div>
+</div>
+</div>
+</div>
+<input id="sd-tab-item-9" name="sd-tab-set-1" type="radio">
+</input><label class="sd-tab-label" for="sd-tab-item-9">
+mrcrwobar</label><div class="sd-tab-content docutils">
+<div class="literal-block-wrapper docutils container" id="id10">
+<div class="code-block-caption"><span class="caption-text">mrcrwobar</span><a class="headerlink" href="#id10" title="Link to this code">#</a></div>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(venv-3.12.1)</span><span class="go">&gt; python3 ./examples/comparison/comparison_1_mrcrowbar.py ./blob</span>
+<span class="go">Parsing measurements:</span>
+<span class="go">default  0.0555872261 sec/call</span>
+
+<span class="go">Building measurements:</span>
+<span class="go">default  0.0898006975 sec/call</span>
 </pre></div>
 </div>
 </div>
