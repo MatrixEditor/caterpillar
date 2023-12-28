@@ -214,6 +214,15 @@
 <span id="basics"></span><h1><span class="section-number">2. </span>Basic Concepts<a class="headerlink" href="#basic-concepts" title="Link to this heading">#</a></h1>
 <p>In this section, we’ll explore some common techniques used in binary file formats, setting
 the stage for more advanced topics in the next chapter.</p>
+<div class="admonition attention">
+<p class="admonition-title">Attention</p>
+<p>Some examples using the interpreter prompts make use of a shortcut to define <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code>
+objects:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">caterpillar.shortcuts</span> <span class="kn">import</span> <span class="n">F</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">F</span><span class="p">(</span><span class="n">uint8</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
 <section id="standard-types">
 <h2><span class="section-number">2.1. </span>Standard Types<a class="headerlink" href="#standard-types" title="Link to this heading">#</a></h2>
 <section id="enumerations">
@@ -258,10 +267,8 @@ sequences. We can define an array of RGB objects as follows:</p>
 length is calculated based on the chunk’s length field divided by three because the RGB class
 occupies three bytes.</p>
 </section>
-<section id="strings">
-<h3><span class="section-number">2.1.3. </span>Strings<a class="headerlink" href="#strings" title="Link to this heading">#</a></h3>
-<p>String handling is integral to binary formats, and Caterpillar introduces various utility strings
-to facilitate this.</p>
+<section id="string-types">
+<h3><span class="section-number">2.1.3. </span>String Types<a class="headerlink" href="#string-types" title="Link to this heading">#</a></h3>
 <section id="cstring">
 <h4><span class="section-number">2.1.3.1. </span>CString<a class="headerlink" href="#cstring" title="Link to this heading">#</a></h4>
 <p>The CString in this library extends beyond a mere reference to C strings. It provides
@@ -280,8 +287,8 @@ additional functionality, as demonstrated in the structure of the next chunk.</p
 </pre></div>
 </div>
 </div>
-<div class="admonition-exercise admonition">
-<p class="admonition-title">Exercise</p>
+<div class="admonition-challenge admonition">
+<p class="admonition-title">Challenge</p>
 <p>You are now ready to implement the <a class="reference external" href="https://www.w3.org/TR/png/#11iTXt">iTXt</a> chunk. Try it yourself!</p>
 <details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
 <summary class="sd-summary-title sd-card-header">
@@ -309,11 +316,54 @@ additional functionality, as demonstrated in the structure of the next chunk.</p
 </div>
 </details></div>
 <p>You can also apply your own termination character, for example:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">CString</span><span class="p">(</span><span class="n">pad</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\x0A</span><span class="s2">&quot;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span> <span class="o">=</span> <span class="n">CString</span><span class="p">(</span><span class="n">pad</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\x0A</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>This struct will use a space as the termination character and strip all trailing
 padding bytes.</p>
+</section>
+<section id="string">
+<h4><span class="section-number">2.1.3.2. </span>String<a class="headerlink" href="#string" title="Link to this heading">#</a></h4>
+<p>Besides special the special <em>c strings</em> there’s a default <code class="xref py py-class docutils literal notranslate"><span class="pre">String</span></code> class that implements
+the basic behaviour of a string. It’s crucial to specify the length for this struct.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span> <span class="o">=</span> <span class="n">String</span><span class="p">(</span><span class="mi">100</span> <span class="ow">or</span> <span class="n">this</span><span class="o">.</span><span class="n">length</span><span class="p">)</span> <span class="c1"># static integer or context lambda</span>
+</pre></div>
+</div>
+</section>
+<section id="prefixed">
+<h4><span class="section-number">2.1.3.3. </span>Prefixed<a class="headerlink" href="#prefixed" title="Link to this heading">#</a></h4>
+<p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">Prefixed</span></code> class introduces so-called <em>Pascal strings</em> for raw bytes and strings. If no
+encoding is specified, the returned value will be of type <code class="code docutils literal notranslate"><span class="pre">bytes</span></code>. This class reads a length
+using the given struct and then retrieves the corresponding number of bytes from the stream returned
+by that struct.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">F</span><span class="p">(</span><span class="n">Prefixed</span><span class="p">(</span><span class="n">uint8</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="s2">&quot;Hello, World!&quot;</span><span class="p">,</span> <span class="n">field</span><span class="p">)</span>
+<span class="go">b&#39;\rHello, World!&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span>
+<span class="go">&#39;Hello, World!&#39;</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="byte-sequences">
+<h3><span class="section-number">2.1.4. </span>Byte Sequences<a class="headerlink" href="#byte-sequences" title="Link to this heading">#</a></h3>
+<section id="memory">
+<h4><span class="section-number">2.1.4.1. </span>Memory<a class="headerlink" href="#memory" title="Link to this heading">#</a></h4>
+<p>When dealing with data that can be stored in memory and you intend to print out your
+unpacked object, the <code class="xref py py-class docutils literal notranslate"><span class="pre">Memory</span></code> struct is recommended.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">F</span><span class="p">(</span><span class="n">Memory</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span> <span class="c1"># static size, dynamix size is allowed too</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="nb">bytes</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)],</span> <span class="n">m</span><span class="p">))</span>
+<span class="go">b&#39;\x00\x01\x02\x03\x04&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span>
+<span class="go">&lt;memory at 0x00000204FDFA4411&gt;</span>
+</pre></div>
+</div>
+</section>
+<section id="bytes">
+<h4><span class="section-number">2.1.4.2. </span>Bytes<a class="headerlink" href="#bytes" title="Link to this heading">#</a></h4>
+<p>If direct access to the bytes is what you need, the <code class="xref py py-class docutils literal notranslate"><span class="pre">Bytes</span></code> struct comes in handy. It
+converts the <code class="code docutils literal notranslate"><span class="pre">memoryview</span></code> to <code class="code docutils literal notranslate"><span class="pre">bytes</span></code>. Additionally, as mentioned earlier, you can
+use the <code class="xref py py-class docutils literal notranslate"><span class="pre">Prefixed</span></code> class to unpack bytes of a prefixed size.</p>
 </section>
 </section>
 </section>
@@ -378,8 +428,15 @@ padding bytes.</p>
 <li><a class="reference internal" href="#standard-types">2.1. Standard Types</a><ul>
 <li><a class="reference internal" href="#enumerations">2.1.1. Enumerations</a></li>
 <li><a class="reference internal" href="#arrays-lists">2.1.2. Arrays/Lists</a></li>
-<li><a class="reference internal" href="#strings">2.1.3. Strings</a><ul>
+<li><a class="reference internal" href="#string-types">2.1.3. String Types</a><ul>
 <li><a class="reference internal" href="#cstring">2.1.3.1. CString</a></li>
+<li><a class="reference internal" href="#string">2.1.3.2. String</a></li>
+<li><a class="reference internal" href="#prefixed">2.1.3.3. Prefixed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#byte-sequences">2.1.4. Byte Sequences</a><ul>
+<li><a class="reference internal" href="#memory">2.1.4.1. Memory</a></li>
+<li><a class="reference internal" href="#bytes">2.1.4.2. Bytes</a></li>
 </ul>
 </li>
 </ul>

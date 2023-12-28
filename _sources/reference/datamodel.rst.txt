@@ -558,7 +558,7 @@ Modifying fields
     The name of a regular field is not explicitly specified in a typical attribute but is
     instead set using a dedicated one. This naming convention is automatically applied by
     all default :class:`~caterpillar.model.Sequence` implementations. The name can be retrieved through the
-    use of :code:`field.get_name()`.
+    use of :code:`field.__name__`.
 
 
 .. _struct: https://docs.python.org/3/library/struct.html

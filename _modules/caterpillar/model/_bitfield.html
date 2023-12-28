@@ -256,7 +256,7 @@
 
 <span class="kn">from</span> <span class="nn">._struct</span> <span class="kn">import</span> <span class="n">Struct</span>
 
-<span class="n">BitTuple</span> <span class="o">=</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
+<span class="n">BitTuple</span> <span class="o">=</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">type</span><span class="p">]</span>
 
 
 <span class="n">BITS_ATTR</span> <span class="o">=</span> <span class="s2">&quot;__bits__&quot;</span>
@@ -266,6 +266,7 @@
 <span class="k">def</span> <span class="nf">getbits</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
     <span class="n">__bits__</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">BITS_ATTR</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">__bits__</span><span class="p">()</span> <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">__bits__</span><span class="p">)</span> <span class="k">else</span> <span class="n">__bits__</span>
+
 
 <span class="k">def</span> <span class="nf">issigned</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
     <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">SIGNED_ATTR</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
@@ -429,7 +430,9 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_bit_pos</span> <span class="o">=</span> <span class="mi">0</span>
 
-        <span class="n">group</span><span class="o">.</span><span class="n">fields</span><span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">_bit_pos</span><span class="p">,</span> <span class="n">width</span><span class="p">)]</span> <span class="o">=</span> <span class="n">field</span>
+        <span class="n">type_</span> <span class="o">=</span> <span class="n">typeof</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">struct</span><span class="p">)</span>
+        <span class="n">bit_pos</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">group</span><span class="o">.</span><span class="n">size</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bit_pos</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">group</span><span class="o">.</span><span class="n">fields</span><span class="p">[(</span><span class="n">bit_pos</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">type_</span><span class="p">)]</span> <span class="o">=</span> <span class="n">field</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_bit_pos</span> <span class="o">+=</span> <span class="n">width</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_abs_bit_pos</span> <span class="o">+=</span> <span class="n">width</span>
         <span class="k">return</span> <span class="n">field</span>
@@ -458,42 +461,38 @@
     <span class="k">def</span> <span class="nf">unpack_one</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
         <span class="c1"># At first, we define the object context where the parsed values</span>
         <span class="c1"># will be stored</span>
-        <span class="n">stream</span><span class="p">:</span> <span class="n">_StreamType</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_STREAM</span><span class="p">]</span>
         <span class="n">init_data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">Context</span><span class="p">()</span>
         <span class="n">context</span><span class="p">[</span><span class="n">CTX_OBJECT</span><span class="p">]</span> <span class="o">=</span> <span class="n">Context</span><span class="p">(</span><span class="n">_parent</span><span class="o">=</span><span class="n">context</span><span class="p">)</span>
         <span class="n">base_path</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_PATH</span><span class="p">]</span>
+        <span class="n">order</span> <span class="o">=</span> <span class="s2">&quot;little&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">==</span> <span class="n">LittleEndian</span> <span class="k">else</span> <span class="s2">&quot;big&quot;</span>
 
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="p">):</span>
             <span class="c1"># each group specifies the fields we are about to unpack. But first, we have</span>
             <span class="c1"># to read the bits from the stream</span>
-            <span class="n">order</span> <span class="o">=</span> <span class="s2">&quot;little&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">==</span> <span class="n">LittleEndian</span> <span class="k">else</span> <span class="s2">&quot;big&quot;</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">group</span><span class="o">.</span><span class="n">size</span> <span class="o">//</span> <span class="mi">8</span><span class="p">)</span>
-            <span class="n">value</span> <span class="o">=</span> <span class="nb">int</span><span class="o">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">byteorder</span><span class="o">=</span><span class="n">order</span><span class="p">)</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="nb">int</span><span class="o">.</span><span class="n">from_bytes</span><span class="p">(</span>
+                <span class="n">context</span><span class="p">[</span><span class="n">CTX_STREAM</span><span class="p">]</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">group</span><span class="o">.</span><span class="n">size</span> <span class="o">//</span> <span class="mi">8</span><span class="p">),</span> <span class="n">byteorder</span><span class="o">=</span><span class="n">order</span>
+            <span class="p">)</span>
 
             <span class="k">for</span> <span class="n">bit_info</span><span class="p">,</span> <span class="n">field</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">group</span><span class="o">.</span><span class="n">fields</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
-                <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span>
-                <span class="n">context</span><span class="p">[</span><span class="n">CTX_PATH</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">base_path</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;&lt;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&gt;&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">])</span>
-                <span class="n">pos</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="n">bit_info</span>
+                <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="vm">__name__</span>
+                <span class="n">context</span><span class="p">[</span><span class="n">CTX_PATH</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_path</span><span class="si">}</span><span class="s2">.&lt;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&gt;.</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">bit_pos</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">factory</span> <span class="o">=</span> <span class="n">bit_info</span>
                 <span class="c1"># The field should be ignored if it is not within the</span>
                 <span class="c1"># member map (this usually means we have a padding field)</span>
                 <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_member_map_</span><span class="p">:</span>
                     <span class="k">continue</span>
 
-                <span class="c1"># The position must be swapped in bit-representation</span>
-                <span class="n">bit_pos</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">7</span> <span class="o">-</span> <span class="n">pos</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
                 <span class="n">low_mask</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">width</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
                 <span class="k">if</span> <span class="n">width</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                    <span class="n">mask</span> <span class="o">=</span> <span class="n">low_mask</span> <span class="o">&lt;&lt;</span> <span class="n">bit_pos</span>
-                    <span class="n">init_data</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">value</span> <span class="o">&amp;</span> <span class="n">mask</span><span class="p">)</span>
+                    <span class="n">field_value</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">value</span> <span class="o">&amp;</span> <span class="n">low_mask</span> <span class="o">&lt;&lt;</span> <span class="n">bit_pos</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">shift</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">bit_pos</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">width</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
                     <span class="n">field_value</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="p">(</span><span class="n">value</span> <span class="o">&gt;&gt;</span> <span class="n">shift</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">low_mask</span>
-                    <span class="n">factory</span> <span class="o">=</span> <span class="n">typeof</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">struct</span><span class="p">)</span>
                     <span class="k">if</span> <span class="n">factory</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span> <span class="n">Any</span><span class="p">):</span>
                         <span class="n">field_value</span> <span class="o">=</span> <span class="n">factory</span><span class="p">(</span><span class="n">field_value</span><span class="p">)</span>
 
-                    <span class="c1"># Finally, apply the new value</span>
-                    <span class="n">init_data</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">field_value</span>
+                <span class="c1"># Finally, apply the new value</span>
+                <span class="n">init_data</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">field_value</span>
 
         <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="o">**</span><span class="n">init_data</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">obj</span>
@@ -508,15 +507,14 @@
             <span class="n">value</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="k">for</span> <span class="n">bit_info</span><span class="p">,</span> <span class="n">field</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">group</span><span class="o">.</span><span class="n">fields</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
                 <span class="c1"># Setup the field&#39;s context</span>
-                <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span>
+                <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="vm">__name__</span>
                 <span class="n">context</span><span class="p">[</span><span class="n">CTX_PATH</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">base_path</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">])</span>
-                <span class="n">pos</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="n">bit_info</span>
+                <span class="n">bit_pos</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">bit_info</span>
                 <span class="c1"># Padding is translated into zeros</span>
                 <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_member_map_</span><span class="p">:</span>
                     <span class="k">continue</span>
 
                 <span class="n">field_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">field</span><span class="p">)</span> <span class="ow">or</span> <span class="mi">0</span>
-                <span class="n">bit_pos</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">7</span> <span class="o">-</span> <span class="n">pos</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
                 <span class="n">shift</span> <span class="o">=</span> <span class="n">bit_pos</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">width</span>
                 <span class="c1"># Here&#39;s the tricky part: we have to convert all values to int</span>
                 <span class="c1"># without knowing their type. We make use of Python&#39;s data model,</span>
