@@ -396,7 +396,7 @@ class Sequence(_StructLike, FieldMixin):
         # and could potentially be a sequence. Therefore, we have to check whether we
         # should unpack multiple objects.
         field: Optional[Field] = context.get("_field")
-        if field and field[CTX_SEQ]:
+        if field and context[CTX_SEQ]:
             pack_seq(obj, context, self.pack_one)
         else:
             ctx = Context(

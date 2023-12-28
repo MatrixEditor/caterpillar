@@ -417,6 +417,8 @@ class Field(_StructLike):
         struct = self.struct
 
         context[CTX_FIELD] = self
+        # pylint: disable-next=protected-access
+        context[CTX_SEQ] = F_SEQUENTIAL._hash_ in self.flags
         # REVISIT: maybe check whether this stream supports .seek()
         has_offset = start != fallback
         if has_offset:

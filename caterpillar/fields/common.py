@@ -32,7 +32,7 @@ from caterpillar.exception import (
 from caterpillar.context import CTX_FIELD, CTX_STREAM, CTX_SEQ
 from caterpillar.options import F_SEQUENTIAL
 from caterpillar.byteorder import LittleEndian
-from ._base import Field, FieldStruct, INVALID_DEFAULT
+from ._base import Field, FieldStruct, INVALID_DEFAULT, singleton
 
 
 class FormatField(FieldStruct):
@@ -595,6 +595,7 @@ class Computed(FieldStruct):
         pass
 
 
+@singleton
 class Pass(FieldStruct):
     def __bits__(self) -> int:
         return 0

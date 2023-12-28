@@ -74,7 +74,8 @@ def unpack_seq(context: _ContextLike, unpack_one) -> List[Any]:
         _lst=values,
         _field=field,
         _obj=context.get(CTX_OBJECT),
-        _pos=context.get(CTX_POS)
+        _pos=context.get(CTX_POS),
+        _is_seq=True
     )
     greedy = length is Ellipsis
     prefixed = isprefixed(length)
@@ -104,8 +105,8 @@ def unpack_seq(context: _ContextLike, unpack_one) -> List[Any]:
         except Stop:
             break
         except Exception as exc:
-            if greedy:
-                break
+            # if greedy:
+            #     break
             raise StructException(str(exc), context) from exc
     return values
 
