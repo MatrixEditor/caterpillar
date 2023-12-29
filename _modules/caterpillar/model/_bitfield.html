@@ -174,7 +174,11 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../library/options.html">2. Options</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../development/index.html">Development</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of Development</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../development/contribution.html">1. Contribution Guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../development/changelog.html">2. Changelog</a></li>
+</ul>
+</li>
 </ul>
 
 </div>
@@ -223,6 +227,8 @@
 <span class="c1">#</span>
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
+<span class="kn">import</span> <span class="nn">struct</span> <span class="k">as</span> <span class="nn">libstruct</span>
+
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Tuple</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Self</span><span class="p">,</span> <span class="n">List</span>
@@ -272,6 +278,11 @@
     <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">SIGNED_ATTR</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
 
 
+<span class="k">def</span> <span class="nf">getformat</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="n">attr</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;__fmt__&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">attr</span><span class="p">()</span> <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span> <span class="k">else</span> <span class="n">attr</span>
+
+
 <div class="viewcode-block" id="BitFieldGroup">
 <a class="viewcode-back" href="../../../library/model.html#caterpillar.model.BitFieldGroup">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -285,6 +296,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="n">size</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pos</span> <span class="o">=</span> <span class="n">pos</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fields</span> <span class="o">=</span> <span class="n">fields</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="c1"># this has to get refactored</span>
         <span class="k">if</span> <span class="mi">8</span> <span class="o">&lt;</span> <span class="n">size</span> <span class="o">&lt;=</span> <span class="mi">16</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fmt</span> <span class="o">=</span> <span class="s2">&quot;H&quot;</span>
         <span class="k">elif</span> <span class="mi">16</span> <span class="o">&lt;</span> <span class="n">size</span> <span class="o">&lt;=</span> <span class="mi">32</span><span class="p">:</span>
@@ -326,6 +338,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">difference_update</span><span class="p">(</span><span class="n">GLOBAL_STRUCT_OPTIONS</span><span class="p">,</span> <span class="n">GLOBAL_UNION_OPTIONS</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">GLOBAL_BITFIELD_FLAGS</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__bits__</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__fmt__</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">fmt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="p">))</span>
 
         <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bit_pos</span>
         <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_abs_bit_pos</span>
@@ -336,6 +349,7 @@
             <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Attempted to add a non-bitfield struct to a bitfield! (type=</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span>
             <span class="p">)</span>
+        <span class="c1"># REVISIT: undefined bahaviour when parsing</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">Struct</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_process_field</span><span class="p">(</span>
@@ -446,7 +460,10 @@
 
         <span class="n">type_</span> <span class="o">=</span> <span class="n">typeof</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">struct</span><span class="p">)</span>
         <span class="n">bit_pos</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">group</span><span class="o">.</span><span class="n">size</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bit_pos</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-        <span class="n">group</span><span class="o">.</span><span class="n">fields</span><span class="p">[(</span><span class="n">bit_pos</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">type_</span><span class="p">)]</span> <span class="o">=</span> <span class="n">field</span>
+        <span class="c1"># NOTE: I know, we&#39;re calling this method twice now, but it saves some</span>
+        <span class="c1"># iterations later on.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_included</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">default</span><span class="p">,</span> <span class="n">annotation</span><span class="p">):</span>
+            <span class="n">group</span><span class="o">.</span><span class="n">fields</span><span class="p">[(</span><span class="n">bit_pos</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">type_</span><span class="p">)]</span> <span class="o">=</span> <span class="n">field</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_bit_pos</span> <span class="o">+=</span> <span class="n">width</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_abs_bit_pos</span> <span class="o">+=</span> <span class="n">width</span>
         <span class="k">return</span> <span class="n">field</span>
@@ -479,12 +496,15 @@
         <span class="n">context</span><span class="p">[</span><span class="n">CTX_OBJECT</span><span class="p">]</span> <span class="o">=</span> <span class="n">Context</span><span class="p">(</span><span class="n">_parent</span><span class="o">=</span><span class="n">context</span><span class="p">)</span>
         <span class="n">base_path</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_PATH</span><span class="p">]</span>
         <span class="n">data</span> <span class="o">=</span> <span class="nb">memoryview</span><span class="p">(</span><span class="n">context</span><span class="p">[</span><span class="n">CTX_STREAM</span><span class="p">]</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__bits__</span> <span class="o">//</span> <span class="mi">8</span><span class="p">))</span>
+
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="p">):</span>
             <span class="c1"># each group specifies the fields we are about to unpack. But first, we have</span>
             <span class="c1"># to read the bits from the stream</span>
             <span class="n">start</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">pos</span> <span class="o">//</span> <span class="mi">8</span>
-            <span class="n">value</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">start</span> <span class="p">:</span> <span class="n">start</span> <span class="o">+</span> <span class="n">group</span><span class="o">.</span><span class="n">size</span> <span class="o">//</span> <span class="mi">8</span><span class="p">]</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">group</span><span class="o">.</span><span class="n">fmt</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="k">for</span> <span class="n">bit_info</span><span class="p">,</span> <span class="n">field</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">group</span><span class="o">.</span><span class="n">fields</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">libstruct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="o">.</span><span class="n">ch</span><span class="si">}{</span><span class="n">group</span><span class="o">.</span><span class="n">fmt</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="n">start</span> <span class="p">:</span> <span class="n">start</span> <span class="o">+</span> <span class="n">group</span><span class="o">.</span><span class="n">size</span> <span class="o">//</span> <span class="mi">8</span><span class="p">]</span>
+            <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">bit_info</span><span class="p">,</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">group</span><span class="o">.</span><span class="n">fields</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="vm">__name__</span>
                 <span class="c1"># The field should be ignored if it is not within the</span>
                 <span class="c1"># member map (this usually means we have a padding field)</span>
@@ -516,15 +536,15 @@
             <span class="c1"># The same applies here, but we convert all values to int instead of reading</span>
             <span class="c1"># them from the stream</span>
             <span class="n">value</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="k">for</span> <span class="n">bit_info</span><span class="p">,</span> <span class="n">field</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">group</span><span class="o">.</span><span class="n">fields</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="k">for</span> <span class="n">bit_info</span><span class="p">,</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">group</span><span class="o">.</span><span class="n">fields</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="c1"># Setup the field&#39;s context</span>
                 <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="vm">__name__</span>
-                <span class="n">context</span><span class="p">[</span><span class="n">CTX_PATH</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_path</span><span class="si">}</span><span class="s2">.(</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">).</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
-                <span class="n">bit_pos</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">bit_info</span>
                 <span class="c1"># Padding is translated into zeros</span>
                 <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_member_map_</span><span class="p">:</span>
                     <span class="k">continue</span>
 
+                <span class="n">context</span><span class="p">[</span><span class="n">CTX_PATH</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_path</span><span class="si">}</span><span class="s2">.(</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">).</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">bit_pos</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">bit_info</span>
                 <span class="n">field_value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="mi">0</span>
                 <span class="n">shift</span> <span class="o">=</span> <span class="n">bit_pos</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">width</span>
                 <span class="c1"># Here&#39;s the tricky part: we have to convert all values to int</span>

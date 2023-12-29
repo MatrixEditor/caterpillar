@@ -135,7 +135,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -175,7 +175,11 @@
 <li class="toctree-l2"><a class="reference internal" href="../library/options.html">2. Options</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Development</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../development/index.html">Development</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of Development</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../development/contribution.html">1. Contribution Guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/changelog.html">2. Changelog</a></li>
+</ul>
+</li>
 </ul>
 
 </div>
@@ -204,7 +208,7 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
@@ -213,6 +217,73 @@
           <section id="advanced-concepts">
 <span id="id1"></span><h1><span class="section-number">3. </span>Advanced Concepts<a class="headerlink" href="#advanced-concepts" title="Link to this heading">#</a></h1>
 <p><em>TODO</em></p>
+<p>Now that you’ve acquired a general understanding of how this library works, let’s
+start the more advanced concepts. This document will bring the tutorial to a close,
+leaving you well-equipped to create your own struct classes in Python.</p>
+<div class="admonition attention">
+<p class="admonition-title">Attention</p>
+<p>Most of the structs and techniques showcased here are subject to change, notably
+<code class="xref py py-class docutils literal notranslate"><span class="pre">BitField</span></code> and <code class="code docutils literal notranslate"><span class="pre">&#64;union</span></code>. Their current usage is not as user-friendly
+as expected.</p>
+</div>
+<section id="operators">
+<h2><span class="section-number">3.1. </span>Operators<a class="headerlink" href="#operators" title="Link to this heading">#</a></h2>
+<section id="switch">
+<h3><span class="section-number">3.1.1. </span>Switch<a class="headerlink" href="#switch" title="Link to this heading">#</a></h3>
+<p><em>TODO</em></p>
+</section>
+<section id="offset">
+<h3><span class="section-number">3.1.2. </span>Offset<a class="headerlink" href="#offset" title="Link to this heading">#</a></h3>
+<p><em>TODO</em></p>
+</section>
+</section>
+<section id="bitfields">
+<h2><span class="section-number">3.2. </span>BitFields<a class="headerlink" href="#bitfields" title="Link to this heading">#</a></h2>
+<p><em>TODO</em> description</p>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">Implementing the <a class="reference external" href="https://www.w3.org/TR/png/#5Chunk-naming-conventions">chunk-naming</a> convention</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@bitfield</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="n">S_DISCARD_UNNAMED</span><span class="p">})</span>
+<span class="k">class</span> <span class="nc">ChunkOptions</span><span class="p">:</span>
+    <span class="n">_</span>            <span class="p">:</span> <span class="mi">2</span>        <span class="c1"># &lt;-- first two bits are not used</span>
+    <span class="n">ancillary</span>    <span class="p">:</span> <span class="mi">1</span>        <span class="c1"># f0</span>
+    <span class="n">_1</span>           <span class="p">:</span> <span class="mi">0</span>
+    <span class="n">_2</span>           <span class="p">:</span> <span class="mi">2</span>
+    <span class="n">private</span>      <span class="p">:</span> <span class="mi">1</span>        <span class="c1"># &lt;-- the 5-th bit (from right to left)</span>
+    <span class="n">_3</span>           <span class="p">:</span> <span class="mi">0</span>
+    <span class="n">_4</span>           <span class="p">:</span> <span class="mi">2</span>
+    <span class="n">reserved</span>     <span class="p">:</span> <span class="mi">1</span>        <span class="c1"># f2</span>
+    <span class="n">_5</span>           <span class="p">:</span> <span class="mi">0</span>        <span class="c1"># &lt;-- padding until the end of this byte</span>
+    <span class="n">_6</span>           <span class="p">:</span> <span class="mi">2</span>
+    <span class="n">safe_to_copy</span> <span class="p">:</span> <span class="mi">1</span>        <span class="c1"># f3</span>
+
+<span class="c1"># byte     :     0        1       2        3</span>
+<span class="c1"># bit      : 76543210 76543210 76543210 76543210</span>
+<span class="c1"># ----------------------------------------------</span>
+<span class="c1"># breakdown: 00100000 00100000 00100000 00100000</span>
+<span class="c1">#            \/|\___/ \/|\___/ \/|\___/ \/|\___/</span>
+<span class="c1">#            u f0 a   u f1 a   u f2  a  u f3 a</span>
+<span class="c1"># Where u=&#39;unnamed&#39;, a=&#39;added&#39; and &#39;f..&#39;=corresponding fields</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="unions">
+<h2><span class="section-number">3.3. </span>Unions<a class="headerlink" href="#unions" title="Link to this heading">#</a></h2>
+<p><em>TODO</em> description</p>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">Combining the name with its naming convention</span><a class="headerlink" href="#id3" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@union</span>
+<span class="k">class</span> <span class="nc">ChunkName</span><span class="p">:</span>
+    <span class="n">text</span><span class="p">:</span> <span class="n">Bytes</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">options</span><span class="p">:</span> <span class="n">ChunkOptions</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="the-end">
+<h2><span class="section-number">3.4. </span>The End!<a class="headerlink" href="#the-end" title="Link to this heading">#</a></h2>
+<p><em>TODO: implement final PNG struct</em></p>
+</section>
 </section>
 
         </article>
@@ -258,8 +329,34 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">3. Advanced Concepts</a><ul>
+<li><a class="reference internal" href="#operators">3.1. Operators</a><ul>
+<li><a class="reference internal" href="#switch">3.1.1. Switch</a></li>
+<li><a class="reference internal" href="#offset">3.1.2. Offset</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#bitfields">3.2. BitFields</a></li>
+<li><a class="reference internal" href="#unions">3.3. Unions</a></li>
+<li><a class="reference internal" href="#the-end">3.4. The End!</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

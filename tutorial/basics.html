@@ -175,7 +175,11 @@
 <li class="toctree-l2"><a class="reference internal" href="../library/options.html">2. Options</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Development</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../development/index.html">Development</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of Development</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../development/contribution.html">1. Contribution Guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/changelog.html">2. Changelog</a></li>
+</ul>
+</li>
 </ul>
 
 </div>
@@ -214,8 +218,8 @@
 <span id="basics"></span><h1><span class="section-number">2. </span>Basic Concepts<a class="headerlink" href="#basic-concepts" title="Link to this heading">#</a></h1>
 <p>In this section, we’ll explore some common techniques used in binary file formats, setting
 the stage for more advanced topics in the next chapter.</p>
-<div class="admonition attention">
-<p class="admonition-title">Attention</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
 <p>Some examples using the interpreter prompts make use of a shortcut to define <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code>
 objects:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">caterpillar.shortcuts</span> <span class="kn">import</span> <span class="n">F</span>
@@ -500,7 +504,9 @@ installed via pip, <em>lzo</em> (using <code class="code docutils literal notran
 <h3><span class="section-number">2.2.3. </span>Specials<a class="headerlink" href="#specials" title="Link to this heading">#</a></h3>
 <section id="computed">
 <h4><span class="section-number">2.2.3.1. </span>Computed<a class="headerlink" href="#computed" title="Link to this heading">#</a></h4>
-<p>A runtime computed variable that does not pack any data.</p>
+<p>A runtime computed variable that does not pack any data. It is rarely recommended to use this
+struct, because you can simply define a <code class="code docutils literal notranslate"><span class="pre">&#64;property</span></code> or method for what this structs
+represents, <strong>unless</strong> you need the value later on while packing or unpacking.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span> <span class="o">=</span> <span class="n">Computed</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">foobar</span><span class="p">)</span> <span class="c1"># context lambda or constant value</span>
 </pre></div>
 </div>
@@ -534,7 +540,7 @@ or can we just define a method?</p>
 </section>
 <section id="pass">
 <h4><span class="section-number">2.2.3.2. </span>Pass<a class="headerlink" href="#pass" title="Link to this heading">#</a></h4>
-<p>In case nothing should be done, just use <code class="xref py py-class docutils literal notranslate"><span class="pre">Pass</span></code>.</p>
+<p>In case nothing should be done, just use <code class="xref py py-class docutils literal notranslate"><span class="pre">Pass</span></code>. This struct won’t affect the stream in any way.</p>
 <hr><div class="admonition important">
 <p class="admonition-title">Important</p>
 <p>Congratulations! You have successfully mastered the basics of <em>caterpillar</em>! Are you
