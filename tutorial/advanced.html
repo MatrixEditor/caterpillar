@@ -223,8 +223,7 @@ leaving you well-equipped to create your own struct classes in Python.</p>
 <div class="admonition attention">
 <p class="admonition-title">Attention</p>
 <p>Most of the structs and techniques showcased here are subject to change, notably
-<code class="xref py py-class docutils literal notranslate"><span class="pre">BitField</span></code> and <code class="code docutils literal notranslate"><span class="pre">&#64;union</span></code>. Their current usage is not as user-friendly
-as expected.</p>
+<code class="xref py py-class docutils literal notranslate"><span class="pre">BitField</span></code>. Its current usage is not as user-friendly as someone might expect.</p>
 </div>
 <section id="operators">
 <h2><span class="section-number">3.1. </span>Operators<a class="headerlink" href="#operators" title="Link to this heading">#</a></h2>
@@ -240,8 +239,8 @@ as expected.</p>
 <section id="bitfields">
 <h2><span class="section-number">3.2. </span>BitFields<a class="headerlink" href="#bitfields" title="Link to this heading">#</a></h2>
 <p><em>TODO</em> description</p>
-<div class="literal-block-wrapper docutils container" id="id2">
-<div class="code-block-caption"><span class="caption-text">Implementing the <a class="reference external" href="https://www.w3.org/TR/png/#5Chunk-naming-conventions">chunk-naming</a> convention</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">Implementing the <a class="reference external" href="https://www.w3.org/TR/png/#5Chunk-naming-conventions">chunk-naming</a> convention</span><a class="headerlink" href="#id3" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@bitfield</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="n">S_DISCARD_UNNAMED</span><span class="p">})</span>
 <span class="k">class</span> <span class="nc">ChunkOptions</span><span class="p">:</span>
     <span class="n">_</span>            <span class="p">:</span> <span class="mi">2</span>        <span class="c1"># &lt;-- first two bits are not used</span>
@@ -269,15 +268,41 @@ as expected.</p>
 </section>
 <section id="unions">
 <h2><span class="section-number">3.3. </span>Unions<a class="headerlink" href="#unions" title="Link to this heading">#</a></h2>
-<p><em>TODO</em> description</p>
-<div class="literal-block-wrapper docutils container" id="id3">
-<div class="code-block-caption"><span class="caption-text">Combining the name with its naming convention</span><a class="headerlink" href="#id3" title="Link to this code">#</a></div>
+<p>This library introduces a special struct, namely <em>union</em>. What makes it special is
+that <strong>it behaves like a C-Union</strong>. Really?</p>
+<p>This library introduces a special struct, namely <em>union</em>. What makes it special is,
+that <strong>it behaves like a C-Union</strong>. Really?</p>
+<p>For example, let’s combine the <a class="reference external" href="https://www.w3.org/TR/png/#5Chunk-naming-conventions">chunk-naming</a>
+convention with its bit options. You can use the bitfield from the previous section.</p>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">Combining the name with its naming convention</span><a class="headerlink" href="#id4" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@union</span>
 <span class="k">class</span> <span class="nc">ChunkName</span><span class="p">:</span>
     <span class="n">text</span><span class="p">:</span> <span class="n">Bytes</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
     <span class="n">options</span><span class="p">:</span> <span class="n">ChunkOptions</span>
 </pre></div>
 </div>
+</div>
+<p>Now, lets look at the bahaviour of an example object:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span> <span class="o">=</span> <span class="n">ChunkName</span><span class="p">()</span>   <span class="c1"># arguments optional</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span>
+<span class="go">ChunkName(text=None, options=None)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;cHNk&quot;</span>  <span class="c1"># lower-case &#39;k&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span>
+<span class="go">ChunkName(text=b&#39;cHNk&#39;, options=ChunkOptions(..., safe_to_copy=True))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;cHNK&quot;</span>  <span class="c1"># upper-case &#39;K&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span>
+<span class="go">ChunkName(text=b&#39;cHNK&#39;, options=ChunkOptions(..., safe_to_copy=False))</span>
+</pre></div>
+</div>
+<p>As stated in the data model reference on <a class="reference internal" href="../reference/datamodel.html#union-reference"><span class="std std-ref">Union</span></a>, the constructor is the only
+place, where the data does not get synchronized. In all other situations, the new value will
+be applied to all other fields.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You can even write your own implementation of a <code class="xref py py-class docutils literal notranslate"><span class="pre">UnionHook</span></code> to do whatever you
+want with the union object. Just specify the <code class="code docutils literal notranslate"><span class="pre">hook_cls</span></code> parameter in the union
+decorator.</p>
 </div>
 </section>
 <section id="the-end">

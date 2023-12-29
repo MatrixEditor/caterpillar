@@ -12,8 +12,7 @@ leaving you well-equipped to create your own struct classes in Python.
 
 .. attention::
     Most of the structs and techniques showcased here are subject to change, notably
-    :class:`BitField` and :code:`@union`. Their current usage is not as user-friendly
-    as expected.
+    :class:`BitField`. Its current usage is not as user-friendly as someone might expect.
 
 
 Operators
@@ -63,7 +62,15 @@ BitFields
 Unions
 ------
 
-*TODO* description
+This library introduces a special struct, namely *union*. What makes it special is
+that **it behaves like a C-Union**. Really?
+
+
+This library introduces a special struct, namely *union*. What makes it special is,
+that **it behaves like a C-Union**. Really?
+
+For example, let's combine the `chunk-naming <https://www.w3.org/TR/png/#5Chunk-naming-conventions>`_
+convention with its bit options. You can use the bitfield from the previous section.
 
 .. code-block:: python
     :caption: Combining the name with its naming convention
@@ -73,6 +80,28 @@ Unions
         text: Bytes(4)
         options: ChunkOptions
 
+Now, lets look at the bahaviour of an example object:
+
+.. code-block:: python
+
+    >>> obj = ChunkName()   # arguments optional
+    >>> obj
+    ChunkName(text=None, options=None)
+    >>> obj.name = b"cHNk"  # lower-case 'k'
+    >>> obj
+    ChunkName(text=b'cHNk', options=ChunkOptions(..., safe_to_copy=True))
+    >>> obj.name = b"cHNK"  # upper-case 'K'
+    >>> obj
+    ChunkName(text=b'cHNK', options=ChunkOptions(..., safe_to_copy=False))
+
+As stated in the data model reference on :ref:`union-reference`, the constructor is the only
+place, where the data does not get synchronized. In all other situations, the new value will
+be applied to all other fields.
+
+.. note::
+    You can even write your own implementation of a :class:`UnionHook` to do whatever you
+    want with the union object. Just specify the :code:`hook_cls` parameter in the union
+    decorator.
 
 The End!
 --------

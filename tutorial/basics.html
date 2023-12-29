@@ -265,8 +265,8 @@ documentation provides a detailed explanation of all different configurations.</
 standard Python enumerations - classes extending  <code class="code docutils literal notranslate"><span class="pre">enum.Enum</span></code> - with ease.</p>
 <p>Let’s revisit <a class="reference external" href="https://www.w3.org/TR/png/#11pHYs">pHYS</a> chunk to add an enum to the
 last field.</p>
-<div class="literal-block-wrapper docutils container" id="id1">
-<div class="code-block-caption"><span class="caption-text">Simple enumeration in a struct definition</span><a class="headerlink" href="#id1" title="Link to this code">#</a></div>
+<div class="literal-block-wrapper docutils container" id="id5">
+<div class="code-block-caption"><span class="caption-text">Simple enumeration in a struct definition</span><a class="headerlink" href="#id5" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">enum</span>
 
 <span class="k">class</span> <span class="nc">PHYSUnit</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">IntEnum</span><span class="p">):</span> <span class="c1"># &lt;-- the enum value doesn&#39;t have to be int</span>
@@ -307,8 +307,8 @@ occupies three bytes.</p>
 <h4><span class="section-number">2.1.4.1. </span>CString<a class="headerlink" href="#cstring" title="Link to this heading">#</a></h4>
 <p>The CString in this library extends beyond a mere reference to C strings. It provides
 additional functionality, as demonstrated in the structure of the next chunk.</p>
-<div class="literal-block-wrapper docutils container" id="id2">
-<div class="code-block-caption"><span class="caption-text">The <a class="reference external" href="https://www.w3.org/TR/png/#11tEXt">tEXt</a> chunk structure</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-text">The <a class="reference external" href="https://www.w3.org/TR/png/#11tEXt">tEXt</a> chunk structure</span><a class="headerlink" href="#id6" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
 <span class="k">class</span> <span class="nc">TEXTChunk</span><span class="p">:</span>
     <span class="c1"># dynamic sized string that ends with a null-byte</span>
@@ -403,8 +403,8 @@ use the <code class="xref py py-class docutils literal notranslate"><span class=
 </div>
 <p>With the gained knowledge, let’s implement the struct for the <a class="reference external" href="https://www.w3.org/TR/png/#fdAT-chunk">fDAT</a>
 chunk of our PNG format. It should look like this:</p>
-<div class="literal-block-wrapper docutils container" id="id3">
-<div class="code-block-caption"><span class="caption-text">Implementation for the frame data chunk</span><a class="headerlink" href="#id3" title="Link to this code">#</a></div>
+<div class="literal-block-wrapper docutils container" id="id7">
+<div class="code-block-caption"><span class="caption-text">Implementation for the frame data chunk</span><a class="headerlink" href="#id7" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span>                    <span class="c1"># &lt;-- endianess as usual</span>
 <span class="k">class</span> <span class="nc">FDATChunk</span><span class="p">:</span>
     <span class="n">sequence_number</span><span class="p">:</span> <span class="n">uint32</span>
@@ -424,8 +424,8 @@ Solution<div class="sd-summary-down docutils">
 <div class="sd-summary-up docutils">
 <svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-up" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M18.78 15.28a.75.75 0 000-1.06l-6.25-6.25a.75.75 0 00-1.06 0l-6.25 6.25a.75.75 0 101.06 1.06L12 9.56l5.72 5.72a.75.75 0 001.06 0z"></path></svg></div>
 </summary><div class="sd-summary-content sd-card-body docutils">
-<div class="literal-block-wrapper docutils container" id="id4">
-<div class="code-block-caption"><span class="caption-text">Sample implementation of the <em>zTXt</em> chunk</span><a class="headerlink" href="#id4" title="Link to this code">#</a></div>
+<div class="literal-block-wrapper docutils container" id="id8">
+<div class="code-block-caption"><span class="caption-text">Sample implementation of the <em>zTXt</em> chunk</span><a class="headerlink" href="#id8" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>                             <span class="c1"># &lt;-- actually, we don&#39;t need a specific byteorder</span>
 <span class="k">class</span> <span class="nc">ZTXTChunk</span><span class="p">:</span>
     <span class="n">keyword</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>           <span class="c1"># &lt;-- variable length</span>
@@ -454,22 +454,54 @@ you can use <code class="xref py py-class docutils literal notranslate"><span cl
 </div>
 </section>
 </section>
+<section id="context">
+<h2><span class="section-number">2.2. </span>Context<a class="headerlink" href="#context" title="Link to this heading">#</a></h2>
+<p><em>Caterpillar</em> uses a special <code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code> to keep track of the current packing or unpacking
+process. A context contains special variables, which are discussed in the <a class="reference internal" href="../reference/datamodel.html#context-reference"><span class="std std-ref">Context</span></a>
+reference in detail.</p>
+<p>The current object that is being packed or parsed can be referenced with a shortcut <code class="code docutils literal notranslate"><span class="pre">this</span></code>.
+Additionally, the parent object (if any) can be referenced by using <code class="code docutils literal notranslate"><span class="pre">parent</span></code>.</p>
+<div class="literal-block-wrapper docutils container" id="id9">
+<div class="code-block-caption"><span class="caption-text">Understanding the <em>context</em></span><a class="headerlink" href="#id9" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
+<span class="k">class</span> <span class="nc">Format</span><span class="p">:</span>
+    <span class="n">length</span><span class="p">:</span> <span class="n">uint8</span>
+    <span class="n">foo</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">length</span><span class="p">)</span>   <span class="c1"># &lt;-- just reference the length field</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You can apply any operation on context paths. However, be aware that conditional branches must
+be encapsulated by lambda expressions.</p>
+</div>
+<section id="runtime-length-of-objects">
+<h3><span class="section-number">2.2.1. </span>Runtime length of objects<a class="headerlink" href="#runtime-length-of-objects" title="Link to this heading">#</a></h3>
+<p>In cases where you want to retrieve the runtime length of a variable that is within the current
+accessible bounds, there is a special class designed for that use-case: <code class="xref py py-attr docutils literal notranslate"><span class="pre">lenof</span></code>.</p>
+<p>You might have seen this special class before when calculating the length of some strings. It
+simply applies the <a href="#id1"><span class="problematic" id="id2">:python:`len(...)`</span></a> function of the retrieved variable.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>To access elements of a sequence within the context, you can just use <a href="#id3"><span class="problematic" id="id4">:python:`this.foobar[...]`</span></a>.</p>
+</div>
+</section>
+</section>
 <section id="standard-structs">
-<h2><span class="section-number">2.2. </span>Standard Structs<a class="headerlink" href="#standard-structs" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">2.3. </span>Standard Structs<a class="headerlink" href="#standard-structs" title="Link to this heading">#</a></h2>
 <p>We still have some important struct types to discuss to start defining <em>complex</em> structs.</p>
 <section id="constants">
-<h3><span class="section-number">2.2.1. </span>Constants<a class="headerlink" href="#constants" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">2.3.1. </span>Constants<a class="headerlink" href="#constants" title="Link to this heading">#</a></h3>
 <p>Proprietary file formats or binary formats often store <a class="reference external" href="https://www.garykessler.net/library/file_sigs.html">magic bytes</a>
 usually at the start of the data stream. Constant values will be validated against the parsed
 data and will be applied to the class automatically, eliminating the need to write them into
 the constructor every time.</p>
-<p>Currently, there are three different types of constant structs:</p>
 <section id="constbytes">
-<h4><span class="section-number">2.2.1.1. </span>ConstBytes<a class="headerlink" href="#constbytes" title="Link to this heading">#</a></h4>
+<h4><span class="section-number">2.3.1.1. </span>ConstBytes<a class="headerlink" href="#constbytes" title="Link to this heading">#</a></h4>
 <p>These constants can be defined implicitly by annotating a field in a struct class with bytes.
 For example, in the case of starting the <em>main</em> PNG struct:</p>
-<div class="literal-block-wrapper docutils container" id="id5">
-<div class="code-block-caption"><span class="caption-text">Starting the <em>main</em> PNG struct</span><a class="headerlink" href="#id5" title="Link to this code">#</a></div>
+<div class="literal-block-wrapper docutils container" id="id10">
+<div class="code-block-caption"><span class="caption-text">Starting the <em>main</em> PNG struct</span><a class="headerlink" href="#id10" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span> <span class="c1"># &lt;-- will be relevant later on</span>
 <span class="k">class</span> <span class="nc">PNG</span><span class="p">:</span>
     <span class="n">magic</span><span class="p">:</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x89</span><span class="s2">PNG</span><span class="se">\x0D\x0A\x1A\x0A</span><span class="s2">&quot;</span>
@@ -478,13 +510,8 @@ For example, in the case of starting the <em>main</em> PNG struct:</p>
 </div>
 </div>
 </section>
-<section id="conststring">
-<h4><span class="section-number">2.2.1.2. </span>ConstString<a class="headerlink" href="#conststring" title="Link to this heading">#</a></h4>
-<p>This struct type is essentially the same as <code class="xref py py-class docutils literal notranslate"><span class="pre">ConstBytes</span></code> but uses a string value
-for validation.</p>
-</section>
 <section id="const">
-<h4><span class="section-number">2.2.1.3. </span>Const<a class="headerlink" href="#const" title="Link to this heading">#</a></h4>
+<h4><span class="section-number">2.3.1.2. </span>Const<a class="headerlink" href="#const" title="Link to this heading">#</a></h4>
 <p>Raw constant values require a struct to be defined to parse or build the value.
 For example:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">F</span><span class="p">(</span><span class="n">Const</span><span class="p">(</span><span class="mh">0xbeef</span><span class="p">,</span> <span class="n">uint32</span><span class="p">))</span>
@@ -493,7 +520,7 @@ For example:</p>
 </section>
 </section>
 <section id="compression">
-<h3><span class="section-number">2.2.2. </span>Compression<a class="headerlink" href="#compression" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">2.3.2. </span>Compression<a class="headerlink" href="#compression" title="Link to this heading">#</a></h3>
 <p>This library also supports default compression formats like <em>zlib</em>, <em>lzma</em>, <em>bz2</em> and, if
 installed via pip, <em>lzo</em> (using <code class="code docutils literal notranslate"><span class="pre">lzallright</span></code>).</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">ZLibCompressed</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span> <span class="c1"># length or struct here applicable</span>
@@ -501,9 +528,11 @@ installed via pip, <em>lzo</em> (using <code class="code docutils literal notran
 </div>
 </section>
 <section id="specials">
-<h3><span class="section-number">2.2.3. </span>Specials<a class="headerlink" href="#specials" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">2.3.3. </span>Specials<a class="headerlink" href="#specials" title="Link to this heading">#</a></h3>
+<p>All of the following structs may be used in special situations where all other previously
+discussed structs can’t be used.</p>
 <section id="computed">
-<h4><span class="section-number">2.2.3.1. </span>Computed<a class="headerlink" href="#computed" title="Link to this heading">#</a></h4>
+<h4><span class="section-number">2.3.3.1. </span>Computed<a class="headerlink" href="#computed" title="Link to this heading">#</a></h4>
 <p>A runtime computed variable that does not pack any data. It is rarely recommended to use this
 struct, because you can simply define a <code class="code docutils literal notranslate"><span class="pre">&#64;property</span></code> or method for what this structs
 represents, <strong>unless</strong> you need the value later on while packing or unpacking.</p>
@@ -521,8 +550,8 @@ Solution<div class="sd-summary-down docutils">
 <div class="sd-summary-up docutils">
 <svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-up" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M18.78 15.28a.75.75 0 000-1.06l-6.25-6.25a.75.75 0 00-1.06 0l-6.25 6.25a.75.75 0 101.06 1.06L12 9.56l5.72 5.72a.75.75 0 001.06 0z"></path></svg></div>
 </summary><div class="sd-summary-content sd-card-body docutils">
-<div class="literal-block-wrapper docutils container" id="id6">
-<div class="code-block-caption"><span class="caption-text">Example implementation of the <em>gAMA</em> chunk</span><a class="headerlink" href="#id6" title="Link to this code">#</a></div>
+<div class="literal-block-wrapper docutils container" id="id11">
+<div class="code-block-caption"><span class="caption-text">Example implementation of the <em>gAMA</em> chunk</span><a class="headerlink" href="#id11" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span>    <span class="c1"># &lt;-- same as usual</span>
 <span class="k">class</span> <span class="nc">GAMAChunk</span><span class="p">:</span>
     <span class="n">gamma</span><span class="p">:</span> <span class="n">uint32</span>
@@ -539,7 +568,7 @@ or can we just define a method?</p>
 </details></div>
 </section>
 <section id="pass">
-<h4><span class="section-number">2.2.3.2. </span>Pass<a class="headerlink" href="#pass" title="Link to this heading">#</a></h4>
+<h4><span class="section-number">2.3.3.2. </span>Pass<a class="headerlink" href="#pass" title="Link to this heading">#</a></h4>
 <p>In case nothing should be done, just use <code class="xref py py-class docutils literal notranslate"><span class="pre">Pass</span></code>. This struct won’t affect the stream in any way.</p>
 <hr><div class="admonition important">
 <p class="admonition-title">Important</p>
@@ -629,17 +658,20 @@ ready for the next level? Brace yourself for some breathtaking action!</p>
 <li><a class="reference internal" href="#padding">2.1.6. Padding</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#standard-structs">2.2. Standard Structs</a><ul>
-<li><a class="reference internal" href="#constants">2.2.1. Constants</a><ul>
-<li><a class="reference internal" href="#constbytes">2.2.1.1. ConstBytes</a></li>
-<li><a class="reference internal" href="#conststring">2.2.1.2. ConstString</a></li>
-<li><a class="reference internal" href="#const">2.2.1.3. Const</a></li>
+<li><a class="reference internal" href="#context">2.2. Context</a><ul>
+<li><a class="reference internal" href="#runtime-length-of-objects">2.2.1. Runtime length of objects</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#compression">2.2.2. Compression</a></li>
-<li><a class="reference internal" href="#specials">2.2.3. Specials</a><ul>
-<li><a class="reference internal" href="#computed">2.2.3.1. Computed</a></li>
-<li><a class="reference internal" href="#pass">2.2.3.2. Pass</a></li>
+<li><a class="reference internal" href="#standard-structs">2.3. Standard Structs</a><ul>
+<li><a class="reference internal" href="#constants">2.3.1. Constants</a><ul>
+<li><a class="reference internal" href="#constbytes">2.3.1.1. ConstBytes</a></li>
+<li><a class="reference internal" href="#const">2.3.1.2. Const</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#compression">2.3.2. Compression</a></li>
+<li><a class="reference internal" href="#specials">2.3.3. Specials</a><ul>
+<li><a class="reference internal" href="#computed">2.3.3.1. Computed</a></li>
+<li><a class="reference internal" href="#pass">2.3.3.2. Pass</a></li>
 </ul>
 </li>
 </ul>

@@ -241,6 +241,43 @@ you can use :class:`Bytes` or :class:`Memory` again. For example:
 .. tip::
     That was a lot of input to take, time for a coffee break! |coffee|
 
+
+Context
+-------
+
+*Caterpillar* uses a special :class:`Context` to keep track of the current packing or unpacking
+process. A context contains special variables, which are discussed in the :ref:`context-reference`
+reference in detail.
+
+The current object that is being packed or parsed can be referenced with a shortcut :code:`this`.
+Additionally, the parent object (if any) can be referenced by using :code:`parent`.
+
+
+.. code-block:: python
+    :caption: Understanding the *context*
+
+    @struct
+    class Format:
+        length: uint8
+        foo: CString(this.length)   # <-- just reference the length field
+
+.. note::
+    You can apply any operation on context paths. However, be aware that conditional branches must
+    be encapsulated by lambda expressions.
+
+Runtime length of objects
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+In cases where you want to retrieve the runtime length of a variable that is within the current
+accessible bounds, there is a special class designed for that use-case: :attr:`lenof`.
+
+You might have seen this special class before when calculating the length of some strings. It
+simply applies the :python:`len(...)` function of the retrieved variable.
+
+.. tip::
+    To access elements of a sequence within the context, you can just use :python:`this.foobar[...]`.
+
+
 Standard Structs
 ----------------
 
@@ -253,8 +290,6 @@ Proprietary file formats or binary formats often store `magic bytes <https://www
 usually at the start of the data stream. Constant values will be validated against the parsed
 data and will be applied to the class automatically, eliminating the need to write them into
 the constructor every time.
-
-Currently, there are three different types of constant structs:
 
 ConstBytes
 ~~~~~~~~~~
@@ -269,12 +304,6 @@ For example, in the case of starting the *main* PNG struct:
     class PNG:
         magic: b"\x89PNG\x0D\x0A\x1A\x0A"
         # other fields will be defined at the end of this tutorial.
-
-ConstString
-~~~~~~~~~~~
-
-This struct type is essentially the same as :class:`ConstBytes` but uses a string value
-for validation.
 
 Const
 ~~~~~
@@ -295,6 +324,9 @@ installed via pip, *lzo* (using :code:`lzallright`).
 
 Specials
 ^^^^^^^^
+
+All of the following structs may be used in special situations where all other previously
+discussed structs can't be used.
 
 Computed
 ~~~~~~~~

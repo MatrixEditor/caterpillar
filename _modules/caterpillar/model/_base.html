@@ -316,9 +316,10 @@
         <span class="c1"># these fields will be set or used while processing the model type</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_member_map_</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Field</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Field</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_union</span> <span class="o">=</span> <span class="n">S_UNION</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span>
         <span class="c1"># Process all fields in the model</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_process_model</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">is_union</span> <span class="o">=</span> <span class="n">S_UNION</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span>
+
 
     <span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="s2">&quot;Sequence&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
         <span class="c1"># We will try to import all fields from the given sequence</span>
@@ -388,6 +389,10 @@
             <span class="c1"># Make it possible to define custom constants</span>
             <span class="k">case</span> <span class="n">Const</span><span class="p">():</span>
                 <span class="n">default</span> <span class="o">=</span> <span class="n">annotation</span><span class="o">.</span><span class="n">value</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_union</span><span class="p">:</span>
+            <span class="c1"># Unions will get none as default value for all fields</span>
+            <span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="k">if</span> <span class="n">default</span> <span class="o">!=</span> <span class="n">INVALID_DEFAULT</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_set_default</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span>
