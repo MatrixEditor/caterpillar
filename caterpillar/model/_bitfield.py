@@ -12,6 +12,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+import struct as libstruct
+
 from typing import Optional, Any, Dict
 from typing import Iterable, Tuple
 from typing import Self, List
@@ -61,6 +63,11 @@ def issigned(obj: Any) -> bool:
     return bool(getattr(obj, SIGNED_ATTR, None))
 
 
+def getformat(obj: Any) -> str:
+    attr = getattr(obj, "__fmt__")
+    return attr() if callable(attr) else attr
+
+
 @dataclass(init=False)
 class BitFieldGroup:
     size: int
@@ -72,6 +79,7 @@ class BitFieldGroup:
         self.size = size
         self.pos = pos
         self.fields = fields or {}
+        # this has to get refactored
         if 8 < size <= 16:
             self.fmt = "H"
         elif 16 < size <= 32:
@@ -110,6 +118,7 @@ class BitField(Struct):
         self.options.difference_update(GLOBAL_STRUCT_OPTIONS, GLOBAL_UNION_OPTIONS)
         self.options.update(GLOBAL_BITFIELD_FLAGS)
         self.__bits__ = sum(map(lambda x: x.size, self.groups))
+        self.__fmt__ = "".join(map(lambda x: x.fmt, self.groups))
 
         del self._bit_pos
         del self._abs_bit_pos
@@ -120,6 +129,7 @@ class BitField(Struct):
             raise ValidationError(
                 f"Attempted to add a non-bitfield struct to a bitfield! (type={type(other)})"
             )
+        # REVISIT: undefined bahaviour when parsing
         return super(Struct, self).__add__(other)
 
     def _process_field(
@@ -230,7 +240,10 @@ class BitField(Struct):
 
         type_ = typeof(field.struct)
         bit_pos = max(group.size - 1 - self._bit_pos, 0)
-        group.fields[(bit_pos, width, type_)] = field
+        # NOTE: I know, we're calling this method twice now, but it saves some
+        # iterations later on.
+        if self._included(name, default, annotation):
+            group.fields[(bit_pos, width, type_)] = field
         self._bit_pos += width
         self._abs_bit_pos += width
         return field
@@ -263,12 +276,15 @@ class BitField(Struct):
         context[CTX_OBJECT] = Context(_parent=context)
         base_path = context[CTX_PATH]
         data = memoryview(context[CTX_STREAM].read(self.__bits__ // 8))
+
         for i, group in enumerate(self.groups):
             # each group specifies the fields we are about to unpack. But first, we have
             # to read the bits from the stream
             start = group.pos // 8
-            value = data[start : start + group.size // 8].cast(group.fmt)[0]
-            for bit_info, field in reversed(group.fields.items()):
+            value = libstruct.unpack(
+                f"{self.order.ch}{group.fmt}", data[start : start + group.size // 8]
+            )[0]
+            for bit_info, field in group.fields.items():
                 name: str = field.__name__
                 # The field should be ignored if it is not within the
                 # member map (this usually means we have a padding field)
@@ -300,15 +316,15 @@ class BitField(Struct):
             # The same applies here, but we convert all values to int instead of reading
             # them from the stream
             value = 0
-            for bit_info, field in reversed(group.fields.items()):
+            for bit_info, field in group.fields.items():
                 # Setup the field's context
                 name: str = field.__name__
-                context[CTX_PATH] = f"{base_path}.({i}).{name}"
-                bit_pos, width, _ = bit_info
                 # Padding is translated into zeros
                 if name not in self._member_map_:
                     continue
 
+                context[CTX_PATH] = f"{base_path}.({i}).{name}"
+                bit_pos, width, _ = bit_info
                 field_value = getattr(obj, name, 0) or 0
                 shift = bit_pos + 1 - width
                 # Here's the tricky part: we have to convert all values to int

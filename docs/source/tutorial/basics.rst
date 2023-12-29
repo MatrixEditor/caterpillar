@@ -7,7 +7,7 @@ Basic Concepts
 In this section, we'll explore some common techniques used in binary file formats, setting
 the stage for more advanced topics in the next chapter.
 
-.. attention::
+.. note::
     Some examples using the interpreter prompts make use of a shortcut to define :class:`Field`
     objects:
 
@@ -299,7 +299,9 @@ Specials
 Computed
 ~~~~~~~~
 
-A runtime computed variable that does not pack any data.
+A runtime computed variable that does not pack any data. It is rarely recommended to use this
+struct, because you can simply define a :code:`@property` or method for what this structs
+represents, **unless** you need the value later on while packing or unpacking.
 
 >>> struct = Computed(this.foobar) # context lambda or constant value
 
@@ -325,12 +327,11 @@ A runtime computed variable that does not pack any data.
 Pass
 ~~~~
 
-In case nothing should be done, just use :class:`Pass`.
+In case nothing should be done, just use :class:`Pass`. This struct won't affect the stream in any way.
 
 .. raw:: html
 
     <hr>
-
 
 .. important::
     Congratulations! You have successfully mastered the basics of *caterpillar*! Are you

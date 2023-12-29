@@ -105,8 +105,8 @@ def unpack_seq(context: _ContextLike, unpack_one) -> List[Any]:
         except Stop:
             break
         except Exception as exc:
-            # if greedy:
-            #     break
+            if greedy:
+                break
             raise StructException(str(exc), context) from exc
     return values
 

@@ -4,8 +4,8 @@ from caterpillar.fields import uint8, UInt, CString, Prefixed, uint32
 
 @bitfield(order=LittleEndian)
 class Flags:
-    bool1: 1
-    num4: 3
+    bool1 : 1
+    num4  : 3
     # padding is generated automatically
 
 

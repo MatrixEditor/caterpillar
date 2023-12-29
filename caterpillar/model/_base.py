@@ -92,7 +92,7 @@ class Sequence(_StructLike, FieldMixin):
     ) -> None:
         self.model = model
         self.arch = arch
-        self.order = order
+        self.order = order or SysNative
         self.options = set(options or [])
         self.field_options = set(field_options or [])
 

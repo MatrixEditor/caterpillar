@@ -9,7 +9,6 @@ Python class definitions and annotations.
    Before using this library, be aware that the current status is "beta/testing". Therefore,
    expect bugs and undocumented issues. Additionally, the documentation is a WIP.
 
-
 Whetting Your Appetite
 ----------------------
 
@@ -74,7 +73,10 @@ what configuration options can be used. Alternatively you can follow the :ref:`t
    library/index.rst
    development/index.rst
 
-
+.. seealso::
+   * `Github Source <https://github.com/MatrixEditor/caterpillar>`_
+   * `Github Issues <https://github.com/MatrixEditor/caterpillar/issues>`_
+   * `Discussions <https://github.com/MatrixEditor/caterpillar/discussions>`_
 
 Indices and tables
 ==================

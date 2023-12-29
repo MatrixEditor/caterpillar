@@ -61,8 +61,7 @@ Packing data
 ^^^^^^^^^^^^
 
 This library's packing and unpacking is similar to Python's `struct <https://docs.python.org/3/library/struct.html>`_
-module. In order to pack data, we need a struct and an input object. When packing data, a struct and an input
-object are needed.
+module. When packing data, a struct and an input object are needed.
 
 Thanks to the RGB class encapsulating its struct instance, explicitly stating the struct to use
 becomes unnecessary.

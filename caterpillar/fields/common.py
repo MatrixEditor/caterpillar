@@ -34,7 +34,6 @@ from caterpillar.context import CTX_FIELD, CTX_STREAM, CTX_SEQ
 from caterpillar.options import F_SEQUENTIAL
 from caterpillar.byteorder import LittleEndian
 from ._base import Field, FieldStruct, INVALID_DEFAULT, singleton
-from .._common import WithoutContextVar
 
 
 class FormatField(FieldStruct):
@@ -53,6 +52,9 @@ class FormatField(FieldStruct):
         self.type_ = type_
         self.__bits__ = calcsize(self.text) * 8
         self._padding_ = self.text == "x"
+
+    def __fmt__(self) -> str:
+        return self.text
 
     def __repr__(self) -> str:
         """
@@ -114,7 +116,7 @@ class FormatField(FieldStruct):
         :param seq: The sequence of values.
         :param context: The current context.
         """
-        if context[CTX_FIELD].length(context) is not Ellipsis:
+        if context[CTX_FIELD].amount is not Ellipsis:
             self.pack_single(seq, context)
         else:
             super().pack_seq(seq, context)
@@ -193,6 +195,7 @@ uint64 = FormatField("Q", int)
 ssize_t = FormatField("n", int)
 size_t = FormatField("N", int)
 
+float16 = FormatField("e", float)
 float32 = FormatField("f", float)
 float64 = FormatField("d", float)
 double = float64
@@ -215,6 +218,9 @@ class Transformer(FieldStruct):
         """
         self.struct = struct
         self.__bits__ = getattr(self.struct, "__bits__", None)
+
+    def __fmt__(self) -> str:
+        return self.struct.__fmt__()
 
     def __type__(self) -> type:
         """
@@ -520,7 +526,7 @@ class CString(Bytes):
         :param context: The current context.
         :return: The unpacked string.
         """
-        raw_pad = self.pad.to_bytes(1, byteorder='big')
+        raw_pad = self.pad.to_bytes(1, byteorder="big")
         if self.length is Ellipsis:
             # Parse actual C-String
             stream: _StreamType = context[CTX_STREAM]
@@ -718,3 +724,24 @@ class Int(FieldStruct):
 class UInt(Int):
     def __init__(self, bits: int) -> None:
         super().__init__(bits, signed=False)
+
+
+# still experimental
+class NotRequired(Transformer):
+    def __type__(self) -> type:
+        return Optional[super().__type__()]
+
+    def __pack__(self, obj: Any, context: _ContextLike) -> None:
+        if obj is None:
+            return
+        super().__pack__(obj, context)
+
+    def __unpack__(self, context: _ContextLike) -> Optional[Any]:
+        try:
+            return super().__unpack__(context)
+        except StructException:
+            return None
+
+
+def optional(struct) -> Transformer:
+    return NotRequired(struct)
