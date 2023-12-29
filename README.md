@@ -16,7 +16,7 @@ options will be added in the future. A brief introduction can be found [here (ou
 
 *Caterpillar* is able to:
 
-* Pack and unpack data just from processing Python class definitions (including support for bitfields with a c++ like syntax!),
+* Pack and unpack data just from processing Python class definitions (including support for bitfields with a c++ like syntax and c-like unions!),
 * apply a wide range of data types (with endianess and architecture configuration),
 * dynamically adapt structs based on their inheritance layout,
 * inserts proper types into the class definition to support documentation and
