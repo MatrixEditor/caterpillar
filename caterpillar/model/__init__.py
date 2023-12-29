@@ -16,6 +16,7 @@ from ._base import Sequence
 from ._struct import (
     Struct,
     struct,
+    UnionHook,
     union,
     unpack,
     unpack_file,

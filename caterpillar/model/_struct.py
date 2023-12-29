@@ -16,7 +16,7 @@ import inspect
 
 from tempfile import TemporaryFile
 from io import BytesIO, IOBase
-from typing import Optional, Union
+from typing import Optional, Union, Callable
 from typing import Dict, Any, Iterable
 from collections import OrderedDict
 from dataclasses import dataclass
@@ -59,6 +59,8 @@ class Struct(Sequence):
         arch: Optional[Arch] = None,
         options: Iterable[Flag] = None,
         field_options: Iterable[Flag] = None,
+        kw_only: bool = True,
+        hook_cls: Optional[type] = None,
     ) -> None:
         options = options or set()
         options.update(
@@ -72,9 +74,14 @@ class Struct(Sequence):
             field_options=field_options,
         )
         # Add additional options based on the struct's type
-        self.model = dataclass(self.model, kw_only=True)
+        self.model = dataclass(self.model, kw_only=kw_only)
         setattr(self.model, STRUCT_FIELD, self)
         setattr(self.model, "__class_getitem__", lambda dim: Field(self, amount=dim))
+        if self.is_union:
+            # install a hook
+            self._union_hook = (hook_cls or UnionHook)(self)
+            setattr(self.model, "__init__", _union_init(self._union_hook))
+            setattr(self.model, "__setattr__", _union_setattr(self._union_hook))
 
     def __type__(self) -> type:
         return self.model
@@ -113,10 +120,12 @@ class Struct(Sequence):
 
 def _make_struct(
     cls: type,
-    options: Iterable[Flag],
+    options: Iterable[Flag] = None,
     order: Optional[ByteOrder] = None,
     arch: Optional[Arch] = None,
     field_options: Iterable[Flag] = None,
+    kw_only: bool = True,
+    hook_cls: Optional[type] = None,
 ) -> type:
     """
     Helper function to create a Struct class.
@@ -129,20 +138,18 @@ def _make_struct(
     :return: The created Struct class.
     """
     _ = Struct(
-        cls, order=order, arch=arch, options=options, field_options=field_options
+        cls,
+        order=order,
+        arch=arch,
+        options=options,
+        field_options=field_options,
+        kw_only=kw_only,
+        hook_cls=hook_cls,
     )
     return cls
 
 
-def struct(
-    cls: type = None,
-    /,
-    *,
-    options: Iterable[Flag] = None,
-    order: Optional[ByteOrder] = None,
-    arch: Optional[Arch] = None,
-    field_options: Iterable[Flag] = None,
-):
+def struct(cls: type = None, /, **kwds):
     """
     Decorator to create a Struct class.
 
@@ -155,27 +162,107 @@ def struct(
     """
 
     def wrap(cls):
-        return _make_struct(
-            cls, options=options, order=order, arch=arch, field_options=field_options
-        )
+        return _make_struct(cls, **kwds)
 
     if cls is not None:
-        return _make_struct(
-            cls, options=options, order=order, arch=arch, field_options=field_options
-        )
+        return _make_struct(cls, **kwds)
 
     return wrap
 
 
-def union(
-    cls: type = None,
-    /,
-    *,
-    options: Iterable[Flag] = None,
-    order: Optional[ByteOrder] = None,
-    arch: Optional[Arch] = None,
-    field_options: Iterable[Flag] = None,
-):
+class UnionHook:
+    """Implementation of a hook to simulate union types.
+
+    It will hook two methods of the target model type: :code:`__init__` and
+    :code:`__setattr__`. Because the constructor calls *setattr* for each
+    attribute in the model, we have to intercept it before it gets called
+    to set an internal status.
+
+    Internally, these two methods will be translated into :meth:`~UnionHook.__model_init__`
+    and :meth:`~UnionHook.__model_setattr__`. Therefore, any class that implements
+    these two methods can be used as a union hook.
+    """
+
+    struct: Struct
+    """The struct reference"""
+
+    max_size: int
+    """The static (cached) maximum size of the union"""
+
+    def __init__(self, struct_: Struct) -> None:
+        self.struct = struct_
+        # Dynamic size is not allowed and will throw an error here
+        self.max_size = sizeof(struct_)
+        # These attributes are set by default
+        self._processing_ = False
+        self._model_init_ = struct_.model.__init__
+
+    def __enter__(self) -> None:
+        # shortcut for disabling permanent attribute refresh during
+        # init and refresh phases
+        self._processing_ = True
+
+    def __exit__(self, exc_type, exc_value, traceback) -> None:
+        # This variable MUST be reset afterward
+        self._processing_ = False
+
+    def __model_init__(self, obj: Any, *args, **kwargs) -> None:
+        # since it is possible now, to specify non-kw_only constructors,
+        # we have to capture both, args and kwargs
+        with self:
+            return self._model_init_(obj, *args, **kwargs)
+
+    def __model_setattr__(self, obj: Any, key: str, new_value: Any) -> None:
+        # The target attribute will alyaws be set
+        object.__setattr__(obj, key, new_value)
+
+        members: Dict[str, Field] = self.struct.get_members()
+        if self._processing_ or key not in members:
+            # Refresh can't be done if:
+            #   1) the current instance is alredy being processed
+            #   2) the member is not in the internal model
+            return
+
+        with self:
+            # delegation into method allows for customisation
+            self.refresh(obj, key, new_value, members)
+
+    def refresh(
+        self, obj: Any, key: str, new_value: Any, members: Dict[str, Field]
+    ) -> None:
+        # DEFAULT: retrieve the current field and temporarily pack its data
+        field = members[key]
+        data = pack(new_value, field)
+
+        # Apply a padding to the retrieved data
+        stream = BytesIO(data + b"\0" * (self.max_size - len(data)))
+        for name, field in members.items():
+            # this field shouldn't be updated as it already was
+            if name == key:
+                continue
+
+            # we can simply use setattr here
+            object.__setattr__(obj, name, unpack(field, stream))
+            stream.seek(0)
+
+
+def _union_init(hook: UnionHook) -> Callable:
+    # wrapper function to capture the calling instance
+    def init(self, *args, **kwargs) -> None:
+        return hook.__model_init__(self, *args, **kwargs)
+
+    return init
+
+
+def _union_setattr(hook: UnionHook) -> Callable:
+    # wrapper function to capture the calling instance
+    def setattribute(self, key: str, value: Any) -> None:
+        hook.__model_setattr__(self, key, value)
+
+    return setattribute
+
+
+def union(cls: type = None, /, *, options: Iterable[Flag] = None, **kwds):
     """
     Decorator to create a Union class.
 
@@ -189,14 +276,10 @@ def union(
     options = set(list(options or []) + [S_UNION])
 
     def wrap(cls):
-        return _make_struct(
-            cls, options=options, order=order, arch=arch, field_options=field_options
-        )
+        return _make_struct(cls, options=options, **kwds)
 
     if cls is not None:
-        return _make_struct(
-            cls, options=options, order=order, arch=arch, field_options=field_options
-        )
+        return _make_struct(cls, options=options, **kwds)
 
     return wrap
 

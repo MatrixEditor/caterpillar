@@ -1,5 +1,8 @@
 .. _first-steps:
 
+.. role:: python(code)
+   :language: python
+
 ***********
 First Steps
 ***********
@@ -39,6 +42,10 @@ for its data.
         r: uint8    # <-- a field can be defined just like this
         g: uint8
         b: uint8
+
+.. tip::
+    Pro's advice: use the configruation option :code:`kw_only=False` to be able to use
+    positional arguments, if applicable.
 
 With this simple annotation, the struct class becomes universally applicable. You can
 integrate it into other struct definitions or instantiate objects of the class.
@@ -127,7 +134,27 @@ struct-wide :class:`Arch`.
                 minute: uint8
                 second: uint8
 
-    Note that we can integrate this truct later on.
+    Note that we can integrate this struct later on.
+
+
+Documenting structs
+^^^^^^^^^^^^^^^^^^^
+
+To minimize changes to your codebase or require as little adaptation as possible from users of
+this library, there's a documentation feature. By utilizing the ability to globally apply
+options, you just need the following code:
+
+.. code-block:: python
+    :caption: Enable documentation feature
+
+    from caterpillar.shortcuts import opt
+
+    opt.set_struct_flags(opt.S_REPLACE_TYPES)
+
+.. tip::
+    If you are working with `Sphinx <https://www.sphinx-doc.org/en/master/>`_, you might need
+    to enable :python:`autodoc_member_order = 'bysource'` to display all struct members in the
+    correct order.
 
 Next Steps
 ----------

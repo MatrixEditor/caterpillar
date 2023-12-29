@@ -99,9 +99,10 @@ class Sequence(_StructLike, FieldMixin):
         # these fields will be set or used while processing the model type
         self._member_map_: Dict[str, Field] = {}
         self.fields: List[Field] = []
+        self.is_union = S_UNION in self.options
         # Process all fields in the model
         self._process_model()
-        self.is_union = S_UNION in self.options
+
 
     def __add__(self, sequence: "Sequence") -> Self:
         # We will try to import all fields from the given sequence
@@ -168,6 +169,10 @@ class Sequence(_StructLike, FieldMixin):
             # Make it possible to define custom constants
             case Const():
                 default = annotation.value
+
+        if self.is_union:
+            # Unions will get none as default value for all fields
+            default = None
 
         if default != INVALID_DEFAULT:
             self._set_default(name, default)
