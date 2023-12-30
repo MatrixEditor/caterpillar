@@ -528,10 +528,12 @@
         <span class="n">data</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">struct</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_elements</span><span class="p">):</span>
             <span class="n">stream</span> <span class="o">=</span> <span class="n">BytesIO</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_STREAM</span><span class="p">]</span>
-            <span class="k">with</span> <span class="n">WithoutContextVar</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">CTX_STREAM</span><span class="p">,</span> <span class="n">stream</span><span class="p">):</span>
+            <span class="k">with</span> <span class="n">WithoutContextVar</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">CTX_STREAM</span><span class="p">,</span> <span class="n">stream</span><span class="p">),</span> <span class="n">WithoutContextVar</span><span class="p">(</span>
+                <span class="n">context</span><span class="p">,</span> <span class="n">CTX_SEQ</span><span class="p">,</span> <span class="kc">False</span>
+            <span class="p">):</span>
                 <span class="n">data</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">__unpack__</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="nb">memoryview</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">data</span></div>
 
 
 <div class="viewcode-block" id="Chain.pack_single">
@@ -551,7 +553,9 @@
                 <span class="n">struct</span><span class="o">.</span><span class="n">__pack__</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># Not the last struct, use a temporary BytesIO object</span>
-                <span class="k">with</span> <span class="n">BytesIO</span><span class="p">()</span> <span class="k">as</span> <span class="n">stream</span><span class="p">,</span> <span class="n">WithoutContextVar</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">CTX_STREAM</span><span class="p">,</span> <span class="n">stream</span><span class="p">):</span>
+                <span class="k">with</span> <span class="n">BytesIO</span><span class="p">()</span> <span class="k">as</span> <span class="n">stream</span><span class="p">,</span> <span class="n">WithoutContextVar</span><span class="p">(</span>
+                    <span class="n">context</span><span class="p">,</span> <span class="n">CTX_STREAM</span><span class="p">,</span> <span class="n">stream</span>
+                <span class="p">),</span> <span class="n">WithoutContextVar</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">CTX_SEQ</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
                     <span class="n">struct</span><span class="o">.</span><span class="n">__pack__</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
                     <span class="n">obj</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span></div>
 </div>
