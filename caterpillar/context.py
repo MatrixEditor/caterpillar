@@ -270,7 +270,7 @@ class ContextPath(ExprMixin, _ContextLambda):
         return value
 
     def __getitem__(self, key) -> Self:
-        self._ops_.append((operator.getitem, (key), {}))
+        self._ops_.append((operator.getitem, (key,), {}))
         return self
 
     def __getattribute__(self, key: str) -> ContextPath:

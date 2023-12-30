@@ -223,11 +223,12 @@ class Sequence(_StructLike, FieldMixin):
             # below the Field one.
             case _StructLike():
                 return Field(annotation, order, arch=arch, default=default)
-            case enum.Enum():
-                # Special case: we have an enum class that stores its struct
-                return Enum(annotation, getstruct(annotation))
             case type():
-                return getstruct(annotation)
+                struct = getstruct(annotation)
+                if issubclass(annotation, enum.Enum):
+                    # Special case: we have an enum class that stores its struct
+                    return Enum(annotation, struct)
+                return struct
             case str():
                 return ConstString(annotation)
             case bytes():

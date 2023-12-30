@@ -18,15 +18,68 @@ leaving you well-equipped to create your own struct classes in Python.
 Operators
 ---------
 
+By now, you should already know that there are special :ref:`operators` that can be used
+with structs, for example :code:`[]` for array creation or :code:`+` to apply an endianess
+configuration.
+
+.. _switch-tutorial:
+
 Switch
 ^^^^^^
 
-*TODO*
+*caterpillar* comes with native support for switch-case structures. There is no need for
+a custom implementation that would unnecessarily slow down the packing or unpacking
+process.
+
+Although there are limitations to :ref:`operators`, its basic behavior should be
+more than enough to work with. Let's go back to our PNG implementation and finally define
+the common chunk type:
+
+.. code-block:: python
+    :caption: Implementation of the general `chunk layout <https://www.w3.org/TR/png/#5Chunk-layout>`_
+
+    @struct(order=BigEndian)
+    class PNGChunk:
+        length: uint32          # length of the data field
+        type: Bytes(4)
+        data: F(this.type) >> { # just use right shift
+            b"IHDR": IHDRChunk,
+            b"PLTE": PLTEChunk, # the key must be comparable to this.type
+            b"pHYs": PHYSChunk,
+            b"iTXt": ITXTChunk,
+            b"tIME": TIMEChunk,
+            b"tEXt": TEXTChunk,
+            b"iTXt": ITXTChunk,
+            b"fDAT": FDATChunk,
+            b"zTXt": ZTXTChunk,
+            b"gAMA": GAMAChunk,
+            # Special chunk: we don't need to parse any data
+            b"IEND": Pass
+            # As we don't define all chunks here for now, a default
+            # option must be provided
+            DEFAULT_OPTION: Memory(this.length)
+        }
+
 
 Offset
 ^^^^^^
 
-*TODO*
+Offsets introduce a special challenge to binary packing as we don't want to override data
+that was previously written to the stream. This library will solve that problem for you
+automatically!
+
+In general, you can use the :code:`@` operator with structs and fields, but not custom defined class
+structs. They have to be wrapped by a :class:`Field` first:
+
+.. code-block:: python
+
+    >>> field = uint32 @ 0x1234     # ok
+    >>> struct = Format @ 0x1234    # not okay
+    Traceback (most recent call last):
+        File "<stdin>", line 1, in <module>
+    TypeError: unsupported operand type(s) for @: 'type' and 'int'
+    >>> field = F(Format) @ 0x1234  # ok
+
 
 BitFields
 ---------
@@ -61,10 +114,6 @@ BitFields
 
 Unions
 ------
-
-This library introduces a special struct, namely *union*. What makes it special is
-that **it behaves like a C-Union**. Really?
-
 
 This library introduces a special struct, namely *union*. What makes it special is,
 that **it behaves like a C-Union**. Really?
@@ -106,5 +155,36 @@ be applied to all other fields.
 The End!
 --------
 
-*TODO: implement final PNG struct*
+We finish this tutorial by completing our PNG format implementation. As the format is just
+a collection of chunks, we can simply alter the *main* struct from before:
+
+.. code-block:: python
+    :caption: Final PNG implementation
+
+    @struct
+    class PNG:
+        magic: b"\x89PNG\x0D\x0A\x1A\x0A"
+        # We don't know the length, therefore we need greedy parsing
+        chunks: PNGChunk[...]
+
+**Thats it!** We now have a qualified PNG image parser **and** builder just using some
+Python class definitions.
+
+.. code-block:: python
+    :caption: Sample usage of the PNG struct
+
+    >>> image = unpack_file(PNG, "/path/to/image.png")
+    >>> image
+    PNG(magic=b'\x89PNG\r\n\x1a\n', chunks=[PNGChunk(length=13,type='IHDR', body=..., crc=258163462), ...])
+    >>> pack_file(image, "/path/to/destination")
+
+
+*This is the end of our journy to the basics of caterpillar. Below is a collection of useful
+resources that might help you progress any further.*
+
+.. seealso::
+    * :ref:`reference-index`
+    * :ref:`library-index` API Docs
+    * `Github Source <https://github.com/MatrixEditor/caterpillar>`_
+    * `Implemented Formats <https://github.com/MatrixEditor/caterpillar/tree/master/examples/formats>`_
 

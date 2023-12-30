@@ -63,6 +63,7 @@ last field.
     import enum
 
     class PHYSUnit(enum.IntEnum): # <-- the enum value doesn't have to be int
+        __struct__ = uint8        # <-- to make the code even more compact, use this
         UNKNOWN = 0
         METRE = 1
 
@@ -70,7 +71,7 @@ last field.
     class PHYSChunk:
         pixels_per_unit_x: uint32
         pixels_per_unit_y: uint32
-        unit: Enum(PHYSUnit, uint8)  # <-- now we have an auto-enumeration
+        unit: PHYSUnit               # <-- now we have an auto-enumeration
 
 .. important::
     It's worth noting that a default value can be specified for the field as a fallback. If
