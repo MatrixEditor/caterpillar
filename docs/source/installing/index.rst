@@ -18,5 +18,20 @@ out of the box.
     it enables developer mode.
 
 
-If you wish to contribute to this project, make sure you follow the :ref:`contribution`. This
-library is especially designed for Python 3.12 and prior versions are still subject to approval.
+This project comes with packaging extras. Therefore, if you want to enable specific structs, you
+have to install the corresponding extra. It can be done using pip again:
+
+.. code-block:: bash
+
+    pip install "caterpillar[$NAME]@git+https://github.com/MatrixEditor/caterpillar.git"
+
+where :code:`$NAME` refers to
+
+* `lzo`: for LZO compression support
+* `crypt`: for extended encryption/decryption support
+* `all`: to simply install all optional dependencies
+
+
+.. tip::
+    If you wish to contribute to this project, make sure you follow the :ref:`contribution`. This
+    library is especially designed for Python 3.12 and prior versions are still subject to approval.
