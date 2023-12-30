@@ -133,6 +133,19 @@ called on a field object.
     >>> field = 3 - uint8   # 3 of 8 bits are used
 
 
+.. function:: struct.__and__(self, other)
+
+    Invoked to create a chain of two structs. It is important that only the last element doesn't need
+    to return a :code:`bytes` object after unpacking.
+
+    >>> chain = ZLibCompressed(...) & Format
+
+    .. important::
+        The returned object is **not** a :class:`Field` instance, but a :class:`Chain` instance to
+        support more than two elements.
+
+
+
 Field specific operations
 -------------------------
 

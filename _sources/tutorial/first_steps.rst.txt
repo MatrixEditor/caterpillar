@@ -18,7 +18,7 @@ additional chunks independently.
 The PNG format organizes data into chunks, each following a common format. The global chunk
 definition will be introduced later due to the impossibility of forward declarations in Python. [*]_
 
-.. [*] It's technically possible to define the :ref:`pngchunk` class here, but let's save that for later.
+.. [*] It's technically possible to define the :ref:`pngchunk <switch-tutorial>` class here, but let's save that for later.
 
 .. important::
     Assume that each code block starts with an import of all fields and the struct function from

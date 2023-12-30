@@ -227,20 +227,80 @@ leaving you well-equipped to create your own struct classes in Python.</p>
 </div>
 <section id="operators">
 <h2><span class="section-number">3.1. </span>Operators<a class="headerlink" href="#operators" title="Link to this heading">#</a></h2>
+<p>By now, you should already know that there are special <a class="reference internal" href="../reference/operators.html#operators"><span class="std std-ref">Operators</span></a> that can be used
+with structs, for example <code class="code docutils literal notranslate"><span class="pre">[]</span></code> for array creation or <code class="code docutils literal notranslate"><span class="pre">+</span></code> to apply an endianess
+configuration.</p>
 <section id="switch">
-<h3><span class="section-number">3.1.1. </span>Switch<a class="headerlink" href="#switch" title="Link to this heading">#</a></h3>
-<p><em>TODO</em></p>
+<span id="switch-tutorial"></span><h3><span class="section-number">3.1.1. </span>Switch<a class="headerlink" href="#switch" title="Link to this heading">#</a></h3>
+<p><em>caterpillar</em> comes with native support for switch-case structures. There is no need for
+a custom implementation that would unnecessarily slow down the packing or unpacking
+process.</p>
+<p>Although there are limitations to <a class="reference internal" href="../reference/operators.html#operators"><span class="std std-ref">Operators</span></a>, its basic behavior should be
+more than enough to work with. Let’s go back to our PNG implementation and finally define
+the common chunk type:</p>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">Implementation of the general <a class="reference external" href="https://www.w3.org/TR/png/#5Chunk-layout">chunk layout</a></span><a class="headerlink" href="#id3" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">PNGChunk</span><span class="p">:</span>
+    <span class="n">length</span><span class="p">:</span> <span class="n">uint32</span>          <span class="c1"># length of the data field</span>
+    <span class="nb">type</span><span class="p">:</span> <span class="n">Bytes</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">F</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">type</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="p">{</span> <span class="c1"># just use right shift</span>
+        <span class="sa">b</span><span class="s2">&quot;IHDR&quot;</span><span class="p">:</span> <span class="n">IHDRChunk</span><span class="p">,</span>
+        <span class="sa">b</span><span class="s2">&quot;PLTE&quot;</span><span class="p">:</span> <span class="n">PLTEChunk</span><span class="p">,</span> <span class="c1"># the key must be comparable to this.type</span>
+        <span class="sa">b</span><span class="s2">&quot;pHYs&quot;</span><span class="p">:</span> <span class="n">PHYSChunk</span><span class="p">,</span>
+        <span class="sa">b</span><span class="s2">&quot;iTXt&quot;</span><span class="p">:</span> <span class="n">ITXTChunk</span><span class="p">,</span>
+        <span class="sa">b</span><span class="s2">&quot;tIME&quot;</span><span class="p">:</span> <span class="n">TIMEChunk</span><span class="p">,</span>
+        <span class="sa">b</span><span class="s2">&quot;tEXt&quot;</span><span class="p">:</span> <span class="n">TEXTChunk</span><span class="p">,</span>
+        <span class="sa">b</span><span class="s2">&quot;iTXt&quot;</span><span class="p">:</span> <span class="n">ITXTChunk</span><span class="p">,</span>
+        <span class="sa">b</span><span class="s2">&quot;fDAT&quot;</span><span class="p">:</span> <span class="n">FDATChunk</span><span class="p">,</span>
+        <span class="sa">b</span><span class="s2">&quot;zTXt&quot;</span><span class="p">:</span> <span class="n">ZTXTChunk</span><span class="p">,</span>
+        <span class="sa">b</span><span class="s2">&quot;gAMA&quot;</span><span class="p">:</span> <span class="n">GAMAChunk</span><span class="p">,</span>
+        <span class="c1"># Special chunk: we don&#39;t need to parse any data</span>
+        <span class="sa">b</span><span class="s2">&quot;IEND&quot;</span><span class="p">:</span> <span class="n">Pass</span>
+        <span class="c1"># As we don&#39;t define all chunks here for now, a default</span>
+        <span class="c1"># option must be provided</span>
+        <span class="n">DEFAULT_OPTION</span><span class="p">:</span> <span class="n">Memory</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">length</span><span class="p">)</span>
+    <span class="p">}</span>
+</pre></div>
+</div>
+</div>
 </section>
 <section id="offset">
 <h3><span class="section-number">3.1.2. </span>Offset<a class="headerlink" href="#offset" title="Link to this heading">#</a></h3>
-<p><em>TODO</em></p>
+<p>Offsets introduce a special challenge to binary packing as we don’t want to override data
+that was previously written to the stream. This library will solve that problem for you
+automatically!</p>
+<p>In general, you can use the <code class="code docutils literal notranslate"><span class="pre">&#64;</span></code> operator with structs and fields, but not custom defined class
+structs. They have to be wrapped by a <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code> first:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">uint32</span> <span class="o">@</span> <span class="mh">0x1234</span>     <span class="c1"># ok</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span> <span class="o">=</span> <span class="n">Format</span> <span class="o">@</span> <span class="mh">0x1234</span>    <span class="c1"># not okay</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="w">    </span><span class="n">File</span> <span class="s2">&quot;&lt;stdin&gt;&quot;</span><span class="p">,</span> <span class="n">line</span> <span class="mi">1</span><span class="p">,</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+<span class="gr">TypeError</span>: <span class="n">unsupported operand type(s) for @: &#39;type&#39; and &#39;int&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">F</span><span class="p">(</span><span class="n">Format</span><span class="p">)</span> <span class="o">@</span> <span class="mh">0x1234</span>  <span class="c1"># ok</span>
+</pre></div>
+</div>
+</section>
+<section id="chaining">
+<h3><span class="section-number">3.1.3. </span>Chaining<a class="headerlink" href="#chaining" title="Link to this heading">#</a></h3>
+<p>A small sidenote: It is also possible, but not recommended, to create a <em>chain</em> of structs. The
+internal struct works as a bi-directional pipeline: unpacking goes from head to tail and packing
+from tail to head.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">chain</span> <span class="o">=</span> <span class="n">ZLibCompressed</span><span class="p">(</span><span class="o">...</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">Format</span>
+</pre></div>
+</div>
+<p>In this example, the data would be decompressed first before <code class="code docutils literal notranslate"><span class="pre">Format.__unpack__</span></code> would be called.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The returned object is <strong>not</strong> a field!</p>
+</div>
 </section>
 </section>
 <section id="bitfields">
 <h2><span class="section-number">3.2. </span>BitFields<a class="headerlink" href="#bitfields" title="Link to this heading">#</a></h2>
 <p><em>TODO</em> description</p>
-<div class="literal-block-wrapper docutils container" id="id3">
-<div class="code-block-caption"><span class="caption-text">Implementing the <a class="reference external" href="https://www.w3.org/TR/png/#5Chunk-naming-conventions">chunk-naming</a> convention</span><a class="headerlink" href="#id3" title="Link to this code">#</a></div>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">Implementing the <a class="reference external" href="https://www.w3.org/TR/png/#5Chunk-naming-conventions">chunk-naming</a> convention</span><a class="headerlink" href="#id4" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@bitfield</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="n">S_DISCARD_UNNAMED</span><span class="p">})</span>
 <span class="k">class</span> <span class="nc">ChunkOptions</span><span class="p">:</span>
     <span class="n">_</span>            <span class="p">:</span> <span class="mi">2</span>        <span class="c1"># &lt;-- first two bits are not used</span>
@@ -268,14 +328,12 @@ leaving you well-equipped to create your own struct classes in Python.</p>
 </section>
 <section id="unions">
 <h2><span class="section-number">3.3. </span>Unions<a class="headerlink" href="#unions" title="Link to this heading">#</a></h2>
-<p>This library introduces a special struct, namely <em>union</em>. What makes it special is
-that <strong>it behaves like a C-Union</strong>. Really?</p>
 <p>This library introduces a special struct, namely <em>union</em>. What makes it special is,
 that <strong>it behaves like a C-Union</strong>. Really?</p>
 <p>For example, let’s combine the <a class="reference external" href="https://www.w3.org/TR/png/#5Chunk-naming-conventions">chunk-naming</a>
 convention with its bit options. You can use the bitfield from the previous section.</p>
-<div class="literal-block-wrapper docutils container" id="id4">
-<div class="code-block-caption"><span class="caption-text">Combining the name with its naming convention</span><a class="headerlink" href="#id4" title="Link to this code">#</a></div>
+<div class="literal-block-wrapper docutils container" id="id5">
+<div class="code-block-caption"><span class="caption-text">Combining the name with its naming convention</span><a class="headerlink" href="#id5" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@union</span>
 <span class="k">class</span> <span class="nc">ChunkName</span><span class="p">:</span>
     <span class="n">text</span><span class="p">:</span> <span class="n">Bytes</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
@@ -307,7 +365,40 @@ decorator.</p>
 </section>
 <section id="the-end">
 <h2><span class="section-number">3.4. </span>The End!<a class="headerlink" href="#the-end" title="Link to this heading">#</a></h2>
-<p><em>TODO: implement final PNG struct</em></p>
+<p>We finish this tutorial by completing our PNG format implementation. As the format is just
+a collection of chunks, we can simply alter the <em>main</em> struct from before:</p>
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-text">Final PNG implementation</span><a class="headerlink" href="#id6" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
+<span class="k">class</span> <span class="nc">PNG</span><span class="p">:</span>
+    <span class="n">magic</span><span class="p">:</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x89</span><span class="s2">PNG</span><span class="se">\x0D\x0A\x1A\x0A</span><span class="s2">&quot;</span>
+    <span class="c1"># We don&#39;t know the length, therefore we need greedy parsing</span>
+    <span class="n">chunks</span><span class="p">:</span> <span class="n">PNGChunk</span><span class="p">[</span><span class="o">...</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<p><strong>Thats it!</strong> We now have a qualified PNG image parser <strong>and</strong> builder just using some
+Python class definitions.</p>
+<div class="literal-block-wrapper docutils container" id="id7">
+<div class="code-block-caption"><span class="caption-text">Sample usage of the PNG struct</span><a class="headerlink" href="#id7" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">image</span> <span class="o">=</span> <span class="n">unpack_file</span><span class="p">(</span><span class="n">PNG</span><span class="p">,</span> <span class="s2">&quot;/path/to/image.png&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">image</span>
+<span class="go">PNG(magic=b&#39;\x89PNG\r\n\x1a\n&#39;, chunks=[PNGChunk(length=13,type=&#39;IHDR&#39;, body=..., crc=258163462), ...])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pack_file</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="s2">&quot;/path/to/destination&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p><em>This is the end of our journy to the basics of caterpillar. Below is a collection of useful
+resources that might help you progress any further.</em></p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../reference/index.html#reference-index"><span class="std std-ref">Caterpillar’s Reference</span></a></p></li>
+<li><p><a class="reference internal" href="../library/index.html#library-index"><span class="std std-ref">Library</span></a> API Docs</p></li>
+<li><p><a class="reference external" href="https://github.com/MatrixEditor/caterpillar">Github Source</a></p></li>
+<li><p><a class="reference external" href="https://github.com/MatrixEditor/caterpillar/tree/master/examples/formats">Implemented Formats</a></p></li>
+</ul>
+</div>
 </section>
 </section>
 
@@ -370,6 +461,7 @@ decorator.</p>
 <li><a class="reference internal" href="#operators">3.1. Operators</a><ul>
 <li><a class="reference internal" href="#switch">3.1.1. Switch</a></li>
 <li><a class="reference internal" href="#offset">3.1.2. Offset</a></li>
+<li><a class="reference internal" href="#chaining">3.1.3. Chaining</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#bitfields">3.2. BitFields</a></li>

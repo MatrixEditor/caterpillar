@@ -270,6 +270,7 @@ last field.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">enum</span>
 
 <span class="k">class</span> <span class="nc">PHYSUnit</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">IntEnum</span><span class="p">):</span> <span class="c1"># &lt;-- the enum value doesn&#39;t have to be int</span>
+    <span class="n">__struct__</span> <span class="o">=</span> <span class="n">uint8</span>        <span class="c1"># &lt;-- to make the code even more compact, use this</span>
     <span class="n">UNKNOWN</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">METRE</span> <span class="o">=</span> <span class="mi">1</span>
 
@@ -277,7 +278,7 @@ last field.</p>
 <span class="k">class</span> <span class="nc">PHYSChunk</span><span class="p">:</span>
     <span class="n">pixels_per_unit_x</span><span class="p">:</span> <span class="n">uint32</span>
     <span class="n">pixels_per_unit_y</span><span class="p">:</span> <span class="n">uint32</span>
-    <span class="n">unit</span><span class="p">:</span> <span class="n">Enum</span><span class="p">(</span><span class="n">PHYSUnit</span><span class="p">,</span> <span class="n">uint8</span><span class="p">)</span>  <span class="c1"># &lt;-- now we have an auto-enumeration</span>
+    <span class="n">unit</span><span class="p">:</span> <span class="n">PHYSUnit</span>               <span class="c1"># &lt;-- now we have an auto-enumeration</span>
 </pre></div>
 </div>
 </div>
