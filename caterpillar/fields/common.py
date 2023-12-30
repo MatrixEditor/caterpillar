@@ -62,7 +62,7 @@ class FormatField(FieldStruct):
 
         :return: A string representation.
         """
-        type_repr = self.type_.__name__ if not self.is_padding else "padding"
+        type_repr = self.type_.__name__ if not self._padding_ else "padding"
         return f"<{self.__class__.__name__}({type_repr}) {self.text!r}>"
 
     def __type__(self) -> type:

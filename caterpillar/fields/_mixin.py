@@ -256,10 +256,12 @@ class Chain(FieldStruct):
         data = None
         for i, struct in enumerate(self._elements):
             stream = BytesIO(data) if i != 0 else context[CTX_STREAM]
-            with WithoutContextVar(context, CTX_STREAM, stream):
+            with WithoutContextVar(context, CTX_STREAM, stream), WithoutContextVar(
+                context, CTX_SEQ, False
+            ):
                 data = struct.__unpack__(context)
 
-        return memoryview(data)
+        return data
 
     def pack_single(self, obj: Any, context: _ContextLike) -> None:
         """
@@ -276,7 +278,9 @@ class Chain(FieldStruct):
                 struct.__pack__(obj, context)
             else:
                 # Not the last struct, use a temporary BytesIO object
-                with BytesIO() as stream, WithoutContextVar(context, CTX_STREAM, stream):
+                with BytesIO() as stream, WithoutContextVar(
+                    context, CTX_STREAM, stream
+                ), WithoutContextVar(context, CTX_SEQ, False):
                     struct.__pack__(obj, context)
                     obj = stream.getvalue()
 
