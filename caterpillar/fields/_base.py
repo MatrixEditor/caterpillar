@@ -155,7 +155,10 @@ class Field(_StructLike):
         self.arch = arch or get_system_arch()
         # this will unset KEEP_POSITION if configured
         self.__matmul__(offset)
-        self.__getitem__(amount)
+        if amount:
+            self.__getitem__(amount)
+        else:
+            self.amount = 1
         self.options = options
         self.condition = condition
         # NOTE: we use INVALID_DEFAULT as disabled default value indicator, so

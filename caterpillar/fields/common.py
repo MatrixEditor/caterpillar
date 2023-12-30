@@ -51,7 +51,7 @@ class FormatField(FieldStruct):
         self.text = ch
         self.type_ = type_
         self.__bits__ = calcsize(self.text) * 8
-        self._padding_ = self.text == "x"
+        self._padding_ = (self.text == "x")
 
     def __fmt__(self) -> str:
         return self.text
@@ -141,14 +141,14 @@ class FormatField(FieldStruct):
         """
         # We don't want to call .length() here as it would
         # consume extra time
-        length = context[CTX_FIELD].amount
+        length = context[CTX_FIELD].length(context)
         if length == 0:
             return []  # maybe add factory
 
         if length is Ellipsis:
             return super().unpack_seq(context)
 
-        fmt = self.get_format(context)
+        fmt = self.get_format(context, length)
         return list(unpack(fmt, context[CTX_STREAM].read(calcsize(fmt))))
 
     def get_format(self, context: _ContextLike, length: int = None) -> str:
@@ -161,11 +161,11 @@ class FormatField(FieldStruct):
         field: Field = context[CTX_FIELD]
         order = field.order
         if length is None:
-            dim = field.length(context) or 1
+            dim = field.length(context)
             if dim is Ellipsis:
                 dim = 1
         else:
-            dim = length or 1
+            dim = length
         return f"{order.ch}{dim}{self.text}"
 
     def is_padding(self) -> bool:

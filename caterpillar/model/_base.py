@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import re
+import enum
 
 from typing import Optional, Self
 from typing import List, Dict, Any
@@ -40,6 +41,7 @@ from caterpillar.fields import (
     ConstString,
     FieldMixin,
     Const,
+    Enum
 )
 from caterpillar._common import unpack_seq, pack_seq
 
@@ -221,6 +223,9 @@ class Sequence(_StructLike, FieldMixin):
             # below the Field one.
             case _StructLike():
                 return Field(annotation, order, arch=arch, default=default)
+            case enum.Enum():
+                # Special case: we have an enum class that stores its struct
+                return Enum(annotation, getstruct(annotation))
             case type():
                 return getstruct(annotation)
             case str():
