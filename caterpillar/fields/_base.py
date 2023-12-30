@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from dataclasses import dataclass
-from typing import Self, Union, Set, Any, Dict, Optional, Iterable, List
+from typing import Self, Union, Set, Any, Dict, Optional, List
 from io import BytesIO
 from caterpillar.abc import (
     _StructLike,
@@ -27,7 +27,7 @@ from caterpillar.abc import (
     getstruct,
     typeof,
 )
-from caterpillar.byteorder import ByteOrder, SysNative, Arch, get_system_arch, byteorder
+from caterpillar.byteorder import ByteOrder, SysNative, Arch, get_system_arch
 from caterpillar.exception import (
     DynamicSizeError,
     StructException,
@@ -45,7 +45,6 @@ from caterpillar.options import (
 from caterpillar.context import CTX_OFFSETS, CTX_STREAM
 from caterpillar.context import CTX_FIELD, CTX_POS
 from caterpillar.context import CTX_VALUE, CTX_SEQ
-from caterpillar._common import unpack_seq, pack_seq
 
 
 def singleton(cls):
@@ -509,108 +508,3 @@ class Field(_StructLike):
         size = struct.__size__(context)
         return count * size
 
-
-class FieldMixin:
-    """A simple mixin to support operators used to create :class:`Field` instances."""
-
-    def __or__(self, flag: Flag) -> Field:
-        """Creates a field *with* the given flag."""
-        return Field(self, byteorder(self)) | flag
-
-    def __xor__(self, flag: Flag) -> Field:
-        """Creates a field *without* the given flag."""
-        return Field(self, byteorder(self)) ^ flag
-
-    def __matmul__(self, offset: Union[_ContextLambda, int]) -> Field:
-        """Creates a field that should start at the given offset."""
-        return Field(self, byteorder(self)) @ offset
-
-    def __getitem__(self, dim: Union[_ContextLambda, int]) -> Field:
-        """Returns a sequenced field."""
-        return Field(self, byteorder(self))[dim]
-
-    def __rshift__(self, switch: Union[_Switch, dict]) -> Field:
-        """Inserts switch options into the new field"""
-        return Field(self, byteorder(self)) >> switch
-
-    def __floordiv__(self, condition: Union[_ContextLambda, bool]) -> Field:
-        """Returns a field with the given condition"""
-        return Field(self, byteorder(self)) // condition
-
-    def __set_byteorder__(self, order: ByteOrder) -> Field:
-        return Field(self, order=order)
-
-    def __rsub__(self, bits: Union[_ContextLambda, int]) -> Field:
-        return Field(self, byteorder(self), bits=bits)
-
-
-class FieldStruct(FieldMixin, _StructLike):
-    """
-    A mix-in class combining the behavior of _StructLike with additional
-    functionality for packing and unpacking structured data.
-    """
-
-    __byteorder__: ByteOrder
-    """An internal field used to measure the byte order of this struct.
-
-    Note that this field will be used during processing only and not during
-    parsing or building data. In addition, the actual byte order should be
-    retrieved using the :class:`Field` instance within the context.
-    """
-
-    def pack_single(self, obj: Any, context: _ContextLike) -> None:
-        """
-        Abstract method to pack a single element.
-
-        :param obj: The element to pack.
-        :param stream: The output stream.
-        :param context: The current operation context.
-        """
-        raise NotImplementedError
-
-    def unpack_single(self, context: _ContextLike) -> None:
-        """
-        Abstract method to unpack a single element.
-
-        :param stream: The input stream.
-        :param context: The current operation context.
-        :return: The unpacked element.
-        """
-        raise NotImplementedError
-
-    def pack_seq(self, seq: Iterable, context: _ContextLike) -> None:
-        pack_seq(seq, context, self.pack_single)
-
-    def unpack_seq(self, context: _ContextLike) -> List[Any]:
-        return unpack_seq(context, self.unpack_single)
-
-    # implementation
-    def __pack__(self, obj: Any, context: _ContextLike) -> None:
-        """
-        Pack data based on whether the field is sequential or not.
-
-        :param obj: The data to pack.
-        :param stream: The output stream.
-        :param context: The current operation context.
-        """
-        (self.pack_single if not context[CTX_SEQ] else self.pack_seq)(obj, context)
-
-    def __unpack__(self, context: _ContextLike) -> Any:
-        """
-        Unpack data based on whether the field is sequential or not.
-
-        :param stream: The input stream.
-        :param context: The current operation context.
-        :return: The unpacked data.
-        """
-        if context[CTX_SEQ]:
-            return self.unpack_seq(context)
-        return self.unpack_single(context)
-
-    def __repr__(self) -> str:
-        """
-        String representation of the FieldStruct instance.
-
-        :return: A string representation.
-        """
-        return f"<{self.__class__.__name__}>"

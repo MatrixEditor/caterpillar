@@ -20,8 +20,10 @@ from caterpillar.abc import _StreamType, _ContextLike
 from caterpillar.exception import InvalidValueError, DynamicSizeError, StreamError
 from caterpillar.byteorder import LittleEndian
 from caterpillar.context import CTX_FIELD, CTX_STREAM
+from caterpillar.options import Flag
 
-from ._base import FieldStruct, Flag, singleton
+from ._base import singleton
+from ._mixin import FieldStruct
 
 
 VARINT_LSB = Flag("varint.lsb")

@@ -33,8 +33,8 @@ from caterpillar.exception import (
 from caterpillar.context import CTX_FIELD, CTX_STREAM, CTX_SEQ
 from caterpillar.options import F_SEQUENTIAL
 from caterpillar.byteorder import LittleEndian
-from ._base import Field, FieldStruct, INVALID_DEFAULT, singleton
-
+from ._base import Field, INVALID_DEFAULT, singleton
+from ._mixin import FieldStruct
 
 class FormatField(FieldStruct):
     """
@@ -51,7 +51,7 @@ class FormatField(FieldStruct):
         self.text = ch
         self.type_ = type_
         self.__bits__ = calcsize(self.text) * 8
-        self._padding_ = (self.text == "x")
+        self._padding_ = self.text == "x"
 
     def __fmt__(self) -> str:
         return self.text

@@ -12,13 +12,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-from ._base import (
-    Field,
-    FieldMixin,
-    FieldStruct,
-    INVALID_DEFAULT,
-    DEFAULT_OPTION
-)
+from ._base import Field, INVALID_DEFAULT, DEFAULT_OPTION, singleton
+from ._mixin import FieldMixin, FieldStruct, Chain
 from .common import (
     FormatField,
     Transformer,
@@ -53,14 +48,12 @@ from .common import (
     double,
     void_ptr,
 )
-from .varint import (
-    VarInt,
-    VARINT_LSB
-)
+from .varint import VarInt, VARINT_LSB
 from .compression import (
     Compressed,
     ZLibCompressed,
     Bz2Compressed,
     LZMACompressed,
-    LZOCompressed
+    LZOCompressed,
 )
+from .crypto import Encrypted

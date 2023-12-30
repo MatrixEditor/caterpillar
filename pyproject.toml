@@ -1,6 +1,8 @@
 [project]
+requires-python = ">= 3.12"
 name = "caterpillar"
 version = "1.0.0"
+
 description="Library to pack and unpack structurized binary data."
 authors = [
   { name="MatrixEditor", email="not@supported.com" },
@@ -20,3 +22,12 @@ classifiers = [
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["caterpillar*"]
+
+[project.optional-dependencies]
+# compression
+lzo = [
+  "lzallright"
+]
+crypt = [
+  "cryptography"
+]

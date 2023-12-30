@@ -81,6 +81,21 @@ structs. They have to be wrapped by a :class:`Field` first:
     >>> field = F(Format) @ 0x1234  # ok
 
 
+Chaining
+^^^^^^^^
+
+A small sidenote: It is also possible, but not recommended, to create a *chain* of structs. The
+internal struct works as a bi-directional pipeline: unpacking goes from head to tail and packing
+from tail to head.
+
+>>> chain = ZLibCompressed(...) & Format
+
+In this example, the data would be decompressed first before :code:`Format.__unpack__` would be called.
+
+.. note::
+    The returned object is **not** a field!
+
+
 BitFields
 ---------
 
