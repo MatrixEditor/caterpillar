@@ -4,6 +4,7 @@
 ![Codestyle](https://img.shields.io:/static/v1?label=Codestyle&message=black&color=black)
 ![License](https://img.shields.io:/static/v1?label=License&message=GNU+v3&color=blue)
 ![Status](https://img.shields.io:/static/v1?label=Status&message=🚧&color=teal)
+[![Build and Deploy Docs](https://github.com/MatrixEditor/caterpillar/actions/workflows/python-sphinx.yml/badge.svg)](https://github.com/MatrixEditor/caterpillar/actions/workflows/python-sphinx.yml)
 
 > [!WARNING]
 > This project is stell in beta/testing phase. Expect bugs, naming changes and errors while using this
