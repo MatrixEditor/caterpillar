@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Development" href="../development/index.html" /><link rel="prev" title="1. Struct Model" href="model.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="3. Abstract base classes" href="abc.html" /><link rel="prev" title="1. Byteorder and Architecture" href="byteorder.html" />
 
     <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
         <title>2. Options - Caterpillar 1.0.0 documentation</title>
@@ -135,7 +135,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -171,11 +171,22 @@
 </ul>
 </li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">Library</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of Library</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="model.html">1. Struct Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="byteorder.html">1. Byteorder and Architecture</a></li>
 <li class="toctree-l2 current current-page"><a class="current reference internal" href="#">2. Options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="abc.html">3. Abstract base classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="context.html">4. Context</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.html">5. Struct Model</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="fields/index.html">6. Fields</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of 6. Fields</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="fields/field_model.html">6.1. Field Model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fields/common.html">6.2. Common Structs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fields/compression.html">6.3. Compression Structs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fields/crypto.html">6.4. Cryptographic Structs</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../development/index.html">Development</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of Development</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="exceptions.html">7. Exceptions</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../development/index.html">Development</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of Development</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../development/contribution.html">1. Contribution Guidelines</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../development/changelog.html">2. Changelog</a></li>
 </ul>
@@ -208,7 +219,7 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
@@ -216,6 +227,193 @@
         <article role="main">
           <section id="options">
 <span id="id1"></span><h1><span class="section-number">2. </span>Options<a class="headerlink" href="#options" title="Link to this heading">#</a></h1>
+<p><em>TODO</em></p>
+<section id="interface">
+<h2><span class="section-number">2.1. </span>Interface<a class="headerlink" href="#interface" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="caterpillar.options.Flag">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">Flag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caterpillar/options.html#Flag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.options.Flag" title="Link to this definition">#</a></dt>
+<dd><p>Simple customizable user-flag.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.options.Flag.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#caterpillar.options.Flag.name" title="Link to this definition">#</a></dt>
+<dd><p>The name of this flag</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.options.Flag.value">
+<span class="sig-name descname"><span class="pre">value</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#caterpillar.options.Flag.value" title="Link to this definition">#</a></dt>
+<dd><p>Optional configuration value.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="caterpillar.options.configure">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">configure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#caterpillar.options.Flag" title="caterpillar.options.Flag"><span class="pre">Flag</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">flags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#caterpillar.options.Flag" title="caterpillar.options.Flag"><span class="pre">Flag</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/caterpillar/options.html#configure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.options.configure" title="Link to this definition">#</a></dt>
+<dd><p>Update the base set of flags with additional flags.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base</strong> – The base set of flags.</p></li>
+<li><p><strong>flags</strong> – Additional flags to be added.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="caterpillar.options.set_struct_flags">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">set_struct_flags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">flags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#caterpillar.options.Flag" title="caterpillar.options.Flag"><span class="pre">Flag</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">with_union</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/caterpillar/options.html#set_struct_flags"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.options.set_struct_flags" title="Link to this definition">#</a></dt>
+<dd><p>Set default flags for structs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>flags</strong> – Flags to be set.</p></li>
+<li><p><strong>with_union</strong> – Whether to include the flags for unions as well.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="caterpillar.options.set_field_flags">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">set_field_flags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">flags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#caterpillar.options.Flag" title="caterpillar.options.Flag"><span class="pre">Flag</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/caterpillar/options.html#set_field_flags"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.options.set_field_flags" title="Link to this definition">#</a></dt>
+<dd><p>Set default flags for fields.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>flags</strong> – Flags to be set.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="caterpillar.options.set_union_flags">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">set_union_flags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">flags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#caterpillar.options.Flag" title="caterpillar.options.Flag"><span class="pre">Flag</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/caterpillar/options.html#set_union_flags"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.options.set_union_flags" title="Link to this definition">#</a></dt>
+<dd><p>Set default flags for unions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>flags</strong> – Flags to be set.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="caterpillar.options.get_flags">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">get_flags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#caterpillar.options.Flag" title="caterpillar.options.Flag"><span class="pre">Flag</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/caterpillar/options.html#get_flags"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.options.get_flags" title="Link to this definition">#</a></dt>
+<dd><p>Get the flags associated with an object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obj</strong> – The object.</p></li>
+<li><p><strong>attr</strong> – The attribute name containing the flags (default is “flags”).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The set of flags, or None if no flags are present.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="caterpillar.options.has_flag">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">has_flag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#caterpillar.options.Flag" title="caterpillar.options.Flag"><span class="pre">Flag</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/caterpillar/options.html#has_flag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.options.has_flag" title="Link to this definition">#</a></dt>
+<dd><p>Check if an object has a specific flag.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>flag</strong> – The flag to check, either as a string or a Flag instance.</p></li>
+<li><p><strong>obj</strong> – The object.</p></li>
+<li><p><strong>attr</strong> – The attribute name containing the flags (default is “flags”).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the flag is present, False otherwise.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="caterpillar.options.get_flag">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">get_flag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#caterpillar.options.Flag" title="caterpillar.options.Flag"><span class="pre">Flag</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/caterpillar/options.html#get_flag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.options.get_flag" title="Link to this definition">#</a></dt>
+<dd><p>Get a specific flag associated with an object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – The name of the flag.</p></li>
+<li><p><strong>obj</strong> – The object.</p></li>
+<li><p><strong>attr</strong> – The attribute name containing the flags (default is “flags”).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The Flag instance if found, otherwise None.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="options-by-type">
+<h2><span class="section-number">2.2. </span>Options by type<a class="headerlink" href="#options-by-type" title="Link to this heading">#</a></h2>
+<section id="sequence-options">
+<h3><span class="section-number">2.2.1. </span>Sequence options<a class="headerlink" href="#sequence-options" title="Link to this heading">#</a></h3>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.options.S_DISCARD_UNNAMED">
+<span class="sig-prename descclassname"><span class="pre">options.</span></span><span class="sig-name descname"><span class="pre">S_DISCARD_UNNAMED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Flag(name='discard_unnamed',</span> <span class="pre">value=None)</span></em><a class="headerlink" href="#caterpillar.options.S_DISCARD_UNNAMED" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.options.S_DISCARD_CONST">
+<span class="sig-prename descclassname"><span class="pre">options.</span></span><span class="sig-name descname"><span class="pre">S_DISCARD_CONST</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Flag(name='discard_const',</span> <span class="pre">value=None)</span></em><a class="headerlink" href="#caterpillar.options.S_DISCARD_CONST" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.options.S_UNION">
+<span class="sig-prename descclassname"><span class="pre">options.</span></span><span class="sig-name descname"><span class="pre">S_UNION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Flag(name='union',</span> <span class="pre">value=None)</span></em><a class="headerlink" href="#caterpillar.options.S_UNION" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.options.S_REPLACE_TYPES">
+<span class="sig-prename descclassname"><span class="pre">options.</span></span><span class="sig-name descname"><span class="pre">S_REPLACE_TYPES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Flag(name='replace_types',</span> <span class="pre">value=None)</span></em><a class="headerlink" href="#caterpillar.options.S_REPLACE_TYPES" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.options.S_EVAL_ANNOTATIONS">
+<span class="sig-prename descclassname"><span class="pre">options.</span></span><span class="sig-name descname"><span class="pre">S_EVAL_ANNOTATIONS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Flag(name='eval_annotations',</span> <span class="pre">value=None)</span></em><a class="headerlink" href="#caterpillar.options.S_EVAL_ANNOTATIONS" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="field-options">
+<h3><span class="section-number">2.2.2. </span>Field options<a class="headerlink" href="#field-options" title="Link to this heading">#</a></h3>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.options.F_KEEP_POSITION">
+<span class="sig-prename descclassname"><span class="pre">options.</span></span><span class="sig-name descname"><span class="pre">F_KEEP_POSITION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Flag(name='keep_position',</span> <span class="pre">value=None)</span></em><a class="headerlink" href="#caterpillar.options.F_KEEP_POSITION" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.options.F_DYNAMIC">
+<span class="sig-prename descclassname"><span class="pre">options.</span></span><span class="sig-name descname"><span class="pre">F_DYNAMIC</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Flag(name='dynamic',</span> <span class="pre">value=None)</span></em><a class="headerlink" href="#caterpillar.options.F_DYNAMIC" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.options.F_SEQUENTIAL">
+<span class="sig-prename descclassname"><span class="pre">options.</span></span><span class="sig-name descname"><span class="pre">F_SEQUENTIAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Flag(name='sequential',</span> <span class="pre">value=None)</span></em><a class="headerlink" href="#caterpillar.options.F_SEQUENTIAL" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.options.F_OFFSET_OVERRIDE">
+<span class="sig-prename descclassname"><span class="pre">options.</span></span><span class="sig-name descname"><span class="pre">F_OFFSET_OVERRIDE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Flag(name='offset_override',</span> <span class="pre">value=None)</span></em><a class="headerlink" href="#caterpillar.options.F_OFFSET_OVERRIDE" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="other-options">
+<h3><span class="section-number">2.2.3. </span>Other options<a class="headerlink" href="#other-options" title="Link to this heading">#</a></h3>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.fields.VARINT_LSB">
+<span class="sig-prename descclassname"><span class="pre">fields.</span></span><span class="sig-name descname"><span class="pre">VARINT_LSB</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Flag(name='varint.lsb',</span> <span class="pre">value=None)</span></em><a class="headerlink" href="#caterpillar.fields.VARINT_LSB" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</section>
+</section>
 </section>
 
         </article>
@@ -223,23 +421,23 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="../development/index.html">
+          <a class="next-page" href="abc.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Development</div>
+                <div class="title"><span class="section-number">3. </span>Abstract base classes</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="model.html">
+          <a class="prev-page" href="byteorder.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title"><span class="section-number">1. </span>Struct Model</div>
+                <div class="title"><span class="section-number">1. </span>Byteorder and Architecture</div>
                 
               </div>
             </a>
@@ -261,8 +459,63 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">2. Options</a><ul>
+<li><a class="reference internal" href="#interface">2.1. Interface</a><ul>
+<li><a class="reference internal" href="#caterpillar.options.Flag"><code class="docutils literal notranslate"><span class="pre">Flag</span></code></a><ul>
+<li><a class="reference internal" href="#caterpillar.options.Flag.name"><code class="docutils literal notranslate"><span class="pre">Flag.name</span></code></a></li>
+<li><a class="reference internal" href="#caterpillar.options.Flag.value"><code class="docutils literal notranslate"><span class="pre">Flag.value</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#caterpillar.options.configure"><code class="docutils literal notranslate"><span class="pre">configure()</span></code></a></li>
+<li><a class="reference internal" href="#caterpillar.options.set_struct_flags"><code class="docutils literal notranslate"><span class="pre">set_struct_flags()</span></code></a></li>
+<li><a class="reference internal" href="#caterpillar.options.set_field_flags"><code class="docutils literal notranslate"><span class="pre">set_field_flags()</span></code></a></li>
+<li><a class="reference internal" href="#caterpillar.options.set_union_flags"><code class="docutils literal notranslate"><span class="pre">set_union_flags()</span></code></a></li>
+<li><a class="reference internal" href="#caterpillar.options.get_flags"><code class="docutils literal notranslate"><span class="pre">get_flags()</span></code></a></li>
+<li><a class="reference internal" href="#caterpillar.options.has_flag"><code class="docutils literal notranslate"><span class="pre">has_flag()</span></code></a></li>
+<li><a class="reference internal" href="#caterpillar.options.get_flag"><code class="docutils literal notranslate"><span class="pre">get_flag()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#options-by-type">2.2. Options by type</a><ul>
+<li><a class="reference internal" href="#sequence-options">2.2.1. Sequence options</a><ul>
+<li><a class="reference internal" href="#caterpillar.options.S_DISCARD_UNNAMED"><code class="docutils literal notranslate"><span class="pre">options.S_DISCARD_UNNAMED</span></code></a></li>
+<li><a class="reference internal" href="#caterpillar.options.S_DISCARD_CONST"><code class="docutils literal notranslate"><span class="pre">options.S_DISCARD_CONST</span></code></a></li>
+<li><a class="reference internal" href="#caterpillar.options.S_UNION"><code class="docutils literal notranslate"><span class="pre">options.S_UNION</span></code></a></li>
+<li><a class="reference internal" href="#caterpillar.options.S_REPLACE_TYPES"><code class="docutils literal notranslate"><span class="pre">options.S_REPLACE_TYPES</span></code></a></li>
+<li><a class="reference internal" href="#caterpillar.options.S_EVAL_ANNOTATIONS"><code class="docutils literal notranslate"><span class="pre">options.S_EVAL_ANNOTATIONS</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#field-options">2.2.2. Field options</a><ul>
+<li><a class="reference internal" href="#caterpillar.options.F_KEEP_POSITION"><code class="docutils literal notranslate"><span class="pre">options.F_KEEP_POSITION</span></code></a></li>
+<li><a class="reference internal" href="#caterpillar.options.F_DYNAMIC"><code class="docutils literal notranslate"><span class="pre">options.F_DYNAMIC</span></code></a></li>
+<li><a class="reference internal" href="#caterpillar.options.F_SEQUENTIAL"><code class="docutils literal notranslate"><span class="pre">options.F_SEQUENTIAL</span></code></a></li>
+<li><a class="reference internal" href="#caterpillar.options.F_OFFSET_OVERRIDE"><code class="docutils literal notranslate"><span class="pre">options.F_OFFSET_OVERRIDE</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#other-options">2.2.3. Other options</a><ul>
+<li><a class="reference internal" href="#caterpillar.fields.VARINT_LSB"><code class="docutils literal notranslate"><span class="pre">fields.VARINT_LSB</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
