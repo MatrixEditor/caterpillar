@@ -95,8 +95,7 @@ class Struct(Sequence):
                 # Importing all fields instead of the entire struct.
                 # The default behavior on importing structs is implemented
                 # by the Sequence class.
-                struct = getstruct(candidate)
-                self += struct
+                self += getstruct(candidate)
 
         eval_str = self.has_option(S_EVAL_ANNOTATIONS)
         # The why is described in detail here: https://docs.python.org/3/howto/annotations.html

@@ -173,6 +173,3 @@ def typeof(struct: Union[_StructLike, _ContainsStruct]) -> type:
     # this function must return a type
     return __type__() or Any
 
-
-def isprefixed(obj) -> bool:
-    return type(obj) is _PrefixedType

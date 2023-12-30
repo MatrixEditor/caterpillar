@@ -192,6 +192,11 @@ In the **compiled** Construct test, *caterpillar* shows a performance difference
 :bdg-success:`11.61%` **faster** in packing data. It's important to note that these figures reflect a trade-off between
 performance and other considerations such as simplicity and ease of use.
 
+.. caution::
+    While this small benchmark provides a foundational starting point, it is crucial to acknowledge that it does
+    not assert perfection. Instead, it serves as an initial reference to start the benchmarking process.
+
+    **Users are advised to interpret the results with caution!**
 
 .. |c0| unicode:: U+02C8
 .. |c1| unicode:: U+00E6

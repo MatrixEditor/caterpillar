@@ -6,11 +6,29 @@ Struct Model
 
 *TODO*
 
-.. autoclass:: caterpillar.model.Sequence
+
+Base classes
+------------
+
+.. autoclass:: caterpillar.model.Sequence()
     :members:
 
-.. autoclass:: caterpillar.model.Struct
+.. autoclass:: caterpillar.model.Struct()
     :members:
+
+.. autoclass:: caterpillar.model.BitFieldGroup
+    :members:
+
+.. autoclass:: caterpillar.model.BitField
+    :members:
+
+.. autoclass:: caterpillar.model.UnionHook
+    :members:
+    :special-members: __model_init__, __model_setattr__
+
+
+Standard functions
+------------------
 
 .. autofunction:: caterpillar.model.struct
 
@@ -25,12 +43,6 @@ Struct Model
 .. autofunction:: caterpillar.model.unpack
 
 .. autofunction:: caterpillar.model.unpack_file
-
-.. autoclass:: caterpillar.model.BitFieldGroup
-    :members:
-
-.. autoclass:: caterpillar.model.BitField
-    :members:
 
 .. autofunction:: caterpillar.model.bitfield
 

@@ -216,7 +216,7 @@ class BinaryExpression(ExprMixin, _ContextLambda):
 
 
 @dataclass(frozen=True)
-class UnaryExpression:
+class UnaryExpression(_ContextLambda):
     """
     Represents a unary expression.
 

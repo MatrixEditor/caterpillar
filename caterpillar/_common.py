@@ -14,9 +14,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import itertools
 
-from typing import List, Any, Union, Iterable
+from typing import List, Any, Union
 
-from caterpillar.abc import _GreedyType, _ContextLike, _StreamType, isprefixed
+from caterpillar.abc import _GreedyType, _ContextLike, _StreamType, _PrefixedType
 from caterpillar.context import (
     Context,
     CTX_PATH,
@@ -25,7 +25,7 @@ from caterpillar.context import (
     CTX_INDEX,
     CTX_OBJECT,
     CTX_STREAM,
-    CTX_SEQ
+    CTX_SEQ,
 )
 from caterpillar.exception import Stop, StructException, InvalidValueError
 
@@ -75,10 +75,11 @@ def unpack_seq(context: _ContextLike, unpack_one) -> List[Any]:
         _field=field,
         _obj=context.get(CTX_OBJECT),
         _pos=context.get(CTX_POS),
-        _is_seq=True
+        _is_seq=True,
     )
     greedy = length is Ellipsis
-    prefixed = isprefixed(length)
+    # pylint: disable-next=unidiomatic-typecheck
+    prefixed = type(length) is _PrefixedType
     if prefixed:
         # We have to temporarily remove the array status from the parsing field
         with WithoutContextVar(context, CTX_SEQ, False):
@@ -128,7 +129,8 @@ def pack_seq(seq: List[Any], context: _ContextLike, pack_one) -> None:
     # REVISIT: when to use field.length(context)
     count = len(seq)
     length = field.amount
-    if isprefixed(length):
+    # pylint: disable-next=unidiomatic-typecheck
+    if type(length) is _PrefixedType:
         struct = length.start
         # We have to temporatily alter the field's values,
         with WithoutContextVar(context, CTX_SEQ, False):
@@ -144,7 +146,7 @@ def pack_seq(seq: List[Any], context: _ContextLike, pack_one) -> None:
         _length=count,
         _field=field,
         _obj=context.get(CTX_OBJECT),
-        _is_seq=True
+        _is_seq=True,
     )
     seq_context[CTX_POS] = stream.tell()
     for i, elem in enumerate(seq):

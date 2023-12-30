@@ -38,7 +38,7 @@ from ._mixin import FieldStruct
 
 class FormatField(FieldStruct):
     """
-    A field class representing a binary format. It inherits from FieldStruct.
+    A field class representing a binary format.
     """
 
     def __init__(self, ch: str, type_: type) -> None:
