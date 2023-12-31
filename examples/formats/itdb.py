@@ -24,6 +24,8 @@ except ImportError:
 # Key information for the structs were taken from here:
 #   - https://home.vollink.com/gary/playlister/ituneslib.html
 #   - https://gitlab.home.vollink.com/external/musicdb-poc/
+#   - Internal TypeLib of iTunes (accessible from within the application
+#     binary)
 # ---------------------------------------------------------------------
 
 from caterpillar.model import struct
@@ -265,12 +267,12 @@ class MHTrackItem(MHChunk):  # mtih
     start_time: uint32
     stop_time: uint32
     play_count: uint32
-    _unknown1: Memory(24)
+    _1: padding[24]
     disc_num: uint16
     disc_total: uint16
-    _unknown2: Memory(20)
+    _2: padding[20]
     persistent_id: uint64
-    _unknown3: Memory(620)
+    _3: padding[620]
     strings: MHObjectHeader[this.string_count]
 
 
