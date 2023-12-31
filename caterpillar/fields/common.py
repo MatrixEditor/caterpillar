@@ -31,10 +31,14 @@ from caterpillar.exception import (
     DynamicSizeError,
 )
 from caterpillar.context import CTX_FIELD, CTX_STREAM, CTX_SEQ
-from caterpillar.options import F_SEQUENTIAL
+from caterpillar.options import F_SEQUENTIAL, Flag
 from caterpillar.byteorder import LittleEndian
 from ._base import Field, INVALID_DEFAULT, singleton
 from ._mixin import FieldStruct
+
+
+ENUM_STRICT = Flag("enum.strict")
+
 
 class FormatField(FieldStruct):
     """
@@ -354,10 +358,13 @@ class Enum(Transformer):
         :return: The encoded value (integer).
         :raises ValidationError: If the input is not an enumeration type.
         """
-        if isinstance(obj, _EnumType):
-            return obj.value
+        if not isinstance(obj, _EnumType):
+            # pylint: disable-next=protected-access
+            if ENUM_STRICT._hash_ in context[CTX_FIELD].flags:
+                raise ValidationError(f"Expected enum type, got {type(obj)}", context)
+            return obj
 
-        raise ValidationError(f"Expected enum type, got {type(obj)}", context)
+        return obj.value
 
     def decode(self, parsed: Any, context: _ContextLike) -> Any:
         """
@@ -367,19 +374,24 @@ class Enum(Transformer):
         :param context: The current context.
         :return: The corresponding enumeration value.
         """
+        # pylint: disable-next=protected-access
         by_name = self.model._member_map_.get(parsed)
         if by_name is not None:
             return by_name
 
+        # pylint: disable-next=protected-access
         by_value = self.model._value2member_map_.get(parsed)
         if by_value is not None:
             return by_value
 
         default = self.default or context[CTX_FIELD].default
         if default == INVALID_DEFAULT:
-            raise InvalidValueError(
-                f"Could not find enum for value {parsed!r}", context
-            )
+            # pylint: disable-next=protected-access
+            if ENUM_STRICT._hash_ in context[CTX_FIELD].flags:
+                raise InvalidValueError(
+                    f"Could not find enum for value {parsed!r}", context
+                )
+            return parsed
         return default
 
 
