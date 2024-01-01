@@ -30,6 +30,7 @@ from caterpillar.byteorder import ByteOrder, Arch
 from caterpillar.options import (
     S_EVAL_ANNOTATIONS,
     S_UNION,
+    S_ADD_BYTES,
     Flag,
     GLOBAL_STRUCT_OPTIONS,
     GLOBAL_UNION_OPTIONS,
@@ -82,6 +83,8 @@ class Struct(Sequence):
             self._union_hook = (hook_cls or UnionHook)(self)
             setattr(self.model, "__init__", _union_init(self._union_hook))
             setattr(self.model, "__setattr__", _union_setattr(self._union_hook))
+        if self.has_option(S_ADD_BYTES):
+            setattr(self.model, "__bytes__", _struct_bytes)
 
     def __type__(self) -> type:
         return self.model
@@ -115,6 +118,13 @@ class Struct(Sequence):
 
     def get_value(self, obj: Any, name: str, field: Field) -> Optional[Any]:
         return getattr(obj, name, None)
+
+
+def _struct_bytes(model: Struct) -> Callable:
+    def to_bytes(self) -> bytes:
+        return pack(self, model)
+
+    return to_bytes
 
 
 def _make_struct(

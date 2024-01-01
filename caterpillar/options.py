@@ -150,6 +150,7 @@ S_DISCARD_CONST = Flag("discard_const")
 S_UNION = Flag("union")
 S_REPLACE_TYPES = Flag("replace_types")
 S_EVAL_ANNOTATIONS = Flag("eval_annotations")
+S_ADD_BYTES = Flag("add_bytes_method")
 
 # for fields
 F_KEEP_POSITION = Flag("keep_position")

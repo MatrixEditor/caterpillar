@@ -59,3 +59,9 @@ from .compression import (
     LZOCompressed,
 )
 from .crypto import Encrypted
+from .net import (
+    IPv4Address,
+    IPv6Address,
+    MAC,
+    MACAddress
+)
