@@ -8,7 +8,7 @@
 
 
 > [!WARNING]
-> This project is stell in beta/testing phase. Expect bugs, naming changes and errors while using this
+> This project is still in beta/testing phase. Expect bugs, naming changes and errors while using this
 > library.
 
 Caterpillar is a Python 3.12+ library to pack and unpack structurized binary data. It
