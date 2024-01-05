@@ -160,7 +160,11 @@ def getstruct(obj: Any, __default: Any = None) -> _StructLike:
     :return: The structure attribute of the object.
     """
     cls_dict = getattr(obj.__class__ if not isinstance(obj, type) else obj, "__dict__")
-    return cls_dict[STRUCT_FIELD]
+    return (
+        cls_dict[STRUCT_FIELD]
+        if __default is None
+        else cls_dict.get(STRUCT_FIELD, __default)
+    )
 
 
 def typeof(struct: Union[_StructLike, _ContainsStruct]) -> type:
@@ -172,4 +176,3 @@ def typeof(struct: Union[_StructLike, _ContainsStruct]) -> type:
         return Any
     # this function must return a type
     return __type__() or Any
-

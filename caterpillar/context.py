@@ -33,6 +33,7 @@ CTX_POS = "_pos"
 CTX_INDEX = "_index"
 CTX_PATH = "_path"
 CTX_SEQ = "_is_seq"
+CTX_ARCH = "_arch"
 
 
 class Context(_ContextLike):

@@ -14,9 +14,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from io import BytesIO
-from typing import Any, List, Union, Iterable
+from typing import Any, List, Union, Optional, Iterable
 
 from caterpillar.abc import _ContextLike, _StructLike, _ContextLambda, _Switch
+from caterpillar.abc import _ContainsStruct, getstruct
 from caterpillar.byteorder import ByteOrder, byteorder
 from caterpillar.options import Flag
 from caterpillar.context import CTX_SEQ, CTX_STREAM

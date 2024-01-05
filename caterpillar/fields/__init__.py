@@ -44,8 +44,6 @@ from .common import (
     uint32,
     int64,
     uint64,
-    int128,
-    uint128,
     ssize_t,
     size_t,
     float16,
@@ -68,4 +66,10 @@ from .net import (
     IPv6Address,
     MAC,
     MACAddress
+)
+from .pointer import (
+    uintptr,
+    intptr,
+    offintptr,
+    offuintptr
 )

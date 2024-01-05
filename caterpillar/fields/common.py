@@ -13,9 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from struct import calcsize, pack, unpack
-from typing import Dict
+from typing import Callable
 from typing import Sequence, Any, Optional, Union, List
 from types import NoneType
+from functools import cached_property
 from enum import Enum as _EnumType
 
 from caterpillar.abc import (
@@ -208,6 +209,7 @@ double = float64
 void_ptr = FormatField("P", int)
 
 _ConstType = Union[str, bytes, Any]
+
 
 class Transformer(FieldStruct):
     """
@@ -709,6 +711,7 @@ class Int(FieldStruct):
     def __init__(self, bits: int, signed: bool = True) -> None:
         self.signed = signed
         self.bits = bits
+        self.__bits__ = bits
         if not isinstance(bits, int):
             raise ValueError(f"Invalid int size: {bits!r} - expected int")
 
@@ -740,20 +743,38 @@ class UInt(Int):
 
 int24 = Int(24)
 uint24 = UInt(24)
-int128 = Int(128)
-uint128 = UInt(128)
+
 
 # still experimental
 class NotRequired(Transformer):
+    """
+    A transformer that makes a field optional during packing and unpacking.
+
+    :param None:
+    """
+
     def __type__(self) -> type:
         return Optional[super().__type__()]
 
     def __pack__(self, obj: Any, context: _ContextLike) -> None:
+        """
+        Pack the value, skipping it if it is None.
+
+        :param obj: The value to pack.
+        :param context: The context for packing.
+        """
         if obj is None:
             return
         super().__pack__(obj, context)
 
     def __unpack__(self, context: _ContextLike) -> Optional[Any]:
+        """
+        Unpack the value, returning None if the field is not present.
+
+        :param context: The context for unpacking.
+        :return: The unpacked value or None.
+        :rtype: Optional[Any]
+        """
         try:
             return super().__unpack__(context)
         except StructException:
@@ -761,4 +782,78 @@ class NotRequired(Transformer):
 
 
 def optional(struct) -> Transformer:
+    """
+    Create an optional field transformer.
+
+    :param struct: The underlying struct for the optional field.
+    :return: The optional field transformer.
+    :rtype: Transformer
+    """
     return NotRequired(struct)
+
+
+class Lazy(FieldStruct):
+    """
+    A lazy field struct that defers the creation of the underlying struct until needed.
+
+    :param struct: A callable that returns the underlying struct.
+    """
+
+    def __init__(self, struct: Callable[[], _StructLike]) -> None:
+        self.struct_fn = struct
+
+    @cached_property
+    def struct(self) -> _StructLike:
+        """
+        Get the underlying struct.
+
+        :return: The underlying struct.
+        :rtype: _StructLike
+        """
+        return self.struct_fn()
+
+    def __bits__(self) -> str:
+        """
+        Get the bit representation of the Lazy struct.
+
+        :return: The bit representation.
+        :rtype: str
+        """
+        return self.struct.__bits__()
+
+    def __type__(self) -> type:
+        """
+        Get the type associated with the Lazy struct.
+
+        :return: The type associated with the Lazy struct.
+        :rtype: type
+        """
+        return self.struct.__type__()
+
+    def __size__(self, context: _ContextLike) -> int:
+        """
+        Get the size of the Lazy struct.
+
+        :param context: The context for size calculation.
+        :return: The size of the Lazy struct.
+        :rtype: int
+        """
+        return self.struct.__size__(context)
+
+    def pack_single(self, obj: Any, context: _ContextLike) -> None:
+        """
+        Pack a single value using the Lazy struct.
+
+        :param Any obj: The value to pack.
+        :param context: The context for packing.
+        """
+        self.struct.__pack__(obj, context)
+
+    def unpack_single(self, context: _ContextLike) -> Any:
+        """
+        Unpack a single value using the Lazy struct.
+
+        :param context: The context for unpacking.
+        :return: The unpacked value.
+        """
+        return self.struct.__unpack__(context)

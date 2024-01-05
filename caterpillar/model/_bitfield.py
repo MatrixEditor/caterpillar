@@ -24,7 +24,7 @@ from caterpillar.byteorder import (
     Arch,
     ByteOrder,
     byteorder,
-    get_system_arch,
+    system_arch,
     LittleEndian,
 )
 from caterpillar.options import (
@@ -153,7 +153,7 @@ class BitField(Struct):
 
         order = byteorder(annotation, self.order)
         group: BitFieldGroup = self._current_group
-        arch = self.arch or get_system_arch()
+        arch = self.arch or system_arch
 
         width = 0
         if group is None:
