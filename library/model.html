@@ -230,9 +230,284 @@
 <p><em>TODO</em></p>
 <section id="base-classes">
 <h2><span class="section-number">5.1. </span>Base classes<a class="headerlink" href="#base-classes" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="caterpillar.model.Sequence">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.model.</span></span><span class="sig-name descname"><span class="pre">Sequence</span></span><a class="reference internal" href="../_modules/caterpillar/model/_base.html#Sequence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.Sequence" title="Link to this definition">#</a></dt>
+<dd><p>Default implementation for a sequence of fields.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="caterpillar.model.Sequence.add_field">
+<span class="sig-name descname"><span class="pre">add_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="fields/field_model.html#caterpillar.fields.Field" title="caterpillar.fields._base.Field"><span class="pre">Field</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">included</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/caterpillar/model/_base.html#Sequence.add_field"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.Sequence.add_field" title="Link to this definition">#</a></dt>
+<dd><p>Add a field to the struct.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – The name of the field.</p></li>
+<li><p><strong>field</strong> – The field to add.</p></li>
+<li><p><strong>included</strong> – True if the field should be included, else False.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.model.Sequence.arch">
+<span class="sig-name descname"><span class="pre">arch</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="byteorder.html#caterpillar.byteorder.Arch" title="caterpillar.byteorder.Arch"><span class="pre">Arch</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#caterpillar.model.Sequence.arch" title="Link to this definition">#</a></dt>
+<dd><p>Global architecture definition (will be inferred on all fields)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caterpillar.model.Sequence.del_field">
+<span class="sig-name descname"><span class="pre">del_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="fields/field_model.html#caterpillar.fields.Field" title="caterpillar.fields._base.Field"><span class="pre">Field</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/caterpillar/model/_base.html#Sequence.del_field"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.Sequence.del_field" title="Link to this definition">#</a></dt>
+<dd><p>Remomves a field from this struct.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – The name of the field.</p></li>
+<li><p><strong>field</strong> – The field to remove.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.model.Sequence.field_options">
+<span class="sig-name descname"><span class="pre">field_options</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="options.html#caterpillar.options.Flag" title="caterpillar.options.Flag"><span class="pre">Flag</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#caterpillar.model.Sequence.field_options" title="Link to this definition">#</a></dt>
+<dd><p>Global field flags that will be applied on all fields.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.model.Sequence.fields">
+<span class="sig-name descname"><span class="pre">fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="fields/field_model.html#caterpillar.fields.Field" title="caterpillar.fields._base.Field"><span class="pre">Field</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#caterpillar.model.Sequence.fields" title="Link to this definition">#</a></dt>
+<dd><p>A list of all fields defined in this struct.</p>
+<p>This attribute stores the fields in an <em>ordered</em> collection, whereby ordered
+means, relative to their initial class declaration position. These fields can
+be modified using <code class="docutils literal notranslate"><span class="pre">add_field</span></code>, <code class="docutils literal notranslate"><span class="pre">del_field</span></code> or the operators <code class="docutils literal notranslate"><span class="pre">+</span></code> and
+<code class="docutils literal notranslate"><span class="pre">-</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caterpillar.model.Sequence.has_option">
+<span class="sig-name descname"><span class="pre">has_option</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">option</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="options.html#caterpillar.options.Flag" title="caterpillar.options.Flag"><span class="pre">Flag</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/caterpillar/model/_base.html#Sequence.has_option"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.Sequence.has_option" title="Link to this definition">#</a></dt>
+<dd><p>Check if the struct has a specific option.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>option</strong> – The option to check.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the struct has the specified option, else False.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.model.Sequence.model">
+<span class="sig-name descname"><span class="pre">model</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Any</span></em><a class="headerlink" href="#caterpillar.model.Sequence.model" title="Link to this definition">#</a></dt>
+<dd><p>Specifies the target class/dictionary used as the base model.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.model.Sequence.options">
+<span class="sig-name descname"><span class="pre">options</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="options.html#caterpillar.options.Flag" title="caterpillar.options.Flag"><span class="pre">Flag</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#caterpillar.model.Sequence.options" title="Link to this definition">#</a></dt>
+<dd><p>Additional options specifying what to include in the final class.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.model.Sequence.order">
+<span class="sig-name descname"><span class="pre">order</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="byteorder.html#caterpillar.byteorder.ByteOrder" title="caterpillar.byteorder.ByteOrder"><span class="pre">ByteOrder</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#caterpillar.model.Sequence.order" title="Link to this definition">#</a></dt>
+<dd><p>Optional configuration value for the byte order of a field.__annotations__</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="caterpillar.model.Struct">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.model.</span></span><span class="sig-name descname"><span class="pre">Struct</span></span><a class="reference internal" href="../_modules/caterpillar/model/_struct.html#Struct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.Struct" title="Link to this definition">#</a></dt>
+<dd><p>Represents a structured data model for serialization and deserialization.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> – The target class used as the base model.</p></li>
+<li><p><strong>order</strong> – Optional byte order for the fields in the structure.</p></li>
+<li><p><strong>arch</strong> – Global architecture definition (will be inferred on all fields).</p></li>
+<li><p><strong>options</strong> – Additional options specifying what to include in the final class.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="caterpillar.model.BitFieldGroup">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.model.</span></span><span class="sig-name descname"><span class="pre">BitFieldGroup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caterpillar/model/_bitfield.html#BitFieldGroup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.BitFieldGroup" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="caterpillar.model.BitField">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.model.</span></span><span class="sig-name descname"><span class="pre">BitField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="byteorder.html#caterpillar.byteorder.ByteOrder" title="caterpillar.byteorder.ByteOrder"><span class="pre">ByteOrder</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="byteorder.html#caterpillar.byteorder.Arch" title="caterpillar.byteorder.Arch"><span class="pre">Arch</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="options.html#caterpillar.options.Flag" title="caterpillar.options.Flag"><span class="pre">Flag</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_options</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="options.html#caterpillar.options.Flag" title="caterpillar.options.Flag"><span class="pre">Flag</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caterpillar/model/_bitfield.html#BitField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.BitField" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="caterpillar.model.UnionHook">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.model.</span></span><span class="sig-name descname"><span class="pre">UnionHook</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">struct_</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#caterpillar.model.Struct" title="caterpillar.model._struct.Struct"><span class="pre">Struct</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caterpillar/model/_struct.html#UnionHook"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.UnionHook" title="Link to this definition">#</a></dt>
+<dd><p>Implementation of a hook to simulate union types.</p>
+<p>It will hook two methods of the target model type: <code class="code docutils literal notranslate"><span class="pre">__init__</span></code> and
+<code class="code docutils literal notranslate"><span class="pre">__setattr__</span></code>. Because the constructor calls <em>setattr</em> for each
+attribute in the model, we have to intercept it before it gets called
+to set an internal status.</p>
+<p>Internally, these two methods will be translated into <code class="xref py py-meth docutils literal notranslate"><span class="pre">__model_init__()</span></code>
+and <code class="xref py py-meth docutils literal notranslate"><span class="pre">__model_setattr__()</span></code>. Therefore, any class that implements
+these two methods can be used as a union hook.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.model.UnionHook.max_size">
+<span class="sig-name descname"><span class="pre">max_size</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#caterpillar.model.UnionHook.max_size" title="Link to this definition">#</a></dt>
+<dd><p>The static (cached) maximum size of the union</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.model.UnionHook.struct">
+<span class="sig-name descname"><span class="pre">struct</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#caterpillar.model.Struct" title="caterpillar.model._struct.Struct"><span class="pre">Struct</span></a></em><a class="headerlink" href="#caterpillar.model.UnionHook.struct" title="Link to this definition">#</a></dt>
+<dd><p>The struct reference</p>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 <section id="standard-functions">
 <h2><span class="section-number">5.2. </span>Standard functions<a class="headerlink" href="#standard-functions" title="Link to this heading">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="caterpillar.model.struct">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.model.</span></span><span class="sig-name descname"><span class="pre">struct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwds</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caterpillar/model/_struct.html#struct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.struct" title="Link to this definition">#</a></dt>
+<dd><p>Decorator to create a Struct class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cls</strong> – The target class used as the base model.</p></li>
+<li><p><strong>options</strong> – Additional options specifying what to include in the final class.</p></li>
+<li><p><strong>order</strong> – Optional configuration value for the byte order of a field.</p></li>
+<li><p><strong>arch</strong> – Global architecture definition (will be inferred on all fields).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The created Struct class or a wrapper function if cls is not provided.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="caterpillar.model.union">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.model.</span></span><span class="sig-name descname"><span class="pre">union</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="options.html#caterpillar.options.Flag" title="caterpillar.options.Flag"><span class="pre">Flag</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwds</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caterpillar/model/_struct.html#union"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.union" title="Link to this definition">#</a></dt>
+<dd><p>Decorator to create a Union class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cls</strong> – The target class used as the base model.</p></li>
+<li><p><strong>options</strong> – Additional options specifying what to include in the final class.</p></li>
+<li><p><strong>order</strong> – Optional configuration value for the byte order of a field.</p></li>
+<li><p><strong>arch</strong> – Global architecture definition (will be inferred on all fields).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The created Union class or a wrapper function if cls is not provided.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="caterpillar.model.pack">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.model.</span></span><span class="sig-name descname"><span class="pre">pack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="abc.html#caterpillar.abc._ContainsStruct" title="caterpillar.abc._ContainsStruct"><span class="pre">_ContainsStruct</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">struct</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="abc.html#caterpillar.abc._StructLike" title="caterpillar.abc._StructLike"><span class="pre">_StructLike</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwds</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="reference internal" href="../_modules/caterpillar/model/_struct.html#pack"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.pack" title="Link to this definition">#</a></dt>
+<dd><p>Pack an object into a bytes buffer using the specified struct.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obj</strong> – The object to pack.</p></li>
+<li><p><strong>struct</strong> – The struct to use for packing.</p></li>
+<li><p><strong>kwds</strong> – Additional keyword arguments to pass to the pack function.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The packed bytes.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="caterpillar.model.pack_into">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.model.</span></span><span class="sig-name descname"><span class="pre">pack_into</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="abc.html#caterpillar.abc._ContainsStruct" title="caterpillar.abc._ContainsStruct"><span class="pre">_ContainsStruct</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">IOBase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">struct</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="abc.html#caterpillar.abc._StructLike" title="caterpillar.abc._StructLike"><span class="pre">_StructLike</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_tempfile</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwds</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/caterpillar/model/_struct.html#pack_into"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.pack_into" title="Link to this definition">#</a></dt>
+<dd><p>Pack an object into the specified buffer using the specified struct.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obj</strong> – The object to pack.</p></li>
+<li><p><strong>buffer</strong> – The buffer to pack the object into.</p></li>
+<li><p><strong>struct</strong> – The struct to use for packing.</p></li>
+<li><p><strong>kwds</strong> – Additional keyword arguments to pass to the pack function.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="caterpillar.model.pack_file">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.model.</span></span><span class="sig-name descname"><span class="pre">pack_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="abc.html#caterpillar.abc._ContainsStruct" title="caterpillar.abc._ContainsStruct"><span class="pre">_ContainsStruct</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">struct</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="abc.html#caterpillar.abc._StructLike" title="caterpillar.abc._StructLike"><span class="pre">_StructLike</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_tempfile</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwds</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/caterpillar/model/_struct.html#pack_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.pack_file" title="Link to this definition">#</a></dt>
+<dd><p>Pack an object into a file using the specified struct.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obj</strong> – The object to pack.</p></li>
+<li><p><strong>filename</strong> – The name of the file to write to.</p></li>
+<li><p><strong>struct</strong> – The struct to use for packing.</p></li>
+<li><p><strong>kwds</strong> – Additional keyword arguments to pass to the pack function.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="caterpillar.model.unpack">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.model.</span></span><span class="sig-name descname"><span class="pre">unpack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">struct</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="abc.html#caterpillar.abc._StructLike" title="caterpillar.abc._StructLike"><span class="pre">_StructLike</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="abc.html#caterpillar.abc._ContainsStruct" title="caterpillar.abc._ContainsStruct"><span class="pre">_ContainsStruct</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">IOBase</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwds</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="../_modules/caterpillar/model/_struct.html#unpack"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.unpack" title="Link to this definition">#</a></dt>
+<dd><p>Unpack an object from a bytes buffer or stream using the specified struct.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>struct</strong> – The struct to use for unpacking.</p></li>
+<li><p><strong>buffer</strong> – The bytes buffer or stream to unpack from.</p></li>
+<li><p><strong>kwds</strong> – Additional keyword arguments to pass to the unpack function.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The unpacked object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="caterpillar.model.unpack_file">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.model.</span></span><span class="sig-name descname"><span class="pre">unpack_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">struct</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="abc.html#caterpillar.abc._StructLike" title="caterpillar.abc._StructLike"><span class="pre">_StructLike</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="abc.html#caterpillar.abc._ContainsStruct" title="caterpillar.abc._ContainsStruct"><span class="pre">_ContainsStruct</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwds</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="../_modules/caterpillar/model/_struct.html#unpack_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.unpack_file" title="Link to this definition">#</a></dt>
+<dd><p>Unpack an object from a file using the specified struct.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>struct</strong> – The struct to use for unpacking.</p></li>
+<li><p><strong>filename</strong> – The name of the file to read from.</p></li>
+<li><p><strong>kwds</strong> – Additional keyword arguments to pass to the unpack function.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The unpacked object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="caterpillar.model.bitfield">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.model.</span></span><span class="sig-name descname"><span class="pre">bitfield</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="options.html#caterpillar.options.Flag" title="caterpillar.options.Flag"><span class="pre">Flag</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="byteorder.html#caterpillar.byteorder.ByteOrder" title="caterpillar.byteorder.ByteOrder"><span class="pre">ByteOrder</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="byteorder.html#caterpillar.byteorder.Arch" title="caterpillar.byteorder.Arch"><span class="pre">Arch</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_options</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="options.html#caterpillar.options.Flag" title="caterpillar.options.Flag"><span class="pre">Flag</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caterpillar/model/_bitfield.html#bitfield"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.bitfield" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
 </section>
 </section>
 
@@ -292,8 +567,40 @@
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">5. Struct Model</a><ul>
-<li><a class="reference internal" href="#base-classes">5.1. Base classes</a></li>
-<li><a class="reference internal" href="#standard-functions">5.2. Standard functions</a></li>
+<li><a class="reference internal" href="#base-classes">5.1. Base classes</a><ul>
+<li><a class="reference internal" href="#caterpillar.model.Sequence"><code class="docutils literal notranslate"><span class="pre">Sequence</span></code></a><ul>
+<li><a class="reference internal" href="#caterpillar.model.Sequence.add_field"><code class="docutils literal notranslate"><span class="pre">Sequence.add_field()</span></code></a></li>
+<li><a class="reference internal" href="#caterpillar.model.Sequence.arch"><code class="docutils literal notranslate"><span class="pre">Sequence.arch</span></code></a></li>
+<li><a class="reference internal" href="#caterpillar.model.Sequence.del_field"><code class="docutils literal notranslate"><span class="pre">Sequence.del_field()</span></code></a></li>
+<li><a class="reference internal" href="#caterpillar.model.Sequence.field_options"><code class="docutils literal notranslate"><span class="pre">Sequence.field_options</span></code></a></li>
+<li><a class="reference internal" href="#caterpillar.model.Sequence.fields"><code class="docutils literal notranslate"><span class="pre">Sequence.fields</span></code></a></li>
+<li><a class="reference internal" href="#caterpillar.model.Sequence.has_option"><code class="docutils literal notranslate"><span class="pre">Sequence.has_option()</span></code></a></li>
+<li><a class="reference internal" href="#caterpillar.model.Sequence.model"><code class="docutils literal notranslate"><span class="pre">Sequence.model</span></code></a></li>
+<li><a class="reference internal" href="#caterpillar.model.Sequence.options"><code class="docutils literal notranslate"><span class="pre">Sequence.options</span></code></a></li>
+<li><a class="reference internal" href="#caterpillar.model.Sequence.order"><code class="docutils literal notranslate"><span class="pre">Sequence.order</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#caterpillar.model.Struct"><code class="docutils literal notranslate"><span class="pre">Struct</span></code></a></li>
+<li><a class="reference internal" href="#caterpillar.model.BitFieldGroup"><code class="docutils literal notranslate"><span class="pre">BitFieldGroup</span></code></a></li>
+<li><a class="reference internal" href="#caterpillar.model.BitField"><code class="docutils literal notranslate"><span class="pre">BitField</span></code></a></li>
+<li><a class="reference internal" href="#caterpillar.model.UnionHook"><code class="docutils literal notranslate"><span class="pre">UnionHook</span></code></a><ul>
+<li><a class="reference internal" href="#caterpillar.model.UnionHook.max_size"><code class="docutils literal notranslate"><span class="pre">UnionHook.max_size</span></code></a></li>
+<li><a class="reference internal" href="#caterpillar.model.UnionHook.struct"><code class="docutils literal notranslate"><span class="pre">UnionHook.struct</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#standard-functions">5.2. Standard functions</a><ul>
+<li><a class="reference internal" href="#caterpillar.model.struct"><code class="docutils literal notranslate"><span class="pre">struct()</span></code></a></li>
+<li><a class="reference internal" href="#caterpillar.model.union"><code class="docutils literal notranslate"><span class="pre">union()</span></code></a></li>
+<li><a class="reference internal" href="#caterpillar.model.pack"><code class="docutils literal notranslate"><span class="pre">pack()</span></code></a></li>
+<li><a class="reference internal" href="#caterpillar.model.pack_into"><code class="docutils literal notranslate"><span class="pre">pack_into()</span></code></a></li>
+<li><a class="reference internal" href="#caterpillar.model.pack_file"><code class="docutils literal notranslate"><span class="pre">pack_file()</span></code></a></li>
+<li><a class="reference internal" href="#caterpillar.model.unpack"><code class="docutils literal notranslate"><span class="pre">unpack()</span></code></a></li>
+<li><a class="reference internal" href="#caterpillar.model.unpack_file"><code class="docutils literal notranslate"><span class="pre">unpack_file()</span></code></a></li>
+<li><a class="reference internal" href="#caterpillar.model.bitfield"><code class="docutils literal notranslate"><span class="pre">bitfield()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
