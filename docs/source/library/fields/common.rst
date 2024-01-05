@@ -51,6 +51,7 @@ Numeric Structs
     :members:
 
 .. autoattribute:: caterpillar.fields.VarInt
+    :annotation:
 
 Bytes, Strings
 --------------

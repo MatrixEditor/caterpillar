@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from struct import calcsize, pack, unpack
+from typing import Dict
 from typing import Sequence, Any, Optional, Union, List
 from types import NoneType
 from enum import Enum as _EnumType
@@ -32,7 +33,7 @@ from caterpillar.exception import (
 )
 from caterpillar.context import CTX_FIELD, CTX_STREAM, CTX_SEQ
 from caterpillar.options import F_SEQUENTIAL, Flag
-from caterpillar.byteorder import LittleEndian
+from caterpillar.byteorder import LittleEndian, Arch
 from ._base import Field, INVALID_DEFAULT, singleton
 from ._mixin import FieldStruct
 
@@ -207,7 +208,6 @@ double = float64
 void_ptr = FormatField("P", int)
 
 _ConstType = Union[str, bytes, Any]
-
 
 class Transformer(FieldStruct):
     """
@@ -737,6 +737,11 @@ class UInt(Int):
     def __init__(self, bits: int) -> None:
         super().__init__(bits, signed=False)
 
+
+int24 = Int(24)
+uint24 = UInt(24)
+int128 = Int(128)
+uint128 = UInt(128)
 
 # still experimental
 class NotRequired(Transformer):

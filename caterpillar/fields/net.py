@@ -16,7 +16,7 @@ import ipaddress
 import binascii
 import re
 
-from typing import Union, Any, Type, Optional
+from typing import Union, Any, Optional
 
 
 from caterpillar.abc import _ContextLike

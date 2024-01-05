@@ -25,7 +25,7 @@ from caterpillar.abc import _StreamType, _ContextLambda
 from caterpillar.abc import getstruct
 from caterpillar.context import Context, CTX_PATH, CTX_OBJECT, CTX_STREAM, CTX_SEQ
 from caterpillar.byteorder import BYTEORDER_FIELD, ByteOrder, SysNative
-from caterpillar.byteorder import Arch, get_system_arch
+from caterpillar.byteorder import Arch, system_arch
 from caterpillar.exception import StructException, ValidationError
 from caterpillar.options import (
     S_DISCARD_CONST,
@@ -171,6 +171,9 @@ class Sequence(_StructLike, FieldMixin):
             # Make it possible to define custom constants
             case Const():
                 default = annotation.value
+            case Field():
+                if isinstance(annotation.struct, Const):
+                    default = annotation.struct.value
 
         if self.is_union:
             # Unions will get none as default value for all fields
@@ -258,7 +261,7 @@ class Sequence(_StructLike, FieldMixin):
         struct: _StructLike = None
 
         order = getattr(annotation, BYTEORDER_FIELD, self.order or SysNative)
-        arch = self.arch or get_system_arch()
+        arch = self.arch or system_arch
         result = self._process_annotation(annotation, default, order, arch)
         if isinstance(result, Field):
             field = result

@@ -31,4 +31,4 @@ Architecture
 .. autoclass:: caterpillar.byteorder.Arch
     :members:
 
-.. autofunction:: caterpillar.byteorder.get_system_arch
+.. autoattribute:: caterpillar.byteorder.system_arch

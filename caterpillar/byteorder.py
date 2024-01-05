@@ -14,6 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from sys import maxsize
 from platform import machine
+from functools import cached_property
 
 from dataclasses import dataclass
 from enum import Enum
@@ -106,17 +107,11 @@ class Arch:
     Represents a system architecture with a name and an indication of whether it is 64-bit.
 
     :param name: The name of the architecture.
-    :param is_64: A boolean indicating whether the architecture is 64-bit.
+    :param ptr_size: the amount of bits one pointer takes
     """
 
     name: str
-    is_64: bool
+    ptr_size: int
 
 
-def get_system_arch() -> Arch:
-    """
-    Get the system architecture.
-
-    :return: An instance of Arch representing the system architecture.
-    """
-    return Arch(machine(), maxsize > 2**32)
+system_arch: Arch = Arch(machine(), 64 if maxsize > 2**32 else 32)

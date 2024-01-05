@@ -27,11 +27,11 @@ options will be added in the future. A brief introduction can be found [here (ou
 ## Installation
 
 Simply use pip to install the package:
-```console
-pip install git+https://github.com/MatrixEditor/caterpillar.git
+```bash
+pip install "caterpillar[all]@git+https://github.com/MatrixEditor/caterpillar.git"
 ```
 
-## Stating Point
+## Starting Point
 
 Please visit the [Documentation](https://matrixeditor.github.io/caterpillar/), it contains a complete tutorial on how to use this library.
 

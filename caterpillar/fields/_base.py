@@ -27,7 +27,7 @@ from caterpillar.abc import (
     getstruct,
     typeof,
 )
-from caterpillar.byteorder import ByteOrder, SysNative, Arch, get_system_arch
+from caterpillar.byteorder import ByteOrder, SysNative, Arch, system_arch
 from caterpillar.exception import (
     DynamicSizeError,
     StructException,
@@ -151,7 +151,7 @@ class Field(_StructLike):
         self.flags = {hash(x): x for x in flags or set([F_KEEP_POSITION])}
         self.bits = bits
 
-        self.arch = arch or get_system_arch()
+        self.arch = arch or system_arch
         # this will unset KEEP_POSITION if configured
         self.__matmul__(offset)
         if amount:
