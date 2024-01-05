@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
     <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
-        <title>caterpillar.fields.common - Caterpillar 1.0.0 documentation</title>
+        <title>caterpillar.fields.common - Caterpillar 1.0.0-b0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=135e06be" />
     <link rel="stylesheet" type="text/css" href="../../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
@@ -123,7 +123,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../../index.html"><div class="brand">Caterpillar 1.0.0 documentation</div></a>
+      <a href="../../../index.html"><div class="brand">Caterpillar 1.0.0-b0 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -146,7 +146,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
   
   
-  <span class="sidebar-brand-text">Caterpillar 1.0.0 documentation</span>
+  <span class="sidebar-brand-text">Caterpillar 1.0.0-b0 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -239,6 +239,7 @@
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
 <span class="kn">from</span> <span class="nn">struct</span> <span class="kn">import</span> <span class="n">calcsize</span><span class="p">,</span> <span class="n">pack</span><span class="p">,</span> <span class="n">unpack</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">List</span>
 <span class="kn">from</span> <span class="nn">types</span> <span class="kn">import</span> <span class="n">NoneType</span>
 <span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span> <span class="k">as</span> <span class="n">_EnumType</span>
@@ -258,7 +259,7 @@
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">caterpillar.context</span> <span class="kn">import</span> <span class="n">CTX_FIELD</span><span class="p">,</span> <span class="n">CTX_STREAM</span><span class="p">,</span> <span class="n">CTX_SEQ</span>
 <span class="kn">from</span> <span class="nn">caterpillar.options</span> <span class="kn">import</span> <span class="n">F_SEQUENTIAL</span><span class="p">,</span> <span class="n">Flag</span>
-<span class="kn">from</span> <span class="nn">caterpillar.byteorder</span> <span class="kn">import</span> <span class="n">LittleEndian</span>
+<span class="kn">from</span> <span class="nn">caterpillar.byteorder</span> <span class="kn">import</span> <span class="n">LittleEndian</span><span class="p">,</span> <span class="n">Arch</span>
 <span class="kn">from</span> <span class="nn">._base</span> <span class="kn">import</span> <span class="n">Field</span><span class="p">,</span> <span class="n">INVALID_DEFAULT</span><span class="p">,</span> <span class="n">singleton</span>
 <span class="kn">from</span> <span class="nn">._mixin</span> <span class="kn">import</span> <span class="n">FieldStruct</span>
 
@@ -454,7 +455,6 @@
 <span class="n">void_ptr</span> <span class="o">=</span> <span class="n">FormatField</span><span class="p">(</span><span class="s2">&quot;P&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
 
 <span class="n">_ConstType</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
-
 
 <div class="viewcode-block" id="Transformer">
 <a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Transformer">[docs]</a>
@@ -1084,6 +1084,11 @@
 
 
 
+<span class="n">int24</span> <span class="o">=</span> <span class="n">Int</span><span class="p">(</span><span class="mi">24</span><span class="p">)</span>
+<span class="n">uint24</span> <span class="o">=</span> <span class="n">UInt</span><span class="p">(</span><span class="mi">24</span><span class="p">)</span>
+<span class="n">int128</span> <span class="o">=</span> <span class="n">Int</span><span class="p">(</span><span class="mi">128</span><span class="p">)</span>
+<span class="n">uint128</span> <span class="o">=</span> <span class="n">UInt</span><span class="p">(</span><span class="mi">128</span><span class="p">)</span>
+
 <span class="c1"># still experimental</span>
 <div class="viewcode-block" id="NotRequired">
 <a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.NotRequired">[docs]</a>
@@ -1138,7 +1143,7 @@
       
     </aside>
   </div>
-</div><script src="../../../_static/documentation_options.js?v=8d563738"></script>
+</div><script src="../../../_static/documentation_options.js?v=68c67630"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>

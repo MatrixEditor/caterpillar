@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="2. Options" href="options.html" /><link rel="prev" title="Library" href="index.html" />
 
     <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
-        <title>1. Byteorder and Architecture - Caterpillar 1.0.0 documentation</title>
+        <title>1. Byteorder and Architecture - Caterpillar 1.0.0-b0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=135e06be" />
     <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
@@ -124,7 +124,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../index.html"><div class="brand">Caterpillar 1.0.0 documentation</div></a>
+      <a href="../index.html"><div class="brand">Caterpillar 1.0.0-b0 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -147,7 +147,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
   
   
-  <span class="sidebar-brand-text">Caterpillar 1.0.0 documentation</span>
+  <span class="sidebar-brand-text">Caterpillar 1.0.0-b0 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -318,28 +318,22 @@ is <cite>Alignment.NONE</cite>).</p></li>
 <h2><span class="section-number">1.2. </span>Architecture<a class="headerlink" href="#architecture" title="Link to this heading">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="caterpillar.byteorder.Arch">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.byteorder.</span></span><span class="sig-name descname"><span class="pre">Arch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_64</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caterpillar/byteorder.html#Arch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.byteorder.Arch" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.byteorder.</span></span><span class="sig-name descname"><span class="pre">Arch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ptr_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caterpillar/byteorder.html#Arch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.byteorder.Arch" title="Link to this definition">#</a></dt>
 <dd><p>Represents a system architecture with a name and an indication of whether it is 64-bit.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – The name of the architecture.</p></li>
-<li><p><strong>is_64</strong> – A boolean indicating whether the architecture is 64-bit.</p></li>
+<li><p><strong>ptr_size</strong> – the amount of bits one pointer takes</p></li>
 </ul>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="py function">
-<dt class="sig sig-object py" id="caterpillar.byteorder.get_system_arch">
-<span class="sig-prename descclassname"><span class="pre">caterpillar.byteorder.</span></span><span class="sig-name descname"><span class="pre">get_system_arch</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#caterpillar.byteorder.Arch" title="caterpillar.byteorder.Arch"><span class="pre">Arch</span></a></span></span><a class="reference internal" href="../_modules/caterpillar/byteorder.html#get_system_arch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.byteorder.get_system_arch" title="Link to this definition">#</a></dt>
-<dd><p>Get the system architecture.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>An instance of Arch representing the system architecture.</p>
-</dd>
-</dl>
-</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.byteorder.system_arch">
+<span class="sig-prename descclassname"><span class="pre">byteorder.</span></span><span class="sig-name descname"><span class="pre">system_arch</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#caterpillar.byteorder.Arch" title="caterpillar.byteorder.Arch"><span class="pre">Arch</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Arch(name='x86_64',</span> <span class="pre">ptr_size=64)</span></em><a class="headerlink" href="#caterpillar.byteorder.system_arch" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
 
 </section>
 </section>
@@ -418,7 +412,7 @@ is <cite>Alignment.NONE</cite>).</p></li>
 </li>
 <li><a class="reference internal" href="#architecture">1.2. Architecture</a><ul>
 <li><a class="reference internal" href="#caterpillar.byteorder.Arch"><code class="docutils literal notranslate"><span class="pre">Arch</span></code></a></li>
-<li><a class="reference internal" href="#caterpillar.byteorder.get_system_arch"><code class="docutils literal notranslate"><span class="pre">get_system_arch()</span></code></a></li>
+<li><a class="reference internal" href="#caterpillar.byteorder.system_arch"><code class="docutils literal notranslate"><span class="pre">byteorder.system_arch</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -432,7 +426,7 @@ is <cite>Alignment.NONE</cite>).</p></li>
       
     </aside>
   </div>
-</div><script src="../_static/documentation_options.js?v=8d563738"></script>
+</div><script src="../_static/documentation_options.js?v=68c67630"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/furo.js?v=32e29ea5"></script>
