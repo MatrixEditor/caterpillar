@@ -81,6 +81,33 @@ structs. They have to be wrapped by a :class:`Field` first:
     >>> field = F(Format) @ 0x1234  # ok
 
 
+Pointers
+^^^^^^^^
+
+There are special structs that can emulate pointer types with a dependency to the current
+architecture. For instance, take a look at the following struct:
+
+.. code-block:: python
+
+    @struct
+    class Format:
+        name: uintptr *CString(...)     # <-- using the multiply operation, a model
+                                        # will be assigned to the pointer
+
+The behavior of this struct transforms based on the assigned model. For example:
+
+.. code-block:: python
+
+    >>> data = b"\x00\x00\x00\x04Hello, World!\x00"
+    >>> o = unpack(Format, data, _arch=x86)
+    Format(name=<str* 0x4>)
+    >>> _.name.obj
+    'Hello, World!'
+
+The resulting object, showcases a transformed structure, where the name attribute is
+stored using the :class:`pointer` class. It is a standard integer class that stores
+the parsed model object as well.
+
 Chaining
 ^^^^^^^^
 

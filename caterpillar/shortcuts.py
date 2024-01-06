@@ -19,10 +19,12 @@ from .model import bitfield, Sequence as Seq
 
 from .context import ContextPath, this, ctx, parent, ContextLength as lenof
 from .byteorder import LittleEndian, BigEndian
+from .byteorder import x86, x86_64, ARM, ARM64, AMD, AMD64, AARCH64
+from .byteorder import PowerPC, PowerPC64, RISC_V, RISC_V64
 
 from .fields import Field as F
-
 from . import options as opt
+
 
 
 

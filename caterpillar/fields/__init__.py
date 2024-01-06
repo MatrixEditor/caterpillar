@@ -71,5 +71,6 @@ from .pointer import (
     uintptr,
     intptr,
     offintptr,
-    offuintptr
+    offuintptr,
+    Pointer
 )

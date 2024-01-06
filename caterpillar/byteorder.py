@@ -115,3 +115,20 @@ class Arch:
 
 
 system_arch: Arch = Arch(machine(), 64 if maxsize > 2**32 else 32)
+
+# common architectures
+x86 = Arch("x86", 32)
+x86_64 = Arch("x86-64", 64)
+ARM = Arch("ARM", 32)
+ARM64 = Arch("ARM64", 64)
+AARCH64 = ARM64
+PowerPC = Arch("PowerPC", 32)
+PowerPC64 = Arch("PowerPC64", 64)
+MIPS = Arch("MIPS", 32)
+MIPS64 = Arch("MIPS64", 64)
+SPARC = Arch("SPARC", 32)
+SPARC64 = Arch("SPARC64", 64)
+RISC_V64 = Arch("RISK-V64", 64)
+RISC_V = Arch("RISK-V", 32)
+AMD = Arch("AMD", 32)
+AMD64 = Arch("AMD64", 64)

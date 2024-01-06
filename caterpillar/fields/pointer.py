@@ -18,12 +18,17 @@ from typing import Any, Union, Optional
 from caterpillar.abc import _ContextLike, _StructLike, _ContextLambda, getstruct
 from caterpillar.byteorder import Arch
 from caterpillar.exception import DelegationError, StructException
-from caterpillar.context import CTX_STREAM, CTX_FIELD, CTX_ARCH
+from caterpillar.context import CTX_STREAM, CTX_FIELD, CTX_ARCH, CTX_SEQ
+from caterpillar.options import Flag
+from caterpillar._common import WithoutContextVar
 
 from ._mixin import FieldStruct
 from .common import uint16, uint24, uint32, uint64, uint8
 from .common import int16, int32, int64, int24, int8
 from .common import UInt, Int
+
+
+PTR_STRICT = Flag("pointer.strict-mode")
 
 
 class pointer(int):
@@ -32,6 +37,17 @@ class pointer(int):
 
     :ivar Any obj: The associated object, if any.
     """
+
+    obj: Optional[Any]
+
+    def __repr__(self) -> str:
+        result = super().__repr__()
+        if self.obj is not None:
+            result = f"<{type(self.obj).__name__}* {hex(self)}>"
+        return result
+
+    def get(self) -> Optional[Any]:
+        return self.obj
 
 
 class Pointer(FieldStruct):
@@ -62,7 +78,7 @@ class Pointer(FieldStruct):
         :rtype: Pointer
         """
 
-        return Pointer(self.struct, model)
+        return type(self)(self.struct, model)
 
     def __type__(self) -> type:
         """
@@ -71,9 +87,7 @@ class Pointer(FieldStruct):
         :return: The type associated with the Pointer.
         :rtype: type
         """
-        if self.model is not None:
-            return pointer
-        return int
+        return pointer
 
     def __size__(self, context: _ContextLike) -> int:
         """
@@ -101,22 +115,29 @@ class Pointer(FieldStruct):
 
         stream = context[CTX_STREAM]
         start = stream.tell()
-        value: int = struct.__unpack__(context)
-        value = self._clean(value, context)
+        with WithoutContextVar(context, CTX_SEQ, False):
+            value: int = struct.__unpack__(context)
+            # cleanup before further parsing
+            value = self._clean(value, context)
 
-        if self.model is None:
-            return value
+            if self.model is None:
+                return self._create(value, start, None, context)
 
-        offset: int = self._to_offset(value, start, context)
-        fallback: int = stream.tell()
-
-        try:
-            stream.seek(offset)
-            model_obj = self.model.__unpack__(context)
-        except StructException as exc:
-            raise DelegationError("Could not parse model!", context) from exc
-
-        stream.seek(fallback)
+            offset: int = self._to_offset(value, start, context)
+            model_obj = None
+            if offset != 0:
+                # using an if-statement here reduces time overhead
+                # of this branch
+                fallback: int = stream.tell()
+                try:
+                    stream.seek(offset)
+                    model_obj = self.model.__unpack__(context)
+                except StructException as exc:
+                    if context[CTX_FIELD].has_flag(PTR_STRICT):
+                        raise DelegationError(
+                            "Could not parse model!", context
+                        ) from exc
+                stream.seek(fallback)
         return self._create(value, start, model_obj, context)
 
     def pack_single(self, obj: Any, context: _ContextLike) -> None:
@@ -129,7 +150,9 @@ class Pointer(FieldStruct):
         struct = self.struct
         if callable(struct):
             struct = self.struct(context)
-        struct.__pack__(int(obj), context)
+
+        with WithoutContextVar(context, CTX_SEQ, False):
+            struct.__pack__(int(obj), context)
 
     def _to_offset(self, value: Any, start: int, context: _ContextLike) -> int:
         """
@@ -202,7 +225,7 @@ uintptr = Pointer(uintptr_fn)
 intptr = Pointer(intptr_fn)
 
 
-class relative_pointer(int):
+class relative_pointer(pointer):
     """
     A custom integer subclass representing a relative pointer to another struct within the stream.
 
@@ -210,6 +233,8 @@ class relative_pointer(int):
     :ivar base: The base offset.
     :ivar absolute: The absolute offset.
     """
+
+    base: int
 
     @property
     def absolute(self) -> int:
@@ -219,7 +244,7 @@ class relative_pointer(int):
         :return: The absolute offset.
         :rtype: int
         """
-        return self + self.base  # pylint: disable=no-member
+        return self + self.base
 
 
 class RelativePointer(Pointer):
@@ -235,8 +260,9 @@ class RelativePointer(Pointer):
         :rtype: type
         """
         if self.model is not None:
-            return relative_pointer
-        return int
+            return f"relative_pointer[{self.model.__type__().__name__}]"
+
+        return relative_pointer
 
     def _to_offset(self, value: Any, start: int, context: _ContextLike) -> int:
         """
