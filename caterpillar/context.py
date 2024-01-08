@@ -65,7 +65,10 @@ class Context(_ContextLike):
                     raise AttributeError(key)
 
             path = key.split(".")
-            root = self[path[0]]
+            if path[0] in self:
+                root = self[path[0]]
+            else:
+                root = getattr(self, path[0])
             for i in range(1, len(path)):
                 root = getattr(root, path[i])
 
