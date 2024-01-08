@@ -406,7 +406,7 @@ def unpack(
     """
     # prepare the data stream
     stream = buffer if isinstance(buffer, IOBase) else BytesIO(buffer)
-    context = Context(_path="<root>", _parent=None, _io=stream, **kwds, _pos=0)
+    context = Context(_path="<root>", _parent=None, _io=stream, **kwds, _pos=0, _is_seq=False)
     if hasstruct(struct):
         struct = getstruct(struct)
 

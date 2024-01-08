@@ -321,6 +321,9 @@ class Field(_StructLike):
             return type_ if not self.is_seq() else List[type_]
 
         # We construct a Union type hint as an alternative:
+        if callable(self.options):
+            return Any
+
         types = [typeof(s) for s in self.options.values()]
         return Union[*types]
 
