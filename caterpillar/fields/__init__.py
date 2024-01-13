@@ -51,6 +51,7 @@ from .common import (
     float64,
     double,
     void_ptr,
+    uuid
 )
 from .varint import VarInt, VARINT_LSB
 from .compression import (

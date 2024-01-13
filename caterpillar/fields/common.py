@@ -18,6 +18,7 @@ from typing import Sequence, Any, Optional, Union, List
 from types import NoneType
 from functools import cached_property
 from enum import Enum as _EnumType
+from uuid import UUID
 
 from caterpillar.abc import (
     _StructLike,
@@ -857,3 +858,18 @@ class Lazy(FieldStruct):
         :return: The unpacked value.
         """
         return self.struct.__unpack__(context)
+
+
+@singleton
+class uuid(Transformer):
+    def __init__(self) -> None:
+        super().__init__(Bytes(16))
+
+    def __type__(self) -> type:
+        return UUID
+
+    def decode(self, parsed: bytes, context) -> UUID:
+        return UUID(bytes=parsed)
+
+    def encode(self, obj: UUID, context) -> bytes:
+        return obj.bytes
