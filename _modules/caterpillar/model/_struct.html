@@ -249,7 +249,7 @@
 <span class="kn">from</span> <span class="nn">shutil</span> <span class="kn">import</span> <span class="n">copyfileobj</span>
 
 <span class="kn">from</span> <span class="nn">caterpillar.abc</span> <span class="kn">import</span> <span class="n">getstruct</span><span class="p">,</span> <span class="n">hasstruct</span><span class="p">,</span> <span class="n">STRUCT_FIELD</span>
-<span class="kn">from</span> <span class="nn">caterpillar.abc</span> <span class="kn">import</span> <span class="n">_StructLike</span><span class="p">,</span> <span class="n">_StreamType</span>
+<span class="kn">from</span> <span class="nn">caterpillar.abc</span> <span class="kn">import</span> <span class="n">_StructLike</span><span class="p">,</span> <span class="n">_StreamType</span><span class="p">,</span> <span class="n">_SupportsUnpack</span>
 <span class="kn">from</span> <span class="nn">caterpillar.abc</span> <span class="kn">import</span> <span class="n">_ContainsStruct</span><span class="p">,</span> <span class="n">_ContextLike</span><span class="p">,</span> <span class="n">_SupportsSize</span>
 <span class="kn">from</span> <span class="nn">caterpillar.context</span> <span class="kn">import</span> <span class="n">Context</span><span class="p">,</span> <span class="n">CTX_STREAM</span>
 <span class="kn">from</span> <span class="nn">caterpillar.byteorder</span> <span class="kn">import</span> <span class="n">ByteOrder</span><span class="p">,</span> <span class="n">Arch</span>
@@ -288,9 +288,10 @@
         <span class="n">arch</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Arch</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">options</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Flag</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">field_options</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Flag</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">kw_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">kw_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">hook_cls</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">type</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kw_only</span> <span class="o">=</span> <span class="n">kw_only</span>
         <span class="n">options</span> <span class="o">=</span> <span class="n">options</span> <span class="ow">or</span> <span class="nb">set</span><span class="p">()</span>
         <span class="n">options</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
             <span class="n">GLOBAL_UNION_OPTIONS</span> <span class="k">if</span> <span class="n">S_UNION</span> <span class="ow">in</span> <span class="n">options</span> <span class="k">else</span> <span class="n">GLOBAL_STRUCT_OPTIONS</span>
@@ -303,7 +304,7 @@
             <span class="n">field_options</span><span class="o">=</span><span class="n">field_options</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="c1"># Add additional options based on the struct&#39;s type</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">dataclass</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">kw_only</span><span class="o">=</span><span class="n">kw_only</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">dataclass</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">kw_only</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kw_only</span><span class="p">)</span>
         <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">STRUCT_FIELD</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
         <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;__class_getitem__&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">dim</span><span class="p">:</span> <span class="n">Field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">amount</span><span class="o">=</span><span class="n">dim</span><span class="p">))</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_union</span><span class="p">:</span>
@@ -334,6 +335,8 @@
 
     <span class="k">def</span> <span class="nf">_set_default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">kw_only</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">kw_only</span> <span class="o">=</span> <span class="kc">True</span>
 
     <span class="k">def</span> <span class="nf">_replace_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">type_</span><span class="p">:</span> <span class="nb">type</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="vm">__annotations__</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">type_</span>
@@ -362,7 +365,7 @@
     <span class="n">order</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ByteOrder</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">arch</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Arch</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">field_options</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Flag</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">kw_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">kw_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">hook_cls</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">type</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -640,7 +643,7 @@
 <div class="viewcode-block" id="unpack">
 <a class="viewcode-back" href="../../../library/model.html#caterpillar.model.unpack">[docs]</a>
 <span class="k">def</span> <span class="nf">unpack</span><span class="p">(</span>
-    <span class="n">struct</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">_StructLike</span><span class="p">,</span> <span class="n">_ContainsStruct</span><span class="p">],</span>
+    <span class="n">struct</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">_SupportsUnpack</span><span class="p">,</span> <span class="n">_ContainsStruct</span><span class="p">],</span>
     <span class="n">buffer</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">_StreamType</span><span class="p">],</span>
     <span class="o">**</span><span class="n">kwds</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
@@ -655,9 +658,14 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># prepare the data stream</span>
     <span class="n">stream</span> <span class="o">=</span> <span class="n">buffer</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="n">IOBase</span><span class="p">)</span> <span class="k">else</span> <span class="n">BytesIO</span><span class="p">(</span><span class="n">buffer</span><span class="p">)</span>
-    <span class="n">context</span> <span class="o">=</span> <span class="n">Context</span><span class="p">(</span><span class="n">_path</span><span class="o">=</span><span class="s2">&quot;&lt;root&gt;&quot;</span><span class="p">,</span> <span class="n">_parent</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">_io</span><span class="o">=</span><span class="n">stream</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">,</span> <span class="n">_pos</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">_is_seq</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">context</span> <span class="o">=</span> <span class="n">Context</span><span class="p">(</span>
+        <span class="n">_path</span><span class="o">=</span><span class="s2">&quot;&lt;root&gt;&quot;</span><span class="p">,</span> <span class="n">_parent</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">_io</span><span class="o">=</span><span class="n">stream</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">,</span> <span class="n">_pos</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">_is_seq</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">)</span>
     <span class="k">if</span> <span class="n">hasstruct</span><span class="p">(</span><span class="n">struct</span><span class="p">):</span>
         <span class="n">struct</span> <span class="o">=</span> <span class="n">getstruct</span><span class="p">(</span><span class="n">struct</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">_SupportsUnpack</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">struct</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> is not a valid struct instance!&quot;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">struct</span><span class="o">.</span><span class="n">__unpack__</span><span class="p">(</span><span class="n">context</span><span class="p">)</span></div>
 

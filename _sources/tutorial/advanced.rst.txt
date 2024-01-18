@@ -194,6 +194,57 @@ be applied to all other fields.
     want with the union object. Just specify the :code:`hook_cls` parameter in the union
     decorator.
 
+Templates
+---------
+
+Yes, you read it correctly. This library supports class templates *similar* to C++. If you need
+more information about the design choices of this subject, refer to the :ref:`ref-templates` section
+in the data model description.
+
+.. code-block:: python
+    :caption: A simple template definition
+
+    A = TemplateTypeVar("A")
+
+    @template(A, "B")       # <-- either strings or global variables
+    class FormatTemplate:
+        foo: A[uint8::]     # <-- prefixed generic array
+        bar: B              # <-- this won't throw an exception, because
+                            # 'B' is created temporarily.
+
+As you can see, the definition does not differ much from struct classes. Implementations
+of template classes are called *derivations*:
+
+.. code-block:: python
+    :caption: Creating template derivations
+
+    # Create a new type with an inferred name
+    Format16 = derive(FormatTemplate, A=uint16, B=uint16, name=...) # <- Struct
+
+    # Struct classes based on template can be created as well
+    @struct
+    class Format32(derive(FormatTemplate, A=uint32, B=uint32)): # <- Struct
+        baz: uint32
+
+    # template sub-classes are allowed as well
+    FormatSubTemplate = derive(FormatTemplate, A=uint8, partial=True) # <- Template
+
+    # The sub-template only needs one parameter upon derivation
+    @struct
+    class Format8(derive(FormatSubTemplate, B=uint8)): # <- Struct
+        blob: Bytes(...)
+
+
+.. note::
+    Keyword arguments are not necessary, you can also use positional arguments
+    if defined in the original template decorator.
+
+.. note::
+    There are several limitations to the template type variables for now. Extended
+    support is an enhancement for the future of this project.
+
+
+
 The End!
 --------
 

@@ -469,7 +469,7 @@ these two methods can be used as a union hook.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="caterpillar.model.unpack">
-<span class="sig-prename descclassname"><span class="pre">caterpillar.model.</span></span><span class="sig-name descname"><span class="pre">unpack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">struct</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="abc.html#caterpillar.abc._StructLike" title="caterpillar.abc._StructLike"><span class="pre">_StructLike</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="abc.html#caterpillar.abc._ContainsStruct" title="caterpillar.abc._ContainsStruct"><span class="pre">_ContainsStruct</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">IOBase</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwds</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="../_modules/caterpillar/model/_struct.html#unpack"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.unpack" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">caterpillar.model.</span></span><span class="sig-name descname"><span class="pre">unpack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">struct</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="abc.html#caterpillar.abc._SupportsUnpack" title="caterpillar.abc._SupportsUnpack"><span class="pre">_SupportsUnpack</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="abc.html#caterpillar.abc._ContainsStruct" title="caterpillar.abc._ContainsStruct"><span class="pre">_ContainsStruct</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">IOBase</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwds</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="../_modules/caterpillar/model/_struct.html#unpack"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.unpack" title="Link to this definition">#</a></dt>
 <dd><p>Unpack an object from a bytes buffer or stream using the specified struct.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -507,6 +507,82 @@ these two methods can be used as a union hook.</p>
 <dt class="sig sig-object py" id="caterpillar.model.bitfield">
 <span class="sig-prename descclassname"><span class="pre">caterpillar.model.</span></span><span class="sig-name descname"><span class="pre">bitfield</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="options.html#caterpillar.options.Flag" title="caterpillar.options.Flag"><span class="pre">Flag</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="byteorder.html#caterpillar.byteorder.ByteOrder" title="caterpillar.byteorder.ByteOrder"><span class="pre">ByteOrder</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="byteorder.html#caterpillar.byteorder.Arch" title="caterpillar.byteorder.Arch"><span class="pre">Arch</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_options</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="options.html#caterpillar.options.Flag" title="caterpillar.options.Flag"><span class="pre">Flag</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caterpillar/model/_bitfield.html#bitfield"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.bitfield" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
+
+</section>
+<section id="templates">
+<h2><span class="section-number">5.3. </span>Templates<a class="headerlink" href="#templates" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="caterpillar.model.TemplateTypeVar">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.model.</span></span><span class="sig-name descname"><span class="pre">TemplateTypeVar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">field_kwds</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caterpillar/model/_template.html#TemplateTypeVar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.TemplateTypeVar" title="Link to this definition">#</a></dt>
+<dd><p>Template type variable.</p>
+<p>These specialised type variables are used within a template definition. They
+support most field operators. Therefore, they can be used in some situations
+where you need to adapt the field type at runtime.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">T</span> <span class="o">=</span> <span class="n">TemplateTypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that there is currently no support for inlined type variables, for example:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@template</span><span class="p">(</span><span class="n">T</span><span class="p">)</span>
+<span class="gp">... </span><span class="k">class</span> <span class="nc">Foo</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">bar</span><span class="p">:</span> <span class="n">Enum</span><span class="p">(</span><span class="n">Baz</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span> <span class="c1"># !!! throws an error</span>
+</pre></div>
+</div>
+<p>is not possible.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.model.TemplateTypeVar.field_kwds">
+<span class="sig-name descname"><span class="pre">field_kwds</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#caterpillar.model.TemplateTypeVar.field_kwds" title="Link to this definition">#</a></dt>
+<dd><p>Arguments that will be passed to the created field instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.model.TemplateTypeVar.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#caterpillar.model.TemplateTypeVar.name" title="Link to this definition">#</a></dt>
+<dd><p>The bound name of this type variable</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="caterpillar.model.istemplate">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.model.</span></span><span class="sig-name descname"><span class="pre">istemplate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/caterpillar/model/_template.html#istemplate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.istemplate" title="Link to this definition">#</a></dt>
+<dd><p>Return true if the object is a template.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="caterpillar.model.template">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.model.</span></span><span class="sig-name descname"><span class="pre">template</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#caterpillar.model.TemplateTypeVar" title="caterpillar.model._template.TemplateTypeVar"><span class="pre">TemplateTypeVar</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">type</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">type</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/caterpillar/model/_template.html#template"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.template" title="Link to this definition">#</a></dt>
+<dd><p>Defines required template type variables if necessary and prepares
+template class definition.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a wrapper function that will be called with the class instance</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Callable[[type], type]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="caterpillar.model.derive">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.model.</span></span><span class="sig-name descname"><span class="pre">derive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">template_ty</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">tys_args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">partial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">union</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">tys_kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">type</span></span></span><a class="reference internal" href="../_modules/caterpillar/model/_template.html#derive"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.derive" title="Link to this definition">#</a></dt>
+<dd><p>Creates a new struct class based on the given template class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>template_ty</strong> (<em>type</em>) – the template class</p></li>
+<li><p><strong>partial</strong> (<em>bool</em><em>, </em><em>optional</em>) – whether the resulting class is also a template, defaults to False</p></li>
+<li><p><strong>name</strong> (<em>str</em><em> | </em><em>Ellipsis</em><em>, </em><em>optional</em>) – the new class name, <code class="code docutils literal notranslate"><span class="pre">...</span></code> infers the outer variable name, defaults to None</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the derived type</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>type</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 </section>
@@ -599,6 +675,17 @@ these two methods can be used as a union hook.</p>
 <li><a class="reference internal" href="#caterpillar.model.unpack"><code class="docutils literal notranslate"><span class="pre">unpack()</span></code></a></li>
 <li><a class="reference internal" href="#caterpillar.model.unpack_file"><code class="docutils literal notranslate"><span class="pre">unpack_file()</span></code></a></li>
 <li><a class="reference internal" href="#caterpillar.model.bitfield"><code class="docutils literal notranslate"><span class="pre">bitfield()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#templates">5.3. Templates</a><ul>
+<li><a class="reference internal" href="#caterpillar.model.TemplateTypeVar"><code class="docutils literal notranslate"><span class="pre">TemplateTypeVar</span></code></a><ul>
+<li><a class="reference internal" href="#caterpillar.model.TemplateTypeVar.field_kwds"><code class="docutils literal notranslate"><span class="pre">TemplateTypeVar.field_kwds</span></code></a></li>
+<li><a class="reference internal" href="#caterpillar.model.TemplateTypeVar.name"><code class="docutils literal notranslate"><span class="pre">TemplateTypeVar.name</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#caterpillar.model.istemplate"><code class="docutils literal notranslate"><span class="pre">istemplate()</span></code></a></li>
+<li><a class="reference internal" href="#caterpillar.model.template"><code class="docutils literal notranslate"><span class="pre">template()</span></code></a></li>
+<li><a class="reference internal" href="#caterpillar.model.derive"><code class="docutils literal notranslate"><span class="pre">derive()</span></code></a></li>
 </ul>
 </li>
 </ul>

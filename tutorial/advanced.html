@@ -396,12 +396,62 @@ want with the union object. Just specify the <code class="code docutils literal 
 decorator.</p>
 </div>
 </section>
+<section id="templates">
+<h2><span class="section-number">3.4. </span>Templates<a class="headerlink" href="#templates" title="Link to this heading">#</a></h2>
+<p>Yes, you read it correctly. This library supports class templates <em>similar</em> to C++. If you need
+more information about the design choices of this subject, refer to the <a class="reference internal" href="../reference/datamodel.html#ref-templates"><span class="std std-ref">Templates</span></a> section
+in the data model description.</p>
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-text">A simple template definition</span><a class="headerlink" href="#id6" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="n">TemplateTypeVar</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">)</span>
+
+<span class="nd">@template</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">)</span>       <span class="c1"># &lt;-- either strings or global variables</span>
+<span class="k">class</span> <span class="nc">FormatTemplate</span><span class="p">:</span>
+    <span class="n">foo</span><span class="p">:</span> <span class="n">A</span><span class="p">[</span><span class="n">uint8</span><span class="p">::]</span>     <span class="c1"># &lt;-- prefixed generic array</span>
+    <span class="n">bar</span><span class="p">:</span> <span class="n">B</span>              <span class="c1"># &lt;-- this won&#39;t throw an exception, because</span>
+                        <span class="c1"># &#39;B&#39; is created temporarily.</span>
+</pre></div>
+</div>
+</div>
+<p>As you can see, the definition does not differ much from struct classes. Implementations
+of template classes are called <em>derivations</em>:</p>
+<div class="literal-block-wrapper docutils container" id="id7">
+<div class="code-block-caption"><span class="caption-text">Creating template derivations</span><a class="headerlink" href="#id7" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a new type with an inferred name</span>
+<span class="n">Format16</span> <span class="o">=</span> <span class="n">derive</span><span class="p">(</span><span class="n">FormatTemplate</span><span class="p">,</span> <span class="n">A</span><span class="o">=</span><span class="n">uint16</span><span class="p">,</span> <span class="n">B</span><span class="o">=</span><span class="n">uint16</span><span class="p">,</span> <span class="n">name</span><span class="o">=...</span><span class="p">)</span> <span class="c1"># &lt;- Struct</span>
+
+<span class="c1"># Struct classes based on template can be created as well</span>
+<span class="nd">@struct</span>
+<span class="k">class</span> <span class="nc">Format32</span><span class="p">(</span><span class="n">derive</span><span class="p">(</span><span class="n">FormatTemplate</span><span class="p">,</span> <span class="n">A</span><span class="o">=</span><span class="n">uint32</span><span class="p">,</span> <span class="n">B</span><span class="o">=</span><span class="n">uint32</span><span class="p">)):</span> <span class="c1"># &lt;- Struct</span>
+    <span class="n">baz</span><span class="p">:</span> <span class="n">uint32</span>
+
+<span class="c1"># template sub-classes are allowed as well</span>
+<span class="n">FormatSubTemplate</span> <span class="o">=</span> <span class="n">derive</span><span class="p">(</span><span class="n">FormatTemplate</span><span class="p">,</span> <span class="n">A</span><span class="o">=</span><span class="n">uint8</span><span class="p">,</span> <span class="n">partial</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="c1"># &lt;- Template</span>
+
+<span class="c1"># The sub-template only needs one parameter upon derivation</span>
+<span class="nd">@struct</span>
+<span class="k">class</span> <span class="nc">Format8</span><span class="p">(</span><span class="n">derive</span><span class="p">(</span><span class="n">FormatSubTemplate</span><span class="p">,</span> <span class="n">B</span><span class="o">=</span><span class="n">uint8</span><span class="p">)):</span> <span class="c1"># &lt;- Struct</span>
+    <span class="n">blob</span><span class="p">:</span> <span class="n">Bytes</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Keyword arguments are not necessary, you can also use positional arguments
+if defined in the original template decorator.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>There are several limitations to the template type variables for now. Extended
+support is an enhancement for the future of this project.</p>
+</div>
+</section>
 <section id="the-end">
-<h2><span class="section-number">3.4. </span>The End!<a class="headerlink" href="#the-end" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">3.5. </span>The End!<a class="headerlink" href="#the-end" title="Link to this heading">#</a></h2>
 <p>We finish this tutorial by completing our PNG format implementation. As the format is just
 a collection of chunks, we can simply alter the <em>main</em> struct from before:</p>
-<div class="literal-block-wrapper docutils container" id="id6">
-<div class="code-block-caption"><span class="caption-text">Final PNG implementation</span><a class="headerlink" href="#id6" title="Link to this code">#</a></div>
+<div class="literal-block-wrapper docutils container" id="id8">
+<div class="code-block-caption"><span class="caption-text">Final PNG implementation</span><a class="headerlink" href="#id8" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
 <span class="k">class</span> <span class="nc">PNG</span><span class="p">:</span>
     <span class="n">magic</span><span class="p">:</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x89</span><span class="s2">PNG</span><span class="se">\x0D\x0A\x1A\x0A</span><span class="s2">&quot;</span>
@@ -412,8 +462,8 @@ a collection of chunks, we can simply alter the <em>main</em> struct from before
 </div>
 <p><strong>Thats it!</strong> We now have a qualified PNG image parser <strong>and</strong> builder just using some
 Python class definitions.</p>
-<div class="literal-block-wrapper docutils container" id="id7">
-<div class="code-block-caption"><span class="caption-text">Sample usage of the PNG struct</span><a class="headerlink" href="#id7" title="Link to this code">#</a></div>
+<div class="literal-block-wrapper docutils container" id="id9">
+<div class="code-block-caption"><span class="caption-text">Sample usage of the PNG struct</span><a class="headerlink" href="#id9" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">image</span> <span class="o">=</span> <span class="n">unpack_file</span><span class="p">(</span><span class="n">PNG</span><span class="p">,</span> <span class="s2">&quot;/path/to/image.png&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">image</span>
 <span class="go">PNG(magic=b&#39;\x89PNG\r\n\x1a\n&#39;, chunks=[PNGChunk(length=13,type=&#39;IHDR&#39;, body=..., crc=258163462), ...])</span>
@@ -500,7 +550,8 @@ resources that might help you progress any further.</em></p>
 </li>
 <li><a class="reference internal" href="#bitfields">3.2. BitFields</a></li>
 <li><a class="reference internal" href="#unions">3.3. Unions</a></li>
-<li><a class="reference internal" href="#the-end">3.4. The End!</a></li>
+<li><a class="reference internal" href="#templates">3.4. Templates</a></li>
+<li><a class="reference internal" href="#the-end">3.5. The End!</a></li>
 </ul>
 </li>
 </ul>

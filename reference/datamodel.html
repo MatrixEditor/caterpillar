@@ -295,12 +295,12 @@ of elements. We can attempt to simulate a chain of extended <em>base sequences</
 concatenation of two sequences. The <a class="reference internal" href="operators.html#sequence.__add__" title="sequence.__add__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__add__()</span></code></a> method will <em>import</em> all fields
 from the other specified sequence. The only disadvantage is the placement required by the
 operator. For instance:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">BaseFormat</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">({</span><span class="s2">&quot;magic&quot;</span><span class="p">:</span> <span class="sa">b</span><span class="s2">&quot;MAGIC&quot;</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="n">uint8</span><span class="p">})</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">BaseFormat</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">({</span><span class="s2">&quot;magic&quot;</span><span class="p">:</span> <span class="sa">b</span><span class="s2">&quot;MAGIC&quot;</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="n">uint8</span><span class="p">})</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Format</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">({</span><span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="n">uint32</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">:</span> <span class="n">uint16</span><span class="p">})</span> <span class="o">+</span> <span class="n">BaseFormat</span>
 </pre></div>
 </div>
 <p>will result in the following field order:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">Format</span><span class="o">.</span><span class="n">get_members</span><span class="p">())</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">Format</span><span class="o">.</span><span class="n">get_members</span><span class="p">())</span>
 <span class="go">[&#39;b&#39;, &#39;c&#39;, &#39;magic&#39;, &#39;a&#39;]</span>
 </pre></div>
 </div>
@@ -385,7 +385,7 @@ enable <code class="xref py py-attr docutils literal notranslate"><span class="p
 evaluates all strings, introducing a potential security risk. Exercise with caution when evaluating code!</p>
 </div>
 <p>Specifying structs is as simple as defining <a class="reference external" href="https://docs.python.org/3/reference/compound_stmts.html#class">Python Classes</a>:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@struct</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@struct</span>
 <span class="gp">... </span><span class="k">class</span> <span class="nc">BaseFormat</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="n">magic</span><span class="p">:</span> <span class="sa">b</span><span class="s2">&quot;MAGIC&quot;</span>
 <span class="gp">... </span>    <span class="n">a</span><span class="p">:</span> <span class="n">uint8</span>
@@ -397,7 +397,7 @@ created. As <code class="code docutils literal notranslate"><span class="pre">b&
 for documentation purposes should be enabled, as shown in <a class="reference internal" href="#struct-type"><span class="std std-ref">Customizing the struct’s type</span></a>.</p>
 <p>As described above, this class introduces an easy-to-use inheritance system using the method
 resolution order of Python:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@struct</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@struct</span>
 <span class="gp">... </span><span class="k">class</span> <span class="nc">Format</span><span class="p">(</span><span class="n">BaseFormat</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="n">b</span><span class="p">:</span> <span class="n">uint32</span>
 <span class="gp">... </span>    <span class="n">c</span><span class="p">:</span> <span class="n">uint16</span>
@@ -411,7 +411,7 @@ resolution order of Python:</p>
 <p>As the <a class="reference internal" href="../library/model.html#caterpillar.model.Struct" title="caterpillar.model.Struct"><code class="xref py py-class docutils literal notranslate"><span class="pre">Struct</span></code></a> class is a direct subclass of <a class="reference internal" href="../library/model.html#caterpillar.model.Sequence" title="caterpillar.model.Sequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>, nesting is supported
 by default. That means, so-called <em>anonymous inner</em> structs can be defined within a class
 definition.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@struct</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@struct</span>
 <span class="gp">... </span><span class="k">class</span> <span class="nc">Format</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="n">a</span><span class="p">:</span> <span class="n">uint32</span>
 <span class="gp">... </span>    <span class="n">b</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;c&quot;</span><span class="p">:</span> <span class="n">uint8</span><span class="p">}</span>
@@ -431,7 +431,7 @@ the greatest length as its representational size. <em>Unions</em>, much like <em
 size.</p>
 <p><strong>In essence, they behave similarly to C unions.</strong> A traditional function hook will be installed on
 the model to capture field assignments. What that means will be illustrated by the following example:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@union</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@union</span>
 <span class="gp">... </span><span class="k">class</span> <span class="nc">Format</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="n">foo</span><span class="p">:</span> <span class="n">uint16</span>
 <span class="gp">... </span>    <span class="n">bar</span><span class="p">:</span> <span class="n">uint32</span>
@@ -446,7 +446,7 @@ will be applied to all others. Hence,</p>
 </pre></div>
 </div>
 <p>will result in</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span>
 <span class="go">Format(foo=65280, bar=4278255360, baz=False)</span>
 </pre></div>
 </div>
@@ -517,7 +517,7 @@ when enabled.</p>
 <p>This special type can be used in places where a length has to be specified. Therefore, it can be applied to all array
 <code class="code docutils literal notranslate"><span class="pre">[]</span></code> declarations and constructors that take the length as an input argument, such as <code class="xref py py-class docutils literal notranslate"><span class="pre">CString</span></code>, for
 example.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">CString</span><span class="p">(</span><span class="o">...</span><span class="p">))</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">CString</span><span class="p">(</span><span class="o">...</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;abcd</span><span class="se">\x00</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="go">&#39;abcd&#39;</span>
 </pre></div>
@@ -658,6 +658,68 @@ more than one field.</p>
 
 </section>
 </section>
+<section id="templates">
+<span id="ref-templates"></span><h3><span class="section-number">2.2.6. </span>Templates<a class="headerlink" href="#templates" title="Link to this heading">#</a></h3>
+<p>A specialized form of structs are <em>templates</em>, which are basically generic Python classes. Think of them
+as blueprints for your final classes/structs that contain placeholders for actual types. As in C++, a
+template needs type arguments, in this case we will name them <a class="reference internal" href="../library/model.html#caterpillar.model.TemplateTypeVar" title="caterpillar.model.TemplateTypeVar"><code class="xref py py-class docutils literal notranslate"><span class="pre">TemplateTypeVar</span></code></a>.</p>
+<p>Actually, there are two different types of type variables:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>Required:</dt><dd><p>These variables are <strong>required</strong> when creating a new struct based on the template and they
+can be used as positional arguments within the type derivation.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Positional:</dt><dd><p>These arguments are usable only as keyword arguments and are may be optional if a default value
+is supplied.</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>These template type variables can be created using simple variable definitions:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">A</span> <span class="o">=</span> <span class="n">TemplateTypeVar</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>A template class is <strong>not</strong> a struct definition. It specifies a blueprint for the final class.</p>
+</div>
+<p>A template class is defined like a struct, union or bitfield class, but without being a
+dataclass nor storing a struct instance.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@template</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">)</span>
+<span class="gp">... </span><span class="k">class</span> <span class="nc">FormatTemplate</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">foo</span><span class="p">:</span> <span class="n">A</span>
+<span class="gp">... </span>    <span class="n">bar</span><span class="p">:</span> <span class="n">B</span>
+<span class="gp">... </span>    <span class="n">baz</span><span class="p">:</span> <span class="n">uint32</span>
+<span class="gp">...</span>
+</pre></div>
+</div>
+<p>The defined class then can be used to create new classes based on the provided class
+structure. For instance,</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Format</span> <span class="o">=</span> <span class="n">derive</span><span class="p">(</span><span class="n">FormatTemplate</span><span class="p">,</span> <span class="n">A</span><span class="o">=</span><span class="n">uint32</span><span class="p">,</span> <span class="n">B</span><span class="o">=</span><span class="n">uint8</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Format</span>
+<span class="go">&lt;class &#39;__main__.__4BE4F2562B65393CFormatTemplate&#39;&gt;</span>
+</pre></div>
+</div>
+<p>will return an anonymous class (in this case). Normally, <em>caterpillar</em> tries to infer the
+variable name from the current module (if <code class="code docutils literal notranslate"><span class="pre">name=...</span></code>). In summary, every time
+<a class="reference internal" href="../library/model.html#caterpillar.model.derive" title="caterpillar.model.derive"><code class="xref py py-meth docutils literal notranslate"><span class="pre">derive()</span></code></a> is called, a new class will be created if not already
+defined.</p>
+<p>The current implementation will place template information about the current class using
+a special class attribute: <a class="reference internal" href="#class.__template__" title="class.__template__"><code class="xref py py-attr docutils literal notranslate"><span class="pre">__template__</span></code></a>.</p>
+<p>To support sub-classes of templates, we can declare a derived class as partial:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Format32</span> <span class="o">=</span> <span class="n">derive</span><span class="p">(</span><span class="n">FormatTemplate</span><span class="p">,</span> <span class="n">A</span><span class="o">=</span><span class="n">uint32</span><span class="p">,</span> <span class="n">partial</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Again, the resulting class is <strong>not</strong> a struct, but another template class.</p>
+<div class="admonition-developer-s-note admonition">
+<p class="admonition-title">Developer’s note</p>
+<p>By now, a template won’t copy existing field documentation comments. Therefore, you
+can’t display inherited members using sphinx.</p>
+</div>
+</section>
 </section>
 <section id="special-method-names">
 <h2><span class="section-number">2.3. </span>Special method names<a class="headerlink" href="#special-method-names" title="Link to this heading">#</a></h2>
@@ -766,6 +828,16 @@ or sequence definition. The type of the stored value must be a subclass of <code
 </dd></dl>
 
 </section>
+<section id="template-containers">
+<h4><span class="section-number">2.3.1.3. </span>Template Containers<a class="headerlink" href="#template-containers" title="Link to this heading">#</a></h4>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="class.__template__">
+<span class="sig-prename descclassname"><span class="pre">class.</span></span><span class="sig-name descname"><span class="pre">__template__</span></span><a class="headerlink" href="#class.__template__" title="Link to this definition">#</a></dt>
+<dd><p>All template classes store information about the used template type variables. Whether they
+are required or just positional. In addition, default inferred types are stored as well.</p>
+</dd></dl>
+
+</section>
 </section>
 <section id="bitfield-specific-methods">
 <h3><span class="section-number">2.3.2. </span>BitField specific methods<a class="headerlink" href="#bitfield-specific-methods" title="Link to this heading">#</a></h3>
@@ -794,7 +866,7 @@ adapts to the appropriate representation based on the context.</p>
 <dd><p>The byteorder of a struct can be temporarily configured using the corresponding
 operator. It is important to note that this attribute is utilized internally and
 should not be used elsewhere.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span> <span class="o">=</span> <span class="n">BigEndian</span> <span class="o">|</span> <span class="n">struct</span> <span class="c1"># Automatically sets __byteorder__</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span> <span class="o">=</span> <span class="n">BigEndian</span> <span class="o">|</span> <span class="n">struct</span> <span class="c1"># Automatically sets __byteorder__</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -916,6 +988,7 @@ use of <code class="code docutils literal notranslate"><span class="pre">field._
 </li>
 </ul>
 </li>
+<li><a class="reference internal" href="#templates">2.2.6. Templates</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#special-method-names">2.3. Special method names</a><ul>
@@ -931,6 +1004,10 @@ use of <code class="code docutils literal notranslate"><span class="pre">field._
 </li>
 <li><a class="reference internal" href="#struct-containers">2.3.1.2. Struct containers</a><ul>
 <li><a class="reference internal" href="#class.__struct__"><code class="docutils literal notranslate"><span class="pre">class.__struct__</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#template-containers">2.3.1.3. Template Containers</a><ul>
+<li><a class="reference internal" href="#class.__template__"><code class="docutils literal notranslate"><span class="pre">class.__template__</span></code></a></li>
 </ul>
 </li>
 </ul>

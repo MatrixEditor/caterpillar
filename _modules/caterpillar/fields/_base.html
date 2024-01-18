@@ -286,7 +286,7 @@
 <div class="viewcode-block" id="Field">
 <a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.Field">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">Field</span><span class="p">(</span><span class="n">_StructLike</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">Field</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents a field in a data structure.&quot;&quot;&quot;</span>
 
     <span class="n">struct</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">_StructLike</span><span class="p">,</span> <span class="n">_ContextLambda</span><span class="p">]</span>
@@ -450,6 +450,9 @@
     <span class="k">def</span> <span class="nf">__set_byteorder__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">order</span><span class="p">:</span> <span class="n">ByteOrder</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">=</span> <span class="n">order</span>
         <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">__type__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_type</span><span class="p">()</span>
 
     <span class="fm">__ixor__</span> <span class="o">=</span> <span class="fm">__xor__</span>
     <span class="fm">__ior__</span> <span class="o">=</span> <span class="fm">__or__</span>

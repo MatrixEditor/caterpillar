@@ -74,13 +74,17 @@ concatenation of two sequences. The :meth:`~sequence.__add__` method will *impor
 from the other specified sequence. The only disadvantage is the placement required by the
 operator. For instance:
 
->>> BaseFormat = Sequence({"magic": b"MAGIC", "a": uint8})
->>> Format = Sequence({"b": uint32, "c": uint16}) + BaseFormat
+.. code-block:: python
+
+    >>> BaseFormat = Sequence({"magic": b"MAGIC", "a": uint8})
+    >>> Format = Sequence({"b": uint32, "c": uint16}) + BaseFormat
 
 will result in the following field order:
 
->>> list(Format.get_members())
-['b', 'c', 'magic', 'a']
+.. code-block:: python
+
+    >>> list(Format.get_members())
+    ['b', 'c', 'magic', 'a']
 
 which is not the intended order. The correct order should be :code:`['magic', 'a', 'b', 'c']`.
 This can be achieved by using the :code:`BaseFormat` instance as the first operand.
@@ -154,11 +158,13 @@ this class adds :attr:`~class.__struct__` to the model afterward.
 
 Specifying structs is as simple as defining `Python Classes`_:
 
->>> @struct
-... class BaseFormat:
-...     magic: b"MAGIC"
-...     a: uint8
-...
+.. code-block:: python
+
+    >>> @struct
+    ... class BaseFormat:
+    ...     magic: b"MAGIC"
+    ...     a: uint8
+    ...
 
 Internally, a representation with all required fields and their corresponding names is
 created. As :code:`b"MAGIC"` or :code:`uint8` are instances of types, the type replacement
@@ -167,13 +173,15 @@ for documentation purposes should be enabled, as shown in :ref:`struct_type`.
 As described above, this class introduces an easy-to-use inheritance system using the method
 resolution order of Python:
 
->>> @struct
-... class Format(BaseFormat):
-...     b: uint32
-...     c: uint16
-...
->>> list(Format.__struct__.get_members())
-['magic', 'a', 'b', 'c']
+.. code-block:: python
+
+    >>> @struct
+    ... class Format(BaseFormat):
+    ...     b: uint32
+    ...     c: uint16
+    ...
+    >>> list(Format.__struct__.get_members())
+    ['magic', 'a', 'b', 'c']
 
 .. admonition:: Programmers Note
 
@@ -181,11 +189,13 @@ resolution order of Python:
     by default. That means, so-called *anonymous inner* structs can be defined within a class
     definition.
 
-    >>> @struct
-    ... class Format:
-    ...     a: uint32
-    ...     b: {"c": uint8}
-    ...
+    .. code-block:: python
+
+        >>> @struct
+        ... class Format:
+        ...     a: uint32
+        ...     b: {"c": uint8}
+        ...
 
     It is not recommended to use this technique as the inner structs can't be used anywhere else.
     Anonymous inner union definitions are tricky and are not officially supported yet. There are
@@ -205,13 +215,15 @@ size.
 **In essence, they behave similarly to C unions.** A traditional function hook will be installed on
 the model to capture field assignments. What that means will be illustrated by the following example:
 
->>> @union
-... class Format:
-...     foo: uint16
-...     bar: uint32
-...     baz: boolean
-...
->>> obj = Format()      # union does not need any values
+.. code-block:: python
+
+    >>> @union
+    ... class Format:
+    ...     foo: uint16
+    ...     bar: uint32
+    ...     baz: boolean
+    ...
+    >>> obj = Format()      # union does not need any values
 
 Right now, all attributes store the default value (:code:`None`). If we assign a new value to one field, it
 will be applied to all others. Hence,
@@ -220,8 +232,10 @@ will be applied to all others. Hence,
 
 will result in
 
->>> obj
-Format(foo=65280, bar=4278255360, baz=False)
+.. code-block:: python
+
+    >>> obj
+    Format(foo=65280, bar=4278255360, baz=False)
 
 
 .. admonition:: Implementation Detail
@@ -297,9 +311,11 @@ This special type can be used in places where a length has to be specified. Ther
 :code:`[]` declarations and constructors that take the length as an input argument, such as :class:`CString`, for
 example.
 
->>> field = Field(CString(...))
->>> unpack(field, b"abcd\x00")
-'abcd'
+.. code-block:: python
+
+    >>> field = Field(CString(...))
+    >>> unpack(field, b"abcd\x00")
+    'abcd'
 
 .. _prefixed:
 
@@ -437,6 +453,75 @@ way to access the context variables.
 
     A shortcut to access the object context of the parent context.
 
+
+.. _ref-templates:
+
+Templates
+---------
+
+A specialized form of structs are *templates*, which are basically generic Python classes. Think of them
+as blueprints for your final classes/structs that contain placeholders for actual types. As in C++, a
+template needs type arguments, in this case we will name them :class:`~caterpillar.model.TemplateTypeVar`.
+
+Actually, there are two different types of type variables:
+
+* Required:
+    These variables are **required** when creating a new struct based on the template and they
+    can be used as positional arguments within the type derivation.
+
+* Positional:
+    These arguments are usable only as keyword arguments and are may be optional if a default value
+    is supplied.
+
+These template type variables can be created using simple variable definitions:
+
+>>> A = TemplateTypeVar("A")
+
+.. important::
+    A template class is **not** a struct definition. It specifies a blueprint for the final class.
+
+A template class is defined like a struct, union or bitfield class, but without being a
+dataclass nor storing a struct instance.
+
+.. code-block:: python
+
+    >>> @template(A, "B")
+    ... class FormatTemplate:
+    ...     foo: A
+    ...     bar: B
+    ...     baz: uint32
+    ...
+
+The defined class then can be used to create new classes based on the provided class
+structure. For instance,
+
+.. code-block:: python
+
+    >>> Format = derive(FormatTemplate, A=uint32, B=uint8)
+    >>> Format
+    <class '__main__.__4BE4F2562B65393CFormatTemplate'>
+
+will return an anonymous class (in this case). Normally, *caterpillar* tries to infer the
+variable name from the current module (if :code:`name=...`). In summary, every time
+:meth:`~caterpillar.model.derive` is called, a new class will be created if not already
+defined.
+
+The current implementation will place template information about the current class using
+a special class attribute: :attr:`~class.__template__`.
+
+To support sub-classes of templates, we can declare a derived class as partial:
+
+.. code-block:: python
+
+    >>> Format32 = derive(FormatTemplate, A=uint32, partial=True)
+
+Again, the resulting class is **not** a struct, but another template class.
+
+.. admonition:: Developer's note
+
+    By now, a template won't copy existing field documentation comments. Therefore, you
+    can't display inherited members using sphinx.
+
 Special method names
 ====================
 
@@ -542,6 +627,14 @@ Struct containers
     or sequence definition. The type of the stored value must be a subclass of :class:`_StructLike`.
 
 
+Template Containers
+^^^^^^^^^^^^^^^^^^^
+
+.. attribute:: class.__template__
+
+    All template classes store information about the used template type variables. Whether they
+    are required or just positional. In addition, default inferred types are stored as well.
+
 BitField specific methods
 -------------------------
 
@@ -569,7 +662,9 @@ Customizing the object's byteorder
     operator. It is important to note that this attribute is utilized internally and
     should not be used elsewhere.
 
-    >>> struct = BigEndian | struct # Automatically sets __byteorder__
+    .. code-block:: python
+
+        >>> struct = BigEndian | struct # Automatically sets __byteorder__
 
 
 .. method:: object.__set_byteorder__(self, byteorder)

@@ -240,7 +240,7 @@
 <span class="c1"># along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
 <span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
 <span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">IOBase</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Protocol</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Protocol</span><span class="p">,</span> <span class="n">runtime_checkable</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Callable</span>
 
 <span class="c1">#: Type alias for IOBase to indicate a stream type</span>
@@ -253,7 +253,8 @@
 
 <div class="viewcode-block" id="_ContextLike">
 <a class="viewcode-back" href="../../library/abc.html#caterpillar.abc._ContextLike">[docs]</a>
-<span class="k">class</span> <span class="nc">_ContextLike</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
+<span class="nd">@runtime_checkable</span>
+<span class="k">class</span> <span class="nc">_ContextLike</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A dictionary-like object used as a context for packing and unpacking.</span>
 
@@ -277,7 +278,8 @@
 
 <div class="viewcode-block" id="_ContextLambda">
 <a class="viewcode-back" href="../../library/abc.html#caterpillar.abc._ContextLambda">[docs]</a>
-<span class="k">class</span> <span class="nc">_ContextLambda</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+<span class="nd">@runtime_checkable</span>
+<span class="k">class</span> <span class="nc">_ContextLambda</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    An abstract base class for a lambda function that takes a _ContextLike object as an argument.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -290,6 +292,7 @@
 
 <div class="viewcode-block" id="_SupportsPack">
 <a class="viewcode-back" href="../../library/abc.html#caterpillar.abc._SupportsPack">[docs]</a>
+<span class="nd">@runtime_checkable</span>
 <span class="k">class</span> <span class="nc">_SupportsPack</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    An abstract base class for objects that support packing data into a binary stream.</span>
@@ -303,6 +306,7 @@
 
 <div class="viewcode-block" id="_SupportsUnpack">
 <a class="viewcode-back" href="../../library/abc.html#caterpillar.abc._SupportsUnpack">[docs]</a>
+<span class="nd">@runtime_checkable</span>
 <span class="k">class</span> <span class="nc">_SupportsUnpack</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    An abstract base class for objects that support unpacking data from a binary stream.</span>
@@ -316,6 +320,7 @@
 
 <div class="viewcode-block" id="_SupportsSize">
 <a class="viewcode-back" href="../../library/abc.html#caterpillar.abc._SupportsSize">[docs]</a>
+<span class="nd">@runtime_checkable</span>
 <span class="k">class</span> <span class="nc">_SupportsSize</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    An abstract base class for objects that support determining the size of packed data.</span>
@@ -329,7 +334,8 @@
 
 <div class="viewcode-block" id="_StructLike">
 <a class="viewcode-back" href="../../library/abc.html#caterpillar.abc._StructLike">[docs]</a>
-<span class="k">class</span> <span class="nc">_StructLike</span><span class="p">:</span>
+<span class="nd">@runtime_checkable</span>
+<span class="k">class</span> <span class="nc">_StructLike</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    An abstract base class for struct-like objects that can be packed, unpacked, and have a size.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -378,6 +384,7 @@
 
 <div class="viewcode-block" id="_Switch">
 <a class="viewcode-back" href="../../library/abc.html#caterpillar.abc._Switch">[docs]</a>
+<span class="nd">@runtime_checkable</span>
 <span class="k">class</span> <span class="nc">_Switch</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    An abstract base class for a switch-like object that generates a _StructLike</span>
