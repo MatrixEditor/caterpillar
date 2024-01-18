@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from abc import ABC, abstractmethod
 from io import IOBase
-from typing import Protocol
+from typing import Protocol, runtime_checkable
 from typing import Dict, Any, Optional, Union, Callable
 
 #: Type alias for IOBase to indicate a stream type
@@ -25,7 +25,8 @@ _GreedyType = type(...)
 _PrefixedType = slice
 
 
-class _ContextLike(dict):
+@runtime_checkable
+class _ContextLike(Protocol):
     """
     A dictionary-like object used as a context for packing and unpacking.
 
@@ -46,7 +47,8 @@ class _ContextLike(dict):
         pass
 
 
-class _ContextLambda(ABC):
+@runtime_checkable
+class _ContextLambda(Protocol):
     """
     An abstract base class for a lambda function that takes a _ContextLike object as an argument.
     """
@@ -56,6 +58,7 @@ class _ContextLambda(ABC):
         pass
 
 
+@runtime_checkable
 class _SupportsPack(Protocol):
     """
     An abstract base class for objects that support packing data into a binary stream.
@@ -66,6 +69,7 @@ class _SupportsPack(Protocol):
         pass
 
 
+@runtime_checkable
 class _SupportsUnpack(Protocol):
     """
     An abstract base class for objects that support unpacking data from a binary stream.
@@ -76,6 +80,7 @@ class _SupportsUnpack(Protocol):
         pass
 
 
+@runtime_checkable
 class _SupportsSize(Protocol):
     """
     An abstract base class for objects that support determining the size of packed data.
@@ -86,7 +91,8 @@ class _SupportsSize(Protocol):
         pass
 
 
-class _StructLike:
+@runtime_checkable
+class _StructLike(Protocol):
     """
     An abstract base class for struct-like objects that can be packed, unpacked, and have a size.
     """
@@ -126,6 +132,7 @@ class _EnumLike(Protocol):
     _value2member_map_: Dict[Any, "_EnumLike"]
 
 
+@runtime_checkable
 class _Switch(Protocol):
     """
     An abstract base class for a switch-like object that generates a _StructLike

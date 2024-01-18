@@ -36,7 +36,7 @@ CTX_SEQ = "_is_seq"
 CTX_ARCH = "_arch"
 
 
-class Context(_ContextLike):
+class Context(dict):
     """Represents a context object with attribute-style access."""
 
     def __setattr__(self, key: str, value) -> None:
@@ -197,7 +197,7 @@ class ExprMixin:
 
 
 @dataclass(frozen=True, repr=False)
-class BinaryExpression(ExprMixin, _ContextLambda):
+class BinaryExpression(ExprMixin):
     """
     Represents a binary expression.
 
@@ -220,7 +220,7 @@ class BinaryExpression(ExprMixin, _ContextLambda):
 
 
 @dataclass(frozen=True)
-class UnaryExpression(_ContextLambda):
+class UnaryExpression:
     """
     Represents a unary expression.
 
@@ -241,7 +241,7 @@ class UnaryExpression(_ContextLambda):
         return f"<{self.operand.__name__} value={self.value!r}>"
 
 
-class ContextPath(ExprMixin, _ContextLambda):
+class ContextPath(ExprMixin):
     """
     Represents a lambda function for retrieving a value from a Context based on a specified path.
     """
@@ -318,7 +318,7 @@ class ContextPath(ExprMixin, _ContextLambda):
         return ContextPath(".".join([self.path, path]))
 
 
-class ContextLength(ExprMixin, _ContextLambda):
+class ContextLength(ExprMixin):
     def __init__(self, path: ContextPath) -> None:
         self.path = path
 

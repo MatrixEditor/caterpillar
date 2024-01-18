@@ -58,7 +58,7 @@ DEFAULT_OPTION = object()
 
 
 @dataclass(init=False)
-class Field(_StructLike):
+class Field:
     """Represents a field in a data structure."""
 
     struct: Union[_StructLike, _ContextLambda]
@@ -222,6 +222,9 @@ class Field(_StructLike):
     def __set_byteorder__(self, order: ByteOrder) -> Self:
         self.order = order
         return self
+
+    def __type__(self) -> type:
+        return self.get_type()
 
     __ixor__ = __xor__
     __ior__ = __or__

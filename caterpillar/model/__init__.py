@@ -30,3 +30,9 @@ from ._bitfield import (
     bitfield,
     BitFieldGroup
 )
+from ._template import (
+    istemplate,
+    template,
+    TemplateTypeVar,
+    derive
+)

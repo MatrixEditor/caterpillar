@@ -14,11 +14,11 @@
 Caterpillar is a Python 3.12+ library to pack and unpack structurized binary data. It
 enhances the capabilities of [Python Struct](https://docs.python.org/3/library/struct.html)
 by enabling direct class declaration. More information about the different configuration
-options will be added in the future. A brief introduction can be found [here (outdated)](docs/INTRO.md) - documentation is [here >](https://matrixeditor.github.io/caterpillar/).
+options will be added in the future. Documentation is [here >](https://matrixeditor.github.io/caterpillar/).
 
 *Caterpillar* is able to:
 
-* Pack and unpack data just from processing Python class definitions (including support for bitfields with a c++ like syntax and c-like unions!),
+* Pack and unpack data just from processing Python class definitions (including support for bitfields with a c++ like syntax, c++-like templates and c-like unions!),
 * apply a wide range of data types (with endianess and architecture configuration),
 * dynamically adapt structs based on their inheritance layout,
 * inserts proper types into the class definition to support documentation and

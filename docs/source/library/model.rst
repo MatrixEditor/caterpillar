@@ -46,3 +46,17 @@ Standard functions
 
 .. autofunction:: caterpillar.model.bitfield
 
+
+Templates
+---------
+
+.. autoclass:: caterpillar.model.TemplateTypeVar
+    :members:
+
+.. autofunction:: caterpillar.model.istemplate
+
+
+.. autofunction:: caterpillar.model.template
+
+
+.. autofunction:: caterpillar.model.derive

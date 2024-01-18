@@ -68,7 +68,7 @@ class FieldMixin:
         return Chain(self, other)
 
 
-class FieldStruct(FieldMixin, _StructLike):
+class FieldStruct(FieldMixin):
     """
     A mix-in class combining the behavior of _StructLike with additional
     functionality for packing and unpacking structured data.

@@ -47,7 +47,7 @@ from caterpillar._common import unpack_seq, pack_seq
 
 
 @dataclass(init=False)
-class Sequence(_StructLike, FieldMixin):
+class Sequence(FieldMixin):
     """Default implementation for a sequence of fields."""
 
     model: Any
@@ -110,8 +110,9 @@ class Sequence(_StructLike, FieldMixin):
         # We will try to import all fields from the given sequence
         for field in sequence.fields:
             name = field.__name__
-            is_included = name and name in sequence._member_map_
-            self.add_field(name, field, is_included)
+            if name not in self._member_map_:
+                is_included = name and name in sequence._member_map_
+                self.add_field(name, field, is_included)
         return self
 
     def __sub__(self, sequence: "Sequence") -> Self:

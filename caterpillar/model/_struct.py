@@ -23,7 +23,7 @@ from dataclasses import dataclass
 from shutil import copyfileobj
 
 from caterpillar.abc import getstruct, hasstruct, STRUCT_FIELD
-from caterpillar.abc import _StructLike, _StreamType
+from caterpillar.abc import _StructLike, _StreamType, _SupportsUnpack
 from caterpillar.abc import _ContainsStruct, _ContextLike, _SupportsSize
 from caterpillar.context import Context, CTX_STREAM
 from caterpillar.byteorder import ByteOrder, Arch
@@ -60,9 +60,10 @@ class Struct(Sequence):
         arch: Optional[Arch] = None,
         options: Iterable[Flag] = None,
         field_options: Iterable[Flag] = None,
-        kw_only: bool = True,
+        kw_only: bool = False,
         hook_cls: Optional[type] = None,
     ) -> None:
+        self.kw_only = kw_only
         options = options or set()
         options.update(
             GLOBAL_UNION_OPTIONS if S_UNION in options else GLOBAL_STRUCT_OPTIONS
@@ -75,7 +76,7 @@ class Struct(Sequence):
             field_options=field_options,
         )
         # Add additional options based on the struct's type
-        self.model = dataclass(self.model, kw_only=kw_only)
+        self.model = dataclass(self.model, kw_only=self.kw_only)
         setattr(self.model, STRUCT_FIELD, self)
         setattr(self.model, "__class_getitem__", lambda dim: Field(self, amount=dim))
         if self.is_union:
@@ -106,6 +107,8 @@ class Struct(Sequence):
 
     def _set_default(self, name: str, value: Any) -> None:
         setattr(self.model, name, value)
+        if not self.kw_only:
+            self.kw_only = True
 
     def _replace_type(self, name: str, type_: type) -> None:
         self.model.__annotations__[name] = type_
@@ -133,7 +136,7 @@ def _make_struct(
     order: Optional[ByteOrder] = None,
     arch: Optional[Arch] = None,
     field_options: Iterable[Flag] = None,
-    kw_only: bool = True,
+    kw_only: bool = False,
     hook_cls: Optional[type] = None,
 ) -> type:
     """
@@ -391,7 +394,7 @@ def pack_file(
 
 
 def unpack(
-    struct: Union[_StructLike, _ContainsStruct],
+    struct: Union[_SupportsUnpack, _ContainsStruct],
     buffer: Union[bytes, _StreamType],
     **kwds,
 ) -> Any:
@@ -406,9 +409,14 @@ def unpack(
     """
     # prepare the data stream
     stream = buffer if isinstance(buffer, IOBase) else BytesIO(buffer)
-    context = Context(_path="<root>", _parent=None, _io=stream, **kwds, _pos=0, _is_seq=False)
+    context = Context(
+        _path="<root>", _parent=None, _io=stream, **kwds, _pos=0, _is_seq=False
+    )
     if hasstruct(struct):
         struct = getstruct(struct)
+
+    if not isinstance(struct, _SupportsUnpack):
+        raise TypeError(f"{type(struct).__name__} is not a valid struct instance!")
 
     return struct.__unpack__(context)
 
