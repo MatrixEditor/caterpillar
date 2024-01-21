@@ -30,6 +30,8 @@ class IPv4Address(Transformer):
     A transformer for encoding and decoding IPv4 addresses.
     """
 
+    __slots__ = ()
+
     def __init__(self) -> None:
         """
         Initialize the IPv4Address transformer.
@@ -72,6 +74,8 @@ class IPv6Address(Transformer):
     """
     A transformer for encoding and decoding IPv6 addresses.
     """
+
+    __slots__ = ()
 
     def __init__(self) -> None:
         """
@@ -152,6 +156,7 @@ class MACAddress(Transformer):
         :return: The decoded MAC address.
         """
         return binascii.b2a_hex(parsed, self.sep)
+
 
 # shortcut for default MAC address format
 MAC = MACAddress()

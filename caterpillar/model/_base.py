@@ -18,7 +18,7 @@ import enum
 from typing import Optional, Self
 from typing import List, Dict, Any
 from typing import Set, Iterable, Union
-from dataclasses import dataclass
+
 
 from caterpillar.abc import _StructLike, _ContextLike
 from caterpillar.abc import _StreamType, _ContextLambda
@@ -41,12 +41,11 @@ from caterpillar.fields import (
     ConstString,
     FieldMixin,
     Const,
-    Enum
+    Enum,
 )
 from caterpillar._common import unpack_seq, pack_seq
 
 
-@dataclass(init=False)
 class Sequence(FieldMixin):
     """Default implementation for a sequence of fields."""
 
@@ -84,6 +83,17 @@ class Sequence(FieldMixin):
     Global field flags that will be applied on all fields.
     """
 
+    __slots__ = (
+        "model",
+        "fields",
+        "order",
+        "arch",
+        "options",
+        "field_options",
+        "_member_map_",
+        "is_union",
+    )
+
     def __init__(
         self,
         model: Optional[Dict[str, Field]] = None,
@@ -104,7 +114,6 @@ class Sequence(FieldMixin):
         self.is_union = S_UNION in self.options
         # Process all fields in the model
         self._process_model()
-
 
     def __add__(self, sequence: "Sequence") -> Self:
         # We will try to import all fields from the given sequence
@@ -220,32 +229,36 @@ class Sequence(FieldMixin):
     def _process_annotation(
         self, annotation: Any, default: Optional[Any], order: ByteOrder, arch: Arch
     ) -> Union[_StructLike, Field]:
+        fd = None
         match annotation:
             case Field():
-                return annotation
+                fd = annotation
             # As Field is a direct subclass of _StructLike, we have to put this check
             # below the Field one.
             case _StructLike():
-                return Field(annotation, order, arch=arch, default=default)
+                fd = Field(annotation, order, arch=arch, default=default)
             case type():
                 struct = getstruct(annotation)
                 if issubclass(annotation, enum.Enum):
                     # Special case: we have an enum class that stores its struct
-                    return Enum(annotation, struct)
-                return struct
+                    fd = Enum(annotation, struct)
+                else:
+                    fd = struct
             case str():
-                return ConstString(annotation)
+                fd = ConstString(annotation)
             case bytes():
-                return ConstBytes(annotation)
+                fd = ConstBytes(annotation)
             case _ContextLambda():
-                return annotation
+                fd = annotation
             case dict():
                 # anonymous inner sequence
-                return Sequence(model=annotation, order=self.order, arch=self.arch)
+                fd = Sequence(model=annotation, order=self.order, arch=self.arch)
             case _:
                 # callables are treates as context lambdas
                 if callable(annotation):
-                    return annotation
+                    fd = annotation
+
+        return fd
 
     def _process_field(
         self, name: str, annotation: Any, default: Optional[Any]
@@ -273,9 +286,12 @@ class Sequence(FieldMixin):
             field = Field(struct, order, arch=arch, default=default)
 
         if field is None:
-            raise ValidationError(
-                f"Field {name!r} could not be created: {annotation!r}"
+            msg = (
+                f"Field '{self.model.__name__}.{name}' could not be created, because "
+                "the placed annotation does not have a corresponding handler:\n "
+                f"type: {type(annotation)},\n annotation: {annotation!r}"
             )
+            raise ValidationError(msg)
         field.default = default
         field.order = self.order or field.order
         field.arch = self.arch or field.arch
@@ -433,3 +449,9 @@ class Sequence(FieldMixin):
                 _obj=obj,
             )
             self.pack_one(obj, ctx)
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__qualname__}(fields={list(self._member_map_)})"
+
+    def __str__(self) -> str:
+        return self.__repr__()

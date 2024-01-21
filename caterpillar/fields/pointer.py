@@ -61,6 +61,8 @@ class Pointer(FieldStruct):
     model: Optional[_StructLike]
     struct: Union[_StructLike, _ContextLambda]
 
+    __slots__ = ("model", "struct")
+
     def __init__(
         self,
         struct: Union[_StructLike, _ContextLambda],

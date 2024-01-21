@@ -51,6 +51,8 @@ class VarInt(FieldStruct):
     b'\\x00\\x88'
     """
 
+    __slots__ = ()
+
     def __type__(self) -> type:
         return int
 

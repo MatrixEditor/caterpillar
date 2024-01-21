@@ -12,7 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-from dataclasses import dataclass
 from typing import Self, Union, Set, Any, Dict, Optional, List
 from io import BytesIO
 from caterpillar.abc import (
@@ -57,7 +56,7 @@ INVALID_DEFAULT = object()
 DEFAULT_OPTION = object()
 
 
-@dataclass(init=False)
+# @dataclass(init=False)
 class Field:
     """Represents a field in a data structure."""
 
@@ -131,6 +130,20 @@ class Field:
     """
     The configured bits.
     """
+
+    __slots__ = (
+        "struct",
+        "order",
+        "flags",
+        "bits",
+        "arch",
+        "amount",
+        "options",
+        "condition",
+        "default",
+        "offset",
+        "__name__",
+    )
 
     def __init__(
         self,
@@ -428,11 +441,10 @@ class Field:
         context[CTX_FIELD] = self
         # pylint: disable-next=protected-access
         context[CTX_SEQ] = F_SEQUENTIAL._hash_ in self.flags
-        # REVISIT: maybe check whether this stream supports .seek()
-        if not keep_pos:
+        has_offset = offset >= 0
+        if not keep_pos or has_offset:
             fallback = stream.tell()
 
-        has_offset = offset >= 0
         if has_offset:
             # TODO: implement F_OFFSET_OVERRIDE
             # We write the current field into a temporary memory buffer
@@ -460,7 +472,7 @@ class Field:
 
         if has_offset:
             # Place the stream into the internal offset map
-            context._root[CTX_OFFSETS][fallback] = stream.getbuffer()
+            context._root[CTX_OFFSETS][offset] = stream.getbuffer()
             context[CTX_STREAM] = base_stream
 
     def __size__(self, context: _ContextLike) -> int:
@@ -514,3 +526,14 @@ class Field:
         size = struct.__size__(context)
         return count * size
 
+    # representation, maybe revisit
+    def __str__(self) -> str:
+        name = self.get_name() or "<unnamed>"
+
+        return (
+            f"Field({name!r}, arch={self.arch.name}, order={self.order.name}, "
+            f"seq={self.is_seq()}, struct={self.struct!r})"
+        )
+
+    def __repr__(self) -> str:
+        return self.__str__()

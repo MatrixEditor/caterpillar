@@ -18,9 +18,10 @@ options will be added in the future. Documentation is [here >](https://matrixedi
 
 *Caterpillar* is able to:
 
-* Pack and unpack data just from processing Python class definitions (including support for bitfields with a c++ like syntax, c++-like templates and c-like unions!),
+* Pack and unpack data just from processing Python class definitions (including support for bitfields, c++-like templates and c-like unions!),
 * apply a wide range of data types (with endianess and architecture configuration),
 * dynamically adapt structs based on their inheritance layout,
+* reduce the used memory space using `__slots__`,
 * inserts proper types into the class definition to support documentation and
 * it helps you to create cleaner and more compact code.
 

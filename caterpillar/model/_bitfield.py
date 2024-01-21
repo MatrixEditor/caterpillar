@@ -93,6 +93,15 @@ class BitFieldGroup:
 class BitField(Struct):
     groups: List[BitFieldGroup]
 
+    __slots__ = (
+        "groups",
+        "_bit_pos",
+        "_abs_bit_pos",
+        "_current_group",
+        "__fmt__",
+        "__bits__",
+    )
+
     def __init__(
         self,
         model: type,

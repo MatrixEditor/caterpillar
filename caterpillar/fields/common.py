@@ -48,15 +48,15 @@ class FormatField(FieldStruct):
     A field class representing a binary format.
     """
 
-    def __init__(self, ch: str, type_: type) -> None:
-        """
-        Initialize the FormatField.
+    __slots__ = {
+        "text": """The format char (e.g. 'x', 'i', ...)""",
+        "ty": """The returned Python type""",
+        "_padding_": """Internal field that indicates this struct is padding""",
+    }
 
-        :param ch: The format specifier text.
-        :param type_: The Python type associated with the format specifier.
-        """
+    def __init__(self, ch: str, type_: type) -> None:
         self.text = ch
-        self.type_ = type_
+        self.ty = type_
         self.__bits__ = calcsize(self.text) * 8
         self._padding_ = self.text == "x"
 
@@ -69,7 +69,7 @@ class FormatField(FieldStruct):
 
         :return: A string representation.
         """
-        type_repr = self.type_.__name__ if not self._padding_ else "padding"
+        type_repr = self.ty.__name__ if not self._padding_ else "padding"
         return f"<{self.__class__.__name__}({type_repr}) {self.text!r}>"
 
     def __type__(self) -> type:
@@ -78,7 +78,7 @@ class FormatField(FieldStruct):
 
         :return: The Python type.
         """
-        return self.type_
+        return self.ty
 
     def __size__(self, context: _ContextLike) -> int:
         """
@@ -217,12 +217,9 @@ class Transformer(FieldStruct):
     A class that acts as a transformer for encoding and decoding data using a wrapped _StructLike object.
     """
 
-    def __init__(self, struct: _StructLike) -> None:
-        """
-        Initialize the Transformer with a wrapped _StructLike object.
+    __slots__ = ("struct",)
 
-        :param struct: The _StructLike object to be wrapped.
-        """
+    def __init__(self, struct: _StructLike) -> None:
         self.struct = struct
         self.__bits__ = getattr(self.struct, "__bits__", None)
 
@@ -290,15 +287,14 @@ class Transformer(FieldStruct):
 class Const(Transformer):
     """
     A specialized Transformer that enforces a constant value during encoding and decoding.
+
+    :param value: The constant value to be enforced during encoding and decoding.
+    :param struct: The _StructLike object to be wrapped.
     """
 
-    def __init__(self, value: _ConstType, struct: _StructLike) -> None:
-        """
-        Initialize the Const transformer with a constant value and a wrapped _StructLike object.
+    __slots__ = ("value",)
 
-        :param value: The constant value to be enforced during encoding and decoding.
-        :param struct: The _StructLike object to be wrapped.
-        """
+    def __init__(self, value: _ConstType, struct: _StructLike) -> None:
         super().__init__(struct)
         self.value = value
 
@@ -331,7 +327,12 @@ class Const(Transformer):
 class Enum(Transformer):
     """
     A specialized Transformer for encoding and decoding enumeration values.
+
+    :param model: The enumeration model (an object with _member_map_ and _value2member_map_ attributes).
+    :param struct: The _StructLike object to be wrapped.
     """
+
+    __slots__ = ("model", "default")
 
     def __init__(
         self,
@@ -339,12 +340,6 @@ class Enum(Transformer):
         struct: _StructLike,
         default: Optional[_EnumLike] = INVALID_DEFAULT,
     ) -> None:
-        """
-        Initialize the Enum transformer with an enumeration model and a wrapped _StructLike object.
-
-        :param model: The enumeration model (an object with _member_map_ and _value2member_map_ attributes).
-        :param struct: The _StructLike object to be wrapped.
-        """
         super().__init__(struct)
         self.model = model
         self.default = default
@@ -399,6 +394,8 @@ class Enum(Transformer):
 
 
 class Memory(FieldStruct):
+    __slots__ = ("length", "encoding")
+
     def __init__(
         self, length: Union[int, _ContextLambda], encoding: Optional[str] = None
     ) -> None:
@@ -445,6 +442,8 @@ class Bytes(Memory):
     A specialized FieldStruct for handling byte sequences.
     """
 
+    __slots__ = ()
+
     def __type__(self) -> type:
         """
         Return the type associated with this Bytes field.
@@ -468,6 +467,8 @@ class String(Bytes):
     A specialized field for handling string data.
     """
 
+    __slots__ = ()
+
     def __type__(self) -> type:
         """
         Return the type associated with this String field.
@@ -490,6 +491,8 @@ class CString(Bytes):
     """
     A specialized field for handling string data that ends with ``\\0x00``.
     """
+
+    __slots__ = ("pad",)
 
     def __init__(
         self,
@@ -565,15 +568,14 @@ class CString(Bytes):
 class ConstString(Const):
     """
     A specialized constant field for handling string values.
+
+    :param value: The constant string value.
+    :param encoding: The encoding to use for string encoding (default is UTF-8).
     """
 
-    def __init__(self, value: str, encoding: Optional[str] = None) -> None:
-        """
-        Initialize the ConstString field with a constant string value.
+    __slots__ = ()
 
-        :param value: The constant string value.
-        :param encoding: The encoding to use for string encoding (default is UTF-8).
-        """
+    def __init__(self, value: str, encoding: Optional[str] = None) -> None:
         struct = String(len(value), encoding)
         super().__init__(value.encode(struct.encoding), struct)
         self.__bits__ = len(value) * 8
@@ -582,19 +584,20 @@ class ConstString(Const):
 class ConstBytes(Const):
     """
     A specialized constant field for handling bytes values.
+
+    :param value: The constant bytes value.
     """
 
-    def __init__(self, value: str) -> None:
-        """
-        Initialize the ConstBytes field with a constant bytes value.
+    __slots__ = ()
 
-        :param value: The constant bytes value.
-        """
+    def __init__(self, value: str) -> None:
         super().__init__(value, Bytes(len(value)))
         self.__bits__ = len(value) * 8
 
 
 class Computed(FieldStruct):
+    __slots__ = ("value",)
+
     def __init__(self, value: Union[_ConstType, _ContextLambda]) -> None:
         self.value = value
         self.__bits__ = 0
@@ -622,6 +625,8 @@ class Computed(FieldStruct):
 
 @singleton
 class Pass(FieldStruct):
+    __slots__ = ()
+
     def __bits__(self) -> int:
         return 0
 
@@ -647,6 +652,8 @@ class Pass(FieldStruct):
 
 
 class Prefixed(FieldStruct):
+    __slots__ = ("encoding", "prefix")
+
     def __init__(
         self, prefix: Optional[_StructLike] = None, encoding: Optional[str] = None
     ):
@@ -709,6 +716,8 @@ class Prefixed(FieldStruct):
 
 
 class Int(FieldStruct):
+    __slots__ = ("signed", "bits")
+
     def __init__(self, bits: int, signed: bool = True) -> None:
         self.signed = signed
         self.bits = bits
@@ -738,6 +747,8 @@ class Int(FieldStruct):
 
 
 class UInt(Int):
+    __slots__ = ()
+
     def __init__(self, bits: int) -> None:
         super().__init__(bits, signed=False)
 
@@ -750,9 +761,9 @@ uint24 = UInt(24)
 class NotRequired(Transformer):
     """
     A transformer that makes a field optional during packing and unpacking.
-
-    :param None:
     """
+
+    __slots__ = ()
 
     def __type__(self) -> type:
         return Optional[super().__type__()]
@@ -799,6 +810,8 @@ class Lazy(FieldStruct):
 
     :param struct: A callable that returns the underlying struct.
     """
+
+    __slots__ = ("struct_fn",)
 
     def __init__(self, struct: Callable[[], _StructLike]) -> None:
         self.struct_fn = struct
@@ -862,6 +875,8 @@ class Lazy(FieldStruct):
 
 @singleton
 class uuid(Transformer):
+    __slots__ = ()
+
     def __init__(self) -> None:
         super().__init__(Bytes(16))
 

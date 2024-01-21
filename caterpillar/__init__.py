@@ -13,6 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-__version__ = "1.0.0-b0"
+__version__ = "1.0.0-b1"
 __release__ = None
 __author__ = "MatrixEditor"

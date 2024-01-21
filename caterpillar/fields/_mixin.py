@@ -74,13 +74,18 @@ class FieldStruct(FieldMixin):
     functionality for packing and unpacking structured data.
     """
 
-    __byteorder__: ByteOrder
-    """An internal field used to measure the byte order of this struct.
+    __slots__ = {
+        "__byteorder__": (
+            """
+            An internal field used to measure the byte order of this struct.
 
-    Note that this field will be used during processing only and not during
-    parsing or building data. In addition, the actual byte order should be
-    retrieved using the :class:`Field` instance within the context.
-    """
+            Note that this field will be used during processing only and not during
+            parsing or building data. In addition, the actual byte order should be
+            retrieved using the :class:`Field` instance within the context.
+            """
+        ),
+        "__bits__": "TBD"
+    }
 
     def pack_single(self, obj: Any, context: _ContextLike) -> None:
         """
@@ -172,6 +177,8 @@ class Chain(FieldStruct):
         - Unpacking travels from the head to the tail.
         - Packing travels from the tail to the head.
     """
+
+    __slots__ = ("_elements",)
 
     def __init__(self, initial: _StructLike, *structs: _StructLike) -> None:
         # start -> next -> next -> next -> done | unpack

@@ -43,26 +43,24 @@ for its data.
         g: uint8
         b: uint8
 
-.. tip::
-    Pro's advice: use the configruation option :code:`kw_only=False` to be able to use
-    positional arguments, if applicable.
 
 With this simple annotation, the struct class becomes universally applicable. You can
 integrate it into other struct definitions or instantiate objects of the class.
 
->>> obj = RGB(r=1, g=2, b=3)
+>>> obj = RGB(1, 2, 3)
 
 .. note::
-    Classes using the :code:`struct` decorator exclusively accept keywords in the final constructor,
-    supporting standard field definitions *after* fields with default values.
+    To optimize memory space and get faster attribute access times, you have to explicitly
+    enable the :code:`S_SLOTS` option. More information can be taken from  :ref:`options`.
 
 Wow, thats it? That was less than expected? Let's move directly to working with the defined class.
 
 Working with structs
 --------------------
 
-Instantiating an object of your class involves providing all **required** fields as keyword
-arguments. Defaults or constant values are automatically applied, removing concerns about them.
+Instantiating an object of your class involves providing all **required** fields as arguments. They must be
+keyword arguments if one of the defined fields contains a default value. Defaults or constant values are
+automatically applied, removing concerns about them.
 
 Packing data
 ^^^^^^^^^^^^

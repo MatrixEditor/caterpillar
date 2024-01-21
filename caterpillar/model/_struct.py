@@ -31,6 +31,7 @@ from caterpillar.options import (
     S_EVAL_ANNOTATIONS,
     S_UNION,
     S_ADD_BYTES,
+    S_SLOTS,
     Flag,
     GLOBAL_STRUCT_OPTIONS,
     GLOBAL_UNION_OPTIONS,
@@ -39,6 +40,7 @@ from caterpillar.fields import Field
 from ._base import Sequence
 
 
+# REVISIT: remove dataclasses dependency
 class Struct(Sequence):
     """
     Represents a structured data model for serialization and deserialization.
@@ -52,6 +54,8 @@ class Struct(Sequence):
     # _member_map_: Dict[str, Field]
     # An internal field that maps the field names of all class attributes to their
     # corresponding struct fields.
+
+    __slots__ = ("kw_only",)
 
     def __init__(
         self,
@@ -75,9 +79,10 @@ class Struct(Sequence):
             options=options,
             field_options=field_options,
         )
-        # Add additional options based on the struct's type
-        self.model = dataclass(self.model, kw_only=self.kw_only)
         setattr(self.model, STRUCT_FIELD, self)
+        # Add additional options based on the struct's type
+        slots = self.has_option(S_SLOTS)
+        self.model = dataclass(self.model, kw_only=self.kw_only, slots=slots)
         setattr(self.model, "__class_getitem__", lambda dim: Field(self, amount=dim))
         if self.is_union:
             # install a hook
@@ -158,7 +163,7 @@ def _make_struct(
         kw_only=kw_only,
         hook_cls=hook_cls,
     )
-    return cls
+    return _.model
 
 
 def struct(cls: type = None, /, **kwds):

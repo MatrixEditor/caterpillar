@@ -1,6 +1,9 @@
-from caterpillar.shortcuts import struct, LittleEndian, bitfield, unpack, pack
+from caterpillar.shortcuts import struct, LittleEndian, bitfield, unpack, pack, opt
 from caterpillar.fields import uint8, UInt, CString, Prefixed, uint32
 
+# The __slots__ options does not affect the packing or
+# unpacking process.
+# opt.set_struct_flags(opt.S_SLOTS, opt.S_REPLACE_TYPES)
 
 @bitfield(order=LittleEndian)
 class Flags:

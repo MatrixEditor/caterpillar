@@ -146,7 +146,8 @@ def pack_seq(seq: List[Any], context: _ContextLike, pack_one) -> None:
         _length=count,
         _field=field,
         _obj=context.get(CTX_OBJECT),
-        _is_seq=True,
+        # We have to unset the sequence status as we are going to call 'unpack_one'
+        _is_seq=False,
     )
     seq_context[CTX_POS] = stream.tell()
     for i, elem in enumerate(seq):

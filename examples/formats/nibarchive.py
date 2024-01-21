@@ -37,7 +37,7 @@ except ImportError:
     pass
 
 # These flags will be applied to all structs and fields
-opt.set_struct_flags(opt.S_REPLACE_TYPES)
+opt.set_struct_flags(opt.S_REPLACE_TYPES, opt.S_SLOTS)
 opt.set_field_flags(VARINT_LSB)
 
 
