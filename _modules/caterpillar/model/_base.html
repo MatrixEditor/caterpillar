@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
     <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
-        <title>caterpillar.model._base - Caterpillar 1.0.0-b0 documentation</title>
+        <title>caterpillar.model._base - Caterpillar 1.0.0-b1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=135e06be" />
     <link rel="stylesheet" type="text/css" href="../../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
@@ -123,7 +123,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../../index.html"><div class="brand">Caterpillar 1.0.0-b0 documentation</div></a>
+      <a href="../../../index.html"><div class="brand">Caterpillar 1.0.0-b1 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -146,7 +146,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
   
   
-  <span class="sidebar-brand-text">Caterpillar 1.0.0-b0 documentation</span>
+  <span class="sidebar-brand-text">Caterpillar 1.0.0-b1 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -244,7 +244,7 @@
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Self</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Union</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+
 
 <span class="kn">from</span> <span class="nn">caterpillar.abc</span> <span class="kn">import</span> <span class="n">_StructLike</span><span class="p">,</span> <span class="n">_ContextLike</span>
 <span class="kn">from</span> <span class="nn">caterpillar.abc</span> <span class="kn">import</span> <span class="n">_StreamType</span><span class="p">,</span> <span class="n">_ContextLambda</span>
@@ -267,14 +267,13 @@
     <span class="n">ConstString</span><span class="p">,</span>
     <span class="n">FieldMixin</span><span class="p">,</span>
     <span class="n">Const</span><span class="p">,</span>
-    <span class="n">Enum</span>
+    <span class="n">Enum</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">caterpillar._common</span> <span class="kn">import</span> <span class="n">unpack_seq</span><span class="p">,</span> <span class="n">pack_seq</span>
 
 
 <div class="viewcode-block" id="Sequence">
 <a class="viewcode-back" href="../../../library/model.html#caterpillar.model.Sequence">[docs]</a>
-<span class="nd">@dataclass</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">Sequence</span><span class="p">(</span><span class="n">FieldMixin</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Default implementation for a sequence of fields.&quot;&quot;&quot;</span>
 
@@ -312,6 +311,17 @@
 <span class="sd">    Global field flags that will be applied on all fields.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;model&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;fields&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;order&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;arch&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;options&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;field_options&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;_member_map_&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;is_union&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">model</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Field</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -332,7 +342,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">is_union</span> <span class="o">=</span> <span class="n">S_UNION</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span>
         <span class="c1"># Process all fields in the model</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_process_model</span><span class="p">()</span>
-
 
     <span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="s2">&quot;Sequence&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
         <span class="c1"># We will try to import all fields from the given sequence</span>
@@ -451,32 +460,36 @@
     <span class="k">def</span> <span class="nf">_process_annotation</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">annotation</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">default</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">order</span><span class="p">:</span> <span class="n">ByteOrder</span><span class="p">,</span> <span class="n">arch</span><span class="p">:</span> <span class="n">Arch</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">_StructLike</span><span class="p">,</span> <span class="n">Field</span><span class="p">]:</span>
+        <span class="n">fd</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">match</span> <span class="n">annotation</span><span class="p">:</span>
             <span class="k">case</span> <span class="n">Field</span><span class="p">():</span>
-                <span class="k">return</span> <span class="n">annotation</span>
+                <span class="n">fd</span> <span class="o">=</span> <span class="n">annotation</span>
             <span class="c1"># As Field is a direct subclass of _StructLike, we have to put this check</span>
             <span class="c1"># below the Field one.</span>
             <span class="k">case</span> <span class="n">_StructLike</span><span class="p">():</span>
-                <span class="k">return</span> <span class="n">Field</span><span class="p">(</span><span class="n">annotation</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">arch</span><span class="o">=</span><span class="n">arch</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">default</span><span class="p">)</span>
+                <span class="n">fd</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">annotation</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">arch</span><span class="o">=</span><span class="n">arch</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">default</span><span class="p">)</span>
             <span class="k">case</span> <span class="nb">type</span><span class="p">():</span>
                 <span class="n">struct</span> <span class="o">=</span> <span class="n">getstruct</span><span class="p">(</span><span class="n">annotation</span><span class="p">)</span>
                 <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">annotation</span><span class="p">,</span> <span class="n">enum</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
                     <span class="c1"># Special case: we have an enum class that stores its struct</span>
-                    <span class="k">return</span> <span class="n">Enum</span><span class="p">(</span><span class="n">annotation</span><span class="p">,</span> <span class="n">struct</span><span class="p">)</span>
-                <span class="k">return</span> <span class="n">struct</span>
+                    <span class="n">fd</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="n">annotation</span><span class="p">,</span> <span class="n">struct</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">fd</span> <span class="o">=</span> <span class="n">struct</span>
             <span class="k">case</span> <span class="nb">str</span><span class="p">():</span>
-                <span class="k">return</span> <span class="n">ConstString</span><span class="p">(</span><span class="n">annotation</span><span class="p">)</span>
+                <span class="n">fd</span> <span class="o">=</span> <span class="n">ConstString</span><span class="p">(</span><span class="n">annotation</span><span class="p">)</span>
             <span class="k">case</span> <span class="nb">bytes</span><span class="p">():</span>
-                <span class="k">return</span> <span class="n">ConstBytes</span><span class="p">(</span><span class="n">annotation</span><span class="p">)</span>
+                <span class="n">fd</span> <span class="o">=</span> <span class="n">ConstBytes</span><span class="p">(</span><span class="n">annotation</span><span class="p">)</span>
             <span class="k">case</span> <span class="n">_ContextLambda</span><span class="p">():</span>
-                <span class="k">return</span> <span class="n">annotation</span>
+                <span class="n">fd</span> <span class="o">=</span> <span class="n">annotation</span>
             <span class="k">case</span> <span class="nb">dict</span><span class="p">():</span>
                 <span class="c1"># anonymous inner sequence</span>
-                <span class="k">return</span> <span class="n">Sequence</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">annotation</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="p">,</span> <span class="n">arch</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">arch</span><span class="p">)</span>
+                <span class="n">fd</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">annotation</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="p">,</span> <span class="n">arch</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">arch</span><span class="p">)</span>
             <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
                 <span class="c1"># callables are treates as context lambdas</span>
                 <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">annotation</span><span class="p">):</span>
-                    <span class="k">return</span> <span class="n">annotation</span>
+                    <span class="n">fd</span> <span class="o">=</span> <span class="n">annotation</span>
+
+        <span class="k">return</span> <span class="n">fd</span>
 
     <span class="k">def</span> <span class="nf">_process_field</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">annotation</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">default</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span>
@@ -504,9 +517,12 @@
             <span class="n">field</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">arch</span><span class="o">=</span><span class="n">arch</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">default</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">field</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Field </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> could not be created: </span><span class="si">{</span><span class="n">annotation</span><span class="si">!r}</span><span class="s2">&quot;</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Field &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; could not be created, because &quot;</span>
+                <span class="s2">&quot;the placed annotation does not have a corresponding handler:</span><span class="se">\n</span><span class="s2"> &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">annotation</span><span class="p">)</span><span class="si">}</span><span class="s2">,</span><span class="se">\n</span><span class="s2"> annotation: </span><span class="si">{</span><span class="n">annotation</span><span class="si">!r}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
         <span class="n">field</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="n">default</span>
         <span class="n">field</span><span class="o">.</span><span class="n">order</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="ow">or</span> <span class="n">field</span><span class="o">.</span><span class="n">order</span>
         <span class="n">field</span><span class="o">.</span><span class="n">arch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">arch</span> <span class="ow">or</span> <span class="n">field</span><span class="o">.</span><span class="n">arch</span>
@@ -669,7 +685,13 @@
                 <span class="n">_path</span><span class="o">=</span><span class="n">context</span><span class="p">[</span><span class="n">CTX_PATH</span><span class="p">],</span>
                 <span class="n">_obj</span><span class="o">=</span><span class="n">obj</span><span class="p">,</span>
             <span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">pack_one</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">ctx</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pack_one</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">ctx</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__qualname__</span><span class="si">}</span><span class="s2">(fields=</span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_member_map_</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span></div>
 
 </pre></div>
         </article>
@@ -703,7 +725,7 @@
       
     </aside>
   </div>
-</div><script src="../../../_static/documentation_options.js?v=68c67630"></script>
+</div><script src="../../../_static/documentation_options.js?v=ccbef229"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>

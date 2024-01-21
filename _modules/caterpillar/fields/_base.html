@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
     <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
-        <title>caterpillar.fields._base - Caterpillar 1.0.0-b0 documentation</title>
+        <title>caterpillar.fields._base - Caterpillar 1.0.0-b1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=135e06be" />
     <link rel="stylesheet" type="text/css" href="../../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
@@ -123,7 +123,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../../index.html"><div class="brand">Caterpillar 1.0.0-b0 documentation</div></a>
+      <a href="../../../index.html"><div class="brand">Caterpillar 1.0.0-b1 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -146,7 +146,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
   
   
-  <span class="sidebar-brand-text">Caterpillar 1.0.0-b0 documentation</span>
+  <span class="sidebar-brand-text">Caterpillar 1.0.0-b1 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -238,7 +238,6 @@
 <span class="c1">#</span>
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Self</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">List</span>
 <span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">BytesIO</span>
 <span class="kn">from</span> <span class="nn">caterpillar.abc</span> <span class="kn">import</span> <span class="p">(</span>
@@ -283,9 +282,9 @@
 <span class="n">DEFAULT_OPTION</span> <span class="o">=</span> <span class="nb">object</span><span class="p">()</span>
 
 
+<span class="c1"># @dataclass(init=False)</span>
 <div class="viewcode-block" id="Field">
 <a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.Field">[docs]</a>
-<span class="nd">@dataclass</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">Field</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents a field in a data structure.&quot;&quot;&quot;</span>
 
@@ -359,6 +358,20 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The configured bits.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;struct&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;order&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;flags&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;bits&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;arch&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;amount&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;options&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;condition&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;default&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;offset&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__name__&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -677,11 +690,10 @@
         <span class="n">context</span><span class="p">[</span><span class="n">CTX_FIELD</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span>
         <span class="c1"># pylint: disable-next=protected-access</span>
         <span class="n">context</span><span class="p">[</span><span class="n">CTX_SEQ</span><span class="p">]</span> <span class="o">=</span> <span class="n">F_SEQUENTIAL</span><span class="o">.</span><span class="n">_hash_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">flags</span>
-        <span class="c1"># REVISIT: maybe check whether this stream supports .seek()</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">keep_pos</span><span class="p">:</span>
+        <span class="n">has_offset</span> <span class="o">=</span> <span class="n">offset</span> <span class="o">&gt;=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">keep_pos</span> <span class="ow">or</span> <span class="n">has_offset</span><span class="p">:</span>
             <span class="n">fallback</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
 
-        <span class="n">has_offset</span> <span class="o">=</span> <span class="n">offset</span> <span class="o">&gt;=</span> <span class="mi">0</span>
         <span class="k">if</span> <span class="n">has_offset</span><span class="p">:</span>
             <span class="c1"># TODO: implement F_OFFSET_OVERRIDE</span>
             <span class="c1"># We write the current field into a temporary memory buffer</span>
@@ -709,7 +721,7 @@
 
         <span class="k">if</span> <span class="n">has_offset</span><span class="p">:</span>
             <span class="c1"># Place the stream into the internal offset map</span>
-            <span class="n">context</span><span class="o">.</span><span class="n">_root</span><span class="p">[</span><span class="n">CTX_OFFSETS</span><span class="p">][</span><span class="n">fallback</span><span class="p">]</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">getbuffer</span><span class="p">()</span>
+            <span class="n">context</span><span class="o">.</span><span class="n">_root</span><span class="p">[</span><span class="n">CTX_OFFSETS</span><span class="p">][</span><span class="n">offset</span><span class="p">]</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">getbuffer</span><span class="p">()</span>
             <span class="n">context</span><span class="p">[</span><span class="n">CTX_STREAM</span><span class="p">]</span> <span class="o">=</span> <span class="n">base_stream</span>
 
     <span class="k">def</span> <span class="nf">__size__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
@@ -761,8 +773,19 @@
             <span class="n">struct</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_struct</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
 
         <span class="n">size</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">__size__</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">count</span> <span class="o">*</span> <span class="n">size</span></div>
+        <span class="k">return</span> <span class="n">count</span> <span class="o">*</span> <span class="n">size</span>
 
+    <span class="c1"># representation, maybe revisit</span>
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span> <span class="ow">or</span> <span class="s2">&quot;&lt;unnamed&gt;&quot;</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Field(</span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">, arch=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">arch</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">, order=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">, &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;seq=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">is_seq</span><span class="p">()</span><span class="si">}</span><span class="s2">, struct=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">struct</span><span class="si">!r}</span><span class="s2">)&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span></div>
 
 </pre></div>
         </article>
@@ -796,7 +819,7 @@
       
     </aside>
   </div>
-</div><script src="../../../_static/documentation_options.js?v=68c67630"></script>
+</div><script src="../../../_static/documentation_options.js?v=ccbef229"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>

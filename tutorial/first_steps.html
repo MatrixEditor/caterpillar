@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="2. Basic Concepts" href="basics.html" /><link rel="prev" title="Tutorial to Caterpillar" href="index.html" />
 
     <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
-        <title>1. First Steps - Caterpillar 1.0.0-b0 documentation</title>
+        <title>1. First Steps - Caterpillar 1.0.0-b1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=135e06be" />
     <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
@@ -124,7 +124,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../index.html"><div class="brand">Caterpillar 1.0.0-b0 documentation</div></a>
+      <a href="../index.html"><div class="brand">Caterpillar 1.0.0-b1 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -147,7 +147,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
   
   
-  <span class="sidebar-brand-text">Caterpillar 1.0.0-b0 documentation</span>
+  <span class="sidebar-brand-text">Caterpillar 1.0.0-b1 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -264,27 +264,23 @@ for its data.</p>
 </pre></div>
 </div>
 </div>
-<div class="admonition tip">
-<p class="admonition-title">Tip</p>
-<p>Pro’s advice: use the configruation option <code class="code docutils literal notranslate"><span class="pre">kw_only=False</span></code> to be able to use
-positional arguments, if applicable.</p>
-</div>
 <p>With this simple annotation, the struct class becomes universally applicable. You can
 integrate it into other struct definitions or instantiate objects of the class.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span> <span class="o">=</span> <span class="n">RGB</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span> <span class="o">=</span> <span class="n">RGB</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Classes using the <code class="code docutils literal notranslate"><span class="pre">struct</span></code> decorator exclusively accept keywords in the final constructor,
-supporting standard field definitions <em>after</em> fields with default values.</p>
+<p>To optimize memory space and get faster attribute access times, you have to explicitly
+enable the <code class="code docutils literal notranslate"><span class="pre">S_SLOTS</span></code> option. More information can be taken from  <a class="reference internal" href="../library/options.html#options"><span class="std std-ref">Options</span></a>.</p>
 </div>
 <p>Wow, thats it? That was less than expected? Let’s move directly to working with the defined class.</p>
 </section>
 <section id="working-with-structs">
 <h2><span class="section-number">1.2. </span>Working with structs<a class="headerlink" href="#working-with-structs" title="Link to this heading">#</a></h2>
-<p>Instantiating an object of your class involves providing all <strong>required</strong> fields as keyword
-arguments. Defaults or constant values are automatically applied, removing concerns about them.</p>
+<p>Instantiating an object of your class involves providing all <strong>required</strong> fields as arguments. They must be
+keyword arguments if one of the defined fields contains a default value. Defaults or constant values are
+automatically applied, removing concerns about them.</p>
 <section id="packing-data">
 <h3><span class="section-number">1.2.1. </span>Packing data<a class="headerlink" href="#packing-data" title="Link to this heading">#</a></h3>
 <p>This library’s packing and unpacking is similar to Python’s <a class="reference external" href="https://docs.python.org/3/library/struct.html">struct</a>
@@ -464,7 +460,7 @@ upcoming sections will explore basic structs, array definitions, enum inclusion,
       
     </aside>
   </div>
-</div><script src="../_static/documentation_options.js?v=68c67630"></script>
+</div><script src="../_static/documentation_options.js?v=ccbef229"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/furo.js?v=32e29ea5"></script>
