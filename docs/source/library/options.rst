@@ -69,7 +69,7 @@ Sequence options
 
     Each struct stores seven fields in total, whereby :code:`Format2` uses :code:`__slots__`
     to store each member. We used `pympler <https://pympler.readthedocs.io/en/latest/>`_ to
-    retireve the amount of occupied bytes per object:
+    retrieve the amount of occupied bytes per object:
 
     .. code-block:: python
         :caption: Size difference between a :code:`__slots__` class and a normal Python class

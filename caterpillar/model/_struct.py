@@ -394,7 +394,7 @@ def pack_file(
 
     :return: None
     """
-    with open(filename, "wb") as fp:
+    with open(filename, "w+b") as fp:
         pack_into(obj, fp, struct, use_tempfile, **kwds)
 
 
