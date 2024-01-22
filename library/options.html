@@ -230,13 +230,81 @@
 <p><em>TODO</em></p>
 <section id="options-by-type">
 <h2><span class="section-number">2.1. </span>Options by type<a class="headerlink" href="#options-by-type" title="Link to this heading">#</a></h2>
+<section id="global-options">
+<h3><span class="section-number">2.1.1. </span>Global options<a class="headerlink" href="#global-options" title="Link to this heading">#</a></h3>
+<dl class="py data">
+<dt class="sig sig-object py" id="caterpillar.options.O_ARRAY_FACTORY">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">O_ARRAY_FACTORY</span></span><a class="headerlink" href="#caterpillar.options.O_ARRAY_FACTORY" title="Link to this definition">#</a></dt>
+<dd><p>To control the returned array type, a factory class or method can be set
+in this option using its attached value. For instance, we can incorporate
+the <code class="code docutils literal notranslate"><span class="pre">numpy.ndarray</span></code> into our unpacked objects:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">caterpillar.options</span> <span class="kn">import</span> <span class="n">O_ARRAY_FACTORY</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">array</span>
+
+<span class="c1"># just set the option&#39;s value</span>
+<span class="n">O_ARRAY_FACTORY</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">array</span>
+</pre></div>
+</div>
+<p>With the new configuration applied, your unpacked objects will occupy less
+memory space. The following table shows the size of unpacked objects in bytes:</p>
+<div class="table-wrapper colwidths-given docutils container" id="id4">
+<table class="docutils align-default" id="id4">
+<caption><span class="caption-text">Object sizes between different configuration options</span><a class="headerlink" href="#id4" title="Link to this table">#</a></caption>
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 37.5%" />
+<col style="width: 37.5%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head stub"><p>Configuration</p></th>
+<th class="head"><p><code class="code docutils literal notranslate"><span class="pre">formats/nibarchive</span></code></p></th>
+<th class="head"><p><code class="code docutils literal notranslate"><span class="pre">formats/caf</span></code> <a class="footnote-reference brackets" href="#id3" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>*<span class="fn-bracket">]</span></a></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><th class="stub"><p>Default configuration</p></th>
+<td><p>26520</p></td>
+<td><p>10608</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p><code class="code docutils literal notranslate"><span class="pre">__slots__</span></code> classes</p></th>
+<td><p>14240</p></td>
+<td><p>3848</p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>Default configuration and <code class="code docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p></th>
+<td><p>7520</p></td>
+<td><p>1232</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p><code class="code docutils literal notranslate"><span class="pre">__slots__</span></code> classes and <code class="code docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p></th>
+<td><p>6152</p></td>
+<td><p>384</p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>Original filesize</p></th>
+<td><p><strong>1157</strong></p></td>
+<td><p><strong>5433</strong></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</dd></dl>
+
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id3" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">*</a><span class="fn-bracket">]</span></span>
+<p>A CAF audio comes with a special chunk type that stores only zeros. By ingoring
+the data in this chunk, we can achieve less bytes in memory than the file originally used.</p>
+</aside>
+</aside>
+</section>
 <section id="sequence-options">
-<h3><span class="section-number">2.1.1. </span>Sequence options<a class="headerlink" href="#sequence-options" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">2.1.2. </span>Sequence options<a class="headerlink" href="#sequence-options" title="Link to this heading">#</a></h3>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>All sequence-related configuration options are applied to structs as well.</p>
+</div>
 <dl class="py data">
 <dt class="sig sig-object py" id="caterpillar.options.S_DISCARD_UNNAMED">
-<span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">S_DISCARD_UNNAMED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Flag(name='discard_unnamed',</span> <span class="pre">value=None)</span></em><a class="headerlink" href="#caterpillar.options.S_DISCARD_UNNAMED" title="Link to this definition">#</a></dt>
-<dd><p>Simple customizable user-flag.</p>
-<p>Using this option, all <em>unnamed</em> fields will be discarded and won’t be
+<span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">S_DISCARD_UNNAMED</span></span><a class="headerlink" href="#caterpillar.options.S_DISCARD_UNNAMED" title="Link to this definition">#</a></dt>
+<dd><p>Using this option, all <em>unnamed</em> fields will be discarded and won’t be
 visible in the final result object. An <em>unnamed</em> field must follow the
 following naming convention:</p>
 <div class="highlight-bnf notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nc">unnamed</span><span class="p">&gt;</span> := &#39;_&#39; [0-9]*
@@ -244,8 +312,8 @@ following naming convention:</p>
 </div>
 <p>Therefore, it is possible to include more than one unnamed field, for
 example:</p>
-<div class="literal-block-wrapper docutils container" id="id2">
-<div class="code-block-caption"><span class="caption-text">Simple sequence with an unnamed field</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
+<div class="literal-block-wrapper docutils container" id="id5">
+<div class="code-block-caption"><span class="caption-text">Simple sequence with an unnamed field</span><a class="headerlink" href="#id5" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span> <span class="o">=</span> <span class="n">Seq</span><span class="p">({</span>
 <span class="gp">... </span>    <span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="n">uint8</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="s2">&quot;_&quot;</span><span class="p">:</span> <span class="n">padding</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span>
@@ -261,10 +329,18 @@ example:</p>
 </dd></dl>
 
 <dl class="py data">
+<dt class="sig sig-object py" id="caterpillar.options.S_DISCARD_CONST">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">S_DISCARD_CONST</span></span><a class="headerlink" href="#caterpillar.options.S_DISCARD_CONST" title="Link to this definition">#</a></dt>
+<dd><p>This option will only discard constant fields.</p>
+</dd></dl>
+
+</section>
+<section id="struct-options">
+<h3><span class="section-number">2.1.3. </span>Struct options<a class="headerlink" href="#struct-options" title="Link to this heading">#</a></h3>
+<dl class="py data">
 <dt class="sig sig-object py" id="caterpillar.options.S_SLOTS">
-<span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">S_SLOTS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Flag(name='struct.slots',</span> <span class="pre">value=None)</span></em><a class="headerlink" href="#caterpillar.options.S_SLOTS" title="Link to this definition">#</a></dt>
-<dd><p>Simple customizable user-flag.</p>
-<p>Feature option that will create a new class with the <code class="code docutils literal notranslate"><span class="pre">__slots__</span></code> attribute
+<span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">S_SLOTS</span></span><a class="headerlink" href="#caterpillar.options.S_SLOTS" title="Link to this definition">#</a></dt>
+<dd><p>Feature option that will create a new class with the <code class="code docutils literal notranslate"><span class="pre">__slots__</span></code> attribute
 to lower required space. Take the following two structs into consideration:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
 <span class="k">class</span> <span class="nc">DictClass</span><span class="p">:</span>
@@ -290,8 +366,8 @@ to lower required space. Take the following two structs into consideration:</p>
 <p>Each struct stores seven fields in total, whereby <code class="code docutils literal notranslate"><span class="pre">Format2</span></code> uses <code class="code docutils literal notranslate"><span class="pre">__slots__</span></code>
 to store each member. We used <a class="reference external" href="https://pympler.readthedocs.io/en/latest/">pympler</a> to
 retrieve the amount of occupied bytes per object:</p>
-<div class="literal-block-wrapper docutils container" id="id3">
-<div class="code-block-caption"><span class="caption-text">Size difference between a <code class="code docutils literal notranslate"><span class="pre">__slots__</span></code> class and a normal Python class</span><a class="headerlink" href="#id3" title="Link to this code">#</a></div>
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-text">Size difference between a <code class="code docutils literal notranslate"><span class="pre">__slots__</span></code> class and a normal Python class</span><a class="headerlink" href="#id6" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">o1</span> <span class="o">=</span> <span class="n">DictClass</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="mh">0xFF</span><span class="p">]</span><span class="o">*</span><span class="mi">7</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">asizeof</span><span class="o">.</span><span class="n">asizeof</span><span class="p">(</span><span class="n">o1</span><span class="p">)</span>
 <span class="go">712</span>
@@ -313,55 +389,73 @@ also occupy less memory:</p>
 </dd></dl>
 
 <dl class="py data">
-<dt class="sig sig-object py" id="caterpillar.options.S_DISCARD_CONST">
-<span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">S_DISCARD_CONST</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Flag(name='discard_const',</span> <span class="pre">value=None)</span></em><a class="headerlink" href="#caterpillar.options.S_DISCARD_CONST" title="Link to this definition">#</a></dt>
-<dd><p>Simple customizable user-flag.</p>
-<p>This option will only discard constant fields.</p>
-</dd></dl>
-
-<dl class="py data">
-<dt class="sig sig-object py" id="caterpillar.options.S_UNION">
-<span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">S_UNION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Flag(name='union',</span> <span class="pre">value=None)</span></em><a class="headerlink" href="#caterpillar.options.S_UNION" title="Link to this definition">#</a></dt>
-<dd><p>Simple customizable user-flag.</p>
-<p>Internal option to add union behaviour to the <code class="code docutils literal notranslate"><span class="pre">caterpillar.model.Struct</span></code> class.</p>
-</dd></dl>
-
-<dl class="py data">
 <dt class="sig sig-object py" id="caterpillar.options.S_REPLACE_TYPES">
-<span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">S_REPLACE_TYPES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Flag(name='replace_types',</span> <span class="pre">value=None)</span></em><a class="headerlink" href="#caterpillar.options.S_REPLACE_TYPES" title="Link to this definition">#</a></dt>
-<dd><p>Simple customizable user-flag.</p>
+<span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">S_REPLACE_TYPES</span></span><a class="headerlink" href="#caterpillar.options.S_REPLACE_TYPES" title="Link to this definition">#</a></dt>
+<dd><p>This option was designed for documentation purposes only and should be
+used in that context only. It will alter the class’ annotations and remove
+all <a class="reference internal" href="fields/field_model.html#caterpillar.fields.Field" title="caterpillar.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">caterpillar.fields.Field</span></code></a> instances.</p>
+<p>Consider the following struct:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
+<span class="k">class</span> <span class="nc">Format</span><span class="p">:</span>
+    <span class="n">a</span><span class="p">:</span> <span class="n">uint8</span>
+    <span class="n">b</span><span class="p">:</span> <span class="n">String</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">c</span><span class="p">:</span> <span class="n">uuid</span>
+
+<span class="c1"># use the following line to enable type replacement globally</span>
+<span class="n">opt</span><span class="o">.</span><span class="n">set_struct_flags</span><span class="p">(</span><span class="n">opt</span><span class="o">.</span><span class="n">S_REPLACE_TYPES</span><span class="p">)</span>
+<span class="c1"># otherwise, just add options={opt.S_REPLACE_TYPES} to the</span>
+<span class="c1"># @struct call.</span>
+</pre></div>
+</div>
+<p>You will notice the difference in the following output on disabled
+type replacement (1) and enabled replacement (2):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Format</span><span class="o">.</span><span class="vm">__annotations__</span> <span class="c1"># (1)</span>
+<span class="go">{&#39;a&#39;: &lt;FormatField(int) &#39;B&#39;&gt;, &#39;b&#39;: &lt;String&gt;, &#39;c&#39;: &lt;uuid&gt;}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Format</span><span class="o">.</span><span class="vm">__annotations__</span> <span class="c1"># (2)</span>
+<span class="go">{&#39;a&#39;: &lt;class &#39;int&#39;&gt;, &#39;b&#39;: &lt;class &#39;str&#39;&gt;, &#39;c&#39;: &lt;class &#39;uuid.UUID&#39;&gt;}</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py data">
 <dt class="sig sig-object py" id="caterpillar.options.S_EVAL_ANNOTATIONS">
-<span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">S_EVAL_ANNOTATIONS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Flag(name='eval_annotations',</span> <span class="pre">value=None)</span></em><a class="headerlink" href="#caterpillar.options.S_EVAL_ANNOTATIONS" title="Link to this definition">#</a></dt>
-<dd><p>Simple customizable user-flag.</p>
+<span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">S_EVAL_ANNOTATIONS</span></span><a class="headerlink" href="#caterpillar.options.S_EVAL_ANNOTATIONS" title="Link to this definition">#</a></dt>
+<dd><p>If you decide to use <code class="code docutils literal notranslate"><span class="pre">from</span> <span class="pre">__future__</span> <span class="pre">import</span> <span class="pre">annotations</span></code>, you have to set this
+option for each struct in the scope of this import, because it will stringify all
+placed annotations. Therefore, they need to be executed before analyzed.</p>
+<div class="admonition caution">
+<p class="admonition-title">Caution</p>
+<p>Use this option with caution! It may result in execution of untrusted code, be aware!</p>
+</div>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="caterpillar.options.S_UNION">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">S_UNION</span></span><a class="headerlink" href="#caterpillar.options.S_UNION" title="Link to this definition">#</a></dt>
+<dd><p>Internal option to add union behaviour to the <code class="code docutils literal notranslate"><span class="pre">caterpillar.model.Struct</span></code> class.</p>
 </dd></dl>
 
 </section>
-<section id="struct-options">
-<h3><span class="section-number">2.1.2. </span>Struct options<a class="headerlink" href="#struct-options" title="Link to this heading">#</a></h3>
-</section>
 <section id="field-options">
-<h3><span class="section-number">2.1.3. </span>Field options<a class="headerlink" href="#field-options" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">2.1.4. </span>Field options<a class="headerlink" href="#field-options" title="Link to this heading">#</a></h3>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caterpillar.options.F_KEEP_POSITION">
-<span class="sig-prename descclassname"><span class="pre">options.</span></span><span class="sig-name descname"><span class="pre">F_KEEP_POSITION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Flag(name='keep_position',</span> <span class="pre">value=None)</span></em><a class="headerlink" href="#caterpillar.options.F_KEEP_POSITION" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">F_KEEP_POSITION</span></span><a class="headerlink" href="#caterpillar.options.F_KEEP_POSITION" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caterpillar.options.F_DYNAMIC">
-<span class="sig-prename descclassname"><span class="pre">options.</span></span><span class="sig-name descname"><span class="pre">F_DYNAMIC</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Flag(name='dynamic',</span> <span class="pre">value=None)</span></em><a class="headerlink" href="#caterpillar.options.F_DYNAMIC" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">F_DYNAMIC</span></span><a class="headerlink" href="#caterpillar.options.F_DYNAMIC" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caterpillar.options.F_SEQUENTIAL">
-<span class="sig-prename descclassname"><span class="pre">options.</span></span><span class="sig-name descname"><span class="pre">F_SEQUENTIAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Flag(name='sequential',</span> <span class="pre">value=None)</span></em><a class="headerlink" href="#caterpillar.options.F_SEQUENTIAL" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">F_SEQUENTIAL</span></span><a class="headerlink" href="#caterpillar.options.F_SEQUENTIAL" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caterpillar.options.F_OFFSET_OVERRIDE">
-<span class="sig-prename descclassname"><span class="pre">options.</span></span><span class="sig-name descname"><span class="pre">F_OFFSET_OVERRIDE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Flag(name='offset_override',</span> <span class="pre">value=None)</span></em><a class="headerlink" href="#caterpillar.options.F_OFFSET_OVERRIDE" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">F_OFFSET_OVERRIDE</span></span><a class="headerlink" href="#caterpillar.options.F_OFFSET_OVERRIDE" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 </section>
@@ -549,21 +643,27 @@ also occupy less memory:</p>
             <ul>
 <li><a class="reference internal" href="#">2. Options</a><ul>
 <li><a class="reference internal" href="#options-by-type">2.1. Options by type</a><ul>
-<li><a class="reference internal" href="#sequence-options">2.1.1. Sequence options</a><ul>
-<li><a class="reference internal" href="#caterpillar.options.S_DISCARD_UNNAMED"><code class="docutils literal notranslate"><span class="pre">S_DISCARD_UNNAMED</span></code></a></li>
-<li><a class="reference internal" href="#caterpillar.options.S_SLOTS"><code class="docutils literal notranslate"><span class="pre">S_SLOTS</span></code></a></li>
-<li><a class="reference internal" href="#caterpillar.options.S_DISCARD_CONST"><code class="docutils literal notranslate"><span class="pre">S_DISCARD_CONST</span></code></a></li>
-<li><a class="reference internal" href="#caterpillar.options.S_UNION"><code class="docutils literal notranslate"><span class="pre">S_UNION</span></code></a></li>
-<li><a class="reference internal" href="#caterpillar.options.S_REPLACE_TYPES"><code class="docutils literal notranslate"><span class="pre">S_REPLACE_TYPES</span></code></a></li>
-<li><a class="reference internal" href="#caterpillar.options.S_EVAL_ANNOTATIONS"><code class="docutils literal notranslate"><span class="pre">S_EVAL_ANNOTATIONS</span></code></a></li>
+<li><a class="reference internal" href="#global-options">2.1.1. Global options</a><ul>
+<li><a class="reference internal" href="#caterpillar.options.O_ARRAY_FACTORY"><code class="docutils literal notranslate"><span class="pre">caterpillar.options.O_ARRAY_FACTORY</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#struct-options">2.1.2. Struct options</a></li>
-<li><a class="reference internal" href="#field-options">2.1.3. Field options</a><ul>
-<li><a class="reference internal" href="#caterpillar.options.F_KEEP_POSITION"><code class="docutils literal notranslate"><span class="pre">options.F_KEEP_POSITION</span></code></a></li>
-<li><a class="reference internal" href="#caterpillar.options.F_DYNAMIC"><code class="docutils literal notranslate"><span class="pre">options.F_DYNAMIC</span></code></a></li>
-<li><a class="reference internal" href="#caterpillar.options.F_SEQUENTIAL"><code class="docutils literal notranslate"><span class="pre">options.F_SEQUENTIAL</span></code></a></li>
-<li><a class="reference internal" href="#caterpillar.options.F_OFFSET_OVERRIDE"><code class="docutils literal notranslate"><span class="pre">options.F_OFFSET_OVERRIDE</span></code></a></li>
+<li><a class="reference internal" href="#sequence-options">2.1.2. Sequence options</a><ul>
+<li><a class="reference internal" href="#caterpillar.options.S_DISCARD_UNNAMED"><code class="docutils literal notranslate"><span class="pre">caterpillar.options.S_DISCARD_UNNAMED</span></code></a></li>
+<li><a class="reference internal" href="#caterpillar.options.S_DISCARD_CONST"><code class="docutils literal notranslate"><span class="pre">caterpillar.options.S_DISCARD_CONST</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#struct-options">2.1.3. Struct options</a><ul>
+<li><a class="reference internal" href="#caterpillar.options.S_SLOTS"><code class="docutils literal notranslate"><span class="pre">caterpillar.options.S_SLOTS</span></code></a></li>
+<li><a class="reference internal" href="#caterpillar.options.S_REPLACE_TYPES"><code class="docutils literal notranslate"><span class="pre">caterpillar.options.S_REPLACE_TYPES</span></code></a></li>
+<li><a class="reference internal" href="#caterpillar.options.S_EVAL_ANNOTATIONS"><code class="docutils literal notranslate"><span class="pre">caterpillar.options.S_EVAL_ANNOTATIONS</span></code></a></li>
+<li><a class="reference internal" href="#caterpillar.options.S_UNION"><code class="docutils literal notranslate"><span class="pre">caterpillar.options.S_UNION</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#field-options">2.1.4. Field options</a><ul>
+<li><a class="reference internal" href="#caterpillar.options.F_KEEP_POSITION"><code class="docutils literal notranslate"><span class="pre">caterpillar.options.F_KEEP_POSITION</span></code></a></li>
+<li><a class="reference internal" href="#caterpillar.options.F_DYNAMIC"><code class="docutils literal notranslate"><span class="pre">caterpillar.options.F_DYNAMIC</span></code></a></li>
+<li><a class="reference internal" href="#caterpillar.options.F_SEQUENTIAL"><code class="docutils literal notranslate"><span class="pre">caterpillar.options.F_SEQUENTIAL</span></code></a></li>
+<li><a class="reference internal" href="#caterpillar.options.F_OFFSET_OVERRIDE"><code class="docutils literal notranslate"><span class="pre">caterpillar.options.F_OFFSET_OVERRIDE</span></code></a></li>
 </ul>
 </li>
 </ul>

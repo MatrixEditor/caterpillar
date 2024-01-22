@@ -54,6 +54,11 @@ Format(magic=b'Foo', name='Hello, World!', value=10, entries=['Bar', 'Baz'])
    There are specialized options created only for documentation purposes, so you don't
    have to worry about documenting fields. Just apply the documentation as usual.
 
+.. admonition:: You want to optimize memory space?
+
+   No problem! It is possible to shrink the memory space occupied by unpacked objects up
+   to 4 times. More information are provided when discussing available configuration
+   :ref:`options`.
 
 Where to start?
 ---------------
