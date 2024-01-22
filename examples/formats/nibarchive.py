@@ -40,6 +40,11 @@ except ImportError:
 opt.set_struct_flags(opt.S_REPLACE_TYPES, opt.S_SLOTS)
 opt.set_field_flags(VARINT_LSB)
 
+try:
+    from numpy import array
+    opt.O_ARRAY_FACTORY.value = array
+except ImportError:
+    pass
 
 @struct(order=LittleEndian)
 class NIBHeader:

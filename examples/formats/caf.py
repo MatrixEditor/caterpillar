@@ -26,10 +26,17 @@ except ImportError:
 # -------------------------------------------------------------------------
 import enum
 
-from caterpillar.shortcuts import BigEndian, this, ctx, parent
+from caterpillar.shortcuts import BigEndian, this, parent, opt
 from caterpillar.model import struct, unpack_file, pack_file
 from caterpillar.fields import *
 
+
+opt.set_struct_flags(opt.S_SLOTS)
+try:
+    from numpy import array
+    opt.O_ARRAY_FACTORY.value = array
+except ImportError:
+    pass
 
 @struct(order=BigEndian)
 class CAFHeader:

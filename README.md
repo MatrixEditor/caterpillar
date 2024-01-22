@@ -22,7 +22,7 @@ options will be added in the future. Documentation is [here >](https://matrixedi
 * apply a wide range of data types (with endianess and architecture configuration),
 * dynamically adapt structs based on their inheritance layout,
 * reduce the used memory space using `__slots__`,
-* inserts proper types into the class definition to support documentation and
+* insert proper types into the class definition to support documentation and
 * it helps you to create cleaner and more compact code.
 
 ## Installation

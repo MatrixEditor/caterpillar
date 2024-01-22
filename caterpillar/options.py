@@ -158,3 +158,6 @@ F_KEEP_POSITION = Flag("keep_position")
 F_DYNAMIC = Flag("dynamic")
 F_SEQUENTIAL = Flag("sequential")
 F_OFFSET_OVERRIDE = Flag("offset_override")
+
+# value intentionally left blank
+O_ARRAY_FACTORY = Flag("option.array_factory", value=None)

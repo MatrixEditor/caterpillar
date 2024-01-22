@@ -28,7 +28,7 @@ from caterpillar.context import (
     CTX_SEQ,
 )
 from caterpillar.exception import Stop, StructException, InvalidValueError
-
+from caterpillar.options import O_ARRAY_FACTORY
 
 class WithoutContextVar:
     def __init__(self, context: _ContextLike, name, value) -> None:
@@ -109,6 +109,9 @@ def unpack_seq(context: _ContextLike, unpack_one) -> List[Any]:
             if greedy:
                 break
             raise StructException(str(exc), context) from exc
+
+    if O_ARRAY_FACTORY.value:
+        return O_ARRAY_FACTORY.value(values)
     return values
 
 
