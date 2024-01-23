@@ -96,6 +96,21 @@
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
+
+
+<script>
+document.write(`<div class="bd-header-announcement"></div>`);
+fetch("https://raw.githubusercontent.com/MatrixEditor/caterpillar/master/docs/_templates/announcement.html")
+  .then(res => {return res.text();})
+  .then(data => {
+    div = document.querySelector(".bd-header-announcement");
+    div.classList.add(...["bd-header-announcement", "container-fluid"]);
+    div.innerHTML = `<div class="bd-header-announcement__content">${data}</div>`;
+  })
+  .catch(error => {
+    console.log("[PST]: Failed to load announcement at: https://raw.githubusercontent.com/MatrixEditor/caterpillar/master/docs/_templates/announcement.html");
+  });
+</script>
   
     <header class="bd-header navbar navbar-expand-lg bd-navbar">
 <div class="bd-header__inner bd-page-width">
@@ -656,8 +671,6 @@ Construct makes it comparable to Kaitai, but since compilation is not a primary 
 <input checked="checked" id="sd-tab-item-5" name="sd-tab-set-1" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-5">
 caterpillar</label><div class="sd-tab-content docutils">
-<div class="literal-block-wrapper docutils container" id="id6">
-<div class="code-block-caption"><span class="caption-text">caterpillar</span><a class="headerlink" href="#id6" title="Link to this code">#</a></div>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(venv-3.12.1)</span><span class="go">&gt; python3 ./examples/comparison/comparison_1_caterpillar.py ./blob</span>
 <span class="go">Timeit measurements:</span>
 <span class="go">unpack 0.0106435117 sec/call</span>
@@ -665,12 +678,9 @@ caterpillar</label><div class="sd-tab-content docutils">
 </pre></div>
 </div>
 </div>
-</div>
 <input id="sd-tab-item-6" name="sd-tab-set-1" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-6">
 construct</label><div class="sd-tab-content docutils">
-<div class="literal-block-wrapper docutils container" id="id7">
-<div class="code-block-caption"><span class="caption-text">Construct</span><a class="headerlink" href="#id7" title="Link to this code">#</a></div>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(venv-3.12.1)</span><span class="go">&gt; python3 ./examples/comparison/comparison_1_construct.py ./blob</span>
 <span class="go">Parsing measurements:</span>
 <span class="go">default  0.0143656098 sec/call</span>
@@ -682,36 +692,27 @@ construct</label><div class="sd-tab-content docutils">
 </pre></div>
 </div>
 </div>
-</div>
 <input id="sd-tab-item-7" name="sd-tab-set-1" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-7">
 kaitai</label><div class="sd-tab-content docutils">
-<div class="literal-block-wrapper docutils container" id="id8">
-<div class="code-block-caption"><span class="caption-text">kaitai</span><a class="headerlink" href="#id8" title="Link to this code">#</a></div>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(venv-3.12.1)</span><span class="go">&gt; python3 ./examples/comparison/comparison_1_kaitai.py ./blob</span>
 <span class="go">Parsing measurements:</span>
 <span class="go">default  0.0034705456 sec/call</span>
 </pre></div>
 </div>
 </div>
-</div>
 <input id="sd-tab-item-8" name="sd-tab-set-1" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-8">
 hachoir</label><div class="sd-tab-content docutils">
-<div class="literal-block-wrapper docutils container" id="id9">
-<div class="code-block-caption"><span class="caption-text">hachoir</span><a class="headerlink" href="#id9" title="Link to this code">#</a></div>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(venv-3.12.1)</span><span class="go">&gt; python3 ./examples/comparison/comparison_1_hachoir.py ./blob</span>
 <span class="go">Parsing measurements:</span>
 <span class="go">default  0.0260070809 sec/call</span>
 </pre></div>
 </div>
 </div>
-</div>
 <input id="sd-tab-item-9" name="sd-tab-set-1" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-9">
 mrcrowbar</label><div class="sd-tab-content docutils">
-<div class="literal-block-wrapper docutils container" id="id10">
-<div class="code-block-caption"><span class="caption-text">mrcrowbar</span><a class="headerlink" href="#id10" title="Link to this code">#</a></div>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(venv-3.12.1)</span><span class="go">&gt; python3 ./examples/comparison/comparison_1_mrcrowbar.py ./blob</span>
 <span class="go">Parsing measurements:</span>
 <span class="go">default  0.0555872261 sec/call</span>
@@ -719,7 +720,6 @@ mrcrowbar</label><div class="sd-tab-content docutils">
 <span class="go">Building measurements:</span>
 <span class="go">default  0.0898006975 sec/call</span>
 </pre></div>
-</div>
 </div>
 </div>
 </div>

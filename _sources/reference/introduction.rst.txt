@@ -132,7 +132,6 @@ Construct makes it comparable to Kaitai, but since compilation is not a primary 
     .. tab-item:: caterpillar
 
         .. code-block:: console
-            :caption: caterpillar
 
             (venv-3.12.1)> python3 ./examples/comparison/comparison_1_caterpillar.py ./blob
             Timeit measurements:
@@ -142,7 +141,6 @@ Construct makes it comparable to Kaitai, but since compilation is not a primary 
     .. tab-item:: construct
 
        .. code-block:: console
-            :caption: Construct
 
             (venv-3.12.1)> python3 ./examples/comparison/comparison_1_construct.py ./blob
             Parsing measurements:
@@ -156,7 +154,6 @@ Construct makes it comparable to Kaitai, but since compilation is not a primary 
     .. tab-item:: kaitai
 
         .. code-block:: console
-            :caption: kaitai
 
             (venv-3.12.1)> python3 ./examples/comparison/comparison_1_kaitai.py ./blob
             Parsing measurements:
@@ -165,7 +162,6 @@ Construct makes it comparable to Kaitai, but since compilation is not a primary 
     .. tab-item:: hachoir
 
         .. code-block:: console
-            :caption: hachoir
 
             (venv-3.12.1)> python3 ./examples/comparison/comparison_1_hachoir.py ./blob
             Parsing measurements:
@@ -174,7 +170,6 @@ Construct makes it comparable to Kaitai, but since compilation is not a primary 
     .. tab-item:: mrcrowbar
 
         .. code-block:: console
-            :caption: mrcrowbar
 
             (venv-3.12.1)> python3 ./examples/comparison/comparison_1_mrcrowbar.py ./blob
             Parsing measurements:
