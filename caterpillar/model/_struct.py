@@ -13,13 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import inspect
+import dataclasses as dc
 
 from tempfile import TemporaryFile
 from io import BytesIO, IOBase
 from typing import Optional, Union, Callable
 from typing import Dict, Any, Iterable
 from collections import OrderedDict
-from dataclasses import dataclass
 from shutil import copyfileobj
 
 from caterpillar.abc import getstruct, hasstruct, STRUCT_FIELD
@@ -36,7 +36,7 @@ from caterpillar.options import (
     GLOBAL_STRUCT_OPTIONS,
     GLOBAL_UNION_OPTIONS,
 )
-from caterpillar.fields import Field
+from caterpillar.fields import Field, INVALID_DEFAULT
 from ._base import Sequence
 
 
@@ -51,7 +51,7 @@ class Struct(Sequence):
     :param options: Additional options specifying what to include in the final class.
     """
 
-    # _member_map_: Dict[str, Field]
+    _member_map_: Dict[str, Field]
     # An internal field that maps the field names of all class attributes to their
     # corresponding struct fields.
 
@@ -82,7 +82,8 @@ class Struct(Sequence):
         setattr(self.model, STRUCT_FIELD, self)
         # Add additional options based on the struct's type
         slots = self.has_option(S_SLOTS)
-        self.model = dataclass(self.model, kw_only=self.kw_only, slots=slots)
+        self.model = dc.dataclass(self.model, kw_only=self.kw_only, slots=slots)
+
         setattr(self.model, "__class_getitem__", lambda dim: Field(self, amount=dim))
         if self.is_union:
             # install a hook
@@ -112,8 +113,12 @@ class Struct(Sequence):
 
     def _set_default(self, name: str, value: Any) -> None:
         setattr(self.model, name, value)
-        if not self.kw_only:
+
+    def _process_default(self, name, annotation: Any, had_default=False) -> Any:
+        default = super()._process_default(name, annotation, had_default)
+        if default is INVALID_DEFAULT and had_default:
             self.kw_only = True
+        return default
 
     def _replace_type(self, name: str, type_: type) -> None:
         self.model.__annotations__[name] = type_

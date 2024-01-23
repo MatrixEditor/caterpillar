@@ -15,13 +15,15 @@
 from __future__ import annotations
 
 import operator
+import sys
 
 from typing import Callable, Any, Union, Self
+from types import FrameType
 from dataclasses import dataclass
 
 
 from caterpillar.abc import _ContextLambda, _ContextLike
-
+from caterpillar.exception import StructException
 
 CTX_PARENT = "_parent"
 CTX_OBJECT = "_obj"
@@ -196,7 +198,82 @@ class ExprMixin:
         return BinaryExpression(operator.ne, self, other)
 
 
-@dataclass(frozen=True, repr=False)
+class ConditionContext:
+    """Class implementation of an inline condition.
+
+    Use this class to automatically apply a condition to multiple
+    field definitions. Note that this class will only work if it
+    has access to the parent stack frame.
+
+    .. code-block:: python
+
+        @struct
+        class Format:
+            magic: b"MGK"
+            length: uint32
+
+            with this.length > 32:
+                # other field definitions here
+                foo: uint8
+
+    This class will **replace** any existing fields!
+
+    :param condition: a context lambda or constant boolean value
+    :type condition: Union[_ContextLambda, bool]
+    """
+
+    __slots__ = "func", "annotations", "namelist", "depth"
+
+    def __init__(self, condition: Union[_ContextLambda, bool], depth=2):
+        self.func = condition
+        self.annotations = None
+        self.namelist = None
+        self.depth = depth
+
+    def getframe(self, num: int, msg=None) -> FrameType:
+        try:
+            return sys._getframe(num)
+        except AttributeError as exc:
+            raise StructException(msg) from exc
+
+    def __enter__(self) -> Self:
+        frame = self.getframe(self.depth, "Could not enter condition context!")
+        # keep track of all annotations
+        try:
+            self.annotations = frame.f_locals["__annotations__"]
+        except AttributeError as exc:
+            module = frame.f_locals.get("__module__")
+            qualname = frame.f_locals.get("__qualname__")
+            msg = f"Could not get annotations in {module} (context={qualname!r})"
+            raise StructException(msg) from exc
+
+        # store names before new fields are added
+        self.namelist = list(self.annotations)
+        return self
+
+    def __exit__(self, *_) -> None:
+        # pylint: disable-next=import-outside-toplevel
+        from caterpillar.fields import Field
+
+        new_names = set(self.annotations) - set(self.namelist)
+        for name in new_names:
+            # modify newly created fields
+            field = self.annotations[name]
+            if isinstance(field, Field):
+                # field already defined/created -> check for condition
+                if field.has_condition():
+                    # the field's condition AND this one must be true
+                    field.condition = BinaryExpression(
+                        operator.and_, field.condition, self.func
+                    )
+                else:
+                    field //= self.func
+            else:
+                # create a field (other attributes will be modified later)
+                self.annotations[name] = Field(field, condition=self.func)
+
+
+@dataclass(repr=False)
 class BinaryExpression(ExprMixin):
     """
     Represents a binary expression.
@@ -216,10 +293,19 @@ class BinaryExpression(ExprMixin):
         return self.operand(lhs, rhs)
 
     def __repr__(self) -> str:
-        return f"<{self.operand.__name__} left={self.left!r} right={self.right!r}>"
+        return f"{self.operand.__name__}{{{self.left!r}, {self.right!r}}}"
+
+    def __enter__(self):
+        # pylint: disable-next=attribute-defined-outside-init
+        self._cond = ConditionContext(self, depth=3)
+        self._cond.__enter__()
+        return self
+
+    def __exit__(self, *_):
+        self._cond.__exit__(*_)
 
 
-@dataclass(frozen=True)
+@dataclass
 class UnaryExpression:
     """
     Represents a unary expression.
@@ -238,7 +324,16 @@ class UnaryExpression:
         return self.operand(value)
 
     def __repr__(self) -> str:
-        return f"<{self.operand.__name__} value={self.value!r}>"
+        return f"{self.operand.__name__}{{{self.value!r}}}"
+
+    def __enter__(self):
+        # pylint: disable-next=attribute-defined-outside-init
+        self._cond = ConditionContext(self, depth=3)
+        self._cond.__enter__()
+        return self
+
+    def __exit__(self, *_):
+        self._cond.__exit__(*_)
 
 
 class ContextPath(ExprMixin):
@@ -277,6 +372,9 @@ class ContextPath(ExprMixin):
         self._ops_.append((operator.getitem, (key,), {}))
         return self
 
+    def __type__(self) -> type:
+        return Any
+
     def __getattribute__(self, key: str) -> ContextPath:
         """
         Gets an attribute from the ContextPath, creating a new instance if needed.
@@ -299,8 +397,17 @@ class ContextPath(ExprMixin):
         """
         extra = []
         for operation, args, kwargs in self._ops_:
-            extra.append(f"{operation.__name__} args={args!r} kwargs={kwargs!r}")
-        return f"<Path {self.path!r} {', '.join(extra)}>"
+            data = []
+            if len(args) > 0:
+                data.append(*map(repr, args))
+            if len(kwargs) > 0:
+                data.append(*[f"{x}={y!r}" for x, y in kwargs.items()])
+            extra.append(f"{operation.__name__}({', '.join(data)})")
+
+        if len(extra) == 0:
+            return f"Path({self.path!r})"
+
+        return f"Path({self.path!r}, {', '.join(extra)})"
 
     def __str__(self) -> str:
         """
@@ -331,6 +438,9 @@ class ContextLength(ExprMixin):
         :return: The value retrieved from the Context based on the path.
         """
         return len(self.path(context))
+
+    def __repr__(self) -> str:
+        return f"len({self.path!r})"
 
 
 this = ContextPath(CTX_OBJECT)

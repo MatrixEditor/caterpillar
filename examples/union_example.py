@@ -6,11 +6,13 @@ try:
 except ImportError:
     pass
 
+
 @union
 class Format:
     foo: uint16
     bar: uint32
     baz: boolean
+
 
 # we don't need any arguments here
 obj = Format()

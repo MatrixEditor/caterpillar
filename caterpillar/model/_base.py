@@ -168,11 +168,14 @@ class Sequence(FieldMixin):
     def _set_default(self, name: str, value: Any) -> None:
         pass
 
-    def _process_default(self, name, annotation: Any) -> Any:
+    def _process_default(self, name, annotation: Any, had_default=False) -> Any:
         default = getattr(self.model, name, INVALID_DEFAULT)
         # constant values that are not in the form of fields, structs or types should
         # be wrapped into constant values. For more information, see _process_field
         if isinstance(annotation, Field):
+            if annotation.has_condition():
+                # Conditional fields always get a default value
+                default = None
             annotation = annotation.struct
 
         match annotation:
@@ -181,9 +184,6 @@ class Sequence(FieldMixin):
             # Make it possible to define custom constants
             case Const():
                 default = annotation.value
-            case Field():
-                if isinstance(annotation.struct, Const):
-                    default = annotation.struct.value
 
         if self.is_union:
             # Unions will get none as default value for all fields
@@ -205,10 +205,13 @@ class Sequence(FieldMixin):
         """
         removables = []
         annotations = self._prepare_fields()
+        had_default = False
         for name, annotation in annotations.items():
             # Process each field and its annotation. In addition, fields with a name in
             # the form of '_[0-9]*' will be removed (if enabled)
-            default = self._process_default(name, annotation)
+            default = self._process_default(name, annotation, had_default)
+            if default != INVALID_DEFAULT:
+                had_default = True
             is_included = self._included(name, default, annotation)
             if not is_included:
                 removables.append(name)

@@ -7,6 +7,7 @@ try:
 except ImportError:
     pass
 
+
 @struct
 class BaseFormat:
     magic: b"BASE"

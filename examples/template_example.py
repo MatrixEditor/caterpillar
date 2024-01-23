@@ -9,6 +9,7 @@ except ImportError:
 
 opt.set_struct_flags(opt.S_REPLACE_TYPES)
 
+
 @struct
 class BaseFormat:
     """Default class documentation"""
@@ -35,9 +36,9 @@ class FormatTemplate(BaseFormat):
 #: anonymous generated partial template
 Format8 = derive(FormatTemplate, uint8, partial=True)
 
+
 @struct
 class Format(derive(Format8, B=uint8)):
-
     #: inline comment
     f4: uint8
 
@@ -45,7 +46,7 @@ class Format(derive(Format8, B=uint8)):
 #: inline data comment
 Format16 = derive(FormatTemplate, uint16, uint16, name=...)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Format(f1: int, f2: List, f3: int, f4: int)
     print(Format.__doc__)
     # Format16(f1: int, f2: List, f3: int)

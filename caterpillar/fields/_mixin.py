@@ -84,7 +84,7 @@ class FieldStruct(FieldMixin):
             retrieved using the :class:`Field` instance within the context.
             """
         ),
-        "__bits__": "TBD"
+        "__bits__": "TBD",
     }
 
     def pack_single(self, obj: Any, context: _ContextLike) -> None:

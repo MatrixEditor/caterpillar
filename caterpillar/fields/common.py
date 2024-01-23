@@ -12,6 +12,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+import sys
+
 from struct import calcsize, pack, unpack
 from typing import Callable
 from typing import Sequence, Any, Optional, Union, List
@@ -810,8 +812,6 @@ class Lazy(FieldStruct):
 
     :param struct: A callable that returns the underlying struct.
     """
-
-    __slots__ = ("struct_fn",)
 
     def __init__(self, struct: Callable[[], _StructLike]) -> None:
         self.struct_fn = struct

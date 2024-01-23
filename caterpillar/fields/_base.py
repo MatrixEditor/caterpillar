@@ -265,6 +265,10 @@ class Field:
         """
         return self.condition(context) if callable(self.condition) else self.condition
 
+    def has_condition(self) -> bool:
+        """Returns whether this field is linked to a condition"""
+        return self.condition is not True
+
     def has_flag(self, flag: Flag) -> bool:
         """Checks whether this field stores the given flag.
 
@@ -529,10 +533,11 @@ class Field:
     # representation, maybe revisit
     def __str__(self) -> str:
         name = self.get_name() or "<unnamed>"
-
+        offset = f", offset={self.offset}" if self.offset != -1 else ""
         return (
-            f"Field({name!r}, arch={self.arch.name}, order={self.order.name}, "
-            f"seq={self.is_seq()}, struct={self.struct!r})"
+            f"Field({name!r}, arch={self.arch.name!r}, order={self.order.name!r}, "
+            f"seq={self.is_seq()}, struct={self.struct!r}, cond={self.condition is not True}, "
+            f"options={bool(self.options)}{offset})"
         )
 
     def __repr__(self) -> str:

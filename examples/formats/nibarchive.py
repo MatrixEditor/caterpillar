@@ -42,9 +42,11 @@ opt.set_field_flags(VARINT_LSB)
 
 try:
     from numpy import array
+
     opt.O_ARRAY_FACTORY.value = array
 except ImportError:
     pass
+
 
 @struct(order=LittleEndian)
 class NIBHeader:
@@ -84,6 +86,7 @@ class NIBClassName:
 # Note that the returned string instance here may contain extra null-bytes
 # at the end.
 NIBKey = Prefixed(VarInt, "utf-8")
+
 
 class ValueType(enum.Enum):
     UNKNOWN = -1
@@ -161,7 +164,7 @@ class NIBArchive:
 
 
 # print(NIBArchive.__struct__.fields)
-if __name__ == '__main__':
+if __name__ == "__main__":
     obj = unpack_file(NIBArchive, sys.argv[1])
     print(obj)
     pack_file(obj, sys.argv[2], use_tempfile=True)

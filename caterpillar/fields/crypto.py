@@ -27,8 +27,9 @@ from caterpillar.exception import UnsupportedOperation
 from .common import Memory
 from ._mixin import get_args
 
+
 @runtime_checkable
-class Padding(Protocol): # pylint: disable=missing-class-docstring
+class Padding(Protocol):  # pylint: disable=missing-class-docstring
     def unpadder(self) -> PaddingContext:
         """Abstract method to get an unpadder for padding."""
 
@@ -63,8 +64,8 @@ class Encrypted(Memory):
     def __init__(
         self,
         length: Union[int, _GreedyType, _ContextLambda],
-        algorithm: Type[algorithms.CipherAlgorithm],
-        mode: Union[Type[modes.Mode], modes.Mode],
+        algorithm: Type["algorithms.CipherAlgorithm"],
+        mode: Union[Type["modes.Mode"], "modes.Mode"],
         padding: Union[Padding, Type[Padding]] = None,
         algo_args: Optional[Iterable[_ArgType]] = None,
         mode_args: Optional[Iterable[_ArgType]] = None,
@@ -72,11 +73,13 @@ class Encrypted(Memory):
         post: Optional[_StructLike] = None,
     ) -> None:
         if Cipher is None:
-            raise UnsupportedOperation((
-                "To use encryption with this framework, the module 'cryptography' "
-                "is required! You can install it via pip or use the packaging "
-                "extra 'crypto' that is available with this library."
-            ))
+            raise UnsupportedOperation(
+                (
+                    "To use encryption with this framework, the module 'cryptography' "
+                    "is required! You can install it via pip or use the packaging "
+                    "extra 'crypto' that is available with this library."
+                )
+            )
 
         super().__init__(length)
         self._algo = algorithm
@@ -87,7 +90,7 @@ class Encrypted(Memory):
         self._padding_args = padding_args
         self.post = post
 
-    def algorithm(self, context: _ContextLike) -> algorithms.CipherAlgorithm:
+    def algorithm(self, context: _ContextLike) -> "algorithms.CipherAlgorithm":
         """
         Get the encryption algorithm instance.
 
@@ -100,7 +103,7 @@ class Encrypted(Memory):
             algorithms.CipherAlgorithm, self._algo, self._algo_args, context
         )
 
-    def mode(self, context: _ContextLike) -> modes.Mode:
+    def mode(self, context: _ContextLike) -> "modes.Mode":
         """
         Get the encryption mode instance.
 

@@ -23,16 +23,7 @@ from ._struct import (
     pack,
     pack_into,
     pack_file,
-    sizeof
+    sizeof,
 )
-from ._bitfield import (
-    BitField,
-    bitfield,
-    BitFieldGroup
-)
-from ._template import (
-    istemplate,
-    template,
-    TemplateTypeVar,
-    derive
-)
+from ._bitfield import BitField, bitfield, BitFieldGroup
+from ._template import istemplate, template, TemplateTypeVar, derive

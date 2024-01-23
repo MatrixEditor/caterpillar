@@ -34,9 +34,11 @@ from caterpillar.fields import *
 opt.set_struct_flags(opt.S_SLOTS)
 try:
     from numpy import array
+
     opt.O_ARRAY_FACTORY.value = array
 except ImportError:
     pass
+
 
 @struct(order=BigEndian)
 class CAFHeader:

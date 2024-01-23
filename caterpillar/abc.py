@@ -109,7 +109,7 @@ class _StructLike(Protocol):
     def __pack__(self, obj: Any, context: _ContextLike) -> None:
         pass
 
-    def __type__(self) -> Optional[type]:
+    def __type__(self) -> Optional[Union[type, str]]:
         pass
 
 

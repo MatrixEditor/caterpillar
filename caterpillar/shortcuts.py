@@ -24,7 +24,3 @@ from .byteorder import PowerPC, PowerPC64, RISC_V, RISC_V64
 
 from .fields import Field as F
 from . import options as opt
-
-
-
-

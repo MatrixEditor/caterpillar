@@ -51,7 +51,7 @@ from .common import (
     float64,
     double,
     void_ptr,
-    uuid
+    uuid,
 )
 from .varint import VarInt, VARINT_LSB
 from .compression import (
@@ -62,16 +62,6 @@ from .compression import (
     LZOCompressed,
 )
 from .crypto import Encrypted
-from .net import (
-    IPv4Address,
-    IPv6Address,
-    MAC,
-    MACAddress
-)
-from .pointer import (
-    uintptr,
-    intptr,
-    offintptr,
-    offuintptr,
-    Pointer
-)
+from .net import IPv4Address, IPv6Address, MAC, MACAddress
+from .pointer import uintptr, intptr, offintptr, offuintptr, Pointer
+from .conditional import ConditionalChain, If, Else, ElseIf

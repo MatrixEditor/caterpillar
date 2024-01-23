@@ -30,6 +30,7 @@ from caterpillar.context import (
 from caterpillar.exception import Stop, StructException, InvalidValueError
 from caterpillar.options import O_ARRAY_FACTORY
 
+
 class WithoutContextVar:
     def __init__(self, context: _ContextLike, name, value) -> None:
         self.context = context

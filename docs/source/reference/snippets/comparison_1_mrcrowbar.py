@@ -16,4 +16,3 @@ class Entry(Block):
 class Format(Block):
     count = UInt32_LE(0x0000)
     entries = BlockField(Entry, 0x0004, count=Ref("count"))
-

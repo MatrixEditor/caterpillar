@@ -5,10 +5,11 @@ from caterpillar.fields import uint8, UInt, CString, Prefixed, uint32
 # unpacking process.
 # opt.set_struct_flags(opt.S_SLOTS, opt.S_REPLACE_TYPES)
 
+
 @bitfield(order=LittleEndian)
 class Flags:
-    bool1 : 1
-    num4  : 3
+    bool1: 1
+    num4: 3
     # padding is generated automatically
 
 
@@ -29,7 +30,7 @@ class Item:
 
 Format = LittleEndian + Item[uint32::]
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import sys
     import timeit
 
