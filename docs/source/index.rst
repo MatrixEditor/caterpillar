@@ -5,10 +5,6 @@ Welcome to Caterpillar's documentation!
 binary data. This framework operates as a declarative parser and builder using standard
 Python class definitions and annotations.
 
-.. caution::
-   Before using this library, be aware that the current status is "beta/testing". Therefore,
-   expect bugs and undocumented issues. Additionally, the documentation is a WIP.
-
 Whetting Your Appetite
 ----------------------
 

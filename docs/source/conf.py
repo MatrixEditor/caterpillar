@@ -68,5 +68,6 @@ html_theme_options = {
     "github_url": "https://github.com/MatrixEditor/caterpillar",
     "logo": {
         "text": "Caterpillar"
-    }
+    },
+    "announcement": "https://raw.githubusercontent.com/MatrixEditor/caterpillar/master/docs/_templates/announcement.html",
 }
