@@ -1,7 +1,7 @@
 .. _reference-index:
 
 ################################
-    Caterpillar's Reference
+           Reference
 ################################
 
 If you've completed the tutorial, you are now ready to delve into the internal logic and models

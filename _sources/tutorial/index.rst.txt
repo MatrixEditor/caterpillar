@@ -1,8 +1,8 @@
 .. _tutorial-index:
 
-***********************
-Tutorial to Caterpillar
-***********************
+********
+Tutorial
+********
 
 *Caterpillar* is a user-friendly and powerful Python framework, easy to learn and with robust
 functionality. Providing an array of high-level data structures, it creates a compact approach
