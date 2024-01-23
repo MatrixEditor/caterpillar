@@ -13,8 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import sys
+import struct as structlib
 
-from struct import calcsize, pack, unpack
 from typing import Callable
 from typing import Sequence, Any, Optional, Union, List
 from types import NoneType
@@ -59,7 +59,7 @@ class FormatField(FieldStruct):
     def __init__(self, ch: str, type_: type) -> None:
         self.text = ch
         self.ty = type_
-        self.__bits__ = calcsize(self.text) * 8
+        self.__bits__ = structlib.calcsize(self.text) * 8
         self._padding_ = self.text == "x"
 
     def __fmt__(self) -> str:
@@ -89,7 +89,7 @@ class FormatField(FieldStruct):
         :param context: The current context.
         :return: The size of the field.
         """
-        return calcsize(self.get_format(context))
+        return structlib.calcsize(self.get_format(context))
 
     def pack_single(self, obj: Any, context: _ContextLike) -> None:
         """
@@ -104,18 +104,18 @@ class FormatField(FieldStruct):
 
         fmt = self.get_format(context)
         if self._padding_:
-            data = pack(fmt)
+            data = structlib.pack(fmt)
         else:
             # NOTE: we write every single branch to reduce the
             # time this method takes
             # pylint: disable-next=unidiomatic-typecheck
-            if type(obj) is list:
+            if obj.__class__ is list:
                 if len(obj) == 0:
                     return
                 # Unfortunately, we have to use the *unpack operation here
-                data = pack(fmt, *obj)
+                data = structlib.pack(fmt, *obj)
             else:
-                data = pack(fmt, obj)
+                data = structlib.pack(fmt, obj)
         context[CTX_STREAM].write(data)
 
     def pack_seq(self, seq: Sequence, context: _ContextLike) -> None:
@@ -138,7 +138,8 @@ class FormatField(FieldStruct):
         :return: The unpacked value.
         """
         fmt = self.get_format(context)
-        value = unpack(fmt, context[CTX_STREAM].read(calcsize(fmt)))
+        size = structlib.calcsize(fmt)
+        value = structlib.unpack(fmt, context[CTX_STREAM].read(size))
         return value[0] if value else None
 
     def unpack_seq(self, context: _ContextLike) -> List[Any]:
@@ -158,7 +159,9 @@ class FormatField(FieldStruct):
             return super().unpack_seq(context)
 
         fmt = self.get_format(context, length)
-        return list(unpack(fmt, context[CTX_STREAM].read(calcsize(fmt))))
+        return list(
+            structlib.unpack(fmt, context[CTX_STREAM].read(structlib.calcsize(fmt)))
+        )
 
     def get_format(self, context: _ContextLike, length: int = None) -> str:
         """
@@ -494,7 +497,7 @@ class CString(Bytes):
     A specialized field for handling string data that ends with ``\\0x00``.
     """
 
-    __slots__ = ("pad",)
+    __slots__ = ("pad", "raw_pad")
 
     def __init__(
         self,
@@ -513,6 +516,7 @@ class CString(Bytes):
         self.pad = pad or 0
         if isinstance(self.pad, str):
             self.pad = ord(self.pad)
+        self.raw_pad = self.pad.to_bytes(1, byteorder="big")
 
     def __type__(self) -> type:
         """
@@ -546,14 +550,13 @@ class CString(Bytes):
         :param context: The current context.
         :return: The unpacked string.
         """
-        raw_pad = self.pad.to_bytes(1, byteorder="big")
         if self.length is Ellipsis:
             # Parse actual C-String
             stream: _StreamType = context[CTX_STREAM]
             data = bytearray()
             while True:
                 value = stream.read(1)
-                if not value or value == raw_pad:
+                if not value or value == self.raw_pad:
                     break
                 data += value
             value = bytes(data)

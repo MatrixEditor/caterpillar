@@ -283,24 +283,22 @@ class BitField(Struct):
         # will be stored
         init_data: Dict[str, Any] = Context()
         context[CTX_OBJECT] = Context(_parent=context)
-        base_path = context[CTX_PATH]
-        data = memoryview(context[CTX_STREAM].read(self.__bits__ // 8))
-
+        values = libstruct.unpack(
+            f"{self.order.ch}{self.__fmt__}",
+            context[CTX_STREAM].read(self.__bits__ // 8),
+        )
         for i, group in enumerate(self.groups):
             # each group specifies the fields we are about to unpack. But first, we have
             # to read the bits from the stream
-            start = group.pos // 8
-            value = libstruct.unpack(
-                f"{self.order.ch}{group.fmt}", data[start : start + group.size // 8]
-            )[0]
+            value = values[i]
             for bit_info, field in group.fields.items():
                 name: str = field.__name__
                 # The field should be ignored if it is not within the
                 # member map (this usually means we have a padding field)
                 if name not in self._member_map_:
                     continue
-
-                context[CTX_PATH] = f"{base_path}.<{i}>.{name}"
+                # unnecessary:
+                # context[CTX_PATH] = f"{base_path}.<{i}>.{name}"
                 bit_pos, width, factory = bit_info
                 low_mask = (1 << width) - 1
                 if width == 1:
@@ -319,9 +317,8 @@ class BitField(Struct):
         # REVISIT: this function is very time consuming. should be do something
         # about that?
         stream: _StreamType = context[CTX_STREAM]
-        base_path: str = context[CTX_PATH]
-        order = "little" if self.order == LittleEndian else "big"
-        for i, group in enumerate(self.groups):
+        values = []
+        for group in self.groups:
             # The same applies here, but we convert all values to int instead of reading
             # them from the stream
             value = 0
@@ -332,7 +329,6 @@ class BitField(Struct):
                 if name not in self._member_map_:
                     continue
 
-                context[CTX_PATH] = f"{base_path}.({i}).{name}"
                 bit_pos, width, _ = bit_info
                 field_value = getattr(obj, name, 0) or 0
                 shift = bit_pos + 1 - width
@@ -349,7 +345,8 @@ class BitField(Struct):
                         f"Field {name!r} does not support to-int conversion!"
                     ) from exc
             # REVISIT: is this cheating?
-            stream.write(value.to_bytes(group.size // 8, byteorder=order))
+            values.append(value)
+        stream.write(libstruct.pack(f"{self.order.ch}{self.__fmt__}", *values))
 
 
 def _make_bitfield(

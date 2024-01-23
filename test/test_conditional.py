@@ -1,6 +1,9 @@
+import pytest
+
+
 from caterpillar.fields import *
 from caterpillar.shortcuts import *
-
+from struct import error
 
 def _test_pack(obj, expected):
     data = pack(obj)
@@ -125,12 +128,16 @@ class Format_ComplexConditional:
         b: uint16
         with If(this.b > 10):
             c: uint8
+            d: uint8
         # we can't use 'Else' here
         with ElseIf(this.b <= 10):
             d: uint32
 
 def test_complex_condition_pack():
-    _test_pack(Format_ComplexConditional(10, b=11, c=0xFF), b"\x0A\x00\x0B\xFF")
-    _test_pack(Format_ComplexConditional(10, b=11, d=0xFFFF), b"\x0A\x00\x0B")
+    _test_pack(Format_ComplexConditional(10, b=11, c=0xFF, d=0xFF), b"\x0A\x00\x0B\xFF\xFF")
+    with pytest.raises(error):
+        _test_pack(Format_ComplexConditional(10, b=11, d=0xFFFF), b"\x0A\x00\x0B")
+    _test_pack(Format_ComplexConditional(10, b=11, d=0xFF), b"\x0A\x00\x0B\xFF")
     _test_pack(Format_ComplexConditional(10, b=10, d=0xFFFF), b"\x0A\x00\x0A\x00\x00\xFF\xFF")
+
 
