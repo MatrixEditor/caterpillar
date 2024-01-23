@@ -135,8 +135,8 @@ Construct makes it comparable to Kaitai, but since compilation is not a primary 
 
             (venv-3.12.1)> python3 ./examples/comparison/comparison_1_caterpillar.py ./blob
             Timeit measurements:
-            unpack 0.0106435117 sec/call
-            pack   0.0088008424 sec/call
+            unpack 0.0097203362 sec/call
+            pack   0.0078892448 sec/call
 
     .. tab-item:: construct
 
@@ -144,12 +144,12 @@ Construct makes it comparable to Kaitai, but since compilation is not a primary 
 
             (venv-3.12.1)> python3 ./examples/comparison/comparison_1_construct.py ./blob
             Parsing measurements:
-            default  0.0143656098 sec/call
-            compiled 0.0085707553 sec/call
+            default  0.0145166325 sec/call
+            compiled 0.0085910592 sec/call
 
             Building measurements:
-            default  0.0127780359 sec/call
-            compiled 0.0099577958 sec/call
+            default  0.0125181926 sec/call
+            compiled 0.0098681578 sec/call
 
     .. tab-item:: kaitai
 
@@ -178,13 +178,13 @@ Construct makes it comparable to Kaitai, but since compilation is not a primary 
             Building measurements:
             default  0.0898006975 sec/call
 
-In this benchmark, *caterpillar* demonstrates a performance advantage, being approximately :bdg-success:`25.91%`
-faster in unpacking data and approximately :bdg-success:`31.12%` faster in packing data compared to Construct
+In this benchmark, *caterpillar* demonstrates a performance advantage, being approximately :bdg-success:`33.04%`
+faster in unpacking data and approximately :bdg-success:`36.97%` faster in packing data compared to Construct
 (*not compiled*).
 
 In the **compiled** Construct test, *caterpillar* shows a performance difference compared to Construct. Specifically,
-*caterpillar* is approximately :bdg-danger:`24.18%` slower in unpacking data, but approximately
-:bdg-success:`11.61%` **faster** in packing data. It's important to note that these figures reflect a trade-off between
+*caterpillar* is approximately :bdg-danger:`13.14%` slower in unpacking data, but approximately
+:bdg-success:`20.05%` **faster** in packing data. It's important to note that these figures reflect a trade-off between
 performance and other considerations such as simplicity and ease of use.
 
 .. caution::

@@ -691,24 +691,22 @@ document.write(`
         <span class="c1"># will be stored</span>
         <span class="n">init_data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">Context</span><span class="p">()</span>
         <span class="n">context</span><span class="p">[</span><span class="n">CTX_OBJECT</span><span class="p">]</span> <span class="o">=</span> <span class="n">Context</span><span class="p">(</span><span class="n">_parent</span><span class="o">=</span><span class="n">context</span><span class="p">)</span>
-        <span class="n">base_path</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_PATH</span><span class="p">]</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="nb">memoryview</span><span class="p">(</span><span class="n">context</span><span class="p">[</span><span class="n">CTX_STREAM</span><span class="p">]</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__bits__</span> <span class="o">//</span> <span class="mi">8</span><span class="p">))</span>
-
+        <span class="n">values</span> <span class="o">=</span> <span class="n">libstruct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="o">.</span><span class="n">ch</span><span class="si">}{</span><span class="bp">self</span><span class="o">.</span><span class="n">__fmt__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">context</span><span class="p">[</span><span class="n">CTX_STREAM</span><span class="p">]</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__bits__</span> <span class="o">//</span> <span class="mi">8</span><span class="p">),</span>
+        <span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="p">):</span>
             <span class="c1"># each group specifies the fields we are about to unpack. But first, we have</span>
             <span class="c1"># to read the bits from the stream</span>
-            <span class="n">start</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">pos</span> <span class="o">//</span> <span class="mi">8</span>
-            <span class="n">value</span> <span class="o">=</span> <span class="n">libstruct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="o">.</span><span class="n">ch</span><span class="si">}{</span><span class="n">group</span><span class="o">.</span><span class="n">fmt</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="n">start</span> <span class="p">:</span> <span class="n">start</span> <span class="o">+</span> <span class="n">group</span><span class="o">.</span><span class="n">size</span> <span class="o">//</span> <span class="mi">8</span><span class="p">]</span>
-            <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="k">for</span> <span class="n">bit_info</span><span class="p">,</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">group</span><span class="o">.</span><span class="n">fields</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="vm">__name__</span>
                 <span class="c1"># The field should be ignored if it is not within the</span>
                 <span class="c1"># member map (this usually means we have a padding field)</span>
                 <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_member_map_</span><span class="p">:</span>
                     <span class="k">continue</span>
-
-                <span class="n">context</span><span class="p">[</span><span class="n">CTX_PATH</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_path</span><span class="si">}</span><span class="s2">.&lt;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&gt;.</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="c1"># unnecessary:</span>
+                <span class="c1"># context[CTX_PATH] = f&quot;{base_path}.&lt;{i}&gt;.{name}&quot;</span>
                 <span class="n">bit_pos</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">factory</span> <span class="o">=</span> <span class="n">bit_info</span>
                 <span class="n">low_mask</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">width</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
                 <span class="k">if</span> <span class="n">width</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
@@ -727,9 +725,8 @@ document.write(`
         <span class="c1"># REVISIT: this function is very time consuming. should be do something</span>
         <span class="c1"># about that?</span>
         <span class="n">stream</span><span class="p">:</span> <span class="n">_StreamType</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_STREAM</span><span class="p">]</span>
-        <span class="n">base_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_PATH</span><span class="p">]</span>
-        <span class="n">order</span> <span class="o">=</span> <span class="s2">&quot;little&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">==</span> <span class="n">LittleEndian</span> <span class="k">else</span> <span class="s2">&quot;big&quot;</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="p">):</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="p">:</span>
             <span class="c1"># The same applies here, but we convert all values to int instead of reading</span>
             <span class="c1"># them from the stream</span>
             <span class="n">value</span> <span class="o">=</span> <span class="mi">0</span>
@@ -740,7 +737,6 @@ document.write(`
                 <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_member_map_</span><span class="p">:</span>
                     <span class="k">continue</span>
 
-                <span class="n">context</span><span class="p">[</span><span class="n">CTX_PATH</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_path</span><span class="si">}</span><span class="s2">.(</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">).</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
                 <span class="n">bit_pos</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">bit_info</span>
                 <span class="n">field_value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="mi">0</span>
                 <span class="n">shift</span> <span class="o">=</span> <span class="n">bit_pos</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">width</span>
@@ -757,7 +753,8 @@ document.write(`
                         <span class="sa">f</span><span class="s2">&quot;Field </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> does not support to-int conversion!&quot;</span>
                     <span class="p">)</span> <span class="kn">from</span> <span class="nn">exc</span>
             <span class="c1"># REVISIT: is this cheating?</span>
-            <span class="n">stream</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="n">group</span><span class="o">.</span><span class="n">size</span> <span class="o">//</span> <span class="mi">8</span><span class="p">,</span> <span class="n">byteorder</span><span class="o">=</span><span class="n">order</span><span class="p">))</span></div>
+            <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">stream</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">libstruct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="o">.</span><span class="n">ch</span><span class="si">}{</span><span class="bp">self</span><span class="o">.</span><span class="n">__fmt__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">values</span><span class="p">))</span></div>
 
 
 
