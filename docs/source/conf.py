@@ -69,5 +69,5 @@ html_theme_options = {
     "logo": {
         "text": "Caterpillar"
     },
-    "announcement": "https://raw.githubusercontent.com/MatrixEditor/caterpillar/master/docs/_templates/announcement.html",
+    "announcement": "https://raw.githubusercontent.com/MatrixEditor/caterpillar/master/docs/source/_templates/announcement.html",
 }
