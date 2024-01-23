@@ -22,10 +22,9 @@ from types import FrameType
 from caterpillar.abc import _ContextLambda, _StructLike
 from caterpillar.abc import _ContextLike, typeof
 from caterpillar.context import BinaryExpression, ConditionContext
-from caterpillar.exception import StructException, ValidationError
+from caterpillar.exception import ValidationError
 
 from ._base import Field
-from ._mixin import FieldStruct
 
 
 class ConditionalChain:
@@ -182,7 +181,7 @@ class ElseIf(ConditionContext):
         self.annotations = annotations
         super().__exit__()
 
-
-class Else(ElseIf):
-    def __init__(self) -> None:
-        super().__init__(None)
+# REVISIT: There is one case where 'ELSE' is not applicable and will cause
+# a field to be present at all times. This problem exists if we add fields
+# into an else-branch without a previously defined field.
+Else = ElseIf(lambda _: True)

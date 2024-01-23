@@ -271,6 +271,8 @@ class ConditionContext:
             else:
                 # create a field (other attributes will be modified later)
                 self.annotations[name] = Field(field, condition=self.func)
+        self.annotations = None
+        self.namelist = None
 
 
 @dataclass(repr=False)

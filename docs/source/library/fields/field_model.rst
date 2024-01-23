@@ -19,3 +19,9 @@ Field Model
 .. autoclass:: caterpillar.fields.Chain
     :members:
     :special-members:
+
+.. autoclass:: caterpillar.fields.If
+    :members:
+
+.. autoclass:: caterpillar.fields.ElseIf
+    :members:

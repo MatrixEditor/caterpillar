@@ -83,7 +83,7 @@ class Format_IfElse:
     a: uint8
     with If(this.a > 9):
         b: uint8
-    with Else():
+    with Else:
         b: uint16
 
 def test_ifelse_condition_pack():
@@ -106,11 +106,31 @@ class Format_IfElseIfElse:
         b: uint8
     with ElseIf(this.a < 16):
         b: uint16
-    with Else():
+    with Else:
         b: uint32
 
 def test_if_elseif_else_condition_pack():
     _test_pack(Format_IfElseIfElse(9, b=0xFF),  b"\x09\xFF")
     _test_pack(Format_IfElseIfElse(10, b=0xFF), b"\x0A\x00\xFF")
     _test_pack(Format_IfElseIfElse(16, b=0xFF), b"\x10\x00\x00\x00\xFF")
+
+
+###############################################################################
+# complex conditional branches
+###############################################################################
+@struct(order=BigEndian)
+class Format_ComplexConditional:
+    a: uint8
+    with this.a == 10:
+        b: uint16
+        with If(this.b > 10):
+            c: uint8
+        # we can't use 'Else' here
+        with ElseIf(this.b <= 10):
+            d: uint32
+
+def test_complex_condition_pack():
+    _test_pack(Format_ComplexConditional(10, b=11, c=0xFF), b"\x0A\x00\x0B\xFF")
+    _test_pack(Format_ComplexConditional(10, b=11, d=0xFFFF), b"\x0A\x00\x0B")
+    _test_pack(Format_ComplexConditional(10, b=10, d=0xFFFF), b"\x0A\x00\x0A\x00\x00\xFF\xFF")
 

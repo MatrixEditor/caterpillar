@@ -18,6 +18,8 @@ Context classes
 .. autoclass:: caterpillar.context.ContextLength
     :members:
 
+.. autoclass:: caterpillar.context.ConditionContext
+
 
 Special paths
 -------------

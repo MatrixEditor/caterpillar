@@ -123,6 +123,33 @@ In this example, the data would be decompressed first before :code:`Format.__unp
     The returned object is **not** a field!
 
 
+Conditional fields
+------------------
+
+To enhance class definitions even further, you can add conditional fields that share the same
+condition. Using native support for context lambdas, we can simply write:
+
+.. code-block:: python
+    :caption: Conditional fields (e.g. for versioned structs)
+
+    @struct
+    class Format:
+        version: uint32
+        # all following fields will be bound to the condition
+        with this.version == 1:
+            length: uint8
+            extra: uint8
+            data: Bytes(this.length)
+        # Use else-if over 'Else' alone
+        with ElseIf(this.version == 2):
+            name: CString(16)
+            data: Prefixed(uint8)
+
+.. note::
+    It is recommended **not** to use :code:`Else`, because it could cause unintended
+    side effects. Use :class:`caterpillar.fields.ElseIf` with the inverted condition
+    instead.
+
 BitFields
 ---------
 
