@@ -253,8 +253,9 @@
 <span class="kn">from</span> <span class="nn">.common</span> <span class="kn">import</span> <span class="n">Memory</span>
 <span class="kn">from</span> <span class="nn">._mixin</span> <span class="kn">import</span> <span class="n">get_args</span>
 
+
 <span class="nd">@runtime_checkable</span>
-<span class="k">class</span> <span class="nc">Padding</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span> <span class="c1"># pylint: disable=missing-class-docstring</span>
+<span class="k">class</span> <span class="nc">Padding</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>  <span class="c1"># pylint: disable=missing-class-docstring</span>
     <span class="k">def</span> <span class="nf">unpadder</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PaddingContext</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Abstract method to get an unpadder for padding.&quot;&quot;&quot;</span>
 
@@ -291,8 +292,8 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">length</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">_GreedyType</span><span class="p">,</span> <span class="n">_ContextLambda</span><span class="p">],</span>
-        <span class="n">algorithm</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">algorithms</span><span class="o">.</span><span class="n">CipherAlgorithm</span><span class="p">],</span>
-        <span class="n">mode</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">modes</span><span class="o">.</span><span class="n">Mode</span><span class="p">],</span> <span class="n">modes</span><span class="o">.</span><span class="n">Mode</span><span class="p">],</span>
+        <span class="n">algorithm</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="s2">&quot;algorithms.CipherAlgorithm&quot;</span><span class="p">],</span>
+        <span class="n">mode</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="s2">&quot;modes.Mode&quot;</span><span class="p">],</span> <span class="s2">&quot;modes.Mode&quot;</span><span class="p">],</span>
         <span class="n">padding</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Padding</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">Padding</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">algo_args</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">_ArgType</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">mode_args</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">_ArgType</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -300,11 +301,13 @@
         <span class="n">post</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">_StructLike</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">Cipher</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">UnsupportedOperation</span><span class="p">((</span>
-                <span class="s2">&quot;To use encryption with this framework, the module &#39;cryptography&#39; &quot;</span>
-                <span class="s2">&quot;is required! You can install it via pip or use the packaging &quot;</span>
-                <span class="s2">&quot;extra &#39;crypto&#39; that is available with this library.&quot;</span>
-            <span class="p">))</span>
+            <span class="k">raise</span> <span class="n">UnsupportedOperation</span><span class="p">(</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;To use encryption with this framework, the module &#39;cryptography&#39; &quot;</span>
+                    <span class="s2">&quot;is required! You can install it via pip or use the packaging &quot;</span>
+                    <span class="s2">&quot;extra &#39;crypto&#39; that is available with this library.&quot;</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">length</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_algo</span> <span class="o">=</span> <span class="n">algorithm</span>
@@ -317,7 +320,7 @@
 
 <div class="viewcode-block" id="Encrypted.algorithm">
 <a class="viewcode-back" href="../../../library/fields/crypto.html#caterpillar.fields.Encrypted.algorithm">[docs]</a>
-    <span class="k">def</span> <span class="nf">algorithm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">algorithms</span><span class="o">.</span><span class="n">CipherAlgorithm</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">algorithm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;algorithms.CipherAlgorithm&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the encryption algorithm instance.</span>
 
@@ -333,7 +336,7 @@
 
 <div class="viewcode-block" id="Encrypted.mode">
 <a class="viewcode-back" href="../../../library/fields/crypto.html#caterpillar.fields.Encrypted.mode">[docs]</a>
-    <span class="k">def</span> <span class="nf">mode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">modes</span><span class="o">.</span><span class="n">Mode</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">mode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;modes.Mode&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the encryption mode instance.</span>
 

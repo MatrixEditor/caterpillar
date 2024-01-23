@@ -239,13 +239,13 @@
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
 <span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">dataclasses</span> <span class="k">as</span> <span class="nn">dc</span>
 
 <span class="kn">from</span> <span class="nn">tempfile</span> <span class="kn">import</span> <span class="n">TemporaryFile</span>
 <span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">BytesIO</span><span class="p">,</span> <span class="n">IOBase</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Callable</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Iterable</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
 <span class="kn">from</span> <span class="nn">shutil</span> <span class="kn">import</span> <span class="n">copyfileobj</span>
 
 <span class="kn">from</span> <span class="nn">caterpillar.abc</span> <span class="kn">import</span> <span class="n">getstruct</span><span class="p">,</span> <span class="n">hasstruct</span><span class="p">,</span> <span class="n">STRUCT_FIELD</span>
@@ -262,7 +262,7 @@
     <span class="n">GLOBAL_STRUCT_OPTIONS</span><span class="p">,</span>
     <span class="n">GLOBAL_UNION_OPTIONS</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">caterpillar.fields</span> <span class="kn">import</span> <span class="n">Field</span>
+<span class="kn">from</span> <span class="nn">caterpillar.fields</span> <span class="kn">import</span> <span class="n">Field</span><span class="p">,</span> <span class="n">INVALID_DEFAULT</span>
 <span class="kn">from</span> <span class="nn">._base</span> <span class="kn">import</span> <span class="n">Sequence</span>
 
 
@@ -279,7 +279,7 @@
 <span class="sd">    :param options: Additional options specifying what to include in the final class.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="c1"># _member_map_: Dict[str, Field]</span>
+    <span class="n">_member_map_</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Field</span><span class="p">]</span>
     <span class="c1"># An internal field that maps the field names of all class attributes to their</span>
     <span class="c1"># corresponding struct fields.</span>
 
@@ -310,7 +310,8 @@
         <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">STRUCT_FIELD</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
         <span class="c1"># Add additional options based on the struct&#39;s type</span>
         <span class="n">slots</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_option</span><span class="p">(</span><span class="n">S_SLOTS</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">dataclass</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">kw_only</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kw_only</span><span class="p">,</span> <span class="n">slots</span><span class="o">=</span><span class="n">slots</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">dataclass</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">kw_only</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kw_only</span><span class="p">,</span> <span class="n">slots</span><span class="o">=</span><span class="n">slots</span><span class="p">)</span>
+
         <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;__class_getitem__&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">dim</span><span class="p">:</span> <span class="n">Field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">amount</span><span class="o">=</span><span class="n">dim</span><span class="p">))</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_union</span><span class="p">:</span>
             <span class="c1"># install a hook</span>
@@ -340,8 +341,12 @@
 
     <span class="k">def</span> <span class="nf">_set_default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">kw_only</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="nf">_process_default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">annotation</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">had_default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="n">default</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_process_default</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">annotation</span><span class="p">,</span> <span class="n">had_default</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">default</span> <span class="ow">is</span> <span class="n">INVALID_DEFAULT</span> <span class="ow">and</span> <span class="n">had_default</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">kw_only</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="n">default</span>
 
     <span class="k">def</span> <span class="nf">_replace_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">type_</span><span class="p">:</span> <span class="nb">type</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="vm">__annotations__</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">type_</span>

@@ -399,11 +399,14 @@
     <span class="k">def</span> <span class="nf">_set_default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">pass</span>
 
-    <span class="k">def</span> <span class="nf">_process_default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">annotation</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_process_default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">annotation</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">had_default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
         <span class="n">default</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">INVALID_DEFAULT</span><span class="p">)</span>
         <span class="c1"># constant values that are not in the form of fields, structs or types should</span>
         <span class="c1"># be wrapped into constant values. For more information, see _process_field</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">annotation</span><span class="p">,</span> <span class="n">Field</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">annotation</span><span class="o">.</span><span class="n">has_condition</span><span class="p">():</span>
+                <span class="c1"># Conditional fields always get a default value</span>
+                <span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="n">annotation</span> <span class="o">=</span> <span class="n">annotation</span><span class="o">.</span><span class="n">struct</span>
 
         <span class="k">match</span> <span class="n">annotation</span><span class="p">:</span>
@@ -412,9 +415,6 @@
             <span class="c1"># Make it possible to define custom constants</span>
             <span class="k">case</span> <span class="n">Const</span><span class="p">():</span>
                 <span class="n">default</span> <span class="o">=</span> <span class="n">annotation</span><span class="o">.</span><span class="n">value</span>
-            <span class="k">case</span> <span class="n">Field</span><span class="p">():</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">annotation</span><span class="o">.</span><span class="n">struct</span><span class="p">,</span> <span class="n">Const</span><span class="p">):</span>
-                    <span class="n">default</span> <span class="o">=</span> <span class="n">annotation</span><span class="o">.</span><span class="n">struct</span><span class="o">.</span><span class="n">value</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_union</span><span class="p">:</span>
             <span class="c1"># Unions will get none as default value for all fields</span>
@@ -436,10 +436,13 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">removables</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">annotations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_fields</span><span class="p">()</span>
+        <span class="n">had_default</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">annotation</span> <span class="ow">in</span> <span class="n">annotations</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="c1"># Process each field and its annotation. In addition, fields with a name in</span>
             <span class="c1"># the form of &#39;_[0-9]*&#39; will be removed (if enabled)</span>
-            <span class="n">default</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_default</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">annotation</span><span class="p">)</span>
+            <span class="n">default</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_default</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">annotation</span><span class="p">,</span> <span class="n">had_default</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">default</span> <span class="o">!=</span> <span class="n">INVALID_DEFAULT</span><span class="p">:</span>
+                <span class="n">had_default</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="n">is_included</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_included</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">default</span><span class="p">,</span> <span class="n">annotation</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">is_included</span><span class="p">:</span>
                 <span class="n">removables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
