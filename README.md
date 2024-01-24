@@ -2,6 +2,7 @@
 
 [![python](https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2FMatrixEditor%2Fcaterpillar%2Fmaster%2Fpyproject.toml&logo=python)](https://www.python.org/downloads/)
 [![Build and Deploy Docs](https://github.com/MatrixEditor/caterpillar/actions/workflows/python-sphinx.yml/badge.svg)](https://github.com/MatrixEditor/caterpillar/actions/workflows/python-sphinx.yml)
+[![Run Tests](https://github.com/MatrixEditor/caterpillar/actions/workflows/python-test.yml/badge.svg)](https://github.com/MatrixEditor/caterpillar/actions/workflows/python-test.yml)
 ![GitHub issues](https://img.shields.io/github/issues/MatrixEditor/caterpillar?logo=github)
 ![GitHub License](https://img.shields.io/github/license/MatrixEditor/caterpillar?logo=github)
 
