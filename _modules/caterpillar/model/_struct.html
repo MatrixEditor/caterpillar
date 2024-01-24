@@ -430,6 +430,7 @@ document.write(`
 <span class="kn">from</span> <span class="nn">caterpillar.abc</span> <span class="kn">import</span> <span class="n">_ContainsStruct</span><span class="p">,</span> <span class="n">_ContextLike</span><span class="p">,</span> <span class="n">_SupportsSize</span>
 <span class="kn">from</span> <span class="nn">caterpillar.context</span> <span class="kn">import</span> <span class="n">Context</span><span class="p">,</span> <span class="n">CTX_STREAM</span>
 <span class="kn">from</span> <span class="nn">caterpillar.byteorder</span> <span class="kn">import</span> <span class="n">ByteOrder</span><span class="p">,</span> <span class="n">Arch</span>
+<span class="kn">from</span> <span class="nn">caterpillar.exception</span> <span class="kn">import</span> <span class="n">InvalidValueError</span>
 <span class="kn">from</span> <span class="nn">caterpillar.options</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">S_EVAL_ANNOTATIONS</span><span class="p">,</span>
     <span class="n">S_UNION</span><span class="p">,</span>
@@ -489,7 +490,7 @@ document.write(`
         <span class="n">slots</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_option</span><span class="p">(</span><span class="n">S_SLOTS</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">dataclass</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">kw_only</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kw_only</span><span class="p">,</span> <span class="n">slots</span><span class="o">=</span><span class="n">slots</span><span class="p">)</span>
 
-        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;__class_getitem__&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">dim</span><span class="p">:</span> <span class="n">Field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">amount</span><span class="o">=</span><span class="n">dim</span><span class="p">))</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;__class_getitem__&quot;</span><span class="p">,</span> <span class="n">_struct_getitem</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_union</span><span class="p">:</span>
             <span class="c1"># install a hook</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_union_hook</span> <span class="o">=</span> <span class="p">(</span><span class="n">hook_cls</span> <span class="ow">or</span> <span class="n">UnionHook</span><span class="p">)(</span><span class="bp">self</span><span class="p">)</span>
@@ -544,6 +545,20 @@ document.write(`
         <span class="k">return</span> <span class="n">pack</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">to_bytes</span>
+
+
+<span class="k">def</span> <span class="nf">_struct_getitem</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">Struct</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Field</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">class_getitem</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">dim</span> <span class="o">=</span> <span class="n">args</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected only one paremeter, got: </span><span class="si">{</span><span class="n">args</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="p">(</span><span class="n">dim</span><span class="p">,)</span> <span class="o">=</span> <span class="n">args</span>
+
+        <span class="k">return</span> <span class="n">Field</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">amount</span><span class="o">=</span><span class="n">dim</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">class_getitem</span>
 
 
 <span class="k">def</span> <span class="nf">_make_struct</span><span class="p">(</span>

@@ -124,8 +124,9 @@ Construct makes it comparable to Kaitai, but since compilation is not a primary 
 *caterpillar*, these results are not considered.
 
 .. note::
-    All tests have been performed on a Windows VM with the latest stable python implementation (
-    :code:`Python 3.12.1 (tags/v3.12.1:2305ca5) [MSC v.1937 64 bit (AMD64)] on win32`)
+    All tests have been performed on a Windows VM using the latest stable python implementation (
+    :code:`Python 3.12.1 (tags/v3.12.1:2305ca5) [MSC v.1937 64 bit (AMD64)] on win32`) and PyPy
+    (:code:`[PyPy 7.3.15 with MSC v.1929 64 bit (AMD64)]`).
 
 .. tab-set::
 
@@ -137,6 +138,12 @@ Construct makes it comparable to Kaitai, but since compilation is not a primary 
             Timeit measurements:
             unpack 0.0097203362 sec/call
             pack   0.0078892448 sec/call
+
+            (pypy-venv-3.10) pypy ./examples/comparison/comparison_1_caterpillar.py ./blob
+            Timeit measurements:
+            unpack 0.0044497086 sec/call
+            pack   0.0021923946 sec/call
+
 
     .. tab-item:: construct
 
@@ -151,6 +158,15 @@ Construct makes it comparable to Kaitai, but since compilation is not a primary 
             default  0.0125181926 sec/call
             compiled 0.0098681578 sec/call
 
+            (pypy-venv-3.10)> pypy ./examples/comparison/comparison_1_construct.py ./blob
+            Parsing measurements:
+            default  0.0051257158 sec/call
+            compiled 0.0033772090 sec/call
+
+            Building measurements:
+            default  0.0037924385 sec/call
+            compiled 0.0031346225 sec/call
+
     .. tab-item:: kaitai
 
         .. code-block:: console
@@ -159,6 +175,10 @@ Construct makes it comparable to Kaitai, but since compilation is not a primary 
             Parsing measurements:
             default  0.0034705456 sec/call
 
+            (pypy-venv-3.10)> pypy ./examples/comparison/comparison_1_kaitai.py ./blob
+            Parsing measurements:
+            default  0.0008136422 sec/call
+
     .. tab-item:: hachoir
 
         .. code-block:: console
@@ -166,6 +186,10 @@ Construct makes it comparable to Kaitai, but since compilation is not a primary 
             (venv-3.12.1)> python3 ./examples/comparison/comparison_1_hachoir.py ./blob
             Parsing measurements:
             default  0.0260070809 sec/call
+
+            (pypy-venv-3.10)> pypy ./examples/comparison/comparison_1_hachoir.py ./blob
+            Parsing measurements:
+            default  0.0063716554 sec/call
 
     .. tab-item:: mrcrowbar
 
@@ -177,6 +201,13 @@ Construct makes it comparable to Kaitai, but since compilation is not a primary 
 
             Building measurements:
             default  0.0898006975 sec/call
+
+            (pypy-venv-3.10)> pypy ./examples/comparison/comparison_1_mrcrowbar.py ./blob
+            Parsing measurements:
+            default  0.0110391153 sec/call
+
+            Building measurements:
+            default  0.0126670091 sec/call
 
 In this benchmark, *caterpillar* demonstrates a performance advantage, being approximately :bdg-success:`33.04%`
 faster in unpacking data and approximately :bdg-success:`36.97%` faster in packing data compared to Construct

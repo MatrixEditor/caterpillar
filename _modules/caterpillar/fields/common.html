@@ -415,7 +415,6 @@ document.write(`
 <span class="c1">#</span>
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
-<span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">struct</span> <span class="k">as</span> <span class="nn">structlib</span>
 
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span>
@@ -425,13 +424,10 @@ document.write(`
 <span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span> <span class="k">as</span> <span class="n">_EnumType</span>
 <span class="kn">from</span> <span class="nn">uuid</span> <span class="kn">import</span> <span class="n">UUID</span>
 
-<span class="kn">from</span> <span class="nn">caterpillar.abc</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">_StructLike</span><span class="p">,</span>
-    <span class="n">_ContextLike</span><span class="p">,</span>
-    <span class="n">_StreamType</span><span class="p">,</span>
-    <span class="n">_ContextLambda</span><span class="p">,</span>
-    <span class="n">_EnumLike</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">caterpillar.abc</span> <span class="kn">import</span> <span class="n">_StructLike</span><span class="p">,</span> <span class="n">_ContextLambda</span>
+<span class="kn">from</span> <span class="nn">caterpillar.abc</span> <span class="kn">import</span> <span class="n">_EnumLike</span><span class="p">,</span> <span class="n">_StreamType</span>
+<span class="kn">from</span> <span class="nn">caterpillar.abc</span> <span class="kn">import</span> <span class="n">_ContextLike</span>
+
 <span class="kn">from</span> <span class="nn">caterpillar.exception</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ValidationError</span><span class="p">,</span>
     <span class="n">StructException</span><span class="p">,</span>
@@ -440,7 +436,7 @@ document.write(`
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">caterpillar.context</span> <span class="kn">import</span> <span class="n">CTX_FIELD</span><span class="p">,</span> <span class="n">CTX_STREAM</span><span class="p">,</span> <span class="n">CTX_SEQ</span>
 <span class="kn">from</span> <span class="nn">caterpillar.options</span> <span class="kn">import</span> <span class="n">F_SEQUENTIAL</span><span class="p">,</span> <span class="n">Flag</span>
-<span class="kn">from</span> <span class="nn">caterpillar.byteorder</span> <span class="kn">import</span> <span class="n">LittleEndian</span><span class="p">,</span> <span class="n">Arch</span>
+<span class="kn">from</span> <span class="nn">caterpillar.byteorder</span> <span class="kn">import</span> <span class="n">LittleEndian</span>
 <span class="kn">from</span> <span class="nn">._base</span> <span class="kn">import</span> <span class="n">Field</span><span class="p">,</span> <span class="n">INVALID_DEFAULT</span><span class="p">,</span> <span class="n">singleton</span>
 <span class="kn">from</span> <span class="nn">._mixin</span> <span class="kn">import</span> <span class="n">FieldStruct</span>
 

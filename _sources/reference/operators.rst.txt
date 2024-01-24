@@ -210,7 +210,7 @@ The context path takes a special place, as it can provide lazy execution of almo
 on definition. Its attribute-access model results in a new :class:`ContextPath` instance.
 
 >>> path = ContextPath("foo").bar.baz
-<Path 'foo.bar.baz'>
+Path('foo.bar.baz')
 
 To enable list-like access and function calls, there are special methods:
 
@@ -221,7 +221,7 @@ To enable list-like access and function calls, there are special methods:
     the value from the context.
 
     >>> path = this.foo.bar(x=19)
-    <Path '_obj.foo.bar' call args=() kwargs={'x': 19}>
+    Path('_obj.foo.bar', call(x=10))
 
 
 .. function:: path.__getitem__(self, key)
@@ -230,7 +230,7 @@ To enable list-like access and function calls, there are special methods:
     :meth:`!__getitem__` method on the retrieved value afterward.
 
     >>> path = this.foo.bar(x=19)[10]
-    <Path '_obj.foo.bar' call args=() kwargs={'x': 19}, getitem args=10 kwargs={}>
+    Path('_obj.foo.bar', call(x=19), getitem(10))
 
 
 .. admonition::: Developer's note

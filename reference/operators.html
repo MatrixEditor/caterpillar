@@ -655,7 +655,7 @@ special operations.</p>
 <p>The context path takes a special place, as it can provide lazy execution of almost all operators
 on definition. Its attribute-access model results in a new <code class="xref py py-class docutils literal notranslate"><span class="pre">ContextPath</span></code> instance.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">ContextPath</span><span class="p">(</span><span class="s2">&quot;foo&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">bar</span><span class="o">.</span><span class="n">baz</span>
-<span class="go">&lt;Path &#39;foo.bar.baz&#39;&gt;</span>
+<span class="go">Path(&#39;foo.bar.baz&#39;)</span>
 </pre></div>
 </div>
 <p>To enable list-like access and function calls, there are special methods:</p>
@@ -666,7 +666,7 @@ on definition. Its attribute-access model results in a new <code class="xref py 
 stores the keyword arguments given in the call and executes them after retrieving
 the value from the context.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">this</span><span class="o">.</span><span class="n">foo</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">19</span><span class="p">)</span>
-<span class="go">&lt;Path &#39;_obj.foo.bar&#39; call args=() kwargs={&#39;x&#39;: 19}&gt;</span>
+<span class="go">Path(&#39;_obj.foo.bar&#39;, call(x=10))</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -677,7 +677,7 @@ the value from the context.</p>
 <dd><p>This method has the same effect on the path, as it stores the key argument and executes the
 <code class="xref py py-meth docutils literal notranslate"><span class="pre">__getitem__()</span></code> method on the retrieved value afterward.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">this</span><span class="o">.</span><span class="n">foo</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">19</span><span class="p">)[</span><span class="mi">10</span><span class="p">]</span>
-<span class="go">&lt;Path &#39;_obj.foo.bar&#39; call args=() kwargs={&#39;x&#39;: 19}, getitem args=10 kwargs={}&gt;</span>
+<span class="go">Path(&#39;_obj.foo.bar&#39;, call(x=19), getitem(10))</span>
 </pre></div>
 </div>
 </dd></dl>
