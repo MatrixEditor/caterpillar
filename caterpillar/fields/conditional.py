@@ -12,16 +12,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-import sys
-import operator
-
-from typing import Self, Union, Set, Any
-from typing import Dict, Optional, List
-from typing import Tuple
-from types import FrameType
+from typing import Union, Any
+from typing import Optional
 from caterpillar.abc import _ContextLambda, _StructLike
 from caterpillar.abc import _ContextLike, typeof
-from caterpillar.context import BinaryExpression, ConditionContext
+from caterpillar.context import ConditionContext
 from caterpillar.exception import ValidationError
 
 from ._base import Field
@@ -132,7 +127,7 @@ class ElseIf(ConditionContext):
                 ...
     """
 
-    def __enter__(self) -> Self:
+    def __enter__(self) :
         self.depth = 3
         super().__enter__()
         self.depth = 2
@@ -180,6 +175,7 @@ class ElseIf(ConditionContext):
         # inspect new fields
         self.annotations = annotations
         super().__exit__()
+
 
 # REVISIT: There is one case where 'ELSE' is not applicable and will cause
 # a field to be present at all times. This problem exists if we add fields

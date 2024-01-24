@@ -14,8 +14,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from sys import maxsize
 from platform import machine
-from functools import cached_property
-
 from dataclasses import dataclass
 from enum import Enum
 

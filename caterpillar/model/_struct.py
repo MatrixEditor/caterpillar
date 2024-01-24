@@ -27,6 +27,7 @@ from caterpillar.abc import _StructLike, _StreamType, _SupportsUnpack
 from caterpillar.abc import _ContainsStruct, _ContextLike, _SupportsSize
 from caterpillar.context import Context, CTX_STREAM
 from caterpillar.byteorder import ByteOrder, Arch
+from caterpillar.exception import InvalidValueError
 from caterpillar.options import (
     S_EVAL_ANNOTATIONS,
     S_UNION,
@@ -84,7 +85,7 @@ class Struct(Sequence):
         slots = self.has_option(S_SLOTS)
         self.model = dc.dataclass(self.model, kw_only=self.kw_only, slots=slots)
 
-        setattr(self.model, "__class_getitem__", lambda dim: Field(self, amount=dim))
+        setattr(self.model, "__class_getitem__", _struct_getitem(self))
         if self.is_union:
             # install a hook
             self._union_hook = (hook_cls or UnionHook)(self)
@@ -138,6 +139,20 @@ def _struct_bytes(model: Struct) -> Callable:
         return pack(self, model)
 
     return to_bytes
+
+
+def _struct_getitem(model: Struct) -> Field:
+    def class_getitem(*args):
+        if len(args) == 2:
+            _, dim = args
+        elif len(args) != 1:
+            raise InvalidValueError(f"Expected only one paremeter, got: {args!r}")
+        else:
+            (dim,) = args
+
+        return Field(model, amount=dim)
+
+    return class_getitem
 
 
 def _make_struct(

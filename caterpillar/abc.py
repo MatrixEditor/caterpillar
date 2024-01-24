@@ -12,7 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from io import IOBase
 from typing import Protocol, runtime_checkable
 from typing import Dict, Any, Optional, Union, Callable

@@ -12,7 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-import sys
 import struct as structlib
 
 from typing import Callable
@@ -22,13 +21,10 @@ from functools import cached_property
 from enum import Enum as _EnumType
 from uuid import UUID
 
-from caterpillar.abc import (
-    _StructLike,
-    _ContextLike,
-    _StreamType,
-    _ContextLambda,
-    _EnumLike,
-)
+from caterpillar.abc import _StructLike, _ContextLambda
+from caterpillar.abc import _EnumLike, _StreamType
+from caterpillar.abc import _ContextLike
+
 from caterpillar.exception import (
     ValidationError,
     StructException,
@@ -37,7 +33,7 @@ from caterpillar.exception import (
 )
 from caterpillar.context import CTX_FIELD, CTX_STREAM, CTX_SEQ
 from caterpillar.options import F_SEQUENTIAL, Flag
-from caterpillar.byteorder import LittleEndian, Arch
+from caterpillar.byteorder import LittleEndian
 from ._base import Field, INVALID_DEFAULT, singleton
 from ._mixin import FieldStruct
 
