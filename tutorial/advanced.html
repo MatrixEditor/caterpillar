@@ -429,7 +429,7 @@ leaving you well-equipped to create your own struct classes in Python.</p>
 <div class="admonition attention">
 <p class="admonition-title">Attention</p>
 <p>Most of the structs and techniques showcased here are subject to change, notably
-<code class="xref py py-class docutils literal notranslate"><span class="pre">BitField</span></code>. Its current usage is not as user-friendly as someone might expect.</p>
+<a class="reference internal" href="../library/model.html#caterpillar.model.BitField" title="caterpillar.model.BitField"><code class="xref py py-class docutils literal notranslate"><span class="pre">BitField</span></code></a>. Its current usage is not as user-friendly as someone might expect.</p>
 </div>
 <section id="operators">
 <h2><span class="section-number">3.1. </span>Operators<a class="headerlink" href="#operators" title="Link to this heading">#</a></h2>
@@ -477,7 +477,7 @@ the common chunk type:</p>
 that was previously written to the stream. This library will solve that problem for you
 automatically!</p>
 <p>In general, you can use the <code class="code docutils literal notranslate"><span class="pre">&#64;</span></code> operator with structs and fields, but not custom defined class
-structs. They have to be wrapped by a <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code> first:</p>
+structs. They have to be wrapped by a <a class="reference internal" href="../library/fields/field_model.html#caterpillar.fields.Field" title="caterpillar.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a> first:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">uint32</span> <span class="o">@</span> <span class="mh">0x1234</span>     <span class="c1"># ok</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span> <span class="o">=</span> <span class="n">Format</span> <span class="o">@</span> <span class="mh">0x1234</span>    <span class="c1"># not okay</span>
 <span class="gt">Traceback (most recent call last):</span>
@@ -548,7 +548,7 @@ condition. Using native support for context lambdas, we can simply write:</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>It is recommended <strong>not</strong> to use <code class="code docutils literal notranslate"><span class="pre">Else</span></code>, because it could cause unintended
-side effects. Use <a class="reference internal" href="../library/fields/field_model.html#caterpillar.fields.ElseIf" title="caterpillar.fields.ElseIf"><code class="xref py py-class docutils literal notranslate"><span class="pre">caterpillar.fields.ElseIf</span></code></a> with the inverted condition
+side effects. Use <a class="reference internal" href="../library/fields/field_model.html#caterpillar.fields.ElseIf" title="caterpillar.fields.ElseIf"><code class="xref py py-class docutils literal notranslate"><span class="pre">ElseIf</span></code></a> with the inverted condition
 instead.</p>
 </div>
 </section>
@@ -614,7 +614,7 @@ place, where the data does not get synchronized. In all other situations, the ne
 be applied to all other fields.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>You can even write your own implementation of a <code class="xref py py-class docutils literal notranslate"><span class="pre">UnionHook</span></code> to do whatever you
+<p>You can even write your own implementation of a <a class="reference internal" href="../library/model.html#caterpillar.model.UnionHook" title="caterpillar.model.UnionHook"><code class="xref py py-class docutils literal notranslate"><span class="pre">UnionHook</span></code></a> to do whatever you
 want with the union object. Just specify the <code class="code docutils literal notranslate"><span class="pre">hook_cls</span></code> parameter in the union
 decorator.</p>
 </div>

@@ -51,7 +51,7 @@ integrate it into other struct definitions or instantiate objects of the class.
 
 .. note::
     To optimize memory space and get faster attribute access times, you have to explicitly
-    enable the :code:`S_SLOTS` option. More information can be taken from  :ref:`options`.
+    enable the :attr:`~caterpillar.options.S_SLOTS` option. More information can be taken from  :ref:`options`.
 
 Wow, thats it? That was less than expected? Let's move directly to working with the defined class.
 
@@ -110,7 +110,7 @@ configure the struct to correctly decode these integer fields.
         unit: uint8                 # <-- endianess meaningless, only one byte
 
 If your structs depend on the architecture associated with the binary, you can also specify a
-struct-wide :class:`Arch`.
+struct-wide :class:`~caterpillar.byteorder.Arch`.
 
 .. admonition:: Challenge
 

@@ -473,7 +473,7 @@ document.write(`
 <span class="sd">        :return: A string representation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">type_repr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ty</span><span class="o">.</span><span class="vm">__name__</span> <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_padding_</span> <span class="k">else</span> <span class="s2">&quot;padding&quot;</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="n">type_repr</span><span class="si">}</span><span class="s2">) </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="si">!r}</span><span class="s2">&gt;&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="n">type_repr</span><span class="si">}</span><span class="s2">) </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="si">!r}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__bits__</span><span class="si">}</span><span class="s2">&gt;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__type__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -593,6 +593,8 @@ document.write(`
                 <span class="n">dim</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">dim</span> <span class="o">=</span> <span class="n">length</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_SEQ</span><span class="p">]:</span>
+            <span class="n">dim</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">order</span><span class="o">.</span><span class="n">ch</span><span class="si">}{</span><span class="n">dim</span><span class="si">}{</span><span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s2">&quot;</span></div>
 
 
@@ -838,7 +840,10 @@ document.write(`
         <span class="k">if</span> <span class="n">by_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">by_value</span>
 
-        <span class="n">default</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default</span> <span class="ow">or</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_FIELD</span><span class="p">]</span><span class="o">.</span><span class="n">default</span>
+        <span class="n">default</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default</span>
+        <span class="k">if</span> <span class="n">default</span> <span class="o">==</span> <span class="n">INVALID_DEFAULT</span><span class="p">:</span>
+            <span class="n">default</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_FIELD</span><span class="p">]</span><span class="o">.</span><span class="n">default</span>
+
         <span class="k">if</span> <span class="n">default</span> <span class="o">==</span> <span class="n">INVALID_DEFAULT</span><span class="p">:</span>
             <span class="c1"># pylint: disable-next=protected-access</span>
             <span class="k">if</span> <span class="n">ENUM_STRICT</span><span class="o">.</span><span class="n">_hash_</span> <span class="ow">in</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_FIELD</span><span class="p">]</span><span class="o">.</span><span class="n">flags</span><span class="p">:</span>
@@ -1279,56 +1284,6 @@ document.write(`
 
 <span class="n">int24</span> <span class="o">=</span> <span class="n">Int</span><span class="p">(</span><span class="mi">24</span><span class="p">)</span>
 <span class="n">uint24</span> <span class="o">=</span> <span class="n">UInt</span><span class="p">(</span><span class="mi">24</span><span class="p">)</span>
-
-
-<span class="c1"># still experimental</span>
-<div class="viewcode-block" id="NotRequired">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.NotRequired">[docs]</a>
-<span class="k">class</span> <span class="nc">NotRequired</span><span class="p">(</span><span class="n">Transformer</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A transformer that makes a field optional during packing and unpacking.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
-
-    <span class="k">def</span> <span class="nf">__type__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__type__</span><span class="p">()]</span>
-
-    <span class="k">def</span> <span class="nf">__pack__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Pack the value, skipping it if it is None.</span>
-
-<span class="sd">        :param obj: The value to pack.</span>
-<span class="sd">        :param context: The context for packing.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">obj</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__pack__</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">__unpack__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Unpack the value, returning None if the field is not present.</span>
-
-<span class="sd">        :param context: The context for unpacking.</span>
-<span class="sd">        :return: The unpacked value or None.</span>
-<span class="sd">        :rtype: Optional[Any]</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__unpack__</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
-        <span class="k">except</span> <span class="n">StructException</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">None</span></div>
-
-
-
-<span class="k">def</span> <span class="nf">optional</span><span class="p">(</span><span class="n">struct</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Transformer</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Create an optional field transformer.</span>
-
-<span class="sd">    :param struct: The underlying struct for the optional field.</span>
-<span class="sd">    :return: The optional field transformer.</span>
-<span class="sd">    :rtype: Transformer</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">NotRequired</span><span class="p">(</span><span class="n">struct</span><span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">Lazy</span><span class="p">(</span><span class="n">FieldStruct</span><span class="p">):</span>

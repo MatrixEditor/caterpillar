@@ -50,8 +50,10 @@ Numeric Structs
 .. autoclass:: caterpillar.fields.UInt
     :members:
 
-.. autoattribute:: caterpillar.fields.VarInt
-    :annotation:
+.. autoattribute:: caterpillar.fields.vint
+
+.. autoclass:: caterpillar.fields.VarInt
+    :members:
 
 Bytes, Strings
 --------------
@@ -83,9 +85,6 @@ Special Structs
 
 .. autoattribute:: caterpillar.fields.Pass
 
-
-.. autoclass:: caterpillar.fields.NotRequired
-    :members:
 
 .. autoclass:: caterpillar.fields.Computed
     :members:

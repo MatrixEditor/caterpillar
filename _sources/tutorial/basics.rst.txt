@@ -1,5 +1,8 @@
 .. _basics:
 
+.. role:: python(code)
+   :language: python
+
 **************
 Basic Concepts
 **************
@@ -8,7 +11,7 @@ In this section, we'll explore some common techniques used in binary file format
 the stage for more advanced topics in the next chapter.
 
 .. note::
-    Some examples using the interpreter prompts make use of a shortcut to define :class:`Field`
+    Some examples using the interpreter prompts make use of a shortcut to define :class:`~caterpillar.fields.Field`
     objects:
 
     >>> from caterpillar.shortcuts import F
@@ -24,8 +27,24 @@ When dealing with binary data, numbers play a crucial role. Besides the default 
 (e.g., uint8, uint16, etc.), *caterpillar* introduces some special integer formats. The default
 types include:
 
-* Unsigned (:code:`u...`) and signed: :attr:`int8`, :attr:`int16`, :attr:`int32` and :attr:`int64`
-* Floating point: :attr:`float32` and :attr:`float64` aka :attr:`double`
+* Unsigned (:code:`u...`) and signed:
+
+  :attr:`~caterpillar.fields.int8`, :attr:`~caterpillar.fields.uint8`,
+  :attr:`~caterpillar.fields.int16`, :attr:`~caterpillar.fields.uint16`,
+  :attr:`~caterpillar.fields.int24`, :attr:`~caterpillar.fields.uint24`,
+  :attr:`~caterpillar.fields.int32`, :attr:`~caterpillar.fields.uint32`,
+  :attr:`~caterpillar.fields.int64`, :attr:`~caterpillar.fields.uint64`,
+  :attr:`~caterpillar.fields.ssize_t`, :attr:`~caterpillar.fields.size_t`,
+
+* Floating point:
+
+  :attr:`~caterpillar.fields.float16`, :attr:`~caterpillar.fields.float32`,
+  :attr:`~caterpillar.fields.float64`
+
+* Special primitives:
+
+  :attr:`~caterpillar.fields.boolean`, :attr:`~caterpillar.fields.char`,
+  :attr:`~caterpillar.fields.void_ptr`
 
 Custom-sized integer
 ~~~~~~~~~~~~~~~~~~~~
@@ -42,10 +61,10 @@ will be used. For example:
 Variable-sized integer
 ~~~~~~~~~~~~~~~~~~~~~~
 
-The built-in struct :class:`VarInt` supports parsing and building integers with variable length. Its
+The built-in struct :class:`~caterpillar.fields.VarInt` supports parsing and building integers with variable length. Its
 documentation provides a detailed explanation of all different configurations.
 
->>> field = F(VarInt)
+>>> field = F(vint) # or F(VarInt())
 
 
 Enumerations
@@ -152,7 +171,7 @@ padding bytes.
 String
 ~~~~~~
 
-Besides special the special *c strings* there's a default :class:`String` class that implements
+Besides special the special *c strings* there's a default :class:`~caterpillar.fields.String` class that implements
 the basic behaviour of a string. It's crucial to specify the length for this struct.
 
 >>> struct = String(100 or this.length) # static integer or context lambda
@@ -161,7 +180,7 @@ the basic behaviour of a string. It's crucial to specify the length for this str
 Prefixed
 ~~~~~~~~
 
-The :class:`Prefixed` class introduces so-called *Pascal strings* for raw bytes and strings. If no
+The :class:`~caterpillar.fields.Prefixed` class introduces so-called *Pascal strings* for raw bytes and strings. If no
 encoding is specified, the returned value will be of type :code:`bytes`. This class reads a length
 using the given struct and then retrieves the corresponding number of bytes from the stream returned
 by that struct.
@@ -180,7 +199,7 @@ Memory
 ~~~~~~
 
 When dealing with data that can be stored in memory and you intend to print out your
-unpacked object, the :class:`Memory` struct is recommended.
+unpacked object, the :class:`~caterpillar.fields.Memory` struct is recommended.
 
 >>> m = F(Memory(5)) # static size; dynamic size is allowed too
 >>> pack(bytes([i for i in range(5)], m))
@@ -191,9 +210,9 @@ b'\x00\x01\x02\x03\x04'
 Bytes
 ~~~~~
 
-If direct access to the bytes is what you need, the :class:`Bytes` struct comes in handy. It
+If direct access to the bytes is what you need, the :class:`~caterpillar.fields.Bytes` struct comes in handy. It
 converts the :code:`memoryview` to :code:`bytes`. Additionally, as mentioned earlier, you can
-use the :class:`Prefixed` class to unpack bytes of a prefixed size.
+use the :class:`~caterpillar.fields.Prefixed` class to unpack bytes of a prefixed size.
 
 >>> field = F(Bytes(5)) # static, dynamic and greedy size allowed
 
@@ -234,7 +253,7 @@ Padding
 
 In certain scenarios, you may need to apply padding to your structs. *caterpillar* doesn't
 store any data associated with paddings. If you need to retain the content of a padding,
-you can use :class:`Bytes` or :class:`Memory` again. For example:
+you can use :class:`~caterpillar.fields.Bytes` or :class:`~caterpillar.fields.Memory` again. For example:
 
 >>> field = padding[10]  # padding always with a length
 
@@ -246,12 +265,12 @@ you can use :class:`Bytes` or :class:`Memory` again. For example:
 Context
 -------
 
-*Caterpillar* uses a special :class:`Context` to keep track of the current packing or unpacking
+*Caterpillar* uses a special :class:`~caterpillar.context.Context` to keep track of the current packing or unpacking
 process. A context contains special variables, which are discussed in the :ref:`context-reference`
 reference in detail.
 
-The current object that is being packed or parsed can be referenced with a shortcut :code:`this`.
-Additionally, the parent object (if any) can be referenced by using :code:`parent`.
+The current object that is being packed or parsed can be referenced with a shortcut :attr:`~caterpillar.context.this`.
+Additionally, the parent object (if any) can be referenced by using :attr:`~caterpillar.context.parent`.
 
 
 .. code-block:: python
@@ -270,7 +289,7 @@ Runtime length of objects
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
 In cases where you want to retrieve the runtime length of a variable that is within the current
-accessible bounds, there is a special class designed for that use-case: :attr:`lenof`.
+accessible bounds, there is a special class designed for that use-case: :attr:`~caterpillar.context.lenof`.
 
 You might have seen this special class before when calculating the length of some strings. It
 simply applies the :python:`len(...)` function of the retrieved variable.
@@ -354,13 +373,13 @@ represents, **unless** you need the value later on while packing or unpacking.
                 gamma_value: Computed(this.gamma / 100000)
 
         .. note::
-            Question: Do we really need to introduce the gamma_value using a :class:`Computed` struct here
+            Question: Do we really need to introduce the gamma_value using a :class:`~caterpillar.fields.Computed` struct here
             or can we just define a method?
 
 Pass
 ~~~~
 
-In case nothing should be done, just use :class:`Pass`. This struct won't affect the stream in any way.
+In case nothing should be done, just use :class:`~caterpillar.fields.Pass`. This struct won't affect the stream in any way.
 
 .. raw:: html
 

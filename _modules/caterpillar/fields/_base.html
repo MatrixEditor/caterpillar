@@ -819,7 +819,10 @@ document.write(`
                 <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">struct</span><span class="o">.</span><span class="n">__unpack__</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">keep_pos</span><span class="p">:</span>
                     <span class="n">stream</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">fallback</span><span class="p">)</span>
-            <span class="k">except</span> <span class="n">StructException</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="c1"># pylint: disable-next=broad-exception-caught</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exc</span><span class="p">,</span> <span class="n">StructException</span><span class="p">):</span>
+                    <span class="n">exc</span> <span class="o">=</span> <span class="n">StructException</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">),</span> <span class="n">context</span><span class="p">)</span>
                 <span class="c1"># Any exception leads to a default value if configured</span>
                 <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default</span>
                 <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="n">INVALID_DEFAULT</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exc</span><span class="p">,</span> <span class="n">ValidationError</span><span class="p">):</span>
