@@ -72,11 +72,11 @@ class NIBHeader:
 
 @struct(order=LittleEndian)
 class NIBClassName:
-    # NOTE: the custom class 'VarInt' is marked as a singleton class. Therefore,
+    # NOTE: the custom class 'vint' is marked as a singleton class. Therefore,
     # we can use it directly. Otherwise, we have to create an instance first,
     # before we can use the struct class.
-    length: VarInt
-    extras_count: VarInt
+    length: vint
+    extras_count: vint
     # This struct will remove all extra null-bytes padding
     name: CString(this.length)
     # Arrays can be created just like this:
@@ -85,7 +85,7 @@ class NIBClassName:
 
 # Note that the returned string instance here may contain extra null-bytes
 # at the end.
-NIBKey = Prefixed(VarInt, "utf-8")
+NIBKey = Prefixed(vint, "utf-8")
 
 
 class ValueType(enum.Enum):
@@ -105,12 +105,12 @@ class ValueType(enum.Enum):
 
 # The raw data is just copied from the stream. If we don't specify an
 # encoding, the raw bytes or copied.
-NIBData = Prefixed(VarInt)
+NIBData = Prefixed(vint)
 
 
 @struct(order=LittleEndian)
 class NIBValue:
-    key: VarInt
+    key: vint
     # NOTE the use of a default value; otherwise None would be set.
     type: Enum(ValueType, uint8, ValueType.UNKNOWN)
     # The field below describes a simple switch-case structure.
@@ -139,9 +139,9 @@ class NIBValue:
 @struct(order=LittleEndian)
 class NIBObject:
     # same usage as above
-    name: VarInt
-    values: VarInt
-    value_count: VarInt
+    name: vint
+    values: vint
+    value_count: vint
 
 
 @struct(order=LittleEndian)

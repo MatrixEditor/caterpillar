@@ -76,7 +76,7 @@ def unpack_seq(context: _ContextLike, unpack_one) -> List[Any]:
         _field=field,
         _obj=context.get(CTX_OBJECT),
         _pos=context.get(CTX_POS),
-        _is_seq=True,
+        _is_seq=False,
     )
     greedy = length is Ellipsis
     # pylint: disable-next=unidiomatic-typecheck
@@ -157,11 +157,16 @@ def pack_seq(seq: List[Any], context: _ContextLike, pack_one) -> None:
     for i, elem in enumerate(seq):
         # The path will contain an additional hint on what element is processed
         # at the moment.
-        seq_context[CTX_INDEX] = i
-        seq_context[CTX_PATH] = ".".join([base_path, str(i)])
-        seq_context[CTX_OBJECT] = elem
-        pack_one(elem, seq_context)
-        seq_context[CTX_POS] = stream.tell()
+        try:
+            seq_context[CTX_INDEX] = i
+            seq_context[CTX_PATH] = ".".join([base_path, str(i)])
+            seq_context[CTX_OBJECT] = elem
+            pack_one(elem, seq_context)
+            seq_context[CTX_POS] = stream.tell()
+        except Stop:
+            break
+        except Exception as exc:
+            raise StructException(str(exc), seq_context) from exc
 
 
 def iseof(stream: _StreamType) -> bool:

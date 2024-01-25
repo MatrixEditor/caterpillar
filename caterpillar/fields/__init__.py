@@ -26,7 +26,6 @@ from .common import (
     Memory,
     Computed,
     Pass,
-    NotRequired,
     CString,
     Prefixed,
     Int,
@@ -53,7 +52,7 @@ from .common import (
     void_ptr,
     uuid,
 )
-from .varint import VarInt, VARINT_LSB
+from .varint import VarInt, VARINT_LSB, vint
 from .compression import (
     Compressed,
     ZLibCompressed,

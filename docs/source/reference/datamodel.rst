@@ -10,17 +10,17 @@ Structs, Sequences and Fields
 =============================
 
 :dfn:`Structs` serve as the foundation of this library. All data within the framework
-undergoes the process of packing and unpacking using structs or :class:`_StructLike`
+undergoes the process of packing and unpacking using structs or :class:`~caterpillar.abc._StructLike`
 objects. There are three possible types of structs:
 
 * *Sequences*:
     These structs operate independently of fields, making them field-agnostic. As
-    such, they do not need to be attached to a :class:`Field` instance. Typically,
+    such, they do not need to be attached to a :class:`~caterpillar.fields.Field` instance. Typically,
     they are are combined with specific requirements, which will be discussed later
     on.
 
 * *Primitive Structs*:
-    All defined primitive structs depent on being linked to a :class:`Field`
+    All defined primitive structs depent on being linked to a :class:`~caterpillar.fields.Field`
     instance. They are designed to incorporate all attributes that can be set
     on a field.
 
@@ -41,7 +41,7 @@ Sequence
 --------
 
 As previously explained, a sequence functions independently of fields. The library introduces
-the :class:`~caterpillar.model.Sequence` as a named finite collection of :class:`Field` objects. A *Sequence*
+the :class:`~caterpillar.model.Sequence` as a named finite collection of :class:`~caterpillar.fields.Field` objects. A *Sequence*
 operates on a model, which is a string-to-field mapping by default. Later, we will discuss
 the distinctions between a *Sequence* and a *Struct* regarding the model representation.
 
@@ -59,7 +59,7 @@ involves passing the dictionary with all fields directly:
     concerns about them when the option ``S_DISCARD_UNNAMED`` is active. Their names usually
     begin with an underscore and must solely contain numbers (e.g., :code:`_123`).
 
-The sequence follows the :class:`Field` configuration model, allowing sequence and
+The sequence follows the :class:`~caterpillar.fields.Field` configuration model, allowing sequence and
 field-related options to be set. As mentioned earlier, the ``S_DISCARD_UNNAMED`` option can
 be used for example to exclude all unnamed fields from the final representation. A complete
 list of all configuration options and their impact can be found in :ref:`options`.
@@ -139,7 +139,7 @@ Several differences exist between a :class:`~caterpillar.model.Sequence` and a
       - Yes
 
 
-.. [*] The unpacked values are stored inside a :class:`Context` instance, a direct subclass of a dictionary.
+.. [*] The unpacked values are stored inside a :class:`~caterpillar.context.Context` instance, a direct subclass of a dictionary.
 
 As evident from the comparison, the :class:`~caterpillar.model.Struct` class introduces new features such as
 inheritance and documentation support. It's crucial to note that inheritance uses
@@ -288,12 +288,12 @@ Field
 
 The next core element of this library is the *Field*. It serves as a context storage to store configuration data
 about a struct. Even sequences and structs can be used as fields. The process is straightforward: each custom operator
-creates an instance of a :class:`Field` with the applied configuration value. Most of the time, this value can be
+creates an instance of a :class:`~caterpillar.fields.Field` with the applied configuration value. Most of the time, this value can be
 static or a :ref:`context_lambda`. A field implements basic behavior that should not be duplicated, such as
 conditional execution, exception handling with default values, and support for a built-in switch-case structure.
 
-As mentioned earlier, some primitive structs depend on being linked to a :class:`Field`. This is because all
-configuration elements are stored in a :class:`Field` instance rather than in the target struct instance. More
+As mentioned earlier, some primitive structs depend on being linked to a :class:`~caterpillar.fields.Field`. This is because all
+configuration elements are stored in a :class:`~caterpillar.fields.Field` instance rather than in the target struct instance. More
 information about each supported configuration can be found in :ref:`operators`.
 
 .. _greedy:
@@ -382,7 +382,7 @@ instance directly. All custom attributes are stored in the dictionary representa
 .. attribute:: CTX_FIELD
     :value: "_field"
 
-    In case a struct is linked to a field, the :class:`Field` instance will always set this context variable
+    In case a struct is linked to a field, the :class:`~caterpillar.fields.Field` instance will always set this context variable
     to be accessible from within the underlying struct.
 
 
@@ -562,10 +562,10 @@ Emulating Struct Types
     The result of :meth:`~object.__unpack__` is not going to be ignored.
 
     Every implementation is tasked with the decision of whether to support the deserialization
-    of multiple elements concurrently. By default, the :class:`Field` class stores all essential
+    of multiple elements concurrently. By default, the :class:`~caterpillar.fields.Field` class stores all essential
     attributes required to determine the length of elements set for unpacking. The :meth:`~__unpack__`
     method is activated through the :code:`unpack()` operation, integrated with the default
-    struct classes — namely, :class:`~caterpillar.model.Sequence`, :class:`~caterpillar.model.Struct`, and :class:`Field`.
+    struct classes — namely, :class:`~caterpillar.model.Sequence`, :class:`~caterpillar.model.Struct`, and :class:`~caterpillar.fields.Field`.
 
     .. versionchanged:: beta
         The *stream* parameter has been removed and was instead moved into the context.
@@ -671,7 +671,7 @@ Customizing the object's byteorder
 
     In contrast to the attribute :attr:`~object.__byteorder__`, the :meth:`~object.__set_byteorder__`
     method is invoked to apply the current byteorder to a struct. The default behavior,
-    as described in :class:`FieldMixin`, is to return a new :class:`Field` instance with
+    as described in :class:`FieldMixin`, is to return a new :class:`~caterpillar.fields.Field` instance with
     the byteorder applied. Note the use of another operator here.
 
     >>> field = BigEndian + struct

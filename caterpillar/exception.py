@@ -19,6 +19,7 @@ class StructException(Exception):
 
     def __init__(self, message: str, context: dict = None) -> None:
         super().__init__(message)
+        self.context = context
         if context:
             self.add_note(f"Context-Path: {context['_path']}")
 

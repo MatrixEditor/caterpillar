@@ -12,7 +12,7 @@ leaving you well-equipped to create your own struct classes in Python.
 
 .. attention::
     Most of the structs and techniques showcased here are subject to change, notably
-    :class:`BitField`. Its current usage is not as user-friendly as someone might expect.
+    :class:`~caterpillar.model.BitField`. Its current usage is not as user-friendly as someone might expect.
 
 
 Operators
@@ -69,7 +69,7 @@ that was previously written to the stream. This library will solve that problem 
 automatically!
 
 In general, you can use the :code:`@` operator with structs and fields, but not custom defined class
-structs. They have to be wrapped by a :class:`Field` first:
+structs. They have to be wrapped by a :class:`~caterpillar.fields.Field` first:
 
 .. code-block:: python
 
@@ -105,7 +105,7 @@ The behavior of this struct transforms based on the assigned model. For example:
     'Hello, World!'
 
 The resulting object, showcases a transformed structure, where the name attribute is
-stored using the :class:`pointer` class. It is a standard integer class that stores
+stored using the :class:`~caterpillar.fields.pointer` class. It is a standard integer class that stores
 the parsed model object as well.
 
 Chaining
@@ -147,7 +147,7 @@ condition. Using native support for context lambdas, we can simply write:
 
 .. note::
     It is recommended **not** to use :code:`Else`, because it could cause unintended
-    side effects. Use :class:`caterpillar.fields.ElseIf` with the inverted condition
+    side effects. Use :class:`~caterpillar.fields.ElseIf` with the inverted condition
     instead.
 
 BitFields
@@ -217,7 +217,7 @@ place, where the data does not get synchronized. In all other situations, the ne
 be applied to all other fields.
 
 .. note::
-    You can even write your own implementation of a :class:`UnionHook` to do whatever you
+    You can even write your own implementation of a :class:`~caterpillar.model.UnionHook` to do whatever you
     want with the union object. Just specify the :code:`hook_cls` parameter in the union
     decorator.
 

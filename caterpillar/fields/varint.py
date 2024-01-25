@@ -22,14 +22,12 @@ from caterpillar.byteorder import LittleEndian
 from caterpillar.context import CTX_FIELD, CTX_STREAM
 from caterpillar.options import Flag
 
-from ._base import singleton
 from ._mixin import FieldStruct
 
 
 VARINT_LSB = Flag("varint.lsb")
 
 
-@singleton
 class VarInt(FieldStruct):
     """Variable-length integer struct.
 
@@ -41,13 +39,13 @@ class VarInt(FieldStruct):
     identify the end of the varint. Otherwise, zero will be used (which is the
     default setting). The following configurations are therefore possible:
 
-    >>> field = be + VarInt; print(pack(1024, field))
+    >>> field = be + vint; print(pack(1024, field))
     b'\\x88\\x00'
-    >>> field = be + VarInt | VARINT_LSB; print(pack(1024, field))
+    >>> field = be + vint | VARINT_LSB; print(pack(1024, field))
     b'\\x08\\x80'
-    >>> field = le + VarInt; print(pack(1024, field))
+    >>> field = le + vint; print(pack(1024, field))
     b'\\x80\\x08'
-    >>> field = le + VarInt | VARINT_LSB; print(pack(1024, field))
+    >>> field = le + vint | VARINT_LSB; print(pack(1024, field))
     b'\\x00\\x88'
     """
 
@@ -140,3 +138,6 @@ class VarInt(FieldStruct):
             value |= number << shift
             shift += 7
         return value
+
+
+vint = VarInt()

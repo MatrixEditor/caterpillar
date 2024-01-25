@@ -1,4 +1,4 @@
-from caterpillar.fields.varint import VarInt, VARINT_LSB
+from caterpillar.fields.varint import vint, VARINT_LSB
 from caterpillar.shortcuts import pack, unpack, BigEndian as be, LittleEndian as le
 
 try:
@@ -7,10 +7,10 @@ except ImportError:
     pass
 
 fields = {
-    "be + VarInt": be + VarInt,
-    "be + VarInt | VARINT_LSB": be + VarInt | VARINT_LSB,
-    "le + VarInt": le + VarInt,
-    "le + VarInt | VARINT_LSB": le + VarInt | VARINT_LSB,
+    "be + vint": be + vint,
+    "be + vint | VARINT_LSB": be + vint | VARINT_LSB,
+    "le + vint": le + vint,
+    "le + vint | VARINT_LSB": le + vint | VARINT_LSB,
 }
 
 value = 1024
@@ -24,15 +24,15 @@ for name, field in fields.items():
 
 # Output should be:
 # Value: 1024
-# Field be + VarInt:
+# Field be + vint:
 #  << b'\x88\x00'
 #  >> 1024
-# Field be + VarInt | VARINT_LSB:
+# Field be + vint | VARINT_LSB:
 #  << b'\x08\x80'
 #  >> 1024
-# Field le + VarInt:
+# Field le + vint:
 #  << b'\x80\x08'
 #  >> 1024
-# Field le + VarInt | VARINT_LSB:
+# Field le + vint | VARINT_LSB:
 #  << b'\x00\x88'
 #  >> 1024

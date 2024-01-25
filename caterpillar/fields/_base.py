@@ -390,7 +390,10 @@ class Field:
                 value = self.struct.__unpack__(context)
                 if not keep_pos:
                     stream.seek(fallback)
-            except StructException as exc:
+            # pylint: disable-next=broad-exception-caught
+            except Exception as exc:
+                if not isinstance(exc, StructException):
+                    exc = StructException(str(exc), context)
                 # Any exception leads to a default value if configured
                 value = self.default
                 if value == INVALID_DEFAULT or isinstance(exc, ValidationError):

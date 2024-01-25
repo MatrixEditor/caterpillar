@@ -68,7 +68,7 @@ class FormatField(FieldStruct):
         :return: A string representation.
         """
         type_repr = self.ty.__name__ if not self._padding_ else "padding"
-        return f"<{self.__class__.__name__}({type_repr}) {self.text!r}>"
+        return f"<{self.__class__.__name__}({type_repr}) {self.text!r} {self.__bits__}>"
 
     def __type__(self) -> type:
         """
@@ -174,6 +174,8 @@ class FormatField(FieldStruct):
                 dim = 1
         else:
             dim = length
+        if not context[CTX_SEQ]:
+            dim = 1
         return f"{order.ch}{dim}{self.text}"
 
     def is_padding(self) -> bool:
@@ -383,7 +385,10 @@ class Enum(Transformer):
         if by_value is not None:
             return by_value
 
-        default = self.default or context[CTX_FIELD].default
+        default = self.default
+        if default == INVALID_DEFAULT:
+            default = context[CTX_FIELD].default
+
         if default == INVALID_DEFAULT:
             # pylint: disable-next=protected-access
             if ENUM_STRICT._hash_ in context[CTX_FIELD].flags:
@@ -756,53 +761,6 @@ class UInt(Int):
 
 int24 = Int(24)
 uint24 = UInt(24)
-
-
-# still experimental
-class NotRequired(Transformer):
-    """
-    A transformer that makes a field optional during packing and unpacking.
-    """
-
-    __slots__ = ()
-
-    def __type__(self) -> type:
-        return Optional[super().__type__()]
-
-    def __pack__(self, obj: Any, context: _ContextLike) -> None:
-        """
-        Pack the value, skipping it if it is None.
-
-        :param obj: The value to pack.
-        :param context: The context for packing.
-        """
-        if obj is None:
-            return
-        super().__pack__(obj, context)
-
-    def __unpack__(self, context: _ContextLike) -> Optional[Any]:
-        """
-        Unpack the value, returning None if the field is not present.
-
-        :param context: The context for unpacking.
-        :return: The unpacked value or None.
-        :rtype: Optional[Any]
-        """
-        try:
-            return super().__unpack__(context)
-        except StructException:
-            return None
-
-
-def optional(struct) -> Transformer:
-    """
-    Create an optional field transformer.
-
-    :param struct: The underlying struct for the optional field.
-    :return: The optional field transformer.
-    :rtype: Transformer
-    """
-    return NotRequired(struct)
 
 
 class Lazy(FieldStruct):
