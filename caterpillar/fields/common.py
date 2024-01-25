@@ -104,10 +104,7 @@ class FormatField(FieldStruct):
         else:
             # NOTE: we write every single branch to reduce the
             # time this method takes
-            # pylint: disable-next=unidiomatic-typecheck
-            if obj.__class__ is list:
-                if len(obj) == 0:
-                    return
+            if hasattr(obj, "__len__"):
                 # Unfortunately, we have to use the *unpack operation here
                 data = structlib.pack(fmt, *obj)
             else:
