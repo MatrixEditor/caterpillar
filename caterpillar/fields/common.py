@@ -85,7 +85,9 @@ class FormatField(FieldStruct):
         :param context: The current context.
         :return: The size of the field.
         """
-        return structlib.calcsize(self.get_format(context))
+        order = context[CTX_FIELD].order
+        length = self.get_length(context)
+        return structlib.calcsize(f"{order.ch}{length}{self.text}")
 
     def pack_single(self, obj: Any, context: _ContextLike) -> None:
         """
@@ -98,17 +100,15 @@ class FormatField(FieldStruct):
         if obj is None and not self._padding_:
             return
 
-        fmt = self.get_format(context)
+        len_ = self.get_length(context)
+        fmt = f"{context[CTX_FIELD].order.ch}{len_}{self.text}"
         if self._padding_:
             data = structlib.pack(fmt)
+        elif len_ > 1:
+            # Unfortunately, we have to use the *unpack operation here
+            data = structlib.pack(fmt, *obj)
         else:
-            # NOTE: we write every single branch to reduce the
-            # time this method takes
-            if hasattr(obj, "__len__"):
-                # Unfortunately, we have to use the *unpack operation here
-                data = structlib.pack(fmt, *obj)
-            else:
-                data = structlib.pack(fmt, obj)
+            data = structlib.pack(fmt, obj)
         context[CTX_STREAM].write(data)
 
     def pack_seq(self, seq: Sequence, context: _ContextLike) -> None:
@@ -130,9 +130,12 @@ class FormatField(FieldStruct):
         :param context: The current context.
         :return: The unpacked value.
         """
-        fmt = self.get_format(context)
-        size = structlib.calcsize(fmt)
-        value = structlib.unpack(fmt, context[CTX_STREAM].read(size))
+        len_ = self.get_length(context)
+        size = (self.__bits__ // 8) * len_
+        value = structlib.unpack(
+            f"{context[CTX_FIELD].order.ch}{len_}{self.text}",
+            context[CTX_STREAM].read(size),
+        )
         return value[0] if value else None
 
     def unpack_seq(self, context: _ContextLike) -> List[Any]:
@@ -144,36 +147,28 @@ class FormatField(FieldStruct):
         """
         # We don't want to call .length() here as it would
         # consume extra time
-        length = context[CTX_FIELD].length(context)
+        field = context[CTX_FIELD]
+        length = field.length(context)
         if length == 0:
             return []  # maybe add factory
 
         if length is Ellipsis:
             return super().unpack_seq(context)
 
-        fmt = self.get_format(context, length)
+        # REVISIT:
+        fmt = f"{field.order.ch}{length}{self.text}"
+        size = (self.__bits__ // 8) * length
         return list(
-            structlib.unpack(fmt, context[CTX_STREAM].read(structlib.calcsize(fmt)))
+            structlib.unpack(
+                fmt, context[CTX_STREAM].read(size)
+            )
         )
 
-    def get_format(self, context: _ContextLike, length: int = None) -> str:
-        """
-        Get the format string for the field.
-
-        :param context: The current context.
-        :return: The format string.
-        """
-        field: Field = context[CTX_FIELD]
-        order = field.order
-        if length is None:
-            dim = field.length(context)
-            if dim is Ellipsis:
-                dim = 1
-        else:
-            dim = length
-        if not context[CTX_SEQ]:
+    def get_length(self, context: _ContextLike) -> int:
+        dim = context[CTX_FIELD].length(context)
+        if dim is Ellipsis or not context[CTX_SEQ]:
             dim = 1
-        return f"{order.ch}{dim}{self.text}"
+        return dim
 
     def is_padding(self) -> bool:
         """
