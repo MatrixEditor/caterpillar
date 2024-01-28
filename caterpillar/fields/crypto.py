@@ -24,8 +24,10 @@ except ImportError:
 from caterpillar.abc import _StructLike, _ContextLike
 from caterpillar.abc import _GreedyType, _ContextLambda
 from caterpillar.exception import UnsupportedOperation
-from .common import Memory
-from ._mixin import get_args
+from caterpillar.exception import InvalidValueError
+from caterpillar.context import CTX_STREAM, Context
+from .common import Memory, Bytes
+from ._mixin import get_args, get_kwargs
 
 
 @runtime_checkable
@@ -38,6 +40,8 @@ class Padding(Protocol):  # pylint: disable=missing-class-docstring
 
 
 _ArgType = Union[_ContextLambda, Any]
+
+KwArgs = Context
 
 
 class Encrypted(Memory):
@@ -145,8 +149,11 @@ class Encrypted(Memory):
         if isinstance(field, type_) or not field:
             return field
 
-        args = get_args(args, context)
-        return field(*args)
+        if isinstance(args, dict):
+            args, kwargs = (), get_kwargs(args, context)
+        else:
+            args, kwargs = get_args(args, context), {}
+        return field(*args, **kwargs)
 
     def pack_single(self, obj: Any, context: _ContextLike) -> None:
         """
@@ -188,3 +195,93 @@ class Encrypted(Memory):
             unpadder = padding.unpadder()
             data = unpadder.update(data) + unpadder.finalize()
         return memoryview(data)
+
+
+_KeyType = Union[str, bytes, int, _ContextLambda]
+
+
+class KeyCipher(Bytes):
+    key: Union[str, bytes, int]
+    """The key that should be applied.
+
+    It will be converted automatically to bytes if not given.
+    """
+
+    key_length: int
+    """Internal attribute to keep track of the key's length"""
+
+    __slots__ = "key", "key_length", "is_lazy"
+
+    def __init__(
+        self, key: _KeyType, length: Union[_ContextLambda, int, None] = None
+    ) -> None:
+        super().__init__(length or ...)
+        self.key = self.is_lazy = self.key_length = None
+        self.set_key(key)
+
+    def set_key(self, key: _KeyType, context: _ContextLike = None) -> None:
+        if callable(key) and context is None:
+            # context lambda indicates the key will be computed at runtime
+            self.key = key
+            self.key_length = -1
+            self.is_lazy = True
+            return
+
+        match key:
+            case str():
+                self.key = key.encode()
+            case int():
+                self.key = bytes([key])
+            case bytes():
+                self.key = key
+            case _:
+                raise InvalidValueError(
+                    f"Expected a valid key type, got {key!r}", context
+                )
+
+        self.key_length = len(self.key)
+        self.is_lazy = False
+
+    def process(self, obj: bytes, context: _ContextLike) -> bytes:
+        length = len(obj)
+        data = bytearray(length)
+        key = self.key
+        if self.is_lazy:
+            self.set_key(key(context), context)
+
+        self._do_process(obj, data)
+        return bytes(data)
+
+    def _do_process(self, src: bytes, dest: bytearray):
+        raise NotImplementedError
+
+    def pack_single(self, obj: bytes, context: _ContextLike) -> None:
+        context[CTX_STREAM].write(self.process(obj, context))
+
+    def unpack_single(self, context: _ContextLike) -> bytes:
+        obj: bytes = super().unpack_single(context)
+        return self.process(obj, context)
+
+
+class Xor(KeyCipher):
+    __slots__ = ()
+
+    def _do_process(self, src: bytes, dest: bytearray):
+        for i, e in enumerate(src):
+            dest[i] = e ^ self.key[i % self.key_length]
+
+
+class Or(KeyCipher):
+    __slots__ = ()
+
+    def _do_process(self, src: bytes, dest: bytearray):
+        for i, e in enumerate(src):
+            dest[i] = e | self.key[i % self.key_length]
+
+
+class And(KeyCipher):
+    __slots__ = ()
+
+    def _do_process(self, src: bytes, dest: bytearray):
+        for i, e in enumerate(src):
+            dest[i] = e & self.key[i % self.key_length]

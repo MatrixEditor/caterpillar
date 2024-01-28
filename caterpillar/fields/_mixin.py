@@ -184,7 +184,8 @@ class Chain(FieldStruct):
         # start -> next -> next -> next -> done | unpack
         #                                   Y
         # done <- previous <- previous <- start | pack
-        self._elements = [initial] + list(structs)
+        self._elements = [getstruct(initial, initial)]
+        self._elements += list(map(lambda x: getstruct(x, x), structs))
 
     @property
     def head(self) -> _StructLike:
@@ -237,7 +238,7 @@ class Chain(FieldStruct):
         :return: The updated chain.
         :rtype: Chain
         """
-        self._elements.append(other)
+        self._elements.append(getstruct(other, other))
         return self
 
     def __rand__(self, other: _StructLike) -> "Chain":
@@ -249,8 +250,7 @@ class Chain(FieldStruct):
         :return: The updated chain.
         :rtype: Chain
         """
-        self._elements.append(other)
-        return self
+        return self.__and__(other)
 
     def unpack_single(self, context: _ContextLike) -> memoryview:
         """

@@ -37,7 +37,7 @@ from caterpillar.options import (
     GLOBAL_STRUCT_OPTIONS,
     GLOBAL_UNION_OPTIONS,
 )
-from caterpillar.fields import Field, INVALID_DEFAULT
+from caterpillar.fields import Field, INVALID_DEFAULT, FieldStruct
 from ._base import Sequence
 
 
@@ -389,12 +389,14 @@ def pack_into(
         struct.__pack__(obj, context)
 
         content = stream.getbuffer()
-        for offset, value in offsets.items():
-            buffer.write(content[start:offset])
-            buffer.write(value)
-            start = offset
         if len(offsets) == 0:
             buffer.write(content)
+        else:
+            for offset, value in offsets.items():
+                buffer.write(content[start:offset])
+                buffer.write(value)
+                start = offset
+
 
 
 def pack_file(

@@ -12,7 +12,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-import struct as structlib
+import struct as libstruct
+import pickle
 
 from typing import Callable
 from typing import Sequence, Any, Optional, Union, List
@@ -55,7 +56,7 @@ class FormatField(FieldStruct):
     def __init__(self, ch: str, type_: type) -> None:
         self.text = ch
         self.ty = type_
-        self.__bits__ = structlib.calcsize(self.text) * 8
+        self.__bits__ = libstruct.calcsize(self.text) * 8
         self._padding_ = self.text == "x"
 
     def __fmt__(self) -> str:
@@ -87,7 +88,7 @@ class FormatField(FieldStruct):
         """
         order = context[CTX_FIELD].order
         length = self.get_length(context)
-        return structlib.calcsize(f"{order.ch}{length}{self.text}")
+        return libstruct.calcsize(f"{order.ch}{length}{self.text}")
 
     def pack_single(self, obj: Any, context: _ContextLike) -> None:
         """
@@ -103,12 +104,12 @@ class FormatField(FieldStruct):
         len_ = self.get_length(context)
         fmt = f"{context[CTX_FIELD].order.ch}{len_}{self.text}"
         if self._padding_:
-            data = structlib.pack(fmt)
+            data = libstruct.pack(fmt)
         elif len_ > 1:
             # Unfortunately, we have to use the *unpack operation here
-            data = structlib.pack(fmt, *obj)
+            data = libstruct.pack(fmt, *obj)
         else:
-            data = structlib.pack(fmt, obj)
+            data = libstruct.pack(fmt, obj)
         context[CTX_STREAM].write(data)
 
     def pack_seq(self, seq: Sequence, context: _ContextLike) -> None:
@@ -132,7 +133,7 @@ class FormatField(FieldStruct):
         """
         len_ = self.get_length(context)
         size = (self.__bits__ // 8) * len_
-        value = structlib.unpack(
+        value = libstruct.unpack(
             f"{context[CTX_FIELD].order.ch}{len_}{self.text}",
             context[CTX_STREAM].read(size),
         )
@@ -158,11 +159,7 @@ class FormatField(FieldStruct):
         # REVISIT:
         fmt = f"{field.order.ch}{length}{self.text}"
         size = (self.__bits__ // 8) * length
-        return list(
-            structlib.unpack(
-                fmt, context[CTX_STREAM].read(size)
-            )
-        )
+        return list(libstruct.unpack(fmt, context[CTX_STREAM].read(size)))
 
     def get_length(self, context: _ContextLike) -> int:
         dim = context[CTX_FIELD].length(context)
@@ -526,14 +523,13 @@ class CString(Bytes):
         :param obj: The string to pack.
         :param context: The current context.
         """
-        pad = chr(self.pad).encode()
         encoded = obj.encode(self.encoding)
         if self.length is not Ellipsis:
             length = self.__size__(context)
             obj_length = len(obj)
-            payload = encoded + pad * (length - obj_length)
+            payload = encoded + self.raw_pad * (length - obj_length)
         else:
-            payload = encoded + pad
+            payload = encoded + self.raw_pad
         super().pack_single(payload, context)
 
     def unpack_single(self, context: _ContextLike) -> Any:
@@ -557,7 +553,7 @@ class CString(Bytes):
             length = self.length(context) if callable(self.length) else self.length
             value: bytes = context[CTX_STREAM].read(length)
 
-        return value.decode(self.encoding).rstrip(chr(self.pad))
+        return value.rstrip(self.raw_pad).decode(self.encoding)
 
     def __class_getitem__(cls, dim) -> Field:
         return CString(...)[dim]
@@ -677,18 +673,10 @@ class Prefixed(FieldStruct):
         :param obj: The bytes object to pack.
         :param context: The current context.
         """
-        field: Field = context[CTX_FIELD]
-        is_seq = context[CTX_SEQ]
-        if is_seq:
-            # We have to remove the sequence status temporarily
-            field ^= F_SEQUENTIAL
         self.prefix.__pack__(len(obj), context)
 
         if self.encoding:
             obj = obj.encode(self.encoding)
-        # The status has to be added again
-        if is_seq:
-            field |= F_SEQUENTIAL
         context[CTX_STREAM].write(obj)
 
     def unpack_single(self, context: _ContextLike) -> Any:
@@ -698,49 +686,39 @@ class Prefixed(FieldStruct):
         :param context: The current context.
         :return: The unpacked bytes object.
         """
-        is_seq = context[CTX_SEQ]
-        if is_seq:
-            # We have to remove the sequence status temporarily
-            context[CTX_SEQ] = False
-
         size = self.prefix.__unpack__(context)
         data = context[CTX_STREAM].read(size)
         if self.encoding:
             data = data.decode(self.encoding)
-
-        # The status has to be added again
-        context[CTX_SEQ] = is_seq
         return data
 
 
 class Int(FieldStruct):
-    __slots__ = ("signed", "bits")
+    __slots__ = ("signed", "size")
 
     def __init__(self, bits: int, signed: bool = True) -> None:
         self.signed = signed
-        self.bits = bits
         self.__bits__ = bits
         if not isinstance(bits, int):
             raise ValueError(f"Invalid int size: {bits!r} - expected int")
+        self.size = self.__bits__ // 8
 
     def __type__(self) -> type:
         return int
 
     def __size__(self, context: _ContextLike) -> int:
-        return self.bits // 8
+        return self.size
 
     def pack_single(self, obj: int, context: _ContextLike) -> None:
         order = context[CTX_FIELD].order
-        byteorder = "little" if order == LittleEndian else "big"
-        size = self.bits // 8
-        context[CTX_STREAM].write(obj.to_bytes(size, byteorder, signed=self.signed))
+        byteorder = "little" if order is LittleEndian else "big"
+        context[CTX_STREAM].write(obj.to_bytes(self.size, byteorder, signed=self.signed))
 
     def unpack_single(self, context: _ContextLike) -> memoryview:
         order = context[CTX_FIELD].order
-        byteorder = "little" if order == LittleEndian else "big"
-        size = self.bits // 8
+        byteorder = "little" if order is LittleEndian else "big"
         return int.from_bytes(
-            context[CTX_STREAM].read(size), byteorder, signed=self.signed
+            context[CTX_STREAM].read(self.size), byteorder, signed=self.signed
         )
 
 
@@ -837,3 +815,19 @@ class uuid(Transformer):
 
     def encode(self, obj: UUID, context) -> bytes:
         return obj.bytes
+
+
+class Pickled(Transformer):
+    __slots__ = ()
+
+    def __init__(self, length: Union[int, _ContextLambda]) -> None:
+        super().__init__(Bytes(length))
+
+    def __type__(self) -> type:
+        return Any
+
+    def decode(self, parsed: bytes, context) -> UUID:
+        return pickle.loads(parsed)
+
+    def encode(self, obj: Any, context) -> bytes:
+        return pickle.dumps(obj)

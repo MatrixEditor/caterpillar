@@ -60,7 +60,7 @@ from .compression import (
     LZMACompressed,
     LZOCompressed,
 )
-from .crypto import Encrypted
+from .crypto import Encrypted, Xor, Or, And
 from .net import IPv4Address, IPv6Address, MAC, MACAddress
 from .pointer import uintptr, intptr, offintptr, offuintptr, Pointer
 from .conditional import ConditionalChain, If, Else, ElseIf

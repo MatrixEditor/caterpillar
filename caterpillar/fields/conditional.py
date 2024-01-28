@@ -127,7 +127,7 @@ class ElseIf(ConditionContext):
                 ...
     """
 
-    def __enter__(self) :
+    def __enter__(self):
         self.depth = 3
         super().__enter__()
         self.depth = 2
