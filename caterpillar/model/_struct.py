@@ -398,7 +398,6 @@ def pack_into(
                 start = offset
 
 
-
 def pack_file(
     obj: Union[Any, _ContainsStruct],
     filename: str,

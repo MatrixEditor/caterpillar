@@ -712,7 +712,9 @@ class Int(FieldStruct):
     def pack_single(self, obj: int, context: _ContextLike) -> None:
         order = context[CTX_FIELD].order
         byteorder = "little" if order is LittleEndian else "big"
-        context[CTX_STREAM].write(obj.to_bytes(self.size, byteorder, signed=self.signed))
+        context[CTX_STREAM].write(
+            obj.to_bytes(self.size, byteorder, signed=self.signed)
+        )
 
     def unpack_single(self, context: _ContextLike) -> memoryview:
         order = context[CTX_FIELD].order
