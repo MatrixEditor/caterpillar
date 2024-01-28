@@ -618,7 +618,8 @@ document.write(`
         <span class="c1"># start -&gt; next -&gt; next -&gt; next -&gt; done | unpack</span>
         <span class="c1">#                                   Y</span>
         <span class="c1"># done &lt;- previous &lt;- previous &lt;- start | pack</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_elements</span> <span class="o">=</span> <span class="p">[</span><span class="n">initial</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">structs</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_elements</span> <span class="o">=</span> <span class="p">[</span><span class="n">getstruct</span><span class="p">(</span><span class="n">initial</span><span class="p">,</span> <span class="n">initial</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_elements</span> <span class="o">+=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">getstruct</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="n">structs</span><span class="p">))</span></div>
 
 
     <span class="nd">@property</span>
@@ -680,7 +681,7 @@ document.write(`
 <span class="sd">        :return: The updated chain.</span>
 <span class="sd">        :rtype: Chain</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_elements</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_elements</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">getstruct</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">other</span><span class="p">))</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
 
@@ -695,8 +696,7 @@ document.write(`
 <span class="sd">        :return: The updated chain.</span>
 <span class="sd">        :rtype: Chain</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_elements</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__and__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Chain.unpack_single">
