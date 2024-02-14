@@ -436,7 +436,7 @@ document.write(`
     <span class="n">DynamicSizeError</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">caterpillar.context</span> <span class="kn">import</span> <span class="n">CTX_FIELD</span><span class="p">,</span> <span class="n">CTX_STREAM</span><span class="p">,</span> <span class="n">CTX_SEQ</span>
-<span class="kn">from</span> <span class="nn">caterpillar.options</span> <span class="kn">import</span> <span class="n">F_SEQUENTIAL</span><span class="p">,</span> <span class="n">Flag</span>
+<span class="kn">from</span> <span class="nn">caterpillar.options</span> <span class="kn">import</span> <span class="n">Flag</span><span class="p">,</span> <span class="n">GLOBAL_FIELD_FLAGS</span>
 <span class="kn">from</span> <span class="nn">caterpillar.byteorder</span> <span class="kn">import</span> <span class="n">LittleEndian</span>
 <span class="kn">from</span> <span class="nn">._base</span> <span class="kn">import</span> <span class="n">Field</span><span class="p">,</span> <span class="n">INVALID_DEFAULT</span><span class="p">,</span> <span class="n">singleton</span>
 <span class="kn">from</span> <span class="nn">._mixin</span> <span class="kn">import</span> <span class="n">FieldStruct</span>
@@ -784,7 +784,11 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="n">default</span>
 
     <span class="k">def</span> <span class="nf">__type__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span>
+        <span class="c1"># pylint: disable-next=protected-access</span>
+        <span class="k">if</span> <span class="n">ENUM_STRICT</span><span class="o">.</span><span class="n">_hash_</span> <span class="ow">in</span> <span class="n">GLOBAL_FIELD_FLAGS</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span>
+
+        <span class="k">return</span> <span class="n">Union</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">struct</span><span class="o">.</span><span class="n">__type__</span><span class="p">()]</span>
 
 <div class="viewcode-block" id="Enum.encode">
 <a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Enum.encode">[docs]</a>
