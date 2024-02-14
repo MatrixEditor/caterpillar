@@ -33,7 +33,7 @@ from caterpillar.exception import (
     DynamicSizeError,
 )
 from caterpillar.context import CTX_FIELD, CTX_STREAM, CTX_SEQ
-from caterpillar.options import F_SEQUENTIAL, Flag
+from caterpillar.options import Flag, GLOBAL_FIELD_FLAGS
 from caterpillar.byteorder import LittleEndian
 from ._base import Field, INVALID_DEFAULT, singleton
 from ._mixin import FieldStruct
@@ -337,7 +337,11 @@ class Enum(Transformer):
         self.default = default
 
     def __type__(self) -> type:
-        return self.model
+        # pylint: disable-next=protected-access
+        if ENUM_STRICT._hash_ in GLOBAL_FIELD_FLAGS:
+            return self.model
+
+        return Union[self.model, self.struct.__type__()]
 
     def encode(self, obj: Any, context: _ContextLike) -> Any:
         """

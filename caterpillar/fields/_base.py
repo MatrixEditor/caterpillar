@@ -345,7 +345,7 @@ class Field:
             return Any
 
         types = [typeof(s) for s in self.options.values()]
-        return Union[*types]
+        return Union[*types, Any]
 
     def get_name(self) -> Optional[str]:
         return getattr(self, "__name__", None)
