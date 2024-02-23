@@ -23,7 +23,7 @@
 
 #define CpModule_AddObject(name, value)                                        \
   Py_INCREF(value);                                                            \
-  if (PyModule_AddObject(m, name, (PyObject *)(value)) < 0) {                  \
+  if (PyModule_AddObject(m, name, (PyObject*)(value)) < 0) {                   \
     Py_DECREF(value);                                                          \
     Py_DECREF(m);                                                              \
     PyErr_SetString(PyExc_RuntimeError, "unable to add '" name "' to module"); \
@@ -37,7 +37,7 @@
 // ------------------------------------------------------------------------------
 #define CpModule_AddOption(varname, name, objname)                             \
   state->varname =                                                             \
-      PyObject_CallFunction((PyObject *)&CpOption_Type, "s", name);            \
+    PyObject_CallFunction((PyObject*)&CpOption_Type, "s", name);               \
   if (!state->varname) {                                                       \
     PyErr_SetString(PyExc_RuntimeError,                                        \
                     ("unable to create option '" objname "'"));                \
@@ -47,9 +47,22 @@
 
 #define CpModule_AddGlobalOptions(varname, objname)                            \
   state->varname = PySet_New(NULL);                                            \
-  if (!state->varname) {                                                        \
+  if (!state->varname) {                                                       \
     PyErr_SetString(PyExc_RuntimeError,                                        \
                     "unable to create set for object: '" objname "'");         \
+    return NULL;                                                               \
+  }                                                                            \
+  CpModule_AddObject(objname, state->varname);
+
+// ------------------------------------------------------------------------------
+// CpArch related macros
+// ------------------------------------------------------------------------------
+#define CpModule_AddArch(varname, name, size, objname)                         \
+  state->varname =                                                             \
+    PyObject_CallFunction((PyObject*)&CpArch_Type, "si", name, size);          \
+  if (!state->varname) {                                                       \
+    PyErr_SetString(PyExc_RuntimeError,                                        \
+                    ("unable to create arch '" objname "'"));                  \
     return NULL;                                                               \
   }                                                                            \
   CpModule_AddObject(objname, state->varname);
