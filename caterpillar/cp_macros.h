@@ -26,12 +26,7 @@
   if (PyModule_AddObject(m, name, (PyObject *)(value)) < 0) {                  \
     Py_DECREF(value);                                                          \
     Py_DECREF(m);                                                              \
-    return NULL;                                                               \
-  }
-
-#define CpModule_AddObjectRef(name, value)                                     \
-  if (PyModule_AddObjectRef(m, name, (PyObject *)value) < 0) {                 \
-    Py_DECREF(m);                                                              \
+    PyErr_SetString(PyExc_RuntimeError, "unable to add '" name "' to module"); \
     return NULL;                                                               \
   }
 
@@ -43,7 +38,18 @@
 #define CpModule_AddOption(varname, name, objname)                             \
   state->varname =                                                             \
       PyObject_CallFunction((PyObject *)&CpOption_Type, "s", name);            \
-  if (state->varname) {                                                        \
+  if (!state->varname) {                                                       \
+    PyErr_SetString(PyExc_RuntimeError,                                        \
+                    ("unable to create option '" objname "'"));                \
+    return NULL;                                                               \
+  }                                                                            \
+  CpModule_AddObject(objname, state->varname);
+
+#define CpModule_AddGlobalOptions(varname, objname)                            \
+  state->varname = PySet_New(NULL);                                            \
+  if (!state->varname) {                                                        \
+    PyErr_SetString(PyExc_RuntimeError,                                        \
+                    "unable to create set for object: '" objname "'");         \
     return NULL;                                                               \
   }                                                                            \
   CpModule_AddObject(objname, state->varname);
