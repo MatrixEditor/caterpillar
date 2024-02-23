@@ -32,6 +32,9 @@ typedef struct
 
   // global arch
   PyObject* cp_arch__host;
+
+  // default endian object
+  PyObject* cp_endian__native;
 } _coremodulestate;
 
 static inline _coremodulestate*
@@ -186,10 +189,10 @@ cp_arch_new(PyTypeObject* type, PyObject* args, PyObject* kw)
 }
 
 static void
-cp_arch_dealloc(CpOption* self)
+cp_arch_dealloc(CpArch* self)
 {
-  Py_XDECREF(self->name);
-  self->value = 0;
+  Py_XDECREF(self->m_name);
+  self->m_ptr_size = 0;
   Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
@@ -276,13 +279,120 @@ PyTypeObject CpArch_Type = {
 // ------------------------------------------------------------------------------
 // CpEndian
 // ------------------------------------------------------------------------------
-typedef struct CpEndian {
-  PyObject_HEAD
-  PyObject* m_name;
+typedef struct CpEndian
+{
+  /// the name of this endian object
+  PyObject_HEAD PyObject* m_name;
+  /// the format character
   char m_id;
 } CpEndian;
 
+static PyObject*
+cp_endian_new(PyTypeObject* type, PyObject* args, PyObject* kw)
+{
+  CpEndian* self;
+  self = (CpEndian*)type->tp_alloc(type, 0);
+  if (self == NULL)
+    return NULL;
 
+  self->m_name = PyUnicode_FromString("");
+  if (!self->m_name) {
+    Py_DECREF(self->m_name);
+    return NULL;
+  }
+  self->m_id = 0;
+  return (PyObject*)self;
+}
+
+static void
+cp_endian_dealloc(CpEndian* self)
+{
+  Py_XDECREF(self->m_name);
+  self->m_id = '=';
+  Py_TYPE(self)->tp_free((PyObject*)self);
+}
+
+static int
+cp_endian_init(CpEndian* self, PyObject* args, PyObject* kw)
+{
+  static char* kwlist[] = { "name", "ch", NULL };
+  PyObject* name = NULL;
+  char value = 0;
+  if (!PyArg_ParseTupleAndKeywords(args, kw, "Ub", kwlist, &name, &value))
+    return -1;
+
+  if (name) {
+    Py_XSETREF(self->m_name, name);
+    Py_INCREF(self->m_name);
+  }
+  self->m_id = value;
+  if (PyUnicode_GET_LENGTH(self->m_name) == 0) {
+    PyErr_SetString(PyExc_ValueError, "name cannot be an empty string");
+    return -1;
+  }
+  return 0;
+}
+
+static PyObject*
+cp_endian_repr(CpEndian* self)
+{
+  return PyUnicode_FromFormat(
+    "CpEndian(name=%R, ch='%c')", self->m_name, self->m_id);
+}
+
+static PyObject*
+cp_endian_richcmp(CpEndian* self, CpEndian* other, int op)
+{
+  return PyObject_RichCompare(self->m_name, other->m_name, op);
+}
+
+static Py_hash_t
+cp_endian_hash(CpEndian* self)
+{
+  return PyObject_Hash(self->m_name);
+}
+
+static const char cp_endian__doc__[] =
+  ("CpEndian(name, ch)\n"
+   "\n"
+   "Represents common byte order information. The format character is "
+   "used to incorporate the struct module internally.\n"
+   "\n"
+   ":param name:  A string representing the name of the byte order.\n"
+   ":type name: str\n"
+   ":param ch: a single character representing the byte order in format "
+   "strings.\n"
+   ":type ch: str\n");
+
+static PyMemberDef CpEndian_Members[] = {
+  { "name",
+    T_OBJECT_EX,
+    offsetof(CpEndian, m_name),
+    READONLY,
+    PyDoc_STR("The name of this architecture (must be unique).") },
+  { "ptr_size",
+    T_CHAR,
+    offsetof(CpEndian, m_id),
+    0,
+    PyDoc_STR(
+      "a single character representing the byte order in format strings.") },
+  { NULL } /* Sentinel */
+};
+
+PyTypeObject CpEndian_Type = {
+  .ob_base = PyVarObject_HEAD_INIT(NULL, 0).tp_name = _Cp_Name(_core.CpEndian),
+  .tp_doc = cp_arch__doc__,
+  .tp_basicsize = sizeof(CpEndian),
+  .tp_itemsize = 0,
+  .tp_flags = Py_TPFLAGS_DEFAULT,
+  .tp_new = cp_endian_new,
+  .tp_dealloc = (destructor)cp_endian_dealloc,
+  .tp_init = (initproc)cp_endian_init,
+  .tp_members = CpEndian_Members,
+  .tp_repr = (reprfunc)cp_endian_repr,
+  .tp_richcompare = (richcmpfunc)cp_endian_richcmp,
+  .tp_hash = (hashfunc)cp_endian_hash,
+};
 
 // ------------------------------------------------------------------------------
 // Module
@@ -296,6 +406,8 @@ _coremodule_clear(PyObject* m)
     Py_CLEAR(state->cp_option__sequential);
     Py_CLEAR(state->cp_option__keep_position);
     Py_CLEAR(state->cp_option__global_field_options);
+    Py_CLEAR(state->cp_endian__native);
+    Py_CLEAR(state->cp_arch__host);
   }
   return 0;
 }
@@ -328,6 +440,7 @@ PyInit__core(void)
 
   CpType_Ready(&CpOption_Type);
   CpType_Ready(&CpArch_Type);
+  CpType_Ready(&CpEndian_Type);
 
   m = PyModule_Create(&_coremodule);
   if (!m) {
@@ -347,5 +460,14 @@ PyInit__core(void)
   CpModule_AddGlobalOptions(cp_option__global_field_options, "G_FIELD_OPTIONS");
 
   CpModule_AddArch(cp_arch__host, "<host>", sizeof(void*) * 8, "HOST_ARCH");
+
+  state->cp_endian__native =
+    PyObject_CallFunction((PyObject*)&CpEndian_Type, "sb", "native", '=');
+  if (!state->cp_endian__native) {
+    PyErr_SetString(PyExc_RuntimeError,
+                    "unable to create native endian object");
+    return NULL;
+  }
+  CpModule_AddObject("NATIVE_ENDIAN", state->cp_endian__native);
   return m;
 }
