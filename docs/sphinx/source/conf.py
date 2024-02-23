@@ -5,7 +5,7 @@
 import sys
 import os
 
-sys.path.insert(0, os.path.abspath("../.."))
+sys.path.insert(0, os.path.abspath("../../.."))
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
@@ -13,7 +13,7 @@ import caterpillar
 
 project = "Caterpillar"
 author = caterpillar.__author__
-copyright = f"2023, {author}"
+copyright = f"2024, {author}"
 release = version = caterpillar.__version__
 
 # -- General configuration ---------------------------------------------------
@@ -25,6 +25,7 @@ extensions = [
     "sphinx.ext.todo",
     "sphinx.ext.viewcode",
     "sphinx_design",
+    "breathe",
 ]
 
 templates_path = ["_templates"]
@@ -71,3 +72,7 @@ html_theme_options = {
     },
     "announcement": "https://raw.githubusercontent.com/MatrixEditor/caterpillar/master/docs/source/_templates/announcement.html",
 }
+
+# -- Options for C++ Docs -----------------------------------------------------
+breathe_default_project = "caterpillar"
+breathe_projects = {"caterpillar": "../../doxygen/build/xml/"}

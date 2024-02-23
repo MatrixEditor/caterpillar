@@ -22,6 +22,7 @@ dev_deps = [
     "sphinx",
     "pydata-sphinx-theme",
     "sphinx-design",
+    "breathe",
 ]
 all_deps = crypto_deps + compression_deps + dev_deps
 

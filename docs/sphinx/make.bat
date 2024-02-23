@@ -10,6 +10,13 @@ if "%SPHINXBUILD%" == "" (
 set SOURCEDIR=source
 set BUILDDIR=build
 
+REM setup doxygen config
+if "%DOXYGEN%" == "" (
+	set DOXYGEN=doxygen
+)
+DOXYDIR=../doxygen
+SPHINXDIR=.
+
 %SPHINXBUILD% >NUL 2>NUL
 if errorlevel 9009 (
 	echo.
@@ -25,7 +32,10 @@ if errorlevel 9009 (
 
 if "%1" == "" goto help
 
-%SPHINXBUILD% -M %1 %SOURCEDIR% %BUILDDIR% %SPHINXOPTS% %O%
+if "%1" != "clean" (
+	cd "%DOXYDIR%"; %DOXYGEN%
+)
+cd "%SPHINXDIR%"; %SPHINXBUILD% -M %1 %SOURCEDIR% %BUILDDIR% %SPHINXOPTS% %O%
 goto end
 
 :help
