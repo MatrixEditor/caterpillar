@@ -16,6 +16,7 @@
 struct CpOption;
 struct CpArch;
 struct CpEndian;
+struct CpContext;
 
 // ------------------------------------------------------------------------------
 // state
@@ -395,6 +396,76 @@ PyTypeObject CpEndian_Type = {
 };
 
 // ------------------------------------------------------------------------------
+// CpContext
+// ------------------------------------------------------------------------------
+typedef struct CpContext
+{
+  PyDictObject m_dict;
+} CpContext;
+
+static int
+cp_context_init(CpContext* self, PyObject* args, PyObject* kw)
+{
+  return PyDict_Type.tp_init((PyObject*)self, args, kw) < 0;
+}
+
+static int
+cp_context__setattr__(CpContext* self, char* name, PyObject* value)
+{
+  return PyDict_SetItemString((PyObject*)&self->m_dict, name, value);
+}
+
+static PyObject*
+cp_context__getattr__(CpContext* self, char* name)
+{
+  // only special attributes are delegated to the dict
+  if (strncmp("__", name, 2) == 0) {
+    PyObject* key = PyUnicode_FromString(name);
+    PyObject* result = PyObject_GenericGetAttr((PyObject*)&self->m_dict, key);
+    Py_XDECREF(key);
+    return result;
+  }
+
+  char* line = name;
+  char* token = strtok(line, ".");
+  PyObject* result = PyDict_GetItemString((PyObject*)&self->m_dict, token);
+  while (result != NULL && (token = strtok(NULL, ".")) != NULL) {
+    PyObject* tmp = PyObject_GetAttrString(result, token);
+    Py_XDECREF(result);
+    result = tmp;
+    if (result == NULL || PyErr_Occurred()) {
+      break;
+    }
+  };
+
+  if (result == NULL) {
+    PyErr_Format(PyExc_AttributeError, "CpContext has no attribute '%s'", name);
+    return NULL;
+  }
+  return result;
+}
+
+const char cp_context__doc__[] =
+  ("CpContext(**kwargs)\n"
+   "\n"
+   "Represents a context object with attribute-style access.\n"
+   "\n"
+   ":param kwargs: The name and value of each keyword argument are used to "
+   "initialize the context.\n"
+   ":type kwargs: dict\n");
+
+static PyTypeObject CpContext_Type = {
+  .ob_base = PyVarObject_HEAD_INIT(NULL, 0).tp_name = _Cp_Name(_core.CpContext),
+  .tp_doc = cp_context__doc__,
+  .tp_basicsize = sizeof(CpContext),
+  .tp_itemsize = 0,
+  .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
+  .tp_init = (initproc)cp_context_init,
+  .tp_setattr = (setattrfunc)cp_context__setattr__,
+  .tp_getattr = (getattrfunc)cp_context__getattr__,
+};
+
+// ------------------------------------------------------------------------------
 // Module
 // ------------------------------------------------------------------------------
 static int
@@ -442,12 +513,17 @@ PyInit__core(void)
   CpType_Ready(&CpArch_Type);
   CpType_Ready(&CpEndian_Type);
 
+  CpContext_Type.tp_base = &PyDict_Type;
+  CpType_Ready(&CpContext_Type);
+
   m = PyModule_Create(&_coremodule);
   if (!m) {
     return NULL;
   }
   CpModule_AddObject("CpOption", &CpOption_Type);
   CpModule_AddObject("CpArch", &CpArch_Type);
+  CpModule_AddObject("CpEndian", &CpEndian_Type);
+  CpModule_AddObject("CpContext", &CpContext_Type);
 
   // setup state
   _coremodulestate* state = get_core_state(m);
@@ -458,16 +534,12 @@ PyInit__core(void)
     cp_option__keep_position, "field:keep_position", "F_KEEP_POSITION");
 
   CpModule_AddGlobalOptions(cp_option__global_field_options, "G_FIELD_OPTIONS");
-
   CpModule_AddArch(cp_arch__host, "<host>", sizeof(void*) * 8, "HOST_ARCH");
 
-  state->cp_endian__native =
-    PyObject_CallFunction((PyObject*)&CpEndian_Type, "sb", "native", '=');
-  if (!state->cp_endian__native) {
-    PyErr_SetString(PyExc_RuntimeError,
-                    "unable to create native endian object");
-    return NULL;
-  }
-  CpModule_AddObject("NATIVE_ENDIAN", state->cp_endian__native);
+  _CpModuleState_Def(
+    cp_endian__native,
+    "NATIVE_ENDIAN",
+    PyObject_CallFunction((PyObject*)&CpEndian_Type, "sb", "native", '='));
+
   return m;
 }
