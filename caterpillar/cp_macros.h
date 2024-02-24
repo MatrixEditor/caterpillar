@@ -41,6 +41,10 @@
   }                                                                            \
   CpModule_AddObject(objname, state->varname);
 
+#define _Cp_Immortal(name, type)                                               \
+  static PyObject name##_Object = { _PyObject_EXTRA_INIT{ _Py_IMMORTAL_REFCNT }, \
+                                  &type };
+
 // ------------------------------------------------------------------------------
 // Option related macros
 // ------------------------------------------------------------------------------

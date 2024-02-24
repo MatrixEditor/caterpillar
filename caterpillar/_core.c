@@ -20,6 +20,8 @@ struct CpContext;
 struct CpContextPath;
 struct CpUnaryExpr;
 struct CpBinaryExpr;
+struct CpAtom;
+struct CpField;
 
 static PyTypeObject CpContextPath_Type;
 static PyTypeObject CpEndian_Type;
@@ -28,8 +30,39 @@ static PyTypeObject CpOption_Type;
 static PyTypeObject CpArch_Type;
 static PyTypeObject CpUnaryExpr_Type;
 static PyTypeObject CpBinaryExpr_Type;
+static PyTypeObject CpAtom_Type;
+
+static PyObject _InvalidDefault_Object;
+#define CP_INVALID_DEFAULT &_InvalidDefault_Object
+
+static PyObject _DefaultSwitchOption_Object;
+#define CP_DEFAULT_OPTION &_DefaultSwitchOption_Object
 
 static struct PyModuleDef _coremodule;
+
+// ------------------------------------------------------------------------------
+// function defs
+// ------------------------------------------------------------------------------
+typedef int (*packfunc)(PyObject*, PyObject*,
+                        PyObject*); // (self, obj, ctx)
+typedef PyObject* (*unpackfunc)(PyObject*, PyObject*, PyObject*); // (self, ctx)
+typedef PyObject* (*sizefunc)(PyObject*, PyObject*, PyObject*);   // (self, ctx)
+typedef PyObject* (*typefunc)(PyObject*);                         // (self)
+typedef PyObject* (*bitsfunc)(PyObject*);                         // (self)
+
+// ------------------------------------------------------------------------------
+// special attribute names
+// ------------------------------------------------------------------------------
+#define CpType_Template "__template__"
+#define CpType_Struct "__struct__"
+
+#define CpAtomType_Pack "__pack__"
+#define CpAtomType_Unpack "__unpack__"
+#define CpAtomType_Size "__size__"
+#define CpAtomType_Type "__type__"
+
+#define CpUnionHook_Init "__model_init__"
+#define CpUnionHook_SetAttr "__model_setattr__"
 
 // ------------------------------------------------------------------------------
 // state
@@ -1133,8 +1166,8 @@ static PyMemberDef CpContextPath_Members[] = {
 };
 
 static PyMethodDef CpContextPath_Methods[] = {
-  { "__type__", (PyCFunction)cp_contextpath__type__, METH_NOARGS },
-  { "__size__", (PyCFunction)cp_contextpath__size__, METH_VARARGS },
+  { "__type__", (PyCFunction)(typefunc)cp_contextpath__type__, METH_NOARGS },
+  { "__size__", (PyCFunction)(sizefunc)cp_contextpath__size__, METH_VARARGS },
 
   { NULL, NULL }
 };
@@ -1181,6 +1214,197 @@ static PyTypeObject CpContextPath_Type = {
 };
 
 #undef _CpContextPath_BinaryNumberMethod
+
+// ------------------------------------------------------------------------------
+// CpAtom
+// ------------------------------------------------------------------------------
+static inline bool
+CpAtomType_CanPack(PyObject* op)
+{
+  PyObject* attr = PyObject_GetAttrString(op, CpAtomType_Pack);
+  if (attr) {
+    Py_DECREF(attr);
+    return true;
+  }
+  PyErr_Clear();
+  return false;
+}
+
+static inline bool
+CpAtomType_CanUnpack(PyObject* op)
+{
+  PyObject* attr = PyObject_GetAttrString(op, CpAtomType_Unpack);
+  if (attr) {
+    Py_DECREF(attr);
+    return true;
+  }
+  PyErr_Clear();
+  return false;
+}
+
+static inline bool
+CpAtomType_HasType(PyObject* op)
+{
+  PyObject* attr = PyObject_GetAttrString(op, CpAtomType_Type);
+  if (attr) {
+    Py_DECREF(attr);
+    return true;
+  }
+  PyErr_Clear();
+  return false;
+}
+
+static inline bool
+CpAtomType_HasSize(PyObject* op)
+{
+  PyObject* attr = PyObject_GetAttrString(op, CpAtomType_Size);
+  if (attr) {
+    Py_DECREF(attr);
+    return true;
+  }
+  PyErr_Clear();
+  return false;
+}
+
+typedef struct CpAtom
+{
+  PyObject_HEAD
+} CpAtom;
+
+static PyObject*
+cp_atom_new(PyTypeObject* type, PyObject* args, PyObject* kw)
+{
+  CpAtom* self;
+  self = (CpAtom*)type->tp_alloc(type, 0);
+  if (self == NULL)
+    return NULL;
+  return (PyObject*)self;
+}
+
+static void
+cp_atom_dealloc(CpAtom* self)
+{
+  Py_TYPE(self)->tp_free((PyObject*)self);
+}
+
+static int
+cp_atom_pack(CpAtom* self, PyObject* args, PyObject* kw)
+{
+  PyErr_SetString(PyExc_NotImplementedError, "pack");
+  return NULL;
+}
+
+static PyObject*
+cp_atom_unpack(CpAtom* self, PyObject* args, PyObject* kw)
+{
+  PyErr_SetString(PyExc_NotImplementedError, "unpack");
+  return NULL;
+}
+
+static PyObject*
+cp_atom_type(CpAtom* self)
+{
+  PyErr_SetString(PyExc_NotImplementedError, "type");
+  return NULL;
+}
+
+static PyObject*
+cp_atom_size(CpAtom* self, PyObject* args, PyObject* kw)
+{
+  PyErr_SetString(PyExc_NotImplementedError, "size");
+  return NULL;
+}
+
+static PyMethodDef CpAtom_Methods[] = {
+  { CpAtomType_Pack, (PyCFunction)cp_atom_pack, METH_VARARGS | METH_KEYWORDS },
+  { CpAtomType_Unpack,
+    (PyCFunction)cp_atom_unpack,
+    METH_VARARGS | METH_KEYWORDS },
+  { CpAtomType_Type, (PyCFunction)cp_atom_type, METH_NOARGS },
+  { CpAtomType_Size, (PyCFunction)cp_atom_size, METH_VARARGS | METH_KEYWORDS },
+  { NULL } /* Sentinel */
+};
+
+static PyTypeObject CpAtom_Type = {
+  .ob_base = PyVarObject_HEAD_INIT(NULL, 0).tp_name = _Cp_Name(_core.CpAtom),
+  .tp_doc = "...",
+  .tp_basicsize = sizeof(CpAtom),
+  .tp_itemsize = 0,
+  .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
+  .tp_new = cp_atom_new,
+  .tp_dealloc = (destructor)cp_atom_dealloc,
+  .tp_methods = CpAtom_Methods,
+};
+
+// ------------------------------------------------------------------------------
+// Invalid default object
+// ------------------------------------------------------------------------------
+static PyObject*
+cp_invaliddefault_new(PyTypeObject* type, PyObject* args, PyObject* kw)
+{
+  if (PyTuple_GET_SIZE(args) || PyDict_GET_SIZE(kw)) {
+    PyErr_SetString(PyExc_TypeError,
+                    "InvalidDefaultType does not accept arguments");
+    return NULL;
+  }
+
+  Py_INCREF(CP_INVALID_DEFAULT);
+  return CP_INVALID_DEFAULT;
+}
+
+static PyObject*
+cp_invaliddefault_repr(PyObject* self)
+{
+  return PyUnicode_FromString("<InvalidDefault>");
+}
+
+static PyTypeObject CpInvalidDefault_Type = {
+  .ob_base = PyVarObject_HEAD_INIT(NULL, 0).tp_name =
+    _Cp_Name(_core.CpInvalidDefaultType),
+  .tp_doc = "...",
+  .tp_basicsize = 0,
+  .tp_itemsize = 0,
+  .tp_flags = Py_TPFLAGS_DEFAULT,
+  .tp_new = cp_invaliddefault_new,
+  .tp_repr = cp_invaliddefault_repr,
+};
+
+_Cp_Immortal(_InvalidDefault, CpInvalidDefault_Type);
+
+// ------------------------------------------------------------------------------
+// default switch option
+// ------------------------------------------------------------------------------
+static PyObject*
+cp_defaultoption_new(PyTypeObject* type, PyObject* args, PyObject* kw)
+{
+  if (PyTuple_GET_SIZE(args) || PyDict_GET_SIZE(kw)) {
+    PyErr_SetString(PyExc_TypeError,
+                    "InvalidDefaultType does not accept arguments");
+    return NULL;
+  }
+
+  Py_INCREF(CP_DEFAULT_OPTION);
+  return CP_DEFAULT_OPTION;
+}
+
+static PyObject*
+cp_defaultoption_repr(PyObject* self)
+{
+  return PyUnicode_FromString("<DefaultSwitchOption>");
+}
+
+static PyTypeObject CpDefaultSwitchOption_Type = {
+  .ob_base = PyVarObject_HEAD_INIT(NULL, 0).tp_name =
+    _Cp_Name(_core.CpDefaultSwitchOptionType),
+  .tp_doc = "...",
+  .tp_basicsize = 0,
+  .tp_itemsize = 0,
+  .tp_flags = Py_TPFLAGS_DEFAULT,
+  .tp_new = cp_defaultoption_new,
+  .tp_repr = cp_defaultoption_repr,
+};
+
+_Cp_Immortal(_DefaultSwitchOption, CpDefaultSwitchOption_Type);
 
 // ------------------------------------------------------------------------------
 // Module
@@ -1235,6 +1459,10 @@ PyInit__core(void)
   CpType_Ready(&CpUnaryExpr_Type);
   CpType_Ready(&CpBinaryExpr_Type);
   CpType_Ready(&CpContextPath_Type);
+  CpType_Ready(&CpAtom_Type);
+
+  CpType_Ready(&CpInvalidDefault_Type);
+  CpType_Ready(&CpDefaultSwitchOption_Type);
 
   m = PyModule_Create(&_coremodule);
   if (!m) {
@@ -1247,6 +1475,13 @@ PyInit__core(void)
   CpModule_AddObject("CpUnaryExpr", &CpUnaryExpr_Type);
   CpModule_AddObject("CpBinaryExpr", &CpBinaryExpr_Type);
   CpModule_AddObject("CpContextPath", &CpContextPath_Type);
+  CpModule_AddObject("CpAtom", &CpAtom_Type);
+
+  CpModule_AddObject("CpInvalidDefault", &CpInvalidDefault_Type);
+  CpModule_AddObject("CpDefaultSwitchOption", &CpDefaultSwitchOption_Type);
+
+  CpModule_AddObject("DEFAULT_OPTION", CP_DEFAULT_OPTION);
+  CpModule_AddObject("INVALID_DEFAULT", CP_INVALID_DEFAULT);
 
   // setup state
   _coremodulestate* state = get_core_state(m);
