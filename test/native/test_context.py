@@ -1,5 +1,5 @@
 import pytest
-from caterpillar._core import CpContext, CpContextPath
+from caterpillar._core import CpContext, CpContextPath, CpBinaryExpr, CpUnaryExpr
 
 
 def test_context_init():
@@ -37,3 +37,53 @@ def test_contextpath():
     p2 = CpContextPath("foo.__class__")
     assert p2(c) == int
     assert p.__class__ == CpContextPath
+
+
+@pytest.mark.parametrize(
+    ("value", "func", "target", "repr_str"),
+    [
+        (10, lambda p: p + 10, 20, "+ (10)"),
+        (10, lambda p: p - 10, 0, "- (10)"),
+        (10, lambda p: p * 10, 100, "* (10)"),
+        (10, lambda p: p / 10, 1, "/ (10)"),
+        (10, lambda p: p // 10, 1, "// (10)"),
+        (10, lambda p: p % 10, 0, "% (10)"),
+        (10, lambda p: p**10, 10000000000, "** (10)"),
+        (1, lambda p: p << 10, 1024, "<< (10)"),
+        (1024, lambda p: p >> 10, 1, ">> (10)"),
+        (2, lambda p: p & 2, 2, "& (2)"),
+        (128, lambda p: p | 2, 130, "| (2)"),
+        (2, lambda p: p ^ 2, 0, "^ (2)"),
+        (10, lambda p: p == 10, True, "== (10)"),
+        (11, lambda p: p != 10, True, "!= (10)"),
+        (12, lambda p: p < 10, False, "< (10)"),
+        (1, lambda p: p > 10, False, "> (10)"),
+        (9, lambda p: p <= 10, True, "<= (10)"),
+        (11, lambda p: p >= 10, True, ">= (10)"),
+    ],
+)
+def test_contextpath_binaryexpr(value, func, target, repr_str):
+    p = CpContextPath("x")
+    c = CpContext(x=value)
+
+    expr = func(p)
+    assert type(expr) == CpBinaryExpr
+    assert repr(expr) == f"(CpPath('x')) {repr_str}"
+    assert expr(c) == target
+
+
+@pytest.mark.parametrize(
+    ("value", "func", "target"),
+    [
+        (10, lambda p: -p, -10),
+        (10, lambda p: ~p, -11),
+        (-10, lambda p: +p, -10),
+    ],
+)
+def test_contextpath_unaryexpr(value, func, target):
+    p = CpContextPath("x")
+    c = CpContext(x=value)
+
+    expr = func(p)
+    assert type(expr) == CpUnaryExpr
+    assert expr(c) == target

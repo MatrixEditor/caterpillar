@@ -17,8 +17,17 @@ struct CpOption;
 struct CpArch;
 struct CpEndian;
 struct CpContext;
+struct CpContextPath;
+struct CpUnaryExpr;
+struct CpBinaryExpr;
 
 static PyTypeObject CpContextPath_Type;
+static PyTypeObject CpEndian_Type;
+static PyTypeObject CpContext_Type;
+static PyTypeObject CpOption_Type;
+static PyTypeObject CpArch_Type;
+static PyTypeObject CpUnaryExpr_Type;
+static PyTypeObject CpBinaryExpr_Type;
 
 static struct PyModuleDef _coremodule;
 
@@ -163,7 +172,7 @@ static PyMemberDef CpOption_Members[] = {
   { NULL } /* Sentinel */
 };
 
-PyTypeObject CpOption_Type = {
+static PyTypeObject CpOption_Type = {
   .ob_base = PyVarObject_HEAD_INIT(NULL, 0).tp_name = _Cp_Name(_core.CpOption),
   .tp_doc = cp_option__doc__,
   .tp_basicsize = sizeof(CpOption),
@@ -277,7 +286,7 @@ static PyMemberDef CpArch_Members[] = {
   { NULL } /* Sentinel */
 };
 
-PyTypeObject CpArch_Type = {
+static PyTypeObject CpArch_Type = {
   .ob_base = PyVarObject_HEAD_INIT(NULL, 0).tp_name = _Cp_Name(_core.CpArch),
   .tp_doc = cp_arch__doc__,
   .tp_basicsize = sizeof(CpArch),
@@ -357,9 +366,13 @@ cp_endian_repr(CpEndian* self)
 }
 
 static PyObject*
-cp_endian_richcmp(CpEndian* self, CpEndian* other, int op)
+cp_endian_richcmp(CpEndian* self, PyObject* other, int op)
 {
-  return PyObject_RichCompare(self->m_name, other->m_name, op);
+  if (!PyObject_IsInstance(other, (PyObject*)&CpEndian_Type)) {
+    Py_RETURN_NOTIMPLEMENTED;
+  }
+
+  return PyObject_RichCompare(self->m_name, ((CpEndian*)other)->m_name, op);
 }
 
 static Py_hash_t
@@ -482,6 +495,467 @@ static PyTypeObject CpContext_Type = {
 };
 
 // ------------------------------------------------------------------------------
+// CpUnaryExpr
+// ------------------------------------------------------------------------------
+enum
+{
+  CpUnaryExpr_OpNeg = 1,
+  CpUnaryExpr_OpNot = 2,
+  CpUnaryExpr_OpPos = 3
+};
+
+typedef struct CpUnaryExpr
+{
+  PyObject_HEAD int m_expr;
+  PyObject* m_value;
+} CpUnaryExpr;
+
+static PyObject*
+cp_unaryexpr_new(PyTypeObject* type, PyObject* args, PyObject* kw)
+{
+  CpUnaryExpr* self;
+  self = (CpUnaryExpr*)type->tp_alloc(type, 0);
+  if (self == NULL)
+    return NULL;
+
+  Py_INCREF(Py_None);
+  self->m_value = Py_None;
+  self->m_expr = -1;
+  return (PyObject*)self;
+}
+
+static void
+cp_unaryexpr_dealloc(CpUnaryExpr* self)
+{
+  Py_XDECREF(self->m_value);
+  Py_TYPE(self)->tp_free((PyObject*)self);
+}
+
+static int
+cp_unaryexpr_init(CpUnaryExpr* self, PyObject* args, PyObject* kw)
+{
+  static char* kwlist[] = { "expr", "value", NULL };
+  PyObject* value = NULL;
+  int expr = -1;
+  if (!PyArg_ParseTupleAndKeywords(args, kw, "iO", kwlist, &expr, &value))
+    return -1;
+
+  if (value) {
+    Py_XSETREF(self->m_value, value);
+    Py_INCREF(self->m_value);
+  }
+
+  self->m_expr = expr;
+  if (self->m_expr < 0 || self->m_expr > 3) {
+    PyErr_SetString(PyExc_ValueError, "invalid expression type");
+    return -1;
+  }
+  return 0;
+}
+
+static PyObject*
+cp_unaryexpr_repr(CpUnaryExpr* self)
+{
+  char ch;
+  switch (self->m_expr) {
+    case CpUnaryExpr_OpNeg:
+      ch = '-';
+      break;
+    case CpUnaryExpr_OpNot:
+      ch = '!';
+      break;
+    case CpUnaryExpr_OpPos:
+      ch = '+';
+      break;
+    default:
+      ch = '?';
+  }
+  return PyUnicode_FromFormat("%c(%R)", ch, self->m_value);
+}
+
+static Py_hash_t
+cp_unaryexpr_hash(CpUnaryExpr* self)
+{
+  PyObject* expr = PyLong_FromSize_t(self->m_expr);
+  Py_hash_t hash = PyObject_Hash(expr);
+  Py_XDECREF(expr);
+  return hash;
+}
+
+static PyObject*
+cp_unaryexpr__call__(CpUnaryExpr* self, PyObject* args, PyObject* kw)
+{
+  PyObject* value = self->m_value;
+  if (PyCallable_Check(value)) {
+    value = PyObject_Call(value, args, kw);
+    if (!value) {
+      if (!PyErr_Occurred()) {
+        PyErr_SetString(PyExc_TypeError, "value must be callable");
+      }
+      Py_XDECREF(value);
+      return NULL;
+    }
+  } else {
+    Py_XINCREF(value);
+  }
+
+  if (!PyNumber_Check(value)) {
+    PyErr_Format(PyExc_TypeError, "value must be a number, got %R", value);
+    Py_XDECREF(value);
+    return NULL;
+  }
+
+  PyObject* result;
+  switch (self->m_expr) {
+    case CpUnaryExpr_OpNeg:
+      result = PyNumber_Negative(value);
+      break;
+    case CpUnaryExpr_OpNot:
+      result = PyNumber_Invert(value);
+      break;
+    case CpUnaryExpr_OpPos:
+      result = PyNumber_Positive(value);
+      break;
+    default:
+      result = NULL;
+      break;
+  }
+
+  Py_XDECREF(value);
+  if (!result) {
+    if (!PyErr_Occurred()) {
+      PyErr_SetString(PyExc_TypeError, "invalid expression type");
+    }
+    return NULL;
+  }
+  return result;
+}
+
+static const char cp_unaryexpr__doc__[] = "CpUnaryExpr(expr, value)";
+
+static PyMemberDef CpUnaryExpr_Members[] = {
+  { "expr", T_INT, offsetof(CpUnaryExpr, m_expr), READONLY },
+  { "value", T_OBJECT_EX, offsetof(CpUnaryExpr, m_value), 0 },
+  { NULL } /* Sentinel */
+};
+
+static PyTypeObject CpUnaryExpr_Type = {
+  .ob_base = PyVarObject_HEAD_INIT(NULL, 0).tp_name =
+    _Cp_Name(_core.CpUnaryExpr),
+  .tp_doc = cp_unaryexpr__doc__,
+  .tp_basicsize = sizeof(CpUnaryExpr),
+  .tp_itemsize = 0,
+  .tp_flags = Py_TPFLAGS_DEFAULT,
+  .tp_new = cp_unaryexpr_new,
+  .tp_dealloc = (destructor)cp_unaryexpr_dealloc,
+  .tp_init = (initproc)cp_unaryexpr_init,
+  .tp_members = CpUnaryExpr_Members,
+  .tp_repr = (reprfunc)cp_unaryexpr_repr,
+  .tp_hash = (hashfunc)cp_unaryexpr_hash,
+  .tp_call = (ternaryfunc)cp_unaryexpr__call__,
+};
+
+// ------------------------------------------------------------------------------
+// CpBinaryExpr
+// ------------------------------------------------------------------------------
+enum
+{
+  CpBinaryExpr_Op_LT = 0,
+  CpBinaryExpr_Op_LE,
+  CpBinaryExpr_Op_EQ,
+  CpBinaryExpr_Op_NE,
+  CpBinaryExpr_Op_GT,
+  CpBinaryExpr_Op_GE,
+  CpBinaryExpr_OpAdd,
+  CpBinaryExpr_OpSub,
+  CpBinaryExpr_OpMul,
+  CpBinaryExpr_OpFloorDiv,
+  CpBinaryExpr_OpTrueDiv,
+  CpBinaryExpr_OpMod,
+  CpBinaryExpr_OpPow,
+  CpBinaryExpr_OpMatMul,
+  CpBinaryExpr_OpAnd,
+  CpBinaryExpr_OpOr,
+  CpBinaryExpr_OpBitXor,
+  CpBinaryExpr_OpBitAnd,
+  CpBinaryExpr_OpBitOr,
+  CpBinaryExpr_OpLShift,
+  CpBinaryExpr_OpRShift,
+};
+
+typedef struct CpBinaryExpr
+{
+  PyObject_HEAD int m_expr;
+  PyObject* m_left;
+  PyObject* m_right;
+} CpBinaryExpr;
+
+static PyObject*
+cp_binaryexpr_new(PyTypeObject* type, PyObject* args, PyObject* kw)
+{
+  CpBinaryExpr* self;
+  self = (CpBinaryExpr*)type->tp_alloc(type, 0);
+  if (self == NULL)
+    return NULL;
+
+  Py_INCREF(Py_None);
+  self->m_right = Py_None;
+  Py_INCREF(Py_None);
+  self->m_left = Py_None;
+  self->m_expr = -1;
+  return (PyObject*)self;
+}
+
+static void
+cp_binaryexpr_dealloc(CpBinaryExpr* self)
+{
+  Py_XDECREF(self->m_left);
+  Py_XDECREF(self->m_right);
+  Py_TYPE(self)->tp_free((PyObject*)self);
+}
+
+static int
+cp_binaryexpr_init(CpBinaryExpr* self, PyObject* args, PyObject* kw)
+{
+  static char* kwlist[] = { "expr", "left", "right", NULL };
+  PyObject *left = NULL, *right = NULL;
+  int expr = -1;
+  if (!PyArg_ParseTupleAndKeywords(
+        args, kw, "iOO", kwlist, &expr, &left, &right)) {
+    return -1;
+  }
+
+  if (left) {
+    Py_XSETREF(self->m_left, left);
+    Py_XINCREF(self->m_left);
+  }
+
+  if (right) {
+    Py_XSETREF(self->m_right, right);
+    Py_XINCREF(self->m_right);
+  }
+
+  self->m_expr = expr;
+  if (self->m_expr < CpBinaryExpr_Op_LT ||
+      self->m_expr > CpBinaryExpr_OpRShift) {
+    PyErr_SetString(PyExc_ValueError, "invalid expression type");
+    return -1;
+  }
+  return 0;
+}
+
+static PyObject*
+cp_binaryexpr_repr(CpBinaryExpr* self)
+{
+  char* s;
+  switch (self->m_expr) {
+    case CpBinaryExpr_OpAdd:
+      s = "+";
+      break;
+    case CpBinaryExpr_OpSub:
+      s = "-";
+      break;
+    case CpBinaryExpr_OpMul:
+      s = "*";
+      break;
+    case CpBinaryExpr_OpFloorDiv:
+      s = "//";
+      break;
+    case CpBinaryExpr_OpTrueDiv:
+      s = "/";
+      break;
+    case CpBinaryExpr_OpMod:
+      s = "%";
+      break;
+    case CpBinaryExpr_OpPow:
+      s = "**";
+      break;
+    case CpBinaryExpr_OpBitXor:
+      s = "^";
+      break;
+    case CpBinaryExpr_OpBitAnd:
+      s = "&";
+      break;
+    case CpBinaryExpr_OpBitOr:
+      s = "|";
+      break;
+    case CpBinaryExpr_OpLShift:
+      s = "<<";
+      break;
+    case CpBinaryExpr_OpRShift:
+      s = ">>";
+      break;
+    case CpBinaryExpr_Op_GT:
+      s = ">";
+      break;
+    case CpBinaryExpr_Op_GE:
+      s = ">=";
+      break;
+    case CpBinaryExpr_Op_LT:
+      s = "<";
+      break;
+    case CpBinaryExpr_Op_LE:
+      s = "<=";
+      break;
+    case CpBinaryExpr_Op_EQ:
+      s = "==";
+      break;
+    case CpBinaryExpr_Op_NE:
+      s = "!=";
+      break;
+    case CpBinaryExpr_OpAnd:
+      s = "and";
+      break;
+    case CpBinaryExpr_OpOr:
+      s = "or";
+      break;
+    case CpBinaryExpr_OpMatMul:
+      s = "@";
+      break;
+    default:
+      PyErr_SetString(PyExc_ValueError, "invalid expression type");
+      return NULL;
+  }
+  return PyUnicode_FromFormat("(%R) %s (%R)", self->m_left, s, self->m_right);
+}
+
+static PyObject*
+cp_binaryexpr__call__(CpBinaryExpr* self, PyObject* args, PyObject* kw)
+{
+  PyObject* left = self->m_left;
+  if (PyCallable_Check(left)) {
+    left = PyObject_Call(left, args, kw);
+    if (!left) {
+      if (!PyErr_Occurred()) {
+        PyErr_SetString(PyExc_RuntimeError, "Error during lhs evaluation");
+      }
+      Py_XDECREF(left);
+      return NULL;
+    }
+  } else {
+    Py_XINCREF(left);
+  }
+
+  PyObject* right = self->m_right;
+  if (PyCallable_Check(right)) {
+    right = PyObject_Call(right, args, kw);
+    if (!right) {
+      if (!PyErr_Occurred()) {
+        PyErr_SetString(PyExc_RuntimeError, "Error during rhs evaluation");
+      }
+      Py_XDECREF(right);
+      return NULL;
+    }
+  } else {
+    Py_XINCREF(right);
+  }
+
+  PyObject* result;
+  switch (self->m_expr) {
+    case CpBinaryExpr_OpAdd:
+      result = PyNumber_Add(left, right);
+      break;
+    case CpBinaryExpr_OpSub:
+      result = PyNumber_Subtract(left, right);
+      break;
+    case CpBinaryExpr_OpMul:
+      result = PyNumber_Multiply(left, right);
+      break;
+    case CpBinaryExpr_OpFloorDiv:
+      result = PyNumber_FloorDivide(left, right);
+      break;
+    case CpBinaryExpr_OpTrueDiv:
+      result = PyNumber_TrueDivide(left, right);
+      break;
+    case CpBinaryExpr_OpMod:
+      result = PyNumber_Remainder(left, right);
+      break;
+    case CpBinaryExpr_OpPow:
+      result = PyNumber_Power(left, right, Py_None);
+      break;
+    case CpBinaryExpr_OpBitXor:
+      result = PyNumber_Xor(left, right);
+      break;
+    case CpBinaryExpr_OpBitAnd:
+      result = PyNumber_And(left, right);
+      break;
+    case CpBinaryExpr_OpBitOr:
+      result = PyNumber_Or(left, right);
+      break;
+    case CpBinaryExpr_OpLShift:
+      result = PyNumber_Lshift(left, right);
+      break;
+    case CpBinaryExpr_OpRShift:
+      result = PyNumber_Rshift(left, right);
+      break;
+    case CpBinaryExpr_Op_GT:
+      result = PyObject_RichCompare(left, right, Py_GT);
+      break;
+    case CpBinaryExpr_Op_GE:
+      result = PyObject_RichCompare(left, right, Py_GE);
+      break;
+    case CpBinaryExpr_Op_LT:
+      result = PyObject_RichCompare(left, right, Py_LT);
+      break;
+    case CpBinaryExpr_Op_LE:
+      result = PyObject_RichCompare(left, right, Py_LE);
+      break;
+    case CpBinaryExpr_Op_EQ:
+      result = PyObject_RichCompare(left, right, Py_EQ);
+      break;
+    case CpBinaryExpr_Op_NE:
+      result = PyObject_RichCompare(left, right, Py_NE);
+      break;
+    case CpBinaryExpr_OpAnd:
+      result = PyNumber_And(left, right);
+      break;
+    case CpBinaryExpr_OpOr:
+      result = PyNumber_Or(left, right);
+      break;
+    case CpBinaryExpr_OpMatMul:
+      result = PyNumber_MatrixMultiply(left, right);
+      break;
+    default:
+      result = NULL;
+      break;
+  }
+
+  Py_XDECREF(left);
+  Py_XDECREF(right);
+  if (!result) {
+    if (!PyErr_Occurred()) {
+      PyErr_SetString(PyExc_TypeError, "invalid expression type");
+    }
+    return NULL;
+  }
+  return result;
+}
+
+static const char cp_binaryexpr__doc__[] = "CpBinaryExpr(expr, left, right)";
+
+static PyMemberDef CpBinaryExpr_Members[] = {
+  { "expr", T_INT, offsetof(CpBinaryExpr, m_expr), READONLY },
+  { "lhs", T_OBJECT_EX, offsetof(CpBinaryExpr, m_left), 0 },
+  { "rhs", T_OBJECT_EX, offsetof(CpBinaryExpr, m_left), 0 },
+  { NULL } /* Sentinel */
+};
+
+static PyTypeObject CpBinaryExpr_Type = {
+  .ob_base = PyVarObject_HEAD_INIT(NULL, 0).tp_name =
+    _Cp_Name(_core._CpBinaryExpr),
+  .tp_doc = cp_binaryexpr__doc__,
+  .tp_basicsize = sizeof(CpBinaryExpr),
+  .tp_itemsize = 0,
+  .tp_flags = Py_TPFLAGS_DEFAULT,
+  .tp_new = cp_binaryexpr_new,
+  .tp_dealloc = (destructor)cp_binaryexpr_dealloc,
+  .tp_init = (initproc)cp_binaryexpr_init,
+  .tp_members = CpUnaryExpr_Members,
+  .tp_repr = (reprfunc)cp_binaryexpr_repr,
+  .tp_call = (ternaryfunc)cp_binaryexpr__call__,
+};
+
+// ------------------------------------------------------------------------------
 // ContextPath
 // ------------------------------------------------------------------------------
 typedef struct CpContextPath
@@ -531,12 +1005,6 @@ static PyObject*
 cp_contextpath_repr(CpContextPath* self)
 {
   return PyUnicode_FromFormat("CpPath(%R)", self->m_path);
-}
-
-static PyObject*
-cp_contextpath_richcmp(CpContextPath* self, CpContextPath* other, int op)
-{
-  return PyObject_RichCompare(self->m_path, other->m_path, op);
 }
 
 static Py_hash_t
@@ -608,16 +1076,88 @@ cp_contextpath__call__(CpContextPath* self, PyObject* args, PyObject* kwargs)
   return PyObject_GetAttrString(context, path);
 }
 
-static PyMemberDef cp_contextpath_members[] = {
+static PyObject*
+cp_contextpath_as_number_neg(CpContextPath* self)
+{
+  return PyObject_CallFunction(
+    (PyObject*)&CpUnaryExpr_Type, "iO", CpUnaryExpr_OpNeg, self);
+}
+
+static PyObject*
+cp_contextpath_as_number_pos(CpContextPath* self)
+{
+  return PyObject_CallFunction(
+    (PyObject*)&CpUnaryExpr_Type, "iO", CpUnaryExpr_OpPos, self);
+}
+
+static PyObject*
+cp_contextpath_as_number_not(CpContextPath* self)
+{
+  return PyObject_CallFunction(
+    (PyObject*)&CpUnaryExpr_Type, "iO", CpUnaryExpr_OpNot, self);
+}
+
+#define _CpContextPath_BinaryNumberMethod(name, op)                            \
+  static PyObject* cp_contextpath_as_number_##name(CpContextPath* self,        \
+                                                   PyObject* other)            \
+  {                                                                            \
+    return PyObject_CallFunction(                                              \
+      (PyObject*)&CpBinaryExpr_Type, "iOO", op, self, other);                  \
+  }
+
+_CpContextPath_BinaryNumberMethod(add, CpBinaryExpr_OpAdd);
+_CpContextPath_BinaryNumberMethod(sub, CpBinaryExpr_OpSub);
+_CpContextPath_BinaryNumberMethod(mul, CpBinaryExpr_OpMul);
+_CpContextPath_BinaryNumberMethod(div, CpBinaryExpr_OpTrueDiv);
+_CpContextPath_BinaryNumberMethod(truediv, CpBinaryExpr_OpTrueDiv);
+_CpContextPath_BinaryNumberMethod(floordiv, CpBinaryExpr_OpFloorDiv);
+_CpContextPath_BinaryNumberMethod(mod, CpBinaryExpr_OpMod);
+_CpContextPath_BinaryNumberMethod(lshift, CpBinaryExpr_OpLShift);
+_CpContextPath_BinaryNumberMethod(rshift, CpBinaryExpr_OpRShift);
+_CpContextPath_BinaryNumberMethod(and, CpBinaryExpr_OpBitAnd);
+_CpContextPath_BinaryNumberMethod(xor, CpBinaryExpr_OpBitXor);
+_CpContextPath_BinaryNumberMethod(or, CpBinaryExpr_OpBitOr);
+_CpContextPath_BinaryNumberMethod(pow, CpBinaryExpr_OpPow);
+_CpContextPath_BinaryNumberMethod(matmul, CpBinaryExpr_OpMatMul);
+
+static PyObject*
+cp_contextpath_richcmp(CpContextPath* self, PyObject* other, int op)
+{
+  return PyObject_CallFunction(
+    (PyObject*)&CpBinaryExpr_Type, "iOO", op, self, other);
+}
+
+static PyMemberDef CpContextPath_Members[] = {
   { "path", T_OBJECT_EX, offsetof(CpContextPath, m_path), READONLY },
   { NULL }
 };
 
-static PyMethodDef cp_contextpath_methods[] = {
+static PyMethodDef CpContextPath_Methods[] = {
   { "__type__", (PyCFunction)cp_contextpath__type__, METH_NOARGS },
   { "__size__", (PyCFunction)cp_contextpath__size__, METH_VARARGS },
 
   { NULL, NULL }
+};
+
+static PyNumberMethods CpContextPath_NumberMethods = {
+  // unary
+  .nb_negative = (unaryfunc)cp_contextpath_as_number_neg,
+  .nb_positive = (unaryfunc)cp_contextpath_as_number_pos,
+  .nb_invert = (unaryfunc)cp_contextpath_as_number_not,
+  // binary
+  .nb_add = (binaryfunc)cp_contextpath_as_number_add,
+  .nb_subtract = (binaryfunc)cp_contextpath_as_number_sub,
+  .nb_multiply = (binaryfunc)cp_contextpath_as_number_mul,
+  .nb_true_divide = (binaryfunc)cp_contextpath_as_number_truediv,
+  .nb_floor_divide = (binaryfunc)cp_contextpath_as_number_floordiv,
+  .nb_remainder = (binaryfunc)cp_contextpath_as_number_mod,
+  .nb_power = (ternaryfunc)cp_contextpath_as_number_pow,
+  .nb_lshift = (binaryfunc)cp_contextpath_as_number_lshift,
+  .nb_rshift = (binaryfunc)cp_contextpath_as_number_rshift,
+  .nb_and = (binaryfunc)cp_contextpath_as_number_and,
+  .nb_xor = (binaryfunc)cp_contextpath_as_number_xor,
+  .nb_or = (binaryfunc)cp_contextpath_as_number_or,
+  .nb_matrix_multiply = (binaryfunc)cp_contextpath_as_number_matmul,
 };
 
 static PyTypeObject CpContextPath_Type = {
@@ -630,14 +1170,17 @@ static PyTypeObject CpContextPath_Type = {
   .tp_init = (initproc)cp_contextpath_init,
   .tp_dealloc = (destructor)cp_contextpath_dealloc,
   .tp_repr = (reprfunc)cp_contextpath_repr,
-  .tp_richcompare = (richcmpfunc)cp_contextpath_richcmp,
   .tp_hash = (hashfunc)cp_contextpath_hash,
   .tp_getattr = (getattrfunc)cp_contextpath__getattr__,
-  .tp_methods = cp_contextpath_methods,
-  .tp_members = cp_contextpath_members,
+  .tp_methods = CpContextPath_Methods,
+  .tp_members = CpContextPath_Members,
   .tp_new = (newfunc)cp_contextpath_new,
   .tp_call = (ternaryfunc)cp_contextpath__call__,
+  .tp_as_number = &CpContextPath_NumberMethods,
+  .tp_richcompare = (richcmpfunc)cp_contextpath_richcmp,
 };
+
+#undef _CpContextPath_BinaryNumberMethod
 
 // ------------------------------------------------------------------------------
 // Module
@@ -689,6 +1232,8 @@ PyInit__core(void)
 
   CpContext_Type.tp_base = &PyDict_Type;
   CpType_Ready(&CpContext_Type);
+  CpType_Ready(&CpUnaryExpr_Type);
+  CpType_Ready(&CpBinaryExpr_Type);
   CpType_Ready(&CpContextPath_Type);
 
   m = PyModule_Create(&_coremodule);
@@ -699,6 +1244,8 @@ PyInit__core(void)
   CpModule_AddObject("CpArch", &CpArch_Type);
   CpModule_AddObject("CpEndian", &CpEndian_Type);
   CpModule_AddObject("CpContext", &CpContext_Type);
+  CpModule_AddObject("CpUnaryExpr", &CpUnaryExpr_Type);
+  CpModule_AddObject("CpBinaryExpr", &CpBinaryExpr_Type);
   CpModule_AddObject("CpContextPath", &CpContextPath_Type);
 
   // setup state
