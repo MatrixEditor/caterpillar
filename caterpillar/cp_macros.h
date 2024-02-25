@@ -36,6 +36,14 @@
     Py_XSETREF(varname, Py_NewRef(value));                                     \
   }
 
+#define _CpModuleState_Set(varname, ...)                                       \
+  state->varname = __VA_ARGS__;                                                \
+  if (!state->varname) {                                                       \
+    PyErr_SetString(PyExc_RuntimeError,                                        \
+                    ("unable to create state object '" #varname "'"));         \
+    return NULL;                                                               \
+  }
+
 #define _CpModuleState_Def(varname, objname, ...)                              \
   state->varname = __VA_ARGS__;                                                \
   if (!state->varname) {                                                       \
@@ -70,5 +78,11 @@
     varname,                                                                   \
     objname,                                                                   \
     PyObject_CallFunction((PyObject*)&CpArch_Type, "si", name, size));
+
+// ------------------------------------------------------------------------------
+// CpField
+// ------------------------------------------------------------------------------
+#define CpField_New(op)                                                        \
+  (PyObject_CallFunction((PyObject*)&CpField_Type, "O", (op)))
 
 #endif

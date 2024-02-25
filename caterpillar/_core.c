@@ -22,6 +22,7 @@ struct CpUnaryExpr;
 struct CpBinaryExpr;
 struct CpAtom;
 struct CpField;
+struct CpFieldAtom;
 
 static PyTypeObject CpContextPath_Type;
 static PyTypeObject CpEndian_Type;
@@ -34,6 +35,7 @@ static PyTypeObject CpAtom_Type;
 static PyTypeObject CpInvalidDefault_Type;
 static PyTypeObject CpDefaultSwitchOption_Type;
 static PyTypeObject CpField_Type;
+static PyTypeObject CpFieldAtom_Type;
 
 static PyObject _InvalidDefault_Object;
 #define CP_INVALID_DEFAULT &_InvalidDefault_Object
@@ -53,6 +55,15 @@ typedef PyObject* (*sizefunc)(PyObject*, PyObject*, PyObject*);   // (self, ctx)
 typedef PyObject* (*typefunc)(PyObject*);                         // (self)
 typedef PyObject* (*bitsfunc)(PyObject*);                         // (self)
 
+static PyObject*
+cp_typeof(PyObject* op);
+
+static PyObject*
+cp_typeof_field(struct CpField* op);
+
+static PyObject*
+cp_typeof_common(PyObject* op);
+
 // ------------------------------------------------------------------------------
 // special attribute names
 // ------------------------------------------------------------------------------
@@ -61,6 +72,7 @@ typedef PyObject* (*bitsfunc)(PyObject*);                         // (self)
 
 #define CpAtomType_Pack "__pack__"
 #define CpAtomType_Unpack "__unpack__"
+#define CpAtomType_UnpackMany "__unpack_many__"
 #define CpAtomType_Size "__size__"
 #define CpAtomType_Type "__type__"
 
@@ -88,6 +100,8 @@ typedef struct
 
   // typing constants
   PyObject* typing_any;
+  PyObject* typing_list;
+  PyObject* typing_union;
 } _coremodulestate;
 
 static inline _coremodulestate*
@@ -1805,6 +1819,11 @@ static PyMappingMethods CpField_MappingMethods = {
   .mp_subscript = (binaryfunc)cp_field_as_mapping_getitem,
 };
 
+static PyMethodDef CpField_Methods[] = {
+  { "__type__", (PyCFunction)(typefunc)cp_typeof_field, METH_NOARGS },
+  { NULL } /* Sentinel */
+};
+
 static PyTypeObject CpField_Type = {
   .ob_base = PyVarObject_HEAD_INIT(NULL, 0).tp_name = _Cp_Name(_core.CpField),
   .tp_doc = "...",
@@ -1819,11 +1838,264 @@ static PyTypeObject CpField_Type = {
   .tp_getset = CpField_GetSetters,
   .tp_as_number = &CpField_NumberMethods,
   .tp_as_mapping = &CpField_MappingMethods,
+  .tp_methods = CpField_Methods,
 };
+
+// ------------------------------------------------------------------------------
+// CpFieldAtom
+// ------------------------------------------------------------------------------
+typedef struct CpFieldAtom
+{
+  CpAtom _base;
+} CpFieldAtom;
+
+static PyObject*
+cp_fieldatom_new(PyTypeObject* type, PyObject* args, PyObject* kw)
+{
+  CpFieldAtom* self;
+  self = (CpFieldAtom*)type->tp_alloc(type, 0);
+  if (self == NULL)
+    return NULL;
+  return (PyObject*)self;
+}
+
+static void
+cp_fieldatom_dealloc(CpAtom* self)
+{
+  Py_TYPE(self)->tp_free((PyObject*)self);
+}
+
+#define _CpFieldAtom_DefMethod(name, func)                                     \
+  static PyObject* cp_fieldatom_##name(CpFieldAtom* self, PyObject* other)     \
+  {                                                                            \
+    PyObject* field = CpField_New(self);                                       \
+    if (!field) {                                                              \
+      return NULL;                                                             \
+    }                                                                          \
+    if (func((CpField*)field, other, NULL) < 0) {                              \
+      Py_XDECREF(field);                                                       \
+      return NULL;                                                             \
+    }                                                                          \
+    return field;                                                              \
+  }
+
+_CpFieldAtom_DefMethod(as_number_matmul, cp_field_set_offset);
+_CpFieldAtom_DefMethod(as_number_floordiv, cp_field_set_condition);
+_CpFieldAtom_DefMethod(as_number_rshift, cp_field_set_switch);
+_CpFieldAtom_DefMethod(as_mapping_getitem, cp_field_set_length);
+
+#undef _CpFieldAtom_DefMethod
+
+static PyObject*
+cp_fieldatom_as_number_add(CpFieldAtom* self, PyObject* other)
+{
+  if (other->ob_type != &CpEndian_Type) {
+    Py_RETURN_NOTIMPLEMENTED;
+  }
+
+  CpField* field = (CpField*)CpField_New(self);
+  if (!field) {
+    return NULL;
+  }
+  _Cp_SetObj(field->m_endian, other);
+  return (PyObject*)field;
+}
+
+static PyObject*
+cp_fieldatom_as_number_or(CpFieldAtom* self, PyObject* other)
+{
+  if (other->ob_type != &CpOption_Type) {
+    Py_RETURN_NOTIMPLEMENTED;
+  }
+
+  CpField* field = (CpField*)CpField_New(self);
+  if (!field) {
+    return NULL;
+  }
+  PySet_Add(field->m_options, other);
+  return (PyObject*)field;
+}
+
+static PyObject*
+cp_fieldatom_as_number_xor(CpFieldAtom* self, PyObject* other)
+{
+  if (other->ob_type != &CpOption_Type) {
+    Py_RETURN_NOTIMPLEMENTED;
+  }
+
+  CpField* field = (CpField*)CpField_New(self);
+  if (!field) {
+    return NULL;
+  }
+  PySet_Discard(field->m_options, other);
+  return (PyObject*)field;
+}
+
+static PyNumberMethods CpFieldAtom_NumberMethods = {
+  .nb_matrix_multiply = (binaryfunc)cp_fieldatom_as_number_matmul,
+  .nb_floor_divide = (binaryfunc)cp_fieldatom_as_number_floordiv,
+  .nb_add = (binaryfunc)cp_fieldatom_as_number_add,
+  .nb_rshift = (binaryfunc)cp_fieldatom_as_number_rshift,
+  .nb_or = (binaryfunc)cp_fieldatom_as_number_or,
+  .nb_xor = (binaryfunc)cp_fieldatom_as_number_xor,
+};
+
+static PyMappingMethods CpFieldAtom_MappingMethods = {
+  .mp_subscript = (binaryfunc)cp_fieldatom_as_mapping_getitem,
+};
+
+static PyTypeObject CpFieldAtom_Type = {
+  .ob_base = PyVarObject_HEAD_INIT(NULL, 0).tp_name =
+    _Cp_Name(_core.CpFieldAtom),
+  .tp_doc = "...",
+  .tp_basicsize = sizeof(CpFieldAtom),
+  .tp_itemsize = 0,
+  .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
+  .tp_new = cp_fieldatom_new,
+  .tp_dealloc = (destructor)cp_fieldatom_dealloc,
+  .tp_as_number = &CpFieldAtom_NumberMethods,
+  .tp_as_mapping = &CpFieldAtom_MappingMethods,
+};
+
+// ------------------------------------------------------------------------------
+// typeof
+// ------------------------------------------------------------------------------
+static PyObject*
+cp_typeof_common(PyObject* op)
+{
+  PyObject* type = NULL;
+  if (!op) {
+    PyErr_SetString(PyExc_ValueError, "input object is NULL!");
+    return NULL;
+  }
+  _coremodulestate* state = get_global_core_state();
+  PyObject* attr = PyObject_GetAttrString(op, CpAtomType_Type);
+  if (!attr) {
+    type = state->typing_any;
+  } else {
+    if (!PyCallable_Check(attr)) {
+      type = state->typing_any;
+    } else {
+      type = PyObject_CallNoArgs(attr);
+      Py_XDECREF(attr);
+      return type;
+    }
+  }
+  return Py_NewRef(type);
+}
+
+static PyObject*
+cp_typeof_field(struct CpField* op)
+{
+  PyObject *type = NULL, *switch_types = NULL;
+  if (!op) {
+    PyErr_SetString(PyExc_ValueError, "input object is NULL!");
+    return NULL;
+  }
+
+  _coremodulestate* state = get_global_core_state();
+  if (!op->s_type) {
+    return Py_NewRef(state->typing_any);
+  }
+
+  if (!op->m_switch || Py_IsNone(op->m_switch)) {
+    // new ref
+    type = cp_typeof(op->m_atom);
+    if (!type) {
+      goto err;
+    }
+  } else if (PyCallable_Check(op->m_switch)) {
+    Py_XSETREF(type, Py_NewRef(state->typing_any));
+  } else {
+    PyObject* types = PyList_New(NULL);
+    if (!types) {
+      goto err;
+    }
+
+    PyObject* values = PyDict_Values(op->m_switch);
+    if (!values) {
+      goto err;
+    }
+
+    Py_ssize_t length = PyList_GET_SIZE(values);
+    PyObject* switch_type = NULL;
+    for (Py_ssize_t i = 0; i < length; i++) {
+      PyObject* value = PyList_GetItem(values, i);
+      if (!value) {
+        Py_XDECREF(values);
+        goto err;
+      }
+
+      switch_type = cp_typeof(value);
+      if (!switch_type) {
+        Py_XDECREF(values);
+        goto err;
+      }
+
+      if (!PySequence_Contains(switch_types, switch_type)) {
+        PyList_Append(types, switch_type);
+      }
+      Py_XDECREF(switch_type);
+      switch_type = NULL;
+    }
+
+    Py_XDECREF(values);
+    PyObject* tuple = PyList_AsTuple(switch_types);
+    if (!tuple) {
+      goto err;
+    }
+
+    type = PyObject_GetItem(state->typing_union, tuple);
+    Py_XDECREF(tuple);
+  }
+
+  if (!type) {
+    goto err;
+  }
+
+  if (op->s_sequential) {
+    Py_XSETREF(type, PyObject_GetItem(state->typing_list, type));
+    if (!type) {
+      goto err;
+    }
+  }
+
+  return type;
+err:
+  Py_XDECREF(type);
+  Py_XDECREF(switch_types);
+  return NULL;
+}
+
+inline static PyObject*
+cp_typeof(PyObject* op)
+{
+  if (!op) {
+    PyErr_SetString(PyExc_ValueError, "input object is NULL!");
+    return NULL;
+  }
+
+  if (op->ob_type == &CpField_Type) {
+    return cp_typeof_field((CpField*)op);
+  }
+
+  return cp_typeof_common(op);
+}
 
 // ------------------------------------------------------------------------------
 // Module
 // ------------------------------------------------------------------------------
+static PyObject*
+_coremodule_typeof(PyObject* m, PyObject* args, PyObject* kw)
+{
+  static char* kwlist[] = { "obj", NULL };
+  PyObject* op = NULL;
+  if (!PyArg_ParseTupleAndKeywords(args, kw, "O", kwlist, &op)) {
+    return NULL;
+  }
+  return cp_typeof(op);
+}
+
 static int
 _coremodule_clear(PyObject* m)
 {
@@ -1835,6 +2107,9 @@ _coremodule_clear(PyObject* m)
     Py_CLEAR(state->cp_option__global_field_options);
     Py_CLEAR(state->cp_endian__native);
     Py_CLEAR(state->cp_arch__host);
+    Py_CLEAR(state->typing_any);
+    Py_CLEAR(state->typing_list);
+    Py_CLEAR(state->typing_union);
   }
   return 0;
 }
@@ -1847,10 +2122,21 @@ _coremodule_free(void* m)
 
 static const char _coremodule__doc__[] = ("...");
 
+static PyMethodDef _coremodule_methods[] = {
+  { "typeof",
+    (PyCFunction)_coremodule_typeof,
+    METH_VARARGS | METH_KEYWORDS,
+    "Returns the type of an object." },
+  { NULL }
+};
+
 static struct PyModuleDef _coremodule = {
-  PyModuleDef_HEAD_INIT,       .m_name = _Cp_Name(_core),
-  .m_doc = _coremodule__doc__, .m_size = sizeof(_coremodulestate),
-  .m_methods = NULL,           .m_clear = _coremodule_clear,
+  PyModuleDef_HEAD_INIT,
+  .m_name = _Cp_Name(_core),
+  .m_doc = _coremodule__doc__,
+  .m_size = sizeof(_coremodulestate),
+  .m_methods = _coremodule_methods,
+  .m_clear = _coremodule_clear,
   .m_free = _coremodule_free,
 };
 
@@ -1879,6 +2165,9 @@ PyInit__core(void)
   CpField_Type.tp_base = &CpAtom_Type;
   CpType_Ready(&CpField_Type);
 
+  CpFieldAtom_Type.tp_base = &CpAtom_Type;
+  CpType_Ready(&CpFieldAtom_Type);
+
   CpType_Ready(&CpInvalidDefault_Type);
   CpType_Ready(&CpDefaultSwitchOption_Type);
 
@@ -1895,6 +2184,7 @@ PyInit__core(void)
   CpModule_AddObject("CpContextPath", &CpContextPath_Type);
   CpModule_AddObject("CpAtom", &CpAtom_Type);
   CpModule_AddObject("CpField", &CpField_Type);
+  CpModule_AddObject("CpFieldAtom", &CpFieldAtom_Type);
 
   CpModule_AddObject("CpInvalidDefault", &CpInvalidDefault_Type);
   CpModule_AddObject("CpDefaultSwitchOption", &CpDefaultSwitchOption_Type);
@@ -1924,7 +2214,11 @@ PyInit__core(void)
     PyErr_SetString(PyExc_ImportError, "failed to import typing");
     return NULL;
   }
-  state->typing_any = PyObject_GetAttrString(typing, "Any");
+
+  _CpModuleState_Set(typing_any, PyObject_GetAttrString(typing, "Any"));
+  _CpModuleState_Set(typing_list, PyObject_GetAttrString(typing, "List"));
+  _CpModuleState_Set(typing_union, PyObject_GetAttrString(typing, "Union"));
+
   Py_XDECREF(typing);
   if (!state->typing_any) {
     PyErr_SetString(PyExc_ImportError, "failed to get typing.Any");
