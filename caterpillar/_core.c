@@ -2715,10 +2715,8 @@ cp_pack_internal(PyObject* op, PyObject* atom, CpState* state)
   int8_t greedy = state->s_greedy, sequential = state->s_sequential;
 
   if (atom->ob_type == &CpField_Type) {
-    printf("DEBUG:cp_pack_field\n");
     success = cp_pack_field(op, (CpField*)atom, state);
   } else {
-    printf("DEBUG:cp_pack_common\n");
     success = cp_pack_common(op, atom, state);
   }
 
@@ -2895,7 +2893,7 @@ _coremodule_typeof(PyObject* m, PyObject* args, PyObject* kw)
 }
 
 static PyObject*
-_coremodule_pack_into(PyObject* m, PyObject* args)
+_coremodule_pack_into(PyObject* m, PyObject* args, PyObject* kw)
 {
   PyObject* r = PyObject_Repr(args);
   if (!r) {
@@ -2924,6 +2922,7 @@ _coremodule_pack_into(PyObject* m, PyObject* args)
     Py_XDECREF(io);
     return NULL;
   }
+
   Py_RETURN_NONE;
 }
 
@@ -2972,7 +2971,10 @@ static PyMethodDef _coremodule_methods[] = {
     (PyCFunction)_coremodule_typeof,
     METH_VARARGS | METH_KEYWORDS,
     "Returns the type of an object." },
-  { "pack_into", (PyCFunction)_coremodule_pack_into, METH_VARARGS, NULL },
+  { "pack_into",
+    (PyCFunction)_coremodule_pack_into,
+    METH_VARARGS | METH_KEYWORDS,
+    NULL },
   { NULL }
 };
 
