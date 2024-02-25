@@ -85,4 +85,8 @@
 #define CpField_New(op)                                                        \
   (PyObject_CallFunction((PyObject*)&CpField_Type, "O", (op)))
 
+#define CpContext_NewEmpty() (PyObject_CallNoArgs((PyObject*)&CpContext_Type))
+#define CpContext_New(op)                                                      \
+  (PyObject_CallFunction((PyObject*)&CpContext_Type, "O", (op)))
+
 #endif

@@ -23,6 +23,7 @@ struct CpBinaryExpr;
 struct CpAtom;
 struct CpField;
 struct CpFieldAtom;
+struct CpState;
 
 static PyTypeObject CpContextPath_Type;
 static PyTypeObject CpEndian_Type;
@@ -36,6 +37,7 @@ static PyTypeObject CpInvalidDefault_Type;
 static PyTypeObject CpDefaultSwitchOption_Type;
 static PyTypeObject CpField_Type;
 static PyTypeObject CpFieldAtom_Type;
+static PyTypeObject CpState_Type;
 
 static PyObject _InvalidDefault_Object;
 #define CP_INVALID_DEFAULT &_InvalidDefault_Object
@@ -54,6 +56,8 @@ typedef PyObject* (*unpackfunc)(PyObject*, PyObject*, PyObject*); // (self, ctx)
 typedef PyObject* (*sizefunc)(PyObject*, PyObject*, PyObject*);   // (self, ctx)
 typedef PyObject* (*typefunc)(PyObject*);                         // (self)
 typedef PyObject* (*bitsfunc)(PyObject*);                         // (self)
+
+typedef char* (*resizefunc)(PyObject**, Py_ssize_t); // (*buf, newsize)
 
 static PyObject*
 cp_typeof(PyObject* op);
@@ -522,7 +526,8 @@ cp_context__getattr__(CpContext* self, char* name)
   result = PyDict_GetItemString((PyObject*)&self->m_dict, token);
   Py_XINCREF(result);
   while (result != NULL && (token = strtok(NULL, ".")) != NULL) {
-    tmp = PyObject_GetAttrString(result, token);
+    tmp = PyMapping_Check(result) ? PyObject_GetAttrString(result, token)
+                                  : PyMapping_GetItemString(result, token);
     Py_XSETREF(result, tmp);
   };
 
@@ -1121,12 +1126,6 @@ cp_contextpath__call__(CpContextPath* self, PyObject* args, PyObject* kwargs)
 
   if (!context || context == Py_None) {
     PyErr_SetString(PyExc_ValueError, "context cannot be None");
-    return NULL;
-  }
-
-  if (!PyObject_IsInstance(context, (PyObject*)&CpContext_Type)) {
-    PyErr_SetString(PyExc_TypeError,
-                    "context must be an instance of CpContext");
     return NULL;
   }
 
@@ -1958,6 +1957,260 @@ static PyTypeObject CpFieldAtom_Type = {
 };
 
 // ------------------------------------------------------------------------------
+// CpState
+// ------------------------------------------------------------------------------
+typedef struct CpState
+{
+  PyObject_HEAD _coremodulestate* mod;
+
+  // common state variables
+  PyObject* m_io;
+  PyObject* m_globals;
+  PyObject* m_offset_table;
+
+  // context-sensitive variables
+  PyObject* m_path;
+  PyObject* m_obj;
+  PyObject* m_field;
+  PyObject* m_value;
+  Py_ssize_t m_length;
+  Py_ssize_t m_index;
+
+  // context-sensitive state variables
+  int8_t s_sequential;
+  int8_t s_greedy;
+
+  // raw buffer variables
+  char* m_raw_buf;
+  Py_ssize_t m_raw_length;
+  Py_ssize_t m_raw_alloc_length;
+  resizefunc m_raw_resize;
+} CpState;
+
+static PyObject*
+cp_state_new(PyTypeObject* type, PyObject* args, PyObject* kw)
+{
+  CpState* self = (CpState*)type->tp_alloc(type, 0);
+  if (!self) {
+    return NULL;
+  }
+  self->mod = get_global_core_state();
+  self->m_io = NULL;
+  self->m_globals = CpContext_NewEmpty();
+  self->m_offset_table = PyDict_New();
+  self->m_path = NULL;
+  self->m_obj = NULL;
+  self->m_field = NULL;
+  self->m_index = 0;
+  self->m_value = NULL;
+  self->m_length = 0;
+  self->s_sequential = false;
+  self->s_greedy = false;
+  self->m_raw_buf = NULL;
+  self->m_raw_length = 0;
+  self->m_raw_alloc_length = 0;
+  self->m_raw_resize = NULL;
+  return (PyObject*)self;
+}
+
+static void
+cp_state_dealloc(CpState* self)
+{
+  Py_CLEAR(self->m_io);
+  Py_CLEAR(self->m_globals);
+  Py_CLEAR(self->m_offset_table);
+  Py_CLEAR(self->m_path);
+  Py_CLEAR(self->m_obj);
+  Py_CLEAR(self->m_field);
+  Py_CLEAR(self->m_value);
+  self->m_length = 0;
+  self->m_index = 0;
+  self->m_raw_buf = NULL;
+  self->m_raw_length = 0;
+  self->m_raw_alloc_length = 0;
+  self->m_raw_resize = NULL;
+  self->mod = NULL;
+  Py_TYPE(self)->tp_free((PyObject*)self);
+}
+
+static int
+cp_state_set_globals(CpState* self, PyObject* globals, void*);
+
+static int
+cp_state_set_offset_table(CpState* self, PyObject* offset_table, void*);
+
+static int
+cp_state_init(CpState* self, PyObject* args, PyObject* kw)
+{
+  static char* kwlist[] = { "io",     "globals", "offset_table",
+                            "path",   "obj",     "field",
+                            "index",  "value",   "length",
+                            "greedy", NULL };
+  PyObject *io = NULL, *globals = NULL, *offset_table = NULL, *path = NULL,
+           *obj = NULL, *field = NULL, *value = NULL;
+  int8_t greedy = false;
+  Py_ssize_t index = 0, length = 0;
+  if (!PyArg_ParseTupleAndKeywords(args,
+                                   kw,
+                                   "O|OOOOOnOnp",
+                                   kwlist,
+                                   &io,
+                                   &globals,
+                                   &offset_table,
+                                   &path,
+                                   &obj,
+                                   &field,
+                                   &index,
+                                   &value,
+                                   &length,
+                                   &greedy)) {
+    return -1;
+  }
+
+  _Cp_SetObj(self->m_io, io);
+  if (!self->m_io) {
+    PyErr_SetString(PyExc_ValueError, "io is NULL!");
+    return -1;
+  }
+
+  if (globals)
+    if (cp_state_set_globals(self, globals, NULL) < 0)
+      return -1;
+
+  if (offset_table)
+    if (cp_state_set_offset_table(self, offset_table, NULL) < 0) {
+      return -1;
+    }
+
+  _Cp_SetObj(self->m_path, path);
+  _Cp_SetObj(self->m_obj, obj);
+  _Cp_SetObj(self->m_field, field);
+  _Cp_SetObj(self->m_value, value);
+  self->s_greedy = greedy;
+  self->m_index = index;
+  self->m_length = length;
+  self->s_sequential = greedy || length > 0;
+  return 0;
+}
+
+static int
+cp_state_set_globals(CpState* self, PyObject* globals, void* unused)
+{
+  if (!globals) {
+    PyErr_SetString(PyExc_ValueError, "globals is NULL!");
+    return -1;
+  }
+
+  if (PyObject_IsInstance(globals, (PyObject*)&CpContext_Type)) {
+    _Cp_SetObj(self->m_globals, globals);
+  } else {
+    if (!PyMapping_Check(globals)) {
+      PyErr_SetString(PyExc_TypeError, "globals must be a mapping");
+      return -1;
+    }
+    self->m_globals = CpContext_New(globals);
+  }
+}
+
+static PyObject*
+cp_state_get_globals(CpState* self)
+{
+  return Py_NewRef(self->m_globals ? self->m_globals : Py_None);
+}
+
+static int
+cp_state_set_offset_table(CpState* self, PyObject* offset_table, void* unused)
+{
+  if (!offset_table) {
+    PyErr_SetString(PyExc_ValueError, "offset_table is NULL!");
+    return -1;
+  }
+  if (!PyMapping_Check(offset_table)) {
+    PyErr_SetString(PyExc_TypeError, "offset_table must be a mapping");
+    return -1;
+  }
+  _Cp_SetObj(self->m_offset_table, offset_table);
+  return 0;
+}
+
+static PyObject*
+cp_state_get_offset_table(CpState* self)
+{
+  return Py_NewRef(self->m_offset_table ? self->m_offset_table : Py_None);
+}
+
+static PyObject*
+cp_state__getattr__(CpContext* self, char* name)
+{
+  PyObject *result = NULL, *tmp = NULL;
+  char* line = name;
+  char* token = strtok(line, ".");
+  if (token == NULL) {
+    PyErr_Format(PyExc_AttributeError, "CpState has no attribute '%s'", name);
+    return NULL;
+  }
+
+  PyObject* key = PyUnicode_FromString(token);
+  if (!key) {
+    return NULL;
+  }
+  result = PyObject_GenericGetAttr((PyObject*)self, key);
+  Py_DECREF(key);
+  while (result != NULL && (token = strtok(NULL, ".")) != NULL) {
+    tmp = PyObject_GetAttrString(result, token);
+    Py_XSETREF(result, tmp);
+  };
+
+  if (result == NULL) {
+    PyErr_Format(
+      PyExc_AttributeError, "'%s' has no attribute '%s'", token, name);
+    return NULL;
+  }
+  return result;
+}
+
+static PyGetSetDef CpState_GetSetters[] = {
+  { "globals",
+    (getter)cp_state_get_globals,
+    (setter)cp_state_set_globals,
+    NULL,
+    NULL },
+  { "offset_table",
+    (getter)cp_state_get_offset_table,
+    (setter)cp_state_set_offset_table,
+    NULL,
+    NULL },
+  { NULL },
+};
+
+static PyMemberDef CpState_Members[] = {
+  { "io", T_OBJECT_EX, offsetof(CpState, m_io), 0, NULL },
+  { "path", T_OBJECT_EX, offsetof(CpState, m_path), 0, NULL },
+  { "obj", T_OBJECT_EX, offsetof(CpState, m_obj), 0, NULL },
+  { "field", T_OBJECT_EX, offsetof(CpState, m_field), 0, NULL },
+  { "value", T_OBJECT_EX, offsetof(CpState, m_value), 0, NULL },
+  { "index", T_INT, offsetof(CpState, m_index), 0, NULL },
+  { "length", T_INT, offsetof(CpState, m_length), 0, NULL },
+  { "sequential", T_BOOL, offsetof(CpState, s_sequential), 0, NULL },
+  { "greedy", T_BOOL, offsetof(CpState, s_greedy), 0, NULL },
+  { NULL } /* Sentinel */
+};
+
+static PyTypeObject CpState_Type = {
+  .ob_base = PyVarObject_HEAD_INIT(NULL, 0).tp_name = _Cp_Name(_core.CpState),
+  .tp_doc = "...",
+  .tp_basicsize = sizeof(CpState),
+  .tp_itemsize = 0,
+  .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
+  .tp_new = cp_state_new,
+  .tp_dealloc = (destructor)cp_state_dealloc,
+  .tp_getset = CpState_GetSetters,
+  .tp_members = CpState_Members,
+  .tp_getattr = (getattrfunc)cp_state__getattr__,
+  .tp_init = (initproc)cp_state_init,
+};
+
+// ------------------------------------------------------------------------------
 // typeof
 // ------------------------------------------------------------------------------
 static PyObject*
@@ -2170,6 +2423,7 @@ PyInit__core(void)
 
   CpType_Ready(&CpInvalidDefault_Type);
   CpType_Ready(&CpDefaultSwitchOption_Type);
+  CpType_Ready(&CpState_Type);
 
   m = PyModule_Create(&_coremodule);
   if (!m) {
@@ -2185,6 +2439,7 @@ PyInit__core(void)
   CpModule_AddObject("CpAtom", &CpAtom_Type);
   CpModule_AddObject("CpField", &CpField_Type);
   CpModule_AddObject("CpFieldAtom", &CpFieldAtom_Type);
+  CpModule_AddObject("CpState", &CpState_Type);
 
   CpModule_AddObject("CpInvalidDefault", &CpInvalidDefault_Type);
   CpModule_AddObject("CpDefaultSwitchOption", &CpDefaultSwitchOption_Type);

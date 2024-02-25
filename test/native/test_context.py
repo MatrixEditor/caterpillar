@@ -1,5 +1,11 @@
 import pytest
-from caterpillar._core import CpContext, CpContextPath, CpBinaryExpr, CpUnaryExpr
+from caterpillar._core import (
+    CpContext,
+    CpContextPath,
+    CpBinaryExpr,
+    CpUnaryExpr,
+    CpState,
+)
 
 
 def test_context_init():
@@ -87,3 +93,9 @@ def test_contextpath_unaryexpr(value, func, target):
     expr = func(p)
     assert type(expr) == CpUnaryExpr
     assert expr(c) == target
+
+
+def test_contextpath_state():
+    s = CpState(io=1)
+    p = CpContextPath("io.__class__")
+    assert p(s) == int
