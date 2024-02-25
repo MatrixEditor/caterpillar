@@ -488,7 +488,7 @@ cp_context__setattr__(CpContext* self, char* name, PyObject* value)
 static PyObject*
 cp_context__getattr__(CpContext* self, char* name)
 {
-  PyObject* key = PyUnicode_FromString(name);
+  PyObject *key = PyUnicode_FromString(name), *tmp = NULL;
   PyObject* result = PyObject_GenericGetAttr((PyObject*)&self->m_dict, key);
   Py_XDECREF(key);
   if (result) {
@@ -496,24 +496,27 @@ cp_context__getattr__(CpContext* self, char* name)
   }
 
   PyErr_Clear();
+  Py_XSETREF(result, NULL);
 
   char* line = name;
   char* token = strtok(line, ".");
+  if (token == NULL) {
+    PyErr_Format(PyExc_AttributeError, "CpContext has no attribute '%s'", name);
+    return NULL;
+  }
+
   result = PyDict_GetItemString((PyObject*)&self->m_dict, token);
+  Py_XINCREF(result);
   while (result != NULL && (token = strtok(NULL, ".")) != NULL) {
-    PyObject* tmp = PyObject_GetAttrString(result, token);
-    Py_XDECREF(result);
-    result = tmp;
-    if (result == NULL || PyErr_Occurred()) {
-      break;
-    }
+    tmp = PyObject_GetAttrString(result, token);
+    Py_XSETREF(result, tmp);
   };
 
   if (result == NULL) {
     PyErr_Format(PyExc_AttributeError, "CpContext has no attribute '%s'", name);
     return NULL;
   }
-  return result;
+  return Py_NewRef(result);
 }
 
 const char cp_context__doc__[] =
