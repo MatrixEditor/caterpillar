@@ -50,14 +50,21 @@ static struct PyModuleDef _coremodule;
 // ------------------------------------------------------------------------------
 // function defs
 // ------------------------------------------------------------------------------
-typedef int (*packfunc)(PyObject*, PyObject*,
-                        PyObject*); // (self, obj, ctx)
+typedef PyObject* (*packfunc)(PyObject*,
+                              PyObject*,
+                              PyObject*); // (self, obj, ctx)
 typedef PyObject* (*unpackfunc)(PyObject*, PyObject*, PyObject*); // (self, ctx)
 typedef PyObject* (*sizefunc)(PyObject*, PyObject*, PyObject*);   // (self, ctx)
 typedef PyObject* (*typefunc)(PyObject*);                         // (self)
 typedef PyObject* (*bitsfunc)(PyObject*);                         // (self)
 
-typedef char* (*resizefunc)(PyObject**, Py_ssize_t); // (*buf, newsize)
+typedef char* (*resizefunc)(PyObject**, Py_ssize_t);        // (*buf, newsize)
+typedef PyObject* (*writefunc)(struct CpState*, PyObject*); // (self, obj)
+typedef PyObject* (*readfunc)(struct CpState*, Py_ssize_t); // (self, size)
+typedef PyObject* (*seekfunc)(struct CpState*,
+                              PyObject*,
+                              int);             // (self, offset, whence)
+typedef PyObject* (*tellfunc)(struct CpState*); // (self)
 
 static PyObject*
 cp_typeof(PyObject* op);
@@ -68,6 +75,17 @@ cp_typeof_field(struct CpField* op);
 static PyObject*
 cp_typeof_common(PyObject* op);
 
+static int
+cp_pack_internal(PyObject* op, PyObject* struct_, struct CpState* state);
+
+static int
+cp_pack_field(PyObject* op, struct CpField* field, struct CpState* state);
+
+static int
+cp_pack_common(PyObject* op, PyObject* atom, struct CpState* state);
+
+static int
+cp_pack(PyObject* op, PyObject* atom, PyObject* io, PyObject* globals);
 // ------------------------------------------------------------------------------
 // special attribute names
 // ------------------------------------------------------------------------------
@@ -75,6 +93,7 @@ cp_typeof_common(PyObject* op);
 #define CpType_Struct "__struct__"
 
 #define CpAtomType_Pack "__pack__"
+#define CpAtomType_PackMany "__pack_many__"
 #define CpAtomType_Unpack "__unpack__"
 #define CpAtomType_UnpackMany "__unpack_many__"
 #define CpAtomType_Size "__size__"
@@ -82,6 +101,8 @@ cp_typeof_common(PyObject* op);
 
 #define CpUnionHook_Init "__model_init__"
 #define CpUnionHook_SetAttr "__model_setattr__"
+
+#define CpContext_GetAttr "__context_getattr__"
 
 // ------------------------------------------------------------------------------
 // state
@@ -106,6 +127,25 @@ typedef struct
   PyObject* typing_any;
   PyObject* typing_list;
   PyObject* typing_union;
+
+  // io buffers
+  PyObject* io_bytesio;
+
+  // strings
+  PyObject* str_tell;
+  PyObject* str_seek;
+  PyObject* str_write;
+  PyObject* str_read;
+  PyObject* str_close;
+  PyObject* str___pack__;
+  PyObject* str___pack_many__;
+  PyObject* str___unpack__;
+  PyObject* str___unpack_many__;
+  PyObject* str___size__;
+  PyObject* str___type__;
+  PyObject* str_start;
+  PyObject* str_ctx__root;
+  PyObject* str_ctx__getattr;
 } _coremodulestate;
 
 static inline _coremodulestate*
@@ -491,6 +531,12 @@ typedef struct CpContext
   PyDictObject m_dict;
 } CpContext;
 
+static inline PyObject*
+CpContext_Call(PyObject* op, PyObject* context)
+{
+  return PyObject_CallFunction(op, "O", context);
+}
+
 static int
 cp_context_init(CpContext* self, PyObject* args, PyObject* kw)
 {
@@ -504,18 +550,9 @@ cp_context__setattr__(CpContext* self, char* name, PyObject* value)
 }
 
 static PyObject*
-cp_context__getattr__(CpContext* self, char* name)
+_cp_context__context_getattr__(CpContext* self, char* name)
 {
-  PyObject *key = PyUnicode_FromString(name), *tmp = NULL;
-  PyObject* result = PyObject_GenericGetAttr((PyObject*)&self->m_dict, key);
-  Py_XDECREF(key);
-  if (result) {
-    return result;
-  }
-
-  PyErr_Clear();
-  Py_XSETREF(result, NULL);
-
+  PyObject *result = NULL, *tmp = NULL;
   char* line = name;
   char* token = strtok(line, ".");
   if (token == NULL) {
@@ -538,6 +575,30 @@ cp_context__getattr__(CpContext* self, char* name)
   return Py_NewRef(result);
 }
 
+static PyObject*
+cp_context__context_getattr__(CpContext* self, PyObject* args)
+{
+  char* name;
+  if (!PyArg_ParseTuple(args, "s", &name)) {
+    return NULL;
+  }
+  return _cp_context__context_getattr__(self, name);
+}
+
+static PyObject*
+cp_context__getattr__(CpContext* self, char* name)
+{
+  PyObject *key = PyUnicode_FromString(name), *tmp = NULL;
+  PyObject* result = PyObject_GenericGetAttr((PyObject*)&self->m_dict, key);
+  Py_XDECREF(key);
+  if (result) {
+    return result;
+  }
+
+  PyErr_Clear();
+  return _cp_context__context_getattr__(self, name);
+}
+
 const char cp_context__doc__[] =
   ("CpContext(**kwargs)\n"
    "\n"
@@ -546,6 +607,14 @@ const char cp_context__doc__[] =
    ":param kwargs: The name and value of each keyword argument are used to "
    "initialize the context.\n"
    ":type kwargs: dict\n");
+
+static PyMethodDef CpContext_Methods[] = {
+  { CpContext_GetAttr,
+    (PyCFunction)cp_context__context_getattr__,
+    METH_VARARGS,
+    NULL },
+  { NULL } /* Sentinel */
+};
 
 static PyTypeObject CpContext_Type = {
   .ob_base = PyVarObject_HEAD_INIT(NULL, 0).tp_name = _Cp_Name(_core.CpContext),
@@ -1025,6 +1094,8 @@ static PyTypeObject CpBinaryExpr_Type = {
 typedef struct CpContextPath
 {
   PyObject_HEAD PyObject* m_path;
+
+  _coremodulestate* m_state;
 } CpContextPath;
 
 static PyObject*
@@ -1040,6 +1111,7 @@ cp_contextpath_new(PyTypeObject* type, PyObject* args, PyObject* kw)
     Py_DECREF(self->m_path);
     return NULL;
   }
+  self->m_state = get_global_core_state();
   return (PyObject*)self;
 }
 
@@ -1129,9 +1201,8 @@ cp_contextpath__call__(CpContextPath* self, PyObject* args, PyObject* kwargs)
     return NULL;
   }
 
-  Py_ssize_t length;
-  const char* path = PyUnicode_AsUTF8AndSize(self->m_path, &length);
-  return PyObject_GetAttrString(context, path);
+  return PyObject_CallMethodOneArg(
+    context, self->m_state->str_ctx__getattr, self->m_path);
 }
 
 static PyObject*
@@ -1291,10 +1362,72 @@ CpAtomType_HasSize(PyObject* op)
   return false;
 }
 
+static inline int
+CpAtomType_FastCanPack(PyObject* op, _coremodulestate* state)
+{
+  PyObject* attr = PyObject_GetAttr(op, state->str___pack__);
+  if (attr) {
+    Py_DECREF(attr);
+    return 1;
+  }
+  PyErr_Clear();
+  return 0;
+}
+
+static inline int
+CpAtomType_FastCanUnpack(PyObject* op, _coremodulestate* state)
+{
+  PyObject* attr = PyObject_GetAttr(op, state->str___unpack__);
+  if (attr) {
+    Py_DECREF(attr);
+    return 1;
+  }
+  PyErr_Clear();
+  return 0;
+}
+
+static inline int
+CpAtomType_FastHasType(PyObject* op, _coremodulestate* state)
+{
+  PyObject* attr = PyObject_GetAttr(op, state->str___type__);
+  if (attr) {
+    Py_DECREF(attr);
+    return 1;
+  }
+  PyErr_Clear();
+  return 0;
+}
+
+static inline int
+CpAtomType_FastHasSize(PyObject* op, _coremodulestate* state)
+{
+  PyObject* attr = PyObject_GetAttr(op, state->str___size__);
+  if (attr) {
+    Py_DECREF(attr);
+    return 1;
+  }
+  PyErr_Clear();
+  return 0;
+}
+
 typedef struct CpAtom
 {
   PyObject_HEAD
 } CpAtom;
+
+static inline PyObject*
+CpAtom_CallPack(PyObject* self, PyObject* name, PyObject* op, PyObject* ctx)
+{
+  PyObject* args = Py_BuildValue("(OO)", self, op, ctx);
+  PyObject* attr = PyObject_GetAttr(self, name);
+  if (!attr) {
+    Py_DECREF(args);
+    return NULL;
+  }
+  PyObject* res = PyObject_Call(attr, args, NULL);
+  Py_DECREF(args);
+  return res;
+}
 
 static PyObject*
 cp_atom_new(PyTypeObject* type, PyObject* args, PyObject* kw)
@@ -1436,8 +1569,7 @@ _Cp_Immortal(_DefaultSwitchOption, CpDefaultSwitchOption_Type);
 // ------------------------------------------------------------------------------
 typedef struct CpField
 {
-  CpAtom _base;
-  PyObject* m_atom;
+  PyObject_HEAD PyObject* m_atom;
   PyObject* m_name;
   PyObject* m_endian;
   PyObject* m_offset;
@@ -1456,6 +1588,89 @@ typedef struct CpField
   int8_t s_sequential;
   int8_t s_keep_pos;
 } CpField;
+
+static inline int
+CpField_IsEnabled(CpField* self, PyObject* context)
+{
+  if (self->m_condition == NULL) {
+    return true;
+  }
+
+  if (PyCallable_Check(self->m_condition)) {
+    PyObject* result = CpContext_Call(self->m_condition, context);
+    if (result == NULL) {
+      return -1;
+    }
+    int truth = PyObject_IsTrue(result);
+    Py_DECREF(result);
+    return truth;
+  }
+
+  return PyObject_IsTrue(self->m_condition);
+}
+
+static inline Py_ssize_t
+CpField_GetOffset(CpField* self, PyObject* context)
+{
+  Py_ssize_t offset = -1;
+  if (self->m_offset != NULL) {
+
+    if (PyCallable_Check(self->m_offset)) {
+      PyObject* result = CpContext_Call(self->m_offset, context);
+      if (result == NULL) {
+        return -1;
+      }
+      offset = PyLong_AsSsize_t(result);
+      Py_DECREF(result);
+    } else {
+      offset = PyLong_AsSsize_t(self->m_offset);
+    }
+  }
+  return offset;
+}
+
+static inline PyObject*
+CpField_GetSwitchAtom(CpField* self, PyObject* op, PyObject* context)
+{
+  if (self->m_switch == NULL) {
+    PyErr_SetString(PyExc_TypeError, "field does not have a switch");
+    return NULL;
+  }
+
+  PyObject* result = NULL;
+  if (PyCallable_Check(self->m_switch)) {
+    result = CpContext_Call(self->m_switch, context);
+    if (!result)
+      return NULL;
+  } else {
+    result = PyObject_GetItem(self->m_switch, op);
+    if (!result) {
+      result = PyObject_GetItem(self->m_switch, CP_INVALID_DEFAULT);
+      if (!result)
+        return NULL;
+    }
+  }
+
+  // TODO: check for nested struct
+  return result;
+}
+
+static inline PyObject*
+CpField_GetLength(CpField* self, PyObject* context)
+{
+  if (self->m_length == NULL) {
+    PyErr_SetString(PyExc_TypeError, "field does not have a length");
+    return NULL;
+  }
+
+  if (PyCallable_Check(self->m_length)) {
+    PyObject* result = CpContext_Call(self->m_length, context);
+    if (!result)
+      return NULL;
+    return result;
+  }
+  return Py_NewRef(self->m_length);
+}
 
 static PyObject*
 cp_field_new(PyTypeObject* type, PyObject* args, PyObject* kw)
@@ -1476,7 +1691,7 @@ cp_field_new(PyTypeObject* type, PyObject* args, PyObject* kw)
   self->m_default = CP_INVALID_DEFAULT;
   self->m_switch = NULL;
   self->m_options = NULL;
-  self->m_condition = NULL;
+  self->m_condition = Py_NewRef(Py_True);
 
   // internal state
   self->s_unpack = false;
@@ -1582,10 +1797,10 @@ cp_field_init(CpField* self, PyObject* args, PyObject* kw)
     if (cp_field_set_offset(self, offset, NULL) < 0)
       return -1;
 
-  self->s_pack = CpAtomType_CanPack(self->m_atom);
-  self->s_unpack = CpAtomType_CanUnpack(self->m_atom);
-  self->s_size = CpAtomType_HasSize(self->m_atom);
-  self->s_type = CpAtomType_HasType(self->m_atom);
+  self->s_pack = CpAtomType_FastCanPack(self->m_atom, state);
+  self->s_unpack = CpAtomType_FastCanUnpack(self->m_atom, state);
+  self->s_size = CpAtomType_FastHasSize(self->m_atom, state);
+  self->s_type = CpAtomType_FastHasType(self->m_atom, state);
   return 0;
 }
 
@@ -1973,6 +2188,9 @@ typedef struct CpState
   PyObject* m_obj;
   PyObject* m_field;
   PyObject* m_value;
+
+  // context-sensitive sequence variables
+  PyObject* m_sequence;
   Py_ssize_t m_length;
   Py_ssize_t m_index;
 
@@ -1985,7 +2203,42 @@ typedef struct CpState
   Py_ssize_t m_raw_length;
   Py_ssize_t m_raw_alloc_length;
   resizefunc m_raw_resize;
+
+  // io functions
+  writefunc m_io_write;
+  readfunc m_io_read;
+  seekfunc m_io_seek;
+  tellfunc m_io_tell;
 } CpState;
+
+static inline PyObject*
+cp_state_io_tell(struct CpState* self)
+{
+  return PyObject_CallMethodNoArgs(self->m_io, self->mod->str_tell);
+}
+
+static inline PyObject*
+cp_state_io_seek(struct CpState* self, PyObject* offset, int whence)
+{
+  return PyObject_CallMethodObjArgs(
+    self->m_io, self->mod->str_seek, "Oi", offset, whence);
+}
+
+static inline PyObject*
+cp_state_io_read(struct CpState* self, Py_ssize_t size)
+{
+  PyObject* sizeobj = PyLong_FromSsize_t(size);
+  PyObject* res =
+    PyObject_CallMethodOneArg(self->m_io, self->mod->str_read, sizeobj);
+  Py_DECREF(sizeobj);
+  return res;
+}
+
+static inline PyObject*
+cp_state_io_write(struct CpState* self, PyObject* value)
+{
+  return PyObject_CallMethodOneArg(self->m_io, self->mod->str_write, value);
+}
 
 static PyObject*
 cp_state_new(PyTypeObject* type, PyObject* args, PyObject* kw)
@@ -2010,6 +2263,11 @@ cp_state_new(PyTypeObject* type, PyObject* args, PyObject* kw)
   self->m_raw_length = 0;
   self->m_raw_alloc_length = 0;
   self->m_raw_resize = NULL;
+  self->m_sequence = NULL;
+  self->m_io_write = (writefunc)&cp_state_io_write;
+  self->m_io_read = (readfunc)&cp_state_io_read;
+  self->m_io_seek = (seekfunc)&cp_state_io_seek;
+  self->m_io_tell = (tellfunc)&cp_state_io_tell;
   return (PyObject*)self;
 }
 
@@ -2023,6 +2281,7 @@ cp_state_dealloc(CpState* self)
   Py_CLEAR(self->m_obj);
   Py_CLEAR(self->m_field);
   Py_CLEAR(self->m_value);
+  Py_CLEAR(self->m_sequence);
   self->m_length = 0;
   self->m_index = 0;
   self->m_raw_buf = NULL;
@@ -2030,6 +2289,10 @@ cp_state_dealloc(CpState* self)
   self->m_raw_alloc_length = 0;
   self->m_raw_resize = NULL;
   self->mod = NULL;
+  self->m_io_write = NULL;
+  self->m_io_read = NULL;
+  self->m_io_seek = NULL;
+  self->m_io_tell = NULL;
   Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
@@ -2042,17 +2305,17 @@ cp_state_set_offset_table(CpState* self, PyObject* offset_table, void*);
 static int
 cp_state_init(CpState* self, PyObject* args, PyObject* kw)
 {
-  static char* kwlist[] = { "io",     "globals", "offset_table",
-                            "path",   "obj",     "field",
-                            "index",  "value",   "length",
-                            "greedy", NULL };
-  PyObject *io = NULL, *globals = NULL, *offset_table = NULL, *path = NULL,
-           *obj = NULL, *field = NULL, *value = NULL;
+  static char* kwlist[] = { "io",     "globals", "offset_table", "path",
+                            "obj",    "field",   "index",        "value",
+                            "length", "greedy",  "sequence",     NULL };
+  PyObject *io = NULL, *globals = NULL, *offset_table = NULL,
+           *path = self->mod->str_ctx__root, *obj = NULL, *field = NULL,
+           *value = NULL, *sequence = NULL;
   int8_t greedy = false;
   Py_ssize_t index = 0, length = 0;
   if (!PyArg_ParseTupleAndKeywords(args,
                                    kw,
-                                   "O|OOOOOnOnp",
+                                   "O|OOOOOnOnpO",
                                    kwlist,
                                    &io,
                                    &globals,
@@ -2063,7 +2326,8 @@ cp_state_init(CpState* self, PyObject* args, PyObject* kw)
                                    &index,
                                    &value,
                                    &length,
-                                   &greedy)) {
+                                   &greedy,
+                                   &sequence)) {
     return -1;
   }
 
@@ -2086,6 +2350,7 @@ cp_state_init(CpState* self, PyObject* args, PyObject* kw)
   _Cp_SetObj(self->m_obj, obj);
   _Cp_SetObj(self->m_field, field);
   _Cp_SetObj(self->m_value, value);
+  _Cp_SetObj(self->m_sequence, sequence);
   self->s_greedy = greedy;
   self->m_index = index;
   self->m_length = length;
@@ -2140,13 +2405,17 @@ cp_state_get_offset_table(CpState* self)
 }
 
 static PyObject*
-cp_state__getattr__(CpContext* self, char* name)
+cp_state__context_getattr__(CpState* self, PyObject* args)
 {
   PyObject *result = NULL, *tmp = NULL;
-  char* line = name;
+  char* line;
+  if (!PyArg_ParseTuple(args, "s", &line)) {
+    return NULL;
+  }
+
   char* token = strtok(line, ".");
   if (token == NULL) {
-    PyErr_Format(PyExc_AttributeError, "CpState has no attribute '%s'", name);
+    PyErr_Format(PyExc_AttributeError, "CpState has no attribute '%s'", line);
     return NULL;
   }
 
@@ -2163,10 +2432,47 @@ cp_state__getattr__(CpContext* self, char* name)
 
   if (result == NULL) {
     PyErr_Format(
-      PyExc_AttributeError, "'%s' has no attribute '%s'", token, name);
+      PyExc_AttributeError, "'%s' has no attribute '%s'", token, line);
     return NULL;
   }
   return result;
+}
+
+static PyObject*
+cp_state_write(CpState* self, PyObject* args)
+{
+  PyObject* value = NULL;
+  if (!PyArg_ParseTuple(args, "O", &value)) {
+    return NULL;
+  }
+  return cp_state_io_write(self, value);
+}
+
+static PyObject*
+cp_state_read(CpState* self, PyObject* args)
+{
+  Py_ssize_t size = 0;
+  if (!PyArg_ParseTuple(args, "n", &size)) {
+    return NULL;
+  }
+  return cp_state_io_read(self, size);
+}
+
+static PyObject*
+cp_state_tell(CpState* self)
+{
+  return cp_state_io_tell(self);
+}
+
+static PyObject*
+cp_state_seek(CpState* self, PyObject* args)
+{
+  PyObject* offset = NULL;
+  int whence = 0;
+  if (!PyArg_ParseTuple(args, "O|i", &offset, &whence)) {
+    return NULL;
+  }
+  return cp_state_io_seek(self, offset, whence);
 }
 
 static PyGetSetDef CpState_GetSetters[] = {
@@ -2184,15 +2490,25 @@ static PyGetSetDef CpState_GetSetters[] = {
 };
 
 static PyMemberDef CpState_Members[] = {
-  { "io", T_OBJECT_EX, offsetof(CpState, m_io), 0, NULL },
-  { "path", T_OBJECT_EX, offsetof(CpState, m_path), 0, NULL },
+  { "io", T_OBJECT, offsetof(CpState, m_io), 0, NULL },
+  { "path", T_OBJECT, offsetof(CpState, m_path), 0, NULL },
   { "obj", T_OBJECT_EX, offsetof(CpState, m_obj), 0, NULL },
   { "field", T_OBJECT_EX, offsetof(CpState, m_field), 0, NULL },
-  { "value", T_OBJECT_EX, offsetof(CpState, m_value), 0, NULL },
-  { "index", T_INT, offsetof(CpState, m_index), 0, NULL },
-  { "length", T_INT, offsetof(CpState, m_length), 0, NULL },
+  { "value", T_OBJECT_EX, offsetof(CpState, m_value), READONLY, NULL },
+  { "index", T_INT, offsetof(CpState, m_index), READONLY, NULL },
+  { "length", T_INT, offsetof(CpState, m_length), READONLY, NULL },
   { "sequential", T_BOOL, offsetof(CpState, s_sequential), 0, NULL },
   { "greedy", T_BOOL, offsetof(CpState, s_greedy), 0, NULL },
+  { "sequence", T_OBJECT_EX, offsetof(CpState, m_sequence), 0, NULL },
+  { NULL } /* Sentinel */
+};
+
+static PyMethodDef CpState_Methods[] = {
+  { "write", (PyCFunction)cp_state_write, METH_VARARGS },
+  { "read", (PyCFunction)cp_state_read, METH_VARARGS },
+  { "tell", (PyCFunction)cp_state_tell, METH_NOARGS },
+  { "seek", (PyCFunction)cp_state_seek, METH_VARARGS },
+  { CpContext_GetAttr, (PyCFunction)cp_state__context_getattr__, METH_VARARGS },
   { NULL } /* Sentinel */
 };
 
@@ -2206,9 +2522,254 @@ static PyTypeObject CpState_Type = {
   .tp_dealloc = (destructor)cp_state_dealloc,
   .tp_getset = CpState_GetSetters,
   .tp_members = CpState_Members,
-  .tp_getattr = (getattrfunc)cp_state__getattr__,
   .tp_init = (initproc)cp_state_init,
+  .tp_methods = CpState_Methods,
 };
+
+// ------------------------------------------------------------------------------
+// pack
+// ------------------------------------------------------------------------------
+
+static int
+cp_pack_field(PyObject* op, CpField* field, CpState* state)
+{
+  // we can assert that all provided objects are of the correct type
+  int res = CpField_IsEnabled(field, (PyObject*)state);
+  if (!res) {
+    // disabled fields are not packed
+    return 0;
+  }
+  if (res < 0) {
+    return -1;
+  }
+
+  if (!field->s_pack) {
+    PyErr_SetString(PyExc_ValueError, "field is not packable");
+    return -1;
+  }
+
+  PyObject *base_stream = NULL, *fallback = NULL;
+
+  state->m_field = (PyObject*)field;
+  state->s_sequential = field->s_sequential;
+
+  Py_ssize_t offset = CpField_GetOffset(field, (PyObject*)state);
+  if (offset < 0 && PyErr_Occurred()) {
+    return -1;
+  }
+
+  if (offset == -1 || !field->s_keep_pos) {
+    if (!(fallback = cp_state_io_tell(state))) {
+      return -1;
+    };
+  }
+
+  if (offset >= 0) {
+    // We write the current field into a temporary memory buffer
+    // and add it after all processing has finished.
+    base_stream = Py_XNewRef(state->m_io);
+    state->m_io = PyObject_CallNoArgs(state->mod->io_bytesio);
+    if (!state->m_io) {
+      return -1;
+    }
+  }
+
+  if (!PyCallable_Check(field->m_atom)) {
+    return cp_pack_internal(op, field->m_atom, state);
+  } else {
+    PyObject* res = CpContext_Call(field->m_atom, (PyObject*)state);
+    if (!res) {
+      return -1;
+    }
+
+    if (field->m_switch && field->m_switch != Py_None) {
+      PyObject* atom = CpField_GetSwitchAtom(field, res, (PyObject*)state);
+      Py_DECREF(res);
+      if (!atom) {
+        return -1;
+      }
+      if (cp_pack_internal(op, atom, state) < 0) {
+        return -1;
+      }
+    } else
+      Py_DECREF(res);
+  }
+
+  if (offset == -1 || !field->s_keep_pos) {
+    if (!cp_state_io_seek(state, fallback, 0)) {
+      return -1;
+    }
+  }
+
+  if (offset >= 0) {
+    if (PyObject_SetItem(
+          state->m_offset_table, PyLong_FromSsize_t(offset), state->m_io) < 0)
+      return -1;
+
+    Py_XSETREF(state->m_io, base_stream);
+  }
+  return 0;
+}
+
+static int
+cp_pack_common(PyObject* op, PyObject* atom, CpState* state)
+{
+  int success;
+  if (!state->s_sequential) {
+    return PyObject_CallMethod(atom, CpAtomType_Pack, "OO", op, state) ? 0 : -1;
+  }
+
+  if (PyObject_HasAttr(atom, state->mod->str___pack_many__)) {
+    // class explicitly defines __pack_many__ -> use it
+    PyObject* res = CpAtom_CallPack(
+      atom, state->mod->str___pack_many__, op, (PyObject*)state);
+    success = res ? 0 : -1;
+    Py_DECREF(res);
+    return success;
+  }
+
+  if (!PySequence_Check(op)) {
+    PyErr_SetString(PyExc_ValueError, "input object is not a sequence");
+    return -1;
+  }
+
+  Py_ssize_t size = PySequence_Size(op);
+  PyObject* length =
+    CpField_GetLength((CpField*)state->m_field, (PyObject*)state);
+  if (!length) {
+    return -1;
+  }
+
+  if (length == &_Py_EllipsisObject) {
+    // Greedy means we pack all elements
+    state->s_greedy = true;
+    state->m_length = size;
+    Py_XDECREF(length);
+  } else if (PySlice_Check(length)) {
+    state->s_greedy = false;
+
+    PyObject* start = PyObject_GetAttr(length, state->mod->str_start);
+    Py_XDECREF(length);
+    if (!start) {
+      return -1;
+    }
+    if (Py_IsNone(start)) {
+      PyErr_SetString(PyExc_ValueError, "start is None");
+      return -1;
+    }
+
+    PyObject* sizeobj = PyLong_FromSsize_t(size);
+    if (!sizeobj) {
+      return -1;
+    }
+    success = cp_pack_internal(sizeobj, start, state);
+    Py_DECREF(sizeobj);
+    Py_DECREF(start);
+    return success;
+  } else {
+    if (!PyLong_Check(length)) {
+      Py_XDECREF(length);
+      PyErr_SetString(PyExc_ValueError, "length is not an integer");
+      return -1;
+    }
+
+    state->s_greedy = false;
+    state->m_length = PyLong_AsSsize_t(length);
+    Py_XDECREF(length);
+    if (state->m_length != size) {
+      PyErr_Format(PyExc_ValueError,
+                   "given length %d does not match sequence size %d",
+                   state->m_length,
+                   size);
+      return -1;
+    }
+  }
+
+  if (state->m_length <= 0) {
+    // continue packing, here's nothing to store
+    return 0;
+  }
+  PyObject* obj = NULL;
+  PyObject* base_path = Py_NewRef(state->m_path);
+  for (state->m_index = 0; state->m_index < state->m_length; state->m_index++) {
+    obj = PySequence_GetItem(op, state->m_index);
+    if (!obj) {
+      Py_DECREF(base_path);
+      return -1;
+    }
+    state->m_path = PyUnicode_FromFormat("%s.%d", base_path, state->m_index);
+    if (!state->m_path) {
+      Py_XDECREF(obj);
+      Py_DECREF(base_path);
+      return -1;
+    }
+
+    success = cp_pack_internal(obj, atom, state);
+    Py_XSETREF(obj, NULL);
+    if (success < 0) {
+      Py_DECREF(base_path);
+      return -1;
+    }
+  }
+  return 0;
+}
+
+static int
+cp_pack_internal(PyObject* op, PyObject* atom, CpState* state)
+{
+  // 1. the current context-sensitive variables must be stored
+  // elsewhere.
+  //
+  // 2. the current context-sensitive variables must be restored
+  // to their original values.
+  int success;
+  PyObject *obj = Py_XNewRef(state->m_obj), *field = Py_XNewRef(state->m_field),
+           *value = Py_XNewRef(state->m_value),
+           *path = Py_XNewRef(state->m_path),
+           *sequence = Py_XNewRef(state->m_sequence);
+
+  Py_ssize_t length = state->m_length, index = state->m_index;
+  int8_t greedy = state->s_greedy, sequential = state->s_sequential;
+
+  if (atom->ob_type == &CpField_Type) {
+    success = cp_pack_field(op, (CpField*)atom, state);
+  } else {
+    success = cp_pack_common(op, atom, state);
+  }
+
+  Py_XSETREF(state->m_obj, obj);
+  Py_XSETREF(state->m_field, field);
+  Py_XSETREF(state->m_value, value);
+  Py_XSETREF(state->m_sequence, sequence);
+  Py_XSETREF(state->m_path, path);
+  state->m_length = length;
+  state->m_index = index;
+  state->s_greedy = greedy;
+  state->s_sequential = sequential;
+  return success;
+}
+
+static int
+cp_pack(PyObject* op, PyObject* atom, PyObject* io, PyObject* globals)
+{
+  CpState* state =
+    (CpState*)PyObject_CallFunction((PyObject*)&CpState_Type, "O", io);
+  if (!state) {
+    return -1;
+  }
+
+  if (globals) {
+    if (cp_state_set_globals(state, globals, NULL) < 0) {
+      Py_DECREF(state);
+      return -1;
+    }
+  }
+
+  _Cp_SetObj(state->m_path, state->mod->str_ctx__root);
+  int success = cp_pack_internal(op, atom, state);
+  Py_DECREF(state);
+  return success;
+}
 
 // ------------------------------------------------------------------------------
 // typeof
@@ -2349,6 +2910,30 @@ _coremodule_typeof(PyObject* m, PyObject* args, PyObject* kw)
   return cp_typeof(op);
 }
 
+static PyObject*
+_coremodule_pack_into(PyObject* m, PyObject* args, PyObject* kw)
+{
+  PyObject *op = NULL, *atom = NULL, *io = NULL;
+  if (!PyArg_ParseTuple(args, "OOO", &op, &atom, &io)) {
+    return NULL;
+  }
+
+  if (Py_IsNone(atom)) {
+    PyErr_SetString(PyExc_ValueError, "atom not set!");
+    return NULL;
+  }
+
+  if (Py_IsNone(io)) {
+    PyErr_SetString(PyExc_ValueError, "output stream not set!");
+    return NULL;
+  }
+
+  if (cp_pack(op, atom, io, kw) < 0) {
+    return NULL;
+  }
+  Py_RETURN_NONE;
+}
+
 static int
 _coremodule_clear(PyObject* m)
 {
@@ -2363,6 +2948,20 @@ _coremodule_clear(PyObject* m)
     Py_CLEAR(state->typing_any);
     Py_CLEAR(state->typing_list);
     Py_CLEAR(state->typing_union);
+    Py_CLEAR(state->str___pack__);
+    Py_CLEAR(state->str___unpack__);
+    Py_CLEAR(state->str___size__);
+    Py_CLEAR(state->str___type__);
+    Py_CLEAR(state->str_write);
+    Py_CLEAR(state->str_close);
+    Py_CLEAR(state->str_read);
+    Py_CLEAR(state->str_seek);
+    Py_CLEAR(state->str_tell);
+    Py_CLEAR(state->str___unpack_many__);
+    Py_CLEAR(state->str___pack_many__);
+    Py_CLEAR(state->str_start);
+    Py_CLEAR(state->str_ctx__root);
+    Py_CLEAR(state->str_ctx__getattr);
   }
   return 0;
 }
@@ -2380,6 +2979,10 @@ static PyMethodDef _coremodule_methods[] = {
     (PyCFunction)_coremodule_typeof,
     METH_VARARGS | METH_KEYWORDS,
     "Returns the type of an object." },
+  { "pack_into",
+    (PyCFunction)_coremodule_pack_into,
+    METH_VARARGS | METH_KEYWORDS,
+    NULL },
   { NULL }
 };
 
@@ -2414,8 +3017,6 @@ PyInit__core(void)
   CpType_Ready(&CpBinaryExpr_Type);
   CpType_Ready(&CpContextPath_Type);
   CpType_Ready(&CpAtom_Type);
-
-  CpField_Type.tp_base = &CpAtom_Type;
   CpType_Ready(&CpField_Type);
 
   CpFieldAtom_Type.tp_base = &CpAtom_Type;
@@ -2473,11 +3074,37 @@ PyInit__core(void)
   _CpModuleState_Set(typing_any, PyObject_GetAttrString(typing, "Any"));
   _CpModuleState_Set(typing_list, PyObject_GetAttrString(typing, "List"));
   _CpModuleState_Set(typing_union, PyObject_GetAttrString(typing, "Union"));
-
   Py_XDECREF(typing);
-  if (!state->typing_any) {
-    PyErr_SetString(PyExc_ImportError, "failed to get typing.Any");
+
+  PyObject* io = PyImport_ImportModule("io");
+  if (!io) {
+    PyErr_SetString(PyExc_ImportError, "failed to import io");
     return NULL;
   }
+
+  _CpModuleState_Set(io_bytesio, PyObject_GetAttrString(io, "BytesIO"));
+  Py_XDECREF(io);
+
+// intern strings
+#define CACHED_STRING(attr, str)                                               \
+  if ((state->attr = PyUnicode_InternFromString(str)) == NULL)                 \
+  return NULL
+
+  CACHED_STRING(str___pack__, CpAtomType_Pack);
+  CACHED_STRING(str___unpack__, CpAtomType_Unpack);
+  CACHED_STRING(str___unpack_many__, CpAtomType_UnpackMany);
+  CACHED_STRING(str___pack_many__, CpAtomType_PackMany);
+  CACHED_STRING(str___size__, CpAtomType_Size);
+  CACHED_STRING(str___type__, CpAtomType_Type);
+  CACHED_STRING(str_close, "close");
+  CACHED_STRING(str_read, "read");
+  CACHED_STRING(str_write, "write");
+  CACHED_STRING(str_seek, "seek");
+  CACHED_STRING(str_tell, "tell");
+  CACHED_STRING(str_start, "start");
+  CACHED_STRING(str_ctx__root, "<root>");
+  CACHED_STRING(str_ctx__getattr, CpContext_GetAttr);
+
+#undef CACHED_STRING
   return m;
 }

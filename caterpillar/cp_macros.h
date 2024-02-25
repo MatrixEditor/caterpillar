@@ -58,6 +58,16 @@
     _PyObject_EXTRA_INIT{ _Py_IMMORTAL_REFCNT }, &type                         \
   };
 
+#define PyErr_SetContext(err, context, format, ...)                            \
+  do {                                                                         \
+    PyErr_Format((err), (format), __VA_ARGS__);                                \
+    PyErr_SetObject((err), (PyObject*)(context));                              \
+    if ((context)->ob_type == &CpState_Type) {                                 \
+      _PyException_AddNote((err),                                              \
+                           (context)->m_path ? (context)->m_path : Py_None);   \
+    }                                                                          \
+  } while (0);
+
 // ------------------------------------------------------------------------------
 // Option related macros
 // ------------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 # pylint: disable=import-error,no-name-in-module
-from caterpillar._core import CpField, CpOption, CpEndian, CpArch, CpAtom
+from caterpillar._core import CpField, CpOption, CpEndian, CpArch, CpAtom, CpFieldAtom
 
 import pytest
 
