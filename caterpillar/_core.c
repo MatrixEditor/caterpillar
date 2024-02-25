@@ -257,12 +257,12 @@ static const char cp_option__doc__[] =
 
 static PyMemberDef CpOption_Members[] = {
   { "name",
-    T_OBJECT_EX,
+    T_OBJECT,
     offsetof(CpOption, name),
     READONLY,
     PyDoc_STR("The name of this option (must be unique).") },
   { "value",
-    T_OBJECT_EX,
+    T_OBJECT,
     offsetof(CpOption, value),
     0,
     PyDoc_STR("The value of this option (optional).") },
@@ -374,12 +374,12 @@ static const char cp_arch__doc__[] =
 
 static PyMemberDef CpArch_Members[] = {
   { "name",
-    T_OBJECT_EX,
+    T_OBJECT,
     offsetof(CpArch, m_name),
     READONLY,
     PyDoc_STR("The name of this architecture (must be unique).") },
   { "ptr_size",
-    T_OBJECT_EX,
+    T_OBJECT,
     offsetof(CpArch, m_ptr_size),
     0,
     PyDoc_STR("the amount of bits one pointer takes.") },
@@ -495,7 +495,7 @@ static const char cp_endian__doc__[] =
 
 static PyMemberDef CpEndian_Members[] = {
   { "name",
-    T_OBJECT_EX,
+    T_OBJECT,
     offsetof(CpEndian, m_name),
     READONLY,
     PyDoc_STR("The name of this architecture (must be unique).") },
@@ -768,7 +768,7 @@ static const char cp_unaryexpr__doc__[] = "CpUnaryExpr(expr, value)";
 
 static PyMemberDef CpUnaryExpr_Members[] = {
   { "expr", T_INT, offsetof(CpUnaryExpr, m_expr), READONLY },
-  { "value", T_OBJECT_EX, offsetof(CpUnaryExpr, m_value), 0 },
+  { "value", T_OBJECT, offsetof(CpUnaryExpr, m_value), 0 },
   { NULL } /* Sentinel */
 };
 
@@ -1068,8 +1068,8 @@ static const char cp_binaryexpr__doc__[] = "CpBinaryExpr(expr, left, right)";
 
 static PyMemberDef CpBinaryExpr_Members[] = {
   { "expr", T_INT, offsetof(CpBinaryExpr, m_expr), READONLY },
-  { "lhs", T_OBJECT_EX, offsetof(CpBinaryExpr, m_left), 0 },
-  { "rhs", T_OBJECT_EX, offsetof(CpBinaryExpr, m_left), 0 },
+  { "lhs", T_OBJECT, offsetof(CpBinaryExpr, m_left), 0 },
+  { "rhs", T_OBJECT, offsetof(CpBinaryExpr, m_left), 0 },
   { NULL } /* Sentinel */
 };
 
@@ -1257,7 +1257,7 @@ cp_contextpath_richcmp(CpContextPath* self, PyObject* other, int op)
 }
 
 static PyMemberDef CpContextPath_Members[] = {
-  { "path", T_OBJECT_EX, offsetof(CpContextPath, m_path), READONLY },
+  { "path", T_OBJECT, offsetof(CpContextPath, m_path), READONLY },
   { NULL }
 };
 
@@ -1581,8 +1581,6 @@ typedef struct CpField
   PyObject* m_condition;
 
   // internal state
-  int8_t s_unpack;
-  int8_t s_pack;
   int8_t s_size;
   int8_t s_type;
   int8_t s_sequential;
@@ -1694,8 +1692,6 @@ cp_field_new(PyTypeObject* type, PyObject* args, PyObject* kw)
   self->m_condition = Py_NewRef(Py_True);
 
   // internal state
-  self->s_unpack = false;
-  self->s_pack = false;
   self->s_size = false;
   self->s_type = false;
   self->s_sequential = false;
@@ -1797,8 +1793,6 @@ cp_field_init(CpField* self, PyObject* args, PyObject* kw)
     if (cp_field_set_offset(self, offset, NULL) < 0)
       return -1;
 
-  self->s_pack = CpAtomType_FastCanPack(self->m_atom, state);
-  self->s_unpack = CpAtomType_FastCanUnpack(self->m_atom, state);
   self->s_size = CpAtomType_FastHasSize(self->m_atom, state);
   self->s_type = CpAtomType_FastHasType(self->m_atom, state);
   return 0;
@@ -1967,19 +1961,6 @@ static PyObject*
 cp_field_as_mapping_getitem(CpField* self, PyObject* key)
 {
   // allow multiple dimensions
-  if (self->m_length) {
-    PyObject* result =
-      PyObject_CallFunction((PyObject*)&CpField_Type, "O", self);
-    if (!result) {
-      return NULL;
-    }
-    if (cp_field_set_length((CpField*)result, key, NULL) < 0) {
-      Py_XDECREF(result);
-      return NULL;
-    }
-    return result;
-  }
-
   if (cp_field_set_length(self, key, NULL) < 0) {
     return NULL;
   }
@@ -1987,12 +1968,12 @@ cp_field_as_mapping_getitem(CpField* self, PyObject* key)
 }
 
 static PyMemberDef CpField_Members[] = {
-  { "name", T_OBJECT_EX, offsetof(CpField, m_name), 0 },
-  { "default", T_OBJECT_EX, offsetof(CpField, m_default), 0 },
-  { "options", T_OBJECT_EX, offsetof(CpField, m_options), 0 },
-  { "atom", T_OBJECT_EX, offsetof(CpField, m_atom), READONLY },
-  { "endian", T_OBJECT_EX, offsetof(CpField, m_endian), 0 },
-  { "arch", T_OBJECT_EX, offsetof(CpField, m_arch), 0 },
+  { "name", T_OBJECT, offsetof(CpField, m_name), 0 },
+  { "default", T_OBJECT, offsetof(CpField, m_default), 0 },
+  { "options", T_OBJECT, offsetof(CpField, m_options), 0 },
+  { "atom", T_OBJECT, offsetof(CpField, m_atom), READONLY },
+  { "endian", T_OBJECT, offsetof(CpField, m_endian), 0 },
+  { "arch", T_OBJECT, offsetof(CpField, m_arch), 0 },
   { NULL } /* Sentinel */
 };
 
@@ -2534,17 +2515,18 @@ static int
 cp_pack_field(PyObject* op, CpField* field, CpState* state)
 {
   // we can assert that all provided objects are of the correct type
+  PyObject* path = PyUnicode_FromFormat("%s.%s", state->m_path, field->m_name);
+  if (!path) {
+    return -1;
+  }
+  Py_XSETREF(state->m_path, path);
+
   int res = CpField_IsEnabled(field, (PyObject*)state);
   if (!res) {
     // disabled fields are not packed
     return 0;
   }
   if (res < 0) {
-    return -1;
-  }
-
-  if (!field->s_pack) {
-    PyErr_SetString(PyExc_ValueError, "field is not packable");
     return -1;
   }
 
@@ -2691,6 +2673,7 @@ cp_pack_common(PyObject* op, PyObject* atom, CpState* state)
   }
   PyObject* obj = NULL;
   PyObject* base_path = Py_NewRef(state->m_path);
+  state->s_sequential = false;
   for (state->m_index = 0; state->m_index < state->m_length; state->m_index++) {
     obj = PySequence_GetItem(op, state->m_index);
     if (!obj) {
@@ -2732,8 +2715,10 @@ cp_pack_internal(PyObject* op, PyObject* atom, CpState* state)
   int8_t greedy = state->s_greedy, sequential = state->s_sequential;
 
   if (atom->ob_type == &CpField_Type) {
+    printf("DEBUG:cp_pack_field\n");
     success = cp_pack_field(op, (CpField*)atom, state);
   } else {
+    printf("DEBUG:cp_pack_common\n");
     success = cp_pack_common(op, atom, state);
   }
 
@@ -2760,13 +2745,12 @@ cp_pack(PyObject* op, PyObject* atom, PyObject* io, PyObject* globals)
 
   if (globals) {
     if (cp_state_set_globals(state, globals, NULL) < 0) {
-      Py_DECREF(state);
+      Py_DECREF(atom);
       return -1;
     }
   }
 
-  _Cp_SetObj(state->m_path, state->mod->str_ctx__root);
-  int success = cp_pack_internal(op, atom, state);
+  int success = cp_pack_internal(op, atom, (CpState*)Py_NewRef(state));
   Py_DECREF(state);
   return success;
 }
@@ -2911,8 +2895,14 @@ _coremodule_typeof(PyObject* m, PyObject* args, PyObject* kw)
 }
 
 static PyObject*
-_coremodule_pack_into(PyObject* m, PyObject* args, PyObject* kw)
+_coremodule_pack_into(PyObject* m, PyObject* args)
 {
+  PyObject* r = PyObject_Repr(args);
+  if (!r) {
+    return NULL;
+  }
+  Py_DECREF(r);
+
   PyObject *op = NULL, *atom = NULL, *io = NULL;
   if (!PyArg_ParseTuple(args, "OOO", &op, &atom, &io)) {
     return NULL;
@@ -2928,7 +2918,10 @@ _coremodule_pack_into(PyObject* m, PyObject* args, PyObject* kw)
     return NULL;
   }
 
-  if (cp_pack(op, atom, io, kw) < 0) {
+  if (cp_pack(Py_NewRef(op), Py_NewRef(atom), Py_NewRef(io), NULL) < 0) {
+    Py_XDECREF(op);
+    Py_XDECREF(atom);
+    Py_XDECREF(io);
     return NULL;
   }
   Py_RETURN_NONE;
@@ -2979,10 +2972,7 @@ static PyMethodDef _coremodule_methods[] = {
     (PyCFunction)_coremodule_typeof,
     METH_VARARGS | METH_KEYWORDS,
     "Returns the type of an object." },
-  { "pack_into",
-    (PyCFunction)_coremodule_pack_into,
-    METH_VARARGS | METH_KEYWORDS,
-    NULL },
+  { "pack_into", (PyCFunction)_coremodule_pack_into, METH_VARARGS, NULL },
   { NULL }
 };
 
