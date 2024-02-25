@@ -31,6 +31,10 @@
   }
 
 #define _Cp_Name(x) ("caterpillar." #x)
+#define _Cp_SetObj(varname, value)                                             \
+  if (value) {                                                                 \
+    Py_XSETREF(varname, Py_NewRef(value));                                     \
+  }
 
 #define _CpModuleState_Def(varname, objname, ...)                              \
   state->varname = __VA_ARGS__;                                                \
@@ -42,8 +46,9 @@
   CpModule_AddObject(objname, state->varname);
 
 #define _Cp_Immortal(name, type)                                               \
-  static PyObject name##_Object = { _PyObject_EXTRA_INIT{ _Py_IMMORTAL_REFCNT }, \
-                                  &type };
+  static PyObject name##_Object = {                                            \
+    _PyObject_EXTRA_INIT{ _Py_IMMORTAL_REFCNT }, &type                         \
+  };
 
 // ------------------------------------------------------------------------------
 // Option related macros
