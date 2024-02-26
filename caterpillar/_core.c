@@ -85,7 +85,7 @@ static int
 cp_pack_common(PyObject* op, PyObject* atom, struct CpState* state);
 
 static int
-cp_pack(PyObject* op, PyObject* atom, PyObject* io, PyObject* globals);
+cp_pack(PyObject* op, PyObject* atom, PyObject* io, PyObject* globals, int raw);
 // ------------------------------------------------------------------------------
 // special attribute names
 // ------------------------------------------------------------------------------
@@ -146,6 +146,7 @@ typedef struct
   PyObject* str_start;
   PyObject* str_ctx__root;
   PyObject* str_ctx__getattr;
+  PyObject* str_bytesio_getvalue;
 } _coremodulestate;
 
 static inline _coremodulestate*
@@ -2182,8 +2183,8 @@ typedef struct CpState
   // raw buffer variables
   char* m_raw_buf;
   Py_ssize_t m_raw_length;
+  Py_ssize_t m_raw_offset;
   Py_ssize_t m_raw_alloc_length;
-  resizefunc m_raw_resize;
 
   // io functions
   writefunc m_io_write;
@@ -2243,7 +2244,6 @@ cp_state_new(PyTypeObject* type, PyObject* args, PyObject* kw)
   self->m_raw_buf = NULL;
   self->m_raw_length = 0;
   self->m_raw_alloc_length = 0;
-  self->m_raw_resize = NULL;
   self->m_sequence = NULL;
   self->m_io_write = (writefunc)&cp_state_io_write;
   self->m_io_read = (readfunc)&cp_state_io_read;
@@ -2268,7 +2268,6 @@ cp_state_dealloc(CpState* self)
   self->m_raw_buf = NULL;
   self->m_raw_length = 0;
   self->m_raw_alloc_length = 0;
-  self->m_raw_resize = NULL;
   self->mod = NULL;
   self->m_io_write = NULL;
   self->m_io_read = NULL;
@@ -2296,7 +2295,7 @@ cp_state_init(CpState* self, PyObject* args, PyObject* kw)
   Py_ssize_t index = 0, length = 0;
   if (!PyArg_ParseTupleAndKeywords(args,
                                    kw,
-                                   "O|OOOOOnOnpO",
+                                   "|OOOOOOnOnpOp",
                                    kwlist,
                                    &io,
                                    &globals,
@@ -2312,12 +2311,11 @@ cp_state_init(CpState* self, PyObject* args, PyObject* kw)
     return -1;
   }
 
-  _Cp_SetObj(self->m_io, io);
-  if (!self->m_io) {
+  if (!io) {
     PyErr_SetString(PyExc_ValueError, "io is NULL!");
     return -1;
   }
-
+  _Cp_SetObj(self->m_io, io);
   if (globals)
     if (cp_state_set_globals(self, globals, NULL) < 0)
       return -1;
@@ -2356,6 +2354,7 @@ cp_state_set_globals(CpState* self, PyObject* globals, void* unused)
     }
     self->m_globals = CpContext_New(globals);
   }
+  return 0;
 }
 
 static PyObject*
@@ -2733,7 +2732,7 @@ cp_pack_internal(PyObject* op, PyObject* atom, CpState* state)
 }
 
 static int
-cp_pack(PyObject* op, PyObject* atom, PyObject* io, PyObject* globals)
+cp_pack(PyObject* op, PyObject* atom, PyObject* io, PyObject* globals, int raw)
 {
   CpState* state =
     (CpState*)PyObject_CallFunction((PyObject*)&CpState_Type, "O", io);
@@ -2749,6 +2748,10 @@ cp_pack(PyObject* op, PyObject* atom, PyObject* io, PyObject* globals)
   }
 
   int success = cp_pack_internal(op, atom, (CpState*)Py_NewRef(state));
+  if (success < 0) {
+    Py_DECREF(state);
+    return success;
+  }
   Py_DECREF(state);
   return success;
 }
@@ -2895,35 +2898,86 @@ _coremodule_typeof(PyObject* m, PyObject* args, PyObject* kw)
 static PyObject*
 _coremodule_pack_into(PyObject* m, PyObject* args, PyObject* kw)
 {
-  PyObject* r = PyObject_Repr(args);
-  if (!r) {
+  PyObject *op = NULL, *atom = NULL, *io = NULL, *globals = PyDict_New(),
+           *key = NULL, *value = NULL;
+  int res = 0;
+  if (!globals) {
     return NULL;
   }
-  Py_DECREF(r);
-
-  PyObject *op = NULL, *atom = NULL, *io = NULL;
   if (!PyArg_ParseTuple(args, "OOO", &op, &atom, &io)) {
-    return NULL;
+    goto finish;
   }
-
+  if (kw && PyDict_Check(kw)) {
+    Py_ssize_t pos = 0;
+    while (PyDict_Next(kw, &pos, &key, &value)) {
+      if (PyDict_SetItem(globals, key, value) < 0) {
+        goto finish;
+      }
+    }
+  }
   if (Py_IsNone(atom)) {
     PyErr_SetString(PyExc_ValueError, "atom not set!");
-    return NULL;
+    goto finish;
   }
 
   if (Py_IsNone(io)) {
     PyErr_SetString(PyExc_ValueError, "output stream not set!");
+    goto finish;
+  }
+
+  // TODO: describe why we don't need to decrease the reference
+  // count on these variables in the end.
+  PyObject *atomobj = Py_NewRef(atom), *obj = Py_NewRef(op),
+           *ioobj = Py_NewRef(io);
+
+  res = cp_pack(obj, atomobj, ioobj, globals, false);
+finish:
+  Py_XDECREF(globals);
+  return res < 0 ? NULL : Py_None;
+}
+
+static PyObject*
+_coremodule_pack(PyObject* m, PyObject* args, PyObject* kw)
+{
+  PyObject *op = NULL, *atom = NULL, *globals = PyDict_New(), *key = NULL,
+           *value = NULL, *io = NULL;
+  int res = 0;
+  if (!globals) {
+    return NULL;
+  }
+  _coremodulestate* state = get_core_state(m);
+  io = PyObject_CallNoArgs(state->io_bytesio);
+  if (!io) {
     return NULL;
   }
 
-  if (cp_pack(Py_NewRef(op), Py_NewRef(atom), Py_NewRef(io), NULL) < 0) {
-    Py_XDECREF(op);
-    Py_XDECREF(atom);
-    Py_XDECREF(io);
+  if (!PyArg_ParseTuple(args, "OO", &op, &atom)) {
+    goto finish;
+  }
+  if (kw && PyDict_Check(kw)) {
+    Py_ssize_t pos = 0;
+    while (PyDict_Next(kw, &pos, &key, &value)) {
+      if (PyDict_SetItem(globals, key, value) < 0) {
+        goto finish;
+      }
+    }
+  }
+  if (Py_IsNone(atom)) {
+    PyErr_SetString(PyExc_ValueError, "atom not set!");
+    goto finish;
+  }
+
+  PyObject *atomobj = Py_NewRef(atom), *obj = Py_NewRef(op);
+  res = cp_pack(obj, atomobj, io, globals, true);
+finish:
+  Py_XDECREF(globals);
+  if (res < 0) {
     return NULL;
   }
 
-  Py_RETURN_NONE;
+  PyObject* result = PyObject_CallMethodNoArgs(io, state->str_bytesio_getvalue);
+  Py_XDECREF(io);
+  return result;
 }
 
 static int
@@ -2954,6 +3008,7 @@ _coremodule_clear(PyObject* m)
     Py_CLEAR(state->str_start);
     Py_CLEAR(state->str_ctx__root);
     Py_CLEAR(state->str_ctx__getattr);
+    Py_CLEAR(state->str_bytesio_getvalue);
   }
   return 0;
 }
@@ -2975,6 +3030,7 @@ static PyMethodDef _coremodule_methods[] = {
     (PyCFunction)_coremodule_pack_into,
     METH_VARARGS | METH_KEYWORDS,
     NULL },
+  { "pack", (PyCFunction)_coremodule_pack, METH_VARARGS | METH_KEYWORDS, NULL },
   { NULL }
 };
 
@@ -3096,6 +3152,7 @@ PyInit__core(void)
   CACHED_STRING(str_start, "start");
   CACHED_STRING(str_ctx__root, "<root>");
   CACHED_STRING(str_ctx__getattr, CpContext_GetAttr);
+  CACHED_STRING(str_bytesio_getvalue, "getvalue");
 
 #undef CACHED_STRING
   return m;
