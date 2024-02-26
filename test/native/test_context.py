@@ -34,7 +34,7 @@ def test_contextpath():
     c = CpContext(foo=10)
     assert p(c) == 10
 
-    with pytest.raises(TypeError):
+    with pytest.raises(AttributeError):
         p(10)
 
     with pytest.raises(ValueError):

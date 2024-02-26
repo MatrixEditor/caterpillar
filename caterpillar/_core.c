@@ -24,6 +24,7 @@ struct CpAtom;
 struct CpField;
 struct CpFieldAtom;
 struct CpState;
+struct CpSequence;
 
 static PyTypeObject CpContextPath_Type;
 static PyTypeObject CpEndian_Type;
@@ -38,6 +39,7 @@ static PyTypeObject CpDefaultSwitchOption_Type;
 static PyTypeObject CpField_Type;
 static PyTypeObject CpFieldAtom_Type;
 static PyTypeObject CpState_Type;
+static PyTypeObject CpSequence_Type;
 
 static PyObject _InvalidDefault_Object;
 #define CP_INVALID_DEFAULT &_InvalidDefault_Object
@@ -113,9 +115,11 @@ typedef struct
   PyObject* cp_option__dynamic;
   PyObject* cp_option__sequential;
   PyObject* cp_option__keep_position;
+  PyObject* cp_option__union;
 
   // global default options
   PyObject* cp_option__global_field_options;
+  PyObject* cp_option__global_sequence_options;
 
   // global arch
   PyObject* cp_arch__host;
@@ -550,7 +554,7 @@ cp_context__setattr__(CpContext* self, char* name, PyObject* value)
   return PyDict_SetItemString((PyObject*)&self->m_dict, name, value);
 }
 
-static PyObject*
+static inline PyObject*
 _cp_context__context_getattr__(CpContext* self, char* name)
 {
   PyObject *result = NULL, *tmp = NULL;
@@ -564,13 +568,13 @@ _cp_context__context_getattr__(CpContext* self, char* name)
   result = PyDict_GetItemString((PyObject*)&self->m_dict, token);
   Py_XINCREF(result);
   while (result != NULL && (token = strtok(NULL, ".")) != NULL) {
-    tmp = PyMapping_Check(result) ? PyObject_GetAttrString(result, token)
-                                  : PyMapping_GetItemString(result, token);
+    tmp = PyObject_GetAttrString(result, token);
     Py_XSETREF(result, tmp);
   };
 
   if (result == NULL) {
-    PyErr_Format(PyExc_AttributeError, "CpContext has no attribute '%s'", name);
+    PyErr_Format(
+      PyExc_AttributeError, "'%s' has no attribute '%s'", name, token);
     return NULL;
   }
   return Py_NewRef(result);
@@ -626,6 +630,7 @@ static PyTypeObject CpContext_Type = {
   .tp_init = (initproc)cp_context_init,
   .tp_setattr = (setattrfunc)cp_context__setattr__,
   .tp_getattr = (getattrfunc)cp_context__getattr__,
+  .tp_methods = CpContext_Methods,
 };
 
 // ------------------------------------------------------------------------------
@@ -2507,6 +2512,118 @@ static PyTypeObject CpState_Type = {
 };
 
 // ------------------------------------------------------------------------------
+// sequence
+// ------------------------------------------------------------------------------
+typedef struct CpSequence
+{
+  CpFieldAtom _base;
+
+  PyObject* m_model;    // dict (initial model)
+  PyObject* m_excluded; // set
+  PyObject* m_options;  // set
+
+  // internal states
+  int8_t s_union;
+} CpSequence;
+
+static PyObject*
+cp_sequence_new(PyTypeObject* type, PyObject* args, PyObject* kw)
+{
+  CpSequence* self = (CpSequence*)type->tp_alloc(type, 0);
+  if (!self) {
+    return NULL;
+  }
+  self->m_model = NULL;
+  self->m_options = NULL;
+  self->m_excluded = NULL;
+  self->s_union = false;
+  return (PyObject*)self;
+}
+
+static void
+cp_sequence_dealloc(CpSequence* self)
+{
+  Py_XDECREF(self->m_model);
+  Py_XDECREF(self->m_options);
+  Py_XDECREF(self->m_excluded);
+  self->s_union = false;
+  Py_TYPE(self)->tp_free((PyObject*)self);
+}
+
+static int
+_cp_sequence_init(CpSequence* self);
+
+static int
+cp_sequence_init(CpSequence* self, PyObject* args, PyObject* kw)
+{
+  static char* kwlist[] = { "model", "options", NULL };
+  PyObject *model = NULL, *options = NULL, *excluded = NULL;
+  if (!PyArg_ParseTupleAndKeywords(
+        args, kw, "OO|O", kwlist, &model, &excluded, &options)) {
+    return -1;
+  }
+
+  _Cp_SetObj(self->m_model, model);
+  if (!options) {
+    options = PySet_New(NULL);
+    if (!options) {
+      return -1;
+    }
+  } else {
+    _Cp_SetObj(self->m_options, options);
+  }
+
+  _coremodulestate* state = get_global_core_state();
+  if (_PySet_Update(self->m_options,
+                    state->cp_option__global_sequence_options) < 0) {
+    return -1;
+  };
+
+  self->s_union = PySet_Contains(self->m_options, state->cp_option__union);
+  if (!excluded) {
+    _Cp_SetObj(self->m_excluded, PySet_New(NULL));
+    if (!self->m_excluded) {
+      return -1;
+    }
+  } else {
+    _Cp_SetObj(self->m_excluded, excluded);
+  }
+  return 0;
+}
+
+static PyObject*
+cp_sequence__type__(CpSequence* self)
+{
+  return Py_NewRef(&PyDict_Type);
+}
+
+static PyObject*
+cp_sequence_add_field(CpSequence* self, PyObject* args, PyObject* kw)
+{
+  static char* kwlist[] = { "field", "exclude", NULL };
+  PyObject* field = NULL;
+  int8_t exclude = false;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kw, "O|p", kwlist, &field, &exclude)) {
+    return NULL;
+  }
+
+  if (field->ob_type != &CpField_Type) {
+    PyErr_SetString(PyExc_ValueError, "input object is not a field!");
+    return NULL;
+  }
+
+  CpField* cp_field = (CpField*)field;
+  if (exclude) {
+    if (PySet_Add(self->m_excluded, cp_field->m_name)) {
+      return NULL;
+    }
+  }
+  PyObject_SetItem(self->m_model, cp_field->m_name, field);
+  return Py_None;
+}
+
+// ------------------------------------------------------------------------------
 // pack
 // ------------------------------------------------------------------------------
 
@@ -2610,9 +2727,12 @@ cp_pack_common(PyObject* op, PyObject* atom, CpState* state)
   }
 
   if (!PySequence_Check(op)) {
-    PyErr_SetString(PyExc_ValueError, "input object is not a sequence");
+    PyErr_Format(PyExc_ValueError, "input object (%R) is not a sequence", op);
     return -1;
   }
+
+  // TODO: explain why
+  state->s_sequential = false;
 
   Py_ssize_t size = PySequence_Size(op);
   PyObject* length =
@@ -2646,7 +2766,10 @@ cp_pack_common(PyObject* op, PyObject* atom, CpState* state)
     success = cp_pack_internal(sizeobj, start, state);
     Py_DECREF(sizeobj);
     Py_DECREF(start);
-    return success;
+    if (success < 0) {
+      return success;
+    }
+    state->m_length = size;
   } else {
     if (!PyLong_Check(length)) {
       Py_XDECREF(length);
@@ -2672,7 +2795,6 @@ cp_pack_common(PyObject* op, PyObject* atom, CpState* state)
   }
   PyObject* obj = NULL;
   PyObject* base_path = Py_NewRef(state->m_path);
-  state->s_sequential = false;
   for (state->m_index = 0; state->m_index < state->m_length; state->m_index++) {
     obj = PySequence_GetItem(op, state->m_index);
     if (!obj) {
@@ -3103,8 +3225,12 @@ PyInit__core(void)
   CpModule_AddOption(cp_option__sequential, "field:sequential", "F_SEQUENTIAL");
   CpModule_AddOption(
     cp_option__keep_position, "field:keep_position", "F_KEEP_POSITION");
+  CpModule_AddOption(cp_option__union, "seq:union", "S_UNION");
 
   CpModule_AddGlobalOptions(cp_option__global_field_options, "G_FIELD_OPTIONS");
+  CpModule_AddGlobalOptions(cp_option__global_sequence_options,
+                            "G_SEQ_OPTIONS");
+
   CpModule_AddArch(cp_arch__host, "<host>", sizeof(void*) * 8, "HOST_ARCH");
 
   _CpModuleState_Def(

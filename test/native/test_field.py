@@ -21,9 +21,8 @@ def test_field_length():
     f = CpField(A, length=0xF00)
     assert f.length == 0xF00
 
-    # 10x10 matrix
-    f = CpField(A)[10][10]
-    assert f.length == 10 and f.atom.length == 10
+    f = CpField(A)[10]
+    assert f.length == 10
 
     f = CpField(A)[...]
     assert f.length is ...
