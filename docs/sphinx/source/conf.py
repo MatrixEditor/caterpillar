@@ -5,6 +5,7 @@
 import sys
 import os
 
+sys.path.insert(0, os.path.abspath("./extensions/"))
 sys.path.insert(0, os.path.abspath("../../.."))
 
 # -- Project information -----------------------------------------------------
@@ -26,6 +27,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx_design",
     "breathe",
+    "c_annotations"
 ]
 
 templates_path = ["_templates"]
@@ -58,6 +60,8 @@ pygments_style = "sphinx"
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
+
+refcount_file = 'extensions/refcounts.dat'
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output

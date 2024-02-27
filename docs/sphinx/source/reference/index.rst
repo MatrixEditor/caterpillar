@@ -14,8 +14,14 @@ documentation.
 
 .. toctree::
    :maxdepth: 2
-   :numbered:
+   :caption: Python Reference
 
    introduction.rst
    datamodel.rst
    operators.rst
+
+.. toctree::
+   :maxdepth: 2
+   :caption: C API
+
+   capi/abstract.rst

@@ -1361,7 +1361,7 @@ CpAtomType_CanUnpack(PyObject* op)
   return false;
 }
 
-static inline bool
+static inline int
 CpAtomType_HasType(PyObject* op)
 {
   PyObject* attr = PyObject_GetAttrString(op, CpAtomType_Type);
@@ -1373,7 +1373,7 @@ CpAtomType_HasType(PyObject* op)
   return false;
 }
 
-static inline bool
+static inline int
 CpAtomType_HasSize(PyObject* op)
 {
   PyObject* attr = PyObject_GetAttrString(op, CpAtomType_Size);
@@ -1438,7 +1438,7 @@ typedef struct CpAtom
   PyObject_HEAD
 } CpAtom;
 
-static inline PyObject*
+static PyObject*
 CpAtom_CallPack(PyObject* self, PyObject* name, PyObject* op, PyObject* ctx)
 {
   PyObject* args = Py_BuildValue("(OO)", self, op, ctx);
