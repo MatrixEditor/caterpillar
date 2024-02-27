@@ -1,6 +1,4 @@
-#include <float.h>
-#include <limits.h>
-#include <math.h>
+#include <regex.h>
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -24,7 +22,7 @@ struct CpAtom;
 struct CpField;
 struct CpFieldAtom;
 struct CpState;
-struct CpSequence;
+struct CpStruct;
 
 static PyTypeObject CpContextPath_Type;
 static PyTypeObject CpEndian_Type;
@@ -39,7 +37,7 @@ static PyTypeObject CpDefaultSwitchOption_Type;
 static PyTypeObject CpField_Type;
 static PyTypeObject CpFieldAtom_Type;
 static PyTypeObject CpState_Type;
-static PyTypeObject CpSequence_Type;
+static PyTypeObject CpStruct_Type;
 
 static PyObject _InvalidDefault_Object;
 #define CP_INVALID_DEFAULT &_InvalidDefault_Object
@@ -88,11 +86,13 @@ cp_pack_common(PyObject* op, PyObject* atom, struct CpState* state);
 
 static int
 cp_pack(PyObject* op, PyObject* atom, PyObject* io, PyObject* globals, int raw);
+
 // ------------------------------------------------------------------------------
 // special attribute names
 // ------------------------------------------------------------------------------
 #define CpType_Template "__template__"
 #define CpType_Struct "__struct__"
+#define CpType_MRO "__mro__"
 
 #define CpAtomType_Pack "__pack__"
 #define CpAtomType_PackMany "__pack_many__"
@@ -116,10 +116,16 @@ typedef struct
   PyObject* cp_option__sequential;
   PyObject* cp_option__keep_position;
   PyObject* cp_option__union;
+  PyObject* cp_option__eval;
+  PyObject* cp_option__discard_unnamed;
+  PyObject* cp_option__discard_const;
 
   // global default options
   PyObject* cp_option__global_field_options;
-  PyObject* cp_option__global_sequence_options;
+  PyObject* cp_option__global_struct_options;
+
+  // compiled regex for unnamed fields
+  regex_t cp_regex__unnamed;
 
   // global arch
   PyObject* cp_arch__host;
@@ -135,6 +141,10 @@ typedef struct
   // io buffers
   PyObject* io_bytesio;
 
+  // inspect:
+  // Why? - https://docs.python.org/3/howto/annotations.html
+  PyObject* inspect_getannotations;
+
   // strings
   PyObject* str_tell;
   PyObject* str_seek;
@@ -147,10 +157,14 @@ typedef struct
   PyObject* str___unpack_many__;
   PyObject* str___size__;
   PyObject* str___type__;
+  PyObject* str___annotations__;
+  PyObject* str___mro__;
+  PyObject* str___struct__;
   PyObject* str_start;
   PyObject* str_ctx__root;
   PyObject* str_ctx__getattr;
   PyObject* str_bytesio_getvalue;
+  PyObject* str_builder_process;
 } _coremodulestate;
 
 static inline _coremodulestate*
@@ -799,6 +813,9 @@ static PyTypeObject CpUnaryExpr_Type = {
 // ------------------------------------------------------------------------------
 enum
 {
+  // The first six operations store the same value as defined by Python,
+  // minimizing the effort to translate *_richcmp calls into this enum.
+
   CpBinaryExpr_Op_LT = 0,
   CpBinaryExpr_Op_LE,
   CpBinaryExpr_Op_EQ,
@@ -1592,6 +1609,12 @@ typedef struct CpField
   int8_t s_sequential;
   int8_t s_keep_pos;
 } CpField;
+
+static inline int
+CpField_HasCondition(CpField* self)
+{
+  return !Py_IsTrue(self->m_condition);
+}
 
 static inline int
 CpField_IsEnabled(CpField* self, PyObject* context)
@@ -2512,116 +2535,299 @@ static PyTypeObject CpState_Type = {
 };
 
 // ------------------------------------------------------------------------------
-// sequence
+// CpStruct
 // ------------------------------------------------------------------------------
-typedef struct CpSequence
+typedef struct CpStruct
 {
-  CpFieldAtom _base;
-
-  PyObject* m_model;    // dict (initial model)
-  PyObject* m_excluded; // set
-  PyObject* m_options;  // set
+  PyObject_HEAD PyTypeObject* m_model; // underlying class
+  PyObject* m_members;                 // Dict[str, Field]
+  PyObject* m_options;                 // set[CpOption]
+  PyObject* m_excluded;                // set[str]
 
   // internal states
   int8_t s_union;
-} CpSequence;
+  _coremodulestate* s_mod;
+} CpStruct;
 
 static PyObject*
-cp_sequence_new(PyTypeObject* type, PyObject* args, PyObject* kw)
+cp_struct_new(PyTypeObject* type, PyObject* args, PyObject* kw)
 {
-  CpSequence* self = (CpSequence*)type->tp_alloc(type, 0);
+  CpStruct* self = (CpStruct*)type->tp_alloc(type, 0);
   if (!self) {
     return NULL;
   }
   self->m_model = NULL;
   self->m_options = NULL;
-  self->m_excluded = NULL;
+  self->m_members = NULL;
   self->s_union = false;
+  self->m_excluded = NULL;
+  self->s_mod = get_global_core_state();
   return (PyObject*)self;
 }
 
 static void
-cp_sequence_dealloc(CpSequence* self)
+cp_sequence_dealloc(CpStruct* self)
 {
   Py_XDECREF(self->m_model);
   Py_XDECREF(self->m_options);
+  Py_XDECREF(self->m_members);
   Py_XDECREF(self->m_excluded);
   self->s_union = false;
   Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
 static int
-_cp_sequence_init(CpSequence* self);
-
-static int
-cp_sequence_init(CpSequence* self, PyObject* args, PyObject* kw)
+cp_sequence_init(CpStruct* self, PyObject* args, PyObject* kw)
 {
-  static char* kwlist[] = { "model", "options", NULL };
-  PyObject *model = NULL, *options = NULL, *excluded = NULL;
+  static char* kwlist[] = { "model", "members", "options", "excluded", NULL };
+  PyObject *model = NULL, *options = NULL, *members = NULL, *excluded = NULL;
   if (!PyArg_ParseTupleAndKeywords(
-        args, kw, "OO|O", kwlist, &model, &excluded, &options)) {
+        args, kw, "O|OOO", kwlist, &model, &members, &options, &excluded)) {
     return -1;
   }
 
-  _Cp_SetObj(self->m_model, model);
-  if (!options) {
-    options = PySet_New(NULL);
-    if (!options) {
-      return -1;
-    }
-  } else {
-    _Cp_SetObj(self->m_options, options);
+  if (!model || !PyType_Check(model)) {
+    PyErr_SetString(PyExc_TypeError, "model must be a type");
+    return -1;
   }
 
-  _coremodulestate* state = get_global_core_state();
+  Py_XSETREF(self->m_model, (PyTypeObject*)Py_NewRef(model));
+  _Cp_SetObj(self->m_options, options) else
+  {
+    self->m_options = PySet_New(NULL);
+    if (!self->m_options) {
+      return -1;
+    }
+  }
   if (_PySet_Update(self->m_options,
-                    state->cp_option__global_sequence_options) < 0) {
+                    self->s_mod->cp_option__global_struct_options) < 0) {
     return -1;
   };
 
-  self->s_union = PySet_Contains(self->m_options, state->cp_option__union);
-  if (!excluded) {
-    _Cp_SetObj(self->m_excluded, PySet_New(NULL));
+  self->s_union =
+    PySet_Contains(self->m_options, self->s_mod->cp_option__union);
+
+  _Cp_SetObj(self->m_members, members) else
+  {
+    self->m_members = PyDict_New();
+    if (!self->m_members) {
+      return -1;
+    }
+  }
+
+  _Cp_SetObj(self->m_excluded, excluded) else
+  {
+    self->m_excluded = PySet_New(NULL);
     if (!self->m_excluded) {
       return -1;
     }
-  } else {
-    _Cp_SetObj(self->m_excluded, excluded);
   }
   return 0;
 }
 
-static PyObject*
-cp_sequence__type__(CpSequence* self)
-{
-  return Py_NewRef(&PyDict_Type);
-}
+static PyMemberDef CpStruct_Members[] = {
+  { "model", T_OBJECT, offsetof(CpStruct, m_model), READONLY, NULL },
+  { "members", T_OBJECT, offsetof(CpStruct, m_members), READONLY, NULL },
+  { "options", T_OBJECT, offsetof(CpStruct, m_options), 0, NULL },
+  { NULL } /* Sentinel */
+};
 
-static PyObject*
-cp_sequence_add_field(CpSequence* self, PyObject* args, PyObject* kw)
-{
-  static char* kwlist[] = { "field", "exclude", NULL };
-  PyObject* field = NULL;
-  int8_t exclude = false;
+static PyTypeObject CpStruct_Type = {
+  .ob_base = PyVarObject_HEAD_INIT(NULL, 0).tp_name = _Cp_Name(_core.CpStruct),
+  .tp_doc = "...",
+  .tp_basicsize = sizeof(CpStruct),
+  .tp_itemsize = 0,
+  .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
+  .tp_new = cp_struct_new,
+  .tp_dealloc = (destructor)cp_sequence_dealloc,
+  .tp_init = (initproc)cp_sequence_init,
+  .tp_members = CpStruct_Members,
+};
 
-  if (!PyArg_ParseTupleAndKeywords(args, kw, "O|p", kwlist, &field, &exclude)) {
-    return NULL;
+// public API methods
+
+static int
+CpStruct_AddField(CpStruct* self, CpField* field, int exclude)
+{
+  if (!field) {
+    PyErr_SetString(PyExc_TypeError, "field must be a Field");
+    return -1;
   }
 
-  if (field->ob_type != &CpField_Type) {
-    PyErr_SetString(PyExc_ValueError, "input object is not a field!");
-    return NULL;
-  }
-
-  CpField* cp_field = (CpField*)field;
   if (exclude) {
-    if (PySet_Add(self->m_excluded, cp_field->m_name)) {
-      return NULL;
+    if (PySet_Add(self->m_excluded, field->m_name) < 0) {
+      return -1;
     }
   }
-  PyObject_SetItem(self->m_model, cp_field->m_name, field);
-  return Py_None;
+  return PyObject_SetItem(self->m_members, field->m_name, (PyObject*)field);
 }
+
+static int
+CpStruct_RemoveField(CpStruct* self, CpField* field)
+{
+  if (!field) {
+    PyErr_SetString(PyExc_TypeError, "field must be a Field");
+    return -1;
+  }
+
+  if (PySet_Discard(self->m_excluded, field->m_name) < 0) {
+    return -1;
+  }
+  return PyDict_DelItem(self->m_members, field->m_name);
+}
+
+static inline int
+CpStruct_SetDefault(CpStruct* self, PyObject* name, PyObject* value)
+{
+  if (!name) {
+    PyErr_SetString(PyExc_TypeError, "name must be a string");
+    return -1;
+  }
+
+  return PyObject_SetAttr((PyObject*)self->m_model, name, value);
+}
+
+static inline int
+CpStruct_SetDefaults(CpStruct* self, const char* name, PyObject* value)
+{
+  if (!name) {
+    PyErr_SetString(PyExc_TypeError, "name must be a string");
+    return -1;
+  }
+
+  return PyObject_SetAttrString((PyObject*)self->m_model, name, value);
+}
+
+static inline PyObject*
+CpStruct_GetAnnotations(CpStruct* self, int eval)
+{
+  PyObject* args = Py_BuildValue("O", self->m_model);
+  if (!args) {
+    return NULL;
+  }
+
+  PyObject* kwargs = Py_BuildValue("{s:i}", "eval_str", eval);
+  if (!kwargs) {
+    Py_DECREF(args);
+    return NULL;
+  }
+
+  PyObject* result = PyObject_Call((PyObject*)self->m_model, args, kwargs);
+  Py_DECREF(args);
+  Py_DECREF(kwargs);
+  return result;
+}
+
+static int
+CpStruct_ReplaceType(CpStruct* self, PyObject* name, PyObject* type)
+{
+  if (!name) {
+    PyErr_SetString(PyExc_TypeError, "name must be a string");
+    return -1;
+  }
+  // TODO
+  PyObject* annotations = CpStruct_GetAnnotations(self, false);
+  if (!annotations) {
+    return -1;
+  }
+
+  if (PyDict_SetItem(annotations, name, type) < 0) {
+    Py_DECREF(annotations);
+    return -1;
+  }
+  Py_XDECREF(annotations);
+  return 0;
+}
+
+static inline PyObject*
+CpStruct_GetValue(CpStruct* self, PyObject* instance, PyObject* name)
+{
+  PyObject* value = PyObject_GetAttr(instance, name);
+  if (!value) {
+    PyErr_Clear();
+    return Py_NewRef(Py_None);
+  }
+  return value;
+}
+
+static inline PyObject*
+CpStruct_GetDefaultValue(CpStruct* self, PyObject* name)
+{
+  PyObject* value = PyObject_GetAttr((PyObject*)self->m_model, name);
+  if (!value) {
+    PyErr_Clear();
+    return Py_NewRef(CP_INVALID_DEFAULT);
+  }
+  return value;
+}
+
+static inline PyObject*
+CpStruct_New(PyObject* model)
+{
+  return PyObject_CallFunctionObjArgs((PyObject*)&CpStruct_Type, model, NULL);
+}
+
+static inline PyObject*
+CpStruct_GetMethodResolutionOrder(CpStruct* self)
+{
+  // state is optional
+  return PyObject_GetAttr((PyObject*)self->m_model, self->s_mod->str___mro__);
+}
+
+static PyObject*
+CpStruct_GetReverseMRO(CpStruct* self)
+{
+  PyObject *mro = CpStruct_GetMethodResolutionOrder(self), *start = NULL,
+           *stop = NULL, *step = NULL, *slice = NULL, *result = NULL;
+  if (!mro) {
+    return NULL;
+  }
+
+  start = PyLong_FromSsize_t(-1), stop = PyLong_FromSsize_t(0),
+  step = PyLong_FromSsize_t(-1);
+  if (!start || !stop || !step) {
+    goto cleanup;
+  }
+
+  slice = PySlice_New(start, stop, step);
+  if (!slice) {
+    goto cleanup;
+  }
+
+  result = PyObject_GetItem(mro, slice);
+cleanup:
+  Py_XDECREF(start);
+  Py_XDECREF(stop);
+  Py_XDECREF(step);
+  Py_XDECREF(slice);
+  Py_XDECREF(mro);
+  return result;
+}
+
+static inline PyObject*
+CpStruct_GetStruct(PyObject* model, _coremodulestate* state)
+{
+  if (!state) {
+    return PyObject_GetAttrString(model, CpType_Struct);
+  } else {
+    return PyObject_GetAttr(model, state->str___struct__);
+  }
+}
+
+static int
+CpStruct_Check(PyObject* model, _coremodulestate* state)
+{
+  PyObject* attr = CpStruct_GetStruct(model, state);
+  PyErr_Clear();
+  return attr ? 1 : 0;
+}
+
+static inline int
+CpStruct_IsExcluded(CpStruct* self, PyObject* name)
+{
+  return PySet_Contains(self->m_excluded, name);
+}
+
 
 // ------------------------------------------------------------------------------
 // pack
@@ -2998,6 +3204,8 @@ cp_typeof(PyObject* op)
 
   if (op->ob_type == &CpField_Type) {
     return cp_typeof_field((CpField*)op);
+  } else if (op->ob_type == &CpStruct_Type) {
+    return Py_NewRef(((CpStruct*)op)->m_model);
   }
 
   return cp_typeof_common(op);
@@ -3131,6 +3339,14 @@ _coremodule_clear(PyObject* m)
     Py_CLEAR(state->str_ctx__root);
     Py_CLEAR(state->str_ctx__getattr);
     Py_CLEAR(state->str_bytesio_getvalue);
+    Py_CLEAR(state->str___annotations__);
+    Py_CLEAR(state->str_builder_process);
+    Py_CLEAR(state->str___mro__);
+    Py_CLEAR(state->str___struct__);
+    Py_CLEAR(state->io_bytesio);
+    Py_CLEAR(state->inspect_getannotations);
+
+    regfree(&state->cp_regex__unnamed);
   }
   return 0;
 }
@@ -3195,12 +3411,19 @@ PyInit__core(void)
   CpType_Ready(&CpInvalidDefault_Type);
   CpType_Ready(&CpDefaultSwitchOption_Type);
   CpType_Ready(&CpState_Type);
+  CpType_Ready(&CpStruct_Type);
 
   m = PyModule_Create(&_coremodule);
   if (!m) {
     return NULL;
   }
   CpModule_AddObject("CpOption", &CpOption_Type);
+  CpModule_AddObject("CpInvalidDefault", &CpInvalidDefault_Type);
+  CpModule_AddObject("CpDefaultSwitchOption", &CpDefaultSwitchOption_Type);
+
+  CpModule_AddObject("DEFAULT_OPTION", CP_DEFAULT_OPTION);
+  CpModule_AddObject("INVALID_DEFAULT", CP_INVALID_DEFAULT);
+
   CpModule_AddObject("CpArch", &CpArch_Type);
   CpModule_AddObject("CpEndian", &CpEndian_Type);
   CpModule_AddObject("CpContext", &CpContext_Type);
@@ -3211,12 +3434,7 @@ PyInit__core(void)
   CpModule_AddObject("CpField", &CpField_Type);
   CpModule_AddObject("CpFieldAtom", &CpFieldAtom_Type);
   CpModule_AddObject("CpState", &CpState_Type);
-
-  CpModule_AddObject("CpInvalidDefault", &CpInvalidDefault_Type);
-  CpModule_AddObject("CpDefaultSwitchOption", &CpDefaultSwitchOption_Type);
-
-  CpModule_AddObject("DEFAULT_OPTION", CP_DEFAULT_OPTION);
-  CpModule_AddObject("INVALID_DEFAULT", CP_INVALID_DEFAULT);
+  CpModule_AddObject("CpStruct", &CpStruct_Type);
 
   // setup state
   _coremodulestate* state = get_core_state(m);
@@ -3225,11 +3443,12 @@ PyInit__core(void)
   CpModule_AddOption(cp_option__sequential, "field:sequential", "F_SEQUENTIAL");
   CpModule_AddOption(
     cp_option__keep_position, "field:keep_position", "F_KEEP_POSITION");
-  CpModule_AddOption(cp_option__union, "seq:union", "S_UNION");
+  CpModule_AddOption(cp_option__union, "struct:union", "S_UNION");
+  CpModule_AddOption(
+    cp_option__eval, "struct:eval_annotations", "S_EVAL_ANNOTATIONS");
 
   CpModule_AddGlobalOptions(cp_option__global_field_options, "G_FIELD_OPTIONS");
-  CpModule_AddGlobalOptions(cp_option__global_sequence_options,
-                            "G_SEQ_OPTIONS");
+  CpModule_AddGlobalOptions(cp_option__global_struct_options, "G_SEQ_OPTIONS");
 
   CpModule_AddArch(cp_arch__host, "<host>", sizeof(void*) * 8, "HOST_ARCH");
 
@@ -3259,6 +3478,16 @@ PyInit__core(void)
   _CpModuleState_Set(io_bytesio, PyObject_GetAttrString(io, "BytesIO"));
   Py_XDECREF(io);
 
+  PyObject* inspect = PyImport_ImportModule("inspect");
+  if (!inspect) {
+    PyErr_SetString(PyExc_ImportError, "failed to import inspect");
+    return NULL;
+  }
+
+  _CpModuleState_Set(inspect_getannotations,
+                     PyObject_GetAttrString(inspect, "get_annotations"));
+  Py_XDECREF(inspect);
+
 // intern strings
 #define CACHED_STRING(attr, str)                                               \
   if ((state->attr = PyUnicode_InternFromString(str)) == NULL)                 \
@@ -3279,7 +3508,17 @@ PyInit__core(void)
   CACHED_STRING(str_ctx__root, "<root>");
   CACHED_STRING(str_ctx__getattr, CpContext_GetAttr);
   CACHED_STRING(str_bytesio_getvalue, "getvalue");
+  CACHED_STRING(str___annotations__, "__annotations__");
+  CACHED_STRING(str_builder_process, "process");
+  CACHED_STRING(str___mro__, CpType_MRO);
+  CACHED_STRING(str___struct__, CpType_Struct);
 
 #undef CACHED_STRING
+
+  if (regcomp(&state->cp_regex__unnamed, "^_[0-9]*", REG_EXTENDED) != 0) {
+    PyErr_SetString(PyExc_ValueError, "failed to compile regex");
+    return NULL;
+  }
+
   return m;
 }
