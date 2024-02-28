@@ -10,6 +10,44 @@ designed to incorporate packing and unpacking of data streams as well
 as calculating its size and measuring its type.
 
 
+.. c:type:: CpAtom
+
+    All classes that implement capabilities of an *atom* should inherit
+    from this class. It defines, but does not implement all four protocol
+    methods. There are no specific members - consider this class to be
+    an abstract base class.
+
+
+.. c:var:: PyTypeObject CpAtom_Type
+
+    The type object of the :c:type:`CpAtom` class.
+
+
+.. c:function:: PyObject *CpAtom_CallPack(PyObject* self, PyObject* name, PyObject* o, PyObject* ctx)
+
+    Packs the object :code:`o` using context :code:`ctx` and returns the result. The
+    :code:`name` describes the target method name to be called on the object :code:`self`.
+    This method will return *NULL* if an error occurs while calling the target method. Proper
+    use would be together with the global module state:
+
+    .. code-block:: c
+
+        _coremodulestate* state = _getstate();
+        PyObject *o = ..., *ctx = ...;
+
+        // invoke __pack__ manually
+        PyObject* result = CpAtom_CallPack(self, state->str___pack__, o, ctx);
+        if (!result) {
+            return NULL;
+        }
+        // do something with result
+
+    The provided context object must support the *Context Protocol*, which is not validated in
+    this method. Furthermore, it must be an instance of the :c:type:`CpState` structure if the
+    native *pack* function is called. This function may return *NotImplemented* to indicate
+    that this class does not support packing.
+
+
 .. c:function:: int CpAtomType_CanPack(PyObject* o)
                 int CpAtomType_FastCanPack(PyObject* o, _coremodulestate* state)
 
@@ -50,26 +88,4 @@ as calculating its size and measuring its type.
     it's string cache will be used.
 
 
-.. c:function:: PyObject *CpAtom_CallPack(PyObject* self, PyObject* name, PyObject* o, PyObject* ctx)
-
-    Packs the object :code:`o` using context :code:`ctx` and returns the result. The
-    :code:`name` describes the target method name to be called on the object :code:`self`.
-    This method will return *NULL* if an error occurs while calling the target method. Proper
-    use would be together with the global module state:
-
-    .. code-block:: c
-
-        _coremodulestate* state = _getstate();
-        PyObject *o = ..., *ctx = ...;
-
-        // invoke __pack__ manually
-        PyObject* result = CpAtom_CallPack(self, state->str___pack__, o, ctx);
-        if (!result) {
-            return NULL;
-        }
-        // do something with result
-
-    The provided context object must support the *Context Protocol*, which is not validated in
-    this method. Furthermore, it must be an instance of the :c:type:`CpState` structure if the
-    native *pack* function is called.
 

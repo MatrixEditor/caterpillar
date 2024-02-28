@@ -71,8 +71,10 @@ class Annotations:
             entry = self.refcount_data.get(name)
             if not entry:
                 continue
-            elif not entry.result_type.endswith("Object*"):
+
+            if not entry.result_type.endswith("Object*"):
                 continue
+
             if entry.result_refs is None:
                 rc = sphinx_gettext("Return value: Always NULL.")
             elif entry.result_refs:
@@ -90,6 +92,6 @@ def init_annotations(app):
 
 
 def setup(app):
-    app.add_config_value('refcount_file', '', True)
+    app.add_config_value("refcount_file", "", True)
     app.connect("builder-inited", init_annotations)
     return {"version": "1.0", "parallel_read_safe": True}

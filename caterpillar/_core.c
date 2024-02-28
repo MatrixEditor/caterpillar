@@ -1,4 +1,3 @@
-#include <regex.h>
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -125,7 +124,7 @@ typedef struct
   PyObject* cp_option__global_struct_options;
 
   // compiled regex for unnamed fields
-  regex_t cp_regex__unnamed;
+  PyObject* cp_regex__unnamed;
 
   // global arch
   PyObject* cp_arch__host;
@@ -2828,7 +2827,6 @@ CpStruct_IsExcluded(CpStruct* self, PyObject* name)
   return PySet_Contains(self->m_excluded, name);
 }
 
-
 // ------------------------------------------------------------------------------
 // pack
 // ------------------------------------------------------------------------------
@@ -3345,8 +3343,7 @@ _coremodule_clear(PyObject* m)
     Py_CLEAR(state->str___struct__);
     Py_CLEAR(state->io_bytesio);
     Py_CLEAR(state->inspect_getannotations);
-
-    regfree(&state->cp_regex__unnamed);
+    Py_CLEAR(state->cp_regex__unnamed);
   }
   return 0;
 }
@@ -3515,8 +3512,18 @@ PyInit__core(void)
 
 #undef CACHED_STRING
 
-  if (regcomp(&state->cp_regex__unnamed, "^_[0-9]*", REG_EXTENDED) != 0) {
-    PyErr_SetString(PyExc_ValueError, "failed to compile regex");
+  PyObject* re = PyImport_ImportModule("re");
+  if (!re) {
+    return NULL;
+  }
+
+  PyObject* compile = PyObject_GetAttrString(re, "compile");
+  if (!compile) {
+    return NULL;
+  }
+
+  state->cp_regex__unnamed = PyObject_CallFunction(compile, "s", "_[0-9]*$");
+  if (!state->cp_regex__unnamed) {
     return NULL;
   }
 
