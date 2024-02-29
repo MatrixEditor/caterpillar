@@ -82,10 +82,28 @@ static int
 cp_pack_field(PyObject* op, struct CpField* field, struct CpState* state);
 
 static int
+cp_pack_struct(PyObject* op, struct CpStruct* field, struct CpState* state);
+
+static int
 cp_pack_common(PyObject* op, PyObject* atom, struct CpState* state);
 
 static int
 cp_pack(PyObject* op, PyObject* atom, PyObject* io, PyObject* globals, int raw);
+
+static PyObject*
+cp_sizeof(PyObject* op);
+
+static PyObject*
+cp_sizeof_internal(PyObject* atom, struct CpState* state);
+
+static PyObject*
+cp_sizeof_common(PyObject* atom, struct CpState* state);
+
+static PyObject*
+cp_sizeof_field(struct CpField* field, struct CpState* state);
+
+static PyObject*
+cp_sizeof_struct(struct CpStruct* struct_, struct CpState* state);
 
 // ------------------------------------------------------------------------------
 // special attribute names
@@ -2610,8 +2628,8 @@ cp_struct_fieldinfo_init(CpStructFieldInfo* self, PyObject* args, PyObject* kw)
     return -1;
   }
 
-  PyObject* o = Py_XNewRef(field);
-  Py_XSETREF(self->m_field, (CpField*)(o));
+  Py_XINCREF(field);
+  Py_XSETREF(self->m_field, (CpField*)(field));
   self->s_excluded = excluded;
   return 0;
 }
@@ -2751,7 +2769,6 @@ CpStruct_AddField(CpStruct* o, CpField* field, int exclude)
   }
   info->s_excluded = exclude;
   int res = CpStruct_AddFieldInfo(o, info);
-  Py_XDECREF(info);
   return res;
 }
 
@@ -2814,8 +2831,7 @@ CpStruct_GetValue(CpStruct* o, PyObject* instance, PyObject* name)
 {
   PyObject* value = PyObject_GetAttr(instance, name);
   if (!value) {
-    PyErr_Clear();
-    return Py_NewRef(Py_None);
+    return NULL;
   }
   return value;
 }
@@ -3331,10 +3347,8 @@ cp_struct_process_annotation(CpStruct* self,
       Py_XDECREF(field);
       return -1;
     }
-    Py_XDECREF(type);
   }
 
-  Py_XDECREF(field);
   return res;
 }
 
@@ -3480,12 +3494,13 @@ static PyTypeObject CpStruct_Type = {
 static int
 cp_pack_field(PyObject* op, CpField* field, CpState* state)
 {
+  PyObject* s = PyObject_Str(op);
+  Py_DECREF(s);
   // we can assert that all provided objects are of the correct type
-  PyObject* path = PyUnicode_FromFormat("%s.%s", state->m_path, field->m_name);
-  if (!path) {
+  CpState_AppendPath(field->m_name);
+  if (!state->m_path) {
     return -1;
   }
-  Py_XSETREF(state->m_path, path);
 
   int res = CpField_IsEnabled(field, (PyObject*)state);
   if (!res) {
@@ -3562,6 +3577,8 @@ cp_pack_field(PyObject* op, CpField* field, CpState* state)
 static int
 cp_pack_common(PyObject* op, PyObject* atom, CpState* state)
 {
+  PyObject* s = PyObject_Str(op);
+  Py_DECREF(s);
   int success;
   if (!state->s_sequential) {
     return PyObject_CallMethod(atom, CpAtomType_Pack, "OO", op, state) ? 0 : -1;
@@ -3651,7 +3668,8 @@ cp_pack_common(PyObject* op, PyObject* atom, CpState* state)
       Py_DECREF(base_path);
       return -1;
     }
-    state->m_path = PyUnicode_FromFormat("%s.%d", base_path, state->m_index);
+    state->m_path = PyUnicode_FromFormat(
+      "%s.%d", _PyUnicode_AsString(base_path), state->m_index);
     if (!state->m_path) {
       Py_XDECREF(obj);
       Py_DECREF(base_path);
@@ -3666,6 +3684,98 @@ cp_pack_common(PyObject* op, PyObject* atom, CpState* state)
     }
   }
   return 0;
+}
+
+static int
+cp_pack_struct(PyObject* op, CpStruct* struct_, CpState* state)
+{
+  if (state->s_sequential) {
+    // TODO: explain why
+    return cp_pack_common(op, (PyObject*)struct_, state);
+  }
+
+  if (PySequence_Check(op)) {
+    PyErr_SetString(
+      PyExc_ValueError,
+      ("Expected a valid CpAtom definition, got a single "
+       "struct for sequential packing. Did you forget to add '[]' "
+       "at the end of your field definiton?"));
+    return -1;
+  }
+  state->m_obj = Py_NewRef(op);
+
+  CpStructFieldInfo *info = NULL, *union_field = NULL;
+  // all borrowed references
+  PyObject* name = NULL;
+  // new references
+  PyObject *max_size = NULL, *size = NULL, *cmp_result = NULL, *value = NULL,
+           *base_path = Py_NewRef(state->m_path);
+  int res = 0;
+  Py_ssize_t pos = 0;
+
+  while (PyDict_Next(struct_->m_members, &pos, &name, (PyObject**)&info)) {
+
+    if (struct_->s_union) {
+      size = NULL; // cp_sizeof_field(info->m_field, state);
+      if (!size) {
+        goto fail;
+      }
+      cmp_result = PyObject_RichCompare(max_size, size, Py_LT);
+      if (!cmp_result) {
+        goto fail;
+      }
+      if (Py_IsTrue(cmp_result)) {
+        max_size = Py_XNewRef(size);
+        union_field = info;
+      }
+      Py_SETREF(cmp_result, NULL);
+      Py_SETREF(size, NULL);
+    }
+
+    else {
+      value = CpStruct_GetValue(struct_, op, name);
+      if (!value) {
+        goto fail;
+      }
+      res = cp_pack_internal(value, (PyObject*)info->m_field, state);
+      if (res < 0) {
+        goto fail;
+      }
+      // Py_SETREF(value, NULL);
+    }
+  }
+
+  if (struct_->s_union) {
+    if (!union_field) {
+      goto success;
+    }
+    value = CpStruct_GetValue(struct_, op, union_field->m_field->m_name);
+    if (!value) {
+      goto fail;
+    }
+    res = cp_pack_internal(value, (PyObject*)union_field->m_field, state);
+    if (res < 0) {
+      goto fail;
+    }
+    goto cleanup;
+  }
+
+  goto success;
+
+fail:
+  res = -1;
+  goto cleanup;
+
+success:
+  res = 0;
+
+cleanup:
+  Py_XDECREF(size);
+  Py_XDECREF(max_size);
+  Py_XDECREF(cmp_result);
+  Py_XDECREF(value);
+  Py_XDECREF(base_path);
+  return res;
 }
 
 static int
@@ -3685,10 +3795,22 @@ cp_pack_internal(PyObject* op, PyObject* atom, CpState* state)
   Py_ssize_t length = state->m_length, index = state->m_index;
   int8_t greedy = state->s_greedy, sequential = state->s_sequential;
 
-  if (atom->ob_type == &CpField_Type) {
-    success = cp_pack_field(op, (CpField*)atom, state);
-  } else {
-    success = cp_pack_common(op, atom, state);
+  MATCH
+  {
+    CASE_EXACT(&CpField_Type, atom)
+    {
+      success = cp_pack_field(op, (CpField*)atom, state);
+    }
+
+    else CASE_EXACT(&CpStruct_Type, atom)
+    {
+      success = cp_pack_struct(op, (CpStruct*)atom, state);
+    }
+
+    else
+    {
+      success = cp_pack_common(op, atom, state);
+    }
   }
 
   Py_XSETREF(state->m_obj, obj);
@@ -3719,7 +3841,7 @@ cp_pack(PyObject* op, PyObject* atom, PyObject* io, PyObject* globals, int raw)
     }
   }
 
-  int success = cp_pack_internal(op, atom, (CpState*)Py_NewRef(state));
+  int success = cp_pack_internal(op, atom, (CpState*)state);
   if (success < 0) {
     Py_DECREF(state);
     return success;
@@ -3916,8 +4038,7 @@ _coremodule_pack_into(PyObject* m, PyObject* args, PyObject* kw)
 
   // TODO: describe why we don't need to decrease the reference
   // count on these variables in the end.
-  PyObject *atomobj = Py_NewRef(atom), *obj = Py_NewRef(op),
-           *ioobj = Py_NewRef(io);
+  PyObject *atomobj = atom, *obj = op, *ioobj = io;
 
   res = cp_pack(obj, atomobj, ioobj, globals, false);
 finish:
@@ -3956,7 +4077,7 @@ _coremodule_pack(PyObject* m, PyObject* args, PyObject* kw)
     goto finish;
   }
 
-  PyObject *atomobj = Py_NewRef(atom), *obj = Py_NewRef(op);
+  PyObject *atomobj = atom, *obj = op;
   res = cp_pack(obj, atomobj, io, globals, true);
 finish:
   Py_XDECREF(globals);
