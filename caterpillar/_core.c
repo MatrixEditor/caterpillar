@@ -40,6 +40,7 @@ static PyTypeObject CpStruct_Type;
 
 static PyObject _InvalidDefault_Object;
 #define CP_INVALID_DEFAULT &_InvalidDefault_Object
+#define Cp_IsInvalidDefault(o) ((o) == CP_INVALID_DEFAULT)
 
 static PyObject _DefaultSwitchOption_Object;
 #define CP_DEFAULT_OPTION &_DefaultSwitchOption_Object
@@ -118,6 +119,7 @@ typedef struct
   PyObject* cp_option__eval;
   PyObject* cp_option__discard_unnamed;
   PyObject* cp_option__discard_const;
+  PyObject* cp_option__replace_types;
 
   // global default options
   PyObject* cp_option__global_field_options;
@@ -164,6 +166,7 @@ typedef struct
   PyObject* str_ctx__getattr;
   PyObject* str_bytesio_getvalue;
   PyObject* str_builder_process;
+  PyObject* str_pattern_match;
 } _coremodulestate;
 
 static inline _coremodulestate*
@@ -1337,7 +1340,7 @@ static PyTypeObject CpContextPath_Type = {
 // CpAtom
 // ------------------------------------------------------------------------------
 static inline bool
-CpAtomType_CanPack(PyObject* op)
+CpAtom_CanPack(PyObject* op)
 {
   PyObject* attr = PyObject_GetAttrString(op, CpAtomType_Pack);
   if (attr) {
@@ -1349,7 +1352,7 @@ CpAtomType_CanPack(PyObject* op)
 }
 
 static inline bool
-CpAtomType_CanUnpack(PyObject* op)
+CpAtom_CanUnpack(PyObject* op)
 {
   PyObject* attr = PyObject_GetAttrString(op, CpAtomType_Unpack);
   if (attr) {
@@ -1361,7 +1364,7 @@ CpAtomType_CanUnpack(PyObject* op)
 }
 
 static inline int
-CpAtomType_HasType(PyObject* op)
+CpAtom_HasType(PyObject* op)
 {
   PyObject* attr = PyObject_GetAttrString(op, CpAtomType_Type);
   if (attr) {
@@ -1373,7 +1376,7 @@ CpAtomType_HasType(PyObject* op)
 }
 
 static inline int
-CpAtomType_HasSize(PyObject* op)
+CpAtom_HasSize(PyObject* op)
 {
   PyObject* attr = PyObject_GetAttrString(op, CpAtomType_Size);
   if (attr) {
@@ -1385,7 +1388,7 @@ CpAtomType_HasSize(PyObject* op)
 }
 
 static inline int
-CpAtomType_FastCanPack(PyObject* op, _coremodulestate* state)
+CpAtom_FastCanPack(PyObject* op, _coremodulestate* state)
 {
   PyObject* attr = PyObject_GetAttr(op, state->str___pack__);
   if (attr) {
@@ -1397,7 +1400,7 @@ CpAtomType_FastCanPack(PyObject* op, _coremodulestate* state)
 }
 
 static inline int
-CpAtomType_FastCanUnpack(PyObject* op, _coremodulestate* state)
+CpAtom_FastCanUnpack(PyObject* op, _coremodulestate* state)
 {
   PyObject* attr = PyObject_GetAttr(op, state->str___unpack__);
   if (attr) {
@@ -1409,7 +1412,7 @@ CpAtomType_FastCanUnpack(PyObject* op, _coremodulestate* state)
 }
 
 static inline int
-CpAtomType_FastHasType(PyObject* op, _coremodulestate* state)
+CpAtom_FastHasType(PyObject* op, _coremodulestate* state)
 {
   PyObject* attr = PyObject_GetAttr(op, state->str___type__);
   if (attr) {
@@ -1421,7 +1424,7 @@ CpAtomType_FastHasType(PyObject* op, _coremodulestate* state)
 }
 
 static inline int
-CpAtomType_FastHasSize(PyObject* op, _coremodulestate* state)
+CpAtom_FastHasSize(PyObject* op, _coremodulestate* state)
 {
   PyObject* attr = PyObject_GetAttr(op, state->str___size__);
   if (attr) {
@@ -1430,6 +1433,18 @@ CpAtomType_FastHasSize(PyObject* op, _coremodulestate* state)
   }
   PyErr_Clear();
   return 0;
+}
+
+static inline int
+CpAtom_Check(PyObject* op)
+{
+  return op && CpAtom_HasSize(op) && CpAtom_CanPack(op) && CpAtom_CanUnpack(op);
+}
+
+static inline int
+CpAtom_CheckExact(PyObject* op)
+{
+  return op && op->ob_type == &CpAtom_Type;
 }
 
 typedef struct CpAtom
@@ -1484,8 +1499,7 @@ cp_atom_unpack(CpAtom* self, PyObject* args, PyObject* kw)
 static PyObject*
 cp_atom_type(CpAtom* self)
 {
-  PyErr_SetString(PyExc_NotImplementedError, "type");
-  return NULL;
+  Py_RETURN_NOTIMPLEMENTED;
 }
 
 static PyObject*
@@ -1609,6 +1623,8 @@ typedef struct CpField
   int8_t s_keep_pos;
 } CpField;
 
+// Public API
+
 static inline int
 CpField_HasCondition(CpField* self)
 {
@@ -1697,6 +1713,14 @@ CpField_GetLength(CpField* self, PyObject* context)
   }
   return Py_NewRef(self->m_length);
 }
+
+static inline int
+CpField_Check(PyObject* o)
+{
+  return o && o->ob_type == &CpField_Type;
+}
+
+// end Public API
 
 static PyObject*
 cp_field_new(PyTypeObject* type, PyObject* args, PyObject* kw)
@@ -1821,8 +1845,8 @@ cp_field_init(CpField* self, PyObject* args, PyObject* kw)
     if (cp_field_set_offset(self, offset, NULL) < 0)
       return -1;
 
-  self->s_size = CpAtomType_FastHasSize(self->m_atom, state);
-  self->s_type = CpAtomType_FastHasType(self->m_atom, state);
+  self->s_size = CpAtom_FastHasSize(self->m_atom, state);
+  self->s_type = CpAtom_FastHasType(self->m_atom, state);
   return 0;
 }
 
@@ -2534,237 +2558,101 @@ static PyTypeObject CpState_Type = {
 };
 
 // ------------------------------------------------------------------------------
+// CpStructFieldInfo
+// ------------------------------------------------------------------------------
+typedef struct CpStructFieldInfo
+{
+  PyObject_HEAD CpField* m_field;
+
+  // Excluded: True if the field is included in the struct
+  int8_t s_excluded;
+
+  // TODO: here's space for more settings
+} CpStructFieldInfo;
+
+static PyObject*
+cp_struct_fieldinfo_new(PyTypeObject* type, PyObject* args, PyObject* kw)
+{
+  CpStructFieldInfo* self = (CpStructFieldInfo*)type->tp_alloc(type, 0);
+  if (!self) {
+    return NULL;
+  }
+  self->m_field = NULL;
+  self->s_excluded = false;
+  return (PyObject*)self;
+}
+
+static void
+cp_struct_fieldinfo_dealloc(CpStructFieldInfo* self)
+{
+  Py_XDECREF(self->m_field);
+  Py_TYPE(self)->tp_free((PyObject*)self);
+}
+
+static int
+cp_struct_fieldinfo_init(CpStructFieldInfo* self, PyObject* args, PyObject* kw)
+{
+  static char* kwlist[] = { "field", "excluded", NULL };
+  PyObject* field = NULL;
+  int8_t excluded = false;
+
+  if (!PyArg_ParseTupleAndKeywords(
+        args, kw, "O|p", kwlist, &field, &excluded)) {
+    return -1;
+  }
+
+  if (!field) {
+    PyErr_SetString(PyExc_ValueError, "field is NULL!");
+    return -1;
+  }
+
+  PyObject* o = Py_XNewRef(field);
+  Py_XSETREF(self->m_field, (CpField*)(o));
+  self->s_excluded = excluded;
+  return 0;
+}
+
+static PyMemberDef CpStructFieldInfo_Members[] = {
+  { "field", T_OBJECT, offsetof(CpStructFieldInfo, m_field), READONLY, NULL },
+  { "excluded", T_BOOL, offsetof(CpStructFieldInfo, s_excluded), 0, NULL },
+  { NULL } /* Sentinel */
+};
+
+static PyTypeObject CpStructFieldInfo_Type = {
+  .ob_base = PyVarObject_HEAD_INIT(NULL, 0).tp_name =
+    _Cp_Name(_core.CpStructFieldInfo),
+  .tp_doc = "...",
+  .tp_basicsize = sizeof(CpStructFieldInfo),
+  .tp_itemsize = 0,
+  .tp_flags = Py_TPFLAGS_DEFAULT,
+  .tp_new = cp_struct_fieldinfo_new,
+  .tp_dealloc = (destructor)cp_struct_fieldinfo_dealloc,
+  .tp_init = (initproc)cp_struct_fieldinfo_init,
+  .tp_members = CpStructFieldInfo_Members,
+};
+
+// ------------------------------------------------------------------------------
 // CpStruct
 // ------------------------------------------------------------------------------
 typedef struct CpStruct
 {
   PyObject_HEAD PyTypeObject* m_model; // underlying class
-  PyObject* m_members;                 // Dict[str, Field]
-  PyObject* m_options;                 // set[CpOption]
-  PyObject* m_excluded;                // set[str]
+
+  PyObject* m_members; // Dict[str, FieldInfo]
+  PyObject* m_options; // set[CpOption]
+
+  PyObject* m_endian;
+  PyObject* m_arch;
+  PyObject* m_field_options;
 
   // internal states
   int8_t s_union;
+  int8_t s_kwonly;
+
   _coremodulestate* s_mod;
 } CpStruct;
 
-static PyObject*
-cp_struct_new(PyTypeObject* type, PyObject* args, PyObject* kw)
-{
-  CpStruct* self = (CpStruct*)type->tp_alloc(type, 0);
-  if (!self) {
-    return NULL;
-  }
-  self->m_model = NULL;
-  self->m_options = NULL;
-  self->m_members = NULL;
-  self->s_union = false;
-  self->m_excluded = NULL;
-  self->s_mod = get_global_core_state();
-  return (PyObject*)self;
-}
-
-static void
-cp_sequence_dealloc(CpStruct* self)
-{
-  Py_XDECREF(self->m_model);
-  Py_XDECREF(self->m_options);
-  Py_XDECREF(self->m_members);
-  Py_XDECREF(self->m_excluded);
-  self->s_union = false;
-  Py_TYPE(self)->tp_free((PyObject*)self);
-}
-
-static int
-cp_sequence_init(CpStruct* self, PyObject* args, PyObject* kw)
-{
-  static char* kwlist[] = { "model", "members", "options", "excluded", NULL };
-  PyObject *model = NULL, *options = NULL, *members = NULL, *excluded = NULL;
-  if (!PyArg_ParseTupleAndKeywords(
-        args, kw, "O|OOO", kwlist, &model, &members, &options, &excluded)) {
-    return -1;
-  }
-
-  if (!model || !PyType_Check(model)) {
-    PyErr_SetString(PyExc_TypeError, "model must be a type");
-    return -1;
-  }
-
-  Py_XSETREF(self->m_model, (PyTypeObject*)Py_NewRef(model));
-  _Cp_SetObj(self->m_options, options) else
-  {
-    self->m_options = PySet_New(NULL);
-    if (!self->m_options) {
-      return -1;
-    }
-  }
-  if (_PySet_Update(self->m_options,
-                    self->s_mod->cp_option__global_struct_options) < 0) {
-    return -1;
-  };
-
-  self->s_union =
-    PySet_Contains(self->m_options, self->s_mod->cp_option__union);
-
-  _Cp_SetObj(self->m_members, members) else
-  {
-    self->m_members = PyDict_New();
-    if (!self->m_members) {
-      return -1;
-    }
-  }
-
-  _Cp_SetObj(self->m_excluded, excluded) else
-  {
-    self->m_excluded = PySet_New(NULL);
-    if (!self->m_excluded) {
-      return -1;
-    }
-  }
-  return 0;
-}
-
-static PyMemberDef CpStruct_Members[] = {
-  { "model", T_OBJECT, offsetof(CpStruct, m_model), READONLY, NULL },
-  { "members", T_OBJECT, offsetof(CpStruct, m_members), READONLY, NULL },
-  { "options", T_OBJECT, offsetof(CpStruct, m_options), 0, NULL },
-  { NULL } /* Sentinel */
-};
-
-static PyTypeObject CpStruct_Type = {
-  .ob_base = PyVarObject_HEAD_INIT(NULL, 0).tp_name = _Cp_Name(_core.CpStruct),
-  .tp_doc = "...",
-  .tp_basicsize = sizeof(CpStruct),
-  .tp_itemsize = 0,
-  .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
-  .tp_new = cp_struct_new,
-  .tp_dealloc = (destructor)cp_sequence_dealloc,
-  .tp_init = (initproc)cp_sequence_init,
-  .tp_members = CpStruct_Members,
-};
-
-// public API methods
-
-static int
-CpStruct_AddField(CpStruct* self, CpField* field, int exclude)
-{
-  if (!field) {
-    PyErr_SetString(PyExc_TypeError, "field must be a Field");
-    return -1;
-  }
-
-  if (exclude) {
-    if (PySet_Add(self->m_excluded, field->m_name) < 0) {
-      return -1;
-    }
-  }
-  return PyObject_SetItem(self->m_members, field->m_name, (PyObject*)field);
-}
-
-static int
-CpStruct_RemoveField(CpStruct* self, CpField* field)
-{
-  if (!field) {
-    PyErr_SetString(PyExc_TypeError, "field must be a Field");
-    return -1;
-  }
-
-  if (PySet_Discard(self->m_excluded, field->m_name) < 0) {
-    return -1;
-  }
-  return PyDict_DelItem(self->m_members, field->m_name);
-}
-
-static inline int
-CpStruct_SetDefault(CpStruct* self, PyObject* name, PyObject* value)
-{
-  if (!name) {
-    PyErr_SetString(PyExc_TypeError, "name must be a string");
-    return -1;
-  }
-
-  return PyObject_SetAttr((PyObject*)self->m_model, name, value);
-}
-
-static inline int
-CpStruct_SetDefaults(CpStruct* self, const char* name, PyObject* value)
-{
-  if (!name) {
-    PyErr_SetString(PyExc_TypeError, "name must be a string");
-    return -1;
-  }
-
-  return PyObject_SetAttrString((PyObject*)self->m_model, name, value);
-}
-
-static inline PyObject*
-CpStruct_GetAnnotations(CpStruct* self, int eval)
-{
-  PyObject* args = Py_BuildValue("O", self->m_model);
-  if (!args) {
-    return NULL;
-  }
-
-  PyObject* kwargs = Py_BuildValue("{s:i}", "eval_str", eval);
-  if (!kwargs) {
-    Py_DECREF(args);
-    return NULL;
-  }
-
-  PyObject* result = PyObject_Call((PyObject*)self->m_model, args, kwargs);
-  Py_DECREF(args);
-  Py_DECREF(kwargs);
-  return result;
-}
-
-static int
-CpStruct_ReplaceType(CpStruct* self, PyObject* name, PyObject* type)
-{
-  if (!name) {
-    PyErr_SetString(PyExc_TypeError, "name must be a string");
-    return -1;
-  }
-  // TODO
-  PyObject* annotations = CpStruct_GetAnnotations(self, false);
-  if (!annotations) {
-    return -1;
-  }
-
-  if (PyDict_SetItem(annotations, name, type) < 0) {
-    Py_DECREF(annotations);
-    return -1;
-  }
-  Py_XDECREF(annotations);
-  return 0;
-}
-
-static inline PyObject*
-CpStruct_GetValue(CpStruct* self, PyObject* instance, PyObject* name)
-{
-  PyObject* value = PyObject_GetAttr(instance, name);
-  if (!value) {
-    PyErr_Clear();
-    return Py_NewRef(Py_None);
-  }
-  return value;
-}
-
-static inline PyObject*
-CpStruct_GetDefaultValue(CpStruct* self, PyObject* name)
-{
-  PyObject* value = PyObject_GetAttr((PyObject*)self->m_model, name);
-  if (!value) {
-    PyErr_Clear();
-    return Py_NewRef(CP_INVALID_DEFAULT);
-  }
-  return value;
-}
-
-static inline PyObject*
-CpStruct_New(PyObject* model)
-{
-  return PyObject_CallFunctionObjArgs((PyObject*)&CpStruct_Type, model, NULL);
-}
+// Public API
 
 static inline PyObject*
 CpStruct_GetMethodResolutionOrder(CpStruct* self)
@@ -2803,6 +2691,130 @@ cleanup:
   return result;
 }
 
+static int
+CpStruct_AddFieldInfo(CpStruct* o, CpStructFieldInfo* info)
+{
+  if (!info) {
+    PyErr_SetString(PyExc_TypeError, "info must be a set");
+    return -1;
+  }
+
+  CpField* field = info->m_field;
+  if (PyMapping_HasKey(o->m_members, field->m_name)) {
+    PyErr_Format(
+      PyExc_ValueError, "field with name %R already exists", field->m_name);
+    return -1;
+  }
+  return PyObject_SetItem(o->m_members, field->m_name, (PyObject*)info);
+}
+
+static int
+CpStruct_AddField(CpStruct* o, CpField* field, int exclude)
+{
+  if (!field) {
+    PyErr_SetString(PyExc_TypeError, "field must be a Field");
+    return -1;
+  }
+
+  CpStructFieldInfo* info =
+    (CpStructFieldInfo*)CpObject_Create(&CpStructFieldInfo_Type, "O", field);
+  if (!info) {
+    return -1;
+  }
+  info->s_excluded = exclude;
+  int res = CpStruct_AddFieldInfo(o, info);
+  Py_XDECREF(info);
+  return res;
+}
+
+static inline int
+CpStruct_RemoveField(CpStruct* o, PyObject* name)
+{
+  return PyDict_DelItem(o->m_members, name);
+}
+
+static inline int
+CpStruct_ModelSetDefault(CpStruct* o, PyObject* name, PyObject* value)
+{
+  if (!name) {
+    PyErr_SetString(PyExc_TypeError, "name must be a string");
+    return -1;
+  }
+
+  return PyObject_SetAttr((PyObject*)o->m_model, name, value);
+}
+
+static PyObject*
+CpStruct_GetAnnotations(CpStruct* o, int eval)
+{
+  PyObject* args = Py_BuildValue("(O)", o->m_model);
+  if (!args) {
+    return NULL;
+  }
+
+  PyObject* kwargs = Py_BuildValue("{s:i}", "eval_str", eval);
+  if (!kwargs) {
+    Py_DECREF(args);
+    return NULL;
+  }
+  PyObject* result =
+    PyObject_Call((PyObject*)o->s_mod->inspect_getannotations, args, kwargs);
+  Py_XDECREF(args);
+  Py_XDECREF(kwargs);
+  return result;
+}
+
+static int
+CpStruct_ReplaceType(CpStruct* o, PyObject* name, PyObject* type)
+{
+  if (!name) {
+    PyErr_SetString(PyExc_TypeError, "name must be a string");
+    return -1;
+  }
+  // We have to use direct attribute access here as inspect copies the
+  // dictionary before returning.
+  PyObject* annotations =
+    PyObject_GetAttr((PyObject*)o->m_model, o->s_mod->str___annotations__);
+  if (!annotations) {
+    return -1;
+  }
+
+  if (PyDict_SetItem(annotations, name, type) < 0) {
+    Py_DECREF(annotations);
+    return -1;
+  }
+  Py_XDECREF(annotations);
+  return 0;
+}
+
+static inline PyObject*
+CpStruct_GetValue(CpStruct* o, PyObject* instance, PyObject* name)
+{
+  PyObject* value = PyObject_GetAttr(instance, name);
+  if (!value) {
+    PyErr_Clear();
+    return Py_NewRef(Py_None);
+  }
+  return value;
+}
+
+static inline PyObject*
+CpStruct_GetDefaultValue(CpStruct* o, PyObject* name)
+{
+  PyObject* value = PyObject_GetAttr((PyObject*)o->m_model, name);
+  if (!value) {
+    PyErr_Clear();
+    return Py_NewRef(CP_INVALID_DEFAULT);
+  }
+  return value;
+}
+
+static inline PyObject*
+CpStruct_New(PyObject* model)
+{
+  return CpObject_Create(&CpStruct_Type, "O", model);
+}
+
 static inline PyObject*
 CpStruct_GetStruct(PyObject* model, _coremodulestate* state)
 {
@@ -2813,19 +2825,492 @@ CpStruct_GetStruct(PyObject* model, _coremodulestate* state)
   }
 }
 
-static int
-CpStruct_Check(PyObject* model, _coremodulestate* state)
+static inline int
+CpStruct_CheckModel(PyObject* model, _coremodulestate* state)
 {
-  PyObject* attr = CpStruct_GetStruct(model, state);
-  PyErr_Clear();
-  return attr ? 1 : 0;
+  return PyObject_HasAttr(model, state->str___struct__);
 }
 
-static inline int
-CpStruct_IsExcluded(CpStruct* self, PyObject* name)
+// end Public API
+
+static PyObject*
+cp_struct_new(PyTypeObject* type, PyObject* args, PyObject* kw)
 {
-  return PySet_Contains(self->m_excluded, name);
+  CpStruct* self = (CpStruct*)type->tp_alloc(type, 0);
+  if (!self) {
+    return NULL;
+  }
+  self->m_model = NULL;
+  self->m_options = NULL;
+  self->m_members = NULL;
+  self->s_union = false;
+  self->s_kwonly = false;
+  self->s_mod = get_global_core_state();
+  self->m_endian = Py_NewRef(self->s_mod->cp_endian__native);
+  self->m_arch = Py_NewRef(self->s_mod->cp_arch__host);
+  self->m_field_options = PySet_New(NULL);
+  if (!self->m_field_options) {
+    return NULL;
+  }
+  return (PyObject*)self;
 }
+
+static void
+cp_struct_dealloc(CpStruct* self)
+{
+  Py_XDECREF(self->m_model);
+  Py_XDECREF(self->m_options);
+  Py_XDECREF(self->m_members);
+  self->s_union = false;
+  Py_TYPE(self)->tp_free((PyObject*)self);
+}
+
+static int
+cp_struct_prepare(CpStruct* self);
+
+static int
+cp_struct_import_bases(CpStruct* self);
+
+static int
+cp_struct_process_annotation(CpStruct* self,
+                             PyObject* name,
+                             PyObject* annotation,
+                             PyObject* default_value,
+                             int exclude);
+
+static int
+cp_struct_init(CpStruct* self, PyObject* args, PyObject* kw)
+{
+  static char* kwlist[] = { "model", "options",       "endian",
+                            "arch",  "field_options", NULL };
+  PyObject *model = NULL, *options = NULL, *endian = NULL, *arch = NULL,
+           *field_options = NULL;
+  if (!PyArg_ParseTupleAndKeywords(args,
+                                   kw,
+                                   "O|OOOO",
+                                   kwlist,
+                                   &model,
+                                   &options,
+                                   &endian,
+                                   &arch,
+                                   &field_options)) {
+    return -1;
+  }
+
+  if (!model || !PyType_Check(model)) {
+    PyErr_SetString(PyExc_TypeError, "model must be a type");
+    return -1;
+  }
+
+  Py_XSETREF(self->m_model, (PyTypeObject*)Py_NewRef(model));
+  _Cp_SetObj(self->m_options, options) else
+  {
+    self->m_options = PySet_New(NULL);
+    if (!self->m_options) {
+      return -1;
+    }
+  }
+  if (_PySet_Update(self->m_options,
+                    self->s_mod->cp_option__global_struct_options) < 0) {
+    return -1;
+  };
+
+  self->s_union =
+    PySet_Contains(self->m_options, self->s_mod->cp_option__union);
+
+  self->m_members = PyDict_New();
+  if (!self->m_members) {
+    return -1;
+  }
+
+  _Cp_SetObj(self->m_endian, endian);
+  _Cp_SetObj(self->m_arch, arch);
+  _Cp_SetObj(self->m_field_options, field_options);
+  return cp_struct_prepare(self);
+}
+
+static int
+cp_struct_prepare(CpStruct* self)
+{
+  // Generic struct implementation:
+  // 1. Process all base classes and import fields from them. All fields
+  //    means that that also "excluded" fields will be imported to this
+  //    object.
+  //
+  // 2. Process all annotations from the given model. The annotations will
+  //    be evaluated first by the *inspect* module and then copied to get
+  //    converted to CpField instances.
+  //
+  // 3. The third and last step involves the tricky part about native type
+  //    creation. It will add "__slots__" if desired and create a new class
+  //    based on the current with the same fields and same base classes.
+  _coremodulestate* state = self->s_mod;
+  int res = 0, had_default = false;
+
+  // First, create a set[str] that will store all field names that won't be
+  // visible in the final class but are used in the struct representation.
+  //
+  // Fields of this category are: unnamed fields and constant fields (if
+  // the according option allows to discard them).
+  PyObject* discardable = PySet_New(NULL);
+  if (!discardable) {
+    return -1;
+  }
+
+  // As described in step (1), we first import fields from base classes that
+  // themselfs store a struct instance (conforming to the StructContainer
+  // protocol).
+  res = cp_struct_import_bases(self);
+  if (res < 0) {
+    return -1;
+  }
+
+  // As described in step (2), we then import all annotations from the
+  // model. Before that, we need to check whether to evaluate the
+  // placed annotations.
+  int eval = PySet_Contains(self->m_options, state->cp_option__eval);
+  if (eval < 0) {
+    return -1;
+  }
+  PyObject *model_annotations = CpStruct_GetAnnotations(self, eval),
+           *name = NULL, *annotation = NULL;
+  if (!model_annotations) {
+    return -1;
+  }
+
+  // The structure of a class annotation may be as follows:
+  //
+  //  class Format:
+  //    [ with <condition>: ]
+  //        <name>: <type> [ = <default> ]
+  //
+  // Where <type> can be any object conforming to the Atom protocol, or a
+  // special variant of:
+  //
+  //  - Any type conforming to the StructContainer protocol
+  //  - Constants: str, bytes
+  //  - Callables that conform to the ContextLambda protocol
+  //  - Enum types
+  //
+  // More detailed information on how each annotation is processed can be
+  // found in the cp_struct_process_annotation().
+  Py_ssize_t pos = 0;
+  while ((res = PyDict_Next(model_annotations, &pos, &name, &annotation))) {
+    if (res < 0) {
+      return -1;
+    }
+    PyObject *default_ = NULL, *atom = annotation;
+    int excluded = false;
+
+    default_ = CpStruct_GetDefaultValue(self, name);
+    if (!default_) {
+      Py_XDECREF(discardable);
+      return -1;
+    }
+    // Constant values that are not in the form of fields. A special case are
+    // definitions using the 'Const' class for example.
+    if (CpField_Check(annotation)) {
+      atom = annotation;
+      // SPECIAL CASE: If the field has a condition linked to it, a default
+      // value of None is inferred.
+      if (CpField_HasCondition((CpField*)annotation) &&
+          Cp_IsInvalidDefault(default_)) {
+        _Cp_SetObj(default_, Py_None);
+      }
+    }
+
+    // SPECIAL CASE: If this struct is a union, we will infer None as the
+    // default value (if none has been set already)
+    if (self->s_union && Cp_IsInvalidDefault(default_)) {
+      _Cp_SetObj(default_, Py_None);
+    }
+
+    if (!Cp_IsInvalidDefault(default_)) {
+      had_default = true;
+    } else {
+      if (had_default) {
+        // By default, we allow definitions of classes with positional
+        // arguments. That feature will be disabled if a non-default
+        // field definition follows a field with a default value.
+        self->s_kwonly = true;
+      }
+    }
+
+    // Next, we check whether the field should be excluded from the
+    // final model type.
+    if ((res = PySet_Contains(self->m_options,
+                              state->cp_option__discard_unnamed))) {
+      if (res < 0) {
+        Py_XDECREF(default_);
+        Py_XDECREF(discardable);
+        return -1;
+      }
+      // Definition 'unnamed fields':
+      // Unnamed fields refer to fields in a struct or sequence which names
+      // begin with an underscore followed by zero or more numeric digits.
+      PyObject* match_ = PyObject_CallMethodObjArgs(
+        state->cp_regex__unnamed, state->str_pattern_match, name, NULL);
+      if (!match_) {
+        Py_XDECREF(default_);
+        Py_XDECREF(discardable);
+        return -1;
+      }
+      if (!Py_IsNone(match_)) {
+        excluded = true;
+      }
+      Py_XDECREF(match_);
+    } else
+      excluded = false;
+
+    if (excluded) {
+      PySet_Add(discardable, name);
+    }
+
+    res =
+      cp_struct_process_annotation(self, name, annotation, default_, excluded);
+    Py_XSETREF(default_, NULL);
+    if (res < 0) {
+      Py_XDECREF(discardable);
+      return -1;
+    }
+  }
+
+  // before we create the new type, discard all marked fields
+  PyObject* annotations =
+    PyObject_GetAttr((PyObject*)self->m_model, state->str___annotations__);
+  if (!annotations) {
+    Py_XDECREF(discardable);
+    return -1;
+  }
+
+  PyObject* iter = PyObject_GetIter(discardable);
+  if (!iter) {
+    Py_XDECREF(discardable);
+    Py_XDECREF(annotations);
+    return -1;
+  }
+
+  PyObject* item = NULL;
+  while ((item = PyIter_Next(iter))) {
+    if (PyDict_DelItem(annotations, item)) {
+      Py_XDECREF(discardable);
+      Py_XDECREF(annotations);
+      return -1;
+    }
+  }
+
+  Py_DECREF(iter);
+  Py_DECREF(discardable);
+  Py_DECREF(annotations);
+  return 0;
+}
+
+static int
+cp_struct_import_bases(CpStruct* self)
+{
+  // We will inspect all base classes in reverse order and selectively
+  // utilize classes that store a struct instance.
+  PyObject* bases = CpStruct_GetReverseMRO(self);
+  if (!bases) {
+    return -1;
+  }
+
+  // All object references here are borrowed.
+  PyObject *base = NULL, *field = NULL, *name = NULL;
+  CpStruct* struct_ = NULL;
+  Py_ssize_t bases_length = PyTuple_GET_SIZE(bases);
+  for (Py_ssize_t i = 0; i < bases_length; i++) {
+    // For simplicity, we will discard all invalid base classes
+    // that can't be displayed as types, e.g. partial template
+    // types.
+    base = PyTuple_GetItem(bases, i);
+    if (!PyType_Check(base)) {
+      continue;
+    }
+
+    if (!CpStruct_CheckModel(base, self->s_mod)) {
+      continue;
+    }
+
+    // NOTE:
+    // Importing all fields instead of the entire struct here. This
+    // action will just add fields to this object using the order of
+    // the given struct.
+    struct_ = (CpStruct*)CpStruct_GetStruct(base, self->s_mod);
+    if (!struct_) {
+      return -1;
+    }
+
+    while (PyDict_Next(struct_->m_members, NULL, &name, &field)) {
+      // The check for duplicates is done in the called function.
+      if (CpStruct_AddFieldInfo(self, (CpStructFieldInfo*)field) < 0) {
+        Py_XDECREF(struct_);
+        return -1;
+      }
+    }
+    Py_XDECREF(struct_);
+  }
+  return 0;
+}
+
+static int
+cp_struct_process_annotation(CpStruct* self,
+                             PyObject* name,
+                             PyObject* annotation,
+                             PyObject* default_value,
+                             int exclude)
+{
+  // As described before in cp_struct_prepare, a field definition follows
+  // the following schema:
+  //
+  //    <name>: <annotation> [ = <default> ]
+  //
+  // Where the name is a string, the annotation is an object conforming that
+  // is convertible to a CpField object, and the default value can be any
+  // object.
+  // It is worthwhile to note that the default value specified here will be
+  // assigned to the created field instance. There is no destinction between
+  // class-level defaults and field-level defaults.
+  CpField* field = NULL;
+  _coremodulestate* state = self->s_mod;
+
+  MATCH
+  {
+    // 1. Annotated field:
+    // The annotation is already a CpField object, so we don't need to convert
+    // it. Note thate we check against the *exact* type, which means that we
+    // will not accept any subclass of CpField.
+    CASE_EXACT(&CpField_Type, annotation)
+    {
+      field = (CpField*)Py_NewRef(annotation);
+    }
+
+    // 2. Atom object
+    // The annotation is an instance of a subclass of the CpAtom class OR it
+    // conforms to the Atom protocol (next branch).
+    else CASE(&CpAtom_Type, annotation)
+    {
+      field = (CpField*)CpField_New(annotation);
+      if (!field) {
+        return -1;
+      }
+    }
+
+    // 3. Atom protocol
+    // The annotation conforms to the Atom protocol. Note that we check here
+    // only against packing, unpacking and size calculation. The type function
+    // is optional and won't be covered here.
+    else CASE_COND(CpAtom_Check(annotation))
+    {
+      field = (CpField*)CpField_New(annotation);
+      if (!field) {
+        return -1;
+      }
+    }
+
+    // 5. Type
+    // Here, the annotation may be a custom struct type or an enum type.
+    // Currently, only struct container are supported.
+    else CASE_COND(PyType_Check(annotation))
+    {
+      if (CpStruct_CheckModel(annotation, state)) {
+        PyObject* struct_ = CpStruct_GetStruct(annotation, state);
+        if (!struct_) {
+          return -1;
+        }
+        field = (CpField*)CpField_New(struct_);
+        Py_XDECREF(struct_);
+        if (!field) {
+          return -1;
+        }
+      }
+    }
+
+    // 4. Callable
+    // The annotation is a callable object and conforms to the ContextLambda
+    // protocol. Note that we assume the right function signature.
+    else CASE_COND(PyCallable_Check(annotation))
+    {
+      field = (CpField*)CpField_New(annotation);
+      if (!field) {
+        return -1;
+      }
+    }
+  }
+
+  // Currently, there is no extension support for other types. That is
+  // a future feature.
+  if (!field) {
+    PyErr_Format(
+      PyExc_ValueError,
+      ("Field %R could not be created, because the placed annotation does not "
+       "conform to any of the supported types.\n"
+       "annotation: %R"),
+      name,
+      annotation);
+    return -1;
+  }
+
+  field->m_arch = self->m_arch;
+  field->m_endian = self->m_endian;
+  field->m_default = default_value;
+  _Cp_SetObj(field->m_name, name);
+  if (_PySet_Update(field->m_options, self->m_field_options) < 0) {
+    Py_XDECREF(field);
+    return -1;
+  }
+
+  int res = CpStruct_AddField(self, field, exclude);
+  if (res < 0) {
+    Py_XDECREF(field);
+    return -1;
+  }
+
+  // Lastly, we replace the field from the internal model type if it
+  // is enabled.
+  res = PySet_Contains(self->m_options, state->cp_option__replace_types);
+  if (res < 0) {
+    Py_XDECREF(field);
+    return -1;
+  }
+
+  if (res) {
+    PyObject* type = cp_typeof_field(field);
+    if (!type) {
+      Py_XDECREF(field);
+      return -1;
+    }
+
+    if (CpStruct_ReplaceType(self, name, type) < 0) {
+      Py_XDECREF(type);
+      Py_XDECREF(field);
+      return -1;
+    }
+    Py_XDECREF(type);
+  }
+
+  Py_XDECREF(field);
+  return res;
+}
+
+static PyMemberDef CpStruct_Members[] = {
+  { "model", T_OBJECT, offsetof(CpStruct, m_model), READONLY, NULL },
+  { "members", T_OBJECT, offsetof(CpStruct, m_members), READONLY, NULL },
+  { "options", T_OBJECT, offsetof(CpStruct, m_options), 0, NULL },
+  { NULL } /* Sentinel */
+};
+
+static PyTypeObject CpStruct_Type = {
+  .ob_base = PyVarObject_HEAD_INIT(NULL, 0).tp_name = _Cp_Name(_core.CpStruct),
+  .tp_doc = "...",
+  .tp_basicsize = sizeof(CpStruct),
+  .tp_itemsize = 0,
+  .tp_flags = Py_TPFLAGS_DEFAULT,
+  .tp_new = cp_struct_new,
+  .tp_dealloc = (destructor)cp_struct_dealloc,
+  .tp_init = (initproc)cp_struct_init,
+  .tp_members = CpStruct_Members,
+};
 
 // ------------------------------------------------------------------------------
 // pack
@@ -3095,18 +3580,33 @@ cp_typeof_common(PyObject* op)
   }
   _coremodulestate* state = get_global_core_state();
   PyObject* attr = PyObject_GetAttrString(op, CpAtomType_Type);
-  if (!attr) {
-    type = state->typing_any;
-  } else {
-    if (!PyCallable_Check(attr)) {
-      type = state->typing_any;
-    } else {
+  MATCH
+  {
+    CASE_COND(!attr)
+    {
+      PyErr_Clear();
+      type = Py_NewRef(state->typing_any);
+    }
+
+    else CASE_COND(!PyCallable_Check(attr))
+    {
+      type = Py_NewRef(state->typing_any);
+    }
+
+    else
+    {
       type = PyObject_CallNoArgs(attr);
-      Py_XDECREF(attr);
-      return type;
+      if (!type) {
+        return NULL;
+      }
     }
   }
-  return Py_NewRef(type);
+
+  if (type == Py_NotImplemented) {
+    _Cp_SetObj(type, Py_NewRef(state->typing_any));
+  }
+
+  return type;
 }
 
 static PyObject*
@@ -3317,11 +3817,18 @@ _coremodule_clear(PyObject* m)
     Py_CLEAR(state->cp_option__sequential);
     Py_CLEAR(state->cp_option__keep_position);
     Py_CLEAR(state->cp_option__global_field_options);
+    Py_CLEAR(state->cp_option__global_struct_options);
+    Py_CLEAR(state->cp_option__union);
+    Py_CLEAR(state->cp_option__eval);
+    Py_CLEAR(state->cp_option__replace_types);
+
     Py_CLEAR(state->cp_endian__native);
     Py_CLEAR(state->cp_arch__host);
+    Py_CLEAR(state->cp_regex__unnamed);
     Py_CLEAR(state->typing_any);
     Py_CLEAR(state->typing_list);
     Py_CLEAR(state->typing_union);
+
     Py_CLEAR(state->str___pack__);
     Py_CLEAR(state->str___unpack__);
     Py_CLEAR(state->str___size__);
@@ -3341,9 +3848,11 @@ _coremodule_clear(PyObject* m)
     Py_CLEAR(state->str_builder_process);
     Py_CLEAR(state->str___mro__);
     Py_CLEAR(state->str___struct__);
+    Py_CLEAR(state->str_pattern_match);
+
     Py_CLEAR(state->io_bytesio);
+
     Py_CLEAR(state->inspect_getannotations);
-    Py_CLEAR(state->cp_regex__unnamed);
   }
   return 0;
 }
@@ -3408,6 +3917,8 @@ PyInit__core(void)
   CpType_Ready(&CpInvalidDefault_Type);
   CpType_Ready(&CpDefaultSwitchOption_Type);
   CpType_Ready(&CpState_Type);
+
+  CpType_Ready(&CpStructFieldInfo_Type);
   CpType_Ready(&CpStruct_Type);
 
   m = PyModule_Create(&_coremodule);
@@ -3431,6 +3942,8 @@ PyInit__core(void)
   CpModule_AddObject("CpField", &CpField_Type);
   CpModule_AddObject("CpFieldAtom", &CpFieldAtom_Type);
   CpModule_AddObject("CpState", &CpState_Type);
+
+  CpModule_AddObject("CpStructFieldInfo", &CpStructFieldInfo_Type);
   CpModule_AddObject("CpStruct", &CpStruct_Type);
 
   // setup state
@@ -3443,6 +3956,12 @@ PyInit__core(void)
   CpModule_AddOption(cp_option__union, "struct:union", "S_UNION");
   CpModule_AddOption(
     cp_option__eval, "struct:eval_annotations", "S_EVAL_ANNOTATIONS");
+  CpModule_AddOption(
+    cp_option__replace_types, "struct:replace_types", "S_REPLACE_TYPES");
+  CpModule_AddOption(
+    cp_option__discard_unnamed, "struct:discard_unnamed", "S_DISCARD_UNNAMED");
+  CpModule_AddOption(
+    cp_option__discard_const, "struct:discard_const", "S_DISCARD_CONST");
 
   CpModule_AddGlobalOptions(cp_option__global_field_options, "G_FIELD_OPTIONS");
   CpModule_AddGlobalOptions(cp_option__global_struct_options, "G_SEQ_OPTIONS");
@@ -3509,6 +4028,7 @@ PyInit__core(void)
   CACHED_STRING(str_builder_process, "process");
   CACHED_STRING(str___mro__, CpType_MRO);
   CACHED_STRING(str___struct__, CpType_Struct);
+  CACHED_STRING(str_pattern_match, "match");
 
 #undef CACHED_STRING
 
