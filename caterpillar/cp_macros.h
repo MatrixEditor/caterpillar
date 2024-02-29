@@ -94,4 +94,17 @@
 #define CpContext_New(op)                                                      \
   (PyObject_CallFunction((PyObject*)&CpContext_Type, "O", (op)))
 
+#define CpObject_Create(type, format, ...)                                     \
+  (PyObject_CallFunction((PyObject*)(type), format, __VA_ARGS__))
+
+#define CpObject_CreateNoArgs(type) (PyObject_CallNoArgs((PyObject*)(type)))
+
+// ------------------------------------------------------------------------------
+// MATCH-CASE
+// ------------------------------------------------------------------------------
+#define MATCH
+#define CASE_EXACT(type, op) if ((op)->ob_type == (type))
+#define CASE(type, op) if (PyObject_IsInstance((op), (PyObject*)(type)))
+#define CASE_COND(cond) if (cond)
+
 #endif

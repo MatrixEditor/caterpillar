@@ -120,6 +120,7 @@ typedef struct
   PyObject* cp_option__discard_unnamed;
   PyObject* cp_option__discard_const;
   PyObject* cp_option__replace_types;
+  PyObject* cp_option__slots;
 
   // global default options
   PyObject* cp_option__global_field_options;
@@ -161,6 +162,9 @@ typedef struct
   PyObject* str___annotations__;
   PyObject* str___mro__;
   PyObject* str___struct__;
+  PyObject* str___slots__;
+  PyObject* str___match_args__;
+
   PyObject* str_start;
   PyObject* str_ctx__root;
   PyObject* str_ctx__getattr;
@@ -2612,9 +2616,20 @@ cp_struct_fieldinfo_init(CpStructFieldInfo* self, PyObject* args, PyObject* kw)
   return 0;
 }
 
+static PyObject*
+cp_struct_fieldinfo_repr(CpStructFieldInfo* self)
+{
+  return PyUnicode_FromFormat("<CpStructFieldInfo of %R>",
+                              self->m_field->m_name);
+}
+
 static PyMemberDef CpStructFieldInfo_Members[] = {
   { "field", T_OBJECT, offsetof(CpStructFieldInfo, m_field), READONLY, NULL },
-  { "excluded", T_BOOL, offsetof(CpStructFieldInfo, s_excluded), 0, NULL },
+  { "excluded",
+    T_BOOL,
+    offsetof(CpStructFieldInfo, s_excluded),
+    READONLY,
+    NULL },
   { NULL } /* Sentinel */
 };
 
@@ -2628,6 +2643,7 @@ static PyTypeObject CpStructFieldInfo_Type = {
   .tp_new = cp_struct_fieldinfo_new,
   .tp_dealloc = (destructor)cp_struct_fieldinfo_dealloc,
   .tp_init = (initproc)cp_struct_fieldinfo_init,
+  .tp_repr = (reprfunc)cp_struct_fieldinfo_repr,
   .tp_members = CpStructFieldInfo_Members,
 };
 
@@ -2648,6 +2664,8 @@ typedef struct CpStruct
   // internal states
   int8_t s_union;
   int8_t s_kwonly;
+  PyObject* s_std_init_fields;    // list[FieldInfo]
+  PyObject* s_kwonly_init_fields; // list[FieldInfo]
 
   _coremodulestate* s_mod;
 } CpStruct;
@@ -2704,6 +2722,16 @@ CpStruct_AddFieldInfo(CpStruct* o, CpStructFieldInfo* info)
     PyErr_Format(
       PyExc_ValueError, "field with name %R already exists", field->m_name);
     return -1;
+  }
+
+  if (!info->s_excluded) {
+    PyObject* list = Cp_IsInvalidDefault(field->m_default)
+                       ? o->s_std_init_fields
+                       : o->s_kwonly_init_fields;
+
+    if (PyList_Append(list, (PyObject*)info) < 0) {
+      return -1;
+    }
   }
   return PyObject_SetItem(o->m_members, field->m_name, (PyObject*)info);
 }
@@ -2852,6 +2880,14 @@ cp_struct_new(PyTypeObject* type, PyObject* args, PyObject* kw)
   if (!self->m_field_options) {
     return NULL;
   }
+  self->s_kwonly_init_fields = PyList_New(0);
+  if (!self->s_kwonly_init_fields) {
+    return NULL;
+  }
+  self->s_std_init_fields = PyList_New(0);
+  if (!self->s_std_init_fields) {
+    return NULL;
+  }
   return (PyObject*)self;
 }
 
@@ -2861,6 +2897,13 @@ cp_struct_dealloc(CpStruct* self)
   Py_XDECREF(self->m_model);
   Py_XDECREF(self->m_options);
   Py_XDECREF(self->m_members);
+  Py_XDECREF(self->m_endian);
+  Py_XDECREF(self->m_arch);
+  Py_XDECREF(self->m_field_options);
+  Py_XDECREF(self->s_kwonly_init_fields);
+  Py_XDECREF(self->s_std_init_fields);
+  self->s_kwonly = false;
+  self->s_mod = NULL;
   self->s_union = false;
   Py_TYPE(self)->tp_free((PyObject*)self);
 }
@@ -2877,6 +2920,9 @@ cp_struct_process_annotation(CpStruct* self,
                              PyObject* annotation,
                              PyObject* default_value,
                              int exclude);
+
+static int
+cp_struct_create_type(CpStruct* self);
 
 static int
 cp_struct_init(CpStruct* self, PyObject* args, PyObject* kw)
@@ -3102,7 +3148,7 @@ cp_struct_prepare(CpStruct* self)
   Py_DECREF(iter);
   Py_DECREF(discardable);
   Py_DECREF(annotations);
-  return 0;
+  return cp_struct_create_type(self);
 }
 
 static int
@@ -3251,9 +3297,9 @@ cp_struct_process_annotation(CpStruct* self,
     return -1;
   }
 
-  field->m_arch = self->m_arch;
-  field->m_endian = self->m_endian;
-  field->m_default = default_value;
+  _Cp_SetObj(field->m_arch, self->m_arch);
+  _Cp_SetObj(field->m_endian, self->m_endian);
+  _Cp_SetObj(field->m_default, default_value);
   _Cp_SetObj(field->m_name, name);
   if (_PySet_Update(field->m_options, self->m_field_options) < 0) {
     Py_XDECREF(field);
@@ -3293,6 +3339,121 @@ cp_struct_process_annotation(CpStruct* self,
   return res;
 }
 
+static int
+_cp_struct_model__init__(PyObject* self, PyObject* args, PyObject* kwnames)
+{
+  CpStruct* struct_ = (CpStruct*)CpStruct_GetStruct(self, NULL);
+  if (!struct_) {
+    return NULL;
+  }
+
+  CpStructFieldInfo* info = NULL;
+  PyObject *key = NULL, *value = NULL;
+  Py_ssize_t pos = 0, argc = PyTuple_Size(args),
+             stdc = PyList_Size(struct_->s_std_init_fields),
+             kwonlyc = PyList_Size(struct_->s_kwonly_init_fields);
+
+  // First, we will iterate over all positional arguments.
+  for (Py_ssize_t i = 0; i < stdc; i++) {
+    // NOTE here: borrowed reference
+    info = (CpStructFieldInfo*)PyList_GetItem(struct_->s_std_init_fields, i);
+    if (!info) {
+      return -1;
+    }
+
+    if (i >= argc) {
+      // If the current positional field is defined as a keyword argument,
+      // we should retrieve it from the keyword arguments.
+      if (!kwnames || !PyDict_Contains(kwnames, info->m_field->m_name)) {
+        Py_DECREF(struct_);
+        PyErr_Format(PyExc_ValueError,
+                     ("Missing argument for positional field %R"),
+                     info->m_field->m_name);
+        return -1;
+      }
+
+      value = PyDict_GetItem(kwnames, info->m_field->m_name);
+    } else
+      value = PyTuple_GetItem(args, i);
+
+    if (!value) {
+      Py_DECREF(struct_);
+      return -1;
+    }
+
+    // as we store a borrowed reference in 'value', we don't need
+    // to decref it.
+    if (PyObject_SetAttr(self, info->m_field->m_name, value) < 0) {
+      Py_DECREF(struct_);
+      return -1;
+    }
+  }
+
+  // If no keyword arguments were provided, we are still not done, because
+  // default values have to be placed.
+  for (Py_ssize_t i = 0; i < kwonlyc; i++) {
+    // NOTE here: borrowed reference
+    info = (CpStructFieldInfo*)PyList_GetItem(struct_->s_kwonly_init_fields, i);
+    if (!info) {
+      Py_DECREF(struct_);
+      return -1;
+    }
+
+    // A custom value is only provided if it is in the given keyword
+    // arguments.
+    if (!kwnames || !PyDict_Contains(kwnames, info->m_field->m_name)) {
+      value = info->m_field->m_default;
+    } else {
+      value = PyDict_GetItem(kwnames, info->m_field->m_name);
+    }
+
+    if (!value) {
+      Py_DECREF(struct_);
+      return -1;
+    }
+
+    // same as before, we don't need to decref the value
+    if (PyObject_SetAttr(self, info->m_field->m_name, value) < 0) {
+      Py_DECREF(struct_);
+      return -1;
+    }
+  }
+
+  Py_DECREF(struct_);
+  return 0;
+}
+
+static int
+cp_struct_create_type(CpStruct* self)
+{
+  // At this point, we've already processed all annotated elements
+  // of our model. Only if S_SLOTS is enabled, we have to create
+  // a new type. Otherwise, we simply create __match_args__
+  // and replace the __init__ attribute.
+  //
+  // TODO: Add support for S_SLOTS
+  _coremodulestate* state = self->s_mod;
+  PyObject* dict = self->m_model->tp_dict;
+  if (!dict) {
+    return -1;
+  }
+
+  // Before modifying the actual type, make sure, the struct is
+  // stored in the target model.
+  if (PyDict_SetItem(dict, state->str___struct__, (PyObject*)self) < 0) {
+    return -1;
+  }
+
+  self->m_model->tp_init = (initproc)_cp_struct_model__init__;
+  return 0;
+}
+
+static PyObject*
+cp_struct_repr(CpStruct* self)
+{
+  return PyUnicode_FromFormat("<CpStruct of '%s'>", self->m_model->tp_name);
+}
+
 static PyMemberDef CpStruct_Members[] = {
   { "model", T_OBJECT, offsetof(CpStruct, m_model), READONLY, NULL },
   { "members", T_OBJECT, offsetof(CpStruct, m_members), READONLY, NULL },
@@ -3306,10 +3467,11 @@ static PyTypeObject CpStruct_Type = {
   .tp_basicsize = sizeof(CpStruct),
   .tp_itemsize = 0,
   .tp_flags = Py_TPFLAGS_DEFAULT,
-  .tp_new = cp_struct_new,
+  .tp_new = (newfunc)cp_struct_new,
   .tp_dealloc = (destructor)cp_struct_dealloc,
   .tp_init = (initproc)cp_struct_init,
   .tp_members = CpStruct_Members,
+  .tp_repr = (reprfunc)cp_struct_repr,
 };
 
 // ------------------------------------------------------------------------------
@@ -3821,6 +3983,9 @@ _coremodule_clear(PyObject* m)
     Py_CLEAR(state->cp_option__union);
     Py_CLEAR(state->cp_option__eval);
     Py_CLEAR(state->cp_option__replace_types);
+    Py_CLEAR(state->cp_option__discard_unnamed);
+    Py_CLEAR(state->cp_option__discard_const);
+    Py_CLEAR(state->cp_option__slots);
 
     Py_CLEAR(state->cp_endian__native);
     Py_CLEAR(state->cp_arch__host);
@@ -3849,6 +4014,8 @@ _coremodule_clear(PyObject* m)
     Py_CLEAR(state->str___mro__);
     Py_CLEAR(state->str___struct__);
     Py_CLEAR(state->str_pattern_match);
+    Py_CLEAR(state->str___match_args__);
+    Py_CLEAR(state->str___slots__);
 
     Py_CLEAR(state->io_bytesio);
 
@@ -3962,6 +4129,7 @@ PyInit__core(void)
     cp_option__discard_unnamed, "struct:discard_unnamed", "S_DISCARD_UNNAMED");
   CpModule_AddOption(
     cp_option__discard_const, "struct:discard_const", "S_DISCARD_CONST");
+  CpModule_AddOption(cp_option__slots, "struct:slots", "S_SLOTS");
 
   CpModule_AddGlobalOptions(cp_option__global_field_options, "G_FIELD_OPTIONS");
   CpModule_AddGlobalOptions(cp_option__global_struct_options, "G_SEQ_OPTIONS");
@@ -4029,6 +4197,8 @@ PyInit__core(void)
   CACHED_STRING(str___mro__, CpType_MRO);
   CACHED_STRING(str___struct__, CpType_Struct);
   CACHED_STRING(str_pattern_match, "match");
+  CACHED_STRING(str___match_args__, "__match_args__");
+  CACHED_STRING(str___slots__, "__slots__");
 
 #undef CACHED_STRING
 
