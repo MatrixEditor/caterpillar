@@ -25,3 +25,4 @@ documentation.
    :caption: C API
 
    capi/abstract.rst
+   capi/objimpl.rst

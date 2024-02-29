@@ -2756,12 +2756,6 @@ CpStruct_AddField(CpStruct* o, CpField* field, int exclude)
 }
 
 static inline int
-CpStruct_RemoveField(CpStruct* o, PyObject* name)
-{
-  return PyDict_DelItem(o->m_members, name);
-}
-
-static inline int
 CpStruct_ModelSetDefault(CpStruct* o, PyObject* name, PyObject* value)
 {
   if (!name) {
@@ -2856,7 +2850,7 @@ CpStruct_GetStruct(PyObject* model, _coremodulestate* state)
 static inline int
 CpStruct_CheckModel(PyObject* model, _coremodulestate* state)
 {
-  return PyObject_HasAttr(model, state->str___struct__);
+  return model && PyObject_HasAttr(model, state->str___struct__);
 }
 
 // end Public API
@@ -2945,6 +2939,11 @@ cp_struct_init(CpStruct* self, PyObject* args, PyObject* kw)
 
   if (!model || !PyType_Check(model)) {
     PyErr_SetString(PyExc_TypeError, "model must be a type");
+    return -1;
+  }
+
+  if (CpStruct_CheckModel(model, self->s_mod)) {
+    PyErr_SetString(PyExc_TypeError, "model must not be a struct container");
     return -1;
   }
 
