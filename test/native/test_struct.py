@@ -2,19 +2,20 @@ import pytest
 import typing
 
 # pylint: disable-next=import-error,wildcard-import,no-name-in-module
-from caterpillar._core import CpAtom, CpStruct, S_REPLACE_TYPES
+from caterpillar._core import CpAtom, CpStruct, S_REPLACE_TYPES, pack, CpField
 
 
 class Format:
     foo: CpAtom()
 
 
-def test_struct_init():
-    s = CpStruct(Format)
+S = CpStruct(Format)
 
-    assert s.model is Format
-    assert len(s.members) == 1
-    assert "foo" in s.members
+
+def test_struct_init():
+    assert S.model is Format
+    assert len(S.members) == 1
+    assert "foo" in S.members
 
     with pytest.raises(ValueError):
         # field 'foo' is required
@@ -36,9 +37,48 @@ def test_struct_default_init():
     # keyword arg has higher priority than default value
     assert a.foo != b.foo
 
+
 def test_struct_replace_types():
-    s = CpStruct(Format, options={S_REPLACE_TYPES})
-    assert s.model is Format
+    class Format2:
+        foo: CpAtom()
+
+    s = CpStruct(Format2, options={S_REPLACE_TYPES})
+    assert s.model is Format2
     assert len(s.members) == 1
     assert "foo" in s.members
-    assert Format.__annotations__["foo"] == typing.Any
+    assert Format2.__annotations__["foo"] == typing.Any
+
+
+class IntAtom(CpAtom):
+    def __pack__(self, obj, context):
+        context.write(obj.to_bytes(2))
+
+    def __type__(self):
+        return int
+
+
+def test_struct_pack():
+
+    class IntFormat:
+        foo: IntAtom()
+
+    C = CpStruct(IntFormat, options={S_REPLACE_TYPES})
+
+    s = C
+    assert len(s.members) == 1
+    assert IntFormat.__annotations__["foo"] == int
+
+    assert pack(IntFormat(2), s) == b"\x00\x02"
+
+    assert pack(IntFormat(foo=2), s) == b"\x00\x02"
+
+
+def test_struct_pack_seq():
+    class IntFormat2:
+        foo: IntAtom()
+
+    f = CpField(CpStruct(IntFormat2))[2]
+    assert f.length == 2
+
+    result = pack([IntFormat2(1), IntFormat2(2)], f)
+    assert result == b"\x00\x01\x00\x02"
