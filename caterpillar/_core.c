@@ -182,6 +182,9 @@ typedef struct
   PyObject* str___struct__;
   PyObject* str___slots__;
   PyObject* str___match_args__;
+  PyObject* str___weakref__;
+  PyObject* str___dict__;
+  PyObject* str___qualname__;
 
   PyObject* str_start;
   PyObject* str_ctx__root;
@@ -2682,6 +2685,7 @@ typedef struct CpStruct
   // internal states
   int8_t s_union;
   int8_t s_kwonly;
+  int8_t s_alter_type;
   PyObject* s_std_init_fields;    // list[FieldInfo]
   PyObject* s_kwonly_init_fields; // list[FieldInfo]
 
@@ -2869,6 +2873,12 @@ CpStruct_CheckModel(PyObject* model, _coremodulestate* state)
   return model && PyObject_HasAttr(model, state->str___struct__);
 }
 
+static inline int
+CpStruct_HasOption(CpStruct* o, PyObject* option)
+{
+  return PySet_Contains(o->m_options, option);
+}
+
 // end Public API
 
 static PyObject*
@@ -2884,6 +2894,7 @@ cp_struct_new(PyTypeObject* type, PyObject* args, PyObject* kw)
   self->s_union = false;
   self->s_kwonly = false;
   self->s_mod = get_global_core_state();
+  self->s_alter_type = false;
   self->m_endian = Py_NewRef(self->s_mod->cp_endian__native);
   self->m_arch = Py_NewRef(self->s_mod->cp_arch__host);
   self->m_field_options = PySet_New(NULL);
@@ -2935,26 +2946,30 @@ static int
 cp_struct_create_type(CpStruct* self);
 
 static int
+cp_struct_add_slots(CpStruct* self);
+
+static int
 cp_struct_init(CpStruct* self, PyObject* args, PyObject* kw)
 {
-  static char* kwlist[] = { "model", "options",       "endian",
-                            "arch",  "field_options", NULL };
+  static char* kwlist[] = { "model",         "options", "endian", "arch",
+                            "field_options", "alter",   NULL };
   PyObject *model = NULL, *options = NULL, *endian = NULL, *arch = NULL,
            *field_options = NULL;
+  int8_t alter = false;
   if (!PyArg_ParseTupleAndKeywords(args,
                                    kw,
-                                   "O|OOOO",
+                                   "O|OOOOp",
                                    kwlist,
                                    &model,
                                    &options,
                                    &endian,
                                    &arch,
-                                   &field_options)) {
+                                   &field_options,
+                                   &alter)) {
     return -1;
   }
-
   if (!model || !PyType_Check(model)) {
-    PyErr_SetString(PyExc_TypeError, "model must be a type");
+    PyErr_Format(PyExc_TypeError, "model %R must be a type", model);
     return -1;
   }
 
@@ -2976,6 +2991,7 @@ cp_struct_init(CpStruct* self, PyObject* args, PyObject* kw)
     return -1;
   };
 
+  self->s_alter_type = alter;
   self->s_union =
     PySet_Contains(self->m_options, self->s_mod->cp_option__union);
 
@@ -3163,7 +3179,7 @@ cp_struct_prepare(CpStruct* self)
   Py_DECREF(iter);
   Py_DECREF(discardable);
   Py_DECREF(annotations);
-  return cp_struct_create_type(self);
+  return self->s_alter_type ? cp_struct_create_type(self) : 0;
 }
 
 static int
@@ -3448,6 +3464,7 @@ cp_struct_create_type(CpStruct* self)
   _coremodulestate* state = self->s_mod;
   PyObject* dict = self->m_model->tp_dict;
   if (!dict) {
+    PyErr_SetString(PyExc_TypeError, "Model is not initialized");
     return -1;
   }
 
@@ -3457,8 +3474,207 @@ cp_struct_create_type(CpStruct* self)
     return -1;
   }
 
+  if (CpStruct_HasOption(self, state->cp_option__slots)) {
+    if (cp_struct_add_slots(self) < 0) {
+      return -1;
+    }
+  }
   self->m_model->tp_init = (initproc)_cp_struct_model__init__;
   return 0;
+}
+
+static PyObject*
+_cp_struct_inherited_slots(CpStruct* self)
+{
+  debug("collecting inherited slots for '%s'", self->m_model->tp_name);
+  _coremodulestate* state = self->s_mod;
+  PyObject *inherited_slots = NULL, *mro = NULL, *base_type = NULL,
+           *base_types = NULL, *type_slots = NULL, *res = NULL;
+
+  mro = GETATTR(self->m_model, state->str___mro__);
+  if (!mro) {
+    res = NULL;
+    goto cleanup;
+  }
+
+  base_types = PyTuple_GetSlice(mro, 1, -1);
+  if (!base_types) {
+    res = NULL;
+    goto cleanup;
+  }
+  PyObject* s = NULL;
+  REPR(base_types, s);
+  debug("base types: %s", _PyUnicode_AsString(s));
+  Py_DECREF(s);
+
+  inherited_slots = PySet_New(NULL);
+  if (!inherited_slots) {
+    res = NULL;
+    goto cleanup;
+  }
+
+  // collect inherited slots
+  Py_ssize_t size = PyTuple_GET_SIZE(base_types);
+  debug("found %d base types", (int)size);
+  for (Py_ssize_t i = 0; i < size; i++) {
+    base_type = PyTuple_GetItem(base_types, i);
+    if (!base_type) {
+      res = NULL;
+      goto cleanup;
+    }
+
+    if (!PyType_Check(base_type)) {
+      continue;
+    }
+
+    type_slots =
+      PyDict_GetItem(((PyTypeObject*)base_type)->tp_dict, state->str___slots__);
+    if (!type_slots) {
+      res = NULL;
+      goto cleanup;
+    }
+
+    MATCH
+    {
+      CASE_COND(PyUnicode_Check(type_slots))
+      {
+        if (PySet_Add(inherited_slots, type_slots) < 0) {
+          res = NULL;
+          goto cleanup;
+        }
+      }
+      CASE_COND(PyIter_Check(type_slots))
+      {
+        if (_PySet_Update(inherited_slots, type_slots) < 0) {
+          res = NULL;
+          goto cleanup;
+        }
+      }
+      else
+      {
+        PyErr_Format(
+          PyExc_ValueError, "Invalid type for slots: %R", type_slots);
+        res = NULL;
+        goto cleanup;
+      }
+    }
+  }
+  REPR(inherited_slots, s);
+  debug("inherited slots: %s", _PyUnicode_AsString(s));
+  Py_DECREF(s);
+  res = Py_NewRef(inherited_slots);
+
+cleanup:
+  Py_XDECREF(mro);
+  Py_XDECREF(inherited_slots);
+  Py_XDECREF(base_types);
+  return res;
+}
+
+static int
+cp_struct_add_slots(CpStruct* self)
+{
+  _coremodulestate* state = self->s_mod;
+  PyObject *dict = NULL, *inherited_slots = NULL, *slots = NULL, *qualname;
+  int res = 0;
+
+  // Make sure, the model type does not already have __slots__
+  if (PyObject_HasAttr((PyObject*)self->m_model, state->str___slots__)) {
+    PyErr_Format(
+      PyExc_ValueError, "Model type %R already has __slots__", self->m_model);
+    return -1;
+  }
+
+  // We create a new custom class dictionary which will be later passed
+  // on to the type creation.
+  dict = PyDict_New();
+  if (!dict) {
+    res = -1;
+    goto cleanup;
+  }
+  if (PyDict_Merge(dict, self->m_model->tp_dict, true) < 0) {
+    res = -1;
+    goto cleanup;
+  }
+
+  // We have to check against overlapping slots, if any.
+  inherited_slots = _cp_struct_inherited_slots(self);
+  if (!inherited_slots) {
+    res = -1;
+    goto cleanup;
+  }
+
+  // collect slots
+  slots = PyList_New(NULL);
+  if (!slots) {
+    res = -1;
+    goto cleanup;
+  }
+
+  PyObject* name = NULL;
+  Py_ssize_t pos = 0;
+  while (PyDict_Next(self->m_members, &pos, &name, NULL)) {
+    if (!PySet_Contains(inherited_slots, name)) {
+      if (PyList_Append(slots, name) < 0) {
+        res = -1;
+        goto cleanup;
+      }
+    }
+  }
+
+  // Get rid of the __dict__ attribute
+  PyObject* tmp = _PyDict_Pop(dict, state->str___dict__, NULL);
+  Py_XDECREF(tmp);
+
+  // removes existing __weakref__ descriptor - we don't need it,
+  // because it belongs to the previous type.
+  tmp = _PyDict_Pop(dict, state->str___weakref__, NULL);
+  Py_XDECREF(tmp);
+
+  PyObject* tuple = PyList_AsTuple(slots);
+  if (!tuple) {
+    res = -1;
+    goto cleanup;
+  }
+
+  if (PyDict_SetItem(dict, state->str___slots__, tuple) < 0) {
+    res = -1;
+    goto cleanup;
+  }
+
+  if (HASATTR(self->m_model, state->str___qualname__)) {
+    qualname = GETATTR(self->m_model, state->str___qualname__);
+    if (!qualname) {
+      res = -1;
+      goto cleanup;
+    }
+  }
+
+  PyObject* new_type = PyObject_CallFunction((PyObject*)&PyType_Type,
+                                             "sOO",
+                                             self->m_model->tp_name,
+                                             self->m_model->tp_bases,
+                                             dict);
+  if (!new_type) {
+    res = -1;
+    goto cleanup;
+  }
+
+  Py_XSETREF(self->m_model, (PyTypeObject*)new_type);
+  if (qualname) {
+    if (SETATTR(self->m_model, state->str___qualname__, qualname) < 0) {
+      res = -1;
+      goto cleanup;
+    }
+  }
+  res = 0;
+
+cleanup:
+  Py_XDECREF(inherited_slots);
+  Py_XDECREF(dict);
+  Py_XDECREF(slots);
+  Py_XDECREF(qualname);
+  return res;
 }
 
 static PyObject*
@@ -4136,6 +4352,9 @@ _coremodule_clear(PyObject* m)
     Py_CLEAR(state->str_pattern_match);
     Py_CLEAR(state->str___match_args__);
     Py_CLEAR(state->str___slots__);
+    Py_CLEAR(state->str___dict__);
+    Py_CLEAR(state->str___weakref__);
+    Py_CLEAR(state->str___qualname__);
 
     Py_CLEAR(state->io_bytesio);
 
@@ -4319,6 +4538,9 @@ PyInit__core(void)
   CACHED_STRING(str_pattern_match, "match");
   CACHED_STRING(str___match_args__, "__match_args__");
   CACHED_STRING(str___slots__, "__slots__");
+  CACHED_STRING(str___dict__, "__dict__");
+  CACHED_STRING(str___weakref__, "__weakref__");
+  CACHED_STRING(str___qualname__, "__qualname__");
 
 #undef CACHED_STRING
 

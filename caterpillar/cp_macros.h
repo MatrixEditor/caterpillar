@@ -63,6 +63,20 @@
     PyErr_Format((err), __VA_ARGS__);                                          \
   } while (0);
 
+#define CpState_AppendPath(newpath)                                            \
+  Py_SETREF(state->m_path,                                                     \
+            PyUnicode_FromFormat("%s.%s",                                      \
+                                 _PyUnicode_AsString(state->m_path),           \
+                                 _PyUnicode_AsString((newpath))));
+
+#define GETATTR(op, name) PyObject_GetAttr((PyObject*)(op), (name))
+#define HASATTR(op, name) PyObject_HasAttr((PyObject*)(op), (name))
+#define SETATTR(op, name, value)                                               \
+  PyObject_SetAttr((PyObject*)(op), (name), (value))
+#define REPR(op, dst)                                                          \
+  do {                                                                         \
+    dst = PyObject_Repr((PyObject*)(op));                                      \
+  } while (0);
 // ------------------------------------------------------------------------------
 // Option related macros
 // ------------------------------------------------------------------------------
@@ -106,5 +120,8 @@
 #define CASE_EXACT(type, op) if ((op)->ob_type == (type))
 #define CASE(type, op) if (PyObject_IsInstance((op), (PyObject*)(type)))
 #define CASE_COND(cond) if (cond)
+
+#define debug(fmt, ...)                                                        \
+  printf(("DEBUG:%s:%d " fmt "\n"), __FUNCTION__, __LINE__, __VA_ARGS__)
 
 #endif
