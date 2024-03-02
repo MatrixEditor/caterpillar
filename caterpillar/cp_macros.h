@@ -36,6 +36,20 @@
     Py_XSETREF(varname, Py_NewRef(value));                                     \
   }
 
+#define _CpInit_SetObj(varname, value, cond, msg, ...)                         \
+  do {                                                                         \
+    if (value) {                                                               \
+      if (cond) {                                                              \
+        Py_XSETREF(varname, Py_NewRef(value));                                 \
+      } else {                                                                 \
+        PyErr_Format(PyExc_ValueError,                                         \
+                     ("unable to set '%s': " msg),                             \
+                     #varname,                                                 \
+                     __VA_ARGS__);                                             \
+      }                                                                        \
+    }                                                                          \
+  } while (0);
+
 #define _CpModuleState_Set(varname, ...)                                       \
   state->varname = __VA_ARGS__;                                                \
   if (!state->varname) {                                                       \
@@ -77,6 +91,13 @@
   do {                                                                         \
     dst = PyObject_Repr((PyObject*)(op));                                      \
   } while (0);
+
+#define _cp_assert(cond, error, rvalue, ...)                                   \
+  if (!(cond)) {                                                               \
+    PyErr_Format((error), __VA_ARGS__);                                        \
+    return rvalue;                                                             \
+  }
+
 // ------------------------------------------------------------------------------
 // Option related macros
 // ------------------------------------------------------------------------------

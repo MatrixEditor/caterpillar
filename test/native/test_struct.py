@@ -2,7 +2,7 @@ import pytest
 import typing
 
 # pylint: disable-next=import-error,wildcard-import,no-name-in-module
-from caterpillar._core import CpAtom, CpStruct, S_REPLACE_TYPES, pack, CpField
+from caterpillar._core import CpAtom, CpStruct, S_REPLACE_TYPES, pack, CpField, sizeof
 
 
 class Format:
@@ -55,6 +55,9 @@ class IntAtom(CpAtom):
     def __type__(self):
         return int
 
+    def __size__(self, context):
+        return 2
+
 
 def test_struct_pack():
 
@@ -81,3 +84,18 @@ def test_struct_pack_seq():
 
     result = pack([IntFormat2(1), IntFormat2(2)], f)
     assert result == b"\x00\x01\x00\x02"
+
+
+def test_struct_sizeof():
+    class IntFormat3:
+        foo: IntAtom()
+
+    s = CpStruct(IntFormat3, alter_model=True)
+    assert sizeof(s) == 2
+    assert sizeof(s[2]) == 4
+
+    with pytest.raises(ValueError):
+        sizeof(s[...]) # dynamic length
+
+    with pytest.raises(ValueError):
+        sizeof(s[IntAtom()::]) # dynamic length

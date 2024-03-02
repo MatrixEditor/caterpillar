@@ -7,3 +7,4 @@ Abstract Objects Layer
 .. toctree::
 
     atom.rst
+    context.rst

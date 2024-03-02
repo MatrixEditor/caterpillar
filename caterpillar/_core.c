@@ -7,6 +7,8 @@
 
 #include "cp_macros.h"
 
+#define PY_TPFLAGS_ATOM (1UL << 54)
+
 // ------------------------------------------------------------------------------
 // structs
 // ------------------------------------------------------------------------------
@@ -22,6 +24,7 @@ struct CpField;
 struct CpFieldAtom;
 struct CpState;
 struct CpStruct;
+struct CpCAtom;
 
 static PyTypeObject CpContextPath_Type;
 static PyTypeObject CpEndian_Type;
@@ -37,6 +40,7 @@ static PyTypeObject CpField_Type;
 static PyTypeObject CpFieldAtom_Type;
 static PyTypeObject CpState_Type;
 static PyTypeObject CpStruct_Type;
+static PyTypeObject CpCAtom_Type;
 
 static PyObject _InvalidDefault_Object;
 #define CP_INVALID_DEFAULT &_InvalidDefault_Object
@@ -1556,6 +1560,99 @@ static PyTypeObject CpAtom_Type = {
   .tp_new = cp_atom_new,
   .tp_dealloc = (destructor)cp_atom_dealloc,
   .tp_methods = CpAtom_Methods,
+};
+
+// ------------------------------------------------------------------------------
+// CpCAtom
+// ------------------------------------------------------------------------------
+typedef struct CpCAtom
+{
+  PyObject ob_base;
+
+  sizefunc m_size;
+  typefunc m_type;
+  bitsfunc m_bits;
+  packfunc m_pack;
+  unpackfunc m_unpack;
+} CpCAtom;
+
+static PyObject*
+cp_catom_new(PyTypeObject* type, PyObject* args, PyObject* kw)
+{
+  CpCAtom* self;
+  self = (CpCAtom*)type->tp_alloc(type, 0);
+  if (self == NULL)
+    return NULL;
+
+  self->m_bits = NULL;
+  self->m_pack = NULL;
+  self->m_unpack = NULL;
+  self->m_size = NULL;
+  self->m_type = NULL;
+  return (PyObject*)self;
+}
+
+static void
+cp_catom_dealloc(CpCAtom* self)
+{
+  self->m_bits = NULL;
+  self->m_pack = NULL;
+  self->m_unpack = NULL;
+  self->m_size = NULL;
+  self->m_type = NULL;
+  Py_TYPE(self)->tp_free((PyObject*)self);
+}
+
+static int
+cp_catom_init(CpCAtom* self, PyObject* args, PyObject* kw)
+{
+  return 0;
+}
+
+static PyMemberDef CpCAtom_Members[] = {
+  {
+    "bits",
+    T_OBJECT,
+    offsetof(CpCAtom, m_bits),
+    NULL,
+  },
+  {
+    "pack",
+    T_OBJECT,
+    offsetof(CpCAtom, m_pack),
+    NULL,
+  },
+  {
+    "unpack",
+    T_OBJECT,
+    offsetof(CpCAtom, m_unpack),
+    NULL,
+  },
+  {
+    "size",
+    T_OBJECT,
+    offsetof(CpCAtom, m_size),
+    NULL,
+  },
+  {
+    "type",
+    T_OBJECT,
+    offsetof(CpCAtom, m_type),
+    NULL,
+  },
+  { NULL } /* Sentinel */
+};
+
+static PyTypeObject CpCAtom_Type = {
+  .ob_base = PyVarObject_HEAD_INIT(NULL, 0).tp_name = _Cp_Name(_core.CpCAtom),
+  .tp_doc = "...",
+  .tp_basicsize = sizeof(CpCAtom),
+  .tp_itemsize = 0,
+  .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
+  .tp_new = cp_catom_new,
+  .tp_dealloc = (destructor)cp_catom_dealloc,
+  .tp_init = (initproc)cp_catom_init,
+  .tp_members = CpCAtom_Members,
 };
 
 // ------------------------------------------------------------------------------
@@ -3230,7 +3327,6 @@ cp_struct_prepare(CpStruct* self)
       return -1;
     }
   }
-
   Py_DECREF(iter);
   Py_DECREF(discardable);
   Py_DECREF(annotations);
@@ -3396,6 +3492,13 @@ cp_struct_process_annotation(CpStruct* self,
   if (res < 0) {
     Py_XDECREF(field);
     return -1;
+  }
+
+  if (!Cp_IsInvalidDefault(default_value)) {
+    if (CpStruct_ModelSetDefault(self, field->m_name, default_value) < 0) {
+      Py_DECREF(field);
+      return -1;
+    }
   }
 
   // Lastly, we replace the field from the internal model type if it
@@ -4241,6 +4344,21 @@ err:
   return NULL;
 }
 
+static PyObject*
+cp_typeof_catom(CpCAtom* op)
+{
+  if (!op) {
+    PyErr_SetString(PyExc_ValueError, "input object is NULL!");
+    return NULL;
+  }
+
+  if (!op->m_type) {
+    return Py_NewRef(get_global_core_state()->typing_any);
+  }
+
+  return op->m_type((PyObject*)op);
+}
+
 inline static PyObject*
 cp_typeof(PyObject* op)
 {
@@ -4249,10 +4367,20 @@ cp_typeof(PyObject* op)
     return NULL;
   }
 
-  if (op->ob_type == &CpField_Type) {
-    return cp_typeof_field((CpField*)op);
-  } else if (op->ob_type == &CpStruct_Type) {
-    return Py_NewRef(((CpStruct*)op)->m_model);
+  MATCH
+  {
+    CASE_EXACT(&CpField_Type, op)
+    {
+      return cp_typeof_field((CpField*)op);
+    }
+    else CASE_EXACT(&CpStruct_Type, op)
+    {
+      return Py_NewRef(((CpStruct*)op)->m_model);
+    }
+    else CASE(&CpCAtom_Type, op)
+    {
+      return cp_typeof_catom((CpCAtom*)op);
+    }
   }
 
   return cp_typeof_common(op);
@@ -4722,8 +4850,9 @@ PyInit__core(void)
   CpType_Ready(&CpInvalidDefault_Type);
   CpType_Ready(&CpDefaultSwitchOption_Type);
   CpType_Ready(&CpState_Type);
-
   CpType_Ready(&CpStructFieldInfo_Type);
+
+  CpStruct_Type.tp_base = &CpFieldAtom_Type;
   CpType_Ready(&CpStruct_Type);
 
   m = PyModule_Create(&_coremodule);

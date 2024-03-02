@@ -60,21 +60,26 @@ class Context(dict):
         try:
             return object.__getattribute__(self, key)
         except AttributeError:
-            if "." not in key:
-                try:
-                    return self[key]  # Raises an error if the key is not found
-                except KeyError:
-                    raise AttributeError(key)
+            return self.__context_getattr__(key)
 
-            path = key.split(".")
-            if path[0] in self:
-                root = self[path[0]]
-            else:
-                root = getattr(self, path[0])
-            for i in range(1, len(path)):
-                root = getattr(root, path[i])
+    def __context_getattr__(self, path: str):
+        """
+        Retrieves an attribute from the context.
 
-            return root
+        :param key: The attribute key.
+        :return: The value associated with the key.
+        """
+        nodes = path.split(".")
+        obj = (
+            self[nodes[0]]
+            if nodes[0] in self
+            else object.__getattribute__(self, nodes[0])
+        )
+
+        for i in range(1, len(nodes)):
+            obj = getattr(obj, nodes[i])
+
+        return obj
 
     @property
     def _root(self) -> _ContextLike:
