@@ -91,7 +91,7 @@ static int
 cp_pack(PyObject* op, PyObject* atom, PyObject* io, PyObject* globals, int raw);
 
 static PyObject*
-cp_sizeof(PyObject* op);
+cp_sizeof(PyObject* op, PyObject* globals);
 
 static PyObject*
 cp_sizeof_internal(PyObject* atom, struct CpState* state);
@@ -1491,6 +1491,9 @@ CpAtom_CallPack(PyObject* self, PyObject* name, PyObject* op, PyObject* ctx)
   return res;
 }
 
+#define CpAtom_CallSize(self, name, ctx)                                       \
+  PyObject_CallMethodOneArg((PyObject*)(self), (name), (PyObject*)(ctx))
+
 static PyObject*
 cp_atom_new(PyTypeObject* type, PyObject* args, PyObject* kw)
 {
@@ -1896,13 +1899,21 @@ cp_field_set_length(CpField* self, PyObject* value, void* closure)
 
   _Cp_SetObj(self->m_length, value);
   _coremodulestate* state = get_global_core_state();
-  if (PyLong_Check(self->m_length) && PyLong_AsSize_t(self->m_length) <= 1) {
+
+  int8_t is_number = PyLong_Check(value);
+  if (is_number && PyLong_AsSize_t(self->m_length) <= 1) {
     // remove sequential option automatically
     PySet_Discard(self->m_options, state->cp_option__sequential);
     self->s_sequential = false;
   } else {
     PySet_Add(self->m_options, state->cp_option__sequential);
     self->s_sequential = true;
+  }
+
+  if (!is_number) {
+    PySet_Add(self->m_options, state->cp_option__dynamic);
+  } else {
+    PySet_Discard(self->m_options, state->cp_option__dynamic);
   }
   return 0;
 }
@@ -2387,10 +2398,6 @@ cp_state_init(CpState* self, PyObject* args, PyObject* kw)
     return -1;
   }
 
-  if (!io) {
-    PyErr_SetString(PyExc_ValueError, "io is NULL!");
-    return -1;
-  }
   _Cp_SetObj(self->m_io, io);
   if (globals)
     if (cp_state_set_globals(self, globals, NULL) < 0)
@@ -2860,17 +2867,39 @@ CpStruct_New(PyObject* model)
 static inline PyObject*
 CpStruct_GetStruct(PyObject* model, _coremodulestate* state)
 {
+  if (!model) {
+    PyErr_SetString(PyExc_TypeError, "model must be a type");
+    return NULL;
+  }
+
+  PyObject* dict = model->ob_type == &PyType_Type
+                     ? ((PyTypeObject*)model)->tp_dict
+                     : model->ob_type->tp_dict;
+
   if (!state) {
-    return PyObject_GetAttrString(model, CpType_Struct);
+    return PyMapping_GetItemString(dict, CpType_Struct);
   } else {
-    return PyObject_GetAttr(model, state->str___struct__);
+    return PyObject_GetItem(dict, state->str___struct__);
   }
 }
 
 static inline int
-CpStruct_CheckModel(PyObject* model, _coremodulestate* state)
+CpStruct_CheckModel(PyObject* model, _coremodulestate* state) MATCH
 {
-  return model && PyObject_HasAttr(model, state->str___struct__);
+  PyObject* dict = NULL;
+  CASE_COND(!model)
+  {
+    return 0;
+  }
+  else CASE_EXACT(&PyType_Type, model)
+  {
+    dict = ((PyTypeObject*)model)->tp_dict;
+  }
+  else
+  {
+    dict = model->ob_type->tp_dict;
+  }
+  return dict && PyDict_Contains(dict, state->str___struct__);
 }
 
 static inline int
@@ -2951,11 +2980,11 @@ cp_struct_add_slots(CpStruct* self);
 static int
 cp_struct_init(CpStruct* self, PyObject* args, PyObject* kw)
 {
-  static char* kwlist[] = { "model",         "options", "endian", "arch",
-                            "field_options", "alter",   NULL };
+  static char* kwlist[] = { "model",         "options",     "endian", "arch",
+                            "field_options", "alter_model", NULL };
   PyObject *model = NULL, *options = NULL, *endian = NULL, *arch = NULL,
            *field_options = NULL;
-  int8_t alter = false;
+  int alter = false;
   if (!PyArg_ParseTupleAndKeywords(args,
                                    kw,
                                    "O|OOOOp",
@@ -2968,24 +2997,30 @@ cp_struct_init(CpStruct* self, PyObject* args, PyObject* kw)
                                    &alter)) {
     return -1;
   }
+
   if (!model || !PyType_Check(model)) {
     PyErr_Format(PyExc_TypeError, "model %R must be a type", model);
     return -1;
   }
-
   if (CpStruct_CheckModel(model, self->s_mod)) {
     PyErr_SetString(PyExc_TypeError, "model must not be a struct container");
     return -1;
   }
 
   Py_XSETREF(self->m_model, (PyTypeObject*)Py_NewRef(model));
-  _Cp_SetObj(self->m_options, options) else
-  {
+  if (!options) {
     self->m_options = PySet_New(NULL);
     if (!self->m_options) {
       return -1;
     }
+  } else {
+    if (!PySet_Check(options)) {
+      PyErr_SetString(PyExc_TypeError, "options must be a set");
+      return -1;
+    }
+    Py_XSETREF(self->m_options, Py_NewRef(options));
   }
+
   if (_PySet_Update(self->m_options,
                     self->s_mod->cp_option__global_struct_options) < 0) {
     return -1;
@@ -3000,9 +3035,29 @@ cp_struct_init(CpStruct* self, PyObject* args, PyObject* kw)
     return -1;
   }
 
-  _Cp_SetObj(self->m_endian, endian);
-  _Cp_SetObj(self->m_arch, arch);
-  _Cp_SetObj(self->m_field_options, field_options);
+  if (endian) {
+    if (endian->ob_type == &CpEndian_Type) {
+      _Cp_SetObj(self->m_endian, endian);
+    } else {
+      PyErr_SetString(PyExc_TypeError, "endian must be an Endian instance");
+      return -1;
+    }
+  }
+
+  if (arch) {
+    if (arch->ob_type == &CpArch_Type) {
+      _Cp_SetObj(self->m_arch, arch);
+    } else {
+      PyErr_SetString(PyExc_TypeError, "arch must be an Arch instance");
+      return -1;
+    }
+  }
+
+  _CpInit_SetObj(self->m_field_options,
+                 field_options,
+                 PySet_Check(field_options),
+                 "%s",
+                 "field_options must be of type set");
   return cp_struct_prepare(self);
 }
 
@@ -3364,7 +3419,6 @@ cp_struct_process_annotation(CpStruct* self,
       return -1;
     }
   }
-
   return res;
 }
 
@@ -3486,7 +3540,6 @@ cp_struct_create_type(CpStruct* self)
 static PyObject*
 _cp_struct_inherited_slots(CpStruct* self)
 {
-  debug("collecting inherited slots for '%s'", self->m_model->tp_name);
   _coremodulestate* state = self->s_mod;
   PyObject *inherited_slots = NULL, *mro = NULL, *base_type = NULL,
            *base_types = NULL, *type_slots = NULL, *res = NULL;
@@ -3504,7 +3557,6 @@ _cp_struct_inherited_slots(CpStruct* self)
   }
   PyObject* s = NULL;
   REPR(base_types, s);
-  debug("base types: %s", _PyUnicode_AsString(s));
   Py_DECREF(s);
 
   inherited_slots = PySet_New(NULL);
@@ -3515,7 +3567,6 @@ _cp_struct_inherited_slots(CpStruct* self)
 
   // collect inherited slots
   Py_ssize_t size = PyTuple_GET_SIZE(base_types);
-  debug("found %d base types", (int)size);
   for (Py_ssize_t i = 0; i < size; i++) {
     base_type = PyTuple_GetItem(base_types, i);
     if (!base_type) {
@@ -3560,7 +3611,6 @@ _cp_struct_inherited_slots(CpStruct* self)
     }
   }
   REPR(inherited_slots, s);
-  debug("inherited slots: %s", _PyUnicode_AsString(s));
   Py_DECREF(s);
   res = Py_NewRef(inherited_slots);
 
@@ -4209,6 +4259,239 @@ cp_typeof(PyObject* op)
 }
 
 // ------------------------------------------------------------------------------
+// sizeof
+// ------------------------------------------------------------------------------
+static PyObject*
+cp_sizeof_common(PyObject* op, struct CpState* state)
+{
+  if (!CpAtom_FastHasSize(op, state->mod)) {
+    PyErr_Format(
+      PyExc_TypeError, "object %R of type %R has no __size__", op, op->ob_type);
+    return NULL;
+  }
+
+  return CpAtom_CallSize(op, state->mod->str___size__, state);
+}
+
+static PyObject*
+cp_sizeof_field(struct CpField* field, struct CpState* state)
+{
+  // Size calculation is done in a special way. The following situations have
+  // to be considered:
+  //
+  //  1. Disabled field: return 0
+  //  2. Dynamic field: raise an error
+  //  3. Sequential field: multiply the size of the underlying atom by the
+  //     number of elements
+  //  4. Constant field: just return the size of the atom
+  _cp_assert(field, PyExc_ValueError, NULL, "field is NULL");
+  _cp_assert(state, PyExc_ValueError, NULL, "state is NULL");
+
+  // set path
+  CpState_AppendPath(field->m_name);
+  if (!state->m_path) {
+    return NULL;
+  }
+
+  if (!CpField_IsEnabled(field, (PyObject*)state)) {
+    // see case 1.
+    return PyLong_FromLong(0);
+  }
+
+  _coremodulestate* mod = state->mod;
+  PyObject *count = PyLong_FromLong(1), *size = NULL;
+  if (!count) {
+    return NULL;
+  }
+
+  if (PySet_Contains(field->m_options, mod->cp_option__dynamic)) {
+    // see case 2.
+    PyErr_SetString(PyExc_ValueError, "dynamic fields are not supported!");
+    return NULL;
+  }
+
+  // prepare context
+  state->m_field = Py_NewRef(field);
+  if (field->s_sequential) {
+    count = CpField_GetLength(field, (PyObject*)state);
+    if (!count) {
+      return NULL;
+    }
+
+    if (!PyLong_Check(count)) {
+      Py_XDECREF(count);
+      PyErr_SetString(PyExc_ValueError, "length is not an integer!");
+      return NULL;
+    }
+  }
+
+  PyObject* atom = Py_NewRef(field->m_atom);
+  if (field->m_switch) {
+    // Static switch structures are supported only if the predecessor
+    // is a context lambda.
+    if (!PyCallable_Check(field->m_switch)) {
+      PyErr_SetString(
+        PyExc_ValueError,
+        "Switch statement without ContextLambda is danymic sized!");
+      goto fail;
+    }
+
+    PyObject* value = PyObject_CallOneArg(field->m_switch, (PyObject*)state);
+    if (!value) {
+      goto fail;
+    }
+
+    atom = CpField_GetSwitchAtom(field, value, (PyObject*)state);
+    Py_DECREF(value);
+    if (!atom) {
+      goto fail;
+    }
+  }
+
+  size = cp_sizeof_internal(atom, state);
+  if (!size) {
+    goto fail;
+  }
+
+  PyObject* result = PyNumber_Multiply(size, count);
+  if (!result) {
+    goto fail;
+  }
+  Py_XDECREF(size);
+  Py_XDECREF(count);
+  return result;
+
+fail:
+  Py_XDECREF(atom);
+  Py_XDECREF(count);
+  Py_XDECREF(size);
+  return NULL;
+}
+
+static PyObject*
+cp_sizeof_struct(struct CpStruct* struct_, struct CpState* state)
+{
+  _cp_assert(struct_, PyExc_ValueError, NULL, "struct is NULL");
+  _cp_assert(state, PyExc_ValueError, NULL, "state is NULL");
+
+  PyObject *max_size = PyLong_FromSize_t(0), *size = PyLong_FromLong(0),
+           *tmp = NULL;
+  CpStructFieldInfo* info = NULL;
+  Py_ssize_t pos = 0;
+
+  if (!max_size || !size) {
+    goto fail;
+  }
+
+  while (PyDict_Next(struct_->m_members, &pos, NULL, (PyObject**)&info)) {
+    tmp = cp_sizeof_internal((PyObject*)info->m_field, state);
+    if (!tmp) {
+      goto fail;
+    }
+
+    if (PyObject_RichCompareBool(max_size, tmp, Py_LT)) {
+      Py_XSETREF(max_size, Py_NewRef(tmp));
+    }
+
+    Py_XSETREF(tmp, PyNumber_Add(size, tmp));
+    if (!tmp) {
+      goto fail;
+    }
+    Py_XSETREF(size, tmp);
+  }
+  return struct_->s_union ? max_size : size;
+
+fail:
+  Py_XDECREF(tmp);
+  Py_XDECREF(max_size);
+  Py_XDECREF(size);
+  return NULL;
+}
+
+static PyObject*
+cp_sizeof_internal(PyObject* op, CpState* state)
+{
+  PyObject *result = NULL, *obj = Py_XNewRef(state->m_obj),
+           *field = Py_XNewRef(state->m_field),
+           *path = Py_XNewRef(state->m_path);
+
+  if (!op) {
+    PyErr_SetString(PyExc_ValueError, "input object is NULL!");
+    return NULL;
+  }
+  if (!state) {
+    PyErr_SetString(PyExc_ValueError, "state is NULL!");
+    return NULL;
+  }
+
+  MATCH
+  {
+    CASE_EXACT(&CpField_Type, op)
+    {
+      result = cp_sizeof_field((CpField*)op, state);
+    }
+    else CASE_EXACT(&CpStruct_Type, op)
+    {
+      result = cp_sizeof_struct((CpStruct*)op, state);
+    }
+    else
+    {
+      result = cp_sizeof_common(op, state);
+    }
+  }
+
+  Py_XSETREF(state->m_obj, obj);
+  Py_XSETREF(state->m_field, field);
+  Py_XSETREF(state->m_path, path);
+  return result;
+}
+
+static PyObject*
+cp_sizeof(PyObject* op, PyObject* globals)
+{
+  PyObject *result = NULL, *atom = NULL;
+  CpState* state = (CpState*)CpObject_CreateNoArgs(&CpState_Type);
+  if (!state) {
+    return NULL;
+  }
+
+  if (globals) {
+    if (cp_state_set_globals(state, globals, NULL) < 0) {
+      Py_DECREF(state);
+      return NULL;
+    }
+  }
+
+  if (!op) {
+    PyErr_SetString(PyExc_ValueError, "input object is NULL!");
+    Py_DECREF(state);
+    return NULL;
+  }
+
+  MATCH
+  {
+    CASE_COND(CpStruct_CheckModel(op, state->mod))
+    {
+      atom = CpStruct_GetStruct(op, state->mod);
+      if (!atom) {
+        Py_DECREF(state);
+        return NULL;
+      }
+      state->m_obj = Py_NewRef(op);
+    }
+    else
+    {
+      atom = Py_NewRef(op);
+    }
+  }
+
+  result = cp_sizeof_internal(atom, state);
+  Py_DECREF(state);
+  Py_DECREF(atom);
+  return result;
+}
+
+// ------------------------------------------------------------------------------
 // Module
 // ------------------------------------------------------------------------------
 static PyObject*
@@ -4306,6 +4589,18 @@ finish:
   return result;
 }
 
+static PyObject*
+_coremodule_sizeof(PyObject* m, PyObject* args, PyObject* kw)
+{
+  static char* kwlist[] = { "obj", "globals", NULL };
+  PyObject *op = NULL, *globals = NULL;
+  if (!PyArg_ParseTupleAndKeywords(args, kw, "O|O", kwlist, &op, &globals)) {
+    return NULL;
+  }
+
+  return cp_sizeof(op, globals);
+}
+
 static int
 _coremodule_clear(PyObject* m)
 {
@@ -4381,6 +4676,10 @@ static PyMethodDef _coremodule_methods[] = {
     METH_VARARGS | METH_KEYWORDS,
     NULL },
   { "pack", (PyCFunction)_coremodule_pack, METH_VARARGS | METH_KEYWORDS, NULL },
+  { "sizeof",
+    (PyCFunction)_coremodule_sizeof,
+    METH_VARARGS | METH_KEYWORDS,
+    NULL },
   { NULL }
 };
 

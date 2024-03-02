@@ -10,7 +10,7 @@ class Format:
 
 
 def test_struct_init():
-    S = CpStruct(Format, alter=True)
+    S = CpStruct(Format, alter_model=True)
 
     assert S.model is Format
     assert len(S.members) == 1
@@ -27,7 +27,7 @@ def test_struct_default_init():
     class A:
         foo: CpAtom() = None
 
-    s = CpStruct(A, alter=True)
+    s = CpStruct(A, alter_model=True)
     assert len(s.members) == 1
     assert s.members["foo"].field.default is None
 
@@ -41,7 +41,7 @@ def test_struct_replace_types():
     class Format2:
         foo: CpAtom()
 
-    s = CpStruct(Format2, options={S_REPLACE_TYPES}, alter=True)
+    s = CpStruct(Format2, options={S_REPLACE_TYPES}, alter_model=True)
     assert s.model is Format2
     assert len(s.members) == 1
     assert "foo" in s.members
@@ -61,7 +61,7 @@ def test_struct_pack():
     class IntFormat:
         foo: IntAtom()
 
-    C = CpStruct(IntFormat, options={S_REPLACE_TYPES})
+    C = CpStruct(IntFormat, options={S_REPLACE_TYPES}, alter_model=True)
 
     s = C
     assert len(s.members) == 1
@@ -76,7 +76,7 @@ def test_struct_pack_seq():
     class IntFormat2:
         foo: IntAtom()
 
-    f = CpField(CpStruct(IntFormat2, alter=True))[2]
+    f = CpField(CpStruct(IntFormat2, alter_model=True))[2]
     assert f.length == 2
 
     result = pack([IntFormat2(1), IntFormat2(2)], f)
