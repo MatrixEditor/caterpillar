@@ -77,10 +77,10 @@
     PyErr_Format((err), __VA_ARGS__);                                          \
   } while (0);
 
-#define CpState_AppendPath(newpath)                                            \
-  Py_SETREF(state->m_path,                                                     \
+#define CpLayer_AppendPath(newpath)                                            \
+  Py_SETREF(layer->m_path,                                                     \
             PyUnicode_FromFormat("%s.%s",                                      \
-                                 _PyUnicode_AsString(state->m_path),           \
+                                 _PyUnicode_AsString(layer->m_parent->m_path), \
                                  _PyUnicode_AsString((newpath))));
 
 #define GETATTR(op, name) PyObject_GetAttr((PyObject*)(op), (name))
@@ -142,6 +142,9 @@
 #define CASE(type, op) if (PyObject_IsInstance((op), (PyObject*)(type)))
 #define CASE_COND(cond) if (cond)
 
+// ------------------------------------------------------------------------------
+// Debugging
+// ------------------------------------------------------------------------------
 #define debug(fmt, ...)                                                        \
   printf(("DEBUG:%s:%d " fmt "\n"), __FUNCTION__, __LINE__, __VA_ARGS__)
 
