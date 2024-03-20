@@ -9,6 +9,7 @@ from caterpillar._core import (
     pack_into,
     CpState,
     pack,
+    CpLayer,
 )
 from io import BytesIO
 
@@ -16,8 +17,8 @@ import pytest
 
 
 class Foo(CpFieldAtom):
-    def __pack__(self, obj, context: CpState):
-        context.write(obj.to_bytes(1, "big"))
+    def __pack__(self, obj, layer: CpLayer):
+        layer.state.write(obj.to_bytes(1, "big"))
 
 
 foo_t = Foo()

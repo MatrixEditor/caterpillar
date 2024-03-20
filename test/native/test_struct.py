@@ -50,7 +50,7 @@ def test_struct_replace_types():
 
 class IntAtom(CpAtom):
     def __pack__(self, obj, context):
-        context.write(obj.to_bytes(2))
+        context.state.write(obj.to_bytes(2))
 
     def __type__(self):
         return int
@@ -99,3 +99,4 @@ def test_struct_sizeof():
 
     with pytest.raises(ValueError):
         sizeof(s[IntAtom()::]) # dynamic length
+

@@ -24,6 +24,7 @@ struct CpField;
 struct CpFieldAtom;
 struct CpStruct;
 struct CpCAtom;
+
 struct _stateobj;
 struct _layerobj;
 
@@ -141,7 +142,7 @@ cp_unpack_catom(struct CpCAtom* catom, CpLayerObject* layer);
 #define CpUnionHook_Init "__model_init__"
 #define CpUnionHook_SetAttr "__model_setattr__"
 
-#define CpContext_GetAttr "__context_getattr__"
+#define _CpSTR_Context_GetAttr "__context_getattr__"
 
 // ------------------------------------------------------------------------------
 // state
@@ -604,6 +605,13 @@ CpContext_Call(PyObject* op, PyObject* context)
   return PyObject_CallFunction(op, "O", context);
 }
 
+static inline PyObject*
+CpContext_GetAttr(PyObject* op, PyObject* key, _coremodulestate* state)
+{
+  return PyObject_CallMethodOneArg(
+    op, (state ? state : get_global_core_state())->str_ctx__getattr, key);
+}
+
 static int
 cp_context_init(CpContext* self, PyObject* args, PyObject* kw)
 {
@@ -676,7 +684,7 @@ const char cp_context__doc__[] =
    ":type kwargs: dict\n");
 
 static PyMethodDef CpContext_Methods[] = {
-  { CpContext_GetAttr,
+  { _CpSTR_Context_GetAttr,
     (PyCFunction)cp_context__context_getattr__,
     METH_VARARGS,
     NULL },
@@ -2419,7 +2427,7 @@ cp_layer_init(CpLayerObject* self, PyObject* args, PyObject* kw)
   _Cp_SetObj(self->m_value, value);
   _Cp_SetObj(self->m_path, path);
   _Cp_SetObj(self->m_sequence, sequence);
-  Py_XSETREF(self->m_parent, (CpLayerObject*)Py_NewRef(parent));
+  Py_XSETREF(self->m_parent, (CpLayerObject*)Py_XNewRef(parent));
   self->s_greedy = false;
   self->m_index = -1;
   self->m_length = -1;
@@ -2436,9 +2444,10 @@ CpLayer_New(CpStateObject* state, CpLayerObject* parent)
   if (!self) {
     return NULL;
   }
-  Py_XSETREF(self->m_parent, (CpLayerObject*)Py_XNewRef(parent));
   if (parent) {
-    Py_XSETREF(parent, (CpLayerObject*)Py_NewRef(self));
+    Py_XSETREF(self->m_parent, (CpLayerObject*)Py_XNewRef(parent));
+    // automatically inherit field object
+    Py_XSETREF(self->m_field, parent->m_field);
   }
   return self;
 }
@@ -2754,7 +2763,9 @@ static PyMethodDef CpState_Methods[] = {
   { "read", (PyCFunction)cp_state_read, METH_VARARGS },
   { "tell", (PyCFunction)cp_state_tell, METH_NOARGS },
   { "seek", (PyCFunction)cp_state_seek, METH_VARARGS },
-  { CpContext_GetAttr, (PyCFunction)cp_state__context_getattr__, METH_VARARGS },
+  { _CpSTR_Context_GetAttr,
+    (PyCFunction)cp_state__context_getattr__,
+    METH_VARARGS },
   { NULL } /* Sentinel */
 };
 
@@ -3942,13 +3953,50 @@ static PyTypeObject CpStruct_Type = {
 };
 
 // ------------------------------------------------------------------------------
-// pack
+// pack:
+// Serializing objects follows specific rules when it comes to CpLayerObject
+// creation. The first layer (root layer) will be assigned with the path
+// '<root>'. By default, cp_pack will automatically create a new layer object
+// when called. Therefore, it is recommended to utilize cp_pack_internal for
+// C calls to avoid unnecessary layer creation.
+//
+// Currently, the following conditions allow the creation of a new layer:
+//    - Start packing an object
+//    - Serializing a sequence object that requires to iterate over all
+//      elements individually. Note that atoms that support '__unpack_many__'
+//      won't be called with the newly created sequence layer.
+//    - Struct object or named sequences of fields in general will always
+//      introduce a new layer object.
+//      REVISIT: HOw should we store context variables of the current packing
+//      layer and where do we get the object from?
+//
+// There are some built-in types that are designed to fasten calls by providing
+// a native C implementation. It is recommended to implement new classes in C
+// to leverage its speed rather than define new Python atom classes.
+//
+// A full workflow of cp_pack with all layers displayed would be the following:
+//    1. cp_pack: create new state and root layer         | l: <root>
+//    2. cp_pack_internal: measure atom type and call     |         <--+-+-+
+//       according C method                               | l: <root>  | | |
+//    3. One of the following methods will be called:                  | | |
+//      a. cp_pack_catom: calls native C method           | l: <root>  | | |
+//      b. cp_pack_atom: call python pack method          | l: <root>  | | |
+//      c. cp_pack_field: inserts the field instance into              | | |
+//         the current layer and calls cp_pack_internal                | | |
+//         again.                                         | l: <root> -+ | |
+//      d. cp_pack_struct: creates a new object layer                    | |
+//         that addresses only the current struct's                      | |
+//         values. Calls cp_pack_internal on each field   | l: <obj>  ---+ |
+//      e. cp_pack_common: createsa a new layer if                         |
+//         multiple objects should be packed AND                           |
+//         __[un]pack_many__ is not implemented.          | l: <seq|root> -+
 // ------------------------------------------------------------------------------
 
 static int
 cp_pack_field(PyObject* op, CpField* field, CpLayerObject* layer)
 {
   // we can assert that all provided objects are of the correct type
+  // REVISIT: really?
   CpLayer_AppendPath(field->m_name);
   if (!layer->m_path) {
     return -1;
@@ -4051,11 +4099,11 @@ cp_pack_common(PyObject* op, PyObject* atom, CpLayerObject* layer)
   }
 
   // TODO: explain why
-  CpLayerObject* sequence_layer = CpLayer_New(state, layer);
-  if (!sequence_layer) {
+  CpLayerObject* seq_layer = CpLayer_New(state, layer);
+  if (!seq_layer) {
     return -1;
   }
-  sequence_layer->s_sequential = false;
+  seq_layer->s_sequential = false;
 
   Py_ssize_t size = PySequence_Size(op);
   PyObject* length =
@@ -4087,7 +4135,10 @@ cp_pack_common(PyObject* op, PyObject* atom, CpLayerObject* layer)
     if (!sizeobj) {
       goto fail;
     }
+    // TODO: explain why
+    layer->s_sequential = false;
     success = cp_pack_internal(sizeobj, start, layer);
+    layer->s_sequential = true;
     Py_DECREF(sizeobj);
     Py_DECREF(start);
     if (success < 0) {
@@ -4115,26 +4166,24 @@ cp_pack_common(PyObject* op, PyObject* atom, CpLayerObject* layer)
 
   if (layer_length <= 0) {
     // continue packing, here's nothing to store
-    Py_XDECREF(sequence_layer);
+    Py_XDECREF(seq_layer);
     return 0;
   }
-  CpLayer_SetSequence(sequence_layer, op, layer_length, greedy);
+  CpLayer_SetSequence(seq_layer, op, layer_length, greedy);
   PyObject* obj = NULL;
-  for (sequence_layer->m_index = 0;
-       sequence_layer->m_index < sequence_layer->m_length;
-       sequence_layer->m_index++) {
-    obj = PySequence_GetItem(op, sequence_layer->m_index);
+  for (seq_layer->m_index = 0; seq_layer->m_index < seq_layer->m_length;
+       seq_layer->m_index++) {
+    obj = PySequence_GetItem(op, seq_layer->m_index);
     if (!obj) {
       return -1;
     }
-    sequence_layer->m_path = PyUnicode_FromFormat(
-      "%s.%d", _PyUnicode_AsString(layer->m_path), sequence_layer->m_index);
-    if (!sequence_layer->m_path) {
+    seq_layer->m_path = PyUnicode_FromFormat(
+      "%s.%d", _PyUnicode_AsString(layer->m_path), seq_layer->m_index);
+    if (!seq_layer->m_path) {
       Py_XDECREF(obj);
       return -1;
     }
-
-    success = cp_pack_internal(obj, atom, sequence_layer);
+    success = cp_pack_internal(obj, atom, seq_layer);
     Py_XSETREF(obj, NULL);
     if (success < 0) {
       return -1;
@@ -4143,8 +4192,8 @@ cp_pack_common(PyObject* op, PyObject* atom, CpLayerObject* layer)
   return 0;
 
 fail:
-  if (sequence_layer) {
-    CpLayer_Invalidate(sequence_layer);
+  if (seq_layer) {
+    CpLayer_Invalidate(seq_layer);
   }
   return -1;
 }
@@ -4296,13 +4345,11 @@ cp_pack(PyObject* op, PyObject* atom, PyObject* io, PyObject* globals, int raw)
       return -1;
     }
   }
-
   CpLayerObject* root = CpLayer_New(state, NULL);
   if (!root) {
     return -1;
   }
-  root->m_path = Py_NewRef(state->mod->str_ctx__root);
-
+  Py_XSETREF(root->m_path, Py_NewRef(state->mod->str_ctx__root));
   int success = cp_pack_internal(op, atom, root);
   Py_DECREF(root);
   Py_DECREF(state);
@@ -4693,6 +4740,7 @@ cp_sizeof(PyObject* op, PyObject* globals)
   if (!layer) {
     return NULL;
   }
+  Py_XSETREF(layer->m_path, state->mod->str_ctx__root);
 
   MATCH
   {
@@ -5085,8 +5133,7 @@ _coremodule_pack(PyObject* m, PyObject* args, PyObject* kw)
     goto finish;
   }
 
-  PyObject *atomobj = atom, *obj = op;
-  res = cp_pack(obj, atomobj, io, globals, true);
+  res = cp_pack(op, atom, io, globals, true);
 finish:
   Py_XDECREF(globals);
   if (res < 0) {
@@ -5391,7 +5438,7 @@ PyInit__core(void)
   CACHED_STRING(str_tell, "tell");
   CACHED_STRING(str_start, "start");
   CACHED_STRING(str_ctx__root, "<root>");
-  CACHED_STRING(str_ctx__getattr, CpContext_GetAttr);
+  CACHED_STRING(str_ctx__getattr, _CpSTR_Context_GetAttr);
   CACHED_STRING(str_bytesio_getvalue, "getvalue");
   CACHED_STRING(str___annotations__, "__annotations__");
   CACHED_STRING(str_builder_process, "process");

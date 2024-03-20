@@ -78,10 +78,12 @@
   } while (0);
 
 #define CpLayer_AppendPath(newpath)                                            \
-  Py_SETREF(layer->m_path,                                                     \
-            PyUnicode_FromFormat("%s.%s",                                      \
-                                 _PyUnicode_AsString(layer->m_parent->m_path), \
-                                 _PyUnicode_AsString((newpath))));
+  Py_XSETREF(layer->m_path,                                                    \
+             PyUnicode_FromFormat(                                             \
+               "%s.%s",                                                        \
+               _PyUnicode_AsString(layer->m_parent ? layer->m_parent->m_path   \
+                                                   : layer->m_path),           \
+               _PyUnicode_AsString((newpath))));
 
 #define GETATTR(op, name) PyObject_GetAttr((PyObject*)(op), (name))
 #define HASATTR(op, name) PyObject_HasAttr((PyObject*)(op), (name))

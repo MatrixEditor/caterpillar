@@ -75,7 +75,6 @@ def unpack_seq(context: _ContextLike, unpack_one) -> List[Any]:
         _lst=values,
         _field=field,
         _obj=context.get(CTX_OBJECT),
-        _pos=context.get(CTX_POS),
         _is_seq=False,
     )
     greedy = length is Ellipsis
@@ -98,7 +97,6 @@ def unpack_seq(context: _ContextLike, unpack_one) -> List[Any]:
             seq_context[CTX_PATH] = f"{base_path}.{i}"
             seq_context[CTX_INDEX] = i
             values.append(unpack_one(seq_context))
-            seq_context[CTX_POS] = stream.tell()
 
             # NOTE: we introduce this check to reduce time when unpacking
             # a greedy range of elements.
@@ -153,16 +151,14 @@ def pack_seq(seq: List[Any], context: _ContextLike, pack_one) -> None:
         # We have to unset the sequence status as we are going to call 'unpack_one'
         _is_seq=False,
     )
-    seq_context[CTX_POS] = stream.tell()
     for i, elem in enumerate(seq):
         # The path will contain an additional hint on what element is processed
         # at the moment.
         try:
             seq_context[CTX_INDEX] = i
-            seq_context[CTX_PATH] = ".".join([base_path, str(i)])
+            seq_context[CTX_PATH] = f"{base_path}.{i}"
             seq_context[CTX_OBJECT] = elem
             pack_one(elem, seq_context)
-            seq_context[CTX_POS] = stream.tell()
         except Stop:
             break
         except Exception as exc:

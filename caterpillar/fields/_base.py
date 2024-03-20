@@ -398,8 +398,6 @@ class Field:
                 value = self.default
                 if value == INVALID_DEFAULT or isinstance(exc, ValidationError):
                     raise exc
-            # Update the position on the current context
-            context[CTX_POS] = stream.tell()
         else:
             # Context functions should be executed with top priority
             value = self.struct(context)
