@@ -2,7 +2,15 @@ import pytest
 import typing
 
 # pylint: disable-next=import-error,wildcard-import,no-name-in-module
-from caterpillar._core import CpAtom, CpStruct, S_REPLACE_TYPES, pack, CpField, sizeof
+from caterpillar._core import (
+    CpAtom,
+    CpStruct,
+    S_REPLACE_TYPES,
+    pack,
+    CpField,
+    sizeof,
+    unpack,
+)
 
 
 class Format:
@@ -95,8 +103,21 @@ def test_struct_sizeof():
     assert sizeof(s[2]) == 4
 
     with pytest.raises(ValueError):
-        sizeof(s[...]) # dynamic length
+        sizeof(s[...])  # dynamic length
 
     with pytest.raises(ValueError):
-        sizeof(s[IntAtom()::]) # dynamic length
+        sizeof(s[IntAtom() : :])  # dynamic length
 
+
+def test_struct_unpack():
+    class IntFormat4:
+        foo: IntAtom()
+
+    s = CpStruct(IntFormat4, alter_model=True)
+    f = s[2]
+    assert f.length == 2
+
+    result = pack([IntFormat4(1), IntFormat4(2)], f)
+    assert result == b"\x00\x01\x00\x02"
+
+    assert unpack(result, f) == [IntFormat4(1), IntFormat4(2)]

@@ -11,17 +11,6 @@ from sphinx.locale import _ as sphinx_gettext
 from sphinx import addnodes
 
 
-# Monkeypatch nodes.Node.findall for forwards compatibility
-# This patch can be dropped when the minimum Sphinx version is 4.4.0
-# or the minimum Docutils version is 0.18.1.
-if docutils.__version_info__ < (0, 18, 1):
-
-    def findall(self, *args, **kwargs):
-        return iter(self.traverse(*args, **kwargs))
-
-    nodes.Node.findall = findall
-
-
 class RCEntry:
     def __init__(self, name):
         self.name = name

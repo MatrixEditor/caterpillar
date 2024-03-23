@@ -32,7 +32,7 @@ as calculating its size and measuring its type.
 
     .. code-block:: c
 
-        _coremodulestate* state = _getstate();
+        _coremodulestate* state = /*...*/;
         PyObject *o = ..., *ctx = ...;
 
         // invoke __pack__ manually
@@ -47,6 +47,13 @@ as calculating its size and measuring its type.
     native *pack* function is called. This function may return *NotImplemented* to indicate
     that this class does not support packing.
 
+
+.. c:function:: PyObject *CpAtom_CallSize(PyObject* self, PyObject* name, PyObject* ctx)
+
+    Calculates the size of the object :code:`self` using context :code:`ctx` and returns the
+    result. The :code:`name` describes the target method name to be called on the object
+    :code:`self`. This method will return *NULL* if an error occurs while calling the target
+    function.
 
 .. c:function:: int CpAtomType_CanPack(PyObject* o)
                 int CpAtomType_FastCanPack(PyObject* o, _coremodulestate* state)

@@ -1549,14 +1549,18 @@ cp_atom_dealloc(CpAtom* self)
 static int
 cp_atom_pack(CpAtom* self, PyObject* args, PyObject* kw)
 {
-  PyErr_SetString(PyExc_NotImplementedError, "pack");
+  PyErr_Format(PyExc_NotImplementedError,
+               "The atom of type %s cannot be packed (missing __pack__)",
+               Py_TYPE(self)->tp_name);
   return NULL;
 }
 
 static PyObject*
 cp_atom_unpack(CpAtom* self, PyObject* args, PyObject* kw)
 {
-  PyErr_SetString(PyExc_NotImplementedError, "unpack");
+  PyErr_Format(PyExc_NotImplementedError,
+               "The atom of type %s cannot be unpacked (missing __unpack__)",
+               Py_TYPE(self)->tp_name);
   return NULL;
 }
 
@@ -4769,7 +4773,12 @@ cp_sizeof(PyObject* op, PyObject* globals)
 }
 
 // ------------------------------------------------------------------------------
-// unpack
+// unpack:
+// Unlike serializing objects, unpacking returns fully qualified objects as a
+// result. In addition, the internal 'obj' within a struct layer will be a
+// CpContext instance.
+//
+// More information follow...
 // ------------------------------------------------------------------------------
 static PyObject*
 cp_unpack_catom(CpCAtom* op, CpLayerObject* layer)
@@ -4976,7 +4985,9 @@ cp_unpack_field(CpField* field, CpLayerObject* layer)
     obj = cp_unpack_internal(field->m_atom, layer);
 
     if (!obj && PyErr_Occurred()) {
-      Py_XSETREF(obj, field->m_default);
+      if (!Cp_IsInvalidDefault(field->m_default)) {
+        Py_XSETREF(obj, field->m_default);
+      }
       if (!obj) {
         goto cleanup;
       }
@@ -5009,6 +5020,96 @@ cleanup:
 }
 
 static PyObject*
+cp_unpack_struct(struct CpStruct* struct_, CpLayerObject* layer)
+{
+  if (layer->s_sequential) {
+    // TODO: explain why
+    return cp_unpack_common((PyObject*)struct_, layer);
+  }
+
+  PyObject* obj = NULL;
+  CpLayerObject* obj_layer = CpLayer_New(layer->m_state, layer);
+  if (!obj_layer) {
+    return NULL;
+  }
+  obj_layer->m_obj = CpObject_CreateNoArgs(&CpContext_Type);
+  if (!obj_layer->m_obj) {
+    goto cleanup;
+  }
+
+  CpStructFieldInfo *info = NULL, *union_field = NULL;
+  Py_ssize_t pos = 0;
+  PyObject *name = NULL, *value = NULL,
+           *start = cp_state_io_tell(layer->m_state), *max_size = NULL,
+           *stream_pos = NULL,
+           *init_data = CpObject_CreateNoArgs(&CpContext_Type);
+
+  if (!start || !init_data) {
+    goto cleanup;
+  }
+
+  while (PyDict_Next(struct_->m_members, &pos, &name, (PyObject**)&info)) {
+    if (struct_->s_union) {
+      Py_XSETREF(stream_pos, cp_state_io_tell(layer->m_state));
+      if (!stream_pos) {
+        goto cleanup;
+      }
+    }
+
+    value = cp_unpack_internal((PyObject*)info->m_field, obj_layer);
+    if (!value || PyObject_SetItem(obj_layer->m_obj, name, value) < 0) {
+      goto cleanup;
+    }
+
+    if (struct_->s_union) {
+      PyObject* pos = cp_state_io_tell(obj_layer->m_state);
+      if (!pos) {
+        goto cleanup;
+      }
+      PyObject* sub_result = PyNumber_Subtract(pos, stream_pos);
+      if (!sub_result) {
+        Py_XDECREF(pos);
+        goto cleanup;
+      }
+      if (PyObject_RichCompareBool(max_size, sub_result, Py_LT)) {
+        Py_XSETREF(max_size, Py_NewRef(sub_result));
+      }
+      Py_XDECREF(sub_result);
+      Py_XDECREF(pos);
+      if (cp_state_io_seek(obj_layer->m_state, start, 0) < 0) {
+        goto cleanup;
+      }
+    }
+  }
+
+  if (struct_->s_union) {
+    PyObject* pos = PyNumber_Add(start, max_size);
+    if (!pos) {
+      goto cleanup;
+    }
+    if (cp_state_io_seek(layer->m_state, pos, 0) < 0) {
+      Py_XDECREF(pos);
+      goto cleanup;
+    }
+    Py_XDECREF(pos);
+  }
+
+  PyObject* args = PyTuple_New(0);
+  obj = PyObject_Call((PyObject*)struct_->m_model, args, obj_layer->m_obj);
+  Py_XDECREF(args);
+
+cleanup:
+  Py_XDECREF(value);
+  Py_XDECREF(start);
+  Py_XDECREF(init_data);
+  Py_XDECREF(stream_pos);
+  if (obj_layer) {
+    CpLayer_Invalidate(obj_layer);
+  }
+  return obj;
+}
+
+static inline PyObject*
 cp_unpack_internal(PyObject* atom, CpLayerObject* layer)
 {
   CASE_EXACT(&CpField_Type, atom)
@@ -5019,12 +5120,14 @@ cp_unpack_internal(PyObject* atom, CpLayerObject* layer)
   {
     return cp_unpack_catom((CpCAtom*)atom, layer);
   }
+  else CASE_EXACT(&CpStruct_Type, atom)
+  {
+    return cp_unpack_struct((CpStruct*)atom, layer);
+  }
   else
   {
     return cp_unpack_common(atom, layer);
   }
-  PyErr_Format(PyExc_TypeError, "invalid atom type: %R", atom);
-  return NULL;
 }
 
 static PyObject*
