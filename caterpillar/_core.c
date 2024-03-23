@@ -1869,13 +1869,14 @@ cp_field_new(PyTypeObject* type, PyObject* args, PyObject* kw)
   self->s_size = false;
   self->s_type = false;
   self->s_sequential = false;
-  self->s_keep_pos = false;
+  self->s_keep_pos = true;
   return (PyObject*)self;
 }
 
 static void
 cp_field_dealloc(CpField* self)
 {
+
   Py_XDECREF(self->m_name);
   Py_XDECREF(self->m_endian);
   Py_XDECREF(self->m_offset);
@@ -1995,6 +1996,7 @@ cp_field_set_length(CpField* self, PyObject* value, void* closure)
   _coremodulestate* state = get_global_core_state();
 
   int8_t is_number = PyLong_Check(value);
+
   if (is_number && PyLong_AsSize_t(self->m_length) <= 1) {
     // remove sequential option automatically
     PySet_Discard(self->m_options, state->cp_option__sequential);
@@ -2339,9 +2341,7 @@ static PyTypeObject CpFieldAtom_Type = {
 // ------------------------------------------------------------------------------
 struct _layerobj
 {
-  PyObject ob_base;
-
-  CpLayerObject* m_parent;
+  PyObject_HEAD CpLayerObject* m_parent;
   CpStateObject* m_state;
 
   // context-sensitive variables
@@ -2462,6 +2462,7 @@ CpLayer_SetSequence(CpLayerObject* self,
   self->m_length = length;
   self->s_greedy = greedy;
   self->m_index = 0;
+  self->s_sequential = false;
 }
 
 static int
@@ -2470,14 +2471,15 @@ CpLayer_Invalidate(CpLayerObject* self)
   if (self->m_parent) {
     Py_XSETREF(self->m_parent, NULL);
   }
-  Py_XDECREF(self);
+
+  // Py_CLEAR(self);
   return 0;
 }
 
 // end Public API
 
 static PyMemberDef CpLayer_Members[] = {
-  { "state", T_OBJECT, offsetof(CpLayerObject, m_state), 0, "state" },
+  { "state", T_OBJECT, offsetof(CpLayerObject, m_state), READONLY, "state" },
   { "field", T_OBJECT, offsetof(CpLayerObject, m_field), 0, "field" },
   { "obj", T_OBJECT, offsetof(CpLayerObject, m_obj), 0, "obj" },
   { "value", T_OBJECT, offsetof(CpLayerObject, m_value), 0, "value" },
@@ -2495,7 +2497,7 @@ static PyMemberDef CpLayer_Members[] = {
     offsetof(CpLayerObject, s_sequential),
     READONLY,
     "sequential" },
-  { "parent", T_OBJECT_EX, offsetof(CpLayerObject, m_parent), 0, "parent" },
+  { "parent", T_OBJECT, offsetof(CpLayerObject, m_parent), 0, "parent" },
   { NULL } /* Sentinel */
 };
 
@@ -2522,9 +2524,6 @@ struct _stateobj
   PyObject* m_io;
   PyObject* m_globals;
   PyObject* m_offset_table;
-
-  // context-sensitive variables
-  CpLayerObject* m_layer;
 };
 
 static inline PyObject*
@@ -2537,7 +2536,7 @@ static inline PyObject*
 cp_state_io_seek(CpStateObject* self, PyObject* offset, int whence)
 {
   return PyObject_CallMethodObjArgs(
-    self->m_io, self->mod->str_seek, "Oi", offset, whence);
+    self->m_io, self->mod->str_seek, offset, whence);
 }
 
 static inline PyObject*
@@ -2567,17 +2566,16 @@ cp_state_new(PyTypeObject* type, PyObject* args, PyObject* kw)
   self->m_io = NULL;
   self->m_globals = CpContext_NewEmpty();
   self->m_offset_table = PyDict_New();
-  self->m_layer = NULL;
   return (PyObject*)self;
 }
 
 static void
 cp_state_dealloc(CpStateObject* self)
 {
+
   Py_CLEAR(self->m_io);
   Py_CLEAR(self->m_globals);
   Py_CLEAR(self->m_offset_table);
-  Py_CLEAR(self->m_layer);
   self->mod = NULL;
   Py_TYPE(self)->tp_free((PyObject*)self);
 }
@@ -2591,10 +2589,10 @@ cp_state_set_offset_table(CpStateObject* self, PyObject* offset_table, void*);
 static int
 cp_state_init(CpStateObject* self, PyObject* args, PyObject* kw)
 {
-  static char* kwlist[] = { "io", "globals", "offset_table", "layer", NULL };
-  PyObject *io = NULL, *globals = NULL, *offset_table = NULL, *layer = NULL;
+  static char* kwlist[] = { "io", "globals", "offset_table", NULL };
+  PyObject *io = NULL, *globals = NULL, *offset_table = NULL;
   if (!PyArg_ParseTupleAndKeywords(
-        args, kw, "|OOOO", kwlist, &io, &globals, &offset_table, &layer)) {
+        args, kw, "|OOOO", kwlist, &io, &globals, &offset_table)) {
     return -1;
   }
 
@@ -2607,8 +2605,6 @@ cp_state_init(CpStateObject* self, PyObject* args, PyObject* kw)
     if (cp_state_set_offset_table(self, offset_table, NULL) < 0) {
       return -1;
     }
-
-  Py_XSETREF(self->m_layer, (CpLayerObject*)Py_XNewRef(layer));
   return 0;
 }
 
@@ -2754,7 +2750,6 @@ static PyMemberDef CpState_Members[] = {
     offsetof(CpStateObject, m_offset_table),
     0,
     NULL },
-  { "layer", T_OBJECT, offsetof(CpStateObject, m_layer), 0, NULL },
   { NULL } /* Sentinel */
 };
 
@@ -3997,6 +3992,7 @@ cp_pack_field(PyObject* op, CpField* field, CpLayerObject* layer)
 {
   // we can assert that all provided objects are of the correct type
   // REVISIT: really?
+
   CpLayer_AppendPath(field->m_name);
   if (!layer->m_path) {
     return -1;
@@ -4078,6 +4074,7 @@ cp_pack_field(PyObject* op, CpField* field, CpLayerObject* layer)
 static int
 cp_pack_common(PyObject* op, PyObject* atom, CpLayerObject* layer)
 {
+
   int success;
   if (!layer->s_sequential) {
     return PyObject_CallMethod(atom, CpAtomType_Pack, "OO", op, layer) ? 0 : -1;
@@ -4189,6 +4186,7 @@ cp_pack_common(PyObject* op, PyObject* atom, CpLayerObject* layer)
       return -1;
     }
   }
+  CpLayer_Invalidate(seq_layer);
   return 0;
 
 fail:
@@ -4201,6 +4199,7 @@ fail:
 static int
 cp_pack_struct(PyObject* op, CpStruct* struct_, CpLayerObject* layer)
 {
+
   if (layer->s_sequential) {
     // TODO: explain why
     return cp_pack_common(op, (PyObject*)struct_, layer);
@@ -4220,6 +4219,7 @@ cp_pack_struct(PyObject* op, CpStruct* struct_, CpLayerObject* layer)
     return -1;
   }
   obj_layer->m_obj = Py_NewRef(op);
+  obj_layer->m_path = Py_NewRef(layer->m_path);
 
   CpStructFieldInfo *info = NULL, *union_field = NULL;
   // all borrowed references
@@ -4244,8 +4244,8 @@ cp_pack_struct(PyObject* op, CpStruct* struct_, CpLayerObject* layer)
         max_size = Py_XNewRef(size);
         union_field = info;
       }
-      Py_SETREF(cmp_result, NULL);
-      Py_SETREF(size, NULL);
+      Py_XSETREF(cmp_result, NULL);
+      Py_XSETREF(size, NULL);
     }
 
     else {
@@ -4253,11 +4253,13 @@ cp_pack_struct(PyObject* op, CpStruct* struct_, CpLayerObject* layer)
       if (!value) {
         goto fail;
       }
+
       res = cp_pack_internal(value, (PyObject*)info->m_field, obj_layer);
       if (res < 0) {
         goto fail;
       }
-      // Py_SETREF(value, NULL);
+      Py_XDECREF(value);
+      value = NULL;
     }
   }
 
@@ -4289,8 +4291,9 @@ cleanup:
   Py_XDECREF(size);
   Py_XDECREF(max_size);
   Py_XDECREF(cmp_result);
-  Py_XDECREF(value);
+
   if (obj_layer) {
+
     CpLayer_Invalidate(obj_layer);
   }
   return res;
@@ -4351,8 +4354,9 @@ cp_pack(PyObject* op, PyObject* atom, PyObject* io, PyObject* globals, int raw)
   }
   Py_XSETREF(root->m_path, Py_NewRef(state->mod->str_ctx__root));
   int success = cp_pack_internal(op, atom, root);
-  Py_DECREF(root);
-  Py_DECREF(state);
+
+  Py_XDECREF(state);
+  CpLayer_Invalidate(root);
   return success;
 }
 
@@ -4759,9 +4763,8 @@ cp_sizeof(PyObject* op, PyObject* globals)
   }
 
   result = cp_sizeof_internal(atom, layer);
-  Py_DECREF(state);
-  Py_DECREF(atom);
-  Py_XDECREF(layer);
+  Py_XDECREF(state);
+  CpLayer_Invalidate(layer);
   return result;
 }
 
@@ -4797,11 +4800,10 @@ cp_unpack_common(PyObject* op, CpLayerObject* layer)
     return PyObject_CallMethodOneArg(op, mod->str___unpack__, (PyObject*)layer);
   }
 
-  layer->s_sequential = false;
   _cp_assert(
     layer->m_field, PyExc_ValueError, NULL, "invalid state: field is NULL");
 
-  PyObject *obj = NULL, *base_path = Py_NewRef(layer->m_path);
+  PyObject* obj = NULL;
 
   // First, get the amount of elements we have to parse
   PyObject* length =
@@ -4827,16 +4829,20 @@ cp_unpack_common(PyObject* op, CpLayerObject* layer)
     //    using the given start atom.
     else CASE_COND(PySlice_Check(length))
     {
+
       seq_greedy = false;
       PyObject* start = PyObject_GetAttr(length, mod->str_start);
       if (!start) {
         goto fail;
       }
+
       if (Py_IsNone(start)) {
         PyErr_SetString(PyExc_ValueError, "start is None");
         goto fail;
       }
+      layer->s_sequential = false;
       Py_XSETREF(length, cp_unpack_internal(start, layer));
+      layer->s_sequential = true;
       Py_DECREF(start);
       if (!length) {
         goto fail;
@@ -4867,7 +4873,7 @@ cp_unpack_common(PyObject* op, CpLayerObject* layer)
     }
   }
 
-  Py_XDECREF(length);
+  Py_XSETREF(length, NULL);
   CpLayerObject* seq_layer = CpLayer_New(layer->m_state, layer);
   if (!layer) {
     goto fail;
@@ -4881,34 +4887,36 @@ cp_unpack_common(PyObject* op, CpLayerObject* layer)
 
   while (seq_layer->s_greedy || (seq_layer->m_index < seq_layer->m_length)) {
     seq_layer->m_path = PyUnicode_FromFormat(
-      "%s.%d", _PyUnicode_AsString(base_path), seq_layer->m_index);
+      "%s.%d", _PyUnicode_AsString(layer->m_path), seq_layer->m_index);
     if (!seq_layer->m_path) {
       goto fail;
     }
 
     Py_XSETREF(obj, cp_unpack_internal(op, seq_layer));
     if (!obj) {
+
       if (seq_layer->s_greedy) {
         PyErr_Clear();
         break;
       }
       goto fail;
     }
-    if (PyList_Append(seq_layer->m_sequence, obj) < 0) {
+
+    if (PyList_Append(seq_layer->m_sequence, Py_NewRef(obj)) < 0) {
       goto fail;
     }
-    layer->m_index++;
+    seq_layer->m_index++;
   }
 
+success:
   Py_XDECREF(obj);
-  Py_XDECREF(base_path);
   CpLayer_Invalidate(seq_layer);
-  return seq;
+  seq_layer = NULL;
+  return Py_NewRef(seq);
 
 fail:
   Py_XDECREF(length);
   Py_XDECREF(obj);
-  Py_XDECREF(base_path);
   if (seq_layer) {
     CpLayer_Invalidate(seq_layer);
   }
@@ -4966,6 +4974,7 @@ cp_unpack_field(CpField* field, CpLayerObject* layer)
     }
 
     obj = cp_unpack_internal(field->m_atom, layer);
+
     if (!obj && PyErr_Occurred()) {
       Py_XSETREF(obj, field->m_default);
       if (!obj) {
@@ -4975,6 +4984,7 @@ cp_unpack_field(CpField* field, CpLayerObject* layer)
     }
 
     if (!field->s_keep_pos) {
+
       if (cp_state_io_seek(layer->m_state, fallback, 0) < 0) {
         goto cleanup;
       }
@@ -4982,6 +4992,7 @@ cp_unpack_field(CpField* field, CpLayerObject* layer)
   }
 
   if (field->m_switch && !Py_IsNone(field->m_switch)) {
+
     PyObject* atom = CpField_GetSwitchAtom(field, obj, (PyObject*)layer);
     if (!atom) {
       Py_XSETREF(obj, NULL);
@@ -5000,23 +5011,20 @@ cleanup:
 static PyObject*
 cp_unpack_internal(PyObject* atom, CpLayerObject* layer)
 {
-  PyObject* result = NULL;
-  MATCH
+  CASE_EXACT(&CpField_Type, atom)
   {
-    CASE_EXACT(&CpField_Type, atom)
-    {
-      result = cp_unpack_field((CpField*)atom, layer);
-    }
-    else CASE(&CpCAtom_Type, atom)
-    {
-      result = cp_unpack_catom((CpCAtom*)atom, layer);
-    }
-    else
-    {
-      result = cp_unpack_common(atom, layer);
-    }
+    return cp_unpack_field((CpField*)atom, layer);
   }
-  return result;
+  else CASE(&CpCAtom_Type, atom)
+  {
+    return cp_unpack_catom((CpCAtom*)atom, layer);
+  }
+  else
+  {
+    return cp_unpack_common(atom, layer);
+  }
+  PyErr_Format(PyExc_TypeError, "invalid atom type: %R", atom);
+  return NULL;
 }
 
 static PyObject*
@@ -5024,6 +5032,7 @@ cp_unpack(PyObject* atom, PyObject* io, PyObject* globals)
 {
   CpStateObject* state =
     (CpStateObject*)CpObject_Create(&CpState_Type, "O", io);
+  PyObject* obj = NULL;
   if (!state) {
     return NULL;
   }
@@ -5042,10 +5051,12 @@ cp_unpack(PyObject* atom, PyObject* io, PyObject* globals)
   }
 
   Py_XSETREF(root->m_path, Py_NewRef(state->mod->str_ctx__root));
-  PyObject* result = cp_unpack_internal(atom, root);
-  Py_DECREF(state);
-  CpLayer_Invalidate(root);
-  return result;
+  return cp_unpack_internal(atom, root);
+  // Py_DECREF(state);
+  // CpLayer_Invalidate(root);
+  //
+
+  // return result;
 }
 
 // ------------------------------------------------------------------------------
@@ -5168,7 +5179,7 @@ _coremodule_unpack(PyObject* m, PyObject* args, PyObject* kw)
     return NULL;
   }
   _coremodulestate* state = get_core_state(m);
-  if (!PyArg_ParseTuple(args, "O", &io, &atom)) {
+  if (!PyArg_ParseTuple(args, "OO", &io, &atom)) {
     goto finish;
   }
 
@@ -5194,6 +5205,7 @@ _coremodule_unpack(PyObject* m, PyObject* args, PyObject* kw)
   }
 
   res = cp_unpack(atom, io, globals);
+
 finish:
   Py_XDECREF(globals);
   if (wrapped_io) {
