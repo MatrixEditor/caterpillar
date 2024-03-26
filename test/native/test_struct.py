@@ -66,6 +66,9 @@ class IntAtom(CpAtom):
     def __size__(self, context):
         return 2
 
+    def __unpack__(self, context):
+        return int.from_bytes(context.state.read(2))
+
 
 def test_struct_pack():
 
@@ -109,12 +112,16 @@ def test_struct_sizeof():
         sizeof(s[IntAtom() : :])  # dynamic length
 
 
-def test_struct_unpack():
-    class IntFormat4:
-        foo: IntAtom()
+class IntFormat4:
+    foo: IntAtom()
 
-    s = CpStruct(IntFormat4, alter_model=True)
-    f = s[2]
+    def __eq__(self, other: object) -> bool:
+        return other.foo == self.foo
+
+IntFormat4_Struct = CpStruct(IntFormat4, alter_model=True)
+
+def test_struct_unpack():
+    f = IntFormat4_Struct[2]
     assert f.length == 2
 
     result = pack([IntFormat4(1), IntFormat4(2)], f)

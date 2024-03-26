@@ -31,5 +31,6 @@ foo_t = Foo()
 )
 def test_unpack(f, target, data):
     with BytesIO(data) as stream:
+        print(foo_t)
         val = unpack(stream, f)
         assert val == target

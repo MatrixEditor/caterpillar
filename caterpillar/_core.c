@@ -2451,7 +2451,7 @@ CpLayer_New(CpStateObject* state, CpLayerObject* parent)
   if (parent) {
     Py_XSETREF(self->m_parent, (CpLayerObject*)Py_XNewRef(parent));
     // automatically inherit field object
-    Py_XSETREF(self->m_field, parent->m_field);
+    Py_XSETREF(self->m_field, Py_XNewRef(parent->m_field));
   }
   return self;
 }
@@ -2472,11 +2472,14 @@ CpLayer_SetSequence(CpLayerObject* self,
 static int
 CpLayer_Invalidate(CpLayerObject* self)
 {
-  if (self->m_parent) {
-    Py_XSETREF(self->m_parent, NULL);
-  }
-
-  // Py_CLEAR(self);
+  Py_XSETREF(self->m_parent, NULL);
+  Py_XSETREF(self->m_field, NULL);
+  Py_XSETREF(self->m_value, NULL);
+  Py_XSETREF(self->m_sequence, NULL);
+  Py_XSETREF(self->m_obj, NULL);
+  Py_XSETREF(self->m_state, NULL);
+  Py_XSETREF(self->m_path, NULL);
+  Py_CLEAR(self);
   return 0;
 }
 
@@ -2832,7 +2835,7 @@ cp_struct_fieldinfo_init(CpStructFieldInfo* self, PyObject* args, PyObject* kw)
   }
 
   Py_XINCREF(field);
-  Py_XSETREF(self->m_field, (CpField*)(field));
+  Py_XSETREF(self->m_field, (CpField*)Py_NewRef(field));
   self->s_excluded = excluded;
   return 0;
 }
@@ -4014,7 +4017,7 @@ cp_pack_field(PyObject* op, CpField* field, CpLayerObject* layer)
   PyObject *base_stream = NULL, *fallback = NULL;
   CpStateObject* state = layer->m_state;
 
-  Py_XSETREF(layer->m_field, (PyObject*)field);
+  Py_XSETREF(layer->m_field, Py_NewRef((PyObject*)field));
   layer->s_sequential = field->s_sequential;
 
   Py_ssize_t offset = CpField_GetOffset(field, (PyObject*)layer);
@@ -4297,7 +4300,6 @@ cleanup:
   Py_XDECREF(cmp_result);
 
   if (obj_layer) {
-
     CpLayer_Invalidate(obj_layer);
   }
   return res;
@@ -4584,7 +4586,7 @@ cp_sizeof_field(struct CpField* field, CpLayerObject* layer)
   }
 
   // prepare context
-  layer->m_field = Py_NewRef(field);
+  Py_XSETREF(layer->m_field, Py_NewRef(field));
   if (field->s_sequential) {
     count = CpField_GetLength(field, (PyObject*)layer);
     if (!count) {
@@ -4632,6 +4634,7 @@ cp_sizeof_field(struct CpField* field, CpLayerObject* layer)
   }
   Py_XDECREF(size);
   Py_XDECREF(count);
+  Py_XDECREF(atom);
   return result;
 
 fail:
@@ -4954,7 +4957,7 @@ cp_unpack_field(CpField* field, CpLayerObject* layer)
   Py_ssize_t offset = -1;
 
   layer->s_sequential = field->s_sequential;
-  layer->m_field = Py_NewRef(field);
+  Py_XSETREF(layer->m_field, Py_NewRef(field));
   if (PyCallable_Check(field->m_atom)) {
     obj = PyObject_CallOneArg(field->m_atom, (PyObject*)layer);
     if (!obj) {
@@ -5047,7 +5050,6 @@ cp_unpack_struct(struct CpStruct* struct_, CpLayerObject* layer)
   if (!start || !init_data) {
     goto cleanup;
   }
-
   while (PyDict_Next(struct_->m_members, &pos, &name, (PyObject**)&info)) {
     if (struct_->s_union) {
       Py_XSETREF(stream_pos, cp_state_io_tell(layer->m_state));
@@ -5116,13 +5118,13 @@ cp_unpack_internal(PyObject* atom, CpLayerObject* layer)
   {
     return cp_unpack_field((CpField*)atom, layer);
   }
-  else CASE(&CpCAtom_Type, atom)
-  {
-    return cp_unpack_catom((CpCAtom*)atom, layer);
-  }
   else CASE_EXACT(&CpStruct_Type, atom)
   {
     return cp_unpack_struct((CpStruct*)atom, layer);
+  }
+  else CASE(&CpCAtom_Type, atom)
+  {
+    return cp_unpack_catom((CpCAtom*)atom, layer);
   }
   else
   {
@@ -5154,12 +5156,12 @@ cp_unpack(PyObject* atom, PyObject* io, PyObject* globals)
   }
 
   Py_XSETREF(root->m_path, Py_NewRef(state->mod->str_ctx__root));
-  return cp_unpack_internal(atom, root);
-  // Py_DECREF(state);
-  // CpLayer_Invalidate(root);
+  obj = cp_unpack_internal(atom, root);
+  Py_DECREF(state);
+  CpLayer_Invalidate(root);
   //
 
-  // return result;
+  return obj;
 }
 
 // ------------------------------------------------------------------------------
@@ -5285,15 +5287,18 @@ _coremodule_unpack(PyObject* m, PyObject* args, PyObject* kw)
   if (!PyArg_ParseTuple(args, "OO", &io, &atom)) {
     goto finish;
   }
-
   if (PyBytes_Check(io)) {
-    io = CpObject_Create(&state->io_bytesio, "O", io);
+    PyObject* args = Py_BuildValue("(O)", io);
+    io = PyObject_CallObject(state->io_bytesio, args);
+    Py_DECREF(args);
+    if (!io) {
+      goto finish;
+    }
     if (!io) {
       goto finish;
     }
     wrapped_io = true;
   }
-
   if (kw && PyDict_Check(kw)) {
     Py_ssize_t pos = 0;
     while (PyDict_Next(kw, &pos, &key, &value)) {
