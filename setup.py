@@ -1,15 +1,19 @@
 import os
+import pathlib
 
 from setuptools import setup
 from setuptools.extension import Extension
 
+CURRENT_DIR = pathlib.Path(__file__).parent
+SRC_DIR = CURRENT_DIR / "src"
 
 ext_modules = [
     Extension(
         "caterpillar._core",
-        [os.path.join("caterpillar", "_core.c")],
+        list(map(str, SRC_DIR.iterdir())),
         extra_compile_args=["-O3", "-g", "-UNDEBUG"],
         extra_link_args=[],
+        include_dirs=[os.path.join(CURRENT_DIR, "include")],
     ),
 ]
 

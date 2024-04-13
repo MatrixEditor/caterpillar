@@ -25,11 +25,13 @@ struct CpFieldAtom;
 struct CpStruct;
 struct CpCAtom;
 
+struct _intatomobj;
 struct _stateobj;
 struct _layerobj;
 
 typedef struct _stateobj CpStateObject;
 typedef struct _layerobj CpLayerObject;
+typedef struct _intatomobj CpIntAtomObject;
 
 static PyTypeObject CpContextPath_Type;
 static PyTypeObject CpEndian_Type;
@@ -3955,6 +3957,149 @@ static PyTypeObject CpStruct_Type = {
 };
 
 // ------------------------------------------------------------------------------
+// Atom implementations
+// ------------------------------------------------------------------------------
+
+struct _intatomobj
+{
+  CpFieldAtom ob_base;
+
+  PyObject* m_bytes;
+
+  size_t _m_bytes;
+  int _m_signed;
+  int _m_little_endian;
+};
+
+// packs AND returns object
+static PyObject*
+IntAtom_Pack(CpIntAtomObject* self, PyObject* op, CpLayerObject* layer)
+{
+  _cp_assert(op, PyExc_ValueError, NULL, "op is NULL");
+  _cp_assert(layer, PyExc_ValueError, NULL, "layer is NULL");
+
+  PyObject* bytes = CpObject_CreateOneArg(&PyBytes_Type, self->m_bytes);
+  if (!bytes) {
+    return NULL;
+  }
+
+  if (!PyLong_Check(op)) {
+    PyErr_Format(PyExc_TypeError, "op must be an int, got %R", op);
+    Py_DECREF(bytes);
+  }
+
+  int res = _PyLong_AsByteArray((PyLongObject*)op,
+                                (unsigned char*)PyBytes_AS_STRING(op),
+                                self->_m_bytes,
+                                self->_m_little_endian,
+                                self->_m_signed);
+  if (res >= 0) {
+    return bytes;
+  }
+  Py_DECREF(bytes);
+  return NULL;
+}
+
+static PyObject*
+IntAtom_Unpack(CpIntAtomObject* self, CpLayerObject* layer)
+{
+  _cp_assert(layer, PyExc_ValueError, NULL, "layer is NULL");
+
+  PyObject* bytes = cp_state_io_read(layer->m_state, self->_m_bytes);
+  if (!bytes) {
+    return NULL;
+  }
+
+  PyObject* obj =
+    _PyLong_FromByteArray((unsigned char*)PyBytes_AS_STRING(bytes),
+                          self->_m_bytes,
+                          self->_m_little_endian,
+                          self->_m_signed);
+
+  Py_DECREF(bytes);
+  return obj;
+}
+
+static PyObject*
+cp_intatom_new(PyTypeObject* type, PyObject* args, PyObject* kwds)
+{
+  CpIntAtomObject* self = (CpIntAtomObject*)type->tp_alloc(type, 0);
+  if (self != NULL) {
+    self->m_bytes = NULL;
+    self->_m_bytes = 0;
+    self->_m_signed = true;
+    self->_m_little_endian = true;
+  }
+  return (PyObject*)self;
+}
+
+static void
+cp_intatom_dealloc(CpIntAtomObject* self)
+{
+  Py_XDECREF(self->m_bytes);
+  Py_TYPE(self)->tp_free((PyObject*)self);
+}
+
+static int
+cp_intatom_init(CpIntAtomObject* self, PyObject* args, PyObject* kwds)
+{
+  static char* kwlist[] = { "bytes", "signed", "little_endian", NULL };
+  int _signed = true, little_endian = true;
+  size_t bytes = 0;
+  if (!PyArg_ParseTupleAndKeywords(
+        args, kwds, "k|pp", kwlist, &bytes, &_signed, &little_endian)) {
+    return -1;
+  }
+  if (bytes == 0) {
+    PyErr_SetString(PyExc_ValueError, "bytes cannot be zero");
+    return -1;
+  }
+  if (bytes % 8 != 0) {
+    PyErr_SetString(PyExc_ValueError, "bytes must be multiple of 8");
+    return -1;
+  }
+  self->_m_bytes = bytes;
+  self->_m_signed = _signed;
+  self->_m_little_endian = little_endian;
+  self->m_bytes = PyLong_FromUnsignedLong(bytes);
+  if (!self->m_bytes) {
+    return -1;
+  }
+  return 0;
+}
+
+static int
+cp_intatom__pack__(CpIntAtomObject* self, PyObject *args, PyObject *kwds)
+{
+
+}
+
+static PyMemberDef CpIntAtom_Members[] = {
+  { "bytes", T_PYSSIZET, offsetof(CpIntAtomObject, _m_bytes), READONLY, NULL },
+  { "signed", T_BOOL, offsetof(CpIntAtomObject, _m_signed), READONLY, NULL },
+  { "little_endian",
+    T_BOOL,
+    offsetof(CpIntAtomObject, _m_little_endian),
+    READONLY,
+    NULL },
+  { NULL } /* Sentinel */
+};
+
+static PyTypeObject CpIntAtom_Type = {
+  .ob_base = PyVarObject_HEAD_INIT(NULL, 0).tp_name = _Cp_Name(_core.CpIntAtom),
+  .tp_doc = "...",
+  .tp_basicsize = sizeof(CpIntAtomObject),
+  .tp_itemsize = 0,
+  .tp_flags = Py_TPFLAGS_DEFAULT,
+  .tp_new = (newfunc)cp_intatom_new,
+  .tp_dealloc = (destructor)cp_intatom_dealloc,
+  .tp_init = (initproc)cp_intatom_init,
+  .tp_members = CpIntAtom_Members,
+};
+
+_Cp_Immortal(_int32_a, CpIntAtom_Type);
+
+// ------------------------------------------------------------------------------
 // pack:
 // Serializing objects follows specific rules when it comes to CpLayerObject
 // creation. The first layer (root layer) will be assigned with the path
@@ -5454,6 +5599,9 @@ PyInit__core(void)
   CpType_Ready(&CpStruct_Type);
   CpType_Ready(&CpLayer_Type);
 
+  CpIntAtom_Type.tp_base = &CpFieldAtom_Type;
+  CpType_Ready(&CpIntAtom_Type);
+
   m = PyModule_Create(&_coremodule);
   if (!m) {
     return NULL;
@@ -5480,6 +5628,9 @@ PyInit__core(void)
   CpModule_AddObject("CpStructFieldInfo", &CpStructFieldInfo_Type);
   CpModule_AddObject("CpStruct", &CpStruct_Type);
   CpModule_AddObject("CpLayer", &CpLayer_Type);
+
+  CpModule_AddObject("Int", &CpIntAtom_Type);
+  CpModule_AddObject("int32", &_int32_a_Object);
 
   // setup state
   _coremodulestate* state = get_core_state(m);

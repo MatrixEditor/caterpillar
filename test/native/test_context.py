@@ -14,7 +14,7 @@ def test_context_init():
 
     c = CpContext(foo=1)
     assert len(c) == 1
-    assert type(c) == CpContext
+    assert type(c) is CpContext
 
 
 def test_context_access():

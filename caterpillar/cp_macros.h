@@ -135,7 +135,8 @@
   (PyObject_CallFunction((PyObject*)(type), format, __VA_ARGS__))
 
 #define CpObject_CreateNoArgs(type) (PyObject_CallNoArgs((PyObject*)(type)))
-
+#define CpObject_CreateOneArg(type, arg) \
+  (PyObject_CallOneArg(((PyObject*)(type)), (arg)))
 // ------------------------------------------------------------------------------
 // MATCH-CASE
 // ------------------------------------------------------------------------------
