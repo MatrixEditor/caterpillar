@@ -10,22 +10,31 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
       - name: Install dependencies
-        run: pip install -r docs/requirements.txt && pip install -e .[all]
+        run: pip install -r docs/requirements.txt && pip install -r requirements.txt && pip install -e .
+
+      - name: Install doxygen
+        run: |
+           wget https://github.com/doxygen/doxygen/releases/download/Release_1_10_0/doxygen-1.10.0.linux.bin.tar.gz
+           tar xzvf doxygen-1.10.0.linux.bin.tar.gz
+           cd doxygen-1.10.0
+           sudo make install
+           cd ..
+           rm -rf doxygen-1.10.0*
 
       - name: Build
         # Create .nojekyll file to disable Jekyll processing
         run: |
           cd docs/sphinx
           make html
-          touch build/sphinx/html/.nojekyll
+          touch build/html/.nojekyll
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3

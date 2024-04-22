@@ -204,7 +204,7 @@ class Field:
         # This operation automatically removes the "keep_position"
         # flag. It has to be set manually.
         if self.offset != -1:
-            self.flags.pop(F_KEEP_POSITION, None)
+            self.flags.pop(F_KEEP_POSITION._hash_, None)
         return self
 
     def __getitem__(self, dim: Union[_ContextLambda, int, _GreedyType]) -> Self:

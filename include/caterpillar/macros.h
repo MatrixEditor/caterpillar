@@ -22,6 +22,18 @@
 #endif
 #include <Python.h>
 
-#define _Cp_Name(x) ("caterpillar." #x)
+#define _Cp_Name(x) ("caterpillar._core." #x)
+
+#define _Cp_SetObj(varname, value)                                             \
+  if (value) {                                                                 \
+    Py_XSETREF(varname, Py_NewRef(value));                                     \
+  }
+
+#define CpObject_Create(type, format, ...)                                     \
+  (PyObject_CallFunction((PyObject*)(type), format, __VA_ARGS__))
+
+#define CpObject_CreateNoArgs(type) (PyObject_CallNoArgs((PyObject*)(type)))
+#define CpObject_CreateOneArg(type, arg)                                       \
+  (PyObject_CallOneArg(((PyObject*)(type)), (arg)))
 
 #endif

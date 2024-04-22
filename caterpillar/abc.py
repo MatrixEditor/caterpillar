@@ -34,11 +34,7 @@ class _ContextLike(Protocol):
     """
 
     @abstractmethod
-    def __setattr__(self, key: str, value) -> None:
-        pass
-
-    @abstractmethod
-    def __getattribute__(self, key: str):
+    def __context_getattr__(self, key: str) -> Any:
         pass
 
     @property

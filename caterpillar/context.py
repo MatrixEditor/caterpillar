@@ -359,7 +359,7 @@ class ContextPath(ExprMixin):
         self.call_kwargs = None
         self.getitem_args = None
 
-    def __call__(self, context: Context = None, **kwds):
+    def __call__(self, context: _ContextLike = None, **kwds):
         """
         Calls the lambda function to retrieve a value from a Context.
 
@@ -370,7 +370,7 @@ class ContextPath(ExprMixin):
         if context is None:
             self._ops_.append((operator.call, (), kwds))
             return self
-        value = getattr(context, self.path)
+        value = context.__context_getattr__(self.path)
         for operation, args, kwargs in self._ops_:
             value = operation(value, *args, **kwargs)
         return value

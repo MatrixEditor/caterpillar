@@ -39,7 +39,7 @@ optional_dependencies = {
 
 setup(
     name="caterpillar",
-    version="0.1.1",
+    version="0.1.2",
     description="Library to pack and unpack structurized binary data.",
     maintainer="MatrixEditor",
     maintainer_email="not@supported.com",
