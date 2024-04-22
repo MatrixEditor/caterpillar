@@ -1,6 +1,6 @@
 /* option implementation */
 
-#include "option.h"
+#include "caterpillar/option.h"
 #include "structmember.h"
 
 /* impl */
@@ -101,7 +101,7 @@ static PyMemberDef CpOption_Members[] = {
 };
 
 PyTypeObject CpOption_Type = {
-  PyVarObject_HEAD_INIT(NULL, 0) _Cp_Name(_core.atom),
+  PyVarObject_HEAD_INIT(NULL, 0) _Cp_Name(Option),
   sizeof(CpOptionObject),         /* tp_basicsize */
   0,                              /* tp_itemsize */
   (destructor)cp_option_dealloc,  /* tp_dealloc */
@@ -138,5 +138,16 @@ PyTypeObject CpOption_Type = {
   (initproc)cp_option_init,       /* tp_init */
   0,                              /* tp_alloc */
   cp_option_new,                  /* tp_new */
+  0,                              /* tp_free */
+  0,                              /* tp_is_gc */
+  0,                              /* tp_bases */
+  0,                              /* tp_mro */
+  0,                              /* tp_cache */
+  0,                              /* tp_subclasses */
+  0,                              /* tp_weaklist */
+  0,                              /* tp_del */
+  0,                              /* tp_version_tag */
+  0,                              /* tp_finalize */
   0,                              /* tp_vectorcall */
+  0,                              /* tp_watched */
 };

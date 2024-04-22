@@ -1,5 +1,5 @@
 /* CpArch and CpEndian */
-#include "arch.h"
+#include "caterpillar/arch.h"
 #include "structmember.h"
 
 /* CpArch */
@@ -94,7 +94,7 @@ static PyMemberDef CpArch_Members[] = { { "name",
                                         { NULL } /* Sentinel */ };
 
 PyTypeObject CpArch_Type = {
-  PyVarObject_HEAD_INIT(NULL, 0) _Cp_Name(_arch), /* tp_name */
+  PyVarObject_HEAD_INIT(NULL, 0) _Cp_Name(Arch), /* tp_name */
   sizeof(CpArchObject),                           /* tp_basicsize */
   0,                                              /* tp_itemsize */
   (destructor)cp_arch_dealloc,                    /* tp_dealloc */
@@ -239,7 +239,7 @@ static PyMemberDef CpEndian_Members[] = {
 };
 
 PyTypeObject CpEndian_Type = {
-  PyVarObject_HEAD_INIT(NULL, 0) "CpEndian", /* tp_name */
+  PyVarObject_HEAD_INIT(NULL, 0) _Cp_Name(Endian), /* tp_name */
   sizeof(CpEndianObject),                    /* tp_basicsize */
   0,                                         /* tp_itemsize */
   (destructor)cp_endian_dealloc,             /* tp_dealloc */
