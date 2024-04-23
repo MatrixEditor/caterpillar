@@ -5,6 +5,9 @@
 #include "caterpillar/context.h"
 #include "caterpillar/field.h"
 #include "caterpillar/option.h"
+#include "caterpillar/parsing.h"
+#include "caterpillar/state.h"
+#include "caterpillar/struct.h"
 
 /* immortal objects */
 static PyObject*
@@ -159,6 +162,153 @@ PyObject _CpDefaultOption_Object = { _PyObject_EXTRA_INIT{
 
 // ------------------------------------------------------------------------------
 // module
+static PyObject*
+cp_core_typeof(PyObject* m, PyObject* args, PyObject* kw)
+{
+  static char* kwlist[] = { "obj", NULL };
+  PyObject* op = NULL;
+  if (!PyArg_ParseTupleAndKeywords(args, kw, "O", kwlist, &op)) {
+    return NULL;
+  }
+  return CpTypeOf(op);
+}
+
+static PyObject*
+cp_core_pack_into(PyObject* m, PyObject* args, PyObject* kw)
+{
+  PyObject *op = NULL, *atom = NULL, *io = NULL, *globals = PyDict_New(),
+           *key = NULL, *value = NULL;
+  int res = 0;
+  if (!globals) {
+    return NULL;
+  }
+  if (!PyArg_ParseTuple(args, "OOO", &op, &atom, &io)) {
+    goto finish;
+  }
+  if (kw && PyDict_Check(kw)) {
+    Py_ssize_t pos = 0;
+    while (PyDict_Next(kw, &pos, &key, &value)) {
+      if (PyDict_SetItem(globals, key, value) < 0) {
+        goto finish;
+      }
+    }
+  }
+  if (Py_IsNone(atom)) {
+    PyErr_SetString(PyExc_ValueError, "atom not set!");
+    goto finish;
+  }
+
+  if (Py_IsNone(io)) {
+    PyErr_SetString(PyExc_ValueError, "output stream not set!");
+    goto finish;
+  }
+  res = CpPack(op, atom, io, globals);
+finish:
+  Py_XDECREF(globals);
+  return res < 0 ? NULL : Py_None;
+}
+
+static PyObject*
+cp_core_pack(PyObject* m, PyObject* args, PyObject* kw)
+{
+  PyObject *op = NULL, *atom = NULL, *globals = PyDict_New(), *key = NULL,
+           *value = NULL, *io = NULL;
+  int res = 0;
+  if (!globals) {
+    return NULL;
+  }
+  _modulestate* state = get_module_state(m);
+  io = PyObject_CallNoArgs(state->BytesIO_Type);
+  if (!io) {
+    return NULL;
+  }
+
+  if (!PyArg_ParseTuple(args, "OO", &op, &atom)) {
+    goto finish;
+  }
+  if (kw && PyDict_Check(kw)) {
+    Py_ssize_t pos = 0;
+    while (PyDict_Next(kw, &pos, &key, &value)) {
+      if (PyDict_SetItem(globals, key, value) < 0) {
+        goto finish;
+      }
+    }
+  }
+  if (Py_IsNone(atom)) {
+    PyErr_SetString(PyExc_ValueError, "atom not set!");
+    goto finish;
+  }
+
+  res = CpPack(op, atom, io, globals);
+finish:
+  Py_XDECREF(globals);
+  if (res < 0) {
+    return NULL;
+  }
+
+  PyObject* result = PyObject_CallMethodNoArgs(io, state->str_bytesio_getvalue);
+  Py_XDECREF(io);
+  return result;
+}
+
+static PyObject*
+cp_core_sizeof(PyObject* m, PyObject* args, PyObject* kw)
+{
+  static char* kwlist[] = { "obj", "globals", NULL };
+  PyObject *op = NULL, *globals = NULL;
+  if (!PyArg_ParseTupleAndKeywords(args, kw, "O|O", kwlist, &op, &globals)) {
+    return NULL;
+  }
+  return CpSizeOf(op, globals);
+}
+
+static PyObject*
+cp_core_unpack(PyObject* m, PyObject* args, PyObject* kw)
+{
+  PyObject *atom = NULL, *globals = PyDict_New(), *key = NULL, *value = NULL,
+           *io = NULL;
+  PyObject* res = NULL;
+  int wrapped_io = false;
+  if (!globals) {
+    return NULL;
+  }
+  _modulestate* state = get_module_state(m);
+  if (!PyArg_ParseTuple(args, "OO", &io, &atom)) {
+    goto finish;
+  }
+  if (PyBytes_Check(io)) {
+    PyObject* args = Py_BuildValue("(O)", io);
+    io = PyObject_CallObject(state->BytesIO_Type, args);
+    Py_DECREF(args);
+    if (!io) {
+      goto finish;
+    }
+    if (!io) {
+      goto finish;
+    }
+    wrapped_io = true;
+  }
+  if (kw && PyDict_Check(kw)) {
+    Py_ssize_t pos = 0;
+    while (PyDict_Next(kw, &pos, &key, &value)) {
+      if (PyDict_SetItem(globals, key, value) < 0) {
+        goto finish;
+      }
+    }
+  }
+  if (Py_IsNone(atom)) {
+    PyErr_SetString(PyExc_ValueError, "atom not set!");
+    goto finish;
+  }
+
+  res = CpUnpack(atom, io, globals);
+finish:
+  Py_XDECREF(globals);
+  if (wrapped_io) {
+    Py_XDECREF(io);
+  }
+  return res;
+}
 
 static int
 cp_module_clear(PyObject* m)
@@ -185,9 +335,9 @@ cp_module_clear(PyObject* m)
     Py_CLEAR(state->cp_arch__host);
 
     // typing references
-    Py_CLEAR(state->typing_any);
-    Py_CLEAR(state->typing_list);
-    Py_CLEAR(state->typing_union);
+    Py_CLEAR(state->Any_Type);
+    Py_CLEAR(state->List_Type);
+    Py_CLEAR(state->Union_Type);
 
     // sttings
     Py_CLEAR(state->str___pack__);
@@ -215,6 +365,8 @@ cp_module_clear(PyObject* m)
     Py_CLEAR(state->str___dict__);
     Py_CLEAR(state->str___weakref__);
     Py_CLEAR(state->str___qualname__);
+
+    Py_CLEAR(state->cp_regex__unnamed);
   }
   return 0;
 }
@@ -226,13 +378,27 @@ cp_module_free(void* m)
 }
 
 /* module def */
+static PyMethodDef _module_methods[] = {
+  { "typeof",
+    (PyCFunction)cp_core_typeof,
+    METH_VARARGS | METH_KEYWORDS,
+    "Returns the type of an object." },
+  { "pack_into",
+    (PyCFunction)cp_core_pack_into,
+    METH_VARARGS | METH_KEYWORDS,
+    NULL },
+  { "pack", (PyCFunction)cp_core_pack, METH_VARARGS | METH_KEYWORDS, NULL },
+  { "sizeof", (PyCFunction)cp_core_sizeof, METH_VARARGS | METH_KEYWORDS, NULL },
+  { "unpack", (PyCFunction)cp_core_unpack, METH_VARARGS | METH_KEYWORDS, NULL },
+  { NULL }
+};
 
 PyModuleDef CpModule = {
   PyModuleDef_HEAD_INIT, /* m_base */
   _Cp_Name(_core),       /* m_name */
   NULL,                  /* m_doc */
   sizeof(_modulestate),  /* m_size */
-  NULL,                  /* m_methods */
+  _module_methods,       /* m_methods */
   NULL,                  /* m_slots */
   NULL,                  /* m_traverse */
   cp_module_clear,       /* m_clear */
@@ -268,6 +434,15 @@ PyInit__core(void)
   CpModule_SetupType(&CpContextPath_Type);
   CpModule_SetupType(&CpField_Type);
 
+  CpFieldAtom_Type.tp_base = &CpAtom_Type;
+  CpModule_SetupType(&CpFieldAtom_Type);
+  CpModule_SetupType(&CpLayer_Type);
+  CpModule_SetupType(&CpState_Type);
+
+  CpModule_SetupType(&CpStructFieldInfo_Type);
+  CpStruct_Type.tp_base = &CpFieldAtom_Type;
+  CpModule_SetupType(&CpStruct_Type);
+
   // module setup
   m = PyModule_Create(&CpModule);
   if (!m) {
@@ -288,9 +463,14 @@ PyInit__core(void)
   CpModule_AddObject("DefaultOptionType", &CpDefaultOption_Type);
   CpModule_AddObject("DefaultOption", CpDefaultOption);
   CpModule_AddObject("Field", &CpField_Type);
+  CpModule_AddObject("fieldatom", &CpFieldAtom_Type);
+  CpModule_AddObject("layer", &CpLayer_Type);
+  CpModule_AddObject("State", &CpState_Type);
+  CpModule_AddObject("fieldinfo", &CpStructFieldInfo_Type);
+  CpModule_AddObject("Struct", &CpStruct_Type)
 
-  /* setup state */
-  _modulestate* state = get_module_state(m);
+    /* setup state */
+    _modulestate* state = get_module_state(m);
   CpModuleState_AddObject(
     cp_option__dynamic,
     "F_DYNAMIC",
@@ -376,9 +556,44 @@ PyInit__core(void)
     return NULL;
   }
 
-  CpModuleState_Set(typing_any, PyObject_GetAttrString(typing, "Any"));
-  CpModuleState_Set(typing_list, PyObject_GetAttrString(typing, "List"));
-  CpModuleState_Set(typing_union, PyObject_GetAttrString(typing, "Union"));
+  CpModuleState_Set(Any_Type, PyObject_GetAttrString(typing, "Any"));
+  CpModuleState_Set(List_Type, PyObject_GetAttrString(typing, "List"));
+  CpModuleState_Set(Union_Type, PyObject_GetAttrString(typing, "Union"));
   Py_XDECREF(typing);
+
+  // regex setup
+  PyObject* re = PyImport_ImportModule("re");
+  if (!re) {
+    return NULL;
+  }
+
+  PyObject* compile = PyObject_GetAttrString(re, "compile");
+  if (!compile) {
+    return NULL;
+  }
+
+  state->cp_regex__unnamed = PyObject_CallFunction(compile, "s", "_[0-9]*$");
+  if (!state->cp_regex__unnamed) {
+    return NULL;
+  }
+
+  PyObject* inspect = PyImport_ImportModule("inspect");
+  if (!inspect) {
+    PyErr_SetString(PyExc_ImportError, "failed to import inspect");
+    return NULL;
+  }
+
+  CpModuleState_Set(inspect_getannotations,
+                    PyObject_GetAttrString(inspect, "get_annotations"));
+  Py_XDECREF(inspect);
+
+  PyObject* io = PyImport_ImportModule("io");
+  if (!io) {
+    PyErr_SetString(PyExc_ImportError, "failed to import io");
+    return NULL;
+  }
+
+  CpModuleState_Set(BytesIO_Type, PyObject_GetAttrString(io, "BytesIO"));
+  Py_XDECREF(io);
   return m;
 }

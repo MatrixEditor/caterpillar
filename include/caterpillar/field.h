@@ -17,8 +17,8 @@
 #ifndef CP_FIELD_H
 #define CP_FIELD_H
 
+#include "atomobj.h"
 #include "macros.h"
-
 
 /* Caterpillar Field definition */
 
@@ -117,11 +117,10 @@ PyAPI_DATA(PyTypeObject) CpField_Type;
 /**
  * @brief Create a new field
  *
- * @param name the name of the field
  * @param atom the atom object
  * @return the new field object
  */
-PyAPI_FUNC(CpFieldObject*) CpField_New(PyObject* name, PyObject* atom);
+PyAPI_FUNC(CpFieldObject*) CpField_New(PyObject* atom);
 
 /**
  * @brief Returns whether the field has a condition
@@ -172,6 +171,42 @@ PyAPI_FUNC(PyObject*)
  */
 PyAPI_FUNC(PyObject*)
   CpField_GetLength(CpFieldObject* field, PyObject* context);
+
+// -----------------------------------------------------------------------------
+// field atom
+
+/**
+ * @brief C implementation of the Python equivalent (FieldMixin).
+ *
+ * A simple mixin to support operators used to create `Field` instances.
+ */
+typedef struct _fieldatomobj
+{
+  CpAtom_HEAD;
+} CpFieldAtomObject;
+
+/// Field atom type
+PyAPI_DATA(PyTypeObject) CpFieldAtom_Type;
+
+/**
+ * @brief Check whether the given object is a field atom
+ *
+ * @param v the object to check
+ * @return true if the object is a field atom
+ * @return false if the object is not a field atom
+ */
+#define CpFieldAtom_CheckExact(v) Py_IS_TYPE((v), &CpFieldAtom_Type)
+
+/**
+ * @brief Check whether the given object is a field atom
+ *
+ * @param v the object to check
+ * @return true if the object is a field atom
+ * @return false if the object is not a field atom
+ */
+#define CpFieldAtom_Check(v) PyObject_TypeCheck((v), &CpFieldAtom_Type)
+
+#define CpFieldAtom_HEAD CpFieldAtomObject ob_base;
 
 
 #endif

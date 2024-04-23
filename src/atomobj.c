@@ -23,7 +23,7 @@ cp_atom_pack(CpAtomObject* self, PyObject* args, PyObject* kw)
   PyErr_Format(PyExc_NotImplementedError,
                "The atom of type '%s' cannot be packed (missing __pack__)",
                Py_TYPE(self)->tp_name);
-  return NULL;
+  return -1;
 }
 
 static PyObject*
@@ -188,13 +188,13 @@ cp_catom_pack(CpCAtomObject* self, PyObject* args, PyObject* kw)
     PyErr_Format(PyExc_NotImplementedError,
                  "The atom of type '%s' cannot be packed (missing __pack__)",
                  Py_TYPE(self)->tp_name);
-    return NULL;
+    return -1;
   }
 
   static char* kwlist[] = { "op", "context", NULL };
   PyObject *op = NULL, *context = NULL;
   if (PyArg_ParseTupleAndKeywords(args, kw, "OO", kwlist, &op, &context) < 0) {
-    return NULL;
+    return -1;
   }
 
   return self->ob_pack((PyObject*)self, op, context);
@@ -208,13 +208,13 @@ cp_catom_pack_many(CpCAtomObject* self, PyObject* args, PyObject* kw)
       PyExc_NotImplementedError,
       "The atom of type '%s' cannot be packed (missing __pack_many__)",
       Py_TYPE(self)->tp_name);
-    return NULL;
+    return -1;
   }
 
   static char* kwlist[] = { "ops", "context", NULL };
   PyObject *ops = NULL, *context = NULL;
   if (PyArg_ParseTupleAndKeywords(args, kw, "OO", kwlist, &ops, &context) < 0) {
-    return NULL;
+    return -1;
   }
 
   return self->ob_pack_many((PyObject*)self, ops, context);

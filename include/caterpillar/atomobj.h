@@ -62,8 +62,7 @@ PyAPI_DATA(PyTypeObject) CpAtom_Type;
  * @param op the object to check (must be a Python object pointer)
  * @return 1 if the object is an atom object, 0 otherwise
  */
-#define CpAtom_Check(op)                                                       \
-  PyObject_TypeCheck((PyObject*)(op), (PyObject*)&CpAtom_Type)
+#define CpAtom_Check(op) PyObject_TypeCheck((op), &CpAtom_Type)
 
 // default method names
 #define CpAtom_Pack_STR "__pack__"

@@ -77,6 +77,13 @@ PyAPI_FUNC(PyObject*)
  */
 PyAPI_FUNC(PyObject*) CpContext_GetAttrString(PyObject* ctx, const char* key);
 
+/**
+ * @brief Create a new context
+ *
+ * @return the new context, or NULL on failure
+ */
+PyAPI_FUNC(CpContextObject*) CpContext_New(void);
+
 // -----------------------------------------------------------------------------
 // unary expression
 enum

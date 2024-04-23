@@ -48,9 +48,10 @@ typedef struct _modulestate
   PyObject* cp_endian__native;
 
   // typing constants
-  PyObject* typing_any;
-  PyObject* typing_list;
-  PyObject* typing_union;
+  PyObject* Any_Type;
+  PyObject* List_Type;
+  PyObject* Union_Type;
+  PyObject *BytesIO_Type;
 
   // string constants
   // strings
@@ -80,6 +81,10 @@ typedef struct _modulestate
   PyObject* str_bytesio_getvalue;
   PyObject* str_builder_process;
   PyObject* str_pattern_match;
+
+  // compiled regex for unnamed fields
+  PyObject* cp_regex__unnamed;
+  PyObject* inspect_getannotations;
 } _modulestate;
 
 /** Module object type */
@@ -116,8 +121,11 @@ PyAPI_DATA(PyTypeObject) CpDefaultOption_Type;
 
 PyAPI_DATA(PyObject) _CpInvalidDefault_Object;
 #define CpInvalidDefault (&_CpInvalidDefault_Object)
+#define Cp_IsInvalidDefault(o) ((o) == CpInvalidDefault)
+
 PyAPI_DATA(PyObject) _CpDefaultOption_Object;
 #define CpDefaultOption (&_CpDefaultOption_Object)
+#define Cp_IsDefaultOption(o) ((o) == CpDefaultOption)
 
 /* utility macros */
 #define CpModule_SetupType(op)                                                 \

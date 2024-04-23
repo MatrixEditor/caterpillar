@@ -80,6 +80,12 @@ CpContext_GetAttr(PyObject* ctx, PyObject* key, _modulestate* m)
   return NULL;
 }
 
+CpContextObject*
+CpContext_New(void)
+{
+  return (CpContextObject*)CpObject_CreateNoArgs(&CpContext_Type);
+}
+
 /* docs */
 
 PyDoc_STRVAR(cp_context__doc__, "\
@@ -103,7 +109,7 @@ static PyMethodDef CpContext_Methods[] = {
 
 PyTypeObject CpContext_Type = {
   PyVarObject_HEAD_INIT(NULL, 0) _Cp_Name(Context),
-  sizeof(CpContextObject),                        /* tp_basicsize */
+  sizeof(CpContextObject),                  /* tp_basicsize */
   0,                                        /* tp_itemsize */
   0,                                        /* tp_dealloc */
   0,                                        /* tp_vectorcall_offset */
@@ -280,7 +286,8 @@ cp_unaryexpr__call__(CpUnaryExprObject* self, PyObject* args, PyObject* kw)
 CpUnaryExprObject*
 CpUnaryExpr_New(int op, PyObject* value)
 {
-  return (CpUnaryExprObject*)CpObject_Create(&CpUnaryExpr_Type, "iO", op, value);
+  return (CpUnaryExprObject*)CpObject_Create(
+    &CpUnaryExpr_Type, "iO", op, value);
 }
 
 /* docs */
@@ -300,7 +307,7 @@ static PyMemberDef CpUnaryExpr_Members[] = {
 
 PyTypeObject CpUnaryExpr_Type = {
   PyVarObject_HEAD_INIT(NULL, 0) _Cp_Name(UnaryExpr),
-  sizeof(CpUnaryExprObject),               /* tp_basicsize */
+  sizeof(CpUnaryExprObject),         /* tp_basicsize */
   0,                                 /* tp_itemsize */
   (destructor)cp_unaryexpr_dealloc,  /* tp_dealloc */
   0,                                 /* tp_vectorcall_offset */
@@ -611,14 +618,22 @@ static PyMemberDef CpBinaryExpr_Members[] = {
     offsetof(CpBinaryExprObject, m_expr),
     READONLY,
     "expression type" },
-  { "lhs", T_OBJECT, offsetof(CpBinaryExprObject, m_left), 0, "left hand side" },
-  { "rhs", T_OBJECT, offsetof(CpBinaryExprObject, m_left), 0, "right hand side" },
+  { "lhs",
+    T_OBJECT,
+    offsetof(CpBinaryExprObject, m_left),
+    0,
+    "left hand side" },
+  { "rhs",
+    T_OBJECT,
+    offsetof(CpBinaryExprObject, m_left),
+    0,
+    "right hand side" },
   { NULL } /* Sentinel */
 };
 
 PyTypeObject CpBinaryExpr_Type = {
   PyVarObject_HEAD_INIT(NULL, 0) _Cp_Name(BinaryExpr),
-  sizeof(CpBinaryExprObject),               /* tp_basicsize */
+  sizeof(CpBinaryExprObject),         /* tp_basicsize */
   0,                                  /* tp_itemsize */
   (destructor)cp_binaryexpr_dealloc,  /* tp_dealloc */
   0,                                  /* tp_vectorcall_offset */
@@ -724,7 +739,7 @@ cp_contextpath_hash(CpContextPathObject* self)
 static PyObject*
 cp_contextpath__type__(CpContextPathObject* self)
 {
-  PyObject* type = get_global_module_state()->typing_any;
+  PyObject* type = get_global_module_state()->Any_Type;
   Py_INCREF(type);
   return type;
 }
@@ -761,7 +776,9 @@ cp_contextpath__getattr__(CpContextPathObject* self, char* name)
 }
 
 static PyObject*
-cp_contextpath__call__(CpContextPathObject* self, PyObject* args, PyObject* kwargs)
+cp_contextpath__call__(CpContextPathObject* self,
+                       PyObject* args,
+                       PyObject* kwargs)
 {
   static char* kwlist[] = { "context", NULL };
   PyObject* context = NULL;
@@ -847,10 +864,13 @@ based on a specified path.\n\
 ");
 
 /* members */
-static PyMemberDef CpContextPath_Members[] = {
-  { "path", T_OBJECT, offsetof(CpContextPathObject, m_path), READONLY, "the path" },
-  { NULL }
-};
+static PyMemberDef CpContextPath_Members[] = { { "path",
+                                                 T_OBJECT,
+                                                 offsetof(CpContextPathObject,
+                                                          m_path),
+                                                 READONLY,
+                                                 "the path" },
+                                               { NULL } };
 
 static PyMethodDef CpContextPath_Methods[] = {
   { "__type__", (PyCFunction)cp_contextpath__type__, METH_NOARGS },
@@ -882,7 +902,7 @@ static PyNumberMethods CpContextPath_NumberMethods = {
 /* type */
 PyTypeObject CpContextPath_Type = {
   PyVarObject_HEAD_INIT(NULL, 0) _Cp_Name(ContextPath),
-  sizeof(CpContextPathObject),                  /* tp_basicsize */
+  sizeof(CpContextPathObject),            /* tp_basicsize */
   0,                                      /* tp_itemsize */
   (destructor)cp_contextpath_dealloc,     /* tp_dealloc */
   0,                                      /* tp_vectorcall_offset */
