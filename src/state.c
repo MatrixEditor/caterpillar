@@ -82,40 +82,62 @@ cp_layer_init(CpLayerObject* self, PyObject* args, PyObject* kw)
 static PyObject*
 cp_layer__context_getattr__(CpLayerObject* self, PyObject* args)
 {
-  PyObject *result = NULL, *tmp = NULL;
-  char* line;
-  if (!PyArg_ParseTuple(args, "s", &line)) {
+  _modulestate* state = get_global_module_state();
+  PyObject *tmp = NULL, *lineValue = NULL, *lastKey = NULL, *key = NULL,
+           *obj = NULL;
+  if (!PyArg_ParseTuple(args, "O", &lineValue)) {
     return NULL;
   }
 
-  char* token = strtok(line, ".");
-  if (token == NULL) {
-    PyErr_Format(PyExc_AttributeError, "CpLayer has no attribute '%s'", line);
+  PyObject* values = PyUnicode_Split(lineValue, state->str_path_delim, -1);
+  if (!values) {
     return NULL;
   }
 
-  PyObject* key = PyUnicode_FromString(token);
+  size_t length = PyList_Size(values);
+  if (length == 0) {
+    Py_XDECREF(values);
+    PyErr_SetString(PyExc_ValueError, "Empty path");
+    return NULL;
+  }
+
+  key = PyList_GetItem(values, 0);
   if (!key) {
+    Py_XDECREF(values);
     return NULL;
   }
-  result = PyObject_GenericGetAttr((PyObject*)self, key);
-  Py_DECREF(key);
-  while (result != NULL && (token = strtok(NULL, ".")) != NULL) {
-    tmp = PyObject_GetAttrString(result, token);
-    Py_XSETREF(result, tmp);
-  };
 
-  if (result == NULL) {
-    if (strcmp(token, line) == 0) {
-      PyErr_Format(
-        PyExc_AttributeError, "CpLayer has no attribute '%s'", token);
+  tmp = PyObject_GenericGetAttr((PyObject*)self, key);
+  if (!tmp) {
+    PyErr_Clear();
+    PyErr_Format(PyExc_ValueError, "CpLayer has no attribute '%s'", key);
+    Py_XDECREF(values);
+    return NULL;
+  }
+
+  obj = tmp;
+  Py_XSETREF(lastKey, Py_XNewRef(key));
+  for (size_t i = 1; i < length; i++) {
+    key = PyList_GetItem(values, i);
+    if (!key) {
+      Py_XDECREF(values);
       return NULL;
     }
-    PyErr_Format(
-      PyExc_AttributeError, "'%s' has no attribute '%s'", token, line);
-    return NULL;
+
+    tmp = PyObject_GetAttr(obj, key);
+    if (!tmp) {
+      PyErr_Clear();
+      PyErr_Format(
+        PyExc_ValueError, "'%s' has no attribute '%s'", lastKey, key);
+      Py_XDECREF(values);
+      return NULL;
+    }
+
+    Py_XSETREF(obj, tmp);
+    Py_XSETREF(lastKey, Py_XNewRef(key));
   }
-  return result;
+  Py_XDECREF(values);
+  return obj;
 }
 
 /* PUblic API */
@@ -363,41 +385,6 @@ cp_state_get_offset_table(CpStateObject* self)
   return Py_NewRef(self->m_offset_table ? self->m_offset_table : Py_None);
 }
 
-// REVISIT: maybe put that into layer
-static PyObject*
-cp_state__context_getattr__(CpStateObject* self, PyObject* args)
-{
-  PyObject *result = NULL, *tmp = NULL;
-  char* line;
-  if (!PyArg_ParseTuple(args, "s", &line)) {
-    return NULL;
-  }
-
-  char* token = strtok(line, ".");
-  if (token == NULL) {
-    PyErr_Format(PyExc_AttributeError, "CpState has no attribute '%s'", line);
-    return NULL;
-  }
-
-  PyObject* key = PyUnicode_FromString(token);
-  if (!key) {
-    return NULL;
-  }
-  result = PyObject_GenericGetAttr((PyObject*)self, key);
-  Py_DECREF(key);
-  while (result != NULL && (token = strtok(NULL, ".")) != NULL) {
-    tmp = PyObject_GetAttrString(result, token);
-    Py_XSETREF(result, tmp);
-  };
-
-  if (result == NULL) {
-    PyErr_Format(
-      PyExc_AttributeError, "'%s' has no attribute '%s'", token, line);
-    return NULL;
-  }
-  return result;
-}
-
 static PyObject*
 cp_state_write(CpStateObject* self, PyObject* args)
 {
@@ -510,9 +497,6 @@ static PyMethodDef CpState_Methods[] = {
   { "read", (PyCFunction)cp_state_read, METH_VARARGS },
   { "tell", (PyCFunction)cp_state_tell, METH_NOARGS },
   { "seek", (PyCFunction)cp_state_seek, METH_VARARGS },
-  { "__context_getattr__",
-    (PyCFunction)cp_state__context_getattr__,
-    METH_VARARGS },
   { NULL } /* Sentinel */
 };
 

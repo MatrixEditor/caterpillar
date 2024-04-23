@@ -340,6 +340,7 @@ cp_module_clear(PyObject* m)
     Py_CLEAR(state->Union_Type);
 
     // sttings
+    Py_CLEAR(state->str_path_delim);
     Py_CLEAR(state->str___pack__);
     Py_CLEAR(state->str___unpack__);
     Py_CLEAR(state->str___size__);
@@ -546,6 +547,7 @@ PyInit__core(void)
   CACHED_STRING(str___dict__, "__dict__");
   CACHED_STRING(str___weakref__, "__weakref__");
   CACHED_STRING(str___qualname__, "__qualname__");
+  CACHED_STRING(str_path_delim, ".");
 
 #undef CACHED_STRING
 

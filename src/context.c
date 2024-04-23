@@ -16,53 +16,80 @@ cp_context__setattr__(CpContextObject* self, char* name, PyObject* value)
 }
 
 static inline PyObject*
-_cp_context__context_getattr__(CpContextObject* self, char* name)
+_cp_context__context_getattr__(CpContextObject* self, PyObject* name)
 {
-  PyObject *result = NULL, *tmp = NULL;
-  char* line = name;
-  char* token = strtok(line, ".");
-  if (token == NULL) {
-    PyErr_Format(PyExc_AttributeError, "CpContext has no attribute '%s'", name);
+  _modulestate* state = get_global_module_state();
+  PyObject *tmp = NULL, *lineValue = name, *lastKey = NULL, *key = NULL,
+           *obj = NULL;
+
+  PyObject* values = PyUnicode_Split(lineValue, state->str_path_delim, -1);
+  if (!values) {
     return NULL;
   }
 
-  // NOTE: GetItemString only returns a borrowed reference
-  result = PyDict_GetItemString((PyObject*)&self->m_dict, token);
-  Py_XINCREF(result);
-  while (result != NULL && (token = strtok(NULL, ".")) != NULL) {
-    tmp = PyObject_GetAttrString(result, token);
-    Py_XSETREF(result, tmp);
-  };
+  size_t length = PyList_Size(values);
+  if (length == 0) {
+    Py_XDECREF(values);
+    PyErr_SetString(PyExc_ValueError, "Empty path");
+    return NULL;
+  }
 
-  if (result == NULL) {
-    if (strcmp(name, token) == 0) {
-      PyErr_Format(
-        PyExc_AttributeError, "Context has no attribute '%s'", name, token);
+  key = PyList_GetItem(values, 0);
+  if (!key) {
+    Py_XDECREF(values);
+    return NULL;
+  }
+
+  tmp = Py_XNewRef(PyDict_GetItem((PyObject*)&self->m_dict, key));
+  if (!tmp) {
+    PyErr_Clear();
+    PyErr_Format(
+      PyExc_AttributeError, "Context has no attribute '%s'", Py_XNewRef(key));
+    Py_XDECREF(values);
+    return NULL;
+  }
+
+  obj = tmp;
+  Py_XSETREF(lastKey, Py_XNewRef(key));
+  for (size_t i = 1; i < length; i++) {
+    key = PyList_GetItem(values, i);
+    if (!key) {
+      Py_XDECREF(values);
       return NULL;
     }
-    PyErr_Format(
-      PyExc_AttributeError, "'%s' has no attribute '%s'", name, token);
-    return NULL;
+
+    tmp = PyObject_GetAttr(obj, key);
+    if (!tmp) {
+      PyErr_Clear();
+      PyErr_Format(PyExc_AttributeError,
+                   "'%s' has no attribute '%s'",
+                   lastKey,
+                   Py_XNewRef(key));
+      Py_XDECREF(values);
+      return NULL;
+    }
+
+    Py_XSETREF(obj, tmp);
+    Py_XSETREF(lastKey, Py_XNewRef(key));
   }
-  return Py_NewRef(result);
+  Py_XDECREF(values);
+  return obj;
 }
 
 static PyObject*
 cp_context__context_getattr__(CpContextObject* self, PyObject* args)
 {
-  char* name;
-  if (!PyArg_ParseTuple(args, "s", &name)) {
+  PyObject* name = NULL;
+  if (!PyArg_ParseTuple(args, "O", &name)) {
     return NULL;
   }
   return _cp_context__context_getattr__(self, name);
 }
 
 static PyObject*
-cp_context__getattr__(CpContextObject* self, char* name)
+cp_context__getattro__(CpContextObject* self, PyObject* name)
 {
-  PyObject *key = PyUnicode_FromString(name), *tmp = NULL;
-  PyObject* result = PyObject_GenericGetAttr((PyObject*)&self->m_dict, key);
-  Py_XDECREF(key);
+  PyObject* result = PyObject_GenericGetAttr((PyObject*)&self->m_dict, name);
   if (result) {
     return result;
   }
@@ -113,7 +140,7 @@ PyTypeObject CpContext_Type = {
   0,                                        /* tp_itemsize */
   0,                                        /* tp_dealloc */
   0,                                        /* tp_vectorcall_offset */
-  (getattrfunc)cp_context__getattr__,       /* tp_getattr */
+  0,                                        /* tp_getattr */
   (setattrfunc)cp_context__setattr__,       /* tp_setattr */
   0,                                        /* tp_as_async */
   0,                                        /* tp_repr */
@@ -123,7 +150,7 @@ PyTypeObject CpContext_Type = {
   0,                                        /* tp_hash */
   0,                                        /* tp_call */
   0,                                        /* tp_str */
-  0,                                        /* tp_getattro */
+  (getattrofunc)cp_context__getattro__,     /* tp_getattro */
   0,                                        /* tp_setattro */
   0,                                        /* tp_as_buffer */
   Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /* tp_flags */

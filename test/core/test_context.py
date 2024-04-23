@@ -70,7 +70,7 @@ def test_contextpath():
 def test_ops(name, func, expected):
     # Context value starts at one
     cp = Context(foo=1)
-    # path always points too foo
+    # path always points to foo
     path = func(ContextPath("foo"))
     rval = path(cp)
     assert rval == expected, f"Invalid result: {rval} - expected {expected} on {name}"

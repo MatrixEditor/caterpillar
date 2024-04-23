@@ -55,6 +55,7 @@ typedef struct _modulestate
 
   // string constants
   // strings
+  PyObject* str_path_delim;
   PyObject* str_tell;
   PyObject* str_seek;
   PyObject* str_write;
