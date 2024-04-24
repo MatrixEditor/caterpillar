@@ -313,12 +313,27 @@ Base class for C atom types.");
 
 /* type */
 static PyMethodDef CpCAtom_Methods[] = {
-  { "__pack__", (PyCFunction)cp_catom_pack, METH_VARARGS, NULL },
-  { "__pack_many__", (PyCFunction)cp_catom_pack_many, METH_VARARGS, NULL },
-  { "__unpack__", (PyCFunction)cp_catom_unpack, METH_VARARGS, NULL },
-  { "__unpack_many__", (PyCFunction)cp_catom_unpack_many, METH_VARARGS, NULL },
+  { "__pack__",
+    (PyCFunction)cp_catom_pack,
+    METH_VARARGS | METH_KEYWORDS,
+    NULL },
+  { "__pack_many__",
+    (PyCFunction)cp_catom_pack_many,
+    METH_VARARGS | METH_KEYWORDS,
+    NULL },
+  { "__unpack__",
+    (PyCFunction)cp_catom_unpack,
+    METH_VARARGS | METH_KEYWORDS,
+    NULL },
+  { "__unpack_many__",
+    (PyCFunction)cp_catom_unpack_many,
+    METH_VARARGS | METH_KEYWORDS,
+    NULL },
   { "__type__", (PyCFunction)cp_catom_type, METH_NOARGS, NULL },
-  { "__size__", (PyCFunction)cp_catom_size, METH_VARARGS, NULL },
+  { "__size__",
+    (PyCFunction)cp_catom_size,
+    METH_VARARGS | METH_KEYWORDS,
+    NULL },
   { NULL } /* Sentinel */
 };
 

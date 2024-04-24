@@ -9,6 +9,9 @@
 #include "caterpillar/state.h"
 #include "caterpillar/struct.h"
 
+// atom implementations
+#include "caterpillar/intatomobj.h"
+
 /* immortal objects */
 static PyObject*
 cp_invaliddefault_new(PyTypeObject* type, PyObject* args, PyObject* kw)
@@ -446,6 +449,9 @@ PyInit__core(void)
   CpStruct_Type.tp_base = &CpFieldAtom_Type;
   CpModule_SetupType(&CpStruct_Type);
 
+  CpIntAtom_Type.tp_base = &CpFieldCAtom_Type;
+  CpModule_SetupType(&CpIntAtom_Type);
+
   // module setup
   m = PyModule_Create(&CpModule);
   if (!m) {
@@ -471,10 +477,11 @@ PyInit__core(void)
   CpModule_AddObject("layer", &CpLayer_Type);
   CpModule_AddObject("State", &CpState_Type);
   CpModule_AddObject("fieldinfo", &CpStructFieldInfo_Type);
-  CpModule_AddObject("Struct", &CpStruct_Type)
+  CpModule_AddObject("Struct", &CpStruct_Type);
+  CpModule_AddObject("intatom", &CpIntAtom_Type);
 
-    /* setup state */
-    _modulestate* state = get_module_state(m);
+  /* setup state */
+  _modulestate* state = get_module_state(m);
   CpModuleState_AddObject(
     cp_option__dynamic,
     "F_DYNAMIC",

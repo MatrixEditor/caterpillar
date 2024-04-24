@@ -264,4 +264,6 @@ PyAPI_DATA(PyTypeObject) CpCAtom_Type;
  */
 #define CpCAtom_CheckExact(op) Py_TYPE(op) == &CpCAtom_Type
 
+#define Cp_CATOM(x) (x)->ob_base
+
 #endif

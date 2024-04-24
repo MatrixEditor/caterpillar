@@ -237,5 +237,6 @@ PyAPI_DATA(PyTypeObject) CpFieldCAtom_Type;
 #define CpFieldCAtom_Check(v) PyObject_TypeCheck((v), &CpFieldCAtom_Type)
 
 #define CpFieldCAtom_HEAD CpFieldCAtomObject ob_base;
+#define CpFieldCAtom_CATOM(x) (x)->ob_base.ob_base
 
 #endif

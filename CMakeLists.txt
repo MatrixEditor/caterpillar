@@ -25,6 +25,8 @@ python_add_library(
   src/parsing_pack.c
   src/parsing_unpack.c
 
+  src/intatomobj.c
+
   WITH_SOABI
 )
 
