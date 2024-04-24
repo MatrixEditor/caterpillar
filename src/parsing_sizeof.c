@@ -47,7 +47,7 @@ CpSizeOf_Field(CpFieldObject* field, CpLayerObject* layer)
   }
 
   _modulestate* mod = layer->m_state->mod;
-  PyObject *count = PyLong_FromLong(1), *size = NULL;
+  PyObject *count = PyLong_FromLong(1), *size = NULL, *extraSize = NULL;
   if (!count) {
     return NULL;
   }
@@ -74,6 +74,11 @@ CpSizeOf_Field(CpFieldObject* field, CpLayerObject* layer)
   }
 
   PyObject* atom = Py_NewRef(field->m_atom);
+  size = _Cp_SizeOf(atom, layer);
+  if (!size) {
+    goto fail;
+  }
+
   if (field->m_switch) {
     // Static switch structures are supported only if the predecessor
     // is a context lambda.
@@ -88,32 +93,36 @@ CpSizeOf_Field(CpFieldObject* field, CpLayerObject* layer)
     if (!value) {
       goto fail;
     }
-
-    atom = CpField_EvalSwitch(field, value, (PyObject*)layer);
-    Py_DECREF(value);
-    if (!atom) {
+    Py_XSETREF(extraSize, size);
+    size = _Cp_SizeOf(value, layer);
+    if (!size) {
       goto fail;
     }
-  }
-
-  size = _Cp_SizeOf(atom, layer);
-  if (!size) {
-    goto fail;
+    Py_XDECREF(value);
   }
 
   PyObject* result = PyNumber_Multiply(size, count);
   if (!result) {
     goto fail;
   }
+  if (extraSize) {
+    Py_XSETREF(result, PyNumber_Add(result, extraSize));
+    if (!result) {
+      goto fail;
+    }
+  }
+
   Py_XDECREF(size);
   Py_XDECREF(count);
   Py_XDECREF(atom);
+  Py_XDECREF(extraSize);
   return result;
 
 fail:
   Py_XDECREF(atom);
   Py_XDECREF(count);
   Py_XDECREF(size);
+  Py_XDECREF(extraSize);
   return NULL;
 }
 

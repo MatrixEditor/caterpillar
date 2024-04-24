@@ -104,6 +104,7 @@ CpContext_GetAttr(PyObject* ctx, PyObject* key, _modulestate* m)
 {
   // TODO
   //  return PyObject_CallMethodOneArg(ctx, m->str, PyObject *arg)
+  PyErr_SetString(PyExc_NotImplementedError, "GetAttr not implemented yet");
   return NULL;
 }
 

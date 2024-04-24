@@ -208,5 +208,34 @@ PyAPI_DATA(PyTypeObject) CpFieldAtom_Type;
 
 #define CpFieldAtom_HEAD CpFieldAtomObject ob_base;
 
+// -----------------------------------------------------------------------------
+// field C atom
+typedef struct _fieldcatomobj
+{
+  CpCAtom_HEAD;
+} CpFieldCAtomObject;
+
+/// Field C atom type
+PyAPI_DATA(PyTypeObject) CpFieldCAtom_Type;
+
+/**
+ * @brief Check whether the given object is a field C atom
+ *
+ * @param v the object to check
+ * @return true if the object is a field C atom
+ * @return false if the object is not a field C atom
+ */
+#define CpFieldCAtom_CheckExact(v) Py_IS_TYPE((v), &CpFieldCAtom_Type)
+
+/**
+ * @brief Check whether the given object is a field C atom
+ *
+ * @param v the object to check
+ * @return true if the object is a field C atom
+ * @return false if the object is not a field C atom
+ */
+#define CpFieldCAtom_Check(v) PyObject_TypeCheck((v), &CpFieldCAtom_Type)
+
+#define CpFieldCAtom_HEAD CpFieldCAtomObject ob_base;
 
 #endif

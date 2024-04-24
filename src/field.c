@@ -114,8 +114,14 @@ cp_field_init(CpFieldObject* self, PyObject* args, PyObject* kw)
     };
   }
 
+  // tyoe checks
   if (!self->m_atom || self->m_atom == Py_None) {
     PyErr_SetString(PyExc_ValueError, "atom is required");
+    return -1;
+  }
+
+  if (!self->m_options || !PySet_Check(self->m_options)) {
+    PyErr_SetString(PyExc_ValueError, "options must be a set");
     return -1;
   }
 
@@ -546,6 +552,17 @@ cp_fieldatom_dealloc(CpFieldAtomObject* self)
   Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
+static int
+cp_fieldatom_init(CpFieldAtomObject* self, PyObject* args, PyObject* kw)
+{
+  if ((args && PyTuple_Size(args)) || (kw && PyDict_Size(kw))) {
+    PyErr_SetString(PyExc_TypeError,
+                    "fieldatoms cannot be initialized with arguments");
+    return -1;
+  }
+  return 0;
+}
+
 #define _CpFieldAtom_DefMethod(name, func)                                     \
   static PyObject* cp_fieldatom_##name(CpFieldAtomObject* self,                \
                                        PyObject* other)                        \
@@ -666,9 +683,175 @@ PyTypeObject CpFieldAtom_Type = {
   0,                                        /* tp_descr_get */
   0,                                        /* tp_descr_set */
   0,                                        /* tp_dictoffset */
-  0,                                        /* tp_init */
+  (initproc)cp_fieldatom_init,              /* tp_init */
   0,                                        /* tp_alloc */
   (newfunc)cp_fieldatom_new,                /* tp_new */
+  0,                                        /* tp_free */
+  0,                                        /* tp_is_gc */
+  0,                                        /* tp_bases */
+  0,                                        /* tp_mro */
+  0,                                        /* tp_cache */
+  0,                                        /* tp_subclasses */
+  0,                                        /* tp_weaklist */
+  0,                                        /* tp_del */
+  0,                                        /* tp_version_tag */
+  0,                                        /* tp_finalize */
+  0,                                        /* tp_vectorcall */
+  0,                                        /* tp_watched */
+};
+
+// -----------------------------------------------------------------------------
+// field C atom
+static PyObject*
+cp_fieldcatom_new(PyTypeObject* type, PyObject* args, PyObject* kw)
+{
+  CpFieldAtomObject* self;
+  self = (CpFieldAtomObject*)type->tp_alloc(type, 0);
+  if (self == NULL)
+    return NULL;
+  return (PyObject*)self;
+}
+
+static void
+cp_fieldcatom_dealloc(CpFieldAtomObject* self)
+{
+  Py_TYPE(self)->tp_free((PyObject*)self);
+}
+
+static int
+cp_fieldcatom_init(CpFieldAtomObject* self, PyObject* args, PyObject* kw)
+{
+  if ((args && PyTuple_Size(args)) || (kw && PyDict_Size(kw))) {
+    PyErr_SetString(PyExc_TypeError,
+                    "fieldcatoms cannot be initialized with arguments");
+    return -1;
+  }
+  return 0;
+}
+
+#define _CpFieldCAtom_DefMethod(name, func)                                    \
+  static PyObject* cp_fieldcatom_##name(CpFieldAtomObject* self,               \
+                                        PyObject* other)                       \
+  {                                                                            \
+    CpFieldObject* field = CpField_New((PyObject*)self);                       \
+    if (!field) {                                                              \
+      return NULL;                                                             \
+    }                                                                          \
+    if (func(field, other, NULL) < 0) {                                        \
+      Py_XDECREF(field);                                                       \
+      return NULL;                                                             \
+    }                                                                          \
+    return (PyObject*)field;                                                   \
+  }
+
+_CpFieldCAtom_DefMethod(as_number_matmul, cp_field_set_offset);
+_CpFieldCAtom_DefMethod(as_number_floordiv, cp_field_set_condition);
+_CpFieldCAtom_DefMethod(as_number_rshift, cp_field_set_switch);
+_CpFieldCAtom_DefMethod(as_mapping_getitem, cp_field_set_length);
+
+#undef _CpFieldCAtom_DefMethod
+
+static PyObject*
+cp_fieldcatom_as_number_add(CpFieldAtomObject* self, PyObject* other)
+{
+  if (other->ob_type != &CpEndian_Type) {
+    Py_RETURN_NOTIMPLEMENTED;
+  }
+
+  CpFieldObject* field = (CpFieldObject*)CpField_New((PyObject*)self);
+  if (!field) {
+    return NULL;
+  }
+  _Cp_SetObj(field->m_endian, other);
+  return (PyObject*)field;
+}
+
+static PyObject*
+cp_fieldcatom_as_number_or(CpFieldAtomObject* self, PyObject* other)
+{
+  if (other->ob_type != &CpOption_Type) {
+    Py_RETURN_NOTIMPLEMENTED;
+  }
+
+  CpFieldObject* field = (CpFieldObject*)CpField_New((PyObject*)self);
+  if (!field) {
+    return NULL;
+  }
+  PySet_Add(field->m_options, other);
+  return (PyObject*)field;
+}
+
+static PyObject*
+cp_fieldcatom_as_number_xor(CpFieldAtomObject* self, PyObject* other)
+{
+  if (other->ob_type != &CpOption_Type) {
+    Py_RETURN_NOTIMPLEMENTED;
+  }
+
+  CpFieldObject* field = (CpFieldObject*)CpField_New((PyObject*)self);
+  if (!field) {
+    return NULL;
+  }
+  PySet_Discard(field->m_options, other);
+  return (PyObject*)field;
+}
+
+/* docs */
+
+/* members */
+
+static PyNumberMethods CpFieldCAtom_NumberMethods = {
+  .nb_matrix_multiply = (binaryfunc)cp_fieldcatom_as_number_matmul,
+  .nb_floor_divide = (binaryfunc)cp_fieldcatom_as_number_floordiv,
+  .nb_add = (binaryfunc)cp_fieldcatom_as_number_add,
+  .nb_rshift = (binaryfunc)cp_fieldcatom_as_number_rshift,
+  .nb_or = (binaryfunc)cp_fieldcatom_as_number_or,
+  .nb_xor = (binaryfunc)cp_fieldcatom_as_number_xor,
+};
+
+static PyMappingMethods CpFieldCAtom_MappingMethods = {
+  .mp_subscript = (binaryfunc)cp_fieldcatom_as_mapping_getitem,
+};
+
+/* type */
+PyTypeObject CpFieldCAtom_Type = {
+  PyVarObject_HEAD_INIT(NULL, 0) _Cp_Name(fieldcatom),
+  sizeof(CpFieldCAtomObject),               /* tp_basicsize */
+  0,                                        /* tp_itemsize */
+  (destructor)cp_fieldcatom_dealloc,        /* tp_dealloc */
+  0,                                        /* tp_vectorcall_offset */
+  0,                                        /* tp_getattr */
+  0,                                        /* tp_setattr */
+  0,                                        /* tp_as_async */
+  0,                                        /* tp_repr */
+  &CpFieldCAtom_NumberMethods,              /* tp_as_number */
+  0,                                        /* tp_as_sequence */
+  &CpFieldCAtom_MappingMethods,             /* tp_as_mapping */
+  0,                                        /* tp_hash */
+  0,                                        /* tp_call */
+  0,                                        /* tp_str */
+  0,                                        /* tp_getattro */
+  0,                                        /* tp_setattro */
+  0,                                        /* tp_as_buffer */
+  Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /* tp_flags */
+  NULL,                                     /* tp_doc */
+  0,                                        /* tp_traverse */
+  0,                                        /* tp_clear */
+  0,                                        /* tp_richcompare */
+  0,                                        /* tp_weaklistoffset */
+  0,                                        /* tp_iter */
+  0,                                        /* tp_iternext */
+  0,                                        /* tp_methods */
+  0,                                        /* tp_members */
+  0,                                        /* tp_getset */
+  0,                                        /* tp_base */
+  0,                                        /* tp_dict */
+  0,                                        /* tp_descr_get */
+  0,                                        /* tp_descr_set */
+  0,                                        /* tp_dictoffset */
+  (initproc)cp_fieldcatom_init,             /* tp_init */
+  0,                                        /* tp_alloc */
+  (newfunc)cp_fieldcatom_new,               /* tp_new */
   0,                                        /* tp_free */
   0,                                        /* tp_is_gc */
   0,                                        /* tp_bases */

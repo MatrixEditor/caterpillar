@@ -27,7 +27,16 @@ CpUnpack_Common(PyObject* op, CpLayerObject* layer)
 
   _modulestate* mod = layer->m_state->mod;
   if (PyObject_HasAttr(op, mod->str___unpack_many__)) {
-    return PyObject_CallMethodOneArg(op, mod->str___unpack__, (PyObject*)layer);
+    PyObject* res =
+      PyObject_CallMethodOneArg(op, mod->str___unpack__, (PyObject*)layer);
+    if (PyErr_Occurred() &&
+        PyErr_GetRaisedException() == PyExc_NotImplementedError) {
+      // Make sure this method continues to unpack
+      PyErr_Clear();
+      Py_XDECREF(res);
+    } else {
+      return res;
+    }
   }
 
   if (!layer->m_field) {

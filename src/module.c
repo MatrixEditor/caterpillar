@@ -396,7 +396,7 @@ static PyMethodDef _module_methods[] = {
 
 PyModuleDef CpModule = {
   PyModuleDef_HEAD_INIT, /* m_base */
-  _Cp_Name(_core),       /* m_name */
+  "caterpillar._core",   /* m_name */
   NULL,                  /* m_doc */
   sizeof(_modulestate),  /* m_size */
   _module_methods,       /* m_methods */
@@ -436,7 +436,9 @@ PyInit__core(void)
   CpModule_SetupType(&CpField_Type);
 
   CpFieldAtom_Type.tp_base = &CpAtom_Type;
+  CpFieldCAtom_Type.tp_base = &CpCAtom_Type;
   CpModule_SetupType(&CpFieldAtom_Type);
+  CpModule_SetupType(&CpFieldCAtom_Type);
   CpModule_SetupType(&CpLayer_Type);
   CpModule_SetupType(&CpState_Type);
 
@@ -465,6 +467,7 @@ PyInit__core(void)
   CpModule_AddObject("DefaultOption", CpDefaultOption);
   CpModule_AddObject("Field", &CpField_Type);
   CpModule_AddObject("fieldatom", &CpFieldAtom_Type);
+  CpModule_AddObject("fieldcatom", &CpFieldCAtom_Type);
   CpModule_AddObject("layer", &CpLayer_Type);
   CpModule_AddObject("State", &CpState_Type);
   CpModule_AddObject("fieldinfo", &CpStructFieldInfo_Type);

@@ -145,9 +145,16 @@ CpPack_Common(PyObject* op, PyObject* atom, CpLayerObject* layer)
     // class explicitly defines __pack_many__ -> use it
     PyObject* res = PyObject_CallMethodObjArgs(
       atom, state->mod->str___pack_many__, op, (PyObject*)layer, NULL);
-    success = res ? 0 : -1;
-    Py_DECREF(res);
-    return success;
+    if (PyErr_Occurred() &&
+        PyErr_GetRaisedException() == PyExc_NotImplementedError) {
+      // Make sure this method continues to pack the given object
+      PyErr_Clear();
+      Py_XDECREF(res);
+    } else {
+      success = res ? 0 : -1;
+      Py_XDECREF(res);
+      return success;
+    }
   }
 
   if (!PySequence_Check(op)) {
