@@ -308,6 +308,7 @@ cp_struct_init(CpStructObject* self, PyObject* args, PyObject* kw)
     PyErr_Format(PyExc_TypeError, "model %R must be a type", model);
     return -1;
   }
+
   if (CpStructModel_Check(model, self->s_mod)) {
     PyErr_SetString(PyExc_TypeError, "model must not be a struct container");
     return -1;
@@ -342,7 +343,7 @@ cp_struct_init(CpStructObject* self, PyObject* args, PyObject* kw)
   }
 
   if (endian) {
-    if (endian->ob_type == &CpEndian_Type) {
+    if (CpEndian_CheckExact(endian)) {
       _Cp_SetObj(self->m_endian, endian);
     } else {
       PyErr_SetString(PyExc_TypeError, "endian must be an Endian instance");
@@ -351,7 +352,7 @@ cp_struct_init(CpStructObject* self, PyObject* args, PyObject* kw)
   }
 
   if (arch) {
-    if (arch->ob_type == &CpArch_Type) {
+    if (CpArch_CheckExact(arch)) {
       _Cp_SetObj(self->m_arch, arch);
     } else {
       PyErr_SetString(PyExc_TypeError, "arch must be an Arch instance");
@@ -441,7 +442,6 @@ cp_struct_prepare(CpStructObject* self)
     }
     PyObject *default_ = NULL, *atom = annotation;
     int excluded = false;
-
     default_ = CpStructModel_GetDefaultValue(self, name);
     if (!default_) {
       Py_XDECREF(discardable);
@@ -488,8 +488,8 @@ cp_struct_prepare(CpStructObject* self)
       // Definition 'unnamed fields':
       // Unnamed fields refer to fields in a struct or sequence which names
       // begin with an underscore followed by zero or more numeric digits.
-      PyObject* match_ = PyObject_CallMethodObjArgs(
-        state->cp_regex__unnamed, state->str_pattern_match, name, NULL);
+      PyObject* match_ = PyObject_CallMethodOneArg(
+        state->cp_regex__unnamed, state->str_pattern_match, name);
       if (!match_) {
         Py_XDECREF(default_);
         Py_XDECREF(discardable);
@@ -499,8 +499,9 @@ cp_struct_prepare(CpStructObject* self)
         excluded = true;
       }
       Py_XDECREF(match_);
-    } else
+    } else {
       excluded = false;
+    }
 
     if (excluded) {
       PySet_Add(discardable, name);
@@ -612,7 +613,6 @@ cp_struct_process_annotation(CpStructObject* self,
   // class-level defaults and field-level defaults.
   CpFieldObject* field = NULL;
   _modulestate* state = self->s_mod;
-
   {
     // 1. Annotated field:
     // The annotation is already a CpField object, so we don't need to convert
@@ -1119,7 +1119,7 @@ CpStructModel_Check(PyObject* model, _modulestate* state)
   PyObject* dict = NULL;
   if (!model) {
     return 0;
-  } else if (Py_IS_TYPE(model, &PyType_Type)) {
+  } else if (model->ob_type == &PyType_Type) {
     dict = ((PyTypeObject*)model)->tp_dict;
   } else {
     dict = model->ob_type->tp_dict;

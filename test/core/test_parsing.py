@@ -1,9 +1,9 @@
 # pylint: disable=unused-import,no-name-in-module,import-error
-import pytest
 import typing
+import pytest
 
 from caterpillar._core import atom, typeof, Field, sizeof, fieldatom
-from caterpillar._core import unpack, layer
+from caterpillar._core import unpack, layer, Struct, pack, ContextPath
 
 
 # This atom class will only be able to return its associated
@@ -25,6 +25,9 @@ class Baz(fieldatom):
     def __unpack__(self, ctx: layer):
         return int.from_bytes(ctx.state.read(2))
 
+    def __pack__(self, obj, ctx: layer):
+        ctx.state.write(obj.to_bytes(2, "big"))
+
 
 def test_typeof():
     # The default behaviour is to call __type__ on the given
@@ -40,16 +43,12 @@ def test_typeof():
     assert typeof(field) == typing.List[str]
 
     field2 = Field(f, switch={1: atom()})
-    with pytest.raises(NotImplementedError):
-        # We can't know the type of a switch atom which does
-        # not implement the __type__ method
-        _ = typeof(field2)
-
-    field2.switch[2] = Foo()
-    assert typeof(field2) == typing.Union[str]
-
+    # We can't know the type of a switch atom which does
+    # not implement the __type__ method
+    assert typeof(Field(atom())) == typing.Any
+    assert typeof(field2) == typing.Union[typing.Any, str]
     # switch and length can be combined as well
-    assert typeof(field2[2]) == typing.List[typing.Union[str]]
+    assert typeof(field2[2]) == typing.List[typing.Union[typing.Any, str]]
 
 
 def test_sizeof():
@@ -92,3 +91,78 @@ def test_unpack_basic():
     # returned atom will be used to parse the rest of the data.
     assert unpack(data, b >> {1: b}) == 2
     assert unpack(data, b @ 0x0002) == 2
+
+
+def test_unpack_struct():
+    # In order to unpack structs, we first need a class definition
+    # with a constructor addressing all defined fields.
+    data = b"\x00\x01\x00\x02"
+
+    class SFoo:
+        a: Baz()
+        b: Baz()
+
+        # REVISIT: maybe provide a default implementation
+        def __eq__(self, other):
+            return self.a == other.a and self.b == other.b
+
+    # Simply create the struct using the class definition
+    s = Struct(SFoo, alter_model=True)
+    assert unpack(data, s) == SFoo(a=1, b=2)
+
+
+def test_unpack_struct_cp():
+    # CASE: a struct definition with an array of data, which
+    # length is computed by a context lambda.
+    cp = ContextPath("obj.a")
+    data = b"\x00\x01\x00\x02"
+
+    class SFoo:
+        a: Baz()
+        b: Baz()[cp]
+
+        # REVISIT: maybe provide a default implementation
+        def __eq__(self, other):
+            return self.a == other.a and self.b == other.b
+
+    # Simply create the struct using the class definition
+    s = Struct(SFoo, alter_model=True)
+    assert unpack(data, s) == SFoo(a=1, b=[2])
+
+
+def test_pack_basic():
+    # The packing will be done by calling __pack__ on the
+    # target atom.
+    b = Baz()
+    # Same as in test_unpack_basic
+    assert pack(1, b) == b"\x00\x01"
+    assert pack([1, 2], b[2]) == b"\x00\x01\x00\x02"
+    assert pack([2], b[b::]) == b"\x00\x01\x00\x02"
+    # NOTE: not implemented yet
+    assert pack(2, b @ 0x0002) == b""
+
+
+def test_pack_struct():
+    # Same scheme as described in test_unpack_struct
+    class SBar:
+        a: Baz()
+        b: Baz()
+
+    s = Struct(SBar, alter_model=True)
+    assert pack(SBar(a=1, b=2), s) == b"\x00\x01\x00\x02"
+
+
+def test_pack_struct_cp():
+    # CASE: a struct definition with an array of data, which
+    # length is computed by a context lambda.
+    cp = ContextPath("obj.a")
+
+    # The next class for illustrating the use of context
+    # lambdas. Please use Baz()[Baz()::] as a shortcut.
+    class SBaz:
+        a: Baz()  # the length of the following field
+        b: Baz()[cp]  # obj.a is evaluated before packing
+        # the data
+
+    s = Struct(SBaz, alter_model=True)
+    assert pack(SBaz(a=1, b=[2]), s) == b"\x00\x01\x00\x02"

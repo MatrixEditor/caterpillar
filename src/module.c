@@ -495,14 +495,18 @@ PyInit__core(void)
     "S_EVAL_ANNOTATIONS",
     CpObject_Create(&CpOption_Type, "s", "struct:eval_annotations"));
   CpModuleState_AddObject(
-    cp_option__dynamic,
+    cp_option__replace_types,
     "S_REPLACE_TYPES",
     CpObject_Create(&CpOption_Type, "s", "struct:replace_types"));
   CpModuleState_AddObject(
-    cp_option__dynamic,
+    cp_option__discard_unnamed,
     "S_DISCARD_UNNAMED",
     CpObject_Create(&CpOption_Type, "s", "struct:discard_unnamed"));
-  CpModuleState_AddObject(cp_option__dynamic,
+  CpModuleState_AddObject(
+    cp_option__discard_const,
+    "S_DISCARD_CONST",
+    CpObject_Create(&CpOption_Type, "s", "struct:discard_const"));
+  CpModuleState_AddObject(cp_option__slots,
                           "S_SLOTS",
                           CpObject_Create(&CpOption_Type, "s", "struct:slots"));
 

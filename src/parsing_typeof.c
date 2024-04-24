@@ -58,9 +58,19 @@ CpTypeOf_Field(CpFieldObject* op)
     if (!types) {
       goto err;
     }
+    PyObject *atomType = CpTypeOf(op->m_atom);
+    if (!atomType) {
+      Py_XDECREF(types);
+      goto err;
+    }
+    if (PyList_Append(types, atomType) < 0) {
+      Py_XDECREF(types);
+      goto err;
+    }
 
     PyObject* values = PyDict_Values(op->m_switch);
     if (!values) {
+      Py_XDECREF(types);
       goto err;
     }
 
@@ -70,16 +80,18 @@ CpTypeOf_Field(CpFieldObject* op)
       PyObject* value = PyList_GetItem(values, i);
       if (!value) {
         Py_XDECREF(values);
+        Py_XDECREF(types);
         goto err;
       }
 
       switch_type = CpTypeOf(value);
       if (!switch_type) {
         Py_XDECREF(values);
+        Py_XDECREF(types);
         goto err;
       }
 
-      if (!PySequence_Contains(switch_types, switch_type)) {
+      if (!PySequence_Contains(types, switch_type)) {
         PyList_Append(types, switch_type);
       }
       Py_XDECREF(switch_type);
@@ -87,7 +99,8 @@ CpTypeOf_Field(CpFieldObject* op)
     }
 
     Py_XDECREF(values);
-    PyObject* tuple = PyList_AsTuple(switch_types);
+    PyObject* tuple = PyList_AsTuple(types);
+    Py_XDECREF(types);
     if (!tuple) {
       goto err;
     }
@@ -110,7 +123,6 @@ CpTypeOf_Field(CpFieldObject* op)
   return type;
 err:
   Py_XDECREF(type);
-  Py_XDECREF(switch_types);
   return NULL;
 }
 
