@@ -1,7 +1,7 @@
 # pylint: disable=unused-import, no-name-in-module
 import pytest
 
-from caterpillar._core import Context, ContextPath
+from caterpillar._C import Context, ContextPath
 
 
 def test_context_init():

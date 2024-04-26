@@ -1,7 +1,7 @@
 # pylint: disable=unused-import,no-name-in-module,import-error
 import pytest
 
-from caterpillar._core import atom, Struct
+from caterpillar._C import atom, Struct
 
 
 def test_struct_init():

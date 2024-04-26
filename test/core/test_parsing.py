@@ -2,8 +2,8 @@
 import typing
 import pytest
 
-from caterpillar._core import atom, typeof, Field, sizeof, fieldatom
-from caterpillar._core import unpack, layer, Struct, pack, ContextPath
+from caterpillar._C import atom, typeof, Field, sizeof, fieldatom
+from caterpillar._C import unpack, layer, Struct, pack, ContextPath
 
 
 # This atom class will only be able to return its associated

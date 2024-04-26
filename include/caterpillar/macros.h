@@ -20,9 +20,10 @@
 #ifndef PY_SSIZE_T_CLEAN
 #define PY_SSIZE_T_CLEAN
 #endif
+
 #include <Python.h>
 
-#define _Cp_Name(x) ("caterpillar._core." #x)
+#define _Cp_Name(x) ("caterpillar._C." #x)
 
 #define _Cp_SetObj(varname, value)                                             \
   if (value) {                                                                 \

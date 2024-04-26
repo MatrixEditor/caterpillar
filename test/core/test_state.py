@@ -1,7 +1,7 @@
 # pylint: disable=unused-import,no-name-in-module,import-error
 import pytest
 
-from caterpillar._core import State, layer, ContextPath, Context
+from caterpillar._C import State, layer, ContextPath, Context
 
 
 # State and layer each implement the context protocol, we

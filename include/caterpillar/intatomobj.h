@@ -23,7 +23,7 @@
 
 typedef struct _intatomobj
 {
-  CpFieldCAtom_HEAD;
+  CpFieldCAtom_HEAD
 
   /// Stores the amount of bytes this integer atom
   /// has in total

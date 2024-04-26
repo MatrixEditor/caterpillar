@@ -28,7 +28,7 @@
  */
 typedef struct CpStructFieldInfo
 {
-  PyObject_HEAD;
+  PyObject_HEAD
 
   /// the referenced field object
   CpFieldObject* m_field;
@@ -82,7 +82,7 @@ PyAPI_FUNC(CpStructFieldInfoObject*) CpStructFieldInfo_New(CpFieldObject* field)
  */
 typedef struct _structobj
 {
-  CpFieldAtom_HEAD;
+  CpFieldAtom_HEAD
   PyTypeObject* m_model; // underlying class
 
   PyObject* m_members; // Dict[str, FieldInfo]

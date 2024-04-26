@@ -1,7 +1,7 @@
 # pylint: disable=unused-import,no-name-in-module,import-error
 import pytest
 
-from caterpillar._core import atom, catom, fieldatom, fieldcatom
+from caterpillar._C import atom, catom, fieldatom, fieldcatom
 
 
 def test_atom_init():

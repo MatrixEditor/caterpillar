@@ -1,8 +1,8 @@
 # pylint: disable=no-name-in-module,unused-import
 import pytest
 
-from caterpillar._core import Option
-from caterpillar._core import (
+from caterpillar._C import Option
+from caterpillar._C import (
     F_DYNAMIC,
     F_SEQUENTIAL,
     S_DISCARD_UNNAMED,
@@ -11,7 +11,7 @@ from caterpillar._core import (
     S_UNION,
     S_EVAL_ANNOTATIONS,
 )
-from caterpillar._core import FIELD_OPTIONS, STRUCT_OPTIONS
+from caterpillar._C import FIELD_OPTIONS, STRUCT_OPTIONS
 
 
 @pytest.mark.parametrize(

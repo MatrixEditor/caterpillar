@@ -1,8 +1,8 @@
 # pylint: disable=unused-import,no-name-in-module,import-error
 import pytest
 
-from caterpillar._core import Field, fieldatom, atom
-from caterpillar._core import NATIVE_ENDIAN, HOST_ARCH, F_DYNAMIC
+from caterpillar._C import Field, fieldatom, atom
+from caterpillar._C import NATIVE_ENDIAN, HOST_ARCH, F_DYNAMIC
 
 
 def test_field_init():

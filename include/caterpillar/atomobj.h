@@ -227,7 +227,7 @@ typedef PyObject* (*bitsfunc)(PyObject*);
  */
 typedef struct _catomobj
 {
-  CpAtom_HEAD;
+  CpAtom_HEAD
 
   // C functions to implement
   sizefunc ob_size;

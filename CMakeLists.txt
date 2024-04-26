@@ -7,7 +7,7 @@ find_package(
   REQUIRED)
 
 python_add_library(
-  _core
+  _C
   MODULE
 
   src/arch.c
@@ -30,8 +30,8 @@ python_add_library(
   WITH_SOABI
 )
 
-target_include_directories(_core PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(_C PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 message(STATUS "CMake ${CMAKE_VERSION}")
 message(STATUS "Python ${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}")
-install(TARGETS _core DESTINATION caterpillar)
+install(TARGETS _C DESTINATION caterpillar)

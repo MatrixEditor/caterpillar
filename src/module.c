@@ -399,7 +399,7 @@ static PyMethodDef _module_methods[] = {
 
 PyModuleDef CpModule = {
   PyModuleDef_HEAD_INIT, /* m_base */
-  "caterpillar._core",   /* m_name */
+  "caterpillar._C",      /* m_name */
   NULL,                  /* m_doc */
   sizeof(_modulestate),  /* m_size */
   _module_methods,       /* m_methods */
@@ -411,7 +411,7 @@ PyModuleDef CpModule = {
 
 /* module init */
 PyMODINIT_FUNC
-PyInit__core(void)
+PyInit__C(void)
 {
   PyObject* m;
   m = PyState_FindModule(&CpModule);

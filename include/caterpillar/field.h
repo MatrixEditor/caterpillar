@@ -29,7 +29,7 @@
  */
 typedef struct _fieldobj
 {
-  PyObject_HEAD;
+  PyObject_HEAD
 
   /// The name of this field
   PyObject* m_name;
@@ -182,7 +182,7 @@ PyAPI_FUNC(PyObject*)
  */
 typedef struct _fieldatomobj
 {
-  CpAtom_HEAD;
+  CpAtom_HEAD
 } CpFieldAtomObject;
 
 /// Field atom type
@@ -212,7 +212,7 @@ PyAPI_DATA(PyTypeObject) CpFieldAtom_Type;
 // field C atom
 typedef struct _fieldcatomobj
 {
-  CpCAtom_HEAD;
+  CpCAtom_HEAD
 } CpFieldCAtomObject;
 
 /// Field C atom type

@@ -38,8 +38,7 @@
  */
 typedef struct _stateobj
 {
-  PyObject_HEAD;
-  _modulestate* mod;
+  PyObject_HEAD _modulestate* mod;
 
   /// The current The input or output stream. This object MUST implement the
   /// stream protocol (read, write, seek and tell).
@@ -135,10 +134,10 @@ struct _layerobj;
  */
 typedef struct _layerobj
 {
-  PyObject_HEAD;
+  PyObject_HEAD
 
-  /// The parent layer
-  struct _layerobj* m_parent;
+    /// The parent layer
+    struct _layerobj* m_parent;
 
   /// the global parsing state
   CpStateObject* m_state;
