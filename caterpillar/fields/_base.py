@@ -203,8 +203,12 @@ class Field:
         self.offset = offset
         # This operation automatically removes the "keep_position"
         # flag. It has to be set manually.
-        if self.offset != -1:
-            self.flags.pop(F_KEEP_POSITION, None)
+        # NOTE: The check does not need to be done if the given value
+        # is a context lambda. Otherwise it would add the __ne__ operation
+        # to the context lambda, which would be an unintended side effect.
+        if isinstance(self.offset, int) and self.offset != -1:
+            # pylint: disable-next=protected-access
+            self.flags.pop(F_KEEP_POSITION._hash_, None)
         return self
 
     def __getitem__(self, dim: Union[_ContextLambda, int, _GreedyType]) -> Self:
