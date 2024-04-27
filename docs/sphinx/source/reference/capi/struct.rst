@@ -9,7 +9,7 @@ named and *unnamed* fields. Internally, PEP 526 *__annotations__* are used
 to determine fields. In contrast to the Python implementation, this native approach
 does not create a dataclass of the model.
 
-.. c:var:: PyTypeObject PyStruct_Type
+.. c:var:: PyTypeObject CpStruct_Type
 
     The type object for the :c:type:`CpStruct` class.
 
@@ -19,7 +19,7 @@ implementation differs. For instance, because the C approach does not use the da
 module, methods such as :code:`__hash__`, :code:`__eq__`, and :code:`__repr__` are not
 generated (at least for now).
 
-.. c:type:: CpStruct
+.. c:type:: CpStructObject
 
     A core element of this library and is the base class for all structs. It is not
     recommended to extend this class, as its Python variant already covers possible
@@ -33,7 +33,7 @@ generated (at least for now).
 To manage field definitions, the :c:type:`CpStruct` class stores all discovered fields
 in an internal dictionary using an extra type:
 
-.. c:type:: CpStructFieldInfo
+.. c:type:: CpStructFieldInfoObject
 
     Container class that stores a reference to the field from a struct. This type was
     introduced to store additional settings and configuration data for a field.
@@ -52,13 +52,13 @@ in an internal dictionary using an extra type:
     If passing custom options to the struct is necessary, the :c:var:`CpStruct_Type`
     should be called directly.
 
-.. c:function:: PyObject* CpStruct_GetStruct(PyObject* m, _coremodulestate* s)
+.. c:function:: PyObject* CpStructModel_GetStruct(PyObject* m, _coremodulestate* s)
 
     Searches for :code:`__struct__` attribute in the given class and returns it,
     or *NULL* if not found. The state can be *NULL*.
 
 
-.. c:function:: int CpStruct_CheckModel(PyObject* m, _coremodulestate* s)
+.. c:function:: int CpStructModel_Check(PyObject* m, _coremodulestate* s)
 
     Returns ``1`` if the model stores a :c:type:`CpStruct` instance and therefore
     conforms to the *StructContainer* protocol, ``0`` otherwise. This function

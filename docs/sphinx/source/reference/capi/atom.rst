@@ -10,7 +10,7 @@ designed to incorporate packing and unpacking of data streams as well
 as calculating its size and measuring its type.
 
 
-.. c:type:: CpAtom
+.. c:type:: CpAtomObject
 
     All classes that implement capabilities of an *atom* should inherit
     from this class. It defines, but does not implement all four protocol
@@ -22,6 +22,8 @@ as calculating its size and measuring its type.
 
     The type object of the :c:type:`CpAtom` class.
 
+
+*The following functions are subject to change in the next release.*
 
 .. c:function:: PyObject *CpAtom_CallPack(PyObject* self, PyObject* name, PyObject* o, PyObject* ctx)
 
@@ -55,8 +57,8 @@ as calculating its size and measuring its type.
     :code:`self`. This method will return *NULL* if an error occurs while calling the target
     function.
 
-.. c:function:: int CpAtomType_CanPack(PyObject* o)
-                int CpAtomType_FastCanPack(PyObject* o, _coremodulestate* state)
+.. c:function:: int CpAtom_CanPack(PyObject* o)
+                int CpAtom_FastCanPack(PyObject* o, _coremodulestate* state)
 
     Return ``1`` if the object provides an interface of packing other
     objects and ``0`` otherwise. Note that it returns ``1`` for classes
@@ -64,8 +66,8 @@ as calculating its size and measuring its type.
     be packed can not be determined by introspection.
 
 
-.. c:function:: int CpAtomType_CanUnpack(PyObject* o)
-                int CpAtomType_FastCanUnpack(PyObject* o, _coremodulestate* state)
+.. c:function:: int CpAtom_CanUnpack(PyObject* o)
+                int CpAtom_FastCanUnpack(PyObject* o, _coremodulestate* state)
 
     Return ``1`` if the object provides an interface of unpacking other
     objects and ``0`` otherwise. Note that it returns ``1`` for classes
@@ -73,8 +75,8 @@ as calculating its size and measuring its type.
     to be unpacked can not be determined by introspection.
 
 
-.. c:function:: int CpAtomType_HasType(PyObject* o)
-                int CpAtomType_FastHasType(PyObject* o, _coremodulestate* state)
+.. c:function:: int CpAtom_HasType(PyObject* o)
+                int CpAtom_FastHasType(PyObject* o, _coremodulestate* state)
 
     Returns ``1`` if the object provides a method of determining the type
     this object (usually an atom) represents and ``0`` otherwise. As all
@@ -82,8 +84,8 @@ as calculating its size and measuring its type.
     :meth:`~object.__type__` method.
 
 
-.. c:function:: int CpAtomType_HasSize(PyObject* o)
-                int CpAtomType_FastHasSize(PyObject* o, _coremodulestate* state)
+.. c:function:: int CpAtom_HasSize(PyObject* o)
+                int CpAtom_FastHasSize(PyObject* o, _coremodulestate* state)
 
     Searches for :meth:`~object.__size__`, returns ``1`` if it is
     present and ``0`` otherwise.
