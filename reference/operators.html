@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>3. Operators &#8212; Caterpillar 1.0.0-b3 documentation</title>
+    <title>Operators &#8212; Caterpillar 2.0.0-b2 documentation</title>
   
   
   
@@ -36,15 +36,15 @@
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../_static/documentation_options.js?v=5f3efc5a"></script>
+    <script src="../_static/documentation_options.js?v=7e1387d2"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/design-tabs.js?v=36754332"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'reference/operators';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Library" href="../library/index.html" />
-    <link rel="prev" title="2. Data Model" href="datamodel.html" />
+    <link rel="next" title="Abstract Objects Layer" href="capi/abstract.html" />
+    <link rel="prev" title="Data Model" href="datamodel.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -132,7 +132,7 @@ fetch("https://raw.githubusercontent.com/MatrixEditor/caterpillar/master/docs/so
   
   
   
-    <p class="title logo__title">Caterpillar</p>
+    <p class="title logo__title">Caterpillar 2.0.0-b2</p>
   
 </a></div>
     
@@ -358,10 +358,16 @@ document.write(`
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="introduction.html">1. Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="datamodel.html">2. Data Model</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">3. Operators</a></li>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Python Reference</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datamodel.html">Data Model</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Operators</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">C API Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="capi/abstract.html">Abstract Objects Layer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="capi/objimpl.html">Concrete Objects Layer</a></li>
 </ul>
 </div>
 </nav></div>
@@ -402,7 +408,7 @@ document.write(`
     
     <li class="breadcrumb-item"><a href="index.html" class="nav-link">Reference</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span...</li>
+    <li class="breadcrumb-item active" aria-current="page">Operators</li>
   </ul>
 </nav>
 </div>
@@ -420,14 +426,14 @@ document.write(`
                 <article class="bd-article">
                   
   <section id="operators">
-<span id="id1"></span><h1><span class="section-number">3. </span>Operators<a class="headerlink" href="#operators" title="Link to this heading">#</a></h1>
+<span id="id1"></span><h1>Operators<a class="headerlink" href="#operators" title="Link to this heading">#</a></h1>
 <p><em>TODO: describe all supported operators</em></p>
 <p><em>Caterpillar</em> supports various operators for <a class="reference internal" href="../library/model.html#caterpillar.model.Sequence" title="caterpillar.model.Sequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>,
 <a class="reference internal" href="../library/model.html#caterpillar.model.Struct" title="caterpillar.model.Struct"><code class="xref py py-class docutils literal notranslate"><span class="pre">Struct</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code>, and custom struct implementations
 <a class="footnote-reference brackets" href="#id3" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. This section provides an overview of the operators that can be used with
 structs, including special context operations.</p>
 <section id="struct-operators">
-<h2><span class="section-number">3.1. </span>Struct operators<a class="headerlink" href="#struct-operators" title="Link to this heading">#</a></h2>
+<h2>Struct operators<a class="headerlink" href="#struct-operators" title="Link to this heading">#</a></h2>
 <p>All functions described below return a new <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code> instance if not already
 called on a field object.</p>
 <dl class="py function">
@@ -572,7 +578,7 @@ support more than two elements.</p>
 
 </section>
 <section id="field-specific-operations">
-<h2><span class="section-number">3.2. </span>Field specific operations<a class="headerlink" href="#field-specific-operations" title="Link to this heading">#</a></h2>
+<h2>Field specific operations<a class="headerlink" href="#field-specific-operations" title="Link to this heading">#</a></h2>
 <p>The following methods are specifically designed for fields and will only affect those. Even though these
 operations are also supported on sequence objects, only the returning <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code> object will be affected.</p>
 <dl class="py function">
@@ -606,7 +612,7 @@ their meaning is described in <a class="reference internal" href="../library/opt
 
 </section>
 <section id="sequence-specific-operators">
-<h2><span class="section-number">3.3. </span>Sequence specific operators<a class="headerlink" href="#sequence-specific-operators" title="Link to this heading">#</a></h2>
+<h2>Sequence specific operators<a class="headerlink" href="#sequence-specific-operators" title="Link to this heading">#</a></h2>
 <p>The following functions have been implemented to provide a user-friendly interface for
 extending <a class="reference internal" href="../library/model.html#caterpillar.model.Sequence" title="caterpillar.model.Sequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a> objects. All subclasses inherit this
 functionality as well.</p>
@@ -643,7 +649,7 @@ internal model representation.</p>
 
 </section>
 <section id="context-specific-operations">
-<h2><span class="section-number">3.4. </span>Context specific operations<a class="headerlink" href="#context-specific-operations" title="Link to this heading">#</a></h2>
+<h2>Context specific operations<a class="headerlink" href="#context-specific-operations" title="Link to this heading">#</a></h2>
 <p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code> implements attribute-like access on top of a dictionary, where the requested
 path is resolved recursively. For instance, the path <code class="code docutils literal notranslate"><span class="pre">&quot;foo.bar.baz&quot;</span></code> will be split into
 three parts and then <code class="code docutils literal notranslate"><span class="pre">getattr</span></code> is called until the final element has been reached or an
@@ -651,7 +657,7 @@ error occurs.</p>
 <p>To enhance the facilities of a <code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code> instance, there are special classes with even more
 special operations.</p>
 <section id="context-path">
-<h3><span class="section-number">3.4.1. </span>Context path<a class="headerlink" href="#context-path" title="Link to this heading">#</a></h3>
+<h3>Context path<a class="headerlink" href="#context-path" title="Link to this heading">#</a></h3>
 <p>The context path takes a special place, as it can provide lazy execution of almost all operators
 on definition. Its attribute-access model results in a new <code class="xref py py-class docutils literal notranslate"><span class="pre">ContextPath</span></code> instance.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">ContextPath</span><span class="p">(</span><span class="s2">&quot;foo&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">bar</span><span class="o">.</span><span class="n">baz</span>
@@ -708,15 +714,15 @@ the value from the context.</p>
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title"><span class="section-number">2. </span>Data Model</p>
+        <p class="prev-next-title">Data Model</p>
       </div>
     </a>
     <a class="right-next"
-       href="../library/index.html"
+       href="capi/abstract.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Library</p>
+        <p class="prev-next-title">Abstract Objects Layer</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -738,7 +744,7 @@ the value from the context.</p>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#struct-operators">3.1. Struct operators</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#struct-operators">Struct operators</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#struct.__getitem__"><code class="docutils literal notranslate"><span class="pre">struct.__getitem__()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#struct.__rshift__"><code class="docutils literal notranslate"><span class="pre">struct.__rshift__()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#struct.__matmul__"><code class="docutils literal notranslate"><span class="pre">struct.__matmul__()</span></code></a></li>
@@ -747,22 +753,22 @@ the value from the context.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#struct.__and__"><code class="docutils literal notranslate"><span class="pre">struct.__and__()</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#field-specific-operations">3.2. Field specific operations</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#field-specific-operations">Field specific operations</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#field.__or__"><code class="docutils literal notranslate"><span class="pre">field.__or__()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#field.__ior__"><code class="docutils literal notranslate"><span class="pre">field.__ior__()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#field.__xor__"><code class="docutils literal notranslate"><span class="pre">field.__xor__()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#field.__ixor__"><code class="docutils literal notranslate"><span class="pre">field.__ixor__()</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sequence-specific-operators">3.3. Sequence specific operators</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sequence-specific-operators">Sequence specific operators</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sequence.__add__"><code class="docutils literal notranslate"><span class="pre">sequence.__add__()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sequence.__iadd__"><code class="docutils literal notranslate"><span class="pre">sequence.__iadd__()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sequence.__sub__"><code class="docutils literal notranslate"><span class="pre">sequence.__sub__()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sequence.__isub__"><code class="docutils literal notranslate"><span class="pre">sequence.__isub__()</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#context-specific-operations">3.4. Context specific operations</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#context-path">3.4.1. Context path</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#context-specific-operations">Context specific operations</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#context-path">Context path</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#path.__call__"><code class="docutils literal notranslate"><span class="pre">path.__call__()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#path.__getitem__"><code class="docutils literal notranslate"><span class="pre">path.__getitem__()</span></code></a></li>
 </ul>
@@ -806,7 +812,7 @@ the value from the context.</p>
 
   <p class="copyright">
     
-      © Copyright 2023, MatrixEditor.
+      © Copyright 2024, MatrixEditor.
       <br/>
     
   </p>

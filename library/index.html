@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Library &#8212; Caterpillar 1.0.0-b3 documentation</title>
+    <title>Library &#8212; Caterpillar 2.0.0-b2 documentation</title>
   
   
   
@@ -36,15 +36,15 @@
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../_static/documentation_options.js?v=5f3efc5a"></script>
+    <script src="../_static/documentation_options.js?v=7e1387d2"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/design-tabs.js?v=36754332"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'library/index';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="1. Byteorder and Architecture" href="byteorder.html" />
-    <link rel="prev" title="3. Operators" href="../reference/operators.html" />
+    <link rel="next" title="Byteorder and Architecture" href="byteorder.html" />
+    <link rel="prev" title="Struct Objects" href="../reference/capi/struct.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -132,7 +132,7 @@ fetch("https://raw.githubusercontent.com/MatrixEditor/caterpillar/master/docs/so
   
   
   
-    <p class="title logo__title">Caterpillar</p>
+    <p class="title logo__title">Caterpillar 2.0.0-b2</p>
   
 </a></div>
     
@@ -358,14 +358,25 @@ document.write(`
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="byteorder.html">1. Byteorder and Architecture</a></li>
-<li class="toctree-l1"><a class="reference internal" href="options.html">2. Options</a></li>
-<li class="toctree-l1"><a class="reference internal" href="abc.html">3. Abstract base classes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="context.html">4. Context</a></li>
-<li class="toctree-l1"><a class="reference internal" href="model.html">5. Struct Model</a></li>
-<li class="toctree-l1"><a class="reference internal" href="fields/index.html">6. Fields</a></li>
-<li class="toctree-l1"><a class="reference internal" href="exceptions.html">7. Exceptions</a></li>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Basic Core classes</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="byteorder.html">Byteorder and Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="options.html">Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="abc.html">Abstract base classes</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Context and Exceptions</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="context.html">Context</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exceptions.html">Exceptions</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Struct model</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="model.html">Struct Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fields/index.html">Fields</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">C API</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="capi/endian.html">Endian / Byteorder</a></li>
 </ul>
 </div>
 </nav></div>
@@ -424,49 +435,66 @@ document.write(`
 <span id="library-index"></span><h1>Library<a class="headerlink" href="#library" title="Link to this heading">#</a></h1>
 <p><em>descriptions are WIP</em></p>
 <div class="toctree-wrapper compound">
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Basic Core classes</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="byteorder.html">1. Byteorder and Architecture</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="byteorder.html#id1">1.1. Byteorder</a></li>
-<li class="toctree-l2"><a class="reference internal" href="byteorder.html#architecture">1.2. Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="byteorder.html">Byteorder and Architecture</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="byteorder.html#id1">Byteorder</a></li>
+<li class="toctree-l2"><a class="reference internal" href="byteorder.html#architecture">Architecture</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="options.html">2. Options</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="options.html#options-by-type">2.1. Options by type</a></li>
-<li class="toctree-l2"><a class="reference internal" href="options.html#interface">2.2. Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="options.html">Options</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="options.html#options-by-type">Options by type</a></li>
+<li class="toctree-l2"><a class="reference internal" href="options.html#interface">Interface</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="abc.html">3. Abstract base classes</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="abc.html#struct">3.1. Struct</a></li>
-<li class="toctree-l2"><a class="reference internal" href="abc.html#context">3.2. Context</a></li>
-<li class="toctree-l2"><a class="reference internal" href="abc.html#other-base-classes">3.3. Other base classes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="abc.html#standard-interface">3.4. Standard interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="abc.html">Abstract base classes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="abc.html#struct">Struct</a></li>
+<li class="toctree-l2"><a class="reference internal" href="abc.html#context">Context</a></li>
+<li class="toctree-l2"><a class="reference internal" href="abc.html#other-base-classes">Other base classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="abc.html#standard-interface">Standard interface</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="context.html">4. Context</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="context.html#context-classes">4.1. Context classes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="context.html#special-paths">4.2. Special paths</a></li>
-<li class="toctree-l2"><a class="reference internal" href="context.html#special-attributes">4.3. Special Attributes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="context.html#expressions">4.4. Expressions</a></li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Context and Exceptions</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="context.html">Context</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="context.html#context-classes">Context classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="context.html#special-paths">Special paths</a></li>
+<li class="toctree-l2"><a class="reference internal" href="context.html#special-attributes">Special Attributes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="context.html#expressions">Expressions</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="model.html">5. Struct Model</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="model.html#base-classes">5.1. Base classes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="model.html#standard-functions">5.2. Standard functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="model.html#templates">5.3. Templates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exceptions.html">Exceptions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="exceptions.html#runtime-exceptions">Runtime exceptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="exceptions.html#formal-exceptions">Formal exceptions</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="fields/index.html">6. Fields</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="fields/field_model.html">6.1. Field Model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fields/common.html">6.2. Common Structs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fields/compression.html">6.3. Compression Structs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fields/crypto.html">6.4. Cryptographic Structs</a></li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Struct model</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="model.html">Struct Model</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="model.html#base-classes">Base classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.html#standard-functions">Standard functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.html#templates">Templates</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="exceptions.html">7. Exceptions</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="exceptions.html#runtime-exceptions">7.1. Runtime exceptions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="exceptions.html#formal-exceptions">7.2. Formal exceptions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fields/index.html">Fields</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="fields/field_model.html">Field Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fields/common.html">Common Structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fields/compression.html">Compression Structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fields/crypto.html">Cryptographic Structs</a></li>
 </ul>
 </li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">C API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="capi/endian.html">Endian / Byteorder</a></li>
 </ul>
 </div>
 </section>
@@ -482,12 +510,12 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="../reference/operators.html"
+       href="../reference/capi/struct.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title"><span class="section-number">3. </span>Operators</p>
+        <p class="prev-next-title">Struct Objects</p>
       </div>
     </a>
     <a class="right-next"
@@ -495,7 +523,7 @@ document.write(`
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">1. </span>Byteorder and Architecture</p>
+        <p class="prev-next-title">Byteorder and Architecture</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -543,7 +571,7 @@ document.write(`
 
   <p class="copyright">
     
-      © Copyright 2023, MatrixEditor.
+      © Copyright 2024, MatrixEditor.
       <br/>
     
   </p>

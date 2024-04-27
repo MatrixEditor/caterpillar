@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>2. Data Model &#8212; Caterpillar 1.0.0-b3 documentation</title>
+    <title>Data Model &#8212; Caterpillar 2.0.0-b2 documentation</title>
   
   
   
@@ -36,15 +36,15 @@
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../_static/documentation_options.js?v=5f3efc5a"></script>
+    <script src="../_static/documentation_options.js?v=7e1387d2"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/design-tabs.js?v=36754332"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'reference/datamodel';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="3. Operators" href="operators.html" />
-    <link rel="prev" title="1. Introduction" href="introduction.html" />
+    <link rel="next" title="Operators" href="operators.html" />
+    <link rel="prev" title="Introduction" href="introduction.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -132,7 +132,7 @@ fetch("https://raw.githubusercontent.com/MatrixEditor/caterpillar/master/docs/so
   
   
   
-    <p class="title logo__title">Caterpillar</p>
+    <p class="title logo__title">Caterpillar 2.0.0-b2</p>
   
 </a></div>
     
@@ -358,10 +358,16 @@ document.write(`
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="introduction.html">1. Introduction</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">2. Data Model</a></li>
-<li class="toctree-l1"><a class="reference internal" href="operators.html">3. Operators</a></li>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Python Reference</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Data Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operators.html">Operators</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">C API Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="capi/abstract.html">Abstract Objects Layer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="capi/objimpl.html">Concrete Objects Layer</a></li>
 </ul>
 </div>
 </nav></div>
@@ -402,7 +408,7 @@ document.write(`
     
     <li class="breadcrumb-item"><a href="index.html" class="nav-link">Reference</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span...</li>
+    <li class="breadcrumb-item active" aria-current="page">Data Model</li>
   </ul>
 </nav>
 </div>
@@ -420,9 +426,9 @@ document.write(`
                 <article class="bd-article">
                   
   <section id="data-model">
-<span id="datamodel"></span><h1><span class="section-number">2. </span>Data Model<a class="headerlink" href="#data-model" title="Link to this heading">#</a></h1>
+<span id="datamodel"></span><h1>Data Model<a class="headerlink" href="#data-model" title="Link to this heading">#</a></h1>
 <section id="structs-sequences-and-fields">
-<span id="objects"></span><h2><span class="section-number">2.1. </span>Structs, Sequences and Fields<a class="headerlink" href="#structs-sequences-and-fields" title="Link to this heading">#</a></h2>
+<span id="objects"></span><h2>Structs, Sequences and Fields<a class="headerlink" href="#structs-sequences-and-fields" title="Link to this heading">#</a></h2>
 <p><em class="dfn">Structs</em> serve as the foundation of this library. All data within the framework
 undergoes the process of packing and unpacking using structs or <a class="reference internal" href="../library/abc.html#caterpillar.abc._StructLike" title="caterpillar.abc._StructLike"><code class="xref py py-class docutils literal notranslate"><span class="pre">_StructLike</span></code></a>
 objects. There are three possible types of structs:</p>
@@ -454,11 +460,11 @@ structs is essential when aiming to extend the capabilities of this framework.</
 </ul>
 </section>
 <section id="standard-types">
-<h2><span class="section-number">2.2. </span>Standard Types<a class="headerlink" href="#standard-types" title="Link to this heading">#</a></h2>
+<h2>Standard Types<a class="headerlink" href="#standard-types" title="Link to this heading">#</a></h2>
 <p>Below is a list of types provided by <em>Caterpillar</em>. These types are designed to maintain
 compatibility with older versions of the library, making them particularly important.</p>
 <section id="sequence">
-<h3><span class="section-number">2.2.1. </span>Sequence<a class="headerlink" href="#sequence" title="Link to this heading">#</a></h3>
+<h3>Sequence<a class="headerlink" href="#sequence" title="Link to this heading">#</a></h3>
 <p>As previously explained, a sequence functions independently of fields. The library introduces
 the <a class="reference internal" href="../library/model.html#caterpillar.model.Sequence" title="caterpillar.model.Sequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a> as a named finite collection of <a class="reference internal" href="../library/fields/field_model.html#caterpillar.fields.Field" title="caterpillar.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a> objects. A <em>Sequence</em>
 operates on a model, which is a string-to-field mapping by default. Later, we will discuss
@@ -513,7 +519,7 @@ The <a class="reference internal" href="../library/model.html#caterpillar.model.
 </pre></div>
 </div>
 <section id="struct">
-<h4><span class="section-number">2.2.1.1. </span>Struct<a class="headerlink" href="#struct" title="Link to this heading">#</a></h4>
+<h4>Struct<a class="headerlink" href="#struct" title="Link to this heading">#</a></h4>
 <p>A <em>struct</em> describes a finite collection of named fields. In contrast to a <em>sequence</em>, a <em>struct</em>
 utilizes Python classes as its model. The annotation feature in Python enables the definition of
 custom types as annotations, enabling this special struct class to create a model solely based on
@@ -616,7 +622,7 @@ workarounds to that problem, which are discussed in the API documentation of <a 
 </div>
 </section>
 <section id="union">
-<span id="union-reference"></span><h4><span class="section-number">2.2.1.2. </span>Union<a class="headerlink" href="#union" title="Link to this heading">#</a></h4>
+<span id="union-reference"></span><h4>Union<a class="headerlink" href="#union" title="Link to this heading">#</a></h4>
 <p>Internally constructing unions in the library poses challenges. The current implementation uses
 the predefined behavior of the <a class="reference internal" href="../library/model.html#caterpillar.model.Sequence" title="caterpillar.model.Sequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a> class for union types. It selects the field with
 the greatest length as its representational size. <em>Unions</em>, much like <em>BitFields</em>, must store a static
@@ -650,7 +656,7 @@ executes <em>unpack</em> on all other fields.</p>
 </div>
 </section>
 <section id="bitfield">
-<h4><span class="section-number">2.2.1.3. </span>BitField<a class="headerlink" href="#bitfield" title="Link to this heading">#</a></h4>
+<h4>BitField<a class="headerlink" href="#bitfield" title="Link to this heading">#</a></h4>
 <p>A <em>BitField</em>, despite its name suggesting a field of bits, is a powerful structure designed for
 detailed byte inspection. Similar to other structures, it is a finite collection of named fields. This
 section will introduce potential challenges associated with the implementation of a <a class="reference internal" href="../library/model.html#caterpillar.model.BitField" title="caterpillar.model.BitField"><code class="xref py py-class docutils literal notranslate"><span class="pre">BitField</span></code></a>
@@ -688,7 +694,7 @@ added. As we start from bit position <code class="docutils literal notranslate">
 </section>
 </section>
 <section id="field">
-<h3><span class="section-number">2.2.2. </span>Field<a class="headerlink" href="#field" title="Link to this heading">#</a></h3>
+<h3>Field<a class="headerlink" href="#field" title="Link to this heading">#</a></h3>
 <p>The next core element of this library is the <em>Field</em>. It serves as a context storage to store configuration data
 about a struct. Even sequences and structs can be used as fields. The process is straightforward: each custom operator
 creates an instance of a <a class="reference internal" href="../library/fields/field_model.html#caterpillar.fields.Field" title="caterpillar.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a> with the applied configuration value. Most of the time, this value can be
@@ -699,7 +705,7 @@ configuration elements are stored in a <a class="reference internal" href="../li
 information about each supported configuration can be found in <a class="reference internal" href="operators.html#operators"><span class="std std-ref">Operators</span></a>.</p>
 </section>
 <section id="greedy">
-<span id="id3"></span><h3><span class="section-number">2.2.3. </span>Greedy<a class="headerlink" href="#greedy" title="Link to this heading">#</a></h3>
+<span id="id3"></span><h3>Greedy<a class="headerlink" href="#greedy" title="Link to this heading">#</a></h3>
 <p>This library provides direct support for <em>greedy</em> parsing. Leveraging Python’s syntactic features, this special form
 of parsing is enabled using the <a class="reference external" href="https://docs.python.org/3/library/constants.html#Ellipsis">Ellipsis</a> (<code class="code docutils literal notranslate"><span class="pre">...</span></code>). All previously introduced structs implement greedy parsing
 when enabled.</p>
@@ -716,7 +722,7 @@ example.</p>
 </div>
 </section>
 <section id="prefixed">
-<span id="id4"></span><h3><span class="section-number">2.2.4. </span>Prefixed<a class="headerlink" href="#prefixed" title="Link to this heading">#</a></h3>
+<span id="id4"></span><h3>Prefixed<a class="headerlink" href="#prefixed" title="Link to this heading">#</a></h3>
 <p>In addition to greedy parsing, this library supports prefixed packing and unpacking as well. With <em>prefixed</em>, we refer
 to the length of an array of elements that should be parsed. In this library, the <code class="code docutils literal notranslate"><span class="pre">slice</span></code> class is to achieve a
 prefix option.</p>
@@ -725,7 +731,7 @@ prefix option.</p>
 </div>
 </section>
 <section id="context">
-<span id="context-reference"></span><h3><span class="section-number">2.2.5. </span>Context<a class="headerlink" href="#context" title="Link to this heading">#</a></h3>
+<span id="context-reference"></span><h3>Context<a class="headerlink" href="#context" title="Link to this heading">#</a></h3>
 <p>The context is another core element of this framework, utilized to store all relevant variables needed during the
 process of packing or unpacking objects. The top-level <a class="reference internal" href="../library/model.html#caterpillar.model.unpack" title="caterpillar.model.unpack"><code class="xref py py-meth docutils literal notranslate"><span class="pre">unpack()</span></code></a> and <a class="reference internal" href="../library/model.html#caterpillar.model.pack" title="caterpillar.model.pack"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pack()</span></code></a> methods are designed to
 create the context themselves with some pre-defined (internal) fields.</p>
@@ -808,7 +814,7 @@ should be placed at an offset position.</p>
 </dd></dl>
 
 <section id="context-lambda">
-<span id="id5"></span><h4><span class="section-number">2.2.5.1. </span>Context lambda<a class="headerlink" href="#context-lambda" title="Link to this heading">#</a></h4>
+<span id="id5"></span><h4>Context lambda<a class="headerlink" href="#context-lambda" title="Link to this heading">#</a></h4>
 <p>Dynamic sized structs are supported by this library using the power of so-called <em>context lambdas</em>. This library
 introduces a special callable <code class="xref py py-class docutils literal notranslate"><span class="pre">_ContextLambda</span></code>, that takes a <code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code> instance and returns the
 desired result. To mimic a <em>context lambda</em>, the <code class="xref py py-meth docutils literal notranslate"><span class="pre">__call__()</span></code> method has to be implemented.</p>
@@ -824,7 +830,7 @@ same class (this aspect is under subject to changes).</p>
 
 </section>
 <section id="context-path">
-<h4><span class="section-number">2.2.5.2. </span>Context path<a class="headerlink" href="#context-path" title="Link to this heading">#</a></h4>
+<h4>Context path<a class="headerlink" href="#context-path" title="Link to this heading">#</a></h4>
 <p>The path of a context is a specialized form of a <a class="reference internal" href="#context-lambda"><span class="std std-ref">Context lambda</span></a> and supports lazy evaluation of most
 operators (conditional ones excluded). Once called, they try to retrieve the requested value from within
 the given <code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code> instance. Below is a list of default paths designed to provide a relatively easy
@@ -851,7 +857,7 @@ more than one field.</p>
 </section>
 </section>
 <section id="templates">
-<span id="ref-templates"></span><h3><span class="section-number">2.2.6. </span>Templates<a class="headerlink" href="#templates" title="Link to this heading">#</a></h3>
+<span id="ref-templates"></span><h3>Templates<a class="headerlink" href="#templates" title="Link to this heading">#</a></h3>
 <p>A specialized form of structs are <em>templates</em>, which are basically generic Python classes. Think of them
 as blueprints for your final classes/structs that contain placeholders for actual types. As in C++, a
 template needs type arguments, in this case we will name them <a class="reference internal" href="../library/model.html#caterpillar.model.TemplateTypeVar" title="caterpillar.model.TemplateTypeVar"><code class="xref py py-class docutils literal notranslate"><span class="pre">TemplateTypeVar</span></code></a>.</p>
@@ -914,13 +920,13 @@ can’t display inherited members using sphinx.</p>
 </section>
 </section>
 <section id="special-method-names">
-<h2><span class="section-number">2.3. </span>Special method names<a class="headerlink" href="#special-method-names" title="Link to this heading">#</a></h2>
+<h2>Special method names<a class="headerlink" href="#special-method-names" title="Link to this heading">#</a></h2>
 <p>A class can either extend <code class="xref py py-class docutils literal notranslate"><span class="pre">_StructLike</span></code> or implement the special methods needed
 to act as a struct. The subsequent sections provide an overview of all special methods
 and attributes introduced by this library. Further insights into extending structs with
 custom operators can be found in  <a class="reference internal" href="operators.html#operators"><span class="std std-ref">Operators</span></a>.</p>
 <section id="emulating-struct-types">
-<h3><span class="section-number">2.3.1. </span>Emulating Struct Types<a class="headerlink" href="#emulating-struct-types" title="Link to this heading">#</a></h3>
+<h3>Emulating Struct Types<a class="headerlink" href="#emulating-struct-types" title="Link to this heading">#</a></h3>
 <dl class="py method">
 <dt class="sig sig-object py" id="object.__pack__">
 <span class="sig-prename descclassname"><span class="pre">object.</span></span><span class="sig-name descname"><span class="pre">__pack__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#object.__pack__" title="Link to this definition">#</a></dt>
@@ -969,7 +975,7 @@ is provided.</p>
 </dd></dl>
 
 <section id="customizing-the-struct-s-type">
-<span id="struct-type"></span><h4><span class="section-number">2.3.1.1. </span>Customizing the struct’s type<a class="headerlink" href="#customizing-the-struct-s-type" title="Link to this heading">#</a></h4>
+<span id="struct-type"></span><h4>Customizing the struct’s type<a class="headerlink" href="#customizing-the-struct-s-type" title="Link to this heading">#</a></h4>
 <dl class="py method">
 <dt class="sig sig-object py" id="object.__type__">
 <span class="sig-prename descclassname"><span class="pre">object.</span></span><span class="sig-name descname"><span class="pre">__type__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#object.__type__" title="Link to this definition">#</a></dt>
@@ -1008,7 +1014,7 @@ automatic creation of constructors.</p>
 
 </section>
 <section id="struct-containers">
-<h4><span class="section-number">2.3.1.2. </span>Struct containers<a class="headerlink" href="#struct-containers" title="Link to this heading">#</a></h4>
+<h4>Struct containers<a class="headerlink" href="#struct-containers" title="Link to this heading">#</a></h4>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="class.__struct__">
 <span class="sig-prename descclassname"><span class="pre">class.</span></span><span class="sig-name descname"><span class="pre">__struct__</span></span><a class="headerlink" href="#class.__struct__" title="Link to this definition">#</a></dt>
@@ -1021,7 +1027,7 @@ or sequence definition. The type of the stored value must be a subclass of <code
 
 </section>
 <section id="template-containers">
-<h4><span class="section-number">2.3.1.3. </span>Template Containers<a class="headerlink" href="#template-containers" title="Link to this heading">#</a></h4>
+<h4>Template Containers<a class="headerlink" href="#template-containers" title="Link to this heading">#</a></h4>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="class.__template__">
 <span class="sig-prename descclassname"><span class="pre">class.</span></span><span class="sig-name descname"><span class="pre">__template__</span></span><a class="headerlink" href="#class.__template__" title="Link to this definition">#</a></dt>
@@ -1032,7 +1038,7 @@ are required or just positional. In addition, default inferred types are stored 
 </section>
 </section>
 <section id="bitfield-specific-methods">
-<h3><span class="section-number">2.3.2. </span>BitField specific methods<a class="headerlink" href="#bitfield-specific-methods" title="Link to this heading">#</a></h3>
+<h3>BitField specific methods<a class="headerlink" href="#bitfield-specific-methods" title="Link to this heading">#</a></h3>
 <p>The introduced <a class="reference internal" href="../library/model.html#caterpillar.model.BitField" title="caterpillar.model.BitField"><code class="xref py py-class docutils literal notranslate"><span class="pre">BitField</span></code></a> class is special in many different ways. One key
 attribute is its fixed size. To determine the size of a struct, it leverages a special
 member, which can be either a function or an attribute.</p>
@@ -1051,7 +1057,7 @@ adapts to the appropriate representation based on the context.</p>
 
 </section>
 <section id="customizing-the-object-s-byteorder">
-<h3><span class="section-number">2.3.3. </span>Customizing the object’s byteorder<a class="headerlink" href="#customizing-the-object-s-byteorder" title="Link to this heading">#</a></h3>
+<h3>Customizing the object’s byteorder<a class="headerlink" href="#customizing-the-object-s-byteorder" title="Link to this heading">#</a></h3>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="object.__byteorder__">
 <span class="sig-prename descclassname"><span class="pre">object.</span></span><span class="sig-name descname"><span class="pre">__byteorder__</span></span><a class="headerlink" href="#object.__byteorder__" title="Link to this definition">#</a></dt>
@@ -1077,7 +1083,7 @@ the byteorder applied. Note the use of another operator here.</p>
 
 </section>
 <section id="modifying-fields">
-<h3><span class="section-number">2.3.4. </span>Modifying fields<a class="headerlink" href="#modifying-fields" title="Link to this heading">#</a></h3>
+<h3>Modifying fields<a class="headerlink" href="#modifying-fields" title="Link to this heading">#</a></h3>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="field.__name__">
 <span class="sig-prename descclassname"><span class="pre">field.</span></span><span class="sig-name descname"><span class="pre">__name__</span></span><a class="headerlink" href="#field.__name__" title="Link to this definition">#</a></dt>
@@ -1107,7 +1113,7 @@ use of <code class="code docutils literal notranslate"><span class="pre">field._
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title"><span class="section-number">1. </span>Introduction</p>
+        <p class="prev-next-title">Introduction</p>
       </div>
     </a>
     <a class="right-next"
@@ -1115,7 +1121,7 @@ use of <code class="code docutils literal notranslate"><span class="pre">field._
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">3. </span>Operators</p>
+        <p class="prev-next-title">Operators</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -1137,18 +1143,18 @@ use of <code class="code docutils literal notranslate"><span class="pre">field._
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#structs-sequences-and-fields">2.1. Structs, Sequences and Fields</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#standard-types">2.2. Standard Types</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sequence">2.2.1. Sequence</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#struct">2.2.1.1. Struct</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#union">2.2.1.2. Union</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#bitfield">2.2.1.3. BitField</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#structs-sequences-and-fields">Structs, Sequences and Fields</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#standard-types">Standard Types</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sequence">Sequence</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#struct">Struct</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#union">Union</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#bitfield">BitField</a></li>
 </ul>
 </li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#field">2.2.2. Field</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#greedy">2.2.3. Greedy</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#prefixed">2.2.4. Prefixed</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#context">2.2.5. Context</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#field">Field</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#greedy">Greedy</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#prefixed">Prefixed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#context">Context</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#CTX_PARENT"><code class="docutils literal notranslate"><span class="pre">CTX_PARENT</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#CTX_OBJECT"><code class="docutils literal notranslate"><span class="pre">CTX_OBJECT</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#CTX_STREAM"><code class="docutils literal notranslate"><span class="pre">CTX_STREAM</span></code></a></li>
@@ -1158,11 +1164,11 @@ use of <code class="code docutils literal notranslate"><span class="pre">field._
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#CTX_VALUE"><code class="docutils literal notranslate"><span class="pre">CTX_VALUE</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#CTX_POS"><code class="docutils literal notranslate"><span class="pre">CTX_POS</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#CTX_OFFSETS"><code class="docutils literal notranslate"><span class="pre">CTX_OFFSETS</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#context-lambda">2.2.5.1. Context lambda</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#context-lambda">Context lambda</a><ul class="nav section-nav flex-column">
 <li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#object.__call__"><code class="docutils literal notranslate"><span class="pre">object.__call__()</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#context-path">2.2.5.2. Context path</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#context-path">Context path</a><ul class="nav section-nav flex-column">
 <li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ctx"><code class="docutils literal notranslate"><span class="pre">ctx</span></code></a></li>
 <li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#this"><code class="docutils literal notranslate"><span class="pre">this</span></code></a></li>
 <li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#parent"><code class="docutils literal notranslate"><span class="pre">parent</span></code></a></li>
@@ -1170,40 +1176,40 @@ use of <code class="code docutils literal notranslate"><span class="pre">field._
 </li>
 </ul>
 </li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#templates">2.2.6. Templates</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#templates">Templates</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#special-method-names">2.3. Special method names</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#emulating-struct-types">2.3.1. Emulating Struct Types</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#special-method-names">Special method names</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#emulating-struct-types">Emulating Struct Types</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#object.__pack__"><code class="docutils literal notranslate"><span class="pre">object.__pack__()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#object.__unpack__"><code class="docutils literal notranslate"><span class="pre">object.__unpack__()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#object.__size__"><code class="docutils literal notranslate"><span class="pre">object.__size__()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#customizing-the-struct-s-type">2.3.1.1. Customizing the struct’s type</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#customizing-the-struct-s-type">Customizing the struct’s type</a><ul class="nav section-nav flex-column">
 <li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#object.__type__"><code class="docutils literal notranslate"><span class="pre">object.__type__()</span></code></a></li>
 <li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#examples.formats.nibarchive.object.NIBHeader"><code class="docutils literal notranslate"><span class="pre">object.NIBHeader</span></code></a></li>
 <li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#examples.formats.nibarchive.object.NIBHeader.NIBHeader.magic"><code class="docutils literal notranslate"><span class="pre">object.NIBHeader.NIBHeader.magic</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#struct-containers">2.3.1.2. Struct containers</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#struct-containers">Struct containers</a><ul class="nav section-nav flex-column">
 <li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#class.__struct__"><code class="docutils literal notranslate"><span class="pre">class.__struct__</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#template-containers">2.3.1.3. Template Containers</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#template-containers">Template Containers</a><ul class="nav section-nav flex-column">
 <li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#class.__template__"><code class="docutils literal notranslate"><span class="pre">class.__template__</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bitfield-specific-methods">2.3.2. BitField specific methods</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bitfield-specific-methods">BitField specific methods</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#object.__bits__"><code class="docutils literal notranslate"><span class="pre">object.__bits__()</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#customizing-the-object-s-byteorder">2.3.3. Customizing the object’s byteorder</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#customizing-the-object-s-byteorder">Customizing the object’s byteorder</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#object.__byteorder__"><code class="docutils literal notranslate"><span class="pre">object.__byteorder__</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#object.__set_byteorder__"><code class="docutils literal notranslate"><span class="pre">object.__set_byteorder__()</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#modifying-fields">2.3.4. Modifying fields</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#modifying-fields">Modifying fields</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#field.__name__"><code class="docutils literal notranslate"><span class="pre">field.__name__</span></code></a></li>
 </ul>
 </li>
@@ -1246,7 +1252,7 @@ use of <code class="code docutils literal notranslate"><span class="pre">field._
 
   <p class="copyright">
     
-      © Copyright 2023, MatrixEditor.
+      © Copyright 2024, MatrixEditor.
       <br/>
     
   </p>

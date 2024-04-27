@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>6.1. Field Model &#8212; Caterpillar 1.0.0-b3 documentation</title>
+    <title>Field Model &#8212; Caterpillar 2.0.0-b2 documentation</title>
   
   
   
@@ -36,15 +36,15 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../_static/documentation_options.js?v=5f3efc5a"></script>
+    <script src="../../_static/documentation_options.js?v=7e1387d2"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/design-tabs.js?v=36754332"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'library/fields/field_model';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="6.2. Common Structs" href="common.html" />
-    <link rel="prev" title="6. Fields" href="index.html" />
+    <link rel="next" title="Common Structs" href="common.html" />
+    <link rel="prev" title="Fields" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -132,7 +132,7 @@ fetch("https://raw.githubusercontent.com/MatrixEditor/caterpillar/master/docs/so
   
   
   
-    <p class="title logo__title">Caterpillar</p>
+    <p class="title logo__title">Caterpillar 2.0.0-b2</p>
   
 </a></div>
     
@@ -358,20 +358,31 @@ document.write(`
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../byteorder.html">1. Byteorder and Architecture</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../options.html">2. Options</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../abc.html">3. Abstract base classes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../context.html">4. Context</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../model.html">5. Struct Model</a></li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">6. Fields</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">6.1. Field Model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="common.html">6.2. Common Structs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compression.html">6.3. Compression Structs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="crypto.html">6.4. Cryptographic Structs</a></li>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Basic Core classes</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../byteorder.html">Byteorder and Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../options.html">Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../abc.html">Abstract base classes</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Context and Exceptions</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../context.html">Context</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../exceptions.html">Exceptions</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Struct model</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../model.html">Struct Model</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Fields</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Field Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="common.html">Common Structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compression.html">Compression Structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="crypto.html">Cryptographic Structs</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../exceptions.html">7. Exceptions</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">C API</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../capi/endian.html">Endian / Byteorder</a></li>
 </ul>
 </div>
 </nav></div>
@@ -413,9 +424,9 @@ document.write(`
     <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Library</a></li>
     
     
-    <li class="breadcrumb-item"><a href="index.html" class="nav-link"><span class="section-number">6. </span>Fields</a></li>
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Fields</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span...</li>
+    <li class="breadcrumb-item active" aria-current="page">Field Model</li>
   </ul>
 </nav>
 </div>
@@ -433,7 +444,7 @@ document.write(`
                 <article class="bd-article">
                   
   <section id="field-model">
-<span id="id1"></span><h1><span class="section-number">6.1. </span>Field Model<a class="headerlink" href="#field-model" title="Link to this heading">#</a></h1>
+<span id="id1"></span><h1>Field Model<a class="headerlink" href="#field-model" title="Link to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="caterpillar.fields.Field">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.fields.</span></span><span class="sig-name descname"><span class="pre">Field</span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_base.html#Field"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Field" title="Link to this definition">#</a></dt>
@@ -980,7 +991,7 @@ to display the condition as well.</p>
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title"><span class="section-number">6. </span>Fields</p>
+        <p class="prev-next-title">Fields</p>
       </div>
     </a>
     <a class="right-next"
@@ -988,7 +999,7 @@ to display the condition as well.</p>
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">6.2. </span>Common Structs</p>
+        <p class="prev-next-title">Common Structs</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -1095,7 +1106,7 @@ to display the condition as well.</p>
 
   <p class="copyright">
     
-      © Copyright 2023, MatrixEditor.
+      © Copyright 2024, MatrixEditor.
       <br/>
     
   </p>

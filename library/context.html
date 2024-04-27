@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>4. Context &#8212; Caterpillar 1.0.0-b3 documentation</title>
+    <title>Context &#8212; Caterpillar 2.0.0-b2 documentation</title>
   
   
   
@@ -36,15 +36,15 @@
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../_static/documentation_options.js?v=5f3efc5a"></script>
+    <script src="../_static/documentation_options.js?v=7e1387d2"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/design-tabs.js?v=36754332"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'library/context';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="5. Struct Model" href="model.html" />
-    <link rel="prev" title="3. Abstract base classes" href="abc.html" />
+    <link rel="next" title="Exceptions" href="exceptions.html" />
+    <link rel="prev" title="Abstract base classes" href="abc.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -132,7 +132,7 @@ fetch("https://raw.githubusercontent.com/MatrixEditor/caterpillar/master/docs/so
   
   
   
-    <p class="title logo__title">Caterpillar</p>
+    <p class="title logo__title">Caterpillar 2.0.0-b2</p>
   
 </a></div>
     
@@ -358,14 +358,25 @@ document.write(`
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="byteorder.html">1. Byteorder and Architecture</a></li>
-<li class="toctree-l1"><a class="reference internal" href="options.html">2. Options</a></li>
-<li class="toctree-l1"><a class="reference internal" href="abc.html">3. Abstract base classes</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">4. Context</a></li>
-<li class="toctree-l1"><a class="reference internal" href="model.html">5. Struct Model</a></li>
-<li class="toctree-l1"><a class="reference internal" href="fields/index.html">6. Fields</a></li>
-<li class="toctree-l1"><a class="reference internal" href="exceptions.html">7. Exceptions</a></li>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Basic Core classes</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="byteorder.html">Byteorder and Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="options.html">Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="abc.html">Abstract base classes</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Context and Exceptions</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Context</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exceptions.html">Exceptions</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Struct model</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="model.html">Struct Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fields/index.html">Fields</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">C API</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="capi/endian.html">Endian / Byteorder</a></li>
 </ul>
 </div>
 </nav></div>
@@ -406,7 +417,7 @@ document.write(`
     
     <li class="breadcrumb-item"><a href="index.html" class="nav-link">Library</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span...</li>
+    <li class="breadcrumb-item active" aria-current="page">Context</li>
   </ul>
 </nav>
 </div>
@@ -424,10 +435,10 @@ document.write(`
                 <article class="bd-article">
                   
   <section id="context">
-<span id="id1"></span><h1><span class="section-number">4. </span>Context<a class="headerlink" href="#context" title="Link to this heading">#</a></h1>
+<span id="id1"></span><h1>Context<a class="headerlink" href="#context" title="Link to this heading">#</a></h1>
 <p><em>TODO</em></p>
 <section id="context-classes">
-<h2><span class="section-number">4.1. </span>Context classes<a class="headerlink" href="#context-classes" title="Link to this heading">#</a></h2>
+<h2>Context classes<a class="headerlink" href="#context-classes" title="Link to this heading">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="caterpillar.context.Context">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.context.</span></span><span class="sig-name descname"><span class="pre">Context</span></span><a class="reference internal" href="../_modules/caterpillar/context.html#Context"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.context.Context" title="Link to this definition">#</a></dt>
@@ -472,7 +483,7 @@ has access to the parent stack frame.</p>
 
 </section>
 <section id="special-paths">
-<h2><span class="section-number">4.2. </span>Special paths<a class="headerlink" href="#special-paths" title="Link to this heading">#</a></h2>
+<h2>Special paths<a class="headerlink" href="#special-paths" title="Link to this heading">#</a></h2>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caterpillar.context.this">
 <span class="sig-prename descclassname"><span class="pre">context.</span></span><span class="sig-name descname"><span class="pre">this</span></span><a class="headerlink" href="#caterpillar.context.this" title="Link to this definition">#</a></dt>
@@ -493,7 +504,7 @@ has access to the parent stack frame.</p>
 
 </section>
 <section id="special-attributes">
-<h2><span class="section-number">4.3. </span>Special Attributes<a class="headerlink" href="#special-attributes" title="Link to this heading">#</a></h2>
+<h2>Special Attributes<a class="headerlink" href="#special-attributes" title="Link to this heading">#</a></h2>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caterpillar.context.CTX_PARENT">
 <span class="sig-prename descclassname"><span class="pre">context.</span></span><span class="sig-name descname"><span class="pre">CTX_PARENT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'_parent'</span></em><a class="headerlink" href="#caterpillar.context.CTX_PARENT" title="Link to this definition">#</a></dt>
@@ -546,7 +557,7 @@ has access to the parent stack frame.</p>
 
 </section>
 <section id="expressions">
-<h2><span class="section-number">4.4. </span>Expressions<a class="headerlink" href="#expressions" title="Link to this heading">#</a></h2>
+<h2>Expressions<a class="headerlink" href="#expressions" title="Link to this heading">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="caterpillar.context.ExprMixin">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.context.</span></span><span class="sig-name descname"><span class="pre">ExprMixin</span></span><a class="reference internal" href="../_modules/caterpillar/context.html#ExprMixin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.context.ExprMixin" title="Link to this definition">#</a></dt>
@@ -602,15 +613,15 @@ has access to the parent stack frame.</p>
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title"><span class="section-number">3. </span>Abstract base classes</p>
+        <p class="prev-next-title">Abstract base classes</p>
       </div>
     </a>
     <a class="right-next"
-       href="model.html"
+       href="exceptions.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">5. </span>Struct Model</p>
+        <p class="prev-next-title">Exceptions</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -632,20 +643,20 @@ has access to the parent stack frame.</p>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#context-classes">4.1. Context classes</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#context-classes">Context classes</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.context.Context"><code class="docutils literal notranslate"><span class="pre">Context</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.context.ContextPath"><code class="docutils literal notranslate"><span class="pre">ContextPath</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.context.ContextLength"><code class="docutils literal notranslate"><span class="pre">ContextLength</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.context.ConditionContext"><code class="docutils literal notranslate"><span class="pre">ConditionContext</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#special-paths">4.2. Special paths</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#special-paths">Special paths</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.context.this"><code class="docutils literal notranslate"><span class="pre">context.this</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.context.ctx"><code class="docutils literal notranslate"><span class="pre">context.ctx</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.context.parent"><code class="docutils literal notranslate"><span class="pre">context.parent</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#special-attributes">4.3. Special Attributes</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#special-attributes">Special Attributes</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.context.CTX_PARENT"><code class="docutils literal notranslate"><span class="pre">context.CTX_PARENT</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.context.CTX_OBJECT"><code class="docutils literal notranslate"><span class="pre">context.CTX_OBJECT</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.context.CTX_OFFSETS"><code class="docutils literal notranslate"><span class="pre">context.CTX_OFFSETS</span></code></a></li>
@@ -658,7 +669,7 @@ has access to the parent stack frame.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.context.CTX_SEQ"><code class="docutils literal notranslate"><span class="pre">context.CTX_SEQ</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#expressions">4.4. Expressions</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#expressions">Expressions</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.context.ExprMixin"><code class="docutils literal notranslate"><span class="pre">ExprMixin</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.context.BinaryExpression"><code class="docutils literal notranslate"><span class="pre">BinaryExpression</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.context.UnaryExpression"><code class="docutils literal notranslate"><span class="pre">UnaryExpression</span></code></a></li>
@@ -701,7 +712,7 @@ has access to the parent stack frame.</p>
 
   <p class="copyright">
     
-      © Copyright 2023, MatrixEditor.
+      © Copyright 2024, MatrixEditor.
       <br/>
     
   </p>

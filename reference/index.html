@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Reference &#8212; Caterpillar 1.0.0-b3 documentation</title>
+    <title>Reference &#8212; Caterpillar 2.0.0-b2 documentation</title>
   
   
   
@@ -36,14 +36,14 @@
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../_static/documentation_options.js?v=5f3efc5a"></script>
+    <script src="../_static/documentation_options.js?v=7e1387d2"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/design-tabs.js?v=36754332"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'reference/index';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="1. Introduction" href="introduction.html" />
+    <link rel="next" title="Introduction" href="introduction.html" />
     <link rel="prev" title="3. Advanced Concepts" href="../tutorial/advanced.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -132,7 +132,7 @@ fetch("https://raw.githubusercontent.com/MatrixEditor/caterpillar/master/docs/so
   
   
   
-    <p class="title logo__title">Caterpillar</p>
+    <p class="title logo__title">Caterpillar 2.0.0-b2</p>
   
 </a></div>
     
@@ -358,10 +358,16 @@ document.write(`
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="introduction.html">1. Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="datamodel.html">2. Data Model</a></li>
-<li class="toctree-l1"><a class="reference internal" href="operators.html">3. Operators</a></li>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Python Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datamodel.html">Data Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operators.html">Operators</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">C API Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="capi/abstract.html">Abstract Objects Layer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="capi/objimpl.html">Concrete Objects Layer</a></li>
 </ul>
 </div>
 </nav></div>
@@ -425,24 +431,40 @@ nothing in the current documentation is considered to be final.</p>
 <p>To get started with the internal API, it is recommended to visit the <a class="reference internal" href="../library/index.html#library-index"><span class="std std-ref">Library</span></a> API
 documentation.</p>
 <div class="toctree-wrapper compound">
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Python Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="introduction.html">1. Introduction</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="introduction.html#why-use-caterpillar">1.1. Why use Caterpillar?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="introduction.html#pros-cons">1.2. Pros &amp; Cons</a></li>
-<li class="toctree-l2"><a class="reference internal" href="introduction.html#comparison">1.3. Comparison</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#why-use-caterpillar">Why use Caterpillar?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#pros-cons">Pros &amp; Cons</a></li>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#comparison">Comparison</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="datamodel.html">2. Data Model</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="datamodel.html#structs-sequences-and-fields">2.1. Structs, Sequences and Fields</a></li>
-<li class="toctree-l2"><a class="reference internal" href="datamodel.html#standard-types">2.2. Standard Types</a></li>
-<li class="toctree-l2"><a class="reference internal" href="datamodel.html#special-method-names">2.3. Special method names</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datamodel.html">Data Model</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="datamodel.html#structs-sequences-and-fields">Structs, Sequences and Fields</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datamodel.html#standard-types">Standard Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datamodel.html#special-method-names">Special method names</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="operators.html">3. Operators</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="operators.html#struct-operators">3.1. Struct operators</a></li>
-<li class="toctree-l2"><a class="reference internal" href="operators.html#field-specific-operations">3.2. Field specific operations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="operators.html#sequence-specific-operators">3.3. Sequence specific operators</a></li>
-<li class="toctree-l2"><a class="reference internal" href="operators.html#context-specific-operations">3.4. Context specific operations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operators.html">Operators</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="operators.html#struct-operators">Struct operators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators.html#field-specific-operations">Field specific operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators.html#sequence-specific-operators">Sequence specific operators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators.html#context-specific-operations">Context specific operations</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>If you want to switch to the C API instead, please refer to the sections below.</p>
+<div class="toctree-wrapper compound">
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">C API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="capi/abstract.html">Abstract Objects Layer</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="capi/atom.html">Atom Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="capi/context.html">Context Protocol</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="capi/objimpl.html">Concrete Objects Layer</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="capi/struct.html">Struct Objects</a></li>
 </ul>
 </li>
 </ul>
@@ -473,7 +495,7 @@ documentation.</p>
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">1. </span>Introduction</p>
+        <p class="prev-next-title">Introduction</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -521,7 +543,7 @@ documentation.</p>
 
   <p class="copyright">
     
-      © Copyright 2023, MatrixEditor.
+      © Copyright 2024, MatrixEditor.
       <br/>
     
   </p>
