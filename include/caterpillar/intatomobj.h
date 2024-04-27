@@ -25,13 +25,14 @@ typedef struct _intatomobj
 {
   CpFieldCAtom_HEAD
 
-  /// Stores the amount of bytes this integer atom
+  /// Stores the amount of bits this integer atom
   /// has in total
   PyObject* m_byte_count;
 
-  /// Stores the bytes of the integer atom as native
+  /// Stores the byte count of the integer atom as native
   /// size_t value.
-  size_t _m_bytes;
+  size_t _m_byte_count;
+  size_t _m_bits;
 
   /// Stores whether or not the integer is signed
   int _m_signed;

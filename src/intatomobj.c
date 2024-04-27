@@ -8,7 +8,7 @@ cp_intatom_new(PyTypeObject* type, PyObject* args, PyObject* kwds)
   CpIntAtomObject* self = (CpIntAtomObject*)type->tp_alloc(type, 0);
   if (self != NULL) {
     self->m_byte_count = NULL;
-    self->_m_bytes = 0;
+    self->_m_bits = 0;
     self->_m_signed = true;
     self->_m_little_endian = true;
 
@@ -33,21 +33,27 @@ cp_intatom_dealloc(CpIntAtomObject* self)
 static int
 cp_intatom_init(CpIntAtomObject* self, PyObject* args, PyObject* kwds)
 {
-  static char* kwlist[] = { "nbytes", "signed", "little_endian", NULL };
+  static char* kwlist[] = { "nbits", "signed", "little_endian", NULL };
   int _signed = true, little_endian = true;
-  size_t bytes = 0;
+  size_t bits = 0;
   if (!PyArg_ParseTupleAndKeywords(
-        args, kwds, "k|pp", kwlist, &bytes, &_signed, &little_endian)) {
+        args, kwds, "k|pp", kwlist, &bits, &_signed, &little_endian)) {
     return -1;
   }
-  if (bytes == 0) {
+  if (bits == 0) {
     PyErr_SetString(PyExc_ValueError, "bytes cannot be zero");
     return -1;
   }
-  self->_m_bytes = bytes;
+  if (bits % 8) {
+    PyErr_SetString(PyExc_ValueError, "nbits must be a multiple of 8");
+    return -1;
+  }
+
+  self->_m_bits = bits;
+  self->_m_byte_count = bits / 8;
   self->_m_signed = _signed;
   self->_m_little_endian = little_endian;
-  self->m_byte_count = PyLong_FromUnsignedLong(bytes);
+  self->m_byte_count = PyLong_FromUnsignedLong(self->_m_byte_count);
   if (!self->m_byte_count) {
     return -1;
   }
@@ -70,7 +76,7 @@ CpIntAtom_Pack(CpIntAtomObject* self, PyObject* op, CpLayerObject* layer)
 
   int res = _PyLong_AsByteArray((PyLongObject*)op,
                                 (unsigned char*)PyBytes_AS_STRING(op),
-                                self->_m_bytes,
+                                self->_m_byte_count,
                                 self->_m_little_endian,
                                 self->_m_signed);
   if (res == -1) {
@@ -88,14 +94,14 @@ CpIntAtom_Pack(CpIntAtomObject* self, PyObject* op, CpLayerObject* layer)
 PyObject*
 CpIntAtom_Unpack(CpIntAtomObject* self, CpLayerObject* layer)
 {
-  PyObject* bytes = CpState_Read(layer->m_state, self->_m_bytes);
+  PyObject* bytes = CpState_Read(layer->m_state, self->_m_byte_count);
   if (!bytes) {
     return NULL;
   }
 
   PyObject* obj =
     _PyLong_FromByteArray((unsigned char*)PyBytes_AS_STRING(bytes),
-                          self->_m_bytes,
+                          self->_m_byte_count,
                           self->_m_little_endian,
                           self->_m_signed);
   Py_DECREF(bytes);
@@ -106,7 +112,12 @@ CpIntAtom_Unpack(CpIntAtomObject* self, CpLayerObject* layer)
 
 /* type */
 static PyMemberDef CpIntAtom_Members[] = {
-  { "bytes", T_PYSSIZET, offsetof(CpIntAtomObject, _m_bytes), READONLY, NULL },
+  { "nbytes",
+    T_PYSSIZET,
+    offsetof(CpIntAtomObject, _m_byte_count),
+    READONLY,
+    NULL },
+  { "nbits", T_PYSSIZET, offsetof(CpIntAtomObject, _m_bits), READONLY, NULL },
   { "signed", T_BOOL, offsetof(CpIntAtomObject, _m_signed), READONLY, NULL },
   { "little_endian",
     T_BOOL,

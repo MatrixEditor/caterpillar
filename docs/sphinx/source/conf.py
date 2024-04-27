@@ -72,9 +72,12 @@ html_theme_options = {
     "collapse_navigation": True,
     "github_url": "https://github.com/MatrixEditor/caterpillar",
     "logo": {
-        "text": "Caterpillar"
+        "text": f"Caterpillar {version}",
     },
     "announcement": "https://raw.githubusercontent.com/MatrixEditor/caterpillar/master/docs/source/_templates/announcement.html",
+}
+html_sidebars = {
+  "installing/index": [],
 }
 
 # -- Options for C++ Docs -----------------------------------------------------

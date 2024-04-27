@@ -4,6 +4,6 @@
 Endian / Byteorder
 ==================
 
-.. doxygenstruct:: CpEndian
+.. doxygenstruct:: _endianobj
     :members:
     :project: caterpillar
