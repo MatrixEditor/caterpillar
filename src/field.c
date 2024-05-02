@@ -531,7 +531,6 @@ PyTypeObject CpField_Type = {
   0,                            /* tp_version_tag */
   0,                            /* tp_finalize */
   0,                            /* tp_vectorcall */
-  0,                            /* tp_watched */
 };
 
 // -----------------------------------------------------------------------------
@@ -697,7 +696,6 @@ PyTypeObject CpFieldAtom_Type = {
   0,                                        /* tp_version_tag */
   0,                                        /* tp_finalize */
   0,                                        /* tp_vectorcall */
-  0,                                        /* tp_watched */
 };
 
 // -----------------------------------------------------------------------------
@@ -863,5 +861,4 @@ PyTypeObject CpFieldCAtom_Type = {
   0,                                        /* tp_version_tag */
   0,                                        /* tp_finalize */
   0,                                        /* tp_vectorcall */
-  0,                                        /* tp_watched */
 };

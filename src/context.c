@@ -184,7 +184,6 @@ PyTypeObject CpContext_Type = {
   0,                                        /* tp_version_tag */
   0,                                        /* tp_finalize */
   0,                                        /* tp_vectorcall */
-  0,                                        /* tp_watched */
 };
 
 //------------------------------------------------------------------------------
@@ -382,7 +381,6 @@ PyTypeObject CpUnaryExpr_Type = {
   0,                                 /* tp_version_tag */
   0,                                 /* tp_finalize */
   0,                                 /* tp_vectorcall */
-  0,                                 /* tp_watched */
 };
 
 //------------------------------------------------------------------------------
@@ -708,7 +706,6 @@ PyTypeObject CpBinaryExpr_Type = {
   0,                                  /* tp_version_tag */
   0,                                  /* tp_finalize */
   0,                                  /* tp_vectorcall */
-  0,                                  /* tp_watched */
 };
 
 //------------------------------------------------------------------------------
@@ -977,5 +974,4 @@ PyTypeObject CpContextPath_Type = {
   0,                                      /* tp_version_tag */
   0,                                      /* tp_finalize */
   0,                                      /* tp_vectorcall */
-  0,                                      /* tp_watched */
 };

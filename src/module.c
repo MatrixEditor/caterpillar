@@ -81,7 +81,6 @@ PyTypeObject CpInvalidDefault_Type = {
   0,                                /* tp_version_tag */
   0,                                /* tp_finalize */
   0,                                /* tp_vectorcall */
-  0,                                /* tp_watched */
 };
 
 PyObject _CpInvalidDefault_Object = { _PyObject_EXTRA_INIT{
@@ -156,7 +155,6 @@ PyTypeObject CpDefaultOption_Type = {
   0,                               /* tp_version_tag */
   0,                               /* tp_finalize */
   0,                               /* tp_vectorcall */
-  0,                               /* tp_watched */
 };
 
 PyObject _CpDefaultOption_Object = { _PyObject_EXTRA_INIT{
