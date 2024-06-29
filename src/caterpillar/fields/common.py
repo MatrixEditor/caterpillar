@@ -81,14 +81,12 @@ class FormatField(FieldStruct):
 
     def __size__(self, context: _ContextLike) -> int:
         """
-        Calculate the size of the field.
+        Calculate the size of the field (single element).
 
         :param context: The current context.
         :return: The size of the field.
         """
-        order = context[CTX_FIELD].order
-        length = self.get_length(context)
-        return libstruct.calcsize(f"{order.ch}{length}{self.text}")
+        return self.__bits__ // 8
 
     def pack_single(self, obj: Any, context: _ContextLike) -> None:
         """
