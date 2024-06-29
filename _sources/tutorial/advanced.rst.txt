@@ -81,6 +81,26 @@ structs. They have to be wrapped by a :class:`~caterpillar.fields.Field` first:
     >>> field = F(Format) @ 0x1234  # ok
 
 
+Custom Operators
+^^^^^^^^^^^^^^^^
+
+In addition to standard Python operators it is possible to define new operators
+tailored to specific use-cases. For instance, it is possible to define a
+new operator that automatically creates an Array with a fixed length:
+
+.. code-block:: python
+
+    from caterpillar.fields import _infix_
+
+    M = _infix_(lambda s, count: s[count * 2])
+
+    @struct
+    class Format:
+        values: uint16 /M/ 3
+
+As of now, the operator is used only during pre-processing. It won't affect the
+overall parsing process on its own but can be used to return custom structs.
+
 Pointers
 ^^^^^^^^
 
