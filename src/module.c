@@ -10,7 +10,8 @@
 #include "caterpillar/struct.h"
 
 // atom implementations
-#include "caterpillar/intatomobj.h"
+#include "caterpillar/atoms/int.h"
+#include "caterpillar/atoms/float.h"
 
 /* immortal objects */
 static PyObject*
@@ -454,6 +455,9 @@ PyInit__C(void)
   CpIntAtom_Type.tp_base = &CpFieldCAtom_Type;
   CpModule_SetupType(&CpIntAtom_Type);
 
+  CpFloatAtom_Type.tp_base = &CpFieldCAtom_Type;
+  CpModule_SetupType(&CpFloatAtom_Type);
+
   // module setup
   m = PyModule_Create(&CpModule);
   if (!m) {
@@ -480,7 +484,9 @@ PyInit__C(void)
   CpModule_AddObject("State", &CpState_Type);
   CpModule_AddObject("fieldinfo", &CpStructFieldInfo_Type);
   CpModule_AddObject("Struct", &CpStruct_Type);
+
   CpModule_AddObject("intatom", &CpIntAtom_Type);
+  CpModule_AddObject("floatatom", &CpFloatAtom_Type);
 
   /* setup custom intatoms */
 #define CpModule_DefAtom(name, ...)                                            \
@@ -508,6 +514,14 @@ PyInit__C(void)
   CpModule_DefIntAtom("u64", 64, false);
 
 
+#define CpModule_DefFloatAtom(name, bits)                                     \
+  CpModule_DefAtom(name, CpObject_Create(&CpFloatAtom_Type, "I", bits));
+
+  CpModule_DefFloatAtom("f16", 16);
+  CpModule_DefFloatAtom("f32", 32);
+  CpModule_DefFloatAtom("f64", 64);
+
+#undef CpModule_DefIntAtom
 #undef CpModule_DefAtom
   /* setup state */
   _modulestate* state = get_module_state(m);

@@ -213,8 +213,7 @@ cp_catom_pack(CpCAtomObject* self, PyObject* args, PyObject* kw)
     return NULL;
   }
 
-  return self->ob_pack((PyObject*)self, op, context) ? Py_NewRef(Py_None)
-                                                     : NULL;
+  return self->ob_pack((PyObject*)self, op, context) ? NULL : Py_NewRef(Py_None);
 }
 
 static PyObject*

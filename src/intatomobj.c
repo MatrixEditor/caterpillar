@@ -1,7 +1,19 @@
 /* intatom C implementation */
-#include "caterpillar/intatomobj.h"
+#include "caterpillar/atoms/int.h"
 #include "caterpillar/arch.h"
 #include <structmember.h>
+
+static PyObject*
+cp_intatom__type__(CpIntAtomObject* self)
+{
+  return Py_XNewRef(&PyLong_Type);
+}
+
+static PyObject *
+cp_intatom__size__(CpIntAtomObject* self)
+{
+  return Py_XNewRef(self->m_byte_count);
+}
 
 static PyObject*
 cp_intatom_new(PyTypeObject* type, PyObject* args, PyObject* kwds)
@@ -17,8 +29,8 @@ cp_intatom_new(PyTypeObject* type, PyObject* args, PyObject* kwds)
     CpFieldCAtom_CATOM(self).ob_unpack = (unpackfunc)CpIntAtom_Unpack;
     CpFieldCAtom_CATOM(self).ob_pack_many = NULL;
     CpFieldCAtom_CATOM(self).ob_unpack_many = NULL;
-    CpFieldCAtom_CATOM(self).ob_size = NULL;
-    CpFieldCAtom_CATOM(self).ob_type = NULL;
+    CpFieldCAtom_CATOM(self).ob_size = (sizefunc)cp_intatom__size__;
+    CpFieldCAtom_CATOM(self).ob_type = (typefunc)cp_intatom__type__;
     CpFieldCAtom_CATOM(self).ob_bits = NULL;
   }
   return (PyObject*)self;
@@ -61,6 +73,8 @@ cp_intatom_init(CpIntAtomObject* self, PyObject* args, PyObject* kwds)
   return 0;
 }
 
+
+
 /* Public API */
 int
 CpIntAtom_Pack(CpIntAtomObject* self, PyObject* op, CpLayerObject* layer)
@@ -80,6 +94,7 @@ CpIntAtom_Pack(CpIntAtomObject* self, PyObject* op, CpLayerObject* layer)
     _modulestate *mod = layer->m_state->mod;
     PyObject *endian = ((CpFieldObject *)layer->m_field)->m_endian;
 
+    if (CpEndian_Check(endian))
     /* If the field has an endian specified, use that. */
     little_endian = CpEndian_IsLittleEndian((CpEndianObject *)endian, mod);
   }
@@ -114,6 +129,7 @@ CpIntAtom_Unpack(CpIntAtomObject* self, CpLayerObject* layer)
     _modulestate *mod = layer->m_state->mod;
     PyObject *endian = ((CpFieldObject *)layer->m_field)->m_endian;
 
+    if (CpEndian_Check(endian))
     /* If the field has an endian specified, use that. */
     little_endian = CpEndian_IsLittleEndian((CpEndianObject *)endian, mod);
   }
