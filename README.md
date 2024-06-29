@@ -34,6 +34,9 @@ Simply use pip to install the package:
 pip install "caterpillar[all]@git+https://github.com/MatrixEditor/caterpillar.git"
 ```
 
+> [!NOTE]
+> You will need to install `make`, a C compiler and the Python3.12 development package.
+
 ## Starting Point
 
 Please visit the [Documentation](https://matrixeditor.github.io/caterpillar/), it contains a complete tutorial on how to use this library.
