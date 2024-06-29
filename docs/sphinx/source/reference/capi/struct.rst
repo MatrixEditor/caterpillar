@@ -11,7 +11,7 @@ does not create a dataclass of the model.
 
 .. c:var:: PyTypeObject CpStruct_Type
 
-    The type object for the :c:type:`CpStruct` class.
+    The type object for the :code:`Struct` class.
 
 There are a few differences between the Python implementation and this one. Although,
 they try to be identical on the high-level programming interface, their low-level
@@ -25,12 +25,12 @@ generated (at least for now).
     recommended to extend this class, as its Python variant already covers possible
     subclass use-cases.
 
-    All :code:`CpStruct` instances will store a reference to the core module state.
+    All :code:`Struct` instances will store a reference to the core module state.
     There is no need to call :c:func:`get_global_core_state` more than once if you
-    own a :code:`CpStruct` instance.
+    own a :code:`Struct` instance.
 
 
-To manage field definitions, the :c:type:`CpStruct` class stores all discovered fields
+To manage field definitions, the :code:`Struct` class stores all discovered fields
 in an internal dictionary using an extra type:
 
 .. c:type:: CpStructFieldInfoObject
@@ -60,7 +60,7 @@ in an internal dictionary using an extra type:
 
 .. c:function:: int CpStructModel_Check(PyObject* m, _coremodulestate* s)
 
-    Returns ``1`` if the model stores a :c:type:`CpStruct` instance and therefore
+    Returns ``1`` if the model stores a :c:type:`Struct` instance and therefore
     conforms to the *StructContainer* protocol, ``0`` otherwise. This function
     always suceeds if the given state is not *NULL*.
 

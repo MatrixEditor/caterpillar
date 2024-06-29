@@ -638,7 +638,7 @@ static PyNumberMethods CpFieldAtom_NumberMethods = {
   .nb_matrix_multiply = (binaryfunc)cp_fieldatom_as_number_matmul,
   .nb_floor_divide = (binaryfunc)cp_fieldatom_as_number_floordiv,
   .nb_add = (binaryfunc)cp_fieldatom_as_number_add,
-  .nb_rshift = (binaryfunc)cp_fieldatom_as_number_rshift,
+  .nb_inplace_add = (binaryfunc)cp_fieldatom_as_number_add,
   .nb_or = (binaryfunc)cp_fieldatom_as_number_or,
   .nb_xor = (binaryfunc)cp_fieldatom_as_number_xor,
 };

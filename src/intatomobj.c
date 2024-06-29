@@ -1,5 +1,6 @@
 /* intatom C implementation */
 #include "caterpillar/intatomobj.h"
+#include "caterpillar/arch.h"
 #include <structmember.h>
 
 static PyObject*
@@ -37,7 +38,7 @@ cp_intatom_init(CpIntAtomObject* self, PyObject* args, PyObject* kwds)
   int _signed = true, little_endian = true;
   size_t bits = 0;
   if (!PyArg_ParseTupleAndKeywords(
-        args, kwds, "k|pp", kwlist, &bits, &_signed, &little_endian)) {
+        args, kwds, "I|pp", kwlist, &bits, &_signed, &little_endian)) {
     return -1;
   }
   if (bits == 0) {
@@ -74,10 +75,19 @@ CpIntAtom_Pack(CpIntAtomObject* self, PyObject* op, CpLayerObject* layer)
     Py_DECREF(bytes);
   }
 
+  int little_endian = self->_m_little_endian;
+  if (layer->m_field) {
+    _modulestate *mod = layer->m_state->mod;
+    PyObject *endian = ((CpFieldObject *)layer->m_field)->m_endian;
+
+    /* If the field has an endian specified, use that. */
+    little_endian = CpEndian_IsLittleEndian((CpEndianObject *)endian, mod);
+  }
+
   int res = _PyLong_AsByteArray((PyLongObject*)op,
                                 (unsigned char*)PyBytes_AS_STRING(op),
                                 self->_m_byte_count,
-                                self->_m_little_endian,
+                                little_endian,
                                 self->_m_signed);
   if (res == -1) {
     return -1;
@@ -99,10 +109,19 @@ CpIntAtom_Unpack(CpIntAtomObject* self, CpLayerObject* layer)
     return NULL;
   }
 
+  int little_endian = self->_m_little_endian;
+  if (layer->m_field) {
+    _modulestate *mod = layer->m_state->mod;
+    PyObject *endian = ((CpFieldObject *)layer->m_field)->m_endian;
+
+    /* If the field has an endian specified, use that. */
+    little_endian = CpEndian_IsLittleEndian((CpEndianObject *)endian, mod);
+  }
+
   PyObject* obj =
     _PyLong_FromByteArray((unsigned char*)PyBytes_AS_STRING(bytes),
                           self->_m_byte_count,
-                          self->_m_little_endian,
+                          little_endian,
                           self->_m_signed);
   Py_DECREF(bytes);
   return obj;
@@ -122,7 +141,7 @@ static PyMemberDef CpIntAtom_Members[] = {
   { "little_endian",
     T_BOOL,
     offsetof(CpIntAtomObject, _m_little_endian),
-    READONLY,
+    NULL,
     NULL },
   { NULL } /* Sentinel */
 };

@@ -7,3 +7,4 @@ Concrete Objects Layer
 .. toctree::
 
     struct.rst
+    intatom.rst

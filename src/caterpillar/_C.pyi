@@ -247,3 +247,21 @@ def pack_into(__obj: Any, __struct: atom, __io: IO, **globals) -> None: ...
 def pack(__obj: Any, __struct: atom, **globals) -> bytes: ...
 def sizeof(obj: atom, globals: Optional[dict | Context] = ...): ...
 def unpack(__io: Any, __struct: atom, **globals) -> Any: ...
+
+class intatom(fieldcatom):
+    little_endian: bool
+    nbits: int
+    nbytes: int
+    signed: bool
+    def __init__(self, nbits: int, signed: bool = ..., little_endian: bool = ...) -> None: ...
+
+i16: intatom
+i24: intatom
+i32: intatom
+i64: intatom
+i8: intatom
+u16: intatom
+u24: intatom
+u32: intatom
+u64: intatom
+u8: intatom

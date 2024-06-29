@@ -335,6 +335,8 @@ cp_module_clear(PyObject* m)
 
     /* clear default arch and endian */
     Py_CLEAR(state->cp_endian__native);
+    Py_CLEAR(state->cp_endian__little);
+    Py_CLEAR(state->cp_endian__big);
     Py_CLEAR(state->cp_arch__host);
 
     // typing references
@@ -480,6 +482,33 @@ PyInit__C(void)
   CpModule_AddObject("Struct", &CpStruct_Type);
   CpModule_AddObject("intatom", &CpIntAtom_Type);
 
+  /* setup custom intatoms */
+#define CpModule_DefAtom(name, ...)                                            \
+  {                                                                            \
+    PyObject* value = (PyObject*)__VA_ARGS__;                                  \
+    if (!value) {                                                              \
+      return NULL;                                                             \
+    }                                                                          \
+    CpModule_AddObject(name, value);                                           \
+  }
+
+#define CpModule_DefIntAtom(name, bits, signed)                                \
+  CpModule_DefAtom(                                                            \
+    name, CpObject_Create(&CpIntAtom_Type, "Iii", bits, signed, true));
+
+  CpModule_DefIntAtom("i8", 8, true);
+  CpModule_DefIntAtom("u8", 8, false);
+  CpModule_DefIntAtom("i16", 16, true);
+  CpModule_DefIntAtom("u16", 16, false);
+  CpModule_DefIntAtom("i24", 24, true);
+  CpModule_DefIntAtom("u24", 24, false);
+  CpModule_DefIntAtom("i32", 32, true);
+  CpModule_DefIntAtom("u32", 32, false);
+  CpModule_DefIntAtom("i64", 64, true);
+  CpModule_DefIntAtom("u64", 64, false);
+
+
+#undef CpModule_DefAtom
   /* setup state */
   _modulestate* state = get_module_state(m);
   CpModuleState_AddObject(
@@ -526,6 +555,12 @@ PyInit__C(void)
   CpModuleState_AddObject(cp_endian__native,
                           "NATIVE_ENDIAN",
                           CpObject_Create(&CpEndian_Type, "sb", "native", '='));
+  CpModuleState_AddObject(cp_endian__little,
+                          "LITTLE_ENDIAN",
+                          CpObject_Create(&CpEndian_Type, "sb", "little", '<'));
+  CpModuleState_AddObject(cp_endian__big,
+                          "BIG_ENDIAN",
+                          CpObject_Create(&CpEndian_Type, "sb", "big", '>'));
   CpModuleState_AddObject(
     cp_arch__host,
     "HOST_ARCH",

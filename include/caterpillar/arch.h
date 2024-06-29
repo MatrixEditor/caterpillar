@@ -18,6 +18,7 @@
 #define CP_ARCH_H
 
 #include "macros.h"
+#include "module.h"
 
 /// Arch object type
 PyAPI_DATA(PyTypeObject) CpArch_Type;
@@ -93,4 +94,16 @@ typedef struct _endianobj
  * @return 1 if the object is an endian object, 0 otherwise
  */
 #define CpEndian_Check(op) PyObject_TypeCheck((PyObject*)(op), &CpEndian_Type)
+
+/**
+ * @brief Checks if the given object is a little endian
+ *
+ * @param endian the object to check
+ * @param mod the module state
+ * @return 1 if the object is a little endian, 0 otherwise
+ *
+ * @note 1 is returned even if the current object may be the native endian
+ */
+PyAPI_FUNC(int) CpEndian_IsLittleEndian(CpEndianObject *endian, _modulestate *mod);
+
 #endif

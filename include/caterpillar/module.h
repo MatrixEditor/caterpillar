@@ -46,6 +46,8 @@ typedef struct _modulestate
 
   // default endian object
   PyObject* cp_endian__native;
+  PyObject* cp_endian__big;
+  PyObject* cp_endian__little;
 
   // typing constants
   PyObject* Any_Type;
