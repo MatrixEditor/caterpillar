@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from ._base import Field, INVALID_DEFAULT, DEFAULT_OPTION, singleton
-from ._mixin import FieldMixin, FieldStruct, Chain
+from ._mixin import FieldMixin, FieldStruct, Chain, _infix_
 from .common import (
     FormatField,
     Transformer,

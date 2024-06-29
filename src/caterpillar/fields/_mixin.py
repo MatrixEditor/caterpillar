@@ -12,9 +12,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+import inspect
 
 from io import BytesIO
-from typing import Any, List, Union, Optional, Iterable
+from typing import Any, List, Union, Optional, Iterable, Callable
+from abc import ABC, abstractmethod
+from functools import partial
 
 from caterpillar.abc import _ContextLike, _StructLike, _ContextLambda, _Switch
 from caterpillar.abc import _ContainsStruct, getstruct
@@ -293,7 +296,52 @@ class Chain(FieldStruct):
                     obj = stream.getvalue()
 
 
-# utility method
+class _infix_:
+    """Defines a custom opearator (user-defined)
+
+    It operates _infix_ between two statements and takes them as
+    agruments. For instance, the following example will return
+    an array of structures:
+
+    .. code-block:: python
+
+        from caterpillar.fields import uint16, _infix_
+        from caterpillar.model import struct
+
+        M = _infix_(lambda a, b: a[b*2])
+
+        @struct
+        class Format:
+            f1: uint16 /M/ 3
+
+    This class reserves the `/` operator. It is also possible to
+    use this class as a decorator on callable objects:
+
+    .. code-block:: python
+
+        @_infix_
+        def M(a, b):
+            return a[b*2]
+
+    :param func: The function to be applied.
+    :type func: Callable[[Any, Any], _StructLike]
+    """
+
+    def __init__(self, func: Callable[[Any, Any], _StructLike]) -> None:
+        self.func = func
+
+    def __truediv__(self, arg2) -> _StructLike:
+        return self.func(arg2)
+
+    def __rtruediv__(self, arg1) -> '_infix_':
+        return _infix_(partial(self.func, arg1))
+
+    def __call__(self, arg1, arg2) -> _StructLike:
+        return self.func(arg1, arg2)
+
+
+
+# utility methods
 def get_args(args: Any, context: _ContextLike) -> List[Any]:
     """
     Get arguments for an instance.
