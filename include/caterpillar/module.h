@@ -88,6 +88,11 @@ typedef struct _modulestate
   // compiled regex for unnamed fields
   PyObject* cp_regex__unnamed;
   PyObject* inspect_getannotations;
+
+
+  // cached objects
+  PyObject *cp_bytes__true;
+  PyObject *cp_bytes__false;
 } _modulestate;
 
 /** Module object type */

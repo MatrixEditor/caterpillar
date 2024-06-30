@@ -10,8 +10,9 @@
 #include "caterpillar/struct.h"
 
 // atom implementations
-#include "caterpillar/atoms/int.h"
 #include "caterpillar/atoms/float.h"
+#include "caterpillar/atoms/int.h"
+#include "caterpillar/atoms/primitive.h"
 
 /* immortal objects */
 static PyObject*
@@ -374,6 +375,9 @@ cp_module_clear(PyObject* m)
     Py_CLEAR(state->str___qualname__);
 
     Py_CLEAR(state->cp_regex__unnamed);
+
+    Py_CLEAR(state->cp_bytes__false);
+    Py_CLEAR(state->cp_bytes__true);
   }
   return 0;
 }
@@ -458,6 +462,9 @@ PyInit__C(void)
   CpFloatAtom_Type.tp_base = &CpFieldCAtom_Type;
   CpModule_SetupType(&CpFloatAtom_Type);
 
+  CpBoolAtom_Type.tp_base = &CpFieldCAtom_Type;
+  CpModule_SetupType(&CpBoolAtom_Type);
+
   // module setup
   m = PyModule_Create(&CpModule);
   if (!m) {
@@ -487,6 +494,7 @@ PyInit__C(void)
 
   CpModule_AddObject("intatom", &CpIntAtom_Type);
   CpModule_AddObject("floatatom", &CpFloatAtom_Type);
+  CpModule_AddObject("boolatom", &CpBoolAtom_Type);
 
   /* setup custom intatoms */
 #define CpModule_DefAtom(name, ...)                                            \
@@ -513,8 +521,7 @@ PyInit__C(void)
   CpModule_DefIntAtom("i64", 64, true);
   CpModule_DefIntAtom("u64", 64, false);
 
-
-#define CpModule_DefFloatAtom(name, bits)                                     \
+#define CpModule_DefFloatAtom(name, bits)                                      \
   CpModule_DefAtom(name, CpObject_Create(&CpFloatAtom_Type, "I", bits));
 
   CpModule_DefFloatAtom("f16", 16);
@@ -523,6 +530,9 @@ PyInit__C(void)
 
 #undef CpModule_DefIntAtom
 #undef CpModule_DefAtom
+
+  CpModule_AddObject("boolean", CpObject_CreateNoArgs(&CpBoolAtom_Type));
+
   /* setup state */
   _modulestate* state = get_module_state(m);
   CpModuleState_AddObject(
@@ -613,6 +623,16 @@ PyInit__C(void)
   CACHED_STRING(str_path_delim, ".");
 
 #undef CACHED_STRING
+
+#define CACHED_BYTES(attr, str, size)                                          \
+  if ((state->attr = PyBytes_FromStringAndSize(str, size)) == NULL) {          \
+    return NULL;                                                               \
+  }
+
+  CACHED_BYTES(cp_bytes__false, "\x00", 1);
+  CACHED_BYTES(cp_bytes__true, "\x01", 1);
+
+#undef CACHED_BYTES
 
   // setup typing constants
   PyObject* typing = PyImport_ImportModule("typing");

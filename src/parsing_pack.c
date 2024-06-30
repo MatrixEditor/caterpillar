@@ -141,22 +141,6 @@ CpPack_Common(PyObject* op, PyObject* atom, CpLayerObject* layer)
   }
 
   CpStateObject* state = layer->m_state;
-  if (PyObject_HasAttr(atom, state->mod->str___pack_many__)) {
-    // class explicitly defines __pack_many__ -> use it
-    PyObject* res = PyObject_CallMethodObjArgs(
-      atom, state->mod->str___pack_many__, op, (PyObject*)layer, NULL);
-    if (PyErr_Occurred() &&
-        PyErr_GetRaisedException() == PyExc_NotImplementedError) {
-      // Make sure this method continues to pack the given object
-      PyErr_Clear();
-      Py_XDECREF(res);
-    } else {
-      success = res ? 0 : -1;
-      Py_XDECREF(res);
-      return success;
-    }
-  }
-
   if (!PySequence_Check(op)) {
     PyErr_Format(PyExc_ValueError, "input object (%R) is not a sequence", op);
     return -1;
@@ -234,6 +218,22 @@ CpPack_Common(PyObject* op, PyObject* atom, CpLayerObject* layer)
     return 0;
   }
   CpLayer_SetSequence(seq_layer, op, layer_length, greedy);
+  if (PyObject_HasAttr(atom, state->mod->str___pack_many__)) {
+    // class explicitly defines __pack_many__ -> use it
+    PyObject* res = CpAtom_Pack(
+      atom, state->mod->str___pack_many__, op, (PyObject*)seq_layer);
+    if (PyErr_Occurred() &&
+        PyErr_GetRaisedException() == PyExc_NotImplementedError) {
+      // Make sure this method continues to pack the given object
+      PyErr_Clear();
+      Py_XDECREF(res);
+    } else {
+      success = res ? 0 : -1;
+      Py_XDECREF(res);
+      return success;
+    }
+  }
+
   PyObject* obj = NULL;
   for (seq_layer->m_index = 0; seq_layer->m_index < seq_layer->m_length;
        seq_layer->m_index++) {

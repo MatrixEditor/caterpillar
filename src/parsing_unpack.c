@@ -26,18 +26,7 @@ CpUnpack_Common(PyObject* op, CpLayerObject* layer)
   }
 
   _modulestate* mod = layer->m_state->mod;
-  if (PyObject_HasAttr(op, mod->str___unpack_many__)) {
-    PyObject* res =
-      PyObject_CallMethodOneArg(op, mod->str___unpack__, (PyObject*)layer);
-    if (PyErr_Occurred() &&
-        PyErr_GetRaisedException() == PyExc_NotImplementedError) {
-      // Make sure this method continues to unpack
-      PyErr_Clear();
-      Py_XDECREF(res);
-    } else {
-      return res;
-    }
-  }
+
 
   if (!layer->m_field) {
     PyErr_SetString(PyExc_ValueError, "state is invalid (field is NULL)!");
@@ -117,6 +106,18 @@ CpUnpack_Common(PyObject* op, CpLayerObject* layer)
     goto fail;
   }
   CpLayer_SetSequence(seq_layer, seq, seq_length, seq_greedy);
+  if (PyObject_HasAttr(op, mod->str___unpack_many__)) {
+    PyObject* res =
+      PyObject_CallMethodOneArg(op, mod->str___unpack_many__, (PyObject*)layer);
+    if (PyErr_Occurred() &&
+        PyErr_GetRaisedException() == PyExc_NotImplementedError) {
+      // Make sure this method continues to unpack
+      PyErr_Clear();
+      Py_XDECREF(res);
+    } else {
+      return res;
+    }
+  }
 
   while (seq_layer->s_greedy || (seq_layer->m_index < seq_layer->m_length)) {
     seq_layer->m_path = PyUnicode_FromFormat(

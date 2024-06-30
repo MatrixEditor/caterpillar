@@ -104,8 +104,11 @@ PyAPI_DATA(PyTypeObject) CpAtom_Type;
  * @param ctx the context object
  * @return the result of the `__pack__` method or `NULL` on error
  */
-PyAPI_FUNC(PyObject*)
-  CpAtom_Pack(PyObject* atom, PyObject* attrname, PyObject* op, PyObject* ctx);
+inline PyObject*
+CpAtom_Pack(PyObject* atom, PyObject* attrname, PyObject* op, PyObject* ctx)
+{
+  return PyObject_CallMethodObjArgs(atom, attrname, op, ctx, NULL);
+}
 
 // ---------------------------------------------------------------------------
 // CAtom
@@ -229,8 +232,8 @@ typedef struct _catomobj
 {
   CpAtom_HEAD
 
-  // C functions to implement
-  sizefunc ob_size;
+    // C functions to implement
+    sizefunc ob_size;
   typefunc ob_type;
   packfunc ob_pack;
   packmanyfunc ob_pack_many;

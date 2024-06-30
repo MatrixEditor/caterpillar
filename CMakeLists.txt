@@ -25,8 +25,9 @@ python_add_library(
   src/parsing_pack.c
   src/parsing_unpack.c
 
-  src/intatomobj.c
-  src/floatatomobj.c
+  src/atomimpl/intatomobj.c
+  src/atomimpl/floatatomobj.c
+  src/atomimpl/boolatomobj.c
 
   WITH_SOABI
 )
