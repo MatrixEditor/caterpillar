@@ -465,6 +465,9 @@ PyInit__C(void)
   CpBoolAtom_Type.tp_base = &CpFieldCAtom_Type;
   CpModule_SetupType(&CpBoolAtom_Type);
 
+  CpCharAtom_Type.tp_base = &CpFieldCAtom_Type;
+  CpModule_SetupType(&CpCharAtom_Type);
+
   // module setup
   m = PyModule_Create(&CpModule);
   if (!m) {
@@ -495,6 +498,7 @@ PyInit__C(void)
   CpModule_AddObject("intatom", &CpIntAtom_Type);
   CpModule_AddObject("floatatom", &CpFloatAtom_Type);
   CpModule_AddObject("boolatom", &CpBoolAtom_Type);
+  CpModule_AddObject("charatom", &CpCharAtom_Type);
 
   /* setup custom intatoms */
 #define CpModule_DefAtom(name, ...)                                            \
@@ -532,6 +536,7 @@ PyInit__C(void)
 #undef CpModule_DefAtom
 
   CpModule_AddObject("boolean", CpObject_CreateNoArgs(&CpBoolAtom_Type));
+  CpModule_AddObject("char", CpObject_CreateNoArgs(&CpCharAtom_Type));
 
   /* setup state */
   _modulestate* state = get_module_state(m);

@@ -1,59 +1,63 @@
-/* boolatom C implementation */
+/* charatom C implementation */
 #include "caterpillar/atoms/primitive.h"
 #include <structmember.h>
 
 static PyObject*
-cp_boolatom__type__(CpBoolAtomObject* self)
+cp_charatom__type__(CpCharAtomObject* self)
 {
-  return Py_XNewRef(&PyBool_Type);
+  return Py_XNewRef(&PyBytes_Type);
 }
 
 static PyObject*
-cp_boolatom__size__(CpBoolAtomObject* self)
+cp_charatom__size__(CpCharAtomObject* self)
 {
   return PyLong_FromSize_t(1);
 }
 
 static PyObject*
-cp_boolatom_new(PyTypeObject* type, PyObject* args, PyObject* kwds)
+cp_charatom_new(PyTypeObject* type, PyObject* args, PyObject* kwds)
 {
-  CpBoolAtomObject* self = (CpBoolAtomObject*)type->tp_alloc(type, 0);
+  CpCharAtomObject* self = (CpCharAtomObject*)type->tp_alloc(type, 0);
   if (self != NULL) {
-    CpFieldCAtom_CATOM(self).ob_pack = (packfunc)CpBoolAtom_Pack;
-    CpFieldCAtom_CATOM(self).ob_unpack = (unpackfunc)CpBoolAtom_Unpack;
+    CpFieldCAtom_CATOM(self).ob_pack = (packfunc)CpCharAtom_Pack;
+    CpFieldCAtom_CATOM(self).ob_unpack = (unpackfunc)CpCharAtom_Unpack;
     CpFieldCAtom_CATOM(self).ob_pack_many = NULL;
     CpFieldCAtom_CATOM(self).ob_unpack_many = NULL;
-    CpFieldCAtom_CATOM(self).ob_size = (sizefunc)cp_boolatom__size__;
-    CpFieldCAtom_CATOM(self).ob_type = (typefunc)cp_boolatom__type__;
+    CpFieldCAtom_CATOM(self).ob_size = (sizefunc)cp_charatom__size__;
+    CpFieldCAtom_CATOM(self).ob_type = (typefunc)cp_charatom__type__;
     CpFieldCAtom_CATOM(self).ob_bits = NULL;
   }
   return (PyObject*)self;
 }
 
 static void
-cp_boolatom_dealloc(CpBoolAtomObject* self)
+cp_charatom_dealloc(CpCharAtomObject* self)
 {
   Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
 static int
-cp_boolatom_init(CpBoolAtomObject* self, PyObject* args, PyObject* kwds)
+cp_charatom_init(CpCharAtomObject* self, PyObject* args, PyObject* kwds)
 {
-  _Cp_InitNoArgs(boolatom, args, kwds);
+  _Cp_InitNoArgs(charatom, args, kwds);
 }
 
 /* Public API */
 
 int
-CpBoolAtom_Pack(CpBoolAtomObject* self, PyObject* value, CpLayerObject* layer)
+CpCharAtom_Pack(CpCharAtomObject* self, PyObject* value, CpLayerObject* layer)
 {
-  PyObject* res;
-  if (value == Py_True) {
-    res = CpState_Write(layer->m_state, layer->m_state->mod->cp_bytes__true);
-  } else {
-    res = CpState_Write(layer->m_state, layer->m_state->mod->cp_bytes__false);
+  if (PyBytes_Check(value)) {
+    PyErr_SetString(PyExc_TypeError, "can only pack bytes objects");
+    return -1;
   }
 
+  if (PyBytes_Size(value) != 1) {
+    PyErr_SetString(PyExc_TypeError, "can only pack one-sized bytes");
+    return -1;
+  }
+
+  PyObject* res = CpState_Write(layer->m_state, value);
   if (!res) {
     return -1;
   }
@@ -62,30 +66,21 @@ CpBoolAtom_Pack(CpBoolAtomObject* self, PyObject* value, CpLayerObject* layer)
 }
 
 PyObject*
-CpBoolAtom_Unpack(CpBoolAtomObject* self, CpLayerObject* layer)
+CpCharAtom_Unpack(CpCharAtomObject* self, CpLayerObject* layer)
 {
-  PyObject* res;
-  PyObject* value = CpState_Read(layer->m_state, 1);
-  if (!value) {
+  PyObject* res = CpState_Read(layer->m_state, 1);
+  if (!res) {
     return NULL;
   }
-
-  if (*PyBytes_AS_STRING(value)) {
-    res = Py_XNewRef(Py_True);
-  } else {
-    res = Py_XNewRef(Py_False);
-  }
-
-  Py_XDECREF(value);
   return res;
 }
 
 /* type setup */
-PyTypeObject CpBoolAtom_Type = {
-  PyVarObject_HEAD_INIT(NULL, 0) _Cp_Name(boolatom),
+PyTypeObject CpCharAtom_Type = {
+  PyVarObject_HEAD_INIT(NULL, 0) _Cp_Name(charatom),
   sizeof(CpBoolAtomObject),        /* tp_basicsize */
   0,                               /* tp_itemsize */
-  (destructor)cp_boolatom_dealloc, /* tp_dealloc */
+  (destructor)cp_charatom_dealloc, /* tp_dealloc */
   0,                               /* tp_vectorcall_offset */
   0,                               /* tp_getattr */
   0,                               /* tp_setattr */
@@ -116,9 +111,9 @@ PyTypeObject CpBoolAtom_Type = {
   0,                               /* tp_descr_get */
   0,                               /* tp_descr_set */
   0,                               /* tp_dictoffset */
-  (initproc)cp_boolatom_init,      /* tp_init */
+  (initproc)cp_charatom_init,      /* tp_init */
   0,                               /* tp_alloc */
-  (newfunc)cp_boolatom_new,        /* tp_new */
+  (newfunc)cp_charatom_new,        /* tp_new */
   0,                               /* tp_free */
   0,                               /* tp_is_gc */
   0,                               /* tp_bases */

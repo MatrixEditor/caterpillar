@@ -21,22 +21,64 @@
 #include "caterpillar/macros.h"
 #include "caterpillar/state.h"
 
+/// @struct _boolatomobj
+/// @brief Struct representing a bool atom object.
+///
+/// This struct defines a bool atom object which is part of the CpFieldCAtom
+/// family.
 typedef struct _boolatomobj
 {
   CpFieldCAtom_HEAD
 } CpBoolAtomObject;
 
-/// Bool atom object type
+/// @brief Bool atom object type
+///
+/// This variable defines the type object for bool atom objects, allowing
+/// them to be used across the library.
 PyAPI_DATA(PyTypeObject) CpBoolAtom_Type;
 
-/** @brief Checks if the given object is a bool atom object */
+/**
+ * @brief Checks if the given object is a bool atom object.
+ *
+ * This macro verifies if the provided object is exactly of the bool
+ * atom type.
+ *
+ * @param op The object to check.
+ * @return True if the object is exactly of type CpBoolAtom_Type,
+ *         false otherwise.
+ */
 #define CpBoolAtom_CheckExact(op) Py_IS_TYPE((op), &CpBoolAtom_Type)
-/** @brief Checks if the given object is a bool atom object */
+
+/**
+ * @brief Checks if the given object is a bool atom object.
+ *
+ * This macro checks if the provided object is of the bool atom type or
+ * a subtype thereof.
+ *
+ * @param op The object to check.
+ * @return True if the object is of type CpBoolAtom_Type or a subtype,
+ *         false otherwise.
+ */
 #define CpBoolAtom_Check(op) (PyObject_TypeCheck((op), &CpBoolAtom_Type))
 
+/**
+ * @brief Packs a value into the underlying stream.
+ *
+ * @param self The bool atom object
+ * @param value The boolean value to be packed.
+ * @param layer The layer object providing the context for packing.
+ * @return Integer status code (typically 0 for success, non-zero for error).
+ */
 PyAPI_FUNC(int)
   CpBoolAtom_Pack(CpBoolAtomObject* self, PyObject* value, CpLayerObject* layer);
 
+/**
+ * @brief Unpacks a value from the underlying stream.
+ *
+ * @param self The bool atom object instance.
+ * @param layer The layer object providing the context for unpacking.
+ * @return The unpacked boolean value as a PyObject.
+ */
 PyAPI_FUNC(PyObject*)
   CpBoolAtom_Unpack(CpBoolAtomObject* self, CpLayerObject* layer);
 
@@ -59,13 +101,29 @@ PyAPI_DATA(PyTypeObject) CpCharAtom_Type;
 PyAPI_FUNC(int)
   CpCharAtom_Pack(CpCharAtomObject* self, PyObject* value, CpLayerObject* layer);
 
-PyAPI_FUNC(int)
-  CpCharAtom_PackMany(CpCharAtomObject* self, PyObject* value, CpLayerObject* layer);
-
 PyAPI_FUNC(PyObject*)
   CpCharAtom_Unpack(CpCharAtomObject* self, CpLayerObject* layer);
 
-PyAPI_FUNC(PyObject *)
-  CpCharAtom_UnpackMany(CpCharAtomObject *self, CpLayerObject *layer);
+
+//------------------------------------------------------------------------------
+// Padding
+typedef struct _paddingatomobj
+{
+  CpFieldCAtom_HEAD
+} CpPaddingAtomObject;
+
+/// Padding atom object type
+PyAPI_DATA(PyTypeObject) CpPaddingAtom_Type;
+
+/** @brief Checks if the given object is a padding atom object */
+#define CpPaddingAtom_CheckExact(op) Py_IS_TYPE((op), &CpPaddingAtom_Type)
+/** @brief Checks if the given object is a padding atom object */
+#define CpPaddingAtom_Check(op) (PyObject_TypeCheck((op), &CpPaddingAtom_Type))
+
+PyAPI_FUNC(int)
+  CpPaddingAtom_Pack(CpPaddingAtomObject* self, PyObject* value, CpLayerObject* layer);
+
+PyAPI_FUNC(PyObject*)
+  CpPaddingAtom_Unpack(CpPaddingAtomObject* self, CpLayerObject* layer);
 
 #endif

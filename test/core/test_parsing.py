@@ -89,7 +89,7 @@ def test_unpack_basic():
     # NOTE: parsing is done by first unpacking the switch value (Baz
     # atom) and then use it aas the key of the switch dictionary. the
     # returned atom will be used to parse the rest of the data.
-    assert unpack(data, b >> {1: b}) == 2
+    assert unpack(data, Field(b) >> {1: b}) == 2
     assert unpack(data, b @ 0x0002) == 2
 
 

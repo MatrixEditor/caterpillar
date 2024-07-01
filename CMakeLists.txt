@@ -28,6 +28,7 @@ python_add_library(
   src/atomimpl/intatomobj.c
   src/atomimpl/floatatomobj.c
   src/atomimpl/boolatomobj.c
+  src/atomimpl/charatomobj.c
 
   WITH_SOABI
 )

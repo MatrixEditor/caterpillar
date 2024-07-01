@@ -37,4 +37,12 @@
 #define CpObject_CreateOneArg(type, arg)                                       \
   (PyObject_CallOneArg(((PyObject*)(type)), (arg)))
 
+
+#define _Cp_InitNoArgs(type, args, kw) \
+  if ((args && PyTuple_Size(args)) || (kw && PyDict_Size(kw))) { \
+    PyErr_SetString(PyExc_TypeError, \
+                    (#type " cannot be initialized with arguments")); \
+    return -1; \
+  } \
+  return 0;
 #endif

@@ -5,6 +5,7 @@ Concrete Objects Layer
 **********************
 
 .. toctree::
+    :maxdepth: 2
 
     struct.rst
-    intatom.rst
+    atoms/index.rst
