@@ -110,6 +110,8 @@ PyAPI_FUNC(PyObject*)
 typedef struct _paddingatomobj
 {
   CpFieldCAtom_HEAD
+
+  char padding;
 } CpPaddingAtomObject;
 
 /// Padding atom object type
@@ -121,9 +123,15 @@ PyAPI_DATA(PyTypeObject) CpPaddingAtom_Type;
 #define CpPaddingAtom_Check(op) (PyObject_TypeCheck((op), &CpPaddingAtom_Type))
 
 PyAPI_FUNC(int)
-  CpPaddingAtom_Pack(CpPaddingAtomObject* self, PyObject* value, CpLayerObject* layer);
+  CpPaddingAtom_Pack(CpPaddingAtomObject* self, PyObject* _, CpLayerObject* layer);
+
+PyAPI_FUNC(int)
+  CpPaddingAtom_PackMany(CpPaddingAtomObject* self, PyObject* _, CpLayerObject* layer);
 
 PyAPI_FUNC(PyObject*)
   CpPaddingAtom_Unpack(CpPaddingAtomObject* self, CpLayerObject* layer);
+
+PyAPI_FUNC(PyObject*)
+  CpPaddingAtom_UnpackMany(CpPaddingAtomObject* self, CpLayerObject* layer);
 
 #endif

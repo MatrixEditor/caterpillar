@@ -229,8 +229,7 @@ cp_catom_pack_many(CpCAtomObject* self, PyObject* args, PyObject* kw)
     return NULL;
   }
 
-  return self->ob_pack_many((PyObject*)self, ops, context) ? Py_NewRef(Py_None)
-                                                           : NULL;
+  return self->ob_pack_many((PyObject*)self, ops, context) ? NULL : Py_NewRef(Py_None);
 }
 
 static PyObject*

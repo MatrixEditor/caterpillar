@@ -78,7 +78,7 @@ CpCharAtom_Unpack(CpCharAtomObject* self, CpLayerObject* layer)
 /* type setup */
 PyTypeObject CpCharAtom_Type = {
   PyVarObject_HEAD_INIT(NULL, 0) _Cp_Name(charatom),
-  sizeof(CpBoolAtomObject),        /* tp_basicsize */
+  sizeof(CpCharAtomObject),        /* tp_basicsize */
   0,                               /* tp_itemsize */
   (destructor)cp_charatom_dealloc, /* tp_dealloc */
   0,                               /* tp_vectorcall_offset */
