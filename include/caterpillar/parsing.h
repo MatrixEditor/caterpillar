@@ -35,6 +35,8 @@ PyAPI_FUNC(int)
 PyAPI_FUNC(int)
   CpPack_Struct(PyObject* op, CpStructObject* struct_, CpLayerObject* layer);
 PyAPI_FUNC(int) _Cp_Pack(PyObject* op, PyObject* atom, CpLayerObject* layer);
+PyAPI_FUNC(int)
+  _CpPack_EvalLength(CpLayerObject* layer, Py_ssize_t size, bool* greedy, Py_ssize_t* length);
 
 PyAPI_FUNC(PyObject*) CpSizeOf(PyObject* op, PyObject* globals);
 PyAPI_FUNC(PyObject*)
@@ -51,5 +53,7 @@ PyAPI_FUNC(PyObject*) CpUnpack_Common(PyObject* atom, CpLayerObject* layer);
 PyAPI_FUNC(PyObject*)
   CpUnpack_Struct(CpStructObject* struct_, CpLayerObject* layer);
 PyAPI_FUNC(PyObject*) _Cp_Unpack(PyObject* atom, CpLayerObject* layer);
+PyAPI_FUNC(int)
+  _CpUnpack_EvalLength(CpLayerObject* layer, bool* greedy, Py_ssize_t* length);
 
 #endif
