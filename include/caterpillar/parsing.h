@@ -35,8 +35,26 @@ PyAPI_FUNC(int)
 PyAPI_FUNC(int)
   CpPack_Struct(PyObject* op, CpStructObject* struct_, CpLayerObject* layer);
 PyAPI_FUNC(int) _Cp_Pack(PyObject* op, PyObject* atom, CpLayerObject* layer);
-PyAPI_FUNC(int)
-  _CpPack_EvalLength(CpLayerObject* layer, Py_ssize_t size, bool* greedy, Py_ssize_t* length);
+
+/**
+ * @brief Evaluates the length of the sequence to pack.
+ *
+ * This funtion can be utilized to evaluate the length of the sequence to
+ * pack. It uses the :code:`size` parameter to validate the input sequence.
+ * Although, the :code:`size` parameter is not mandatory, it is recommended
+ * - a value of :code:`-1` will disable the check mentioned before.
+ *
+ * @param layer the current layer that is marked as sequential
+ * @param size the size of the input sequence to pack (might be -1, see above)
+ * @param greedy destination pointer to store the result whether the sequence
+ * should be parsed greedily
+ * @param length destination pointer to store the result of the evaluation
+ * @return int 0 on success, -1 on error
+ */
+PyAPI_FUNC(int) _CpPack_EvalLength(CpLayerObject* layer,
+                                   Py_ssize_t size,
+                                   /* out */ bool* seq_greedy,
+                                   /* out */ Py_ssize_t* seq_length);
 
 PyAPI_FUNC(PyObject*) CpSizeOf(PyObject* op, PyObject* globals);
 PyAPI_FUNC(PyObject*)

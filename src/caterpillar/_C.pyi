@@ -277,3 +277,8 @@ class floatatom(fieldcatom):
 f16: floatatom
 f32: floatatom
 f64: floatatom
+
+class paddingatom(fieldcatom):
+    def __init__(self, pad: int) -> None: ...
+
+padding: paddingatom

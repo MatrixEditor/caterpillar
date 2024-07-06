@@ -11,3 +11,4 @@ Atom Objects
     charatom.rst
     floatatom.rst
     boolatom.rst
+    paddingatom.rst

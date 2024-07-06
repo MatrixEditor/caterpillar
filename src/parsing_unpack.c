@@ -58,6 +58,7 @@ _CpUnpack_EvalLength(CpLayerObject* layer,
     // Set the length
     *seq_length = PyLong_AsSsize_t(length);
     if (seq_length < 0) {
+      PyErr_SetString(PyExc_ValueError, "invalid length");
       return -1;
     }
   }
@@ -67,6 +68,7 @@ _CpUnpack_EvalLength(CpLayerObject* layer,
     seq_greedy = false;
     *seq_length = PyLong_AsSsize_t(length);
     if (seq_length < 0) {
+      PyErr_SetString(PyExc_ValueError, "invalid length");
       return -1;
     }
   }
@@ -100,12 +102,15 @@ CpUnpack_Common(PyObject* op, CpLayerObject* layer)
   if (PyObject_HasAttr(op, mod->str___unpack_many__)) {
     PyObject* res =
       PyObject_CallMethodOneArg(op, mod->str___unpack_many__, (PyObject*)layer);
-    if (PyErr_Occurred() &&
-        PyErr_GetRaisedException() == PyExc_NotImplementedError) {
+    PyObject* exc = NULL;
+    if ((exc = PyErr_GetRaisedException(),
+         exc && PyErr_GivenExceptionMatches(exc, PyExc_NotImplementedError))) {
       // Make sure this method continues to unpack
+      Py_XDECREF(exc);
       PyErr_Clear();
       Py_XDECREF(res);
     } else {
+      Py_XDECREF(exc);
       return res;
     }
   }
@@ -377,6 +382,12 @@ CpUnpack(PyObject* atom, PyObject* io, PyObject* globals)
 
   Py_XSETREF(root->m_path, Py_NewRef(state->mod->str_ctx__root));
   obj = _Cp_Unpack(atom, root);
+
+  if (!obj) {
+    if (!PyErr_Occurred()) {
+      PyErr_SetString(PyExc_RuntimeError, "Unpack failed");
+    }
+  }
   Py_DECREF(state);
   CpLayer_Invalidate(root);
   return obj;
