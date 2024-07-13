@@ -4,7 +4,7 @@
 #include "caterpillar/arch.h"
 #include "caterpillar/atomobj.h"
 #include "caterpillar/field.h"
-#include "caterpillar/parsing.h"
+#include "caterpillar/module.h"
 #include "caterpillar/struct.h"
 #include <structmember.h>
 

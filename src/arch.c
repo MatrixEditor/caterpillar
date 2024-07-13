@@ -1,5 +1,7 @@
 /* CpArch and CpEndian */
+#include "caterpillar/caterpillar.h"
 #include "caterpillar/arch.h"
+#include "caterpillar/field.h"
 #include "structmember.h"
 
 /* CpArch */
@@ -95,55 +97,70 @@ static PyMemberDef CpArch_Members[] = { { "name",
 
 PyTypeObject CpArch_Type = {
   PyVarObject_HEAD_INIT(NULL, 0) _Cp_Name(Arch), /* tp_name */
-  sizeof(CpArchObject),                           /* tp_basicsize */
-  0,                                              /* tp_itemsize */
-  (destructor)cp_arch_dealloc,                    /* tp_dealloc */
-  0,                                              /* tp_print */
-  0,                                              /* tp_getattr */
-  0,                                              /* tp_setattr */
-  0,                                              /* tp_reserved */
-  (reprfunc)cp_arch_repr,                         /* tp_repr */
-  0,                                              /* tp_as_number */
-  0,                                              /* tp_as_sequence */
-  0,                                              /* tp_as_mapping */
-  (hashfunc)cp_arch_hash,                         /* tp_hash */
-  (ternaryfunc)cp_arch_richcmp,                   /* tp_call */
-  0,                                              /* tp_str */
-  0,                                              /* tp_getattro */
-  0,                                              /* tp_setattro */
-  0,                                              /* tp_as_buffer */
-  Py_TPFLAGS_DEFAULT,                             /* tp_flags */
-  cp_arch_doc,                                    /* tp_doc */
-  0,                                              /* tp_traverse */
-  0,                                              /* tp_clear */
-  0,                                              /* tp_richcompare */
-  0,                                              /* tp_weaklistoffset */
-  0,                                              /* tp_iter */
-  0,                                              /* tp_iternext */
-  0,                                              /* tp_methods */
-  CpArch_Members,                                 /* tp_members */
-  0,                                              /* tp_getset */
-  0,                                              /* tp_base */
-  0,                                              /* tp_dict */
-  0,                                              /* tp_descr_get */
-  0,                                              /* tp_descr_set */
-  0,                                              /* tp_dictoffset */
-  (initproc)cp_arch_init,                         /* tp_init */
-  0,                                              /* tp_alloc */
-  cp_arch_new,                                    /* tp_new */
-  0,                                              /* tp_free */
-  0,                                              /* tp_is_gc */
-  0,                                              /* tp_bases */
-  0,                                              /* tp_mro */
-  0,                                              /* tp_cache */
-  0,                                              /* tp_subclasses */
-  0,                                              /* tp_weaklist */
-  0,                                              /* tp_del */
-  0,                                              /* tp_version_tag */
-  0,                                              /* tp_finalize */
+  sizeof(CpArchObject),                          /* tp_basicsize */
+  0,                                             /* tp_itemsize */
+  (destructor)cp_arch_dealloc,                   /* tp_dealloc */
+  0,                                             /* tp_print */
+  0,                                             /* tp_getattr */
+  0,                                             /* tp_setattr */
+  0,                                             /* tp_reserved */
+  (reprfunc)cp_arch_repr,                        /* tp_repr */
+  0,                                             /* tp_as_number */
+  0,                                             /* tp_as_sequence */
+  0,                                             /* tp_as_mapping */
+  (hashfunc)cp_arch_hash,                        /* tp_hash */
+  (ternaryfunc)cp_arch_richcmp,                  /* tp_call */
+  0,                                             /* tp_str */
+  0,                                             /* tp_getattro */
+  0,                                             /* tp_setattro */
+  0,                                             /* tp_as_buffer */
+  Py_TPFLAGS_DEFAULT,                            /* tp_flags */
+  cp_arch_doc,                                   /* tp_doc */
+  0,                                             /* tp_traverse */
+  0,                                             /* tp_clear */
+  0,                                             /* tp_richcompare */
+  0,                                             /* tp_weaklistoffset */
+  0,                                             /* tp_iter */
+  0,                                             /* tp_iternext */
+  0,                                             /* tp_methods */
+  CpArch_Members,                                /* tp_members */
+  0,                                             /* tp_getset */
+  0,                                             /* tp_base */
+  0,                                             /* tp_dict */
+  0,                                             /* tp_descr_get */
+  0,                                             /* tp_descr_set */
+  0,                                             /* tp_dictoffset */
+  (initproc)cp_arch_init,                        /* tp_init */
+  0,                                             /* tp_alloc */
+  cp_arch_new,                                   /* tp_new */
+  0,                                             /* tp_free */
+  0,                                             /* tp_is_gc */
+  0,                                             /* tp_bases */
+  0,                                             /* tp_mro */
+  0,                                             /* tp_cache */
+  0,                                             /* tp_subclasses */
+  0,                                             /* tp_weaklist */
+  0,                                             /* tp_del */
+  0,                                             /* tp_version_tag */
+  0,                                             /* tp_finalize */
 };
 
 /* CpEndian */
+
+/*CpAPI*/
+int
+CpEndian_IsLittleEndian(CpEndianObject* endian, _modulestate* mod)
+{
+  if (endian->id == '=') {
+#ifdef PY_LITTLE_ENDIAN
+    return 1;
+#else
+    return 0;
+#endif
+  }
+  return endian->id == '<';
+}
+
 static PyObject*
 cp_endian_new(PyTypeObject* type, PyObject* args, PyObject* kw)
 {
@@ -213,6 +230,17 @@ cp_endian_hash(CpEndianObject* self)
   return PyObject_Hash(self->name);
 }
 
+static PyObject*
+cp_endian_as_number_add(CpEndianObject* self, PyObject* atom)
+{
+  CpFieldObject* field = (CpFieldObject*)CpField_New(atom);
+  if (!field) {
+    return NULL;
+  }
+  _Cp_SetObj(field->m_endian, self);
+  return (PyObject*)field;
+}
+
 /* Doc strings */
 
 PyDoc_STRVAR(cp_endian_doc, "\
@@ -223,6 +251,10 @@ Represents common byte order information. The format character is \
 used to incorporate the struct module internally.");
 
 /* type setup */
+
+static PyNumberMethods CpEndian_NumberMethods = {
+  .nb_add = (binaryfunc)cp_endian_as_number_add
+};
 
 static PyMemberDef CpEndian_Members[] = {
   { "name",
@@ -240,49 +272,49 @@ static PyMemberDef CpEndian_Members[] = {
 
 PyTypeObject CpEndian_Type = {
   PyVarObject_HEAD_INIT(NULL, 0) _Cp_Name(Endian), /* tp_name */
-  sizeof(CpEndianObject),                    /* tp_basicsize */
-  0,                                         /* tp_itemsize */
-  (destructor)cp_endian_dealloc,             /* tp_dealloc */
-  0,                                         /* tp_print */
-  0,                                         /* tp_getattr */
-  0,                                         /* tp_setattr */
-  0,                                         /* tp_reserved */
-  (reprfunc)cp_endian_repr,                  /* tp_repr */
-  0,                                         /* tp_as_number */
-  0,                                         /* tp_as_sequence */
-  0,                                         /* tp_as_mapping */
-  (hashfunc)cp_endian_hash,                  /* tp_hash */
-  0,                                         /* tp_call */
-  0,                                         /* tp_str */
-  0,                                         /* tp_getattro */
-  0,                                         /* tp_setattro */
-  0,                                         /* tp_as_buffer */
-  Py_TPFLAGS_DEFAULT,                        /* tp_flags */
-  cp_endian_doc,                             /* tp_doc */
-  0,                                         /* tp_traverse */
-  0,                                         /* tp_clear */
-  (richcmpfunc)cp_endian_richcmp,            /* tp_richcompare */
-  0,                                         /* tp_weaklistoffset */
-  0,                                         /* tp_iter */
-  0,                                         /* tp_iternext */
-  0,                                         /* tp_methods */
-  CpEndian_Members,                          /* tp_members */
-  0,                                         /* tp_getset */
-  0,                                         /* tp_base */
-  0,                                         /* tp_dict */
-  0,                                         /* tp_descr_get */
-  0,                                         /* tp_descr_set */
-  0,                                         /* tp_dictoffset */
-  (initproc)cp_endian_init,                  /* tp_init */
-  0,                                         /* tp_alloc */
-  cp_endian_new,                             /* tp_new */
-  0,                                         /* tp_free */
-  0,                                         /* tp_is_gc */
-  0,                                         /* tp_bases */
-  0,                                         /* tp_mro */
-  0,                                         /* tp_cache */
-  0,                                         /* tp_subclasses */
-  0,                                         /* tp_weaklist */
-  0,                                         /* tp_del */
-  0                                          /* tp_version_tag */
+  sizeof(CpEndianObject),                          /* tp_basicsize */
+  0,                                               /* tp_itemsize */
+  (destructor)cp_endian_dealloc,                   /* tp_dealloc */
+  0,                                               /* tp_print */
+  0,                                               /* tp_getattr */
+  0,                                               /* tp_setattr */
+  0,                                               /* tp_reserved */
+  (reprfunc)cp_endian_repr,                        /* tp_repr */
+  &CpEndian_NumberMethods,                         /* tp_as_number */
+  0,                                               /* tp_as_sequence */
+  0,                                               /* tp_as_mapping */
+  (hashfunc)cp_endian_hash,                        /* tp_hash */
+  0,                                               /* tp_call */
+  0,                                               /* tp_str */
+  0,                                               /* tp_getattro */
+  0,                                               /* tp_setattro */
+  0,                                               /* tp_as_buffer */
+  Py_TPFLAGS_DEFAULT,                              /* tp_flags */
+  cp_endian_doc,                                   /* tp_doc */
+  0,                                               /* tp_traverse */
+  0,                                               /* tp_clear */
+  (richcmpfunc)cp_endian_richcmp,                  /* tp_richcompare */
+  0,                                               /* tp_weaklistoffset */
+  0,                                               /* tp_iter */
+  0,                                               /* tp_iternext */
+  0,                                               /* tp_methods */
+  CpEndian_Members,                                /* tp_members */
+  0,                                               /* tp_getset */
+  0,                                               /* tp_base */
+  0,                                               /* tp_dict */
+  0,                                               /* tp_descr_get */
+  0,                                               /* tp_descr_set */
+  0,                                               /* tp_dictoffset */
+  (initproc)cp_endian_init,                        /* tp_init */
+  0,                                               /* tp_alloc */
+  cp_endian_new,                                   /* tp_new */
+  0,                                               /* tp_free */
+  0,                                               /* tp_is_gc */
+  0,                                               /* tp_bases */
+  0,                                               /* tp_mro */
+  0,                                               /* tp_cache */
+  0,                                               /* tp_subclasses */
+  0,                                               /* tp_weaklist */
+  0,                                               /* tp_del */
+  0                                                /* tp_version_tag */
 };

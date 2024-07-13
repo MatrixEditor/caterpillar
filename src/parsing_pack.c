@@ -2,6 +2,7 @@
 #include "caterpillar/module.h"
 #include "caterpillar/parsing.h"
 #include "caterpillar/state.h"
+#include "caterpillar/struct.h"
 
 // ------------------------------------------------------------------------------
 // pack:
@@ -43,6 +44,79 @@
 //         __[un]pack_many__ is not implemented.          | l: <seq|root> -+
 // ------------------------------------------------------------------------------
 
+/*CpAPI*/
+int
+_CpPack_EvalLength(CpLayerObject* layer,
+                   PyObject* length,
+                   Py_ssize_t size,
+                   bool* greedy,
+                   Py_ssize_t* dstLength)
+{
+  int success = 0;
+  *greedy = false;
+  *dstLength = 0;
+  if (length == &_Py_EllipsisObject) {
+    // Greedy means we pack all elements
+    *greedy = true;
+    *dstLength = size;
+    Py_XDECREF(length);
+    return 0;
+  }
+  if (PySlice_Check(length)) {
+    greedy = false;
+
+    PyObject* start = PyObject_GetAttr(length, layer->m_state->mod->str_start);
+    Py_XDECREF(length);
+    if (!start) {
+      return -1;
+    }
+    if (Py_IsNone(start)) {
+      PyErr_SetString(PyExc_ValueError, "start is None");
+      return -1;
+    }
+
+    if (size < 0) {
+      PyErr_SetString(PyExc_ValueError,
+                      "Prefixed length is not supported for this atom!");
+      return -1;
+    }
+
+    PyObject* sizeobj = PyLong_FromSsize_t(size);
+    if (!sizeobj) {
+      return -1;
+    }
+    // TODO: explain why
+    layer->s_sequential = false;
+    success = _Cp_Pack(sizeobj, start, layer);
+    layer->s_sequential = true;
+    Py_DECREF(sizeobj);
+    Py_DECREF(start);
+    if (success < 0) {
+      return success;
+    }
+    *dstLength = size;
+  } else {
+    if (!PyLong_Check(length)) {
+      Py_XDECREF(length);
+      PyErr_SetString(PyExc_ValueError, "length is not an integer");
+      return -1;
+    }
+
+    greedy = false;
+    *dstLength = PyLong_AsSsize_t(length);
+    Py_XDECREF(length);
+    if (*dstLength != size && size > 0) {
+      PyErr_Format(PyExc_ValueError,
+                   "given length %d does not match sequence size %d",
+                   *dstLength,
+                   size);
+      return -1;
+    }
+  }
+  return 0;
+}
+
+/*CpAPI*/
 int
 CpPack_Field(PyObject* op, CpFieldObject* field, CpLayerObject* layer)
 {
@@ -131,6 +205,7 @@ CpPack_Field(PyObject* op, CpFieldObject* field, CpLayerObject* layer)
   return 0;
 }
 
+/*CpAPI*/
 int
 CpPack_Common(PyObject* op, PyObject* atom, CpLayerObject* layer)
 {
@@ -143,16 +218,19 @@ CpPack_Common(PyObject* op, PyObject* atom, CpLayerObject* layer)
   CpStateObject* state = layer->m_state;
   if (PyObject_HasAttr(atom, state->mod->str___pack_many__)) {
     // class explicitly defines __pack_many__ -> use it
-    PyObject* res = PyObject_CallMethodObjArgs(
-      atom, state->mod->str___pack_many__, op, (PyObject*)layer, NULL);
-    if (PyErr_Occurred() &&
-        PyErr_GetRaisedException() == PyExc_NotImplementedError) {
+    PyObject* res =
+      CpAtom_Pack(atom, state->mod->str___pack_many__, op, (PyObject*)layer);
+    PyObject* exc = NULL;
+    if ((exc = PyErr_GetRaisedException(),
+         exc && PyErr_GivenExceptionMatches(exc, PyExc_NotImplementedError))) {
       // Make sure this method continues to pack the given object
+      Py_XDECREF(exc);
       PyErr_Clear();
       Py_XDECREF(res);
     } else {
       success = res ? 0 : -1;
       Py_XDECREF(res);
+      Py_XDECREF(exc);
       return success;
     }
   }
@@ -170,63 +248,18 @@ CpPack_Common(PyObject* op, PyObject* atom, CpLayerObject* layer)
   seq_layer->s_sequential = false;
 
   Py_ssize_t size = PySequence_Size(op);
+  bool greedy = false;
+  Py_ssize_t layer_length = 0;
   PyObject* length =
     CpField_GetLength((CpFieldObject*)layer->m_field, (PyObject*)layer);
   if (!length) {
-    goto fail;
+    return -1;
   }
-  int8_t greedy = false;
-  Py_ssize_t layer_length = 0;
-  if (length == &_Py_EllipsisObject) {
-    // Greedy means we pack all elements
-    greedy = true;
-    layer_length = size;
+  if (_CpPack_EvalLength(layer, length, size, &greedy, &layer_length) < 0) {
     Py_XDECREF(length);
-  } else if (PySlice_Check(length)) {
-    greedy = false;
-
-    PyObject* start = PyObject_GetAttr(length, state->mod->str_start);
-    Py_XDECREF(length);
-    if (!start) {
-      goto fail;
-    }
-    if (Py_IsNone(start)) {
-      PyErr_SetString(PyExc_ValueError, "start is None");
-      goto fail;
-    }
-
-    PyObject* sizeobj = PyLong_FromSsize_t(size);
-    if (!sizeobj) {
-      goto fail;
-    }
-    // TODO: explain why
-    layer->s_sequential = false;
-    success = _Cp_Pack(sizeobj, start, layer);
-    layer->s_sequential = true;
-    Py_DECREF(sizeobj);
-    Py_DECREF(start);
-    if (success < 0) {
-      return success;
-    }
-    layer_length = size;
-  } else {
-    if (!PyLong_Check(length)) {
-      Py_XDECREF(length);
-      PyErr_SetString(PyExc_ValueError, "length is not an integer");
-      goto fail;
-    }
-
-    greedy = false;
-    layer_length = PyLong_AsSsize_t(length);
-    Py_XDECREF(length);
-    if (layer_length != size) {
-      PyErr_Format(PyExc_ValueError,
-                   "given length %d does not match sequence size %d",
-                   layer_length,
-                   size);
-      goto fail;
-    }
+    return -1;
   }
+  Py_XDECREF(length);
 
   if (layer_length <= 0) {
     // continue packing, here's nothing to store
@@ -234,6 +267,7 @@ CpPack_Common(PyObject* op, PyObject* atom, CpLayerObject* layer)
     return 0;
   }
   CpLayer_SetSequence(seq_layer, op, layer_length, greedy);
+
   PyObject* obj = NULL;
   for (seq_layer->m_index = 0; seq_layer->m_index < seq_layer->m_length;
        seq_layer->m_index++) {
@@ -263,6 +297,7 @@ fail:
   return -1;
 }
 
+/*CpAPI*/
 int
 CpPack_Struct(PyObject* op, CpStructObject* struct_, CpLayerObject* layer)
 {
@@ -365,6 +400,32 @@ cleanup:
   return res;
 }
 
+/*CpAPI*/
+int
+CpPack_CAtom(PyObject* op, CpCAtomObject* catom, CpLayerObject* layer)
+{
+
+  if (!layer->s_sequential) {
+    if (catom->ob_pack == NULL) {
+      PyErr_Format(PyExc_NotImplementedError,
+                   "The atom of type '%s' cannot be packed (missing __pack__)",
+                   Py_TYPE(catom)->tp_name);
+      return -1;
+    }
+    return catom->ob_pack((PyObject*)catom, op, (PyObject*)layer);
+  }
+
+  if (catom->ob_pack_many == NULL) {
+    PyErr_Format(
+      PyExc_NotImplementedError,
+      "The atom of type '%s' cannot be packed (missing __pack_many__)",
+      Py_TYPE(catom)->tp_name);
+    return -1;
+  }
+  return catom->ob_pack_many((PyObject*)catom, op, (PyObject*)layer);
+}
+
+/*CpAPI*/
 int
 _Cp_Pack(PyObject* op, PyObject* atom, CpLayerObject* layer)
 {
@@ -378,16 +439,18 @@ _Cp_Pack(PyObject* op, PyObject* atom, CpLayerObject* layer)
     success = CpPack_Field(op, (CpFieldObject*)atom, layer);
   } else if (CpStruct_CheckExact(atom)) {
     success = CpPack_Struct(op, (CpStructObject*)atom, layer);
-  }
+  } else if (CpCAtom_Check(atom)) {
+    return CpPack_CAtom(op, (CpCAtomObject*)atom, layer);
   // else CASE(&CpCAtom_Type, atom) {
   //   success = cp_pack_catom
   // }
-  else {
+  } else {
     success = CpPack_Common(op, atom, layer);
   }
   return success;
 }
 
+/*CpAPI*/
 int
 CpPack(PyObject* op, PyObject* atom, PyObject* io, PyObject* globals)
 {

@@ -17,7 +17,7 @@
 #ifndef ATOMOBJ_H
 #define ATOMOBJ_H
 
-#include "macros.h"
+#include "caterpillar.h"
 
 /**
  * @brief Special base class for all atom objects
@@ -29,13 +29,13 @@
  *
  * @see _catomobj
  */
-typedef struct _atomobj
+struct _atomobj
 {
   PyObject_HEAD
-} CpAtomObject;
+};
 
 /// Atom object type
-PyAPI_DATA(PyTypeObject) CpAtom_Type;
+// PyAPI_DATA(PyTypeObject) CpAtom_Type;
 
 /**
  * @brief Defines the base type for atom objects to be a Atom
@@ -104,8 +104,11 @@ PyAPI_DATA(PyTypeObject) CpAtom_Type;
  * @param ctx the context object
  * @return the result of the `__pack__` method or `NULL` on error
  */
-PyAPI_FUNC(PyObject*)
-  CpAtom_Pack(PyObject* atom, PyObject* attrname, PyObject* op, PyObject* ctx);
+inline PyObject*
+CpAtom_Pack(PyObject* atom, PyObject* attrname, PyObject* op, PyObject* ctx)
+{
+  return PyObject_CallMethodObjArgs(atom, attrname, op, ctx, NULL);
+}
 
 // ---------------------------------------------------------------------------
 // CAtom
@@ -225,22 +228,22 @@ typedef PyObject* (*bitsfunc)(PyObject*);
 /**
  * @brief Atom object for C types
  */
-typedef struct _catomobj
+struct _catomobj
 {
   CpAtom_HEAD
 
-  // C functions to implement
-  sizefunc ob_size;
+    // C functions to implement
+    sizefunc ob_size;
   typefunc ob_type;
   packfunc ob_pack;
   packmanyfunc ob_pack_many;
   unpackfunc ob_unpack;
   unpackmanyfunc ob_unpack_many;
   bitsfunc ob_bits;
-} CpCAtomObject;
+};
 
-/// Atom object type
-PyAPI_DATA(PyTypeObject) CpCAtom_Type;
+/// Atom object type (defined in __caterpillar_api.h)
+// PyAPI_DATA(PyTypeObject) CpCAtom_Type;
 
 /**
  * @brief Checks if the given object is an atom
@@ -251,7 +254,7 @@ PyAPI_DATA(PyTypeObject) CpCAtom_Type;
  * @param op the object to check (must be a Python object pointer)
  * @return 1 if the object is an atom, 0 otherwise
  */
-#define CpCAtom_Check(op) Py_IS_TYPE((op), &CpCAtom_Type)
+#define CpCAtom_Check(op) PyObject_TypeCheck((op), &CpCAtom_Type)
 
 /**
  * @brief Checks if the given object is an atom

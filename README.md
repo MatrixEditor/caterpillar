@@ -10,7 +10,7 @@
 
 > [!WARNING]
 > This project is still in beta/testing phase. Expect bugs, naming changes and errors while using this
-> library.
+> library. C API Reference is WIP, C extensions are supported since v2.1.0.
 
 Caterpillar is a Python 3.12+ library to pack and unpack structurized binary data. It
 enhances the capabilities of [Python Struct](https://docs.python.org/3/library/struct.html)
@@ -26,6 +26,7 @@ options will be added in the future. Documentation is [here >](https://matrixedi
 * allowing you to place conditional statements into class definitions,
 * insert proper types into the class definition to support documentation and
 * it helps you to create cleaner and more compact code.
+* You can even extend Caterpillar and write your parsing logic in C or C++!!
 
 ## Installation
 

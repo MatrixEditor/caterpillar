@@ -141,6 +141,8 @@ cp_layer__context_getattr__(CpLayerObject* self, PyObject* args)
 }
 
 /* PUblic API */
+
+/*CpAPI*/
 CpLayerObject*
 CpLayer_New(CpStateObject* state, CpLayerObject* parent)
 {
@@ -158,6 +160,7 @@ CpLayer_New(CpStateObject* state, CpLayerObject* parent)
   return self;
 }
 
+/*CpAPI*/
 int
 CpLayer_SetSequence(CpLayerObject* self,
                     PyObject* sequence,
@@ -177,6 +180,7 @@ CpLayer_SetSequence(CpLayerObject* self,
   return 0;
 }
 
+/*CpAPI*/
 int
 CpLayer_Invalidate(CpLayerObject* self)
 {
@@ -402,6 +406,7 @@ cp_state_read(CpStateObject* self, PyObject* args)
   if (!PyArg_ParseTuple(args, "n", &size)) {
     return NULL;
   }
+
   return CpState_Read(self, size);
 }
 
@@ -423,24 +428,29 @@ cp_state_seek(CpStateObject* self, PyObject* args)
 }
 
 /* PUblic API */
+
+/*CpAPI*/
 CpStateObject*
 CpState_New(PyObject* io)
 {
   return (CpStateObject*)CpObject_CreateOneArg(&CpState_Type, io);
 }
 
+/*CpAPI*/
 int
 CpState_SetGlobals(CpStateObject* self, PyObject* globals)
 {
   return cp_state_set_globals(self, globals, NULL);
 }
 
+/*CpAPI*/
 PyObject*
 CpState_Tell(CpStateObject* self)
 {
   return PyObject_CallMethodNoArgs(self->m_io, self->mod->str_tell);
 }
 
+/*CpAPI*/
 PyObject*
 CpState_Seek(CpStateObject* self, PyObject* offset, int whence)
 {
@@ -448,6 +458,7 @@ CpState_Seek(CpStateObject* self, PyObject* offset, int whence)
     self->m_io, self->mod->str_seek, offset, whence);
 }
 
+/*CpAPI*/
 PyObject*
 CpState_Read(CpStateObject* self, Py_ssize_t size)
 {
@@ -455,9 +466,31 @@ CpState_Read(CpStateObject* self, Py_ssize_t size)
   PyObject* res =
     PyObject_CallMethodOneArg(self->m_io, self->mod->str_read, sizeobj);
   Py_DECREF(sizeobj);
+
+  if (!res) {
+    return NULL;
+  }
+
+  Py_ssize_t length = 0;
+  if ((length = PyObject_Length(res)) != size) {
+    Py_DECREF(res);
+    PyErr_Format(PyExc_ValueError,
+                 "read() expected to return buffer with length %ld, got %ld",
+                 size,
+                 length);
+    return NULL;
+  }
   return res;
 }
 
+/*CpAPI*/
+PyObject*
+CpState_ReadFully(CpStateObject* self)
+{
+  return PyObject_CallMethodNoArgs(self->m_io, self->mod->str_read);
+}
+
+/*CpAPI*/
 PyObject*
 CpState_Write(CpStateObject* self, PyObject* value)
 {

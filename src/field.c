@@ -330,19 +330,21 @@ cp_field_as_mapping_getitem(CpFieldObject* self, PyObject* key)
   return Py_NewRef((PyObject*)self);
 }
 
-/* Public API */
+/*CpAPI*/
 CpFieldObject*
 CpField_New(PyObject* atom)
 {
   return (CpFieldObject*)CpObject_CreateOneArg(&CpField_Type, atom);
 }
 
+/*CpAPI*/
 int
 CpField_HasCondition(CpFieldObject* self)
 {
   return !Py_IsTrue(self->m_condition);
 }
 
+/*CpAPI*/
 int
 CpField_IsEnabled(CpFieldObject* self, PyObject* context)
 {
@@ -363,6 +365,7 @@ CpField_IsEnabled(CpFieldObject* self, PyObject* context)
   return PyObject_IsTrue(self->m_condition);
 }
 
+/*CpAPI*/
 Py_ssize_t
 CpField_GetOffset(CpFieldObject* self, PyObject* context)
 {
@@ -383,6 +386,7 @@ CpField_GetOffset(CpFieldObject* self, PyObject* context)
   return offset;
 }
 
+/*CpAPI*/
 PyObject*
 CpField_EvalSwitch(CpFieldObject* self, PyObject* op, PyObject* context)
 {
@@ -409,6 +413,7 @@ CpField_EvalSwitch(CpFieldObject* self, PyObject* op, PyObject* context)
   return result;
 }
 
+/*CpAPI*/
 PyObject*
 CpField_GetLength(CpFieldObject* self, PyObject* context)
 {
@@ -638,7 +643,7 @@ static PyNumberMethods CpFieldAtom_NumberMethods = {
   .nb_matrix_multiply = (binaryfunc)cp_fieldatom_as_number_matmul,
   .nb_floor_divide = (binaryfunc)cp_fieldatom_as_number_floordiv,
   .nb_add = (binaryfunc)cp_fieldatom_as_number_add,
-  .nb_rshift = (binaryfunc)cp_fieldatom_as_number_rshift,
+  .nb_inplace_add = (binaryfunc)cp_fieldatom_as_number_add,
   .nb_or = (binaryfunc)cp_fieldatom_as_number_or,
   .nb_xor = (binaryfunc)cp_fieldatom_as_number_xor,
 };
@@ -863,5 +868,4 @@ PyTypeObject CpFieldCAtom_Type = {
   0,                                        /* tp_version_tag */
   0,                                        /* tp_finalize */
   0,                                        /* tp_vectorcall */
-  0,                                        /* tp_watched */
 };

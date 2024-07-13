@@ -3,6 +3,7 @@
 #include "caterpillar/parsing.h"
 #include "caterpillar/struct.h"
 
+/*CpAPI*/
 PyObject*
 CpTypeOf_Common(PyObject* op)
 {
@@ -31,6 +32,7 @@ CpTypeOf_Common(PyObject* op)
   return type;
 }
 
+/*CpAPI*/
 PyObject*
 CpTypeOf_Field(CpFieldObject* op)
 {
@@ -126,6 +128,17 @@ err:
   return NULL;
 }
 
+/*CpAPI*/
+PyObject *
+CpTypeOf_CAtom(CpCAtomObject* op)
+{
+  if (op->ob_type == NULL) {
+    Py_RETURN_NOTIMPLEMENTED;
+  }
+  return op->ob_type((PyObject*)op);
+}
+
+/*CpAPI*/
 PyObject*
 CpTypeOf(PyObject* op)
 {
@@ -138,6 +151,8 @@ CpTypeOf(PyObject* op)
     return CpTypeOf_Field((CpFieldObject*)op);
   } else if (CpStruct_CheckExact(op)) {
     return Py_NewRef(((CpStructObject*)op)->m_model);
+  } else if (CpCAtom_CheckExact(op)) {
+    return CpTypeOf_CAtom((CpCAtomObject*)op);
   }
   return CpTypeOf_Common(op);
 }

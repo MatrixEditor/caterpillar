@@ -12,6 +12,76 @@
 // result. In addition, the internal 'obj' within a struct layer will be a
 // CpContext instance.
 // ------------------------------------------------------------------------------
+
+/*CpAPI*/
+int
+_CpUnpack_EvalLength(CpLayerObject* layer,
+                     PyObject* length,
+                     bool* seq_greedy,
+                     Py_ssize_t* seq_length)
+{
+  *seq_greedy = false;
+  *seq_length = 0;
+  if (!length) {
+    return -1;
+  }
+
+  // 1. Case: greedy length
+  //    We have to set the context variables accordingly.
+  if (Py_IS_TYPE(length, &PyEllipsis_Type)) {
+    *seq_greedy = true;
+    *seq_length = -1;
+  }
+
+  // 2. Case: length is a slice (prefixed type)
+  //    As this is a special type, we have to first parse the length
+  //    using the given start atom.
+  else if (PySlice_Check(length)) {
+
+    seq_greedy = false;
+    PyObject* start = PyObject_GetAttr(length, layer->m_state->mod->str_start);
+    if (!start) {
+      return -1;
+    }
+
+    if (Py_IsNone(start)) {
+      PyErr_SetString(PyExc_ValueError, "start is None");
+      return -1;
+    }
+    layer->s_sequential = false;
+    Py_XSETREF(length, _Cp_Unpack(start, layer));
+    layer->s_sequential = true;
+    Py_DECREF(start);
+    if (!length) {
+      return -1;
+    }
+
+    // Set the length
+    *seq_length = PyLong_AsSsize_t(length);
+    if (seq_length < 0) {
+      PyErr_SetString(PyExc_ValueError, "invalid length");
+      return -1;
+    }
+  }
+
+  // 3. Case: constant number
+  else if (PyNumber_Check(length)) {
+    seq_greedy = false;
+    *seq_length = PyLong_AsSsize_t(length);
+    if (seq_length < 0) {
+      PyErr_SetString(PyExc_ValueError, "invalid length");
+      return -1;
+    }
+  }
+
+  else {
+    PyErr_Format(PyExc_ValueError, "invalid length type: %R", length->ob_type);
+    return -1;
+  }
+  return 0;
+}
+
+/*CpAPI*/
 PyObject*
 CpUnpack_Common(PyObject* op, CpLayerObject* layer)
 {
@@ -26,87 +96,38 @@ CpUnpack_Common(PyObject* op, CpLayerObject* layer)
   }
 
   _modulestate* mod = layer->m_state->mod;
-  if (PyObject_HasAttr(op, mod->str___unpack_many__)) {
-    PyObject* res =
-      PyObject_CallMethodOneArg(op, mod->str___unpack__, (PyObject*)layer);
-    if (PyErr_Occurred() &&
-        PyErr_GetRaisedException() == PyExc_NotImplementedError) {
-      // Make sure this method continues to unpack
-      PyErr_Clear();
-      Py_XDECREF(res);
-    } else {
-      return res;
-    }
-  }
-
   if (!layer->m_field) {
     PyErr_SetString(PyExc_ValueError, "state is invalid (field is NULL)!");
     return NULL;
   }
 
-  PyObject* obj = NULL;
+  if (PyObject_HasAttr(op, mod->str___unpack_many__)) {
+    PyObject* res =
+      PyObject_CallMethodOneArg(op, mod->str___unpack_many__, (PyObject*)layer);
+    PyObject* exc = NULL;
+    if ((exc = PyErr_GetRaisedException(),
+         exc && PyErr_GivenExceptionMatches(exc, PyExc_NotImplementedError))) {
+      // Make sure this method continues to unpack
+      Py_XDECREF(exc);
+      PyErr_Clear();
+      Py_XDECREF(res);
+    } else {
+      Py_XDECREF(exc);
+      return res;
+    }
+  }
 
+  PyObject *obj = NULL, *length = NULL;
   // First, get the amount of elements we have to parse
-  PyObject* length =
-    CpField_GetLength((CpFieldObject*)layer->m_field, (PyObject*)layer);
-  int8_t seq_greedy = false;
+  bool seq_greedy = false;
   Py_ssize_t seq_length = 0;
+  length = CpField_GetLength((CpFieldObject*)layer->m_field, (PyObject*)layer);
   if (!length) {
     goto fail;
   }
-
-  // 1. Case: greedy length
-  //    We have to set the context variables accordingly.
-  if (Py_IS_TYPE(length, &PyEllipsis_Type)) {
-    seq_greedy = true;
-    seq_length = -1;
-  }
-
-  // 2. Case: length is a slice (prefixed type)
-  //    As this is a special type, we have to first parse the length
-  //    using the given start atom.
-  else if (PySlice_Check(length)) {
-
-    seq_greedy = false;
-    PyObject* start = PyObject_GetAttr(length, mod->str_start);
-    if (!start) {
-      goto fail;
-    }
-
-    if (Py_IsNone(start)) {
-      PyErr_SetString(PyExc_ValueError, "start is None");
-      goto fail;
-    }
-    layer->s_sequential = false;
-    Py_XSETREF(length, _Cp_Unpack(start, layer));
-    layer->s_sequential = true;
-    Py_DECREF(start);
-    if (!length) {
-      goto fail;
-    }
-
-    // Set the length
-    seq_length = PyLong_AsSsize_t(length);
-    if (seq_length < 0) {
-      goto fail;
-    }
-  }
-
-  // 3. Case: constant number
-  else if (PyNumber_Check(length)) {
-    seq_greedy = false;
-    seq_length = PyLong_AsSsize_t(length);
-    if (seq_length < 0) {
-      goto fail;
-    }
-  }
-
-  else {
-    PyErr_Format(PyExc_ValueError, "invalid length type: %R", length->ob_type);
+  if (_CpUnpack_EvalLength(layer, length, &seq_greedy, &seq_length) < 0) {
     goto fail;
   }
-
-  Py_XSETREF(length, NULL);
   CpLayerObject* seq_layer = CpLayer_New(layer->m_state, layer);
   if (!layer) {
     goto fail;
@@ -116,8 +137,8 @@ CpUnpack_Common(PyObject* op, CpLayerObject* layer)
   if (!seq) {
     goto fail;
   }
-  CpLayer_SetSequence(seq_layer, seq, seq_length, seq_greedy);
 
+  CpLayer_SetSequence(seq_layer, seq, seq_length, seq_greedy);
   while (seq_layer->s_greedy || (seq_layer->m_index < seq_layer->m_length)) {
     seq_layer->m_path = PyUnicode_FromFormat(
       "%s.%d", _PyUnicode_AsString(layer->m_path), seq_layer->m_index);
@@ -143,19 +164,21 @@ CpUnpack_Common(PyObject* op, CpLayerObject* layer)
 
 success:
   Py_XDECREF(obj);
+  Py_XDECREF(length);
   CpLayer_Invalidate(seq_layer);
   seq_layer = NULL;
   return Py_NewRef(seq);
 
 fail:
-  Py_XDECREF(length);
   Py_XDECREF(obj);
+  Py_XDECREF(length);
   if (seq_layer) {
     CpLayer_Invalidate(seq_layer);
   }
   return NULL;
 }
 
+/*CpAPI*/
 PyObject*
 CpUnpack_Field(CpFieldObject* field, CpLayerObject* layer)
 {
@@ -244,6 +267,7 @@ cleanup:
   return obj;
 }
 
+/*CpAPI*/
 PyObject*
 CpUnpack_Struct(CpStructObject* struct_, CpLayerObject* layer)
 {
@@ -332,6 +356,7 @@ cleanup:
   return obj;
 }
 
+/*CpAPI*/
 PyObject*
 _Cp_Unpack(PyObject* atom, CpLayerObject* layer)
 {
@@ -339,11 +364,42 @@ _Cp_Unpack(PyObject* atom, CpLayerObject* layer)
     return CpUnpack_Field((CpFieldObject*)atom, layer);
   } else if (CpStruct_CheckExact(atom)) {
     return CpUnpack_Struct((CpStructObject*)atom, layer);
+  } else if (CpCAtom_Check(atom)) {
+    return CpUnpack_CAtom((CpCAtomObject*)atom, layer);
   } else {
     return CpUnpack_Common(atom, layer);
   }
 }
 
+/*CpAPI*/
+PyObject*
+CpUnpack_CAtom(CpCAtomObject* catom, CpLayerObject* layer)
+{
+  PyObject* result = NULL;
+  if (!layer->s_sequential) {
+    if (catom->ob_unpack == NULL) {
+      PyErr_Format(
+        PyExc_NotImplementedError,
+        "The atom of type '%s' cannot be unpacked (missing __unpack__)",
+        Py_TYPE(catom)->tp_name);
+      return NULL;
+    }
+    result = catom->ob_unpack((PyObject *)catom, (PyObject *)layer);
+  }
+  else {
+    if (!catom->ob_unpack_many) {
+      PyErr_Format(
+        PyExc_NotImplementedError,
+        "The atom of type '%s' cannot be unpacked (missing __unpack_many__)",
+        Py_TYPE(catom)->tp_name);
+      return NULL;
+    }
+    result = catom->ob_unpack_many((PyObject *)catom, (PyObject *)layer);
+  }
+  return result;
+}
+
+/*CpAPI*/
 PyObject*
 CpUnpack(PyObject* atom, PyObject* io, PyObject* globals)
 {
@@ -368,6 +424,12 @@ CpUnpack(PyObject* atom, PyObject* io, PyObject* globals)
 
   Py_XSETREF(root->m_path, Py_NewRef(state->mod->str_ctx__root));
   obj = _Cp_Unpack(atom, root);
+
+  if (!obj) {
+    if (!PyErr_Occurred()) {
+      PyErr_SetString(PyExc_RuntimeError, "Unpack failed");
+    }
+  }
   Py_DECREF(state);
   CpLayer_Invalidate(root);
   return obj;

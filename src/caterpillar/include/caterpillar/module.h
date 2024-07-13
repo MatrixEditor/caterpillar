@@ -17,14 +17,14 @@
 #ifndef CP_MODULE_H
 #define CP_MODULE_H
 
-#include "macros.h"
+#include "caterpillar.h"
 
 /**
  * @brief The internal state for this module.
  *
  * It will store all necessary information about the core module.
  */
-typedef struct _modulestate
+struct _modulestate
 {
   // global options
   PyObject* cp_option__dynamic;
@@ -46,6 +46,8 @@ typedef struct _modulestate
 
   // default endian object
   PyObject* cp_endian__native;
+  PyObject* cp_endian__big;
+  PyObject* cp_endian__little;
 
   // typing constants
   PyObject* Any_Type;
@@ -61,6 +63,7 @@ typedef struct _modulestate
   PyObject* str_write;
   PyObject* str_read;
   PyObject* str_close;
+  PyObject* str_strict;
   PyObject* str___pack__;
   PyObject* str___pack_many__;
   PyObject* str___unpack__;
@@ -86,10 +89,15 @@ typedef struct _modulestate
   // compiled regex for unnamed fields
   PyObject* cp_regex__unnamed;
   PyObject* inspect_getannotations;
-} _modulestate;
+
+
+  // cached objects
+  PyObject *cp_bytes__true;
+  PyObject *cp_bytes__false;
+};
 
 /** Module object type */
-PyAPI_DATA(PyModuleDef) CpModule;
+// PyAPI_DATA(PyModuleDef) CpModule;
 
 /**
  * @brief Get the module state object
@@ -117,14 +125,14 @@ get_global_module_state(void)
 }
 
 /* immortal objects */
-PyAPI_DATA(PyTypeObject) CpInvalidDefault_Type;
-PyAPI_DATA(PyTypeObject) CpDefaultOption_Type;
+// PyAPI_DATA(PyTypeObject) CpInvalidDefault_Type;
+// PyAPI_DATA(PyTypeObject) CpDefaultOption_Type;
 
-PyAPI_DATA(PyObject) _CpInvalidDefault_Object;
+// PyAPI_DATA(PyObject) _CpInvalidDefault_Object;
 #define CpInvalidDefault (&_CpInvalidDefault_Object)
 #define Cp_IsInvalidDefault(o) ((o) == CpInvalidDefault)
 
-PyAPI_DATA(PyObject) _CpDefaultOption_Object;
+// PyAPI_DATA(PyObject) _CpDefaultOption_Object;
 #define CpDefaultOption (&_CpDefaultOption_Object)
 #define Cp_IsDefaultOption(o) ((o) == CpDefaultOption)
 

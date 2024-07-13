@@ -20,7 +20,7 @@
 #include "macros.h"
 
 /// Arch object type
-PyAPI_DATA(PyTypeObject) CpArch_Type;
+// PyAPI_DATA(PyTypeObject) CpArch_Type;
 
 /**
  * @brief Configuration class that represents an architecture.
@@ -28,13 +28,13 @@ PyAPI_DATA(PyTypeObject) CpArch_Type;
  * This class/struct will be used by pointer atoms to represent
  * an architecture with its pointer size.
  */
-typedef struct _archobj
+struct _archobj
 {
   /// The name of the architecture
   PyObject_HEAD PyObject* name;
   /// The pointer size of the architecture
   int pointer_size;
-} CpArchObject;
+};
 
 /**
  * @brief Checks if the given object is an architecture object
@@ -59,18 +59,18 @@ typedef struct _archobj
 #define CpArch_Check(op) PyObject_TypeCheck((PyObject*)(op), &CpArch_Type)
 
 /// Endian object type
-PyAPI_DATA(PyTypeObject) CpEndian_Type;
+// PyAPI_DATA(PyTypeObject) CpEndian_Type;
 
 /**
  * @brief Configuration class that represents endian configuration.
  */
-typedef struct _endianobj
+struct _endianobj
 {
   /// The human readable name of this endian
   PyObject_HEAD PyObject* name;
   /// struct format character
   char id;
-} CpEndianObject;
+};
 
 /**
  * @brief Checks if the given object is an endian object
@@ -93,4 +93,16 @@ typedef struct _endianobj
  * @return 1 if the object is an endian object, 0 otherwise
  */
 #define CpEndian_Check(op) PyObject_TypeCheck((PyObject*)(op), &CpEndian_Type)
+
+/**
+ * @brief Checks if the given object is a little endian
+ *
+ * @param endian the object to check
+ * @param mod the module state
+ * @return 1 if the object is a little endian, 0 otherwise
+ *
+ * @note 1 is returned even if the current object may be the native endian
+ */
+// PyAPI_FUNC(int) CpEndian_IsLittleEndian(CpEndianObject *endian, _modulestate *mod);
+
 #endif

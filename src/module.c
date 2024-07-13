@@ -1,16 +1,8 @@
 /* module implementation */
-#include "caterpillar/module.h"
-#include "caterpillar/arch.h"
-#include "caterpillar/atomobj.h"
-#include "caterpillar/context.h"
-#include "caterpillar/field.h"
-#include "caterpillar/option.h"
-#include "caterpillar/parsing.h"
-#include "caterpillar/state.h"
-#include "caterpillar/struct.h"
+#include "caterpillar/module.h"  /* invalid default object and types through caterpillar.h*/
+#include "caterpillar/parsing.h" /* Pack and unpack functions */
 
-// atom implementations
-#include "caterpillar/intatomobj.h"
+#include "caterpillar.c"
 
 /* immortal objects */
 static PyObject*
@@ -335,6 +327,8 @@ cp_module_clear(PyObject* m)
 
     /* clear default arch and endian */
     Py_CLEAR(state->cp_endian__native);
+    Py_CLEAR(state->cp_endian__little);
+    Py_CLEAR(state->cp_endian__big);
     Py_CLEAR(state->cp_arch__host);
 
     // typing references
@@ -369,8 +363,12 @@ cp_module_clear(PyObject* m)
     Py_CLEAR(state->str___dict__);
     Py_CLEAR(state->str___weakref__);
     Py_CLEAR(state->str___qualname__);
+    Py_CLEAR(state->str_strict);
 
     Py_CLEAR(state->cp_regex__unnamed);
+
+    Py_CLEAR(state->cp_bytes__false);
+    Py_CLEAR(state->cp_bytes__true);
   }
   return 0;
 }
@@ -452,6 +450,21 @@ PyInit__C(void)
   CpIntAtom_Type.tp_base = &CpFieldCAtom_Type;
   CpModule_SetupType(&CpIntAtom_Type);
 
+  CpFloatAtom_Type.tp_base = &CpFieldCAtom_Type;
+  CpModule_SetupType(&CpFloatAtom_Type);
+
+  CpBoolAtom_Type.tp_base = &CpFieldCAtom_Type;
+  CpModule_SetupType(&CpBoolAtom_Type);
+
+  CpCharAtom_Type.tp_base = &CpFieldCAtom_Type;
+  CpModule_SetupType(&CpCharAtom_Type);
+
+  CpPaddingAtom_Type.tp_base = &CpFieldCAtom_Type;
+  CpModule_SetupType(&CpPaddingAtom_Type);
+
+  CpStringAtom_Type.tp_base = &CpFieldCAtom_Type;
+  CpModule_SetupType(&CpStringAtom_Type);
+
   // module setup
   m = PyModule_Create(&CpModule);
   if (!m) {
@@ -478,7 +491,52 @@ PyInit__C(void)
   CpModule_AddObject("State", &CpState_Type);
   CpModule_AddObject("fieldinfo", &CpStructFieldInfo_Type);
   CpModule_AddObject("Struct", &CpStruct_Type);
+
   CpModule_AddObject("intatom", &CpIntAtom_Type);
+  CpModule_AddObject("floatatom", &CpFloatAtom_Type);
+  CpModule_AddObject("boolatom", &CpBoolAtom_Type);
+  CpModule_AddObject("charatom", &CpCharAtom_Type);
+  CpModule_AddObject("paddingatom", &CpPaddingAtom_Type);
+  CpModule_AddObject("stringatom", &CpStringAtom_Type);
+
+  /* setup custom intatoms */
+#define CpModule_DefAtom(name, ...)                                            \
+  {                                                                            \
+    PyObject* value = (PyObject*)__VA_ARGS__;                                  \
+    if (!value) {                                                              \
+      return NULL;                                                             \
+    }                                                                          \
+    CpModule_AddObject(name, value);                                           \
+  }
+
+#define CpModule_DefIntAtom(name, bits, signed)                                \
+  CpModule_DefAtom(                                                            \
+    name, CpObject_Create(&CpIntAtom_Type, "Iii", bits, signed, true));
+
+  CpModule_DefIntAtom("i8", 8, true);
+  CpModule_DefIntAtom("u8", 8, false);
+  CpModule_DefIntAtom("i16", 16, true);
+  CpModule_DefIntAtom("u16", 16, false);
+  CpModule_DefIntAtom("i24", 24, true);
+  CpModule_DefIntAtom("u24", 24, false);
+  CpModule_DefIntAtom("i32", 32, true);
+  CpModule_DefIntAtom("u32", 32, false);
+  CpModule_DefIntAtom("i64", 64, true);
+  CpModule_DefIntAtom("u64", 64, false);
+
+#define CpModule_DefFloatAtom(name, bits)                                      \
+  CpModule_DefAtom(name, CpObject_Create(&CpFloatAtom_Type, "I", bits));
+
+  CpModule_DefFloatAtom("f16", 16);
+  CpModule_DefFloatAtom("f32", 32);
+  CpModule_DefFloatAtom("f64", 64);
+
+#undef CpModule_DefIntAtom
+#undef CpModule_DefAtom
+
+  CpModule_AddObject("boolean", CpObject_CreateNoArgs(&CpBoolAtom_Type));
+  CpModule_AddObject("char", CpObject_CreateNoArgs(&CpCharAtom_Type));
+  CpModule_AddObject("padding", CpObject_CreateNoArgs(&CpPaddingAtom_Type));
 
   /* setup state */
   _modulestate* state = get_module_state(m);
@@ -526,6 +584,12 @@ PyInit__C(void)
   CpModuleState_AddObject(cp_endian__native,
                           "NATIVE_ENDIAN",
                           CpObject_Create(&CpEndian_Type, "sb", "native", '='));
+  CpModuleState_AddObject(cp_endian__little,
+                          "LITTLE_ENDIAN",
+                          CpObject_Create(&CpEndian_Type, "sb", "little", '<'));
+  CpModuleState_AddObject(cp_endian__big,
+                          "BIG_ENDIAN",
+                          CpObject_Create(&CpEndian_Type, "sb", "big", '>'));
   CpModuleState_AddObject(
     cp_arch__host,
     "HOST_ARCH",
@@ -562,8 +626,19 @@ PyInit__C(void)
   CACHED_STRING(str___weakref__, "__weakref__");
   CACHED_STRING(str___qualname__, "__qualname__");
   CACHED_STRING(str_path_delim, ".");
+  CACHED_STRING(str_strict, "strict");
 
 #undef CACHED_STRING
+
+#define CACHED_BYTES(attr, str, size)                                          \
+  if ((state->attr = PyBytes_FromStringAndSize(str, size)) == NULL) {          \
+    return NULL;                                                               \
+  }
+
+  CACHED_BYTES(cp_bytes__false, "\x00", 1);
+  CACHED_BYTES(cp_bytes__true, "\x01", 1);
+
+#undef CACHED_BYTES
 
   // setup typing constants
   PyObject* typing = PyImport_ImportModule("typing");
@@ -580,23 +655,23 @@ PyInit__C(void)
   // regex setup
   PyObject* re = PyImport_ImportModule("re");
   if (!re) {
-    return NULL;
+    goto err;
   }
 
   PyObject* compile = PyObject_GetAttrString(re, "compile");
   if (!compile) {
-    return NULL;
+    goto err;
   }
 
   state->cp_regex__unnamed = PyObject_CallFunction(compile, "s", "_[0-9]*$");
   if (!state->cp_regex__unnamed) {
-    return NULL;
+    goto err;
   }
 
   PyObject* inspect = PyImport_ImportModule("inspect");
   if (!inspect) {
     PyErr_SetString(PyExc_ImportError, "failed to import inspect");
-    return NULL;
+    goto err;
   }
 
   CpModuleState_Set(inspect_getannotations,
@@ -606,10 +681,33 @@ PyInit__C(void)
   PyObject* io = PyImport_ImportModule("io");
   if (!io) {
     PyErr_SetString(PyExc_ImportError, "failed to import io");
-    return NULL;
+    goto err;
   }
 
   CpModuleState_Set(BytesIO_Type, PyObject_GetAttrString(io, "BytesIO"));
   Py_XDECREF(io);
+
+  /*Export API table*/
+  PyObject* c_api = PyCapsule_New((void*)Cp_API, NULL, NULL);
+  if (c_api == NULL) {
+    goto err;
+  }
+
+  PyObject* d = PyModule_GetDict(m);
+  if (d == NULL) {
+    goto err;
+  }
+
+  if (PyDict_SetItemString(d, "_C_API", c_api) < 0) {
+    goto err;
+  }
+  Py_DECREF(c_api);
   return m;
+
+err:
+  if (!PyErr_Occurred()) {
+    PyErr_SetString(PyExc_RuntimeError, "cannot load caterpillar._C module.");
+  }
+  Py_DECREF(m);
+  return NULL;
 }

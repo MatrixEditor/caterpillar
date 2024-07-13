@@ -1,7 +1,9 @@
 /* sizeof implementation */
 #include "caterpillar/module.h"
 #include "caterpillar/parsing.h"
+#include "caterpillar/struct.h"
 
+/*CpAPI*/
 PyObject*
 CpSizeOf_Common(PyObject* op, CpLayerObject* layer)
 {
@@ -15,6 +17,7 @@ CpSizeOf_Common(PyObject* op, CpLayerObject* layer)
   return PyObject_CallMethodOneArg(op, state->str___size__, (PyObject*)layer);
 }
 
+/*CpAPI*/
 PyObject*
 CpSizeOf_Field(CpFieldObject* field, CpLayerObject* layer)
 {
@@ -126,6 +129,7 @@ fail:
   return NULL;
 }
 
+/*CpAPI*/
 PyObject*
 CpSizeOf_Struct(CpStructObject* struct_, CpLayerObject* layer)
 {
@@ -181,6 +185,20 @@ fail:
   return NULL;
 }
 
+/*CpAPI*/
+PyObject*
+CpSizeOf_CAtom(CpCAtomObject* catom, CpLayerObject* layer)
+{
+  if (!catom->ob_size) {
+    PyErr_Format(PyExc_NotImplementedError,
+                 "The atom of type '%s' has no size (missing __size__)",
+                 Py_TYPE(catom)->tp_name);
+    return NULL;
+  }
+  return catom->ob_size((PyObject *)catom, (PyObject *)layer);
+}
+
+/*CpAPI*/
 PyObject*
 _Cp_SizeOf(PyObject* op, CpLayerObject* layer)
 {
@@ -199,12 +217,15 @@ _Cp_SizeOf(PyObject* op, CpLayerObject* layer)
     result = CpSizeOf_Field((CpFieldObject*)op, layer);
   } else if (CpStruct_CheckExact(op)) {
     result = CpSizeOf_Struct((CpStructObject*)op, layer);
+  } else if (CpCAtom_Check(op)) {
+    result = CpSizeOf_CAtom((CpCAtomObject*)op, layer);
   } else {
     result = CpSizeOf_Common(op, layer);
   }
   return result;
 }
 
+/*CpAPI*/
 PyObject*
 CpSizeOf(PyObject* op, PyObject* globals)
 {

@@ -1,0 +1,131 @@
+/*!! AUTO-GENERATED FILE - DO NOT MODIFY !!*/
+/**
+ * Copyright (C) MatrixEditor 2024
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+#ifndef CATERPILLAR_H
+#define CATERPILLAR_H
+
+#include <stdbool.h>
+#include <stdint.h>
+
+// TODO: remove import
+#include "macros.h"
+
+
+/* struct and typedefs */
+%s
+
+#ifdef _CPMODULE
+
+/*
+Here, all publicly exposed types and functions are defined. These declarations
+are then used and implemented in the internal API.
+*/
+
+%s
+
+#else
+
+/*
+All external functions and types are defined here using the same name but as
+macro. They all point to the exposed API table storing references to all
+internal API functions and types. Their indices are static and defined in
+caterpillar_api.py
+*/
+%s
+
+/**
+ * @brief Public C API for extension modules as reference table
+ *
+ * All entries in this table point either to internal API functions or to
+ * internal API types. Rerved entries are NULL pointers.
+ *
+ * You usually don't need to modify this table or interact with it directly.
+ * All generated macros will implement the interaction for you.
+ */
+static void** Cp_API = NULL;
+
+/**
+ * @brief Imports the Caterpillar C API and prepares the internal API table
+ *
+ * @return int 0 on success, -1 on failure
+ */
+static inline int
+_import_caterpillar(void)
+{
+  PyObject* caterpillar = PyImport_ImportModule("caterpillar._C");
+  if (caterpillar == NULL)
+    return -1;
+
+  PyObject* c_api = PyObject_GetAttrString(caterpillar, "_C_API");
+  if (c_api == NULL) {
+    PyErr_SetString(PyExc_AttributeError, "_C_API not found");
+    return -1;
+  }
+
+  if (!PyCapsule_CheckExact(c_api)) {
+    PyErr_SetString(PyExc_TypeError, "_C_API is not a capsule");
+    Py_DECREF(c_api);
+    return -1;
+  }
+
+  Cp_API = (void**)PyCapsule_GetPointer(c_api, NULL);
+  Py_DECREF(c_api);
+  if (Cp_API == NULL) {
+    PyErr_SetString(PyExc_AttributeError, "_C_API is NULL pointer");
+    return -1;
+  }
+  return 0;
+}
+
+/**
+ * @brief Imports the Caterpillar C API and prepares the internal API table
+ *
+ * @param ret the return value
+ * @return the given return value on failure
+ */
+#define __import_caterpillar__(ret)                                            \
+  do {                                                                         \
+    if (_import_caterpillar() < 0) {                                           \
+      PyErr_Print();                                                           \
+      PyErr_SetString(PyExc_ImportError, "Failed to import caterpillar");      \
+      return (ret);                                                            \
+    }                                                                          \
+  } while (0);
+
+/**
+ * @brief Imports the Caterpillar C API and prepares the internal API table
+ *
+ * @return `NULL` on failure, does nothing on success
+ */
+#define import_caterpillar() __import_caterpillar__(NULL)
+
+/**
+ * @brief Public function to programmatically import the C API
+ *
+ * @return int 0 on success, -1 on failure
+ */
+static inline int
+Cp_ImportCpAPI(void)
+{
+  if (Cp_API == NULL) {
+    __import_caterpillar__(-1);
+  }
+  return 0;
+}
+
+#endif
+#endif

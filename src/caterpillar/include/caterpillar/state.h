@@ -20,8 +20,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "caterpillar/macros.h"
-#include "caterpillar/module.h"
+#include "caterpillar/caterpillar.h"
 
 /* advanced parsing state in C */
 
@@ -36,7 +35,7 @@
  *
  * The state is meant to be accessible from any layer in the parsing process.
  */
-typedef struct _stateobj
+struct _stateobj
 {
   PyObject_HEAD _modulestate* mod;
 
@@ -52,10 +51,10 @@ typedef struct _stateobj
   /// This special member  stores all packed objects that should be placed at
   /// an offset position.
   PyObject* m_offset_table;
-} CpStateObject;
+};
 
 /// State object type
-PyAPI_DATA(PyTypeObject) CpState_Type;
+// PyAPI_DATA(PyTypeObject) CpState_Type;
 
 /**
  * @brief Check whether the given object is a state
@@ -81,14 +80,14 @@ PyAPI_DATA(PyTypeObject) CpState_Type;
  * @param io the input or output stream object
  * @return the new state object, or NULL on failure
  */
-PyAPI_FUNC(CpStateObject*) CpState_New(PyObject* io);
+// PyAPI_FUNC(CpStateObject*) CpState_New(PyObject* io);
 
 /**
  * @brief Returns the current position in the input stream
  *
  * @return the current position
  */
-PyAPI_FUNC(PyObject*) CpState_Tell(CpStateObject* self);
+// PyAPI_FUNC(PyObject*) CpState_Tell(CpStateObject* self);
 
 /**
  * @brief Sets the current position in the input stream
@@ -96,8 +95,8 @@ PyAPI_FUNC(PyObject*) CpState_Tell(CpStateObject* self);
  * @param pos the new position
  * @return the new position
  */
-PyAPI_FUNC(PyObject*)
-  CpState_Seek(CpStateObject* self, PyObject* pos, int whence);
+// PyAPI_FUNC(PyObject*)
+  // CpState_Seek(CpStateObject* self, PyObject* pos, int whence);
 
 /**
  * @brief Reads the given number of bytes from the input stream
@@ -105,7 +104,9 @@ PyAPI_FUNC(PyObject*)
  * @param size the number of bytes to read
  * @return the read bytes
  */
-PyAPI_FUNC(PyObject*) CpState_Read(CpStateObject* self, Py_ssize_t size);
+// PyAPI_FUNC(PyObject*) CpState_Read(CpStateObject* self, Py_ssize_t size);
+
+// PyAPI_FUNC(PyObject*) CpState_ReadFully(CpStateObject* self);
 
 /**
  * @brief Writes the given bytes to the output stream
@@ -113,7 +114,7 @@ PyAPI_FUNC(PyObject*) CpState_Read(CpStateObject* self, Py_ssize_t size);
  * @param bytes the bytes to write
  * @return the number of bytes written
  */
-PyAPI_FUNC(PyObject*) CpState_Write(CpStateObject* self, PyObject* bytes);
+// PyAPI_FUNC(PyObject*) CpState_Write(CpStateObject* self, PyObject* bytes);
 
 /**
  * @brief Sets the global namespace for pre-defined context variables
@@ -121,18 +122,15 @@ PyAPI_FUNC(PyObject*) CpState_Write(CpStateObject* self, PyObject* bytes);
  * @param globals the new global namespace
  * @return the new global namespace
  */
-PyAPI_FUNC(int) CpState_SetGlobals(CpStateObject* self, PyObject* globals);
+// PyAPI_FUNC(int) CpState_SetGlobals(CpStateObject* self, PyObject* globals);
 
 //-----------------------------------------------------------------------------
 // layer
 
-// forward declaration is necessary here
-struct _layerobj;
-
 /**
  * @brief TODO
  */
-typedef struct _layerobj
+struct _layerobj
 {
   PyObject_HEAD
 
@@ -180,10 +178,10 @@ typedef struct _layerobj
   // --- Internal state variables ---
   int8_t s_greedy;
   int8_t s_sequential;
-} CpLayerObject;
+};
 
 /// Layer type
-PyAPI_DATA(PyTypeObject) CpLayer_Type;
+// PyAPI_DATA(PyTypeObject) CpLayer_Type;
 
 /**
  * @brief Check whether the given object is a layer
@@ -210,8 +208,8 @@ PyAPI_DATA(PyTypeObject) CpLayer_Type;
  * @param state the global parsing state
  * @return the new layer object, or NULL on failure
  */
-PyAPI_FUNC(CpLayerObject*)
-  CpLayer_New(CpStateObject* state, CpLayerObject* parent);
+// PyAPI_FUNC(CpLayerObject*)
+  // CpLayer_New(CpStateObject* state, CpLayerObject* parent);
 
 /**
  * @brief Invalidates the layer
@@ -219,7 +217,7 @@ PyAPI_FUNC(CpLayerObject*)
  * @param layer the layer to invalidate
  * @return 0 on success, -1 on failure
  */
-PyAPI_FUNC(int) CpLayer_Invalidate(CpLayerObject* layer);
+// PyAPI_FUNC(int) CpLayer_Invalidate(CpLayerObject* layer);
 
 /**
  * @brief Applies the given sequence to the layer
@@ -230,10 +228,10 @@ PyAPI_FUNC(int) CpLayer_Invalidate(CpLayerObject* layer);
  * @param greedy whether the sequence is greedy
  * @return 0 on success, -1 on failure
  */
-PyAPI_FUNC(int) CpLayer_SetSequence(CpLayerObject* layer,
-                                    PyObject* sequence,
-                                    Py_ssize_t length,
-                                    int8_t greedy);
+// PyAPI_FUNC(int) CpLayer_SetSequence(CpLayerObject* layer,
+//                                     PyObject* sequence,
+//                                     Py_ssize_t length,
+//                                     int8_t greedy);
 
 #define CpLayer_AppendPath(layer, newpath)                                     \
   Py_XSETREF(                                                                  \

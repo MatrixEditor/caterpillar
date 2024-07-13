@@ -189,12 +189,7 @@ cp_catom_init(CpCAtomObject* self, PyObject* args, PyObject* kw)
   // We don't have to initialize anything here, because subclasses
   // will overload the `__init__` method and place their method
   // implementations.
-  if ((args && PyTuple_Size(args)) || (kw && PyDict_Size(kw))) {
-    PyErr_SetString(PyExc_TypeError,
-                    "catoms cannot be initialized with arguments");
-    return -1;
-  }
-  return 0;
+  _Cp_InitNoArgs(catom, args, kw);
 }
 
 static PyObject*
@@ -213,8 +208,8 @@ cp_catom_pack(CpCAtomObject* self, PyObject* args, PyObject* kw)
     return NULL;
   }
 
-  return self->ob_pack((PyObject*)self, op, context) ? Py_NewRef(Py_None)
-                                                     : NULL;
+  return self->ob_pack((PyObject*)self, op, context) ? NULL
+                                                     : Py_NewRef(Py_None);
 }
 
 static PyObject*
@@ -234,8 +229,7 @@ cp_catom_pack_many(CpCAtomObject* self, PyObject* args, PyObject* kw)
     return NULL;
   }
 
-  return self->ob_pack_many((PyObject*)self, ops, context) ? Py_NewRef(Py_None)
-                                                           : NULL;
+  return self->ob_pack_many((PyObject*)self, ops, context) ? NULL : Py_NewRef(Py_None);
 }
 
 static PyObject*

@@ -18,7 +18,6 @@
 #define CP_FIELD_H
 
 #include "atomobj.h"
-#include "macros.h"
 
 /* Caterpillar Field definition */
 
@@ -27,7 +26,7 @@
  *
  * Represents a field in a data structure.
  */
-typedef struct _fieldobj
+struct _fieldobj
 {
   PyObject_HEAD
 
@@ -91,10 +90,10 @@ typedef struct _fieldobj
   int8_t s_type;
   int8_t s_sequential;
   int8_t s_keep_pos;
-} CpFieldObject;
+};
 
 /// Field type
-PyAPI_DATA(PyTypeObject) CpField_Type;
+// PyAPI_DATA(PyTypeObject) CpField_Type;
 
 /**
  * @brief Check whether the given object is afield
@@ -180,13 +179,13 @@ PyAPI_FUNC(PyObject*)
  *
  * A simple mixin to support operators used to create `Field` instances.
  */
-typedef struct _fieldatomobj
+struct _fieldatomobj
 {
   CpAtom_HEAD
-} CpFieldAtomObject;
+};
 
 /// Field atom type
-PyAPI_DATA(PyTypeObject) CpFieldAtom_Type;
+// PyAPI_DATA(PyTypeObject) CpFieldAtom_Type;
 
 /**
  * @brief Check whether the given object is a field atom
@@ -210,13 +209,13 @@ PyAPI_DATA(PyTypeObject) CpFieldAtom_Type;
 
 // -----------------------------------------------------------------------------
 // field C atom
-typedef struct _fieldcatomobj
+struct _fieldcatomobj
 {
   CpCAtom_HEAD
-} CpFieldCAtomObject;
+};
 
 /// Field C atom type
-PyAPI_DATA(PyTypeObject) CpFieldCAtom_Type;
+// PyAPI_DATA(PyTypeObject) CpFieldCAtom_Type;
 
 /**
  * @brief Check whether the given object is a field C atom
