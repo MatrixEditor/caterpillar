@@ -3,6 +3,7 @@
 #include "caterpillar/parsing.h"
 #include "caterpillar/struct.h"
 
+/*CpAPI*/
 PyObject*
 CpTypeOf_Common(PyObject* op)
 {
@@ -31,6 +32,7 @@ CpTypeOf_Common(PyObject* op)
   return type;
 }
 
+/*CpAPI*/
 PyObject*
 CpTypeOf_Field(CpFieldObject* op)
 {
@@ -126,6 +128,7 @@ err:
   return NULL;
 }
 
+/*CpAPI*/
 PyObject*
 CpTypeOf(PyObject* op)
 {

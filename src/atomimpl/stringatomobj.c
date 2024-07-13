@@ -1,5 +1,6 @@
 /* string atom implementation */
 
+#include "caterpillar/caterpillar.h"
 #include "caterpillar/atoms/string.h"
 #include "caterpillar/parsing.h"
 #include "caterpillar/module.h"

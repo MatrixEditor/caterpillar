@@ -3,6 +3,7 @@
 #include "caterpillar/parsing.h"
 #include "caterpillar/struct.h"
 
+/*CpAPI*/
 PyObject*
 CpSizeOf_Common(PyObject* op, CpLayerObject* layer)
 {
@@ -16,6 +17,7 @@ CpSizeOf_Common(PyObject* op, CpLayerObject* layer)
   return PyObject_CallMethodOneArg(op, state->str___size__, (PyObject*)layer);
 }
 
+/*CpAPI*/
 PyObject*
 CpSizeOf_Field(CpFieldObject* field, CpLayerObject* layer)
 {
@@ -127,6 +129,7 @@ fail:
   return NULL;
 }
 
+/*CpAPI*/
 PyObject*
 CpSizeOf_Struct(CpStructObject* struct_, CpLayerObject* layer)
 {
@@ -182,6 +185,7 @@ fail:
   return NULL;
 }
 
+/*CpAPI*/
 PyObject*
 _Cp_SizeOf(PyObject* op, CpLayerObject* layer)
 {
@@ -206,6 +210,7 @@ _Cp_SizeOf(PyObject* op, CpLayerObject* layer)
   return result;
 }
 
+/*CpAPI*/
 PyObject*
 CpSizeOf(PyObject* op, PyObject* globals)
 {

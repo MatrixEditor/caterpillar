@@ -18,7 +18,6 @@
 #define CP_ARCH_H
 
 #include "macros.h"
-#include "module.h"
 
 /// Arch object type
 // PyAPI_DATA(PyTypeObject) CpArch_Type;

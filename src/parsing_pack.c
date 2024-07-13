@@ -44,6 +44,7 @@
 //         __[un]pack_many__ is not implemented.          | l: <seq|root> -+
 // ------------------------------------------------------------------------------
 
+/*CpAPI*/
 int
 _CpPack_EvalLength(CpLayerObject* layer,
                    PyObject* length,
@@ -115,6 +116,7 @@ _CpPack_EvalLength(CpLayerObject* layer,
   return 0;
 }
 
+/*CpAPI*/
 int
 CpPack_Field(PyObject* op, CpFieldObject* field, CpLayerObject* layer)
 {
@@ -203,6 +205,7 @@ CpPack_Field(PyObject* op, CpFieldObject* field, CpLayerObject* layer)
   return 0;
 }
 
+/*CpAPI*/
 int
 CpPack_Common(PyObject* op, PyObject* atom, CpLayerObject* layer)
 {
@@ -294,6 +297,7 @@ fail:
   return -1;
 }
 
+/*CpAPI*/
 int
 CpPack_Struct(PyObject* op, CpStructObject* struct_, CpLayerObject* layer)
 {
@@ -396,6 +400,7 @@ cleanup:
   return res;
 }
 
+/*CpAPI*/
 int
 _Cp_Pack(PyObject* op, PyObject* atom, CpLayerObject* layer)
 {
@@ -419,6 +424,7 @@ _Cp_Pack(PyObject* op, PyObject* atom, CpLayerObject* layer)
   return success;
 }
 
+/*CpAPI*/
 int
 CpPack(PyObject* op, PyObject* atom, PyObject* io, PyObject* globals)
 {

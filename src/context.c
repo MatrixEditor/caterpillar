@@ -99,6 +99,7 @@ cp_context__getattro__(CpContextObject* self, PyObject* name)
 }
 
 /* public API */
+/*CpAPI*/
 PyObject*
 CpContext_GetAttr(PyObject* ctx, PyObject* key, _modulestate* m)
 {
@@ -108,6 +109,7 @@ CpContext_GetAttr(PyObject* ctx, PyObject* key, _modulestate* m)
   return NULL;
 }
 
+/*CpAPI*/
 CpContextObject*
 CpContext_New(void)
 {
@@ -310,7 +312,7 @@ cp_unaryexpr__call__(CpUnaryExprObject* self, PyObject* args, PyObject* kw)
   return result;
 }
 
-/* public API */
+/*CpAPI*/
 CpUnaryExprObject*
 CpUnaryExpr_New(int op, PyObject* value)
 {
@@ -628,7 +630,7 @@ cp_binaryexpr__call__(CpBinaryExprObject* self, PyObject* args, PyObject* kw)
   return result;
 }
 
-/* public API */
+/*CpAPI*/
 CpBinaryExprObject*
 CpBinaryExpr_New(int op, PyObject* left, PyObject* right)
 {
@@ -870,18 +872,20 @@ cp_contextpath_richcmp(PyObject* self, PyObject* other, int op)
   return (PyObject*)CpBinaryExpr_New(op, self, other);
 }
 
-/* PUblic API */
+/*CpAPI*/
 CpContextPathObject*
 CpContextPath_New(PyObject* path)
 {
   return (CpContextPathObject*)CpObject_Create(&CpContextPath_Type, "O", path);
 }
 
+/*CpAPI*/
 CpContextPathObject*
 CpContextPath_FromString(const char* path)
 {
   return (CpContextPathObject*)CpObject_Create(&CpContextPath_Type, "s", path);
 }
+
 
 /* docs */
 PyDoc_STRVAR(cp_contextpath__doc__, "\

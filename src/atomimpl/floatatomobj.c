@@ -1,4 +1,5 @@
 /* floatatom C implementation */
+#include "caterpillar/caterpillar.h"
 #include "caterpillar/arch.h"
 #include "caterpillar/atoms/float.h"
 #include "caterpillar/state.h"

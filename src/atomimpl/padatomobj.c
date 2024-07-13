@@ -1,5 +1,6 @@
 /* padding atom implementation */
 
+#include "caterpillar/caterpillar.h"
 #include "caterpillar/atoms/primitive.h"
 #include "caterpillar/parsing.h"
 #include "caterpillar/module.h"

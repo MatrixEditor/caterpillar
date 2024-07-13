@@ -1,6 +1,7 @@
 /* intatom C implementation */
 #include <stdbool.h>
 
+#include "caterpillar/caterpillar.h"
 #include "caterpillar/atoms/int.h"
 #include "caterpillar/arch.h"
 #include "caterpillar/state.h"

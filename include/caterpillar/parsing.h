@@ -23,19 +23,19 @@
 #include "caterpillar/field.h"
 #include "caterpillar/state.h"
 
-PyAPI_FUNC(PyObject*) CpTypeOf(PyObject* op);
-PyAPI_FUNC(PyObject*) CpTypeOf_Field(CpFieldObject* field);
-PyAPI_FUNC(PyObject*) CpTypeOf_Common(PyObject* op);
+// PyAPI_FUNC(PyObject*) CpTypeOf(PyObject* op);
+// PyAPI_FUNC(PyObject*) CpTypeOf_Field(CpFieldObject* field);
+// PyAPI_FUNC(PyObject*) CpTypeOf_Common(PyObject* op);
 
-PyAPI_FUNC(int)
-  CpPack(PyObject* op, PyObject* atom, PyObject* io, PyObject* globals);
-PyAPI_FUNC(int)
-  CpPack_Field(PyObject* op, CpFieldObject* field, CpLayerObject* layer);
-PyAPI_FUNC(int)
-  CpPack_Common(PyObject* op, PyObject* atom, CpLayerObject* layer);
-PyAPI_FUNC(int)
-  CpPack_Struct(PyObject* op, CpStructObject* struct_, CpLayerObject* layer);
-PyAPI_FUNC(int) _Cp_Pack(PyObject* op, PyObject* atom, CpLayerObject* layer);
+// PyAPI_FUNC(int)
+//   CpPack(PyObject* op, PyObject* atom, PyObject* io, PyObject* globals);
+// PyAPI_FUNC(int)
+//   CpPack_Field(PyObject* op, CpFieldObject* field, CpLayerObject* layer);
+// PyAPI_FUNC(int)
+//   CpPack_Common(PyObject* op, PyObject* atom, CpLayerObject* layer);
+// PyAPI_FUNC(int)
+//   CpPack_Struct(PyObject* op, CpStructObject* struct_, CpLayerObject* layer);
+// PyAPI_FUNC(int) _Cp_Pack(PyObject* op, PyObject* atom, CpLayerObject* layer);
 
 /**
  * @brief Evaluates the length of the sequence to pack.
@@ -52,30 +52,30 @@ PyAPI_FUNC(int) _Cp_Pack(PyObject* op, PyObject* atom, CpLayerObject* layer);
  * @param length destination pointer to store the result of the evaluation
  * @return int 0 on success, -1 on error
  */
-PyAPI_FUNC(int) _CpPack_EvalLength(CpLayerObject* layer,
-                                   PyObject* length,
-                                   Py_ssize_t size,
-                                   /* out */ bool* seq_greedy,
-                                   /* out */ Py_ssize_t* seq_length);
+// PyAPI_FUNC(int) _CpPack_EvalLength(CpLayerObject* layer,
+//                                    PyObject* length,
+//                                    Py_ssize_t size,
+//                                    /* out */ bool* seq_greedy,
+//                                    /* out */ Py_ssize_t* seq_length);
 
-PyAPI_FUNC(PyObject*) CpSizeOf(PyObject* op, PyObject* globals);
-PyAPI_FUNC(PyObject*)
-  CpSizeOf_Field(CpFieldObject* field, CpLayerObject* layer);
-PyAPI_FUNC(PyObject*)
-  CpSizeOf_Struct(CpStructObject* struct_, CpLayerObject* layer);
-PyAPI_FUNC(PyObject*) CpSizeOf_Common(PyObject* atom, CpLayerObject* layer);
-PyAPI_FUNC(PyObject*) _Cp_SizeOf(PyObject* atom, CpLayerObject* layer);
+// PyAPI_FUNC(PyObject*) CpSizeOf(PyObject* op, PyObject* globals);
+// PyAPI_FUNC(PyObject*)
+//   CpSizeOf_Field(CpFieldObject* field, CpLayerObject* layer);
+// PyAPI_FUNC(PyObject*)
+//   CpSizeOf_Struct(CpStructObject* struct_, CpLayerObject* layer);
+// PyAPI_FUNC(PyObject*) CpSizeOf_Common(PyObject* atom, CpLayerObject* layer);
+// PyAPI_FUNC(PyObject*) _Cp_SizeOf(PyObject* atom, CpLayerObject* layer);
 
-PyAPI_FUNC(PyObject*) CpUnpack(PyObject* atom, PyObject* io, PyObject* globals);
-PyAPI_FUNC(PyObject*)
-  CpUnpack_Field(CpFieldObject* field, CpLayerObject* layer);
-PyAPI_FUNC(PyObject*) CpUnpack_Common(PyObject* atom, CpLayerObject* layer);
-PyAPI_FUNC(PyObject*)
-  CpUnpack_Struct(CpStructObject* struct_, CpLayerObject* layer);
-PyAPI_FUNC(PyObject*) _Cp_Unpack(PyObject* atom, CpLayerObject* layer);
-PyAPI_FUNC(int) _CpUnpack_EvalLength(CpLayerObject* layer,
-                                     PyObject* length,
-                                     bool* seq_greedy,
-                                     Py_ssize_t* seq_length);
+// PyAPI_FUNC(PyObject*) CpUnpack(PyObject* atom, PyObject* io, PyObject* globals);
+// PyAPI_FUNC(PyObject*)
+//   CpUnpack_Field(CpFieldObject* field, CpLayerObject* layer);
+// PyAPI_FUNC(PyObject*) CpUnpack_Common(PyObject* atom, CpLayerObject* layer);
+// PyAPI_FUNC(PyObject*)
+//   CpUnpack_Struct(CpStructObject* struct_, CpLayerObject* layer);
+// PyAPI_FUNC(PyObject*) _Cp_Unpack(PyObject* atom, CpLayerObject* layer);
+// PyAPI_FUNC(int) _CpUnpack_EvalLength(CpLayerObject* layer,
+//                                      PyObject* length,
+//                                      bool* seq_greedy,
+//                                      Py_ssize_t* seq_length);
 
 #endif

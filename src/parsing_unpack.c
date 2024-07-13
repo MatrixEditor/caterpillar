@@ -12,6 +12,8 @@
 // result. In addition, the internal 'obj' within a struct layer will be a
 // CpContext instance.
 // ------------------------------------------------------------------------------
+
+/*CpAPI*/
 int
 _CpUnpack_EvalLength(CpLayerObject* layer,
                      PyObject *length,
@@ -79,6 +81,7 @@ _CpUnpack_EvalLength(CpLayerObject* layer,
   return 0;
 }
 
+/*CpAPI*/
 PyObject*
 CpUnpack_Common(PyObject* op, CpLayerObject* layer)
 {
@@ -175,6 +178,7 @@ fail:
   return NULL;
 }
 
+/*CpAPI*/
 PyObject*
 CpUnpack_Field(CpFieldObject* field, CpLayerObject* layer)
 {
@@ -263,6 +267,7 @@ cleanup:
   return obj;
 }
 
+/*CpAPI*/
 PyObject*
 CpUnpack_Struct(CpStructObject* struct_, CpLayerObject* layer)
 {
@@ -351,6 +356,7 @@ cleanup:
   return obj;
 }
 
+/*CpAPI*/
 PyObject*
 _Cp_Unpack(PyObject* atom, CpLayerObject* layer)
 {
@@ -363,6 +369,7 @@ _Cp_Unpack(PyObject* atom, CpLayerObject* layer)
   }
 }
 
+/*CpAPI*/
 PyObject*
 CpUnpack(PyObject* atom, PyObject* io, PyObject* globals)
 {

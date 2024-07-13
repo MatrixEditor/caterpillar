@@ -82,7 +82,7 @@ PyAPI_FUNC(PyObject*) CpContext_GetAttrString(PyObject* ctx, const char* key);
  *
  * @return the new context, or NULL on failure
  */
-PyAPI_FUNC(CpContextObject*) CpContext_New(void);
+// PyAPI_FUNC(CpContextObject*) CpContext_New(void);
 
 // -----------------------------------------------------------------------------
 // unary expression
@@ -117,7 +117,7 @@ struct _unaryexpr
  * @param value the value to apply the operation to
  * @return the new unary expression, or NULL on failure
  */
-PyAPI_FUNC(CpUnaryExprObject*) CpUnaryExpr_New(int op, PyObject* value);
+// PyAPI_FUNC(CpUnaryExprObject*) CpUnaryExpr_New(int op, PyObject* value);
 
 // -----------------------------------------------------------------------------
 // binary expression
@@ -174,8 +174,8 @@ struct _binaryexpr
  * @param right the right value
  * @return the new binary expression, or NULL on failure
  */
-PyAPI_FUNC(CpBinaryExprObject*)
-  CpBinaryExpr_New(int op, PyObject* left, PyObject* right);
+// PyAPI_FUNC(CpBinaryExprObject*)
+//   CpBinaryExpr_New(int op, PyObject* left, PyObject* right);
 
 // -----------------------------------------------------------------------------
 // context path
@@ -205,7 +205,7 @@ struct _contextpath
  * @param path the path object (unicode object)
  * @return the new context path, or NULL on failure
  */
-PyAPI_FUNC(CpContextPathObject*) CpContextPath_New(PyObject* path);
+// PyAPI_FUNC(CpContextPathObject*) CpContextPath_New(PyObject* path);
 
 /**
  * @brief Create a new context path
@@ -213,7 +213,7 @@ PyAPI_FUNC(CpContextPathObject*) CpContextPath_New(PyObject* path);
  * @param path the path string
  * @return the new context path, or NULL on failure
  */
-PyAPI_FUNC(CpContextPathObject*) CpContextPath_FromString(const char* path);
+// PyAPI_FUNC(CpContextPathObject*) CpContextPath_FromString(const char* path);
 
 /**
  * @brief Checks if the given object is a context path
