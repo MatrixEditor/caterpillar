@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Struct Objects &#8212; Caterpillar 2.0.1 documentation</title>
+    <title>Struct Objects &#8212; Caterpillar 2.1.0 documentation</title>
   
   
   
@@ -36,14 +36,14 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../_static/documentation_options.js?v=f5cff4aa"></script>
+    <script src="../../_static/documentation_options.js?v=20623aea"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'reference/capi/struct';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Library" href="../../library/index.html" />
+    <link rel="next" title="Atom Objects" href="atoms/index.html" />
     <link rel="prev" title="Concrete Objects Layer" href="objimpl.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -121,7 +121,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.0.1</p>
+    <p class="title logo__title">Caterpillar 2.1.0</p>
   
 </a></div>
     
@@ -356,11 +356,16 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="../datamodel.html">Data Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../operators.html">Operators</a></li>
 </ul>
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">C API Reference</span></p>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">C Reference</span></p>
 <ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="abstract.html">Abstract Objects Layer</a></li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="objimpl.html">Concrete Objects Layer</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Struct Objects</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Caterpillar C API Reference</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="abstract.html">Abstract Objects Layer</a></li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="objimpl.html">Concrete Objects Layer</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">Struct Objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="atoms/index.html">Atom Objects</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="extension.html">Using the C API</a></li>
 </ul>
 </details></li>
 </ul>
@@ -392,6 +397,8 @@ document.write(`
 
 
 
+
+
 <nav aria-label="Breadcrumb" class="d-print-none">
   <ul class="bd-breadcrumbs">
     
@@ -402,6 +409,9 @@ document.write(`
     </li>
     
     <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Reference</a></li>
+    
+    
+    <li class="breadcrumb-item"><i class="fa-solid fa-ellipsis"></i></li>
     
     
     <li class="breadcrumb-item"><a href="objimpl.html" class="nav-link">Concrete Objects Layer</a></li>
@@ -432,7 +442,7 @@ does not create a dataclass of the model.</p>
 <dl class="c var">
 <dt class="sig sig-object c" id="c.CpStruct_Type">
 <span class="n"><span class="pre">PyTypeObject</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CpStruct_Type</span></span></span><a class="headerlink" href="#c.CpStruct_Type" title="Link to this definition">#</a><br /></dt>
-<dd><p>The type object for the <code class="xref c c-type docutils literal notranslate"><span class="pre">CpStruct</span></code> class.</p>
+<dd><p>The type object for the <code class="code docutils literal notranslate"><span class="pre">Struct</span></code> class.</p>
 </dd></dl>
 
 <p>There are a few differences between the Python implementation and this one. Although,
@@ -446,12 +456,12 @@ generated (at least for now).</p>
 <dd><p>A core element of this library and is the base class for all structs. It is not
 recommended to extend this class, as its Python variant already covers possible
 subclass use-cases.</p>
-<p>All <code class="code docutils literal notranslate"><span class="pre">CpStruct</span></code> instances will store a reference to the core module state.
+<p>All <code class="code docutils literal notranslate"><span class="pre">Struct</span></code> instances will store a reference to the core module state.
 There is no need to call <code class="xref c c-func docutils literal notranslate"><span class="pre">get_global_core_state()</span></code> more than once if you
-own a <code class="code docutils literal notranslate"><span class="pre">CpStruct</span></code> instance.</p>
+own a <code class="code docutils literal notranslate"><span class="pre">Struct</span></code> instance.</p>
 </dd></dl>
 
-<p>To manage field definitions, the <code class="xref c c-type docutils literal notranslate"><span class="pre">CpStruct</span></code> class stores all discovered fields
+<p>To manage field definitions, the <code class="code docutils literal notranslate"><span class="pre">Struct</span></code> class stores all discovered fields
 in an internal dictionary using an extra type:</p>
 <dl class="c type">
 <dt class="sig sig-object c" id="c.CpStructFieldInfoObject">
@@ -486,7 +496,7 @@ or <em>NULL</em> if not found. The state can be <em>NULL</em>.</p>
 <dl class="c function">
 <dt class="sig sig-object c" id="c.CpStructModel_Check">
 <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CpStructModel_Check</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">m</span></span>, <span class="n"><span class="pre">_coremodulestate</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">s</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpStructModel_Check" title="Link to this definition">#</a><br /></dt>
-<dd><p>Returns <code class="docutils literal notranslate"><span class="pre">1</span></code> if the model stores a <code class="xref c c-type docutils literal notranslate"><span class="pre">CpStruct</span></code> instance and therefore
+<dd><p>Returns <code class="docutils literal notranslate"><span class="pre">1</span></code> if the model stores a <code class="xref c c-type docutils literal notranslate"><span class="pre">Struct</span></code> instance and therefore
 conforms to the <em>StructContainer</em> protocol, <code class="docutils literal notranslate"><span class="pre">0</span></code> otherwise. This function
 always suceeds if the given state is not <em>NULL</em>.</p>
 </dd></dl>
@@ -529,11 +539,11 @@ on to the internal <code class="xref c c-type docutils literal notranslate"><spa
       </div>
     </a>
     <a class="right-next"
-       href="../../library/index.html"
+       href="atoms/index.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Library</p>
+        <p class="prev-next-title">Atom Objects</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

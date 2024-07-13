@@ -63,7 +63,7 @@ It is recommended to take a look at the explanation of the internal :ref:`datamo
 in touch with all forms of structs. Additionally, there's a detailed documentation on
 what configuration options can be used. Alternatively you can follow the :ref:`tutorial-index`.
 
-.. grid:: 1 2 3 4
+.. grid:: 1 2 3 5
 
    .. grid-item-card:: Tutorial
       :link: tutorial/index.html
@@ -85,6 +85,12 @@ what configuration options can be used. Alternatively you can follow the :ref:`t
 
       Changelog and contributing information.
 
+   .. grid-item-card:: C Reference
+      :link: reference/capi/index.html
+
+      Caterpillar C API Reference and extension development.
+
+
 .. toctree::
    :maxdepth: 3
    :hidden:
@@ -105,5 +111,4 @@ Indices and tables
 ==================
 
 * :ref:`genindex`
-* :ref:`modindex`
 * :ref:`search`
