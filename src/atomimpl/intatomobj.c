@@ -10,7 +10,7 @@ cp_intatom__type__(CpIntAtomObject* self)
 }
 
 static PyObject *
-cp_intatom__size__(CpIntAtomObject* self)
+cp_intatom__size__(CpIntAtomObject* self, PyObject *ctx)
 {
   return Py_XNewRef(self->m_byte_count);
 }

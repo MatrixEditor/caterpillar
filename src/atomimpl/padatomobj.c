@@ -11,7 +11,7 @@ cp_paddingatom__type__(PyObject* self)
 }
 
 static PyObject*
-cp_paddingatom__size__(PyObject* self)
+cp_paddingatom__size__(PyObject* self, PyObject *ctx)
 {
   /* NOTE:
   We are using the size of one byte here to allow padding atoms to be
@@ -92,7 +92,7 @@ CpPaddingAtom_PackMany(CpPaddingAtomObject* self,
                        CpLayerObject* layer)
 {
   /* value will be ignored here */
-  PyObject *res = NULL, *bytes = NULL, *objSize;
+  PyObject *res = NULL, *bytes = NULL, *objSize = NULL, *objLengh = NULL;
   bool greedy = false;
   Py_ssize_t length = 0;
 
@@ -103,9 +103,16 @@ CpPaddingAtom_PackMany(CpPaddingAtomObject* self,
 
   /* The following call will fail if the length is a prefixed statement
    * (slice)*/
-  if (_CpPack_EvalLength(layer, -1, &greedy, &length) < 0) {
+  objLengh =
+    CpField_GetLength((CpFieldObject*)layer->m_field, (PyObject*)layer);
+  if (!objLengh) {
     return -1;
   }
+  if (_CpPack_EvalLength(layer, objLengh, -1, &greedy, &length) < 0) {
+    Py_XDECREF(objLengh);
+    return -1;
+  }
+  Py_XDECREF(objLengh);
 
   if (length == 0) {
     return 0;
@@ -153,18 +160,26 @@ CpPaddingAtom_Unpack(CpPaddingAtomObject* self, CpLayerObject* layer)
 PyObject*
 CpPaddingAtom_UnpackMany(CpPaddingAtomObject* self, CpLayerObject* layer)
 {
-  PyObject *res = NULL, *bytes = NULL;
+  PyObject *res = NULL, *bytes = NULL, *objLengh = NULL;
   bool greedy = false;
   Py_ssize_t length = 0, parsedLength = 0;
 
-  if (_CpPack_EvalLength(layer, -1, &greedy, &length) < 0) {
+  objLengh =
+    CpField_GetLength((CpFieldObject*)layer->m_field, (PyObject*)layer);
+  if (!objLengh) {
     return NULL;
   }
+  if (_CpPack_EvalLength(layer, objLengh, -1, &greedy, &length) < 0) {
+    Py_DECREF(objLengh);
+    return NULL;
+  }
+  Py_DECREF(objLengh);
 
   res = CpState_Read(layer->m_state, length);
   if (!res) {
     return NULL;
   }
+
   Py_XDECREF(res);
   Py_RETURN_NONE;
 }

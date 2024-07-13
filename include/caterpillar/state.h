@@ -107,6 +107,8 @@ PyAPI_FUNC(PyObject*)
  */
 PyAPI_FUNC(PyObject*) CpState_Read(CpStateObject* self, Py_ssize_t size);
 
+PyAPI_FUNC(PyObject*) CpState_ReadFully(CpStateObject* self);
+
 /**
  * @brief Writes the given bytes to the output stream
  *

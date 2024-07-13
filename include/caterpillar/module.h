@@ -63,6 +63,7 @@ typedef struct _modulestate
   PyObject* str_write;
   PyObject* str_read;
   PyObject* str_close;
+  PyObject* str_strict;
   PyObject* str___pack__;
   PyObject* str___pack_many__;
   PyObject* str___unpack__;

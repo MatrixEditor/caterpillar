@@ -13,6 +13,9 @@
 #include "caterpillar/atoms/float.h"
 #include "caterpillar/atoms/int.h"
 #include "caterpillar/atoms/primitive.h"
+#include "caterpillar/atoms/string.h"
+
+#include "caterpillar.c"
 
 /* immortal objects */
 static PyObject*
@@ -373,6 +376,7 @@ cp_module_clear(PyObject* m)
     Py_CLEAR(state->str___dict__);
     Py_CLEAR(state->str___weakref__);
     Py_CLEAR(state->str___qualname__);
+    Py_CLEAR(state->str_strict);
 
     Py_CLEAR(state->cp_regex__unnamed);
 
@@ -471,6 +475,9 @@ PyInit__C(void)
   CpPaddingAtom_Type.tp_base = &CpFieldCAtom_Type;
   CpModule_SetupType(&CpPaddingAtom_Type);
 
+  CpStringAtom_Type.tp_base = &CpFieldCAtom_Type;
+  CpModule_SetupType(&CpStringAtom_Type);
+
   // module setup
   m = PyModule_Create(&CpModule);
   if (!m) {
@@ -503,6 +510,7 @@ PyInit__C(void)
   CpModule_AddObject("boolatom", &CpBoolAtom_Type);
   CpModule_AddObject("charatom", &CpCharAtom_Type);
   CpModule_AddObject("paddingatom", &CpPaddingAtom_Type);
+  CpModule_AddObject("stringatom", &CpStringAtom_Type);
 
   /* setup custom intatoms */
 #define CpModule_DefAtom(name, ...)                                            \
@@ -631,6 +639,7 @@ PyInit__C(void)
   CACHED_STRING(str___weakref__, "__weakref__");
   CACHED_STRING(str___qualname__, "__qualname__");
   CACHED_STRING(str_path_delim, ".");
+  CACHED_STRING(str_strict, "strict");
 
 #undef CACHED_STRING
 
@@ -659,23 +668,23 @@ PyInit__C(void)
   // regex setup
   PyObject* re = PyImport_ImportModule("re");
   if (!re) {
-    return NULL;
+    goto err;
   }
 
   PyObject* compile = PyObject_GetAttrString(re, "compile");
   if (!compile) {
-    return NULL;
+    goto err;
   }
 
   state->cp_regex__unnamed = PyObject_CallFunction(compile, "s", "_[0-9]*$");
   if (!state->cp_regex__unnamed) {
-    return NULL;
+    goto err;
   }
 
   PyObject* inspect = PyImport_ImportModule("inspect");
   if (!inspect) {
     PyErr_SetString(PyExc_ImportError, "failed to import inspect");
-    return NULL;
+    goto err;
   }
 
   CpModuleState_Set(inspect_getannotations,
@@ -685,10 +694,34 @@ PyInit__C(void)
   PyObject* io = PyImport_ImportModule("io");
   if (!io) {
     PyErr_SetString(PyExc_ImportError, "failed to import io");
-    return NULL;
+    goto err;
   }
 
   CpModuleState_Set(BytesIO_Type, PyObject_GetAttrString(io, "BytesIO"));
   Py_XDECREF(io);
+
+  /*Export API table*/
+  PyObject *c_api = PyCapsule_New((void *)Cp_API, NULL, NULL);
+  if (c_api == NULL) {
+    goto err;
+  }
+
+  PyObject *d = PyModule_GetDict(m);
+  if (d == NULL) {
+    goto err;
+  }
+
+  if (PyDict_SetItemString(d, "_C_API", c_api) < 0) {
+    goto err;
+  }
+  Py_DECREF(c_api);
   return m;
+
+ err:
+    if (!PyErr_Occurred()) {
+        PyErr_SetString(PyExc_RuntimeError,
+                        "cannot load caterpillar._C module.");
+    }
+    Py_DECREF(m);
+    return NULL;
 }

@@ -18,6 +18,7 @@
 #define ATOMOBJ_H
 
 #include "macros.h"
+#include "caterpillar.h"
 
 /**
  * @brief Special base class for all atom objects
@@ -35,7 +36,7 @@ typedef struct _atomobj
 } CpAtomObject;
 
 /// Atom object type
-PyAPI_DATA(PyTypeObject) CpAtom_Type;
+// PyAPI_DATA(PyTypeObject) CpAtom_Type;
 
 /**
  * @brief Defines the base type for atom objects to be a Atom
@@ -242,8 +243,8 @@ typedef struct _catomobj
   bitsfunc ob_bits;
 } CpCAtomObject;
 
-/// Atom object type
-PyAPI_DATA(PyTypeObject) CpCAtom_Type;
+/// Atom object type (defined in __caterpillar_api.h)
+// PyAPI_DATA(PyTypeObject) CpCAtom_Type;
 
 /**
  * @brief Checks if the given object is an atom

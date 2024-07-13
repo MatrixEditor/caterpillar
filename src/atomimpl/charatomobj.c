@@ -9,7 +9,7 @@ cp_charatom__type__(CpCharAtomObject* self)
 }
 
 static PyObject*
-cp_charatom__size__(CpCharAtomObject* self)
+cp_charatom__size__(CpCharAtomObject* self, PyObject *ctx)
 {
   return PyLong_FromSize_t(1);
 }

@@ -14,11 +14,10 @@
 // ------------------------------------------------------------------------------
 int
 _CpUnpack_EvalLength(CpLayerObject* layer,
+                     PyObject *length,
                      bool* seq_greedy,
                      Py_ssize_t* seq_length)
 {
-  PyObject* length =
-    CpField_GetLength((CpFieldObject*)layer->m_field, (PyObject*)layer);
   *seq_greedy = false;
   *seq_length = 0;
   if (!length) {
@@ -115,11 +114,15 @@ CpUnpack_Common(PyObject* op, CpLayerObject* layer)
     }
   }
 
-  PyObject* obj = NULL;
+  PyObject* obj = NULL, *length = NULL;
   // First, get the amount of elements we have to parse
   bool seq_greedy = false;
   Py_ssize_t seq_length = 0;
-  if (_CpUnpack_EvalLength(layer, &seq_greedy, &seq_length) < 0) {
+  length = CpField_GetLength((CpFieldObject*)layer->m_field, (PyObject*)layer);
+  if (!length) {
+    goto fail;
+  }
+  if (_CpUnpack_EvalLength(layer, length, &seq_greedy, &seq_length) < 0) {
     goto fail;
   }
   CpLayerObject* seq_layer = CpLayer_New(layer->m_state, layer);
@@ -158,12 +161,14 @@ CpUnpack_Common(PyObject* op, CpLayerObject* layer)
 
 success:
   Py_XDECREF(obj);
+  Py_XDECREF(length);
   CpLayer_Invalidate(seq_layer);
   seq_layer = NULL;
   return Py_NewRef(seq);
 
 fail:
   Py_XDECREF(obj);
+  Py_XDECREF(length);
   if (seq_layer) {
     CpLayer_Invalidate(seq_layer);
   }

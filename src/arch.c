@@ -145,15 +145,17 @@ PyTypeObject CpArch_Type = {
 };
 
 /* CpEndian */
+
+/*CpAPI*/
 int
 CpEndian_IsLittleEndian(CpEndianObject* endian, _modulestate* mod)
 {
   if (endian->id == '=') {
-    #ifdef PY_LITTLE_ENDIAN
-      return 1;
-    #else
-      return 0;
-    #endif
+#ifdef PY_LITTLE_ENDIAN
+    return 1;
+#else
+    return 0;
+#endif
   }
   return endian->id == '<';
 }
@@ -253,7 +255,6 @@ static PyNumberMethods CpEndian_NumberMethods = {
   .nb_add = (binaryfunc)cp_endian_as_number_add
 };
 
-
 static PyMemberDef CpEndian_Members[] = {
   { "name",
     T_OBJECT_EX,
@@ -278,7 +279,7 @@ PyTypeObject CpEndian_Type = {
   0,                                               /* tp_setattr */
   0,                                               /* tp_reserved */
   (reprfunc)cp_endian_repr,                        /* tp_repr */
-  &CpEndian_NumberMethods,                                               /* tp_as_number */
+  &CpEndian_NumberMethods,                         /* tp_as_number */
   0,                                               /* tp_as_sequence */
   0,                                               /* tp_as_mapping */
   (hashfunc)cp_endian_hash,                        /* tp_hash */

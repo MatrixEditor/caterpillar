@@ -45,17 +45,12 @@
 
 int
 _CpPack_EvalLength(CpLayerObject* layer,
+                   PyObject* length,
                    Py_ssize_t size,
                    bool* greedy,
                    Py_ssize_t* dstLength)
 {
   int success = 0;
-  PyObject* length =
-    CpField_GetLength((CpFieldObject*)layer->m_field, (PyObject*)layer);
-  if (!length) {
-    return -1;
-  }
-
   *greedy = false;
   *dstLength = 0;
   if (length == &_Py_EllipsisObject) {
@@ -251,9 +246,16 @@ CpPack_Common(PyObject* op, PyObject* atom, CpLayerObject* layer)
   Py_ssize_t size = PySequence_Size(op);
   bool greedy = false;
   Py_ssize_t layer_length = 0;
-  if (_CpPack_EvalLength(layer, size, &greedy, &layer_length) < 0) {
+  PyObject* length =
+    CpField_GetLength((CpFieldObject*)layer->m_field, (PyObject*)layer);
+  if (!length) {
     return -1;
   }
+  if (_CpPack_EvalLength(layer, length, size, &greedy, &layer_length) < 0) {
+    Py_XDECREF(length);
+    return -1;
+  }
+  Py_XDECREF(length);
 
   if (layer_length <= 0) {
     // continue packing, here's nothing to store

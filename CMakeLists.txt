@@ -6,6 +6,8 @@ find_package(
   COMPONENTS Interpreter Development.Module
   REQUIRED)
 
+add_compile_definitions(_CPMODULE)
+
 python_add_library(
   _C
   MODULE
@@ -30,6 +32,7 @@ python_add_library(
   src/atomimpl/boolatomobj.c
   src/atomimpl/charatomobj.c
   src/atomimpl/padatomobj.c
+  src/atomimpl/stringatom.c
 
   WITH_SOABI
 )
@@ -38,4 +41,14 @@ target_include_directories(_C PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 message(STATUS "CMake ${CMAKE_VERSION}")
 message(STATUS "Python ${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}")
+
+add_custom_target(
+ genapi ALL
+ COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/src/code_gen/genapi.py ${CMAKE_CURRENT_SOURCE_DIR}/include/caterpillar/caterpillar.h.in ${CMAKE_CURRENT_SOURCE_DIR}/src/caterpillar.c.in
+ BYPRODUCTS ${CMAKE_CURRENT_SOURCE_DIR}/include/caterpillar/caterpillar.h ${CMAKE_CURRENT_SOURCE_DIR}/src/caterpillar.c
+ COMMENT "Generating Public Caterpillar API"
+)
+
+add_dependencies(_C genapi)
+
 install(TARGETS _C DESTINATION caterpillar)

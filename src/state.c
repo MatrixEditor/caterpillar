@@ -459,6 +459,12 @@ CpState_Read(CpStateObject* self, Py_ssize_t size)
 }
 
 PyObject*
+CpState_ReadFully(CpStateObject* self)
+{
+  return PyObject_CallMethodNoArgs(self->m_io, self->mod->str_read);
+}
+
+PyObject*
 CpState_Write(CpStateObject* self, PyObject* value)
 {
   return PyObject_CallMethodOneArg(self->m_io, self->mod->str_write, value);

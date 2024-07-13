@@ -9,7 +9,7 @@ cp_boolatom__type__(CpBoolAtomObject* self)
 }
 
 static PyObject*
-cp_boolatom__size__(CpBoolAtomObject* self)
+cp_boolatom__size__(CpBoolAtomObject* self, PyObject *ctx)
 {
   return PyLong_FromSize_t(1);
 }

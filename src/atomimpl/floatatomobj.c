@@ -10,7 +10,7 @@ cp_floatatom__type__(CpFloatAtomObject* self)
 }
 
 static PyObject*
-cp_floatatom__size__(CpFloatAtomObject* self)
+cp_floatatom__size__(CpFloatAtomObject* self, PyObject *ctx)
 {
   return Py_XNewRef(self->m_byte_count);
 }
