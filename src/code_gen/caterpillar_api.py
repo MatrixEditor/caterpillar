@@ -8,6 +8,8 @@ Make sure to check all standard indices before adding a new
 function.
 """
 
+# !! heavily inspired by numpy !!
+
 import os
 
 # Reserved for future use
@@ -111,6 +113,16 @@ cp_func_api = {
     "CpPack_CAtom":                 85,
     "CpSizeOf_CAtom":               86,
     "CpTypeOf_CAtom":               87,
+    "CpState_New":                  88,
+    "CpState_Tell":                 89,
+    "CpState_Seek":                 90,
+    "CpState_Read":                 91,
+    "CpState_ReadFully":            92,
+    "CpState_Write":                93,
+    "CpState_SetGlobals":           94,
+    "CpLayer_New":                  95,
+    "CpLayer_Invalidate":           96,
+    "CpLayer_SetSequence":          97
 }
 
 API_SRC = [

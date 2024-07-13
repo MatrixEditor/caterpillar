@@ -90,6 +90,16 @@ void *Cp_API[] = {
     (void *) &CpUnpack_CAtom,
     (void *) &CpPack_CAtom,
     (void *) &CpSizeOf_CAtom,
-    (void *) &CpTypeOf_CAtom
+    (void *) &CpTypeOf_CAtom,
+    (void *) &CpState_New,
+    (void *) &CpState_Tell,
+    (void *) &CpState_Seek,
+    (void *) &CpState_Read,
+    (void *) &CpState_ReadFully,
+    (void *) &CpState_Write,
+    (void *) &CpState_SetGlobals,
+    (void *) &CpLayer_New,
+    (void *) &CpLayer_Invalidate,
+    (void *) &CpLayer_SetSequence
 };
 

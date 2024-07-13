@@ -31,7 +31,7 @@ def test_padding_unpack():
 
     # Therefore, the following code IS valid if the underlying
     # stream does not throw an exception.
-    assert unpack(b"\x00", padding[10]) is None
+    assert unpack(b"\x00" * 10, paddingatom(0x02)[10]) is None
 
 def test_padding_unpack_many():
     assert unpack(b"\x00" * 10, padding[10]) is None

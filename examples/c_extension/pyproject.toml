@@ -1,0 +1,22 @@
+[build-system]
+requires = ["scikit-build-core"]
+build-backend = "scikit_build_core.build"
+
+[tool.scikit-build]
+build-dir = "build/{wheel_tag}"
+sdist.include = ["*.pyi"]
+wheel.py-api = "cp312"
+
+[project]
+name = "example"
+version = "0.0.0"
+
+authors = [
+  { name="Foo", email="bar@baz.com" },
+]
+classifiers = [
+    'Intended Audience :: Science/Research',
+    'License :: OSI Approved :: MIT License',
+
+    'Programming Language :: Python :: 3.12',
+  ]

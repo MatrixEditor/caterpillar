@@ -117,16 +117,6 @@ CpStringAtom_Unpack(CpStringAtomObject* self, CpLayerObject* layer)
     return NULL;
   }
 
-  if (PyBytes_GET_SIZE(res) != length) {
-    PyErr_Format(
-      PyExc_ValueError,
-      "Insufficient data, expected a buffer of at least %zd bytes, got %zd",
-      length,
-      PyBytes_GET_SIZE(res));
-    Py_DECREF(res);
-    return NULL;
-  }
-
   PyObject* string = PyUnicode_Decode(PyBytes_AS_STRING(res),
                                       PyBytes_GET_SIZE(res),
                                       PyUnicode_DATA(self->m_encoding),

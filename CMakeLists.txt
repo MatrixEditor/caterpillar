@@ -37,15 +37,15 @@ python_add_library(
   WITH_SOABI
 )
 
-target_include_directories(_C PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(_C PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/caterpillar/include)
 
 message(STATUS "CMake ${CMAKE_VERSION}")
 message(STATUS "Python ${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}")
 
 add_custom_target(
  genapi ALL
- COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/src/code_gen/genapi.py ${CMAKE_CURRENT_SOURCE_DIR}/include/caterpillar/caterpillar.h.in ${CMAKE_CURRENT_SOURCE_DIR}/src/caterpillar.c.in
- BYPRODUCTS ${CMAKE_CURRENT_SOURCE_DIR}/include/caterpillar/caterpillar.h ${CMAKE_CURRENT_SOURCE_DIR}/src/caterpillar.c
+ COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/src/code_gen/genapi.py ${CMAKE_CURRENT_SOURCE_DIR}/src/caterpillar/include/caterpillar/caterpillar.h.in ${CMAKE_CURRENT_SOURCE_DIR}/src/caterpillar.c.in
+ BYPRODUCTS ${CMAKE_CURRENT_SOURCE_DIR}/src/caterpillar/include/caterpillar/caterpillar.h ${CMAKE_CURRENT_SOURCE_DIR}/src/caterpillar.c
  COMMENT "Generating Public Caterpillar API"
 )
 
