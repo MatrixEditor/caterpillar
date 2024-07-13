@@ -16,7 +16,7 @@
 /*CpAPI*/
 int
 _CpUnpack_EvalLength(CpLayerObject* layer,
-                     PyObject *length,
+                     PyObject* length,
                      bool* seq_greedy,
                      Py_ssize_t* seq_length)
 {
@@ -117,7 +117,7 @@ CpUnpack_Common(PyObject* op, CpLayerObject* layer)
     }
   }
 
-  PyObject* obj = NULL, *length = NULL;
+  PyObject *obj = NULL, *length = NULL;
   // First, get the amount of elements we have to parse
   bool seq_greedy = false;
   Py_ssize_t seq_length = 0;
@@ -364,9 +364,39 @@ _Cp_Unpack(PyObject* atom, CpLayerObject* layer)
     return CpUnpack_Field((CpFieldObject*)atom, layer);
   } else if (CpStruct_CheckExact(atom)) {
     return CpUnpack_Struct((CpStructObject*)atom, layer);
+  } else if (CpCAtom_Check(atom)) {
+    return CpUnpack_CAtom((CpCAtomObject*)atom, layer);
   } else {
     return CpUnpack_Common(atom, layer);
   }
+}
+
+/*CpAPI*/
+PyObject*
+CpUnpack_CAtom(CpCAtomObject* catom, CpLayerObject* layer)
+{
+  PyObject* result = NULL;
+  if (!layer->s_sequential) {
+    if (catom->ob_unpack == NULL) {
+      PyErr_Format(
+        PyExc_NotImplementedError,
+        "The atom of type '%s' cannot be unpacked (missing __unpack__)",
+        Py_TYPE(catom)->tp_name);
+      return NULL;
+    }
+    result = catom->ob_unpack((PyObject *)catom, (PyObject *)layer);
+  }
+  else {
+    if (!catom->ob_unpack_many) {
+      PyErr_Format(
+        PyExc_NotImplementedError,
+        "The atom of type '%s' cannot be unpacked (missing __unpack_many__)",
+        Py_TYPE(catom)->tp_name);
+      return NULL;
+    }
+    result = catom->ob_unpack_many((PyObject *)catom, (PyObject *)layer);
+  }
+  return result;
 }
 
 /*CpAPI*/

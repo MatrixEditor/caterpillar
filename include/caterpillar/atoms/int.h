@@ -46,7 +46,7 @@ struct _intatomobj
 /** @brief Checks if the given object is an integer atom object */
 #define CpIntAtom_CheckExact(op) Py_IS_TYPE((op), &CpIntAtom_Type)
 /** @brief Checks if the given object is an integer atom object */
-#define CpIntAtom_Check(op) (PyObject_TypeCheck((op), &CpIntAtom_Type))
+#define CpIntAtom_Check(op) (PyObject_IsInstance((op), &CpIntAtom_Type))
 
 PyAPI_FUNC(int)
   CpIntAtom_Pack(CpIntAtomObject* self, PyObject* value, CpLayerObject* layer);

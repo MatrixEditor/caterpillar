@@ -254,7 +254,7 @@ struct _catomobj
  * @param op the object to check (must be a Python object pointer)
  * @return 1 if the object is an atom, 0 otherwise
  */
-#define CpCAtom_Check(op) Py_IS_TYPE((op), &CpCAtom_Type)
+#define CpCAtom_Check(op) PyObject_TypeCheck((op), &CpCAtom_Type)
 
 /**
  * @brief Checks if the given object is an atom

@@ -40,7 +40,7 @@ struct _floatatomobj
 /** @brief Checks if the given object is an integer atom object */
 #define CpFloatAtom_CheckExact(op) Py_IS_TYPE((op), &CpFloatAtom_Type)
 /** @brief Checks if the given object is an integer atom object */
-#define CpFloatAtom_Check(op) (PyObject_TypeCheck((op), &CpFloatAtom_Type))
+#define CpFloatAtom_Check(op) (PyObject_IsInstance((op), &CpFloatAtom_Type))
 
 PyAPI_FUNC(int) CpFloatAtom_Pack(CpFloatAtomObject* self,
                                  PyObject* value,

@@ -107,6 +107,10 @@ cp_func_api = {
     "CpUnpack_Struct":              81,
     "_Cp_Unpack":                   82,
     "_CpUnpack_EvalLength":         83,
+    "CpUnpack_CAtom":               84,
+    "CpPack_CAtom":                 85,
+    "CpSizeOf_CAtom":               86,
+    "CpTypeOf_CAtom":               87,
 }
 
 API_SRC = [

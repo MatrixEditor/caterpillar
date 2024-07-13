@@ -58,7 +58,7 @@ PyAPI_DATA(PyTypeObject) CpBoolAtom_Type;
  * @return True if the object is of type CpBoolAtom_Type or a subtype,
  *         false otherwise.
  */
-#define CpBoolAtom_Check(op) (PyObject_TypeCheck((op), &CpBoolAtom_Type))
+#define CpBoolAtom_Check(op) (PyObject_IsInstance((op), &CpBoolAtom_Type))
 
 /**
  * @brief Packs a value into the underlying stream.
@@ -95,7 +95,7 @@ struct _charatomobj
 /** @brief Checks if the given object is a char atom object */
 #define CpCharAtom_CheckExact(op) Py_IS_TYPE((op), &CpCharAtom_Type)
 /** @brief Checks if the given object is a char atom object */
-#define CpCharAtom_Check(op) (PyObject_TypeCheck((op), &CpCharAtom_Type))
+#define CpCharAtom_Check(op) (PyObject_IsInstance((op), &CpCharAtom_Type))
 
 PyAPI_FUNC(int) CpCharAtom_Pack(CpCharAtomObject* self,
                                 PyObject* value,
@@ -119,7 +119,7 @@ struct _paddingatomobj
 /** @brief Checks if the given object is a padding atom object */
 #define CpPaddingAtom_CheckExact(op) Py_IS_TYPE((op), &CpPaddingAtom_Type)
 /** @brief Checks if the given object is a padding atom object */
-#define CpPaddingAtom_Check(op) (PyObject_TypeCheck((op), &CpPaddingAtom_Type))
+#define CpPaddingAtom_Check(op) (PyObject_IsInstance((op), &CpPaddingAtom_Type))
 
 PyAPI_FUNC(int) CpPaddingAtom_Pack(CpPaddingAtomObject* self,
                                    PyObject* _,

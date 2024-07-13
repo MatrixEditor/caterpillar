@@ -402,6 +402,31 @@ cleanup:
 
 /*CpAPI*/
 int
+CpPack_CAtom(PyObject* op, CpCAtomObject* catom, CpLayerObject* layer)
+{
+
+  if (!layer->s_sequential) {
+    if (catom->ob_pack == NULL) {
+      PyErr_Format(PyExc_NotImplementedError,
+                   "The atom of type '%s' cannot be packed (missing __pack__)",
+                   Py_TYPE(catom)->tp_name);
+      return -1;
+    }
+    return catom->ob_pack((PyObject*)catom, op, (PyObject*)layer);
+  }
+
+  if (catom->ob_pack_many == NULL) {
+    PyErr_Format(
+      PyExc_NotImplementedError,
+      "The atom of type '%s' cannot be packed (missing __pack_many__)",
+      Py_TYPE(catom)->tp_name);
+    return -1;
+  }
+  return catom->ob_pack_many((PyObject*)catom, op, (PyObject*)layer);
+}
+
+/*CpAPI*/
+int
 _Cp_Pack(PyObject* op, PyObject* atom, CpLayerObject* layer)
 {
   // 1. the current context-sensitive variables must be stored
@@ -414,11 +439,12 @@ _Cp_Pack(PyObject* op, PyObject* atom, CpLayerObject* layer)
     success = CpPack_Field(op, (CpFieldObject*)atom, layer);
   } else if (CpStruct_CheckExact(atom)) {
     success = CpPack_Struct(op, (CpStructObject*)atom, layer);
-  }
+  } else if (CpCAtom_Check(atom)) {
+    return CpPack_CAtom(op, (CpCAtomObject*)atom, layer);
   // else CASE(&CpCAtom_Type, atom) {
   //   success = cp_pack_catom
   // }
-  else {
+  } else {
     success = CpPack_Common(op, atom, layer);
   }
   return success;

@@ -39,7 +39,7 @@ struct _option
  * @param op the object to check (must be a Python object pointer)
  * @return 1 if the object is an option, 0 otherwise
  */
-#define CpOption_Check(op) Py_IS_TYPE((op), &CpOption_Type)
+#define CpOption_Check(op) PyObject_TypeCheck((op), &CpOption_Type)
 
 /**
  * @brief Checks if the given object is an option

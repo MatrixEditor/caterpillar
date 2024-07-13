@@ -86,6 +86,10 @@ void *Cp_API[] = {
     (void *) &CpUnpack_Common,
     (void *) &CpUnpack_Struct,
     (void *) &_Cp_Unpack,
-    (void *) &_CpUnpack_EvalLength
+    (void *) &_CpUnpack_EvalLength,
+    (void *) &CpUnpack_CAtom,
+    (void *) &CpPack_CAtom,
+    (void *) &CpSizeOf_CAtom,
+    (void *) &CpTypeOf_CAtom
 };
 
