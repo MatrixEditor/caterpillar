@@ -18,7 +18,7 @@
 #define CP_CONTEXT_H
 
 /* Caterpillar Context and ContextPath C implementation */
-#include "caterpillar/macros.h"
+#include "caterpillar/caterpillar.h"
 #include "caterpillar/module.h"
 
 /*context*/
@@ -29,16 +29,16 @@
  * Represents a context object with attribute-style access, which also conforms
  * to the context protocol.
  */
-typedef struct _contextobj
+struct _contextobj
 {
   /// This object is essentially a dict object with some extra
   /// methods to conform to the Context protocol. Therefore, this
   /// object can be casted into a dictionary directly.
   PyDictObject m_dict;
-} CpContextObject;
+};
 
 /// Context object type
-PyAPI_DATA(PyTypeObject) CpContext_Type;
+// PyAPI_DATA(PyTypeObject) CpContext_Type;
 
 /**
  * @brief Checks if the given object is an context object
@@ -99,16 +99,16 @@ enum
  * This is a helper class to support lazy evaluation of unary expressions
  * while parsing data.
  */
-typedef struct CpUnaryExpr
+struct _unaryexpr
 {
   /// the operation to perform
   PyObject_HEAD int m_expr;
   /// the value to apply the operation to
   PyObject* m_value;
-} CpUnaryExprObject;
+};
 
 /// Unary expression type
-PyAPI_DATA(PyTypeObject) CpUnaryExpr_Type;
+// PyAPI_DATA(PyTypeObject) CpUnaryExpr_Type;
 
 /**
  * @brief Create a new unary expression
@@ -154,17 +154,17 @@ enum
  * This is a helper class to support lazy evaluation of binary expressions
  * while parsing data. The operations are defined in the enum above.
  */
-typedef struct CpBinaryExpr
+struct _binaryexpr
 {
   /// the operation to perform
   PyObject_HEAD int m_expr;
   /// the left and right values
   PyObject* m_left;
   PyObject* m_right;
-} CpBinaryExprObject;
+};
 
 /// Binary expression type
-PyAPI_DATA(PyTypeObject) CpBinaryExpr_Type;
+// PyAPI_DATA(PyTypeObject) CpBinaryExpr_Type;
 
 /**
  * @brief Create a new binary expression
@@ -186,7 +186,7 @@ PyAPI_FUNC(CpBinaryExprObject*)
  * Represents a lambda function for retrieving a value from a Context based on
  * a specified path.
  */
-typedef struct CpContextPath
+struct _contextpath
 {
   /// the path object
   PyObject_HEAD PyObject* m_path;
@@ -194,10 +194,10 @@ typedef struct CpContextPath
   // internal variable to minimize the amount of calls to get the
   // global module state.
   _modulestate* m_state;
-} CpContextPathObject;
+};
 
 /// Context path type
-PyAPI_DATA(PyTypeObject) CpContextPath_Type;
+// PyAPI_DATA(PyTypeObject) CpContextPath_Type;
 
 /**
  * @brief Create a new context path

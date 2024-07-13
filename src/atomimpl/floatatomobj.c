@@ -1,6 +1,8 @@
 /* floatatom C implementation */
 #include "caterpillar/arch.h"
 #include "caterpillar/atoms/float.h"
+#include "caterpillar/state.h"
+#include "caterpillar/module.h"
 #include <structmember.h>
 
 static PyObject*
@@ -10,7 +12,7 @@ cp_floatatom__type__(CpFloatAtomObject* self)
 }
 
 static PyObject*
-cp_floatatom__size__(CpFloatAtomObject* self, PyObject *ctx)
+cp_floatatom__size__(CpFloatAtomObject* self, PyObject* ctx)
 {
   return Py_XNewRef(self->m_byte_count);
 }
@@ -154,15 +156,15 @@ CpFloatAtom_Unpack(CpFloatAtomObject* self, CpLayerObject* layer)
   double res;
   switch (self->_m_byte_count) {
     case 2: {
-      res = PyFloat_Unpack2(((PyBytesObject *)bytes)->ob_sval, little_endian);
+      res = PyFloat_Unpack2(((PyBytesObject*)bytes)->ob_sval, little_endian);
       break;
     }
     case 4: {
-      res = PyFloat_Unpack4(((PyBytesObject *)bytes)->ob_sval, little_endian);
+      res = PyFloat_Unpack4(((PyBytesObject*)bytes)->ob_sval, little_endian);
       break;
     }
     case 8: {
-      res = PyFloat_Unpack8(((PyBytesObject *)bytes)->ob_sval, little_endian);
+      res = PyFloat_Unpack8(((PyBytesObject*)bytes)->ob_sval, little_endian);
       break;
     }
     default: {

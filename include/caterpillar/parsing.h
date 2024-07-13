@@ -17,10 +17,11 @@
 #ifndef CP_PARSING_H
 #define CP_PARSING_H
 
+#include <stdbool.h>
+
+#include "caterpillar/caterpillar.h"
 #include "caterpillar/field.h"
-#include "caterpillar/macros.h"
 #include "caterpillar/state.h"
-#include "caterpillar/struct.h"
 
 PyAPI_FUNC(PyObject*) CpTypeOf(PyObject* op);
 PyAPI_FUNC(PyObject*) CpTypeOf_Field(CpFieldObject* field);

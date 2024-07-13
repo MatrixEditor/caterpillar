@@ -17,7 +17,6 @@
 #ifndef ATOMOBJ_H
 #define ATOMOBJ_H
 
-#include "macros.h"
 #include "caterpillar.h"
 
 /**
@@ -30,10 +29,10 @@
  *
  * @see _catomobj
  */
-typedef struct _atomobj
+struct _atomobj
 {
   PyObject_HEAD
-} CpAtomObject;
+};
 
 /// Atom object type
 // PyAPI_DATA(PyTypeObject) CpAtom_Type;
@@ -229,7 +228,7 @@ typedef PyObject* (*bitsfunc)(PyObject*);
 /**
  * @brief Atom object for C types
  */
-typedef struct _catomobj
+struct _catomobj
 {
   CpAtom_HEAD
 
@@ -241,7 +240,7 @@ typedef struct _catomobj
   unpackfunc ob_unpack;
   unpackmanyfunc ob_unpack_many;
   bitsfunc ob_bits;
-} CpCAtomObject;
+};
 
 /// Atom object type (defined in __caterpillar_api.h)
 // PyAPI_DATA(PyTypeObject) CpCAtom_Type;

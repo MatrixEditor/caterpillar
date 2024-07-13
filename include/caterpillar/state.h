@@ -20,8 +20,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "caterpillar/macros.h"
-#include "caterpillar/module.h"
+#include "caterpillar/caterpillar.h"
 
 /* advanced parsing state in C */
 
@@ -36,7 +35,7 @@
  *
  * The state is meant to be accessible from any layer in the parsing process.
  */
-typedef struct _stateobj
+struct _stateobj
 {
   PyObject_HEAD _modulestate* mod;
 
@@ -52,10 +51,10 @@ typedef struct _stateobj
   /// This special member  stores all packed objects that should be placed at
   /// an offset position.
   PyObject* m_offset_table;
-} CpStateObject;
+};
 
 /// State object type
-PyAPI_DATA(PyTypeObject) CpState_Type;
+// PyAPI_DATA(PyTypeObject) CpState_Type;
 
 /**
  * @brief Check whether the given object is a state
@@ -128,13 +127,10 @@ PyAPI_FUNC(int) CpState_SetGlobals(CpStateObject* self, PyObject* globals);
 //-----------------------------------------------------------------------------
 // layer
 
-// forward declaration is necessary here
-struct _layerobj;
-
 /**
  * @brief TODO
  */
-typedef struct _layerobj
+struct _layerobj
 {
   PyObject_HEAD
 
@@ -182,10 +178,10 @@ typedef struct _layerobj
   // --- Internal state variables ---
   int8_t s_greedy;
   int8_t s_sequential;
-} CpLayerObject;
+};
 
 /// Layer type
-PyAPI_DATA(PyTypeObject) CpLayer_Type;
+// PyAPI_DATA(PyTypeObject) CpLayer_Type;
 
 /**
  * @brief Check whether the given object is a layer

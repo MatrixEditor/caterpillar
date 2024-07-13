@@ -2,6 +2,7 @@
 
 #include "caterpillar/atoms/string.h"
 #include "caterpillar/parsing.h"
+#include "caterpillar/module.h"
 
 #include <structmember.h>
 

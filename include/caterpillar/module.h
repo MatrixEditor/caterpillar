@@ -17,14 +17,14 @@
 #ifndef CP_MODULE_H
 #define CP_MODULE_H
 
-#include "macros.h"
+#include "caterpillar.h"
 
 /**
  * @brief The internal state for this module.
  *
  * It will store all necessary information about the core module.
  */
-typedef struct _modulestate
+struct _modulestate
 {
   // global options
   PyObject* cp_option__dynamic;
@@ -94,10 +94,10 @@ typedef struct _modulestate
   // cached objects
   PyObject *cp_bytes__true;
   PyObject *cp_bytes__false;
-} _modulestate;
+};
 
 /** Module object type */
-PyAPI_DATA(PyModuleDef) CpModule;
+// PyAPI_DATA(PyModuleDef) CpModule;
 
 /**
  * @brief Get the module state object
@@ -125,14 +125,14 @@ get_global_module_state(void)
 }
 
 /* immortal objects */
-PyAPI_DATA(PyTypeObject) CpInvalidDefault_Type;
-PyAPI_DATA(PyTypeObject) CpDefaultOption_Type;
+// PyAPI_DATA(PyTypeObject) CpInvalidDefault_Type;
+// PyAPI_DATA(PyTypeObject) CpDefaultOption_Type;
 
-PyAPI_DATA(PyObject) _CpInvalidDefault_Object;
+// PyAPI_DATA(PyObject) _CpInvalidDefault_Object;
 #define CpInvalidDefault (&_CpInvalidDefault_Object)
 #define Cp_IsInvalidDefault(o) ((o) == CpInvalidDefault)
 
-PyAPI_DATA(PyObject) _CpDefaultOption_Object;
+// PyAPI_DATA(PyObject) _CpDefaultOption_Object;
 #define CpDefaultOption (&_CpDefaultOption_Object)
 #define Cp_IsDefaultOption(o) ((o) == CpDefaultOption)
 

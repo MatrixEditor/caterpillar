@@ -1,6 +1,10 @@
 /* intatom C implementation */
+#include <stdbool.h>
+
 #include "caterpillar/atoms/int.h"
 #include "caterpillar/arch.h"
+#include "caterpillar/state.h"
+#include "caterpillar/module.h"
 #include <structmember.h>
 
 static PyObject*

@@ -1,5 +1,7 @@
 /* boolatom C implementation */
 #include "caterpillar/atoms/primitive.h"
+#include "caterpillar/module.h"
+#include "caterpillar/state.h"
 #include <structmember.h>
 
 static PyObject*
@@ -9,7 +11,7 @@ cp_boolatom__type__(CpBoolAtomObject* self)
 }
 
 static PyObject*
-cp_boolatom__size__(CpBoolAtomObject* self, PyObject *ctx)
+cp_boolatom__size__(CpBoolAtomObject* self, PyObject* ctx)
 {
   return PyLong_FromSize_t(1);
 }

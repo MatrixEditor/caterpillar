@@ -17,34 +17,34 @@
 #ifndef FLOATATOMOBJ_H
 #define FLOATATOMOBJ_H
 
+#include "caterpillar/caterpillar.h"
 #include "caterpillar/field.h"
-#include "caterpillar/macros.h"
-#include "caterpillar/state.h"
 
-typedef struct _floatatomobj
+struct _floatatomobj
 {
   CpFieldCAtom_HEAD
 
-  /// Stores the amount of bytes this float atom
-  /// has in total
-  PyObject* m_byte_count;
+    /// Stores the amount of bytes this float atom
+    /// has in total
+    PyObject* m_byte_count;
 
   size_t _m_byte_count;
   size_t _m_bits;
 
   /// Stores whether or not the float is little endian
   int _m_little_endian;
-} CpFloatAtomObject;
+};
 
-PyAPI_DATA(PyTypeObject) CpFloatAtom_Type;
+// PyAPI_DATA(PyTypeObject) CpFloatAtom_Type;
 
 /** @brief Checks if the given object is an integer atom object */
 #define CpFloatAtom_CheckExact(op) Py_IS_TYPE((op), &CpFloatAtom_Type)
 /** @brief Checks if the given object is an integer atom object */
 #define CpFloatAtom_Check(op) (PyObject_TypeCheck((op), &CpFloatAtom_Type))
 
-PyAPI_FUNC(int)
-  CpFloatAtom_Pack(CpFloatAtomObject* self, PyObject* value, CpLayerObject* layer);
+PyAPI_FUNC(int) CpFloatAtom_Pack(CpFloatAtomObject* self,
+                                 PyObject* value,
+                                 CpLayerObject* layer);
 
 PyAPI_FUNC(PyObject*)
   CpFloatAtom_Unpack(CpFloatAtomObject* self, CpLayerObject* layer);

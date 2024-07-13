@@ -2,6 +2,7 @@
 
 #include "caterpillar/atoms/primitive.h"
 #include "caterpillar/parsing.h"
+#include "caterpillar/module.h"
 #include <structmember.h>
 
 static PyObject*

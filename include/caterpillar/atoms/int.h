@@ -17,17 +17,16 @@
 #ifndef INTATOMOBJ_H
 #define INTATOMOBJ_H
 
+#include "caterpillar/caterpillar.h"
 #include "caterpillar/field.h"
-#include "caterpillar/macros.h"
-#include "caterpillar/state.h"
 
-typedef struct _intatomobj
+struct _intatomobj
 {
   CpFieldCAtom_HEAD
 
-  /// Stores the amount of bits this integer atom
-  /// has in total
-  PyObject* m_byte_count;
+    /// Stores the amount of bits this integer atom
+    /// has in total
+    PyObject* m_byte_count;
 
   /// Stores the byte count of the integer atom as native
   /// size_t value.
@@ -39,10 +38,10 @@ typedef struct _intatomobj
 
   /// Stores whether or not the integer is little endian
   int _m_little_endian;
-} CpIntAtomObject;
+};
 
 /// Integer atom object type
-PyAPI_DATA(PyTypeObject) CpIntAtom_Type;
+// PyAPI_DATA(PyTypeObject) CpIntAtom_Type;
 
 /** @brief Checks if the given object is an integer atom object */
 #define CpIntAtom_CheckExact(op) Py_IS_TYPE((op), &CpIntAtom_Type)

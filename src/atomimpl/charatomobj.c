@@ -1,5 +1,6 @@
 /* charatom C implementation */
 #include "caterpillar/atoms/primitive.h"
+#include "caterpillar/state.h"
 #include <structmember.h>
 
 static PyObject*

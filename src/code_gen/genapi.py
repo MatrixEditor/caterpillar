@@ -8,12 +8,14 @@ Custom script to generate the public Caterpillar API.
 import sys
 import os
 
-from caterpillar_api import cp_type_api, cp_func_api
+from caterpillar_api import cp_type_api, cp_func_api, cp_api_functions, cp_types
 
 
 # Base class for all API objects (functions or types)
 class APIObj:
-    def __init__(self, name: str = None, index: int = 0, api_name: str = None, type_: str = None) -> None:
+    def __init__(
+        self, name: str = None, index: int = 0, api_name: str = None, type_: str = None
+    ) -> None:
         self.name = name
         self.index = index
         self.api_name = api_name
@@ -33,12 +35,12 @@ class APIObj:
 
 
 class APIType(APIObj):
-    def __init__(self, name: str, index: int, api_name: str) -> None:
-        super().__init__(name, index, api_name, "PyTypeObject")
+    def __init__(self, name: str, index: int, api_name: str, type_: str = None) -> None:
+        super().__init__(name, index, api_name, type_ or "PyTypeObject")
 
     def cp_internal_def(self) -> str:
         # REVISIT: what about struct definitions?
-        return f"PyAPI_DATA(PyTypeObject) {self.name};"
+        return f"PyAPI_DATA({self.type}) {self.name};"
 
     def cp_external_def(self):
         """Return the external definition for this API object
@@ -73,23 +75,26 @@ def genapi(api_h: str, api_c: str) -> None:
     api_h_out = api_h.replace(".in", "")
     api_c_out = api_c.replace(".in", "")
 
-    api_objects = [None] * (len(cp_type_api) + len(cp_func_api))
-    for index, name in cp_type_api.items():
+    func_api = cp_api_functions()
+    max_func_index = max(cp_func_api.values())
+    max_type_index = max(map(lambda x: x[0], cp_type_api.values()))
+
+    api_objects = [None] * (max(max_func_index, max_type_index) + 1)
+    for name, args in cp_type_api.items():
         if name == "__reserved__":
             continue
-        elif api_objects[index] is not None:
-            raise ValueError(f"Duplicate API object: {name} at index {index}")
-
-        api_objects[index] = APIType(name, index, "Cp_API")
-
-    for index, signature in cp_func_api.items():
+        index = args[0]
         if api_objects[index] is not None:
             raise ValueError(f"Duplicate API object: {name} at index {index}")
 
-        rtype, signature = signature.split(" ", 1)
-        name, signature = signature.split("(", 1)
-        args = signature[:-1].split(",")
+        type_ = None if len(args) == 1 else args[1]
+        api_objects[index] = APIType(name, index, "Cp_API", type_)
 
+    for name, index in cp_func_api.items():
+        if api_objects[index] is not None:
+            raise ValueError(f"Duplicate API object: {name} at index {index}")
+
+        rtype, args = func_api[name]
         api_objects[index] = APIFunc(name, index, "Cp_API", rtype, args)
 
     array_def = []
@@ -103,11 +108,19 @@ def genapi(api_h: str, api_c: str) -> None:
             external_def.append(obj.cp_external_def())
             internal_def.append(obj.cp_internal_def())
 
+    typedefs = []
+    for struct_name, type_name in cp_types.items():
+        typedefs.append(f"struct {struct_name};")
+        typedefs.append(f"typedef struct {struct_name} {type_name};")
+
     with open(api_h, "r", encoding="utf-8") as f:
         api_h_source = f.read()
 
     with open(api_h_out, "w", encoding="utf-8") as f:
-        f.write(api_h_source % ("\n".join(internal_def), "\n".join(external_def)))
+        f.write(
+            api_h_source
+            % ("\n".join(typedefs), "\n".join(internal_def), "\n".join(external_def))
+        )
 
     with open(api_c, "r", encoding="utf-8") as f:
         api_c_source = f.read()

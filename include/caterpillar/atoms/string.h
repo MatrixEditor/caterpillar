@@ -17,20 +17,19 @@
 #ifndef STRINGATOMOBJ_H
 #define STRINGATOMOBJ_H
 
+#include "caterpillar/caterpillar.h"
 #include "caterpillar/field.h"
-#include "caterpillar/macros.h"
-#include "caterpillar/state.h"
 
-typedef struct _stringatomobj
+struct _stringatomobj
 {
   CpFieldCAtom_HEAD
 
     PyObject* m_length;
   PyObject* m_errors;
   PyObject* m_encoding;
-} CpStringAtomObject;
+};
 
-PyAPI_DATA(PyTypeObject) CpStringAtom_Type;
+// PyAPI_DATA(PyTypeObject) CpStringAtom_Type;
 
 #define CpStringAtom_CheckExact(op) Py_IS_TYPE((op), &CpStringAtom_Type)
 #define CpStringAtom_Check(op) PyObject_TypeCheck((op), &CpStringAtom_Type)

@@ -1,19 +1,6 @@
 /* module implementation */
-#include "caterpillar/module.h"
-#include "caterpillar/arch.h"
-#include "caterpillar/atomobj.h"
-#include "caterpillar/context.h"
-#include "caterpillar/field.h"
-#include "caterpillar/option.h"
-#include "caterpillar/parsing.h"
-#include "caterpillar/state.h"
-#include "caterpillar/struct.h"
-
-// atom implementations
-#include "caterpillar/atoms/float.h"
-#include "caterpillar/atoms/int.h"
-#include "caterpillar/atoms/primitive.h"
-#include "caterpillar/atoms/string.h"
+#include "caterpillar/module.h"  /* invalid default object and types through caterpillar.h*/
+#include "caterpillar/parsing.h" /* Pack and unpack functions */
 
 #include "caterpillar.c"
 
@@ -701,12 +688,12 @@ PyInit__C(void)
   Py_XDECREF(io);
 
   /*Export API table*/
-  PyObject *c_api = PyCapsule_New((void *)Cp_API, NULL, NULL);
+  PyObject* c_api = PyCapsule_New((void*)Cp_API, NULL, NULL);
   if (c_api == NULL) {
     goto err;
   }
 
-  PyObject *d = PyModule_GetDict(m);
+  PyObject* d = PyModule_GetDict(m);
   if (d == NULL) {
     goto err;
   }
@@ -717,11 +704,10 @@ PyInit__C(void)
   Py_DECREF(c_api);
   return m;
 
- err:
-    if (!PyErr_Occurred()) {
-        PyErr_SetString(PyExc_RuntimeError,
-                        "cannot load caterpillar._C module.");
-    }
-    Py_DECREF(m);
-    return NULL;
+err:
+  if (!PyErr_Occurred()) {
+    PyErr_SetString(PyExc_RuntimeError, "cannot load caterpillar._C module.");
+  }
+  Py_DECREF(m);
+  return NULL;
 }

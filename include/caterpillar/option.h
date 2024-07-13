@@ -17,23 +17,18 @@
 #ifndef CP_OPTION_H
 #define CP_OPTION_H
 
-#include "macros.h"
-
-/**
- * @brief The option object type
- */
-PyAPI_DATA(PyTypeObject) CpOption_Type;
+#include "caterpillar.h"
 
 /**
  * @brief Simple option struct that stores a name and a value.
  */
-typedef struct _option
+struct _option
 {
   /// Name of the option
   PyObject_HEAD PyObject* name;
   /// Value of the option
   PyObject* value;
-} CpOptionObject;
+};
 
 /**
  * @brief Checks if the given object is an option

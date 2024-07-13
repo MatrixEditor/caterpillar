@@ -17,30 +17,29 @@
 #ifndef CP_STRUCT_H
 #define CP_STRUCT_H
 
+#include "caterpillar/caterpillar.h"
 #include "caterpillar/field.h"
-#include "caterpillar/macros.h"
-#include "caterpillar/module.h"
 
 /* Caterpillar Struct C implementation */
 
 /**
  * @brief Internal class used to store information about a field
  */
-typedef struct CpStructFieldInfo
+struct CpStructFieldInfo
 {
   PyObject_HEAD
 
-  /// the referenced field object
-  CpFieldObject* m_field;
+    /// the referenced field object
+    CpFieldObject* m_field;
 
   // Excluded: True if the field is included in the struct
   int8_t s_excluded;
 
   // TODO: here's space for more settings
-} CpStructFieldInfoObject;
+};
 
 /// object type
-PyAPI_DATA(PyTypeObject) CpStructFieldInfo_Type;
+// PyAPI_DATA(PyTypeObject) CpStructFieldInfo_Type;
 
 /**
  * @brief Checks if the given object is a struct field info object
@@ -72,7 +71,8 @@ PyAPI_DATA(PyTypeObject) CpStructFieldInfo_Type;
  * @param field the field object
  * @return the new struct field info object
  */
-PyAPI_FUNC(CpStructFieldInfoObject*) CpStructFieldInfo_New(CpFieldObject* field);
+PyAPI_FUNC(CpStructFieldInfoObject*)
+  CpStructFieldInfo_New(CpFieldObject* field);
 
 //---------------------------------------------------------------------------
 // struct
@@ -80,10 +80,9 @@ PyAPI_FUNC(CpStructFieldInfoObject*) CpStructFieldInfo_New(CpFieldObject* field)
 /**
  * @brief C implementation of the Python equivalent.
  */
-typedef struct _structobj
+struct _structobj
 {
-  CpFieldAtom_HEAD
-  PyTypeObject* m_model; // underlying class
+  CpFieldAtom_HEAD PyTypeObject* m_model; // underlying class
 
   PyObject* m_members; // Dict[str, FieldInfo]
   PyObject* m_options; // set[CpOption]
@@ -100,10 +99,10 @@ typedef struct _structobj
   PyObject* s_kwonly_init_fields; // list[FieldInfo]
 
   _modulestate* s_mod;
-} CpStructObject;
+};
 
 /// Struct object type
-PyAPI_DATA(PyTypeObject) CpStruct_Type;
+// PyAPI_DATA(PyTypeObject) CpStruct_Type;
 
 /**
  * @brief Checks if the given object is a struct object

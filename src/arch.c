@@ -1,4 +1,5 @@
 /* CpArch and CpEndian */
+#include "caterpillar/caterpillar.h"
 #include "caterpillar/arch.h"
 #include "caterpillar/field.h"
 #include "structmember.h"

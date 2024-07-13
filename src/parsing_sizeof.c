@@ -1,6 +1,7 @@
 /* sizeof implementation */
 #include "caterpillar/module.h"
 #include "caterpillar/parsing.h"
+#include "caterpillar/struct.h"
 
 PyObject*
 CpSizeOf_Common(PyObject* op, CpLayerObject* layer)
