@@ -46,7 +46,7 @@ configuration:
     set(CP_INCLUDE_DIR "...")
     # or
     execute_process(
-        COMMAND "${Python_EXECUTABLE}" -m caterpillar --cmake_dir
+        COMMAND "${Python_EXECUTABLE}" -m caterpillar --include-dir
         OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE CP_INCLUDE_DIR
     )
 
