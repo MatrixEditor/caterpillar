@@ -2,9 +2,9 @@
 #undef _CPMODULE
 #endif
 
+#include "caterpillar/atomobj.h"     /* atom struct */
 #include "caterpillar/caterpillar.h" /* global types and API */
-#include "caterpillar/atomobj.h" /* atom struct */
-#include "caterpillar/module.h" /* module macros */
+#include "caterpillar/module.h"      /* module macros */
 
 /* example C atom*/
 typedef struct _ExampleCAtom

@@ -2,8 +2,6 @@
 #include <stdbool.h>
 
 #include "caterpillar/arch.h"
-#include "caterpillar/atomobj.h"
-#include "caterpillar/field.h"
 #include "caterpillar/module.h"
 #include "caterpillar/struct.h"
 #include <structmember.h>
@@ -66,6 +64,8 @@ cp_struct_fieldinfo_repr(CpStructFieldInfoObject* self)
 }
 
 /* public API */
+
+/*CpAPI*/
 CpStructFieldInfoObject*
 CpStructFieldInfo_New(CpFieldObject* field)
 {
@@ -1024,6 +1024,8 @@ cp_struct_repr(CpStructObject* self)
 }
 
 /* public API */
+
+/*CpAPI*/
 int
 CpStruct_AddFieldInfo(CpStructObject* o, CpStructFieldInfoObject* info)
 {
@@ -1051,6 +1053,7 @@ CpStruct_AddFieldInfo(CpStructObject* o, CpStructFieldInfoObject* info)
   return PyObject_SetItem(o->m_members, field->m_name, (PyObject*)info);
 }
 
+/*CpAPI*/
 int
 CpStruct_AddField(CpStructObject* o, CpFieldObject* field, int exclude)
 {
@@ -1068,6 +1071,7 @@ CpStruct_AddField(CpStructObject* o, CpFieldObject* field, int exclude)
   return res;
 }
 
+/*CpAPI*/
 PyObject*
 CpStruct_GetAnnotations(CpStructObject* o, int eval)
 {
@@ -1088,12 +1092,14 @@ CpStruct_GetAnnotations(CpStructObject* o, int eval)
   return result;
 }
 
+/*CpAPI*/
 int
 CpStruct_HasOption(CpStructObject* o, PyObject* option)
 {
   return PySet_Contains(o->m_options, option);
 }
 
+/*CpAPI*/
 PyObject*
 CpStructModel_GetStruct(PyObject* model, _modulestate* state)
 {
@@ -1113,6 +1119,7 @@ CpStructModel_GetStruct(PyObject* model, _modulestate* state)
   }
 }
 
+/*CpAPI*/
 int
 CpStructModel_Check(PyObject* model, _modulestate* state)
 {
@@ -1127,6 +1134,7 @@ CpStructModel_Check(PyObject* model, _modulestate* state)
   return dict && PyDict_Contains(dict, state->str___struct__);
 }
 
+/*CpAPI*/
 int
 CpStruct_ReplaceType(CpStructObject* o, PyObject* name, PyObject* type)
 {
@@ -1148,6 +1156,17 @@ CpStruct_ReplaceType(CpStructObject* o, PyObject* name, PyObject* type)
   }
   Py_XDECREF(annotations);
   return 0;
+}
+
+/*CpAPI*/
+CpStructObject*
+CpStruct_New(PyObject* model)
+{
+  if (!model) {
+    PyErr_SetString(PyExc_TypeError, "model must be a type");
+    return NULL;
+  }
+  return (CpStructObject*)CpObject_CreateOneArg(&CpStruct_Type, model);
 }
 
 /* docs */

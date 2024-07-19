@@ -1,4 +1,8 @@
 /* module implementation */
+#ifndef _CPMODULE
+#define _CPMODULE
+#endif
+
 #include "caterpillar/module.h"  /* invalid default object and types through caterpillar.h*/
 #include "caterpillar/parsing.h" /* Pack and unpack functions */
 

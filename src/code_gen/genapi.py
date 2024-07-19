@@ -40,7 +40,7 @@ class APIType(APIObj):
 
     def cp_internal_def(self) -> str:
         # REVISIT: what about struct definitions?
-        return f"PyAPI_DATA({self.type}) {self.name};"
+        return f"extern {self.type} {self.name};"
 
     def cp_external_def(self):
         """Return the external definition for this API object
@@ -65,7 +65,7 @@ class APIFunc(APIObj):
         super().__init__(name, index, api_name, type_)
 
     def cp_internal_def(self) -> str:
-        return f"PyAPI_FUNC({self.rtype}) {self.name}({', '.join(self.args)});"
+        return f"{self.rtype} {self.name}({', '.join(self.args)});"
 
     def cp_external_def(self) -> str:
         return f"#define {self.name} (*({self.type}){self.api_name}[{self.index}])"

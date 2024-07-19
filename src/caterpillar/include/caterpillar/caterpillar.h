@@ -80,79 +80,88 @@ Here, all publicly exposed types and functions are defined. These declarations
 are then used and implemented in the internal API.
 */
 
-PyAPI_DATA(PyModuleDef) CpModule;
-PyAPI_DATA(PyTypeObject) CpCAtom_Type;
-PyAPI_DATA(PyTypeObject) CpArch_Type;
-PyAPI_DATA(PyTypeObject) CpEndian_Type;
-PyAPI_DATA(PyTypeObject) CpContext_Type;
-PyAPI_DATA(PyTypeObject) CpUnaryExpr_Type;
-PyAPI_DATA(PyTypeObject) CpBinaryExpr_Type;
-PyAPI_DATA(PyTypeObject) CpContextPath_Type;
-PyAPI_DATA(PyTypeObject) CpField_Type;
-PyAPI_DATA(PyTypeObject) CpFieldAtom_Type;
-PyAPI_DATA(PyTypeObject) CpFieldCAtom_Type;
-PyAPI_DATA(PyTypeObject) CpInvalidDefault_Type;
-PyAPI_DATA(PyTypeObject) CpDefaultOption_Type;
-PyAPI_DATA(PyObject) _CpInvalidDefault_Object;
-PyAPI_DATA(PyObject) _CpDefaultOption_Object;
-PyAPI_DATA(PyTypeObject) CpAtom_Type;
-PyAPI_DATA(PyTypeObject) CpOption_Type;
-PyAPI_DATA(PyTypeObject) CpState_Type;
-PyAPI_DATA(PyTypeObject) CpLayer_Type;
-PyAPI_DATA(PyTypeObject) CpStructFieldInfo_Type;
-PyAPI_DATA(PyTypeObject) CpStruct_Type;
-PyAPI_DATA(PyTypeObject) CpFloatAtom_Type;
-PyAPI_DATA(PyTypeObject) CpIntAtom_Type;
-PyAPI_DATA(PyTypeObject) CpBoolAtom_Type;
-PyAPI_DATA(PyTypeObject) CpCharAtom_Type;
-PyAPI_DATA(PyTypeObject) CpPaddingAtom_Type;
-PyAPI_DATA(PyTypeObject) CpStringAtom_Type;
-PyAPI_FUNC(int) CpEndian_IsLittleEndian(CpEndianObject* endian, _modulestate* mod);
-PyAPI_FUNC(CpContextObject*) CpContext_New(void);
-PyAPI_FUNC(CpUnaryExprObject*) CpUnaryExpr_New(int op, PyObject* value);
-PyAPI_FUNC(CpBinaryExprObject*) CpBinaryExpr_New(int op, PyObject* left, PyObject* right);
-PyAPI_FUNC(CpContextPathObject*) CpContextPath_New(PyObject* path);
-PyAPI_FUNC(CpContextPathObject*) CpContextPath_FromString(const char* path);
-PyAPI_FUNC(CpFieldObject*) CpField_New(PyObject* atom);
-PyAPI_FUNC(int) CpField_HasCondition(CpFieldObject* self);
-PyAPI_FUNC(int) CpField_IsEnabled(CpFieldObject* self, PyObject* context);
-PyAPI_FUNC(Py_ssize_t) CpField_GetOffset(CpFieldObject* self, PyObject* context);
-PyAPI_FUNC(PyObject*) CpField_EvalSwitch(CpFieldObject* self, PyObject* op, PyObject* context);
-PyAPI_FUNC(PyObject*) CpField_GetLength(CpFieldObject* self, PyObject* context);
-PyAPI_FUNC(PyObject*) CpTypeOf(PyObject* op);
-PyAPI_FUNC(PyObject*) CpTypeOf_Field(CpFieldObject* op);
-PyAPI_FUNC(PyObject*) CpTypeOf_Common(PyObject* op);
-PyAPI_FUNC(int) CpPack(PyObject* op, PyObject* atom, PyObject* io, PyObject* globals);
-PyAPI_FUNC(int) CpPack_Field(PyObject* op, CpFieldObject* field, CpLayerObject* layer);
-PyAPI_FUNC(int) CpPack_Common(PyObject* op, PyObject* atom, CpLayerObject* layer);
-PyAPI_FUNC(int) CpPack_Struct(PyObject* op, CpStructObject* struct_, CpLayerObject* layer);
-PyAPI_FUNC(int) _Cp_Pack(PyObject* op, PyObject* atom, CpLayerObject* layer);
-PyAPI_FUNC(int) _CpPack_EvalLength(CpLayerObject* layer,PyObject* length,Py_ssize_t size,bool* greedy,Py_ssize_t* dstLength);
-PyAPI_FUNC(PyObject*) CpSizeOf(PyObject* op, PyObject* globals);
-PyAPI_FUNC(PyObject*) CpSizeOf_Field(CpFieldObject* field, CpLayerObject* layer);
-PyAPI_FUNC(PyObject*) CpSizeOf_Struct(CpStructObject* struct_, CpLayerObject* layer);
-PyAPI_FUNC(PyObject*) CpSizeOf_Common(PyObject* op, CpLayerObject* layer);
-PyAPI_FUNC(PyObject*) _Cp_SizeOf(PyObject* op, CpLayerObject* layer);
-PyAPI_FUNC(PyObject*) CpUnpack(PyObject* atom, PyObject* io, PyObject* globals);
-PyAPI_FUNC(PyObject*) CpUnpack_Field(CpFieldObject* field, CpLayerObject* layer);
-PyAPI_FUNC(PyObject*) CpUnpack_Common(PyObject* op, CpLayerObject* layer);
-PyAPI_FUNC(PyObject*) CpUnpack_Struct(CpStructObject* struct_, CpLayerObject* layer);
-PyAPI_FUNC(PyObject*) _Cp_Unpack(PyObject* atom, CpLayerObject* layer);
-PyAPI_FUNC(int) _CpUnpack_EvalLength(CpLayerObject* layer,PyObject* length,bool* seq_greedy,Py_ssize_t* seq_length);
-PyAPI_FUNC(PyObject*) CpUnpack_CAtom(CpCAtomObject* catom, CpLayerObject* layer);
-PyAPI_FUNC(int) CpPack_CAtom(PyObject* op, CpCAtomObject* catom, CpLayerObject* layer);
-PyAPI_FUNC(PyObject*) CpSizeOf_CAtom(CpCAtomObject* catom, CpLayerObject* layer);
-PyAPI_FUNC(PyObject *) CpTypeOf_CAtom(CpCAtomObject* op);
-PyAPI_FUNC(CpStateObject*) CpState_New(PyObject* io);
-PyAPI_FUNC(PyObject*) CpState_Tell(CpStateObject* self);
-PyAPI_FUNC(PyObject*) CpState_Seek(CpStateObject* self, PyObject* offset, int whence);
-PyAPI_FUNC(PyObject*) CpState_Read(CpStateObject* self, Py_ssize_t size);
-PyAPI_FUNC(PyObject*) CpState_ReadFully(CpStateObject* self);
-PyAPI_FUNC(PyObject*) CpState_Write(CpStateObject* self, PyObject* value);
-PyAPI_FUNC(int) CpState_SetGlobals(CpStateObject* self, PyObject* globals);
-PyAPI_FUNC(CpLayerObject*) CpLayer_New(CpStateObject* state, CpLayerObject* parent);
-PyAPI_FUNC(int) CpLayer_Invalidate(CpLayerObject* self);
-PyAPI_FUNC(int) CpLayer_SetSequence(CpLayerObject* self,PyObject* sequence,Py_ssize_t length,int8_t greedy);
+extern PyModuleDef CpModule;
+extern PyTypeObject CpCAtom_Type;
+extern PyTypeObject CpArch_Type;
+extern PyTypeObject CpEndian_Type;
+extern PyTypeObject CpContext_Type;
+extern PyTypeObject CpUnaryExpr_Type;
+extern PyTypeObject CpBinaryExpr_Type;
+extern PyTypeObject CpContextPath_Type;
+extern PyTypeObject CpField_Type;
+extern PyTypeObject CpFieldAtom_Type;
+extern PyTypeObject CpFieldCAtom_Type;
+extern PyTypeObject CpInvalidDefault_Type;
+extern PyTypeObject CpDefaultOption_Type;
+extern PyObject _CpInvalidDefault_Object;
+extern PyObject _CpDefaultOption_Object;
+extern PyTypeObject CpAtom_Type;
+extern PyTypeObject CpOption_Type;
+extern PyTypeObject CpState_Type;
+extern PyTypeObject CpLayer_Type;
+extern PyTypeObject CpStructFieldInfo_Type;
+extern PyTypeObject CpStruct_Type;
+extern PyTypeObject CpFloatAtom_Type;
+extern PyTypeObject CpIntAtom_Type;
+extern PyTypeObject CpBoolAtom_Type;
+extern PyTypeObject CpCharAtom_Type;
+extern PyTypeObject CpPaddingAtom_Type;
+extern PyTypeObject CpStringAtom_Type;
+int CpEndian_IsLittleEndian(CpEndianObject* endian, _modulestate* mod);
+CpContextObject* CpContext_New(void);
+CpUnaryExprObject* CpUnaryExpr_New(int op, PyObject* value);
+CpBinaryExprObject* CpBinaryExpr_New(int op, PyObject* left, PyObject* right);
+CpContextPathObject* CpContextPath_New(PyObject* path);
+CpContextPathObject* CpContextPath_FromString(const char* path);
+CpFieldObject* CpField_New(PyObject* atom);
+int CpField_HasCondition(CpFieldObject* self);
+int CpField_IsEnabled(CpFieldObject* self, PyObject* context);
+Py_ssize_t CpField_GetOffset(CpFieldObject* self, PyObject* context);
+PyObject* CpField_EvalSwitch(CpFieldObject* self, PyObject* op, PyObject* context);
+PyObject* CpField_GetLength(CpFieldObject* self, PyObject* context);
+PyObject* CpTypeOf(PyObject* op);
+PyObject* CpTypeOf_Field(CpFieldObject* op);
+PyObject* CpTypeOf_Common(PyObject* op);
+int CpPack(PyObject* op, PyObject* atom, PyObject* io, PyObject* globals);
+int CpPack_Field(PyObject* op, CpFieldObject* field, CpLayerObject* layer);
+int CpPack_Common(PyObject* op, PyObject* atom, CpLayerObject* layer);
+int CpPack_Struct(PyObject* op, CpStructObject* struct_, CpLayerObject* layer);
+int _Cp_Pack(PyObject* op, PyObject* atom, CpLayerObject* layer);
+int _CpPack_EvalLength(CpLayerObject* layer,PyObject* length,Py_ssize_t size,bool* greedy,Py_ssize_t* dstLength);
+PyObject* CpSizeOf(PyObject* op, PyObject* globals);
+PyObject* CpSizeOf_Field(CpFieldObject* field, CpLayerObject* layer);
+PyObject* CpSizeOf_Struct(CpStructObject* struct_, CpLayerObject* layer);
+PyObject* CpSizeOf_Common(PyObject* op, CpLayerObject* layer);
+PyObject* _Cp_SizeOf(PyObject* op, CpLayerObject* layer);
+PyObject* CpUnpack(PyObject* atom, PyObject* io, PyObject* globals);
+PyObject* CpUnpack_Field(CpFieldObject* field, CpLayerObject* layer);
+PyObject* CpUnpack_Common(PyObject* op, CpLayerObject* layer);
+PyObject* CpUnpack_Struct(CpStructObject* struct_, CpLayerObject* layer);
+PyObject* _Cp_Unpack(PyObject* atom, CpLayerObject* layer);
+int _CpUnpack_EvalLength(CpLayerObject* layer,PyObject* length,bool* seq_greedy,Py_ssize_t* seq_length);
+PyObject* CpUnpack_CAtom(CpCAtomObject* catom, CpLayerObject* layer);
+int CpPack_CAtom(PyObject* op, CpCAtomObject* catom, CpLayerObject* layer);
+PyObject* CpSizeOf_CAtom(CpCAtomObject* catom, CpLayerObject* layer);
+PyObject * CpTypeOf_CAtom(CpCAtomObject* op);
+CpStateObject* CpState_New(PyObject* io);
+PyObject* CpState_Tell(CpStateObject* self);
+PyObject* CpState_Seek(CpStateObject* self, PyObject* offset, int whence);
+PyObject* CpState_Read(CpStateObject* self, Py_ssize_t size);
+PyObject* CpState_ReadFully(CpStateObject* self);
+PyObject* CpState_Write(CpStateObject* self, PyObject* value);
+int CpState_SetGlobals(CpStateObject* self, PyObject* globals);
+CpLayerObject* CpLayer_New(CpStateObject* state, CpLayerObject* parent);
+int CpLayer_Invalidate(CpLayerObject* self);
+int CpLayer_SetSequence(CpLayerObject* self,PyObject* sequence,Py_ssize_t length,int8_t greedy);
+CpStructFieldInfoObject* CpStructFieldInfo_New(CpFieldObject* field);
+int CpStruct_AddFieldInfo(CpStructObject* o, CpStructFieldInfoObject* info);
+int CpStruct_AddField(CpStructObject* o, CpFieldObject* field, int exclude);
+CpStructObject* CpStruct_New(PyObject* model);
+PyObject* CpStruct_GetAnnotations(CpStructObject* o, int eval);
+int CpStruct_ReplaceType(CpStructObject* o, PyObject* name, PyObject* type);
+int CpStruct_HasOption(CpStructObject* o, PyObject* option);
+int CpStructModel_Check(PyObject* model, _modulestate* state);
+PyObject* CpStructModel_GetStruct(PyObject* model, _modulestate* state);
 
 #else
 
@@ -235,6 +244,15 @@ caterpillar_api.py
 #define CpLayer_New (*((CpLayerObject* (*)(CpStateObject* state, CpLayerObject* parent)))Cp_API[95])
 #define CpLayer_Invalidate (*((int (*)(CpLayerObject* self)))Cp_API[96])
 #define CpLayer_SetSequence (*((int (*)(CpLayerObject* self,PyObject* sequence,Py_ssize_t length,int8_t greedy)))Cp_API[97])
+#define CpStructFieldInfo_New (*((CpStructFieldInfoObject* (*)(CpFieldObject* field)))Cp_API[98])
+#define CpStruct_AddFieldInfo (*((int (*)(CpStructObject* o, CpStructFieldInfoObject* info)))Cp_API[99])
+#define CpStruct_AddField (*((int (*)(CpStructObject* o, CpFieldObject* field, int exclude)))Cp_API[100])
+#define CpStruct_New (*((CpStructObject* (*)(PyObject* model)))Cp_API[101])
+#define CpStruct_GetAnnotations (*((PyObject* (*)(CpStructObject* o, int eval)))Cp_API[102])
+#define CpStruct_ReplaceType (*((int (*)(CpStructObject* o, PyObject* name, PyObject* type)))Cp_API[103])
+#define CpStruct_HasOption (*((int (*)(CpStructObject* o, PyObject* option)))Cp_API[104])
+#define CpStructModel_Check (*((int (*)(PyObject* model, _modulestate* state)))Cp_API[105])
+#define CpStructModel_GetStruct (*((PyObject* (*)(PyObject* model, _modulestate* state)))Cp_API[106])
 
 /**
  * @brief Public C API for extension modules as reference table
