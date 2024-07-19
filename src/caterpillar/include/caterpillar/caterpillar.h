@@ -153,6 +153,15 @@ PyAPI_FUNC(int) CpState_SetGlobals(CpStateObject* self, PyObject* globals);
 PyAPI_FUNC(CpLayerObject*) CpLayer_New(CpStateObject* state, CpLayerObject* parent);
 PyAPI_FUNC(int) CpLayer_Invalidate(CpLayerObject* self);
 PyAPI_FUNC(int) CpLayer_SetSequence(CpLayerObject* self,PyObject* sequence,Py_ssize_t length,int8_t greedy);
+PyAPI_FUNC(CpStructFieldInfoObject*) CpStructFieldInfo_New(CpFieldObject* field);
+PyAPI_FUNC(int) CpStruct_AddFieldInfo(CpStructObject* o, CpStructFieldInfoObject* info);
+PyAPI_FUNC(int) CpStruct_AddField(CpStructObject* o, CpFieldObject* field, int exclude);
+PyAPI_FUNC(CpStructObject*) CpStruct_New(PyObject* model);
+PyAPI_FUNC(PyObject*) CpStruct_GetAnnotations(CpStructObject* o, int eval);
+PyAPI_FUNC(int) CpStruct_ReplaceType(CpStructObject* o, PyObject* name, PyObject* type);
+PyAPI_FUNC(int) CpStruct_HasOption(CpStructObject* o, PyObject* option);
+PyAPI_FUNC(int) CpStructModel_Check(PyObject* model, _modulestate* state);
+PyAPI_FUNC(PyObject*) CpStructModel_GetStruct(PyObject* model, _modulestate* state);
 
 #else
 
@@ -235,6 +244,15 @@ caterpillar_api.py
 #define CpLayer_New (*((CpLayerObject* (*)(CpStateObject* state, CpLayerObject* parent)))Cp_API[95])
 #define CpLayer_Invalidate (*((int (*)(CpLayerObject* self)))Cp_API[96])
 #define CpLayer_SetSequence (*((int (*)(CpLayerObject* self,PyObject* sequence,Py_ssize_t length,int8_t greedy)))Cp_API[97])
+#define CpStructFieldInfo_New (*((CpStructFieldInfoObject* (*)(CpFieldObject* field)))Cp_API[98])
+#define CpStruct_AddFieldInfo (*((int (*)(CpStructObject* o, CpStructFieldInfoObject* info)))Cp_API[99])
+#define CpStruct_AddField (*((int (*)(CpStructObject* o, CpFieldObject* field, int exclude)))Cp_API[100])
+#define CpStruct_New (*((CpStructObject* (*)(PyObject* model)))Cp_API[101])
+#define CpStruct_GetAnnotations (*((PyObject* (*)(CpStructObject* o, int eval)))Cp_API[102])
+#define CpStruct_ReplaceType (*((int (*)(CpStructObject* o, PyObject* name, PyObject* type)))Cp_API[103])
+#define CpStruct_HasOption (*((int (*)(CpStructObject* o, PyObject* option)))Cp_API[104])
+#define CpStructModel_Check (*((int (*)(PyObject* model, _modulestate* state)))Cp_API[105])
+#define CpStructModel_GetStruct (*((PyObject* (*)(PyObject* model, _modulestate* state)))Cp_API[106])
 
 /**
  * @brief Public C API for extension modules as reference table

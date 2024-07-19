@@ -34,7 +34,7 @@ struct _boolatomobj
 ///
 /// This variable defines the type object for bool atom objects, allowing
 /// them to be used across the library.
-PyAPI_DATA(PyTypeObject) CpBoolAtom_Type;
+// PyAPI_DATA(PyTypeObject) CpBoolAtom_Type;
 
 /**
  * @brief Checks if the given object is a bool atom object.

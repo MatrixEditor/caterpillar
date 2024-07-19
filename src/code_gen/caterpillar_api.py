@@ -122,7 +122,18 @@ cp_func_api = {
     "CpState_SetGlobals":           94,
     "CpLayer_New":                  95,
     "CpLayer_Invalidate":           96,
-    "CpLayer_SetSequence":          97
+    "CpLayer_SetSequence":          97,
+    "CpStructFieldInfo_New" :       98,
+    "CpStruct_AddFieldInfo":        99,
+    "CpStruct_AddField":           100,
+    "CpStruct_New":                101,
+    "CpStruct_GetAnnotations":     102,
+    "CpStruct_ReplaceType":        103,
+    "CpStruct_HasOption":          104,
+    "CpStructModel_Check":         105,
+    "CpStructModel_GetStruct":     106,
+
+
 }
 
 API_SRC = [

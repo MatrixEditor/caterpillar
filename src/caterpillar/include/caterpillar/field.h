@@ -119,7 +119,7 @@ struct _fieldobj
  * @param atom the atom object
  * @return the new field object
  */
-PyAPI_FUNC(CpFieldObject*) CpField_New(PyObject* atom);
+// PyAPI_FUNC(CpFieldObject*) CpField_New(PyObject* atom);
 
 /**
  * @brief Returns whether the field has a condition
@@ -129,7 +129,7 @@ PyAPI_FUNC(CpFieldObject*) CpField_New(PyObject* atom);
  * @param field the field object
  * @return 1 if the field has a condition, 0 otherwise
  */
-PyAPI_FUNC(int) CpField_HasCondition(CpFieldObject* field);
+// PyAPI_FUNC(int) CpField_HasCondition(CpFieldObject* field);
 
 /**
  * @brief Returns whether the field is enabled
@@ -138,7 +138,7 @@ PyAPI_FUNC(int) CpField_HasCondition(CpFieldObject* field);
  * @param context the context object
  * @return 1 if the field is enabled, 0 otherwise, or -1 on failure
  */
-PyAPI_FUNC(int) CpField_IsEnabled(CpFieldObject* field, PyObject* context);
+// PyAPI_FUNC(int) CpField_IsEnabled(CpFieldObject* field, PyObject* context);
 
 /**
  * @brief Returns the offset of the field
@@ -147,8 +147,8 @@ PyAPI_FUNC(int) CpField_IsEnabled(CpFieldObject* field, PyObject* context);
  * @param context the context object
  * @return the offset of the field, or -1 on failure
  */
-PyAPI_FUNC(Py_ssize_t)
-  CpField_GetOffset(CpFieldObject* field, PyObject* context);
+// PyAPI_FUNC(Py_ssize_t)
+//   CpField_GetOffset(CpFieldObject* field, PyObject* context);
 
 /**
  * @brief Evaluates a switch statement (if any)
@@ -158,8 +158,8 @@ PyAPI_FUNC(Py_ssize_t)
  * @param context the context object
  * @return the result of the switch statement, or NULL on failure
  */
-PyAPI_FUNC(PyObject*)
-  CpField_EvalSwitch(CpFieldObject* field, PyObject* value, PyObject* context);
+// PyAPI_FUNC(PyObject*)
+//   CpField_EvalSwitch(CpFieldObject* field, PyObject* value, PyObject* context);
 
 /**
  * @brief Returns the length of the field
@@ -168,8 +168,8 @@ PyAPI_FUNC(PyObject*)
  * @param context the context object
  * @return the length of the field, or NULL on failure
  */
-PyAPI_FUNC(PyObject*)
-  CpField_GetLength(CpFieldObject* field, PyObject* context);
+// PyAPI_FUNC(PyObject*)
+//   CpField_GetLength(CpFieldObject* field, PyObject* context);
 
 // -----------------------------------------------------------------------------
 // field atom

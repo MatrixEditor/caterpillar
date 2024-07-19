@@ -100,6 +100,15 @@ void *Cp_API[] = {
     (void *) &CpState_SetGlobals,
     (void *) &CpLayer_New,
     (void *) &CpLayer_Invalidate,
-    (void *) &CpLayer_SetSequence
+    (void *) &CpLayer_SetSequence,
+    (void *) &CpStructFieldInfo_New,
+    (void *) &CpStruct_AddFieldInfo,
+    (void *) &CpStruct_AddField,
+    (void *) &CpStruct_New,
+    (void *) &CpStruct_GetAnnotations,
+    (void *) &CpStruct_ReplaceType,
+    (void *) &CpStruct_HasOption,
+    (void *) &CpStructModel_Check,
+    (void *) &CpStructModel_GetStruct
 };
 
