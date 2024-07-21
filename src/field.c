@@ -1,11 +1,8 @@
 /* field implementation */
 #include <stdbool.h>
 
-#include "caterpillar/arch.h"
-#include "caterpillar/atomobj.h"
 #include "caterpillar/field.h"
 #include "caterpillar/module.h"
-#include "caterpillar/option.h"
 #include "structmember.h"
 
 /* impl */
