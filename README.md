@@ -39,20 +39,16 @@ Simply use pip to install the package with all tools, all extra packages and the
 pip install "caterpillar[all]@git+https://github.com/MatrixEditor/caterpillar.git"
 ```
 
-> [!NOTE]
-> You will need to install `make`, a C compiler and the Python3.12 development package.
+If you want to use the native C extension you can specify the following environment variables:
 
-If you just want to use the Python package without any native modules written in C,
-you can specify the following environment variables:
+* `CP_ENABLE_NATIVE` - Enables installation of the native C extension
+* `CP_ENABLE_TOOLS` - Enables installation of extra tools (proposed)
 
-* `CP_DISABLE_NATIVE` - Disables installation of the native C extension
-* `CP_DISABLE_TOOLS` - Disables installation of extra tools
-
-For instance, the following command will install the `caterpillar` package without
-a native interface and without extra tools:
+For instance, the following command will install the `caterpillar` package with
+a native interface and with extra tools:
 ```bash
-CP_DISABLE_NATIVE=TRUE \
-CP_DISABLE_TOOLS=TRUE \
+CP_ENABLE_NATIVE=1 \
+CP_ENABLE_TOOLS=1 \
 pip install git+https://github.com/MatrixEditor/caterpillar
 ```
 

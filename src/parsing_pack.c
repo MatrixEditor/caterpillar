@@ -1,6 +1,5 @@
 /* packing operations */
 #include "caterpillar/module.h"
-#include "caterpillar/parsing.h"
 #include "caterpillar/state.h"
 #include "caterpillar/struct.h"
 
@@ -416,11 +415,12 @@ CpPack_CAtom(PyObject* op, CpCAtomObject* catom, CpLayerObject* layer)
   }
 
   if (catom->ob_pack_many == NULL) {
-    PyErr_Format(
-      PyExc_NotImplementedError,
-      "The atom of type '%s' cannot be packed (missing __pack_many__)",
-      Py_TYPE(catom)->tp_name);
-    return -1;
+    // PyErr_Format(
+    //   PyExc_NotImplementedError,
+    //   "The atom of type '%s' cannot be packed (missing __pack_many__)",
+    //   Py_TYPE(catom)->tp_name);
+    // return -1;
+    return CpPack_Common(op, (PyObject *)catom, layer);
   }
   return catom->ob_pack_many((PyObject*)catom, op, (PyObject*)layer);
 }

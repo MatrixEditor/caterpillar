@@ -8,21 +8,25 @@ Installation
 to install it by providing the Git link. This library has no fixed dependencies, so it can run
 out of the box.
 
-There are several installation options you can use to install a desired part of the library. By
-default, *caterpillar* ships with a native C extension and additional tools, that are using native
-extensions too. AS not everyone wants to use C extensions, it is possible to install the library
-without them:
+There are several installation options you can use to install a desired part of the library.
+*caterpillar* ships with a native C extension and additional tools, that are using native
+extensions too. As not everyone wants to use C extensions, it's default installation candidate
+does not include the native extension.
 
 .. code-block:: bash
 
-    CP_DISABLE_NATIVE=TRUE \
-    CP_DISABLE_TOOLS=TRUE \
     pip install git+https://github.com/MatrixEditor/caterpillar.git
 
 
 .. note::
     If you clone the repository, don't forget to add `-e` to the installation via pip as
     it enables developer mode.
+
+
+If you want to use the native C extension you can specify the following environment variables:
+
+* `CP_ENABLE_NATIVE` - Enables installation of the native C extension
+* `CP_ENABLE_TOOLS` - Enables installation of extra tools (proposed)
 
 
 This project comes with packaging extras. Therefore, if you want to enable specific structs, you

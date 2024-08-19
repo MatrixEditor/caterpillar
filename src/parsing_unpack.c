@@ -388,11 +388,12 @@ CpUnpack_CAtom(CpCAtomObject* catom, CpLayerObject* layer)
   }
   else {
     if (!catom->ob_unpack_many) {
-      PyErr_Format(
-        PyExc_NotImplementedError,
-        "The atom of type '%s' cannot be unpacked (missing __unpack_many__)",
-        Py_TYPE(catom)->tp_name);
-      return NULL;
+      // REVISIT: use flag to enable strict parsing
+      // PyErr_Format(
+      //   PyExc_NotImplementedError,
+      //   "The atom of type '%s' cannot be unpacked (missing __unpack_many__)",
+      //   Py_TYPE(catom)->tp_name);
+      return CpUnpack_Common((PyObject *)catom, layer);
     }
     result = catom->ob_unpack_many((PyObject *)catom, (PyObject *)layer);
   }

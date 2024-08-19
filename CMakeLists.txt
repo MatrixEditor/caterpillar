@@ -8,10 +8,7 @@ find_package(
 
 add_compile_definitions(_CPMODULE)
 
-if (DEFINED ENV{CP_DISABLE_NATIVE})
-  MESSAGE(STATUS "Ignoring Caterpillar C extension")
-else()
-
+if (DEFINED ENV{CP_ENABLE_NATIVE})
 python_add_library(
   _C
   MODULE
@@ -56,10 +53,14 @@ add_custom_target(
 add_dependencies(_C genapi)
 
 install(TARGETS _C DESTINATION caterpillar)
+
+else()
+MESSAGE(STATUS "Ignoring Caterpillar C extension")
 endif()
 
-if(DEFINED ENV{CP_DISABLE_TOOLS})
-  MESSAGE(STATUS "Ignoring tools")
-else()
+
+if(DEFINED ENV{CP_ENABLE_TOOLS})
   # install native extensions for tools (TODO)
+else()
+MESSAGE(STATUS "Ignoring tools")
 endif()
