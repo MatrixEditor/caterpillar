@@ -58,9 +58,6 @@ struct _archobj
  */
 #define CpArch_Check(op) PyObject_TypeCheck((PyObject*)(op), &CpArch_Type)
 
-/// Endian object type
-// PyAPI_DATA(PyTypeObject) CpEndian_Type;
-
 /**
  * @brief Configuration class that represents endian configuration.
  */
@@ -93,16 +90,5 @@ struct _endianobj
  * @return 1 if the object is an endian object, 0 otherwise
  */
 #define CpEndian_Check(op) PyObject_TypeCheck((PyObject*)(op), &CpEndian_Type)
-
-/**
- * @brief Checks if the given object is a little endian
- *
- * @param endian the object to check
- * @param mod the module state
- * @return 1 if the object is a little endian, 0 otherwise
- *
- * @note 1 is returned even if the current object may be the native endian
- */
-// PyAPI_FUNC(int) CpEndian_IsLittleEndian(CpEndianObject *endian, _modulestate *mod);
 
 #endif

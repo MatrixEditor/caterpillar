@@ -139,54 +139,13 @@ static PyMethodDef CpContext_Methods[] = {
 
 PyTypeObject CpContext_Type = {
   PyVarObject_HEAD_INIT(NULL, 0) _Cp_Name(Context),
-  sizeof(CpContextObject),                  /* tp_basicsize */
-  0,                                        /* tp_itemsize */
-  0,                                        /* tp_dealloc */
-  0,                                        /* tp_vectorcall_offset */
-  0,                                        /* tp_getattr */
-  (setattrfunc)cp_context__setattr__,       /* tp_setattr */
-  0,                                        /* tp_as_async */
-  0,                                        /* tp_repr */
-  0,                                        /* tp_as_number */
-  0,                                        /* tp_as_sequence */
-  0,                                        /* tp_as_mapping */
-  0,                                        /* tp_hash */
-  0,                                        /* tp_call */
-  0,                                        /* tp_str */
-  (getattrofunc)cp_context__getattro__,     /* tp_getattro */
-  0,                                        /* tp_setattro */
-  0,                                        /* tp_as_buffer */
-  Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /* tp_flags */
-  cp_context__doc__,                        /* tp_doc */
-  0,                                        /* tp_traverse */
-  0,                                        /* tp_clear */
-  0,                                        /* tp_richcompare */
-  0,                                        /* tp_weaklistoffset */
-  0,                                        /* tp_iter */
-  0,                                        /* tp_iternext */
-  CpContext_Methods,                        /* tp_methods */
-  0,                                        /* tp_members */
-  0,                                        /* tp_getset */
-  0,                                        /* tp_base */
-  0,                                        /* tp_dict */
-  0,                                        /* tp_descr_get */
-  0,                                        /* tp_descr_set */
-  0,                                        /* tp_dictoffset */
-  (initproc)cp_context_init,                /* tp_init */
-  0,                                        /* tp_alloc */
-  0,                                        /* tp_new */
-  0,                                        /* tp_free */
-  0,                                        /* tp_is_gc */
-  0,                                        /* tp_bases */
-  0,                                        /* tp_mro */
-  0,                                        /* tp_cache */
-  0,                                        /* tp_subclasses */
-  0,                                        /* tp_weaklist */
-  0,                                        /* tp_del */
-  0,                                        /* tp_version_tag */
-  0,                                        /* tp_finalize */
-  0,                                        /* tp_vectorcall */
-  0,                                        /* tp_watched */
+  .tp_basicsize = sizeof(CpContextObject),
+  .tp_setattr = (setattrfunc)cp_context__setattr__,
+  .tp_getattro = (getattrofunc)cp_context__getattro__,
+  .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
+  .tp_doc = cp_context__doc__,
+  .tp_methods = CpContext_Methods,
+  .tp_init = (initproc)cp_context_init,
 };
 
 //------------------------------------------------------------------------------
@@ -337,54 +296,16 @@ static PyMemberDef CpUnaryExpr_Members[] = {
 
 PyTypeObject CpUnaryExpr_Type = {
   PyVarObject_HEAD_INIT(NULL, 0) _Cp_Name(UnaryExpr),
-  sizeof(CpUnaryExprObject),         /* tp_basicsize */
-  0,                                 /* tp_itemsize */
-  (destructor)cp_unaryexpr_dealloc,  /* tp_dealloc */
-  0,                                 /* tp_vectorcall_offset */
-  0,                                 /* tp_getattr */
-  0,                                 /* tp_setattr */
-  0,                                 /* tp_as_async */
-  (reprfunc)cp_unaryexpr_repr,       /* tp_repr */
-  0,                                 /* tp_as_number */
-  0,                                 /* tp_as_sequence */
-  0,                                 /* tp_as_mapping */
-  (hashfunc)cp_unaryexpr_hash,       /* tp_hash */
-  (ternaryfunc)cp_unaryexpr__call__, /* tp_call */
-  0,                                 /* tp_str */
-  0,                                 /* tp_getattro */
-  0,                                 /* tp_setattro */
-  0,                                 /* tp_as_buffer */
-  Py_TPFLAGS_DEFAULT,                /* tp_flags */
-  cp_unaryexpr_doc,                  /* tp_doc */
-  0,                                 /* tp_traverse */
-  0,                                 /* tp_clear */
-  0,                                 /* tp_richcompare */
-  0,                                 /* tp_weaklistoffset */
-  0,                                 /* tp_iter */
-  0,                                 /* tp_iternext */
-  0,                                 /* tp_methods */
-  CpUnaryExpr_Members,               /* tp_members */
-  0,                                 /* tp_getset */
-  0,                                 /* tp_base */
-  0,                                 /* tp_dict */
-  0,                                 /* tp_descr_get */
-  0,                                 /* tp_descr_set */
-  0,                                 /* tp_dictoffset */
-  (initproc)cp_unaryexpr_init,       /* tp_init */
-  0,                                 /* tp_alloc */
-  (newfunc)cp_unaryexpr_new,         /* tp_new */
-  0,                                 /* tp_free */
-  0,                                 /* tp_is_gc */
-  0,                                 /* tp_bases */
-  0,                                 /* tp_mro */
-  0,                                 /* tp_cache */
-  0,                                 /* tp_subclasses */
-  0,                                 /* tp_weaklist */
-  0,                                 /* tp_del */
-  0,                                 /* tp_version_tag */
-  0,                                 /* tp_finalize */
-  0,                                 /* tp_vectorcall */
-  0,                                 /* tp_watched */
+  .tp_basicsize = sizeof(CpUnaryExprObject),
+  .tp_dealloc = (destructor)cp_unaryexpr_dealloc,
+  .tp_repr = (reprfunc)cp_unaryexpr_repr,
+  .tp_hash = (hashfunc)cp_unaryexpr_hash,
+  .tp_call = (ternaryfunc)cp_unaryexpr__call__,
+  .tp_flags = Py_TPFLAGS_DEFAULT,
+  .tp_doc = cp_unaryexpr_doc,
+  .tp_members = CpUnaryExpr_Members,
+  .tp_init = (initproc)cp_unaryexpr_init,
+  .tp_new = (newfunc)cp_unaryexpr_new,
 };
 
 //------------------------------------------------------------------------------
@@ -663,54 +584,15 @@ static PyMemberDef CpBinaryExpr_Members[] = {
 
 PyTypeObject CpBinaryExpr_Type = {
   PyVarObject_HEAD_INIT(NULL, 0) _Cp_Name(BinaryExpr),
-  sizeof(CpBinaryExprObject),         /* tp_basicsize */
-  0,                                  /* tp_itemsize */
-  (destructor)cp_binaryexpr_dealloc,  /* tp_dealloc */
-  0,                                  /* tp_vectorcall_offset */
-  0,                                  /* tp_getattr */
-  0,                                  /* tp_setattr */
-  0,                                  /* tp_as_async */
-  (reprfunc)cp_binaryexpr_repr,       /* tp_repr */
-  0,                                  /* tp_as_number */
-  0,                                  /* tp_as_sequence */
-  0,                                  /* tp_as_mapping */
-  0,                                  /* tp_hash */
-  (ternaryfunc)cp_binaryexpr__call__, /* tp_call */
-  0,                                  /* tp_str */
-  0,                                  /* tp_getattro */
-  0,                                  /* tp_setattro */
-  0,                                  /* tp_as_buffer */
-  Py_TPFLAGS_DEFAULT,                 /* tp_flags */
-  cp_unaryexpr_doc,                   /* tp_doc */
-  0,                                  /* tp_traverse */
-  0,                                  /* tp_clear */
-  0,                                  /* tp_richcompare */
-  0,                                  /* tp_weaklistoffset */
-  0,                                  /* tp_iter */
-  0,                                  /* tp_iternext */
-  0,                                  /* tp_methods */
-  CpBinaryExpr_Members,               /* tp_members */
-  0,                                  /* tp_getset */
-  0,                                  /* tp_base */
-  0,                                  /* tp_dict */
-  0,                                  /* tp_descr_get */
-  0,                                  /* tp_descr_set */
-  0,                                  /* tp_dictoffset */
-  (initproc)cp_binaryexpr_init,       /* tp_init */
-  0,                                  /* tp_alloc */
-  (newfunc)cp_binaryexpr_new,         /* tp_new */
-  0,                                  /* tp_free */
-  0,                                  /* tp_is_gc */
-  0,                                  /* tp_bases */
-  0,                                  /* tp_mro */
-  0,                                  /* tp_cache */
-  0,                                  /* tp_subclasses */
-  0,                                  /* tp_weaklist */
-  0,                                  /* tp_del */
-  0,                                  /* tp_version_tag */
-  0,                                  /* tp_finalize */
-  0,                                  /* tp_vectorcall */
-  0,                                  /* tp_watched */
+  .tp_basicsize = sizeof(CpBinaryExprObject),
+  .tp_dealloc = (destructor)cp_binaryexpr_dealloc,
+  .tp_repr = (reprfunc)cp_binaryexpr_repr,
+  .tp_call = (ternaryfunc)cp_binaryexpr__call__,
+  .tp_flags = Py_TPFLAGS_DEFAULT,
+  .tp_doc = cp_unaryexpr_doc,
+  .tp_members = CpBinaryExpr_Members,
+  .tp_init = (initproc)cp_binaryexpr_init,
+  .tp_new = (newfunc)cp_binaryexpr_new,
 };
 
 //------------------------------------------------------------------------------

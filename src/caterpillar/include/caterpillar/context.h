@@ -18,7 +18,7 @@
 #define CP_CONTEXT_H
 
 /* Caterpillar Context and ContextPath C implementation */
-#include "caterpillar/caterpillar.h"
+#include "caterpillar/caterpillarapi.h"
 #include "caterpillar/module.h"
 
 /*context*/

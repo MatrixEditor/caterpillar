@@ -17,7 +17,7 @@
 #ifndef CP_STRUCT_H
 #define CP_STRUCT_H
 
-#include "caterpillar/caterpillar.h"
+#include "caterpillar/caterpillarapi.h"
 #include "caterpillar/field.h"
 
 /* Caterpillar Struct C implementation */

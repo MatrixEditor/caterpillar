@@ -17,7 +17,7 @@
 #ifndef FLOATATOMOBJ_H
 #define FLOATATOMOBJ_H
 
-#include "caterpillar/caterpillar.h"
+#include "caterpillar/caterpillarapi.h"
 #include "caterpillar/field.h"
 
 struct _floatatomobj

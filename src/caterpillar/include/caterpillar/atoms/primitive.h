@@ -17,7 +17,7 @@
 #ifndef PRIMITIVEATOMOBJ_H
 #define PRIMITIVEATOMOBJ_H
 
-#include "caterpillar/caterpillar.h"
+#include "caterpillar/caterpillarapi.h"
 #include "caterpillar/field.h"
 
 /// @struct _boolatomobj

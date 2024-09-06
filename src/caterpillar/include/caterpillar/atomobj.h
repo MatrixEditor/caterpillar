@@ -17,7 +17,7 @@
 #ifndef ATOMOBJ_H
 #define ATOMOBJ_H
 
-#include "caterpillar.h"
+#include "caterpillarapi.h"
 
 /**
  * @brief Special base class for all atom objects
