@@ -30,9 +30,3 @@ Library
    model.rst
    fields/index.rst
 
-
-.. toctree::
-   :maxdepth: 1
-   :caption: C API
-
-   capi/endian.rst
