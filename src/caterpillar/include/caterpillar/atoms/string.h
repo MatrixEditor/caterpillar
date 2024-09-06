@@ -17,7 +17,7 @@
 #ifndef STRINGATOMOBJ_H
 #define STRINGATOMOBJ_H
 
-#include "caterpillar/caterpillar.h"
+#include "caterpillar/caterpillarapi.h"
 #include "caterpillar/field.h"
 
 struct _stringatomobj

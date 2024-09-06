@@ -190,9 +190,7 @@ static PyMemberDef CpFloatAtom_Members[] = {
   { "bits", T_PYSSIZET, offsetof(CpFloatAtomObject, _m_bits), READONLY, NULL },
   { "little_endian",
     T_BOOL,
-    offsetof(CpFloatAtomObject, _m_little_endian),
-    NULL,
-    NULL },
+    offsetof(CpFloatAtomObject, _m_little_endian)},
   { NULL } /* Sentinel */
 };
 

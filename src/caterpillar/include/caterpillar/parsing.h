@@ -19,7 +19,7 @@
 
 #include <stdbool.h>
 
-#include "caterpillar/caterpillar.h"
+#include "caterpillar/caterpillarapi.h"
 #include "caterpillar/field.h"
 #include "caterpillar/state.h"
 

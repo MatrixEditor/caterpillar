@@ -652,54 +652,14 @@ static PyMappingMethods CpFieldAtom_MappingMethods = {
 /* type */
 PyTypeObject CpFieldAtom_Type = {
   PyVarObject_HEAD_INIT(NULL, 0) _Cp_Name(fieldatom),
-  sizeof(CpFieldAtomObject),                /* tp_basicsize */
-  0,                                        /* tp_itemsize */
-  (destructor)cp_fieldatom_dealloc,         /* tp_dealloc */
-  0,                                        /* tp_vectorcall_offset */
-  0,                                        /* tp_getattr */
-  0,                                        /* tp_setattr */
-  0,                                        /* tp_as_async */
-  0,                                        /* tp_repr */
-  &CpFieldAtom_NumberMethods,               /* tp_as_number */
-  0,                                        /* tp_as_sequence */
-  &CpFieldAtom_MappingMethods,              /* tp_as_mapping */
-  0,                                        /* tp_hash */
-  0,                                        /* tp_call */
-  0,                                        /* tp_str */
-  0,                                        /* tp_getattro */
-  0,                                        /* tp_setattro */
-  0,                                        /* tp_as_buffer */
-  Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /* tp_flags */
-  NULL,                                     /* tp_doc */
-  0,                                        /* tp_traverse */
-  0,                                        /* tp_clear */
-  0,                                        /* tp_richcompare */
-  0,                                        /* tp_weaklistoffset */
-  0,                                        /* tp_iter */
-  0,                                        /* tp_iternext */
-  0,                                        /* tp_methods */
-  0,                                        /* tp_members */
-  0,                                        /* tp_getset */
-  0,                                        /* tp_base */
-  0,                                        /* tp_dict */
-  0,                                        /* tp_descr_get */
-  0,                                        /* tp_descr_set */
-  0,                                        /* tp_dictoffset */
-  (initproc)cp_fieldatom_init,              /* tp_init */
-  0,                                        /* tp_alloc */
-  (newfunc)cp_fieldatom_new,                /* tp_new */
-  0,                                        /* tp_free */
-  0,                                        /* tp_is_gc */
-  0,                                        /* tp_bases */
-  0,                                        /* tp_mro */
-  0,                                        /* tp_cache */
-  0,                                        /* tp_subclasses */
-  0,                                        /* tp_weaklist */
-  0,                                        /* tp_del */
-  0,                                        /* tp_version_tag */
-  0,                                        /* tp_finalize */
-  0,                                        /* tp_vectorcall */
-  0,                                        /* tp_watched */
+  .tp_basicsize = sizeof(CpFieldAtomObject),
+  .tp_dealloc = (destructor)cp_fieldatom_dealloc,
+  .tp_as_number = &CpFieldAtom_NumberMethods,
+  .tp_as_mapping = &CpFieldAtom_MappingMethods,
+  .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
+  .tp_doc = NULL,
+  .tp_init = (initproc)cp_fieldatom_init,
+  .tp_new = (newfunc)cp_fieldatom_new,
 };
 
 // -----------------------------------------------------------------------------
@@ -723,11 +683,6 @@ cp_fieldcatom_dealloc(CpFieldAtomObject* self)
 static int
 cp_fieldcatom_init(CpFieldAtomObject* self, PyObject* args, PyObject* kw)
 {
-  if ((args && PyTuple_Size(args)) || (kw && PyDict_Size(kw))) {
-    PyErr_SetString(PyExc_TypeError,
-                    "fieldcatoms cannot be initialized with arguments");
-    return -1;
-  }
   return 0;
 }
 
@@ -818,51 +773,12 @@ static PyMappingMethods CpFieldCAtom_MappingMethods = {
 /* type */
 PyTypeObject CpFieldCAtom_Type = {
   PyVarObject_HEAD_INIT(NULL, 0) _Cp_Name(fieldcatom),
-  sizeof(CpFieldCAtomObject),               /* tp_basicsize */
-  0,                                        /* tp_itemsize */
-  (destructor)cp_fieldcatom_dealloc,        /* tp_dealloc */
-  0,                                        /* tp_vectorcall_offset */
-  0,                                        /* tp_getattr */
-  0,                                        /* tp_setattr */
-  0,                                        /* tp_as_async */
-  0,                                        /* tp_repr */
-  &CpFieldCAtom_NumberMethods,              /* tp_as_number */
-  0,                                        /* tp_as_sequence */
-  &CpFieldCAtom_MappingMethods,             /* tp_as_mapping */
-  0,                                        /* tp_hash */
-  0,                                        /* tp_call */
-  0,                                        /* tp_str */
-  0,                                        /* tp_getattro */
-  0,                                        /* tp_setattro */
-  0,                                        /* tp_as_buffer */
-  Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /* tp_flags */
-  NULL,                                     /* tp_doc */
-  0,                                        /* tp_traverse */
-  0,                                        /* tp_clear */
-  0,                                        /* tp_richcompare */
-  0,                                        /* tp_weaklistoffset */
-  0,                                        /* tp_iter */
-  0,                                        /* tp_iternext */
-  0,                                        /* tp_methods */
-  0,                                        /* tp_members */
-  0,                                        /* tp_getset */
-  0,                                        /* tp_base */
-  0,                                        /* tp_dict */
-  0,                                        /* tp_descr_get */
-  0,                                        /* tp_descr_set */
-  0,                                        /* tp_dictoffset */
-  (initproc)cp_fieldcatom_init,             /* tp_init */
-  0,                                        /* tp_alloc */
-  (newfunc)cp_fieldcatom_new,               /* tp_new */
-  0,                                        /* tp_free */
-  0,                                        /* tp_is_gc */
-  0,                                        /* tp_bases */
-  0,                                        /* tp_mro */
-  0,                                        /* tp_cache */
-  0,                                        /* tp_subclasses */
-  0,                                        /* tp_weaklist */
-  0,                                        /* tp_del */
-  0,                                        /* tp_version_tag */
-  0,                                        /* tp_finalize */
-  0,                                        /* tp_vectorcall */
+  .tp_basicsize = sizeof(CpFieldCAtomObject),
+  .tp_dealloc = (destructor)cp_fieldcatom_dealloc,
+  .tp_as_number = &CpFieldCAtom_NumberMethods,
+  .tp_as_mapping = &CpFieldCAtom_MappingMethods,
+  .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
+  .tp_doc = NULL,
+  .tp_init = (initproc)cp_fieldcatom_init,
+  .tp_new = (newfunc)cp_fieldcatom_new,
 };

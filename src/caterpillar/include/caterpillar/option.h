@@ -17,7 +17,7 @@
 #ifndef CP_OPTION_H
 #define CP_OPTION_H
 
-#include "caterpillar.h"
+#include "caterpillarapi.h"
 
 /**
  * @brief Simple option struct that stores a name and a value.

@@ -11,3 +11,4 @@ Caterpillar C API Reference
    abstract.rst
    objimpl.rst
    extension.rst
+   arch.rst

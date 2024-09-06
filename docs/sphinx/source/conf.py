@@ -74,7 +74,7 @@ html_theme_options = {
     "logo": {
         "text": f"Caterpillar {version}",
     },
-    "announcement": "https://raw.githubusercontent.com/MatrixEditor/caterpillar/master/docs/source/_templates/announcement.html",
+    "announcement": "https://raw.githubusercontent.com/MatrixEditor/caterpillar/master/docs/sphinx/source/_templates/announcement.html",
 }
 html_sidebars = {
   "installing/index": [],

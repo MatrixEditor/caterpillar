@@ -20,7 +20,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "caterpillar/caterpillar.h"
+#include "caterpillar/caterpillarapi.h"
 
 /* advanced parsing state in C */
 

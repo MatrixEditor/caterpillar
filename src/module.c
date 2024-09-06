@@ -6,7 +6,7 @@
 #include "caterpillar/module.h"  /* invalid default object and types through caterpillar.h*/
 #include "caterpillar/parsing.h" /* Pack and unpack functions */
 
-#include "caterpillar.c"
+#include "caterpillarapi.c"
 
 /* immortal objects */
 static PyObject*
@@ -501,7 +501,7 @@ PyInit__C(void)
   CpModule_AddObject("boolatom", &CpBoolAtom_Type);
   CpModule_AddObject("charatom", &CpCharAtom_Type);
   CpModule_AddObject("paddingatom", &CpPaddingAtom_Type);
-  CpModule_AddObject("stringatom", &CpStringAtom_Type);
+  CpModule_AddObject("string", &CpStringAtom_Type);
 
   /* setup custom intatoms */
 #define CpModule_DefAtom(name, ...)                                            \

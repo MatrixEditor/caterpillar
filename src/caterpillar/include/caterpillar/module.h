@@ -17,7 +17,7 @@
 #ifndef CP_MODULE_H
 #define CP_MODULE_H
 
-#include "caterpillar.h"
+#include "caterpillarapi.h"
 
 /**
  * @brief The internal state for this module.

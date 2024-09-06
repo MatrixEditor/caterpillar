@@ -8,6 +8,7 @@ find_package(
 
 add_compile_definitions(_CPMODULE)
 
+
 if (DEFINED ENV{CP_ENABLE_NATIVE})
 python_add_library(
   _C
@@ -45,8 +46,8 @@ message(STATUS "Python ${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}")
 
 add_custom_target(
  genapi ALL
- COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/src/code_gen/genapi.py ${CMAKE_CURRENT_SOURCE_DIR}/src/caterpillar/include/caterpillar/caterpillar.h.in ${CMAKE_CURRENT_SOURCE_DIR}/src/caterpillar.c.in
- BYPRODUCTS ${CMAKE_CURRENT_SOURCE_DIR}/src/caterpillar/include/caterpillar/caterpillar.h ${CMAKE_CURRENT_SOURCE_DIR}/src/caterpillar.c
+ COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/src/code_gen/genapi.py ${CMAKE_CURRENT_SOURCE_DIR}/src/caterpillar/include/caterpillar/caterpillarapi.h.in ${CMAKE_CURRENT_SOURCE_DIR}/src/caterpillarapi.c.in
+ BYPRODUCTS ${CMAKE_CURRENT_SOURCE_DIR}/src/caterpillar/include/caterpillar/caterpillarapi.h ${CMAKE_CURRENT_SOURCE_DIR}/src/caterpillarapi.c
  COMMENT "Generating Public Caterpillar API"
 )
 
