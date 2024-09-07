@@ -31,7 +31,7 @@ options will be added in the future. Documentation is [here >](https://matrixedi
 ## What does it look like?
 
 ```python
-from caterpillar._Py import *
+from caterpillar.py import *
 
 @struct(order=LittleEndian)
 class Format:

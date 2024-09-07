@@ -1,5 +1,5 @@
 # type: ignore
-from caterpillar._Py import uint16, uint32, boolean, union
+from caterpillar.py import uint16, uint32, boolean, union
 
 try:
     from rich import print

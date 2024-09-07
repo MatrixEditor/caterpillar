@@ -1,5 +1,5 @@
 # type: ignore
-from caterpillar._Py import (
+from caterpillar.py import (
     set_struct_flags,
     uintptr,
     CString,

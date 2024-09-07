@@ -4,7 +4,7 @@ import caterpillar
 
 if caterpillar.native_support():
 
-    from caterpillar._C import atom, Struct
+    from caterpillar.c import atom, Struct, struct
 
 
     def test_struct_init():
@@ -51,3 +51,11 @@ if caterpillar.native_support():
         # value for 'a'.
         assert Foo().a == 1
         assert Foo(a=2).a == 2
+
+    def test_struct_decorator():
+        @struct
+        class Foo:
+            a: atom() = 1
+
+        assert len(Foo.__struct__.members) == 1
+        assert Foo().a == 1

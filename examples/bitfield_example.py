@@ -1,5 +1,5 @@
 # type: ignore
-from caterpillar._Py import bitfield, char, int8, unpack, pack
+from caterpillar.py import bitfield, char, int8, unpack, pack
 
 try:
     from rich import print

@@ -1,5 +1,5 @@
 # type: ignore
-from caterpillar._Py import struct, pack, unpack, this, uint8, int32, Bytes
+from caterpillar.py import struct, pack, unpack, this, uint8, int32, Bytes
 
 try:
     from rich import print

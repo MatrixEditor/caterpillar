@@ -1,5 +1,5 @@
 # type: ignore
-from caterpillar._Py import struct, BigEndian, this, unpack, uint8
+from caterpillar.py import struct, BigEndian, this, unpack, uint8
 
 try:
     from rich import print

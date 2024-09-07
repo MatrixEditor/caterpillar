@@ -1,5 +1,5 @@
 # type: ignore
-from caterpillar._Py import (
+from caterpillar.py import (
     struct,
     set_struct_flags,
     S_REPLACE_TYPES,
