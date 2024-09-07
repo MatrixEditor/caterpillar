@@ -1,7 +1,5 @@
 /* typeof implementation */
-#include "caterpillar/module.h"
-#include "caterpillar/parsing.h"
-#include "caterpillar/struct.h"
+#include "caterpillar/caterpillar.h"
 
 /*CpAPI*/
 PyObject*

@@ -296,7 +296,7 @@ class Chain(FieldStruct):
                     obj = stream.getvalue()
 
 
-class _infix_:
+class Operator:
     """Defines a custom opearator (user-defined)
 
     It operates _infix_ between two statements and takes them as
@@ -334,7 +334,7 @@ class _infix_:
         return self.func(arg2)
 
     def __rtruediv__(self, arg1) -> '_infix_':
-        return _infix_(partial(self.func, arg1))
+        return Operator(partial(self.func, arg1))
 
     def __call__(self, arg1, arg2) -> _StructLike:
         return self.func(arg1, arg2)

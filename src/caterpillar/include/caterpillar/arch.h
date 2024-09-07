@@ -17,10 +17,7 @@
 #ifndef CP_ARCH_H
 #define CP_ARCH_H
 
-#include "macros.h"
-
-/// Arch object type
-// PyAPI_DATA(PyTypeObject) CpArch_Type;
+#include "caterpillarapi.h"
 
 /**
  * @brief Configuration class that represents an architecture.

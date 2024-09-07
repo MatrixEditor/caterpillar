@@ -7,5 +7,13 @@ Concrete Objects Layer
 .. toctree::
     :maxdepth: 2
 
-    struct.rst
+    arch
+    option
+    contextobj
+    contextexpr
+    contextpath
+    state
+    layer
+    fieldobj
+    struct
     atoms/index.rst

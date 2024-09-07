@@ -1,6 +1,5 @@
-from caterpillar.shortcuts import struct, this, pack, unpack
-from caterpillar.fields import uint8, int32, Bytes
-
+# type: ignore
+from caterpillar._Py import struct, pack, unpack, this, uint8, int32, Bytes
 
 try:
     from rich import print

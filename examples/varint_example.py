@@ -1,5 +1,12 @@
-from caterpillar.fields.varint import vint, VARINT_LSB
-from caterpillar.shortcuts import pack, unpack, BigEndian as be, LittleEndian as le
+# type: ignore
+from caterpillar._Py import (
+    vint,
+    VARINT_LSB,
+    pack,
+    unpack,
+    BigEndian as be,
+    LittleEndian as le,
+)
 
 try:
     from rich import print

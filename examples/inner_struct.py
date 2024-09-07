@@ -1,5 +1,5 @@
-from caterpillar.shortcuts import *
-from caterpillar.fields import uint8, Field
+# type: ignore
+from caterpillar._Py import struct, pack, unpack, uint8
 
 try:
     from rich import print

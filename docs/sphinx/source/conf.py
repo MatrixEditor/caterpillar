@@ -68,8 +68,9 @@ refcount_file = 'extensions/refcounts.dat'
 html_theme = "pydata_sphinx_theme"
 html_static_path = ["_static"]
 html_theme_options = {
+    "show_nav_level": 4,
     "navbar_end": ["navbar-icon-links", "theme-switcher"],
-    "collapse_navigation": True,
+    "collapse_navigation": False,
     "github_url": "https://github.com/MatrixEditor/caterpillar",
     "logo": {
         "text": f"Caterpillar {version}",

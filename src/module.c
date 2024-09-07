@@ -8,6 +8,32 @@
 
 #include "caterpillarapi.c"
 
+#define CpModule_AddObject(name, value)                                        \
+  Py_INCREF(value);                                                            \
+  if (PyModule_AddObject(m, name, (PyObject*)(value)) < 0) {                   \
+    Py_DECREF(value);                                                          \
+    Py_DECREF(m);                                                              \
+    PyErr_SetString(PyExc_RuntimeError, "unable to add '" name "' to module"); \
+    return NULL;                                                               \
+  }
+
+#define CpModuleState_AddObject(varName, objName, ...)                         \
+  state->varName = __VA_ARGS__;                                                \
+  if (!state->varName) {                                                       \
+    PyErr_SetString(PyExc_RuntimeError,                                        \
+                    ("unable to create state object '" objName "'"));          \
+    return NULL;                                                               \
+  }                                                                            \
+  CpModule_AddObject(objName, state->varName);
+
+#define CpModuleState_Set(varName, ...)                                        \
+  state->varName = __VA_ARGS__;                                                \
+  if (!state->varName) {                                                       \
+    PyErr_SetString(PyExc_RuntimeError,                                        \
+                    ("unable to create state object '" #varName "'"));         \
+    return NULL;                                                               \
+  }
+
 /* immortal objects */
 static PyObject*
 cp_invaliddefault_new(PyTypeObject* type, PyObject* args, PyObject* kw)
@@ -30,54 +56,9 @@ cp_invaliddefault_repr(PyObject* self)
 
 PyTypeObject CpInvalidDefault_Type = {
   PyVarObject_HEAD_INIT(NULL, 0) _Cp_Name(InvalidDefaultType),
-  0,                                /* tp_basicsize */
-  0,                                /* tp_itemsize */
-  0,                                /* tp_dealloc */
-  0,                                /* tp_vectorcall_offset */
-  0,                                /* tp_getattr */
-  0,                                /* tp_setattr */
-  0,                                /* tp_as_async */
-  (reprfunc)cp_invaliddefault_repr, /* tp_repr */
-  0,                                /* tp_as_number */
-  0,                                /* tp_as_sequence */
-  0,                                /* tp_as_mapping */
-  0,                                /* tp_hash */
-  0,                                /* tp_call */
-  0,                                /* tp_str */
-  0,                                /* tp_getattro */
-  0,                                /* tp_setattro */
-  0,                                /* tp_as_buffer */
-  Py_TPFLAGS_DEFAULT,               /* tp_flags */
-  0,                                /* tp_doc */
-  0,                                /* tp_traverse */
-  0,                                /* tp_clear */
-  0,                                /* tp_richcompare */
-  0,                                /* tp_weaklistoffset */
-  0,                                /* tp_iter */
-  0,                                /* tp_iternext */
-  0,                                /* tp_methods */
-  0,                                /* tp_members */
-  0,                                /* tp_getset */
-  0,                                /* tp_base */
-  0,                                /* tp_dict */
-  0,                                /* tp_descr_get */
-  0,                                /* tp_descr_set */
-  0,                                /* tp_dictoffset */
-  0,                                /* tp_init */
-  0,                                /* tp_alloc */
-  (newfunc)cp_invaliddefault_new,   /* tp_new */
-  0,                                /* tp_free */
-  0,                                /* tp_is_gc */
-  0,                                /* tp_bases */
-  0,                                /* tp_mro */
-  0,                                /* tp_cache */
-  0,                                /* tp_subclasses */
-  0,                                /* tp_weaklist */
-  0,                                /* tp_del */
-  0,                                /* tp_version_tag */
-  0,                                /* tp_finalize */
-  0,                                /* tp_vectorcall */
-  0,                                /* tp_watched */
+  .tp_repr = (reprfunc)cp_invaliddefault_repr,
+  .tp_flags = Py_TPFLAGS_DEFAULT,
+  .tp_new = (newfunc)cp_invaliddefault_new,
 };
 
 PyObject _CpInvalidDefault_Object = { _PyObject_EXTRA_INIT{
@@ -105,54 +86,9 @@ cp_defaultoption_repr(PyObject* self)
 
 PyTypeObject CpDefaultOption_Type = {
   PyVarObject_HEAD_INIT(NULL, 0) _Cp_Name(DefaultOptionType),
-  0,                               /* tp_basicsize */
-  0,                               /* tp_itemsize */
-  0,                               /* tp_dealloc */
-  0,                               /* tp_vectorcall_offset */
-  0,                               /* tp_getattr */
-  0,                               /* tp_setattr */
-  0,                               /* tp_as_async */
-  (reprfunc)cp_defaultoption_repr, /* tp_repr */
-  0,                               /* tp_as_number */
-  0,                               /* tp_as_sequence */
-  0,                               /* tp_as_mapping */
-  0,                               /* tp_hash */
-  0,                               /* tp_call */
-  0,                               /* tp_str */
-  0,                               /* tp_getattro */
-  0,                               /* tp_setattro */
-  0,                               /* tp_as_buffer */
-  Py_TPFLAGS_DEFAULT,              /* tp_flags */
-  0,                               /* tp_doc */
-  0,                               /* tp_traverse */
-  0,                               /* tp_clear */
-  0,                               /* tp_richcompare */
-  0,                               /* tp_weaklistoffset */
-  0,                               /* tp_iter */
-  0,                               /* tp_iternext */
-  0,                               /* tp_methods */
-  0,                               /* tp_members */
-  0,                               /* tp_getset */
-  0,                               /* tp_base */
-  0,                               /* tp_dict */
-  0,                               /* tp_descr_get */
-  0,                               /* tp_descr_set */
-  0,                               /* tp_dictoffset */
-  0,                               /* tp_init */
-  0,                               /* tp_alloc */
-  (newfunc)cp_defaultoption_new,   /* tp_new */
-  0,                               /* tp_free */
-  0,                               /* tp_is_gc */
-  0,                               /* tp_bases */
-  0,                               /* tp_mro */
-  0,                               /* tp_cache */
-  0,                               /* tp_subclasses */
-  0,                               /* tp_weaklist */
-  0,                               /* tp_del */
-  0,                               /* tp_version_tag */
-  0,                               /* tp_finalize */
-  0,                               /* tp_vectorcall */
-  0,                               /* tp_watched */
+  .tp_repr = (reprfunc)cp_defaultoption_repr,
+  .tp_flags = Py_TPFLAGS_DEFAULT,
+  .tp_new = (newfunc)cp_defaultoption_new,
 };
 
 PyObject _CpDefaultOption_Object = { _PyObject_EXTRA_INIT{

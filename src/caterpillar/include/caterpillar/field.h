@@ -113,64 +113,6 @@ struct _fieldobj
  */
 #define CpField_Check(v) PyObject_TypeCheck((v), &CpField_Type)
 
-/**
- * @brief Create a new field
- *
- * @param atom the atom object
- * @return the new field object
- */
-// PyAPI_FUNC(CpFieldObject*) CpField_New(PyObject* atom);
-
-/**
- * @brief Returns whether the field has a condition
- *
- * This function always succeeds.
- *
- * @param field the field object
- * @return 1 if the field has a condition, 0 otherwise
- */
-// PyAPI_FUNC(int) CpField_HasCondition(CpFieldObject* field);
-
-/**
- * @brief Returns whether the field is enabled
- *
- * @param field the field object
- * @param context the context object
- * @return 1 if the field is enabled, 0 otherwise, or -1 on failure
- */
-// PyAPI_FUNC(int) CpField_IsEnabled(CpFieldObject* field, PyObject* context);
-
-/**
- * @brief Returns the offset of the field
- *
- * @param field the field object
- * @param context the context object
- * @return the offset of the field, or -1 on failure
- */
-// PyAPI_FUNC(Py_ssize_t)
-//   CpField_GetOffset(CpFieldObject* field, PyObject* context);
-
-/**
- * @brief Evaluates a switch statement (if any)
- *
- * @param field the field object
- * @param value the value to evaluate
- * @param context the context object
- * @return the result of the switch statement, or NULL on failure
- */
-// PyAPI_FUNC(PyObject*)
-//   CpField_EvalSwitch(CpFieldObject* field, PyObject* value, PyObject* context);
-
-/**
- * @brief Returns the length of the field
- *
- * @param field the field object
- * @param context the context object
- * @return the length of the field, or NULL on failure
- */
-// PyAPI_FUNC(PyObject*)
-//   CpField_GetLength(CpFieldObject* field, PyObject* context);
-
 // -----------------------------------------------------------------------------
 // field atom
 
@@ -213,9 +155,6 @@ struct _fieldcatomobj
 {
   CpCAtom_HEAD
 };
-
-/// Field C atom type
-// PyAPI_DATA(PyTypeObject) CpFieldCAtom_Type;
 
 /**
  * @brief Check whether the given object is a field C atom

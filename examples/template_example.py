@@ -1,13 +1,23 @@
-from caterpillar.model import *
-from caterpillar.fields import *
-from caterpillar.shortcuts import *
+# type: ignore
+from caterpillar._Py import (
+    struct,
+    set_struct_flags,
+    S_REPLACE_TYPES,
+    uint8,
+    uint16,
+    TemplateTypeVar,
+    template,
+    derive,
+    pack,
+    this
+)
 
 try:
     from rich import print
 except ImportError:
     pass
 
-opt.set_struct_flags(opt.S_REPLACE_TYPES)
+set_struct_flags(S_REPLACE_TYPES)
 
 
 @struct
