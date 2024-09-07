@@ -1,5 +1,14 @@
-from caterpillar.shortcuts import *
-from caterpillar.fields import *
+# type: ignore
+from caterpillar._Py import (
+    set_struct_flags,
+    uintptr,
+    CString,
+    BigEndian,
+    S_REPLACE_TYPES,
+    unpack,
+    struct,
+    x86
+)
 from caterpillar.fields.pointer import uintptr_fn
 
 try:
@@ -7,7 +16,7 @@ try:
 except ImportError:
     pass
 
-opt.set_struct_flags(opt.S_REPLACE_TYPES)
+set_struct_flags(S_REPLACE_TYPES)
 
 
 @struct(kw_only=False, order=BigEndian)

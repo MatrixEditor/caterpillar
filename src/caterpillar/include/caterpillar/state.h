@@ -53,8 +53,6 @@ struct _stateobj
   PyObject* m_offset_table;
 };
 
-/// State object type
-// PyAPI_DATA(PyTypeObject) CpState_Type;
 
 /**
  * @brief Check whether the given object is a state
@@ -73,56 +71,6 @@ struct _stateobj
  * @return false if the object is not a state
  */
 #define CpState_Check(v) PyObject_TypeCheck((v), &CpState_Type)
-
-/**
- * @brief Creates a new state object
- *
- * @param io the input or output stream object
- * @return the new state object, or NULL on failure
- */
-// PyAPI_FUNC(CpStateObject*) CpState_New(PyObject* io);
-
-/**
- * @brief Returns the current position in the input stream
- *
- * @return the current position
- */
-// PyAPI_FUNC(PyObject*) CpState_Tell(CpStateObject* self);
-
-/**
- * @brief Sets the current position in the input stream
- *
- * @param pos the new position
- * @return the new position
- */
-// PyAPI_FUNC(PyObject*)
-  // CpState_Seek(CpStateObject* self, PyObject* pos, int whence);
-
-/**
- * @brief Reads the given number of bytes from the input stream
- *
- * @param size the number of bytes to read
- * @return the read bytes
- */
-// PyAPI_FUNC(PyObject*) CpState_Read(CpStateObject* self, Py_ssize_t size);
-
-// PyAPI_FUNC(PyObject*) CpState_ReadFully(CpStateObject* self);
-
-/**
- * @brief Writes the given bytes to the output stream
- *
- * @param bytes the bytes to write
- * @return the number of bytes written
- */
-// PyAPI_FUNC(PyObject*) CpState_Write(CpStateObject* self, PyObject* bytes);
-
-/**
- * @brief Sets the global namespace for pre-defined context variables
- *
- * @param globals the new global namespace
- * @return the new global namespace
- */
-// PyAPI_FUNC(int) CpState_SetGlobals(CpStateObject* self, PyObject* globals);
 
 //-----------------------------------------------------------------------------
 // layer
@@ -201,37 +149,6 @@ struct _layerobj
  */
 #define CpLayer_Check(v) PyObject_TypeCheck((v), &CpLayer_Type)
 
-/**
- * @brief Creates a new layer object
- *
- * @param parent the parent layer (may be NULL)
- * @param state the global parsing state
- * @return the new layer object, or NULL on failure
- */
-// PyAPI_FUNC(CpLayerObject*)
-  // CpLayer_New(CpStateObject* state, CpLayerObject* parent);
-
-/**
- * @brief Invalidates the layer
- *
- * @param layer the layer to invalidate
- * @return 0 on success, -1 on failure
- */
-// PyAPI_FUNC(int) CpLayer_Invalidate(CpLayerObject* layer);
-
-/**
- * @brief Applies the given sequence to the layer
- *
- * @param layer the layer to apply the sequence to
- * @param sequence the sequence to apply
- * @param length the length of the sequence
- * @param greedy whether the sequence is greedy
- * @return 0 on success, -1 on failure
- */
-// PyAPI_FUNC(int) CpLayer_SetSequence(CpLayerObject* layer,
-//                                     PyObject* sequence,
-//                                     Py_ssize_t length,
-//                                     int8_t greedy);
 
 #define CpLayer_AppendPath(layer, newpath)                                     \
   Py_XSETREF(                                                                  \

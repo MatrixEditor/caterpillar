@@ -23,17 +23,43 @@
 
 #include <Python.h>
 
+/**
+ * @brief Appends the name of the C module to the given name.
+ */
 #define _Cp_Name(x) ("caterpillar._C." #x)
 
+/**
+ * @brief Sets the given object to the given value.
+ */
 #define _Cp_SetObj(varname, value)                                             \
   if (value) {                                                                 \
     Py_XSETREF(varname, Py_NewRef(value));                                     \
   }
 
+/**
+ * @brief Creates an object of the given type and returns it.
+ *
+ * @returns *NULL* if an error occurs.
+ *
+ */
 #define CpObject_Create(type, format, ...)                                     \
   (PyObject_CallFunction((PyObject*)(type), format, __VA_ARGS__))
 
+/**
+ * @brief Creates an object of the given type and returns it.
+ *
+ * @param type the type of the object to create
+ * @returns *NULL* if an error occurs.
+ */
 #define CpObject_CreateNoArgs(type) (PyObject_CallNoArgs((PyObject*)(type)))
+
+/**
+ * @brief Creates an object of the given type and returns it.
+ *
+ * @param type the type of the object to create
+ * @param arg the argument to pass to the constructor
+ * @returns *NULL* if an error occurs.
+ */
 #define CpObject_CreateOneArg(type, arg)                                       \
   (PyObject_CallOneArg(((PyObject*)(type)), (arg)))
 
@@ -45,4 +71,5 @@
     return -1; \
   } \
   return 0;
+
 #endif

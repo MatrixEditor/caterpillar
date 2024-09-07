@@ -70,7 +70,7 @@ class Annotations:
                 rc = sphinx_gettext("Return value: New reference.")
             else:
                 rc = sphinx_gettext("Return value: Borrowed reference.")
-            node.insert(0, nodes.emphasis(rc, rc, classes=["refcount"]))
+            node.insert(0, nodes.emphasis(rc, rc, classes=["refcount", "text-info"]))
 
 
 def init_annotations(app):

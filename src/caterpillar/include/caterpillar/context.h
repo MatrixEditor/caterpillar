@@ -37,9 +37,6 @@ struct _contextobj
   PyDictObject m_dict;
 };
 
-/// Context object type
-// PyAPI_DATA(PyTypeObject) CpContext_Type;
-
 /**
  * @brief Checks if the given object is an context object
  *
@@ -77,13 +74,6 @@ PyAPI_FUNC(PyObject*)
  */
 PyAPI_FUNC(PyObject*) CpContext_GetAttrString(PyObject* ctx, const char* key);
 
-/**
- * @brief Create a new context
- *
- * @return the new context, or NULL on failure
- */
-// PyAPI_FUNC(CpContextObject*) CpContext_New(void);
-
 // -----------------------------------------------------------------------------
 // unary expression
 enum
@@ -106,18 +96,6 @@ struct _unaryexpr
   /// the value to apply the operation to
   PyObject* m_value;
 };
-
-/// Unary expression type
-// PyAPI_DATA(PyTypeObject) CpUnaryExpr_Type;
-
-/**
- * @brief Create a new unary expression
- *
- * @param op the operation to perform
- * @param value the value to apply the operation to
- * @return the new unary expression, or NULL on failure
- */
-// PyAPI_FUNC(CpUnaryExprObject*) CpUnaryExpr_New(int op, PyObject* value);
 
 // -----------------------------------------------------------------------------
 // binary expression
@@ -163,20 +141,6 @@ struct _binaryexpr
   PyObject* m_right;
 };
 
-/// Binary expression type
-// PyAPI_DATA(PyTypeObject) CpBinaryExpr_Type;
-
-/**
- * @brief Create a new binary expression
- *
- * @param op the operation to perform
- * @param left the left value
- * @param right the right value
- * @return the new binary expression, or NULL on failure
- */
-// PyAPI_FUNC(CpBinaryExprObject*)
-//   CpBinaryExpr_New(int op, PyObject* left, PyObject* right);
-
 // -----------------------------------------------------------------------------
 // context path
 
@@ -195,25 +159,6 @@ struct _contextpath
   // global module state.
   _modulestate* m_state;
 };
-
-/// Context path type
-// PyAPI_DATA(PyTypeObject) CpContextPath_Type;
-
-/**
- * @brief Create a new context path
- *
- * @param path the path object (unicode object)
- * @return the new context path, or NULL on failure
- */
-// PyAPI_FUNC(CpContextPathObject*) CpContextPath_New(PyObject* path);
-
-/**
- * @brief Create a new context path
- *
- * @param path the path string
- * @return the new context path, or NULL on failure
- */
-// PyAPI_FUNC(CpContextPathObject*) CpContextPath_FromString(const char* path);
 
 /**
  * @brief Checks if the given object is a context path

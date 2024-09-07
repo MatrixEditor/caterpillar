@@ -1,7 +1,10 @@
-from caterpillar.shortcuts import struct, BigEndian, this, unpack
-from caterpillar.fields import uint8
+# type: ignore
+from caterpillar._Py import struct, BigEndian, this, unpack, uint8
 
-from rich import print
+try:
+    from rich import print
+except ImportError:
+    pass
 
 
 @struct(order=BigEndian)

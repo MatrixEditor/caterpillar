@@ -1,13 +1,12 @@
-from caterpillar.model import struct, sizeof
-from caterpillar.fields import uint16, _infix_
-from caterpillar.options import S_REPLACE_TYPES
+# type: ignore
+from caterpillar._Py import struct, uint16, Operator, S_REPLACE_TYPES
 
 # Here, we define a custom operator named 'M' that will multiply
 # the second argument by 2.
-M = _infix_(lambda a, b: a[b*2])
+M = Operator(lambda a, b: a[b*2])
 
 # or directly as function
-# @_infix_
+# @Operator
 # def M(a, b):
 #     return a[b*2]
 

@@ -90,14 +90,11 @@ struct _modulestate
   PyObject* cp_regex__unnamed;
   PyObject* inspect_getannotations;
 
-
   // cached objects
   PyObject *cp_bytes__true;
   PyObject *cp_bytes__false;
 };
 
-/** Module object type */
-// PyAPI_DATA(PyModuleDef) CpModule;
 
 /**
  * @brief Get the module state object
@@ -140,31 +137,5 @@ get_global_module_state(void)
 #define CpModule_SetupType(op)                                                 \
   if (PyType_Ready(op) < 0)                                                    \
     return NULL;
-
-#define CpModule_AddObject(name, value)                                        \
-  Py_INCREF(value);                                                            \
-  if (PyModule_AddObject(m, name, (PyObject*)(value)) < 0) {                   \
-    Py_DECREF(value);                                                          \
-    Py_DECREF(m);                                                              \
-    PyErr_SetString(PyExc_RuntimeError, "unable to add '" name "' to module"); \
-    return NULL;                                                               \
-  }
-
-#define CpModuleState_AddObject(varName, objName, ...)                         \
-  state->varName = __VA_ARGS__;                                                \
-  if (!state->varName) {                                                       \
-    PyErr_SetString(PyExc_RuntimeError,                                        \
-                    ("unable to create state object '" objName "'"));          \
-    return NULL;                                                               \
-  }                                                                            \
-  CpModule_AddObject(objName, state->varName);
-
-#define CpModuleState_Set(varName, ...)                                        \
-  state->varName = __VA_ARGS__;                                                \
-  if (!state->varName) {                                                       \
-    PyErr_SetString(PyExc_RuntimeError,                                        \
-                    ("unable to create state object '" #varName "'"));         \
-    return NULL;                                                               \
-  }
 
 #endif

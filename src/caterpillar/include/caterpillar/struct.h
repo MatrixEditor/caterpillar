@@ -38,9 +38,6 @@ struct CpStructFieldInfo
   // TODO: here's space for more settings
 };
 
-/// object type
-// PyAPI_DATA(PyTypeObject) CpStructFieldInfo_Type;
-
 /**
  * @brief Checks if the given object is a struct field info object
  *
@@ -64,15 +61,6 @@ struct CpStructFieldInfo
  */
 #define CpStructFieldInfo_Check(op)                                            \
   PyObject_TypeCheck((op), &CpStructFieldInfo_Type)
-
-/**
- * @brief Creates a new struct field info object
- *
- * @param field the field object
- * @return the new struct field info object
- */
-// PyAPI_FUNC(CpStructFieldInfoObject*)
-//   CpStructFieldInfo_New(CpFieldObject* field);
 
 //---------------------------------------------------------------------------
 // struct
@@ -126,79 +114,4 @@ struct _structobj
  */
 #define CpStruct_Check(op) PyObject_TypeCheck((op), &CpStruct_Type)
 
-/**
- * @brief Add a field to the struct
- *
- * @param self the struct object
- * @param field the field information
- * @return 1 on success, 0 on failure
- */
-// PyAPI_FUNC(int)
-//   CpStruct_AddFieldInfo(CpStructObject* self, CpStructFieldInfoObject* field);
-
-/**
- * @brief Add a field to the struct
- *
- * @param self the struct object
- * @param field the field information
- * @param exclude true if the field should be excluded
- * @return 1 on success, 0 on failure
- */
-// PyAPI_FUNC(int)
-//   CpStruct_AddField(CpStructObject* self, CpFieldObject* field, int exclude);
-
-/**
- * @brief Create a new struct
- *
- * @param model the model object
- * @return the new struct object, or NULL on failure
- */
-//PyAPI_FUNC(CpStructObject*) CpStruct_New(PyObject* model);
-
-/**
- * @brief Get the annotations of the struct's model
- *
- * @param op the struct object
- * @param eval true if the annotations should be evaluated
- * @return the annotations, or NULL on failure
- */
-// PyAPI_FUNC(PyObject*) CpStruct_GetAnnotations(CpStructObject* op, int eval);
-
-/**
- * @brief Replace the annotation of the struct's model with the given value
- *
- * @param op the struct object
- * @param name the name of the annotation
- * @param value the new value of the annotation
- * @return 1 on success, 0 on failure
- */
-// PyAPI_FUNC(int)
-//   CpStruct_ReplaceType(CpStructObject* op, PyObject* name, PyObject* value);
-
-/**
- * @brief Checks if the given struct has a given option
- *
- * @param op the object to check
- * @param option the option to check
- * @return 1 if the object has the option, 0 otherwise
- */
-// PyAPI_FUNC(int) CpStruct_HasOption(CpStructObject* op, PyObject* option);
-
-/**
- * @brief Checks if the given model stores a struct
- *
- * @param model the model object
- * @param m the module state, may be NULL
- * @return 1 if the model stores a struct, 0 otherwise
- */
-// PyAPI_FUNC(int) CpStructModel_Check(PyObject* model, _modulestate* m);
-
-/**
- * @brief Get the struct from the model
- *
- * @param model the model object
- * @param m the module state, may be NULL
- * @return the struct object, or NULL if the model does not store a struct
- */
-// PyAPI_FUNC(PyObject*) CpStructModel_GetStruct(PyObject* model, _modulestate* m);
 #endif

@@ -12,7 +12,8 @@ data. This procotol is implemented by *all* context-related classes in
 this package.
 
 
-.. py:function:: object.__context_getattr__(self, path) -> object
+.. py:method:: object.__context_getattr__(self, path) -> object
+    :noindex:
 
     This function is used to retrieve a value from the context. It is implementation
     dependent whether nested paths are supported. By default, multiple path elements

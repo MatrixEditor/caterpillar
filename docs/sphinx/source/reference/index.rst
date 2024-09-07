@@ -20,11 +20,17 @@ documentation.
    datamodel.rst
    operators.rst
 
-If you want to switch to the C API instead, please refer to the sections described in :ref:`reference_capi-index`.
+If you want to switch to the C API instead, please refer to the sections described in the CAPI reference.
 
 .. toctree::
    :maxdepth: 3
-   :caption: C Reference
+   :numbered:
+   :caption: C API Reference
 
-   capi/index.rst
+   capi/abstract
+   capi/objects/objimpl
+   capi/parsing
+   capi/macros
+   capi/module
+   capi/extension
 

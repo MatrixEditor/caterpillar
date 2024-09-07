@@ -1,10 +1,6 @@
 /* unpacking operations */
 
-#include "caterpillar/context.h"
-#include "caterpillar/module.h"
-#include "caterpillar/parsing.h"
-#include "caterpillar/state.h"
-#include "caterpillar/struct.h"
+#include "caterpillar/caterpillar.h"
 
 // ------------------------------------------------------------------------------
 // unpack:
