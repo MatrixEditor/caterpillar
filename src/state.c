@@ -235,54 +235,14 @@ static PyMethodDef CpLayer_Methods[] = {
 
 PyTypeObject CpLayer_Type = {
   PyVarObject_HEAD_INIT(NULL, 0) _Cp_Name(layer),
-  sizeof(CpLayerObject),        /* tp_basicsize */
-  0,                            /* tp_itemsize */
-  (destructor)cp_layer_dealloc, /* tp_dealloc */
-  0,                            /* tp_vectorcall_offset */
-  0,                            /* tp_getattr */
-  0,                            /* tp_setattr */
-  0,                            /* tp_as_async */
-  0,                            /* tp_repr */
-  0,                            /* tp_as_number */
-  0,                            /* tp_as_sequence */
-  0,                            /* tp_as_mapping */
-  0,                            /* tp_hash */
-  0,                            /* tp_call */
-  0,                            /* tp_str */
-  0,                            /* tp_getattro */
-  0,                            /* tp_setattro */
-  0,                            /* tp_as_buffer */
-  Py_TPFLAGS_DEFAULT,           /* tp_flags */
-  NULL,                         /* tp_doc */
-  0,                            /* tp_traverse */
-  0,                            /* tp_clear */
-  0,                            /* tp_richcompare */
-  0,                            /* tp_weaklistoffset */
-  0,                            /* tp_iter */
-  0,                            /* tp_iternext */
-  CpLayer_Methods,              /* tp_methods */
-  CpLayer_Members,              /* tp_members */
-  0,                            /* tp_getset */
-  0,                            /* tp_base */
-  0,                            /* tp_dict */
-  0,                            /* tp_descr_get */
-  0,                            /* tp_descr_set */
-  0,                            /* tp_dictoffset */
-  (initproc)cp_layer_init,      /* tp_init */
-  0,                            /* tp_alloc */
-  (newfunc)cp_layer_new,        /* tp_new */
-  0,                            /* tp_free */
-  0,                            /* tp_is_gc */
-  0,                            /* tp_bases */
-  0,                            /* tp_mro */
-  0,                            /* tp_cache */
-  0,                            /* tp_subclasses */
-  0,                            /* tp_weaklist */
-  0,                            /* tp_del */
-  0,                            /* tp_version_tag */
-  0,                            /* tp_finalize */
-  0,                            /* tp_vectorcall */
-  0,                            /* tp_watched */
+  .tp_basicsize = sizeof(CpLayerObject),
+  .tp_dealloc = (destructor)cp_layer_dealloc,
+  .tp_flags = Py_TPFLAGS_DEFAULT,
+  .tp_doc = NULL,
+  .tp_methods = CpLayer_Methods,
+  .tp_members = CpLayer_Members,
+  .tp_init = (initproc)cp_layer_init,
+  .tp_new = (newfunc)cp_layer_new,
 };
 
 //-------------------------------------------------------------------------------
@@ -536,52 +496,13 @@ static PyMethodDef CpState_Methods[] = {
 /* type */
 PyTypeObject CpState_Type = {
   PyVarObject_HEAD_INIT(NULL, 0) _Cp_Name(State),
-  sizeof(CpStateObject),        /* tp_basicsize */
-  0,                            /* tp_itemsize */
-  (destructor)cp_state_dealloc, /* tp_dealloc */
-  0,                            /* tp_vectorcall_offset */
-  0,                            /* tp_getattr */
-  0,                            /* tp_setattr */
-  0,                            /* tp_as_async */
-  0,                            /* tp_repr */
-  0,                            /* tp_as_number */
-  0,                            /* tp_as_sequence */
-  0,                            /* tp_as_mapping */
-  0,                            /* tp_hash */
-  0,                            /* tp_call */
-  0,                            /* tp_str */
-  0,                            /* tp_getattro */
-  0,                            /* tp_setattro */
-  0,                            /* tp_as_buffer */
-  Py_TPFLAGS_DEFAULT,           /* tp_flags */
-  NULL,                         /* tp_doc */
-  0,                            /* tp_traverse */
-  0,                            /* tp_clear */
-  0,                            /* tp_richcompare */
-  0,                            /* tp_weaklistoffset */
-  0,                            /* tp_iter */
-  0,                            /* tp_iternext */
-  CpState_Methods,              /* tp_methods */
-  CpState_Members,              /* tp_members */
-  CpState_GetSetters,           /* tp_getset */
-  0,                            /* tp_base */
-  0,                            /* tp_dict */
-  0,                            /* tp_descr_get */
-  0,                            /* tp_descr_set */
-  0,                            /* tp_dictoffset */
-  (initproc)cp_state_init,      /* tp_init */
-  0,                            /* tp_alloc */
-  (newfunc)cp_state_new,        /* tp_new */
-  0,                            /* tp_free */
-  0,                            /* tp_is_gc */
-  0,                            /* tp_bases */
-  0,                            /* tp_mro */
-  0,                            /* tp_cache */
-  0,                            /* tp_subclasses */
-  0,                            /* tp_weaklist */
-  0,                            /* tp_del */
-  0,                            /* tp_version_tag */
-  0,                            /* tp_finalize */
-  0,                            /* tp_vectorcall */
-  0,                            /* tp_watched */
+  .tp_basicsize = sizeof(CpStateObject),
+  .tp_dealloc = (destructor)cp_state_dealloc,
+  .tp_flags = Py_TPFLAGS_DEFAULT,
+  .tp_doc = NULL,
+  .tp_methods = CpState_Methods,
+  .tp_members = CpState_Members,
+  .tp_getset = CpState_GetSetters,
+  .tp_init = (initproc)cp_state_init,
+  .tp_new = (newfunc)cp_state_new,
 };

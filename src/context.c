@@ -816,52 +816,18 @@ static PyNumberMethods CpContextPath_NumberMethods = {
 /* type */
 PyTypeObject CpContextPath_Type = {
   PyVarObject_HEAD_INIT(NULL, 0) _Cp_Name(ContextPath),
-  sizeof(CpContextPathObject),            /* tp_basicsize */
-  0,                                      /* tp_itemsize */
-  (destructor)cp_contextpath_dealloc,     /* tp_dealloc */
-  0,                                      /* tp_vectorcall_offset */
-  (getattrfunc)cp_contextpath__getattr__, /* tp_getattr */
-  0,                                      /* tp_setattr */
-  0,                                      /* tp_as_async */
-  (reprfunc)cp_contextpath_repr,          /* tp_repr */
-  &CpContextPath_NumberMethods,           /* tp_as_number */
-  0,                                      /* tp_as_sequence */
-  0,                                      /* tp_as_mapping */
-  (hashfunc)cp_contextpath_hash,          /* tp_hash */
-  (ternaryfunc)cp_contextpath__call__,    /* tp_call */
-  0,                                      /* tp_str */
-  0,                                      /* tp_getattro */
-  0,                                      /* tp_setattro */
-  0,                                      /* tp_as_buffer */
-  Py_TPFLAGS_DEFAULT,                     /* tp_flags */
-  cp_contextpath__doc__,                  /* tp_doc */
-  0,                                      /* tp_traverse */
-  0,                                      /* tp_clear */
-  (richcmpfunc)cp_contextpath_richcmp,    /* tp_richcompare */
-  0,                                      /* tp_weaklistoffset */
-  0,                                      /* tp_iter */
-  0,                                      /* tp_iternext */
-  CpContextPath_Methods,                  /* tp_methods */
-  CpContextPath_Members,                  /* tp_members */
-  0,                                      /* tp_getset */
-  0,                                      /* tp_base */
-  0,                                      /* tp_dict */
-  0,                                      /* tp_descr_get */
-  0,                                      /* tp_descr_set */
-  0,                                      /* tp_dictoffset */
-  (initproc)cp_contextpath_init,          /* tp_init */
-  0,                                      /* tp_alloc */
-  (newfunc)cp_contextpath_new,            /* tp_new */
-  0,                                      /* tp_free */
-  0,                                      /* tp_is_gc */
-  0,                                      /* tp_bases */
-  0,                                      /* tp_mro */
-  0,                                      /* tp_cache */
-  0,                                      /* tp_subclasses */
-  0,                                      /* tp_weaklist */
-  0,                                      /* tp_del */
-  0,                                      /* tp_version_tag */
-  0,                                      /* tp_finalize */
-  0,                                      /* tp_vectorcall */
-  0,                                      /* tp_watched */
+  .tp_basicsize =sizeof(CpContextPathObject),
+  .tp_dealloc =(destructor)cp_contextpath_dealloc,
+  .tp_getattr =(getattrfunc)cp_contextpath__getattr__,
+  .tp_repr =(reprfunc)cp_contextpath_repr,
+  .tp_as_number =&CpContextPath_NumberMethods,
+  .tp_hash =(hashfunc)cp_contextpath_hash,
+  .tp_call =(ternaryfunc)cp_contextpath__call__,
+  .tp_flags =Py_TPFLAGS_DEFAULT,
+  .tp_doc =cp_contextpath__doc__,
+  .tp_richcompare =(richcmpfunc)cp_contextpath_richcmp,
+  .tp_methods =CpContextPath_Methods,
+  .tp_members =CpContextPath_Members,
+  .tp_init =(initproc)cp_contextpath_init,
+  .tp_new =(newfunc)cp_contextpath_new,
 };

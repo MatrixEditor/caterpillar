@@ -1,7 +1,5 @@
 /* packing operations */
-#include "caterpillar/module.h"
-#include "caterpillar/state.h"
-#include "caterpillar/struct.h"
+#include "caterpillar/caterpillar.h"
 
 // ------------------------------------------------------------------------------
 // pack:
