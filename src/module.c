@@ -3,8 +3,7 @@
 #define _CPMODULE
 #endif
 
-#include "caterpillar/module.h"  /* invalid default object and types through caterpillar.h*/
-#include "caterpillar/parsing.h" /* Pack and unpack functions */
+#include "caterpillar/caterpillar.h"
 
 #include "caterpillarapi.c"
 
@@ -432,12 +431,12 @@ PyInit__C(void)
   CpModule_AddObject("fieldinfo", &CpStructFieldInfo_Type);
   CpModule_AddObject("Struct", &CpStruct_Type);
 
-  CpModule_AddObject("intatom", &CpIntAtom_Type);
-  CpModule_AddObject("floatatom", &CpFloatAtom_Type);
-  CpModule_AddObject("boolatom", &CpBoolAtom_Type);
-  CpModule_AddObject("charatom", &CpCharAtom_Type);
-  CpModule_AddObject("paddingatom", &CpPaddingAtom_Type);
-  CpModule_AddObject("string", &CpStringAtom_Type);
+  CpModule_AddObject(CpIntAtom_NAME, &CpIntAtom_Type);
+  CpModule_AddObject(CpFloatAtom_NAME, &CpFloatAtom_Type);
+  CpModule_AddObject(CpBoolAtom_NAME, &CpBoolAtom_Type);
+  CpModule_AddObject(CpCharAtom_NAME, &CpCharAtom_Type);
+  CpModule_AddObject(CpPaddingAtom_NAME, &CpPaddingAtom_Type);
+  CpModule_AddObject(CpStringAtom_NAME, &CpStringAtom_Type);
 
   /* setup custom intatoms */
 #define CpModule_DefAtom(name, ...)                                            \
@@ -463,6 +462,8 @@ PyInit__C(void)
   CpModule_DefIntAtom("u32", 32, false);
   CpModule_DefIntAtom("i64", 64, true);
   CpModule_DefIntAtom("u64", 64, false);
+  CpModule_DefIntAtom("i128", 128, true);
+  CpModule_DefIntAtom("u128", 128, false);
 
 #define CpModule_DefFloatAtom(name, bits)                                      \
   CpModule_DefAtom(name, CpObject_Create(&CpFloatAtom_Type, "I", bits));

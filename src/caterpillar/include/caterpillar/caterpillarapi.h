@@ -162,6 +162,20 @@ int CpStruct_ReplaceType(CpStructObject* o, PyObject* name, PyObject* type);
 int CpStruct_HasOption(CpStructObject* o, PyObject* option);
 int CpStructModel_Check(PyObject* model, _modulestate* state);
 PyObject* CpStructModel_GetStruct(PyObject* model, _modulestate* state);
+int CpIntAtom_Pack(CpIntAtomObject* self, PyObject* op, CpLayerObject* layer);
+PyObject* CpIntAtom_Unpack(CpIntAtomObject* self, CpLayerObject* layer);
+int CpFloatAtom_Pack(CpFloatAtomObject* self, PyObject* value, CpLayerObject* layer);
+PyObject* CpFloatAtom_Unpack(CpFloatAtomObject* self, CpLayerObject* layer);
+int CpBoolAtom_Pack(CpBoolAtomObject* self, PyObject* value, CpLayerObject* layer);
+PyObject* CpBoolAtom_Unpack(CpBoolAtomObject* self, CpLayerObject* layer);
+int CpCharAtom_Pack(CpCharAtomObject* self, PyObject* value, CpLayerObject* layer);
+PyObject* CpCharAtom_Unpack(CpCharAtomObject* self, CpLayerObject* layer);
+int CpPaddingAtom_Pack(CpPaddingAtomObject* self,PyObject* value,CpLayerObject* layer);
+int CpPaddingAtom_PackMany(CpPaddingAtomObject* self,PyObject* value,CpLayerObject* layer);
+PyObject* CpPaddingAtom_Unpack(CpPaddingAtomObject* self, CpLayerObject* layer);
+PyObject* CpPaddingAtom_UnpackMany(CpPaddingAtomObject* self, CpLayerObject* layer);
+int CpStringAtom_Pack(CpStringAtomObject* self,PyObject* value,CpLayerObject* layer);
+PyObject* CpStringAtom_Unpack(CpStringAtomObject* self, CpLayerObject* layer);
 
 #else
 
@@ -253,6 +267,20 @@ caterpillar_api.py
 #define CpStruct_HasOption (*((int (*)(CpStructObject* o, PyObject* option)))Cp_API[104])
 #define CpStructModel_Check (*((int (*)(PyObject* model, _modulestate* state)))Cp_API[105])
 #define CpStructModel_GetStruct (*((PyObject* (*)(PyObject* model, _modulestate* state)))Cp_API[106])
+#define CpIntAtom_Pack (*((int (*)(CpIntAtomObject* self, PyObject* op, CpLayerObject* layer)))Cp_API[120])
+#define CpIntAtom_Unpack (*((PyObject* (*)(CpIntAtomObject* self, CpLayerObject* layer)))Cp_API[121])
+#define CpFloatAtom_Pack (*((int (*)(CpFloatAtomObject* self, PyObject* value, CpLayerObject* layer)))Cp_API[122])
+#define CpFloatAtom_Unpack (*((PyObject* (*)(CpFloatAtomObject* self, CpLayerObject* layer)))Cp_API[123])
+#define CpBoolAtom_Pack (*((int (*)(CpBoolAtomObject* self, PyObject* value, CpLayerObject* layer)))Cp_API[124])
+#define CpBoolAtom_Unpack (*((PyObject* (*)(CpBoolAtomObject* self, CpLayerObject* layer)))Cp_API[125])
+#define CpCharAtom_Pack (*((int (*)(CpCharAtomObject* self, PyObject* value, CpLayerObject* layer)))Cp_API[126])
+#define CpCharAtom_Unpack (*((PyObject* (*)(CpCharAtomObject* self, CpLayerObject* layer)))Cp_API[127])
+#define CpPaddingAtom_Pack (*((int (*)(CpPaddingAtomObject* self,PyObject* value,CpLayerObject* layer)))Cp_API[128])
+#define CpPaddingAtom_PackMany (*((int (*)(CpPaddingAtomObject* self,PyObject* value,CpLayerObject* layer)))Cp_API[129])
+#define CpPaddingAtom_Unpack (*((PyObject* (*)(CpPaddingAtomObject* self, CpLayerObject* layer)))Cp_API[130])
+#define CpPaddingAtom_UnpackMany (*((PyObject* (*)(CpPaddingAtomObject* self, CpLayerObject* layer)))Cp_API[131])
+#define CpStringAtom_Pack (*((int (*)(CpStringAtomObject* self,PyObject* value,CpLayerObject* layer)))Cp_API[132])
+#define CpStringAtom_Unpack (*((PyObject* (*)(CpStringAtomObject* self, CpLayerObject* layer)))Cp_API[133])
 
 /**
  * @brief Public C API for extension modules as reference table

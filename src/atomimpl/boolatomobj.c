@@ -1,7 +1,6 @@
 /* boolatom C implementation */
-#include "caterpillar/atoms/primitive.h"
-#include "caterpillar/module.h"
-#include "caterpillar/state.h"
+#include "caterpillar/caterpillar.h"
+
 #include <structmember.h>
 
 static PyObject*
@@ -45,7 +44,7 @@ cp_boolatom_init(CpBoolAtomObject* self, PyObject* args, PyObject* kwds)
 }
 
 /* Public API */
-
+/*CpAPI*/
 int
 CpBoolAtom_Pack(CpBoolAtomObject* self, PyObject* value, CpLayerObject* layer)
 {
@@ -63,6 +62,7 @@ CpBoolAtom_Pack(CpBoolAtomObject* self, PyObject* value, CpLayerObject* layer)
   return 0;
 }
 
+/*CpAPI*/
 PyObject*
 CpBoolAtom_Unpack(CpBoolAtomObject* self, CpLayerObject* layer)
 {
@@ -84,7 +84,7 @@ CpBoolAtom_Unpack(CpBoolAtomObject* self, CpLayerObject* layer)
 
 /* type setup */
 PyTypeObject CpBoolAtom_Type = {
-  PyVarObject_HEAD_INIT(NULL, 0) _Cp_Name(boolatom),
+  PyVarObject_HEAD_INIT(NULL, 0) _Cp_NameStr(CpBoolAtom_NAME),
   .tp_basicsize = sizeof(CpBoolAtomObject),
   .tp_dealloc = (destructor)cp_boolatom_dealloc,
   .tp_flags = Py_TPFLAGS_DEFAULT,

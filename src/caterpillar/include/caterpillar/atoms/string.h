@@ -30,15 +30,9 @@ struct _stringatomobj
 };
 
 // PyAPI_DATA(PyTypeObject) CpStringAtom_Type;
+#define CpStringAtom_NAME "string"
 
 #define CpStringAtom_CheckExact(op) Py_IS_TYPE((op), &CpStringAtom_Type)
 #define CpStringAtom_Check(op) PyObject_TypeCheck((op), &CpStringAtom_Type)
-
-PyAPI_FUNC(int) CpStringAtom_Pack(CpStringAtomObject* self,
-                                  PyObject* value,
-                                  CpLayerObject* layer);
-
-PyAPI_FUNC(PyObject*)
-  CpStringAtom_Unpack(CpStringAtomObject* self, CpLayerObject* layer);
 
 #endif

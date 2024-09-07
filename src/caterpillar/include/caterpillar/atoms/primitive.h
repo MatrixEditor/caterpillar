@@ -35,6 +35,7 @@ struct _boolatomobj
 /// This variable defines the type object for bool atom objects, allowing
 /// them to be used across the library.
 // PyAPI_DATA(PyTypeObject) CpBoolAtom_Type;
+#define CpBoolAtom_NAME "bool_t"
 
 /**
  * @brief Checks if the given object is a bool atom object.
@@ -60,28 +61,6 @@ struct _boolatomobj
  */
 #define CpBoolAtom_Check(op) (PyObject_IsInstance((op), &CpBoolAtom_Type))
 
-/**
- * @brief Packs a value into the underlying stream.
- *
- * @param self The bool atom object
- * @param value The boolean value to be packed.
- * @param layer The layer object providing the context for packing.
- * @return Integer status code (typically 0 for success, non-zero for error).
- */
-PyAPI_FUNC(int) CpBoolAtom_Pack(CpBoolAtomObject* self,
-                                PyObject* value,
-                                CpLayerObject* layer);
-
-/**
- * @brief Unpacks a value from the underlying stream.
- *
- * @param self The bool atom object instance.
- * @param layer The layer object providing the context for unpacking.
- * @return The unpacked boolean value as a PyObject.
- */
-PyAPI_FUNC(PyObject*)
-  CpBoolAtom_Unpack(CpBoolAtomObject* self, CpLayerObject* layer);
-
 //------------------------------------------------------------------------------
 // Char Atom
 struct _charatomobj
@@ -91,18 +70,12 @@ struct _charatomobj
 
 /// Char atom object type
 // PyAPI_DATA(PyTypeObject) CpCharAtom_Type;
+#define CpCharAtom_NAME "char_t"
 
 /** @brief Checks if the given object is a char atom object */
 #define CpCharAtom_CheckExact(op) Py_IS_TYPE((op), &CpCharAtom_Type)
 /** @brief Checks if the given object is a char atom object */
 #define CpCharAtom_Check(op) (PyObject_IsInstance((op), &CpCharAtom_Type))
-
-PyAPI_FUNC(int) CpCharAtom_Pack(CpCharAtomObject* self,
-                                PyObject* value,
-                                CpLayerObject* layer);
-
-PyAPI_FUNC(PyObject*)
-  CpCharAtom_Unpack(CpCharAtomObject* self, CpLayerObject* layer);
 
 //------------------------------------------------------------------------------
 // Padding
@@ -115,24 +88,11 @@ struct _paddingatomobj
 
 /// Padding atom object type
 // PyAPI_DATA(PyTypeObject) CpPaddingAtom_Type;
+#define CpPaddingAtom_NAME "padding_t"
 
 /** @brief Checks if the given object is a padding atom object */
 #define CpPaddingAtom_CheckExact(op) Py_IS_TYPE((op), &CpPaddingAtom_Type)
 /** @brief Checks if the given object is a padding atom object */
 #define CpPaddingAtom_Check(op) (PyObject_IsInstance((op), &CpPaddingAtom_Type))
-
-PyAPI_FUNC(int) CpPaddingAtom_Pack(CpPaddingAtomObject* self,
-                                   PyObject* _,
-                                   CpLayerObject* layer);
-
-PyAPI_FUNC(int) CpPaddingAtom_PackMany(CpPaddingAtomObject* self,
-                                       PyObject* _,
-                                       CpLayerObject* layer);
-
-PyAPI_FUNC(PyObject*)
-  CpPaddingAtom_Unpack(CpPaddingAtomObject* self, CpLayerObject* layer);
-
-PyAPI_FUNC(PyObject*)
-  CpPaddingAtom_UnpackMany(CpPaddingAtomObject* self, CpLayerObject* layer);
 
 #endif

@@ -133,7 +133,21 @@ cp_func_api = {
     "CpStructModel_Check":         105,
     "CpStructModel_GetStruct":     106,
 
-
+    # atom api
+    "CpIntAtom_Pack":              120,
+    "CpIntAtom_Unpack":            121,
+    "CpFloatAtom_Pack":            122,
+    "CpFloatAtom_Unpack":          123,
+    "CpBoolAtom_Pack":             124,
+    "CpBoolAtom_Unpack":           125,
+    "CpCharAtom_Pack":             126,
+    "CpCharAtom_Unpack":           127,
+    "CpPaddingAtom_Pack":          128,
+    "CpPaddingAtom_PackMany":      129,
+    "CpPaddingAtom_Unpack":        130,
+    "CpPaddingAtom_UnpackMany":    131,
+    "CpStringAtom_Pack":           132,
+    "CpStringAtom_Unpack":         133,
 }
 
 API_SRC = [

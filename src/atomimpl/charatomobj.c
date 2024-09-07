@@ -1,6 +1,6 @@
 /* charatom C implementation */
-#include "caterpillar/atoms/primitive.h"
-#include "caterpillar/state.h"
+#include "caterpillar/caterpillar.h"
+
 #include <structmember.h>
 
 static PyObject*
@@ -44,7 +44,7 @@ cp_charatom_init(CpCharAtomObject* self, PyObject* args, PyObject* kwds)
 }
 
 /* Public API */
-
+/*CpAPI*/
 int
 CpCharAtom_Pack(CpCharAtomObject* self, PyObject* value, CpLayerObject* layer)
 {
@@ -66,6 +66,7 @@ CpCharAtom_Pack(CpCharAtomObject* self, PyObject* value, CpLayerObject* layer)
   return 0;
 }
 
+/*CpAPI*/
 PyObject*
 CpCharAtom_Unpack(CpCharAtomObject* self, CpLayerObject* layer)
 {
@@ -78,7 +79,7 @@ CpCharAtom_Unpack(CpCharAtomObject* self, CpLayerObject* layer)
 
 /* type setup */
 PyTypeObject CpCharAtom_Type = {
-  PyVarObject_HEAD_INIT(NULL, 0) _Cp_Name(charatom),
+  PyVarObject_HEAD_INIT(NULL, 0) _Cp_NameStr(CpCharAtom_NAME),
   .tp_basicsize = sizeof(CpCharAtomObject),
   .tp_dealloc = (destructor)cp_charatom_dealloc,
   .tp_flags = Py_TPFLAGS_DEFAULT,

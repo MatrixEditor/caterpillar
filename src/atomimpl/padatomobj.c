@@ -1,9 +1,7 @@
 /* padding atom implementation */
 
 #include "caterpillar/caterpillar.h"
-#include "caterpillar/atoms/primitive.h"
-#include "caterpillar/parsing.h"
-#include "caterpillar/module.h"
+
 #include <structmember.h>
 
 static PyObject*
@@ -62,7 +60,7 @@ cp_paddingatom_init(CpPaddingAtomObject* self, PyObject* args, PyObject* kwds)
 }
 
 /* Public API */
-
+/*CpAPI*/
 int
 CpPaddingAtom_Pack(CpPaddingAtomObject* self,
                    PyObject* value,
@@ -88,6 +86,7 @@ CpPaddingAtom_Pack(CpPaddingAtomObject* self,
   return 0;
 }
 
+/*CpAPI*/
 int
 CpPaddingAtom_PackMany(CpPaddingAtomObject* self,
                        PyObject* value,
@@ -148,6 +147,7 @@ CpPaddingAtom_PackMany(CpPaddingAtomObject* self,
   return 0;
 }
 
+/*CpAPI*/
 PyObject*
 CpPaddingAtom_Unpack(CpPaddingAtomObject* self, CpLayerObject* layer)
 {
@@ -159,6 +159,7 @@ CpPaddingAtom_Unpack(CpPaddingAtomObject* self, CpLayerObject* layer)
   Py_RETURN_NONE;
 }
 
+/*CpAPI*/
 PyObject*
 CpPaddingAtom_UnpackMany(CpPaddingAtomObject* self, CpLayerObject* layer)
 {
@@ -194,7 +195,7 @@ cp_paddingatom__repr__(CpPaddingAtomObject* self)
 
 /* type setup */
 PyTypeObject CpPaddingAtom_Type = {
-  PyVarObject_HEAD_INIT(NULL, 0) _Cp_Name(paddingatom),
+  PyVarObject_HEAD_INIT(NULL, 0) _Cp_NameStr(CpPaddingAtom_NAME),
   .tp_basicsize = sizeof(CpPaddingAtomObject),
   .tp_dealloc = (destructor)cp_paddingatom_dealloc,
   .tp_repr = (reprfunc)cp_paddingatom__repr__,

@@ -23,6 +23,8 @@
 
 #include <Python.h>
 
+#define _Cp_NameStr(x) ("caterpillar._C." x)
+
 /**
  * @brief Appends the name of the C module to the given name.
  */

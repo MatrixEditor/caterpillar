@@ -1,9 +1,6 @@
 /* string atom implementation */
 
 #include "caterpillar/caterpillar.h"
-#include "caterpillar/atoms/string.h"
-#include "caterpillar/parsing.h"
-#include "caterpillar/module.h"
 
 #include <structmember.h>
 
@@ -80,6 +77,7 @@ cp_stringatom_init(CpStringAtomObject* self, PyObject* args, PyObject* kwds)
 
 /* Public API */
 
+/*CpAPI*/
 int
 CpStringAtom_Pack(CpStringAtomObject* self,
                   PyObject* value,
@@ -99,6 +97,7 @@ CpStringAtom_Pack(CpStringAtomObject* self,
   return 0;
 }
 
+/*CpAPI*/
 PyObject*
 CpStringAtom_Unpack(CpStringAtomObject* self, CpLayerObject* layer)
 {
@@ -134,7 +133,7 @@ static PyMemberDef CpStringAtom_Members[] = {
 };
 
 PyTypeObject CpStringAtom_Type = {
-  PyVarObject_HEAD_INIT(NULL, 0) _Cp_Name(string),
+  PyVarObject_HEAD_INIT(NULL, 0) _Cp_NameStr(CpStringAtom_NAME),
   .tp_basicsize = sizeof(CpStringAtomObject),
   .tp_dealloc = (destructor)cp_stringatom_dealloc,
   .tp_flags = Py_TPFLAGS_DEFAULT,

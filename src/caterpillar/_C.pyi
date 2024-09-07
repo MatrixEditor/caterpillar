@@ -252,41 +252,43 @@ def pack(__obj: Any, __struct: atom, **globals) -> bytes: ...
 def sizeof(obj: atom, globals: Optional[dict | Context] = ...): ...
 def unpack(__io: Any, __struct: atom, **globals) -> Any: ...
 
-class intatom(fieldcatom):
+class int_t(fieldcatom):
     little_endian: bool
     nbits: int
     nbytes: int
     signed: bool
     def __init__(self, nbits: int, signed: bool = ..., little_endian: bool = ...) -> None: ...
 
-i16: intatom
-i24: intatom
-i32: intatom
-i64: intatom
-i8: intatom
-u16: intatom
-u24: intatom
-u32: intatom
-u64: intatom
-u8: intatom
+i16: int_t
+i24: int_t
+i32: int_t
+i64: int_t
+i8: int_t
+u16: int_t
+u24: int_t
+u32: int_t
+u64: int_t
+u8: int_t
 
-class floatatom(fieldcatom):
+class float_t(fieldcatom):
     little_endian: bool
     nbits: int
     nbytes: int
     def __init__(self, nbits: int, little_endian: bool = ...) -> None: ...
 
-f16: floatatom
-f32: floatatom
-f64: floatatom
+f16: float_t
+f32: float_t
+f64: float_t
 
-class paddingatom(fieldcatom):
+class padding_t(fieldcatom):
     def __init__(self, pad: int) -> None: ...
 
-padding: paddingatom
+padding: padding_t
 
-class stringatom(fieldcatom):
+class string(fieldcatom):
     encoding: str
     errors: str
     length: _Length
     def __init__(self, length: _Length, encoding: str, errors: str = ...) -> None: ...
+
+

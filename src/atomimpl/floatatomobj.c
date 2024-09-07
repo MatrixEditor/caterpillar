@@ -1,9 +1,5 @@
 /* floatatom C implementation */
 #include "caterpillar/caterpillar.h"
-#include "caterpillar/arch.h"
-#include "caterpillar/atoms/float.h"
-#include "caterpillar/state.h"
-#include "caterpillar/module.h"
 #include <structmember.h>
 
 static PyObject*
@@ -74,7 +70,7 @@ cp_floatatom_init(CpFloatAtomObject* self, PyObject* args, PyObject* kwds)
 }
 
 /* Public API */
-
+/*CpAPI*/
 int
 CpFloatAtom_Pack(CpFloatAtomObject* self, PyObject* value, CpLayerObject* layer)
 {
@@ -135,6 +131,7 @@ CpFloatAtom_Pack(CpFloatAtomObject* self, PyObject* value, CpLayerObject* layer)
   return 0;
 }
 
+/*CpAPI*/
 PyObject*
 CpFloatAtom_Unpack(CpFloatAtomObject* self, CpLayerObject* layer)
 {
@@ -195,7 +192,7 @@ static PyMemberDef CpFloatAtom_Members[] = {
 };
 
 PyTypeObject CpFloatAtom_Type = {
-  PyVarObject_HEAD_INIT(NULL, 0) _Cp_Name(floatatom),
+  PyVarObject_HEAD_INIT(NULL, 0) _Cp_NameStr(CpFloatAtom_NAME),
   .tp_basicsize = sizeof(CpFloatAtomObject),
   .tp_dealloc = (destructor)cp_floatatom_dealloc,
   .tp_flags = Py_TPFLAGS_DEFAULT,

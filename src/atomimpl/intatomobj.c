@@ -2,10 +2,7 @@
 #include <stdbool.h>
 
 #include "caterpillar/caterpillar.h"
-#include "caterpillar/atoms/int.h"
-#include "caterpillar/arch.h"
-#include "caterpillar/state.h"
-#include "caterpillar/module.h"
+
 #include <structmember.h>
 
 static PyObject*
@@ -14,8 +11,8 @@ cp_intatom__type__(CpIntAtomObject* self)
   return Py_XNewRef(&PyLong_Type);
 }
 
-static PyObject *
-cp_intatom__size__(CpIntAtomObject* self, PyObject *ctx)
+static PyObject*
+cp_intatom__size__(CpIntAtomObject* self, PyObject* ctx)
 {
   return Py_XNewRef(self->m_byte_count);
 }
@@ -78,9 +75,8 @@ cp_intatom_init(CpIntAtomObject* self, PyObject* args, PyObject* kwds)
   return 0;
 }
 
-
-
 /* Public API */
+/*CpAPI*/
 int
 CpIntAtom_Pack(CpIntAtomObject* self, PyObject* op, CpLayerObject* layer)
 {
@@ -96,12 +92,12 @@ CpIntAtom_Pack(CpIntAtomObject* self, PyObject* op, CpLayerObject* layer)
 
   int little_endian = self->_m_little_endian;
   if (layer->m_field) {
-    _modulestate *mod = layer->m_state->mod;
-    PyObject *endian = ((CpFieldObject *)layer->m_field)->m_endian;
+    _modulestate* mod = layer->m_state->mod;
+    PyObject* endian = ((CpFieldObject*)layer->m_field)->m_endian;
 
     if (CpEndian_Check(endian))
-    /* If the field has an endian specified, use that. */
-    little_endian = CpEndian_IsLittleEndian((CpEndianObject *)endian, mod);
+      /* If the field has an endian specified, use that. */
+      little_endian = CpEndian_IsLittleEndian((CpEndianObject*)endian, mod);
   }
 
   int res = _PyLong_AsByteArray((PyLongObject*)op,
@@ -121,6 +117,7 @@ CpIntAtom_Pack(CpIntAtomObject* self, PyObject* op, CpLayerObject* layer)
   return 0;
 }
 
+/*CpAPI*/
 PyObject*
 CpIntAtom_Unpack(CpIntAtomObject* self, CpLayerObject* layer)
 {
@@ -131,12 +128,12 @@ CpIntAtom_Unpack(CpIntAtomObject* self, CpLayerObject* layer)
 
   int little_endian = self->_m_little_endian;
   if (layer->m_field) {
-    _modulestate *mod = layer->m_state->mod;
-    PyObject *endian = ((CpFieldObject *)layer->m_field)->m_endian;
+    _modulestate* mod = layer->m_state->mod;
+    PyObject* endian = ((CpFieldObject*)layer->m_field)->m_endian;
 
     if (CpEndian_Check(endian))
-    /* If the field has an endian specified, use that. */
-    little_endian = CpEndian_IsLittleEndian((CpEndianObject *)endian, mod);
+      /* If the field has an endian specified, use that. */
+      little_endian = CpEndian_IsLittleEndian((CpEndianObject*)endian, mod);
   }
 
   PyObject* obj =
@@ -159,14 +156,12 @@ static PyMemberDef CpIntAtom_Members[] = {
     NULL },
   { "nbits", T_PYSSIZET, offsetof(CpIntAtomObject, _m_bits), READONLY, NULL },
   { "signed", T_BOOL, offsetof(CpIntAtomObject, _m_signed), READONLY, NULL },
-  { "little_endian",
-    T_BOOL,
-    offsetof(CpIntAtomObject, _m_little_endian)},
+  { "little_endian", T_BOOL, offsetof(CpIntAtomObject, _m_little_endian) },
   { NULL } /* Sentinel */
 };
 
 PyTypeObject CpIntAtom_Type = {
-  PyVarObject_HEAD_INIT(NULL, 0) _Cp_Name(intatom),
+  PyVarObject_HEAD_INIT(NULL, 0) _Cp_NameStr(CpIntAtom_NAME),
   .tp_basicsize = sizeof(CpIntAtomObject),
   .tp_dealloc = (destructor)cp_intatom_dealloc,
   .tp_flags = Py_TPFLAGS_DEFAULT,
