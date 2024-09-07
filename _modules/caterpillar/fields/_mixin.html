@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>caterpillar.fields._mixin &#8212; Caterpillar 2.1.4 documentation</title>
+    <title>caterpillar.fields._mixin &#8212; Caterpillar 2.1.5 documentation</title>
   
   
   
@@ -35,7 +35,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=dc13204d"></script>
+    <script src="../../../_static/documentation_options.js?v=786ba454"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
@@ -118,7 +118,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.1.4</p>
+    <p class="title logo__title">Caterpillar 2.1.5</p>
   
 </a></div>
     
@@ -742,7 +742,7 @@ document.write(`
 
 
 
-<span class="k">class</span> <span class="nc">_infix_</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">Operator</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Defines a custom opearator (user-defined)</span>
 
 <span class="sd">    It operates _infix_ between two statements and takes them as</span>
@@ -780,7 +780,7 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="n">arg2</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__rtruediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;_infix_&#39;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">_infix_</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">,</span> <span class="n">arg1</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">Operator</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">,</span> <span class="n">arg1</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_StructLike</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">)</span>

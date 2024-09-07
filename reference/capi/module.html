@@ -1,0 +1,702 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>5. Module API &#8212; Caterpillar 2.1.5 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../../_static/documentation_options.js?v=786ba454"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'reference/capi/module';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="6. Using the C API" href="extension.html" />
+    <link rel="prev" title="4. Defined Macros" href="macros.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+  <aside class="bd-header-announcement d-print-none d-none" aria-label="Announcement" data-pst-announcement-url="https://raw.githubusercontent.com/MatrixEditor/caterpillar/master/docs/sphinx/source/_templates/announcement.html"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Caterpillar 2.1.5</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../installing/index.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../tutorial/index.html">
+    Tutorial
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../library/index.html">
+    Library
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../development/index.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/MatrixEditor/caterpillar" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../installing/index.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../tutorial/index.html">
+    Tutorial
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../library/index.html">
+    Library
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../development/index.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/MatrixEditor/caterpillar" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Python Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../datamodel.html">Data Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../operators.html">Operators</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">C API Reference</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="abstract.html">1. Abstract Objects Layer</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="atom.html">1.1. Atom Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="context.html">1.2. Context Protocol</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="objects/objimpl.html">2. Concrete Objects Layer</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="objects/arch.html">2.1. Arch &amp; Endian Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="objects/option.html">2.2. Option Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="objects/contextobj.html">2.3. Context Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="objects/contextexpr.html">2.4. Context Expressions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="objects/contextpath.html">2.5. Context Path Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="objects/state.html">2.6. State Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="objects/layer.html">2.7. Layer Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="objects/fieldobj.html">2.8. Field Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="objects/struct.html">2.9. Struct Objects</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="objects/atoms/index.html">2.10. Atom Objects</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="objects/atoms/fieldatom.html">2.10.1. Field Atom Objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="objects/atoms/intatom.html">2.10.2. Integer Atoms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="objects/atoms/charatom.html">2.10.3. Char Atoms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="objects/atoms/floatatom.html">2.10.4. Float Atoms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="objects/atoms/boolatom.html">2.10.5. Bool Atoms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="objects/atoms/paddingatom.html">2.10.6. Padding Atoms</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="parsing.html">3. Packing and Unpacking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="macros.html">4. Defined Macros</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">5. Module API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="extension.html">6. Using the C API</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Reference</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="module-api">
+<span id="reference-capi-module"></span><h1><span class="section-number">5. </span>Module API<a class="headerlink" href="#module-api" title="Link to this heading">#</a></h1>
+<dl class="c var">
+<dt class="sig sig-object c" id="c.CpModule">
+<span class="n"><span class="pre">PyModuleDef</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CpModule</span></span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.CpModule" title="Link to this definition">#</a><br /></dt>
+<dd><p>Global module object for the Caterpillar C module.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.get_module_state">
+<span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#c._modulestate" title="_modulestate"><span class="n"><span class="pre">_modulestate</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">get_module_state</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">module</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.get_module_state" title="Link to this definition">#</a><br /></dt>
+<dd><p>Returns the <a class="reference internal" href="#c._modulestate" title="_modulestate"><code class="xref c c-type docutils literal notranslate"><span class="pre">_modulestate</span></code></a> for the given module.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.get_global_module_state">
+<span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#c._modulestate" title="_modulestate"><span class="n"><span class="pre">_modulestate</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">get_global_module_state</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.get_global_module_state" title="Link to this definition">#</a><br /></dt>
+<dd><p>Returns the <a class="reference internal" href="#c._modulestate" title="_modulestate"><code class="xref c c-type docutils literal notranslate"><span class="pre">_modulestate</span></code></a> using the global caterpillar module object.</p>
+</dd></dl>
+
+<dl class="c struct">
+<dt class="sig sig-object c" id="c._modulestate">
+<span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">_modulestate</span></span></span><a class="headerlink" href="#c._modulestate" title="Link to this definition">#</a><br /></dt>
+<dd><p>The internal state for this module. It will store all necessary information
+about the core module.</p>
+<p>Global options:</p>
+<dl class="c member">
+<dt class="sig sig-object c" id="c._modulestate.cp_option__dynamic">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">cp_option__dynamic</span></span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.cp_option__dynamic" title="Link to this definition">#</a><br /></dt>
+<dt class="sig sig-object c" id="c._modulestate.cp_option__sequential">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">cp_option__sequential</span></span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.cp_option__sequential" title="Link to this definition">#</a><br /></dt>
+<dt class="sig sig-object c" id="c._modulestate.cp_option__keep_position">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">cp_option__keep_position</span></span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.cp_option__keep_position" title="Link to this definition">#</a><br /></dt>
+<dt class="sig sig-object c" id="c._modulestate.cp_option__union">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">cp_option__union</span></span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.cp_option__union" title="Link to this definition">#</a><br /></dt>
+<dt class="sig sig-object c" id="c._modulestate.cp_option__eval">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">cp_option__eval</span></span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.cp_option__eval" title="Link to this definition">#</a><br /></dt>
+<dt class="sig sig-object c" id="c._modulestate.cp_option__discard_unnamed">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">cp_option__discard_unnamed</span></span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.cp_option__discard_unnamed" title="Link to this definition">#</a><br /></dt>
+<dt class="sig sig-object c" id="c._modulestate.cp_option__discard_const">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">cp_option__discard_const</span></span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.cp_option__discard_const" title="Link to this definition">#</a><br /></dt>
+<dt class="sig sig-object c" id="c._modulestate.cp_option__replace_types">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">cp_option__replace_types</span></span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.cp_option__replace_types" title="Link to this definition">#</a><br /></dt>
+<dt class="sig sig-object c" id="c._modulestate.cp_option__slots">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">cp_option__slots</span></span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.cp_option__slots" title="Link to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<p>Global default options:</p>
+<dl class="c member">
+<dt class="sig sig-object c" id="c._modulestate.cp_option__global_field_options">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">cp_option__global_field_options</span></span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.cp_option__global_field_options" title="Link to this definition">#</a><br /></dt>
+<dt class="sig sig-object c" id="c._modulestate.cp_option__global_struct_options">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">cp_option__global_struct_options</span></span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.cp_option__global_struct_options" title="Link to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<p>Global arch and endian:</p>
+<dl class="c member">
+<dt class="sig sig-object c" id="c._modulestate.cp_arch__host">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">cp_arch__host</span></span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.cp_arch__host" title="Link to this definition">#</a><br /></dt>
+<dt class="sig sig-object c" id="c._modulestate.cp_endian__native">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">cp_endian__native</span></span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.cp_endian__native" title="Link to this definition">#</a><br /></dt>
+<dt class="sig sig-object c" id="c._modulestate.cp_endian__big">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">cp_endian__big</span></span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.cp_endian__big" title="Link to this definition">#</a><br /></dt>
+<dt class="sig sig-object c" id="c._modulestate.cp_endian__little">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">cp_endian__little</span></span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.cp_endian__little" title="Link to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<p>Typing constants:</p>
+<dl class="c member">
+<dt class="sig sig-object c" id="c._modulestate.Any_Type">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">Any_Type</span></span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.Any_Type" title="Link to this definition">#</a><br /></dt>
+<dt class="sig sig-object c" id="c._modulestate.List_Type">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">List_Type</span></span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.List_Type" title="Link to this definition">#</a><br /></dt>
+<dt class="sig sig-object c" id="c._modulestate.Union_Type">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">Union_Type</span></span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.Union_Type" title="Link to this definition">#</a><br /></dt>
+<dt class="sig sig-object c" id="c._modulestate.BytesIO_Type">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">BytesIO_Type</span></span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.BytesIO_Type" title="Link to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<p>String constants:</p>
+<dl class="c member">
+<dt class="sig sig-object c" id="c._modulestate.str_path_delim">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str_path_delim</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;.&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str_path_delim" title="Link to this definition">#</a><br /></dt>
+<dt class="sig sig-object c" id="c._modulestate.str_tell">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str_tell</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;tell&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str_tell" title="Link to this definition">#</a><br /></dt>
+<dt class="sig sig-object c" id="c._modulestate.str_seek">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str_seek</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;seek&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str_seek" title="Link to this definition">#</a><br /></dt>
+<dt class="sig sig-object c" id="c._modulestate.str_write">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str_write</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;write&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str_write" title="Link to this definition">#</a><br /></dt>
+<dt class="sig sig-object c" id="c._modulestate.str_read">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str_read</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;read&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str_read" title="Link to this definition">#</a><br /></dt>
+<dt class="sig sig-object c" id="c._modulestate.str_close">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str_close</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;close&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str_close" title="Link to this definition">#</a><br /></dt>
+<dt class="sig sig-object c" id="c._modulestate.str_strict">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str_strict</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;strict&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str_strict" title="Link to this definition">#</a><br /></dt>
+<dt class="sig sig-object c" id="c._modulestate.str___pack__">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str___pack__</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;__pack__&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str___pack__" title="Link to this definition">#</a><br /></dt>
+<dt class="sig sig-object c" id="c._modulestate.str___pack_many__">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str___pack_many__</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;__pack_many__&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str___pack_many__" title="Link to this definition">#</a><br /></dt>
+<dt class="sig sig-object c" id="c._modulestate.str___unpack__">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str___unpack__</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;__unpack__&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str___unpack__" title="Link to this definition">#</a><br /></dt>
+<dt class="sig sig-object c" id="c._modulestate.str___unpack_many__">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str___unpack_many__</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;__unpack_many__&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str___unpack_many__" title="Link to this definition">#</a><br /></dt>
+<dt class="sig sig-object c" id="c._modulestate.str___size__">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str___size__</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;__size__&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str___size__" title="Link to this definition">#</a><br /></dt>
+<dt class="sig sig-object c" id="c._modulestate.str___type__">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str___type__</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;__type__&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str___type__" title="Link to this definition">#</a><br /></dt>
+<dt class="sig sig-object c" id="c._modulestate.str___annotations__">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str___annotations__</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;__annotations__&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str___annotations__" title="Link to this definition">#</a><br /></dt>
+<dt class="sig sig-object c" id="c._modulestate.str___mro__">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str___mro__</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;__mro__&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str___mro__" title="Link to this definition">#</a><br /></dt>
+<dt class="sig sig-object c" id="c._modulestate.str___struct__">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str___struct__</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;__struct__&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str___struct__" title="Link to this definition">#</a><br /></dt>
+<dt class="sig sig-object c" id="c._modulestate.str___slots__">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str___slots__</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;__slots__&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str___slots__" title="Link to this definition">#</a><br /></dt>
+<dt class="sig sig-object c" id="c._modulestate.str___match_args__">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str___match_args__</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;__match_args__&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str___match_args__" title="Link to this definition">#</a><br /></dt>
+<dt class="sig sig-object c" id="c._modulestate.str___weakref__">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str___weakref__</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;__weakref__&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str___weakref__" title="Link to this definition">#</a><br /></dt>
+<dt class="sig sig-object c" id="c._modulestate.str___dict__">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str___dict__</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;__dict__&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str___dict__" title="Link to this definition">#</a><br /></dt>
+<dt class="sig sig-object c" id="c._modulestate.str___qualname__">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str___qualname__</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;__qualname__&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str___qualname__" title="Link to this definition">#</a><br /></dt>
+<dt class="sig sig-object c" id="c._modulestate.str_start">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str_start</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;start&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str_start" title="Link to this definition">#</a><br /></dt>
+<dt class="sig sig-object c" id="c._modulestate.str_ctx__root">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str_ctx__root</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&lt;root&gt;&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str_ctx__root" title="Link to this definition">#</a><br /></dt>
+<dt class="sig sig-object c" id="c._modulestate.str_ctx__getattr">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str_ctx__getattr</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;__context_getattr__&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str_ctx__getattr" title="Link to this definition">#</a><br /></dt>
+<dt class="sig sig-object c" id="c._modulestate.str_bytesio_getvalue">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str_bytesio_getvalue</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;getvalue&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str_bytesio_getvalue" title="Link to this definition">#</a><br /></dt>
+<dt class="sig sig-object c" id="c._modulestate.str_builder_process">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str_builder_process</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;process&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str_builder_process" title="Link to this definition">#</a><br /></dt>
+<dt class="sig sig-object c" id="c._modulestate.str_pattern_match">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str_pattern_match</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;match&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str_pattern_match" title="Link to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="c macro">
+<dt class="sig sig-object c" id="c.CpModule_SetupType">
+<span class="sig-name descname"><span class="n"><span class="pre">CpModule_SetupType</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">op</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpModule_SetupType" title="Link to this definition">#</a><br /></dt>
+<dd><p>Sets up the type object for the given module object. Expands to:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">PyType_Ready</span><span class="p">(</span><span class="n">op</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nb">NULL</span><span class="p">;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="macros.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title"><span class="section-number">4. </span>Defined Macros</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="extension.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><span class="section-number">6. </span>Using the C API</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../../_sources/reference/capi/module.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, MatrixEditor.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.0.2.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
