@@ -439,9 +439,6 @@ _Cp_Pack(PyObject* op, PyObject* atom, CpLayerObject* layer)
     success = CpPack_Struct(op, (CpStructObject*)atom, layer);
   } else if (CpCAtom_Check(atom)) {
     return CpPack_CAtom(op, (CpCAtomObject*)atom, layer);
-  // else CASE(&CpCAtom_Type, atom) {
-  //   success = cp_pack_catom
-  // }
   } else {
     success = CpPack_Common(op, atom, layer);
   }

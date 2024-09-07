@@ -404,6 +404,9 @@ PyInit__C(void)
   CpStringAtom_Type.tp_base = &CpFieldCAtom_Type;
   CpModule_SetupType(&CpStringAtom_Type);
 
+  CpConstAtom_Type.tp_base = &CpFieldCAtom_Type;
+  CpModule_SetupType(&CpConstAtom_Type);
+
   // module setup
   m = PyModule_Create(&CpModule);
   if (!m) {
@@ -437,6 +440,7 @@ PyInit__C(void)
   CpModule_AddObject(CpCharAtom_NAME, &CpCharAtom_Type);
   CpModule_AddObject(CpPaddingAtom_NAME, &CpPaddingAtom_Type);
   CpModule_AddObject(CpStringAtom_NAME, &CpStringAtom_Type);
+  CpModule_AddObject(CpConstAtom_NAME, &CpConstAtom_Type);
 
   /* setup custom intatoms */
 #define CpModule_DefAtom(name, ...)                                            \

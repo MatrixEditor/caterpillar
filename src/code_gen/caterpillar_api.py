@@ -41,6 +41,7 @@ cp_types = {
     "_charatomobj":             "CpCharAtomObject",
     "_paddingatomobj":          "CpPaddingAtomObject",
     "_stringatomobj":           "CpStringAtomObject",
+    "_constatomobj":            "CpConstAtomObject",
 }
 
 cp_type_api = {
@@ -71,6 +72,7 @@ cp_type_api = {
     "CpCharAtom_Type":              (24,),
     "CpPaddingAtom_Type":           (25,),
     "CpStringAtom_Type":            (26,),
+    "CpConstAtom_Type":             (27,),
 }
 
 cp_func_api = {
@@ -148,6 +150,8 @@ cp_func_api = {
     "CpPaddingAtom_UnpackMany":    131,
     "CpStringAtom_Pack":           132,
     "CpStringAtom_Unpack":         133,
+    "CpConstAtom_Pack":            134,
+    "CpConstAtom_Unpack":          135,
 }
 
 API_SRC = [
@@ -168,6 +172,7 @@ API_SRC = [
     "atomimpl/intatomobj.c",
     "atomimpl/padatomobj.c",
     "atomimpl/stringatomobj.c",
+    "atomimpl/constatomobj.c",
 ]
 
 

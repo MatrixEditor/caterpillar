@@ -35,6 +35,7 @@ python_add_library(
   src/atomimpl/charatomobj.c
   src/atomimpl/padatomobj.c
   src/atomimpl/stringatomobj.c
+  src/atomimpl/constatomobj.c
 
   WITH_SOABI
 )

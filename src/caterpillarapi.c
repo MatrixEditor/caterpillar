@@ -30,7 +30,7 @@ void *Cp_API[] = {
     (void *) &CpCharAtom_Type,
     (void *) &CpPaddingAtom_Type,
     (void *) &CpStringAtom_Type,
-    NULL,
+    (void *) &CpConstAtom_Type,
     NULL,
     NULL,
     NULL,
@@ -136,6 +136,8 @@ void *Cp_API[] = {
     (void *) &CpPaddingAtom_Unpack,
     (void *) &CpPaddingAtom_UnpackMany,
     (void *) &CpStringAtom_Pack,
-    (void *) &CpStringAtom_Unpack
+    (void *) &CpStringAtom_Unpack,
+    (void *) &CpConstAtom_Pack,
+    (void *) &CpConstAtom_Unpack
 };
 

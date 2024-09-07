@@ -28,7 +28,7 @@ options will be added in the future. Documentation is [here >](https://matrixedi
 * it helps you to create cleaner and more compact code.
 * You can even extend Caterpillar and write your parsing logic in C or C++!!
 
-## What does it look like?
+## Give me some code!
 
 ```python
 from caterpillar.py import *

@@ -50,7 +50,7 @@ cp_intatom_init(CpIntAtomObject* self, PyObject* args, PyObject* kwds)
 {
   static char* kwlist[] = { "nbits", "signed", "little_endian", NULL };
   int _signed = true, little_endian = true;
-  size_t bits = 0;
+  unsigned int bits = 0;
   if (!PyArg_ParseTupleAndKeywords(
         args, kwds, "I|pp", kwlist, &bits, &_signed, &little_endian)) {
     return -1;
@@ -101,7 +101,7 @@ CpIntAtom_Pack(CpIntAtomObject* self, PyObject* op, CpLayerObject* layer)
   }
 
   int res = _PyLong_AsByteArray((PyLongObject*)op,
-                                (unsigned char*)PyBytes_AS_STRING(op),
+                                (unsigned char*)PyBytes_AS_STRING(bytes),
                                 self->_m_byte_count,
                                 little_endian,
                                 self->_m_signed);
@@ -168,4 +168,5 @@ PyTypeObject CpIntAtom_Type = {
   .tp_doc = NULL,
   .tp_members = CpIntAtom_Members,
   .tp_new = (newfunc)cp_intatom_new,
+  .tp_init = (initproc)cp_intatom_init,
 };
