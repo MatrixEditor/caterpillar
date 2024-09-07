@@ -28,6 +28,33 @@ options will be added in the future. Documentation is [here >](https://matrixedi
 * it helps you to create cleaner and more compact code.
 * You can even extend Caterpillar and write your parsing logic in C or C++!!
 
+## What does it look like?
+
+```python
+from caterpillar._Py import *
+
+@struct(order=LittleEndian)
+class Format:
+    magic: b"ITS MAGIC"       # Supports string and byte constants directly
+    a: uint8                  # Primitive data types
+    b: int32
+    length: uint8             # String fields with computed lengths
+    name: String(this.length) #  -> you can also use Prefixed(uint8)
+    names: CString[uint8::]   # Sequences with prefixed, computed lengths
+
+# Instantiation (keyword-only arguments, magic is auto-inferred):
+obj = Format(a=1, b=2, length=3, name="foo", names=["a", "b"])
+# Packing the object:
+blob = pack(obj) # objects of struct classes can be packed right away
+# results in: b'ITS MAGIC\x01\x02\x00\x00\x00\x03foo\x02a\x00b\x00'
+# Unpacking the binary data:
+obj2 = unpack(blob, Format)
+```
+
+This library offers extensive functionality beyond basic struct handling. For further details
+on its powerful features, explore the official [documentation](https://matrixeditor.github.io/caterpillar/),
+[examples](./examples/), and [test cases](./test/).
+
 ## Installation
 
 > [!NOTE]
