@@ -22,5 +22,6 @@
 #include "caterpillar/atoms/primitive.h"
 #include "caterpillar/atoms/string.h"
 #include "caterpillar/atoms/const.h"
+#include "caterpillar/atoms/enum.h"
 
 #endif

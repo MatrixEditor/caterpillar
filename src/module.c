@@ -276,7 +276,7 @@ cp_module_clear(PyObject* m)
     Py_CLEAR(state->Union_Type);
     Py_CLEAR(state->Optional_Type);
 
-    // sttings
+    // strings
     Py_CLEAR(state->str_path_delim);
     Py_CLEAR(state->str___pack__);
     Py_CLEAR(state->str___unpack__);
@@ -304,6 +304,8 @@ cp_module_clear(PyObject* m)
     Py_CLEAR(state->str___weakref__);
     Py_CLEAR(state->str___qualname__);
     Py_CLEAR(state->str_strict);
+    Py_CLEAR(state->str__value2member_map_);
+    Py_CLEAR(state->str__member_map_);
 
     Py_CLEAR(state->cp_regex__unnamed);
 
@@ -408,6 +410,7 @@ PyInit__C(void)
   CpConstAtom_Type.tp_base = &CpBuiltinAtom_Type;
   CpBytesAtom_Type.tp_base = &CpBuiltinAtom_Type;
   CpPStringAtom_Type.tp_base = &CpBuiltinAtom_Type;
+  CpEnumAtom_Type.tp_base = &CpBuiltinAtom_Type;
 
   CpModule_SetupType(&CpBuiltinAtom_Type);
   CpModule_SetupType(&CpPrimitiveAtom_Type);
@@ -425,6 +428,7 @@ PyInit__C(void)
   CpModule_SetupType(&CpConstAtom_Type);
   CpModule_SetupType(&CpBytesAtom_Type);
   CpModule_SetupType(&CpPStringAtom_Type);
+  CpModule_SetupType(&CpEnumAtom_Type);
 
   // module setup
   m = PyModule_Create(&CpModule);
@@ -472,6 +476,7 @@ PyInit__C(void)
   CpModule_AddObject(CpConstAtom_NAME, &CpConstAtom_Type);
   CpModule_AddObject(CpBytesAtom_NAME, &CpBytesAtom_Type);
   CpModule_AddObject(CpPStringAtom_NAME, &CpPStringAtom_Type);
+  CpModule_AddObject(CpEnumAtom_NAME, &CpEnumAtom_Type);
 
   /* setup custom intatoms */
 #define CpModule_DefAtom(name, ...)                                            \
@@ -603,6 +608,8 @@ PyInit__C(void)
   CACHED_STRING(str___qualname__, "__qualname__");
   CACHED_STRING(str_path_delim, ".");
   CACHED_STRING(str_strict, "strict");
+  CACHED_STRING(str__member_map_, "_member_map_");
+  CACHED_STRING(str__value2member_map_, "_value2member_map_");
 
 #undef CACHED_STRING
 

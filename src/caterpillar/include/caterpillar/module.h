@@ -54,7 +54,7 @@ struct _modulestate
   PyObject* List_Type;
   PyObject* Optional_Type;
   PyObject* Union_Type;
-  PyObject *BytesIO_Type;
+  PyObject* BytesIO_Type;
 
   // string constants
   // strings
@@ -79,6 +79,8 @@ struct _modulestate
   PyObject* str___weakref__;
   PyObject* str___dict__;
   PyObject* str___qualname__;
+  PyObject* str__member_map_;
+  PyObject* str__value2member_map_;
 
   PyObject* str_start;
   PyObject* str_ctx__root;
@@ -92,10 +94,9 @@ struct _modulestate
   PyObject* inspect_getannotations;
 
   // cached objects
-  PyObject *cp_bytes__true;
-  PyObject *cp_bytes__false;
+  PyObject* cp_bytes__true;
+  PyObject* cp_bytes__false;
 };
-
 
 /**
  * @brief Get the module state object

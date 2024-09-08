@@ -39,6 +39,7 @@ python_add_library(
   src/atomimpl/constatomobj.c
   src/atomimpl/bytesatomobj.c
   src/atomimpl/pstringatomobj.c
+  src/atomimpl/enumatomobj.c
 
   src/atomimpl/builtins/builtinatomobj.c
   src/atomimpl/builtins/repeatedatomobj.c
@@ -57,6 +58,8 @@ message(STATUS "Python ${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}")
 
 add_custom_target(
  genapi ALL
+ # execute python ./src/code_gen/genapi.py ./src/caterpillar/include/caterpillar/caterpillarapi.h.in ./src/caterpillarapi.c.in
+ # in the root directory
  COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/src/code_gen/genapi.py ${CMAKE_CURRENT_SOURCE_DIR}/src/caterpillar/include/caterpillar/caterpillarapi.h.in ${CMAKE_CURRENT_SOURCE_DIR}/src/caterpillarapi.c.in
  BYPRODUCTS ${CMAKE_CURRENT_SOURCE_DIR}/src/caterpillar/include/caterpillar/caterpillarapi.h ${CMAKE_CURRENT_SOURCE_DIR}/src/caterpillarapi.c
  COMMENT "Generating Public Caterpillar API"

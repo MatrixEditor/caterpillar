@@ -42,7 +42,7 @@ void *Cp_API[] = {
     (void *) &CpLengthInfo_Type,
     (void *) &CpBytesAtom_Type,
     (void *) &CpPStringAtom_Type,
-    NULL,
+    (void *) &CpEnumAtom_Type,
     NULL,
     NULL,
     NULL,
@@ -156,6 +156,8 @@ void *Cp_API[] = {
     (void *) &CpBytesAtom_Unpack,
     NULL,
     (void *) &CpPStringAtom_Pack,
-    (void *) &CpPStringAtom_Unpack
+    (void *) &CpPStringAtom_Unpack,
+    (void *) &CpEnumAtom_Pack,
+    (void *) &CpEnumAtom_Unpack
 };
 

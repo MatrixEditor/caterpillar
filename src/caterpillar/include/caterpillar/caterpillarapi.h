@@ -96,6 +96,8 @@ struct _bytesatomobj;
 typedef struct _bytesatomobj CpBytesAtomObject;
 struct _pstringatomobj;
 typedef struct _pstringatomobj CpPStringAtomObject;
+struct _enumatomobj;
+typedef struct _enumatomobj CpEnumAtomObject;
 
 #ifdef _CPMODULE
 
@@ -143,6 +145,7 @@ extern PyTypeObject CpPrimitiveAtom_Type;
 extern PyTypeObject CpLengthInfo_Type;
 extern PyTypeObject CpBytesAtom_Type;
 extern PyTypeObject CpPStringAtom_Type;
+extern PyTypeObject CpEnumAtom_Type;
 int CpEndian_IsLittleEndian(CpEndianObject* endian, _modulestate* mod);
 CpContextObject* CpContext_New(void);
 CpUnaryExprObject* CpUnaryExpr_New(int op, PyObject* value);
@@ -229,6 +232,8 @@ int CpBytesAtom_Pack(CpBytesAtomObject* self, PyObject* value, CpLayerObject* la
 PyObject* CpBytesAtom_Unpack(CpBytesAtomObject* self, CpLayerObject* layer);
 int CpPStringAtom_Pack(CpPStringAtomObject* self,PyObject* value,CpLayerObject* layer);
 PyObject* CpPStringAtom_Unpack(CpPStringAtomObject* self, CpLayerObject* layer);
+int CpEnumAtom_Pack(CpEnumAtomObject* self, PyObject* value, CpLayerObject* layer);
+PyObject* CpEnumAtom_Unpack(CpEnumAtomObject* self, CpLayerObject* layer);
 
 #else
 
@@ -277,6 +282,7 @@ caterpillar_api.py
 #define CpLengthInfo_Type (*(PyTypeObject *)Cp_API[36])
 #define CpBytesAtom_Type (*(PyTypeObject *)Cp_API[37])
 #define CpPStringAtom_Type (*(PyTypeObject *)Cp_API[38])
+#define CpEnumAtom_Type (*(PyTypeObject *)Cp_API[39])
 #define CpEndian_IsLittleEndian (*((int (*)(CpEndianObject* endian, _modulestate* mod)))Cp_API[50])
 #define CpContext_New (*((CpContextObject* (*)(void)))Cp_API[53])
 #define CpUnaryExpr_New (*((CpUnaryExprObject* (*)(int op, PyObject* value)))Cp_API[54])
@@ -363,6 +369,8 @@ caterpillar_api.py
 #define CpBytesAtom_Unpack (*((PyObject* (*)(CpBytesAtomObject* self, CpLayerObject* layer)))Cp_API[150])
 #define CpPStringAtom_Pack (*((int (*)(CpPStringAtomObject* self,PyObject* value,CpLayerObject* layer)))Cp_API[152])
 #define CpPStringAtom_Unpack (*((PyObject* (*)(CpPStringAtomObject* self, CpLayerObject* layer)))Cp_API[153])
+#define CpEnumAtom_Pack (*((int (*)(CpEnumAtomObject* self, PyObject* value, CpLayerObject* layer)))Cp_API[154])
+#define CpEnumAtom_Unpack (*((PyObject* (*)(CpEnumAtomObject* self, CpLayerObject* layer)))Cp_API[155])
 
 /**
  * @brief Public C API for extension modules as reference table
