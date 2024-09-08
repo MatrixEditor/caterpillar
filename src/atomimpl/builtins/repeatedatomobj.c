@@ -125,10 +125,44 @@ CpRepeatedAtom_Pack(CpRepeatedAtomObject* self,
                     CpLayerObject* layer)
 {
   CpStateObject* state = layer->m_state;
-  if (PyObject_HasAttr(self->m_atom, state->mod->str___pack_many__)) {
+  CpLengthInfoObject* lengthinfo =
+    (CpLengthInfoObject*)CpObject_CreateNoArgs(&CpLengthInfo_Type);
+
+  bool pack_many_attr =
+    PyObject_HasAttr(self->m_atom, state->mod->str___pack_many__);
+  bool is_seq = PySequence_Check(op);
+
+  Py_ssize_t obj_length = 0;
+  if (is_seq) {
+    obj_length = PySequence_Length(op);
+    if (obj_length < 0) {
+      goto failure;
+    }
+  }
+
+  PyObject* length = CpRepeatedAtom_GetLength(self, (PyObject*)layer);
+  if (!length) {
+    goto failure;
+  }
+
+  if (_CpPack_EvalLength(layer,
+                         length,
+                         obj_length,
+                         (bool*)&lengthinfo->m_greedy,
+                         &lengthinfo->m_length) < 0) {
+    Py_XDECREF(length);
+    goto failure;
+  }
+  Py_XDECREF(length);
+
+  if (pack_many_attr) {
     // class explicitly defines __pack_many__ -> use it
-    PyObject* res = CpAtom_Pack(
-      self->m_atom, state->mod->str___pack_many__, op, (PyObject*)layer);
+    PyObject* res = PyObject_CallMethodObjArgs(self->m_atom,
+                                               state->mod->str___pack_many__,
+                                               op,
+                                               (PyObject*)layer,
+                                               lengthinfo,
+                                               NULL);
     PyObject* exc = NULL;
     if ((exc = PyErr_GetRaisedException(),
          exc && PyErr_GivenExceptionMatches(exc, PyExc_NotImplementedError))) {
@@ -139,14 +173,30 @@ CpRepeatedAtom_Pack(CpRepeatedAtomObject* self,
     } else {
       int success = res ? 0 : -1;
       Py_XDECREF(res);
-      Py_XDECREF(exc);
+      if (success < 0) {
+        PyErr_SetRaisedException(exc);
+      } else {
+        Py_XDECREF(exc);
+      }
       return success;
     }
   }
 
-  if (!PySequence_Check(op)) {
+  if (!is_seq) {
     PyErr_Format(PyExc_TypeError, "input object (%R) is not a sequence", op);
     return -1;
+  }
+
+  if (lengthinfo->m_greedy) {
+    lengthinfo->m_length = obj_length;
+  } else {
+    if (lengthinfo->m_length != obj_length) {
+      PyErr_Format(PyExc_ValueError,
+                   "given length %d does not match sequence size %d",
+                   lengthinfo->m_length,
+                   obj_length);
+      goto failure;
+    }
   }
 
   CpSeqLayerObject* seq_layer = CpSeqLayer_New(state, layer);
@@ -154,26 +204,8 @@ CpRepeatedAtom_Pack(CpRepeatedAtomObject* self,
     return -1;
   }
 
-  Py_ssize_t size = PySequence_Size(op);
-  bool greedy = false;
-  Py_ssize_t layer_length = 0;
-  PyObject* length = CpRepeatedAtom_GetLength(self, (PyObject*)layer);
-  if (!length) {
-    goto failure;
-  }
-  if (_CpPack_EvalLength(layer, length, size, &greedy, &layer_length) < 0) {
-    Py_XDECREF(length);
-    goto failure;
-  }
-  Py_XDECREF(length);
-
-  if (layer_length <= 0) {
-    // continue packing, here's nothing to store
-    Py_XDECREF(seq_layer);
-    return 0;
-  }
-
-  CpSeqLayer_SetSequence(seq_layer, op, layer_length, greedy);
+  CpSeqLayer_SetSequence(
+    seq_layer, op, lengthinfo->m_length, lengthinfo->m_greedy);
 
   PyObject* obj = NULL;
   int success = 0;
@@ -198,6 +230,7 @@ CpRepeatedAtom_Pack(CpRepeatedAtomObject* self,
   CpLayer_Invalidate((CpLayerObject*)seq_layer);
   return 0;
 failure:
+  Py_XDECREF(lengthinfo);
   CpLayer_Invalidate((CpLayerObject*)seq_layer);
   return -1;
 }
@@ -207,9 +240,28 @@ PyObject*
 CpRepeatedAtom_Unpack(CpRepeatedAtomObject* self, CpLayerObject* layer)
 {
   _modulestate* mod = layer->m_state->mod;
-  if (PyObject_HasAttr(self->m_atom, mod->str___unpack_many__)) {
-    PyObject* res = PyObject_CallMethodOneArg(
-      self->m_atom, mod->str___unpack_many__, (PyObject*)layer);
+  CpLengthInfoObject* lengthinfo =
+    (CpLengthInfoObject*)CpObject_CreateNoArgs(&CpLengthInfo_Type);
+
+  bool unpack_many_attr =
+    PyObject_HasAttr(self->m_atom, mod->str___unpack_many__);
+
+  PyObject* length = CpRepeatedAtom_GetLength(self, (PyObject*)layer);
+  if (!length) {
+    goto fail;
+  }
+  if (_CpUnpack_EvalLength(
+        layer, length, (bool*)&lengthinfo->m_greedy, &lengthinfo->m_length) <
+      0) {
+    goto fail;
+  }
+
+  if (unpack_many_attr) {
+    PyObject* res = PyObject_CallMethodObjArgs(self->m_atom,
+                                               mod->str___unpack_many__,
+                                               (PyObject*)layer,
+                                               lengthinfo,
+                                               NULL);
     PyObject* exc = NULL;
     if ((exc = PyErr_GetRaisedException(),
          exc && PyErr_GivenExceptionMatches(exc, PyExc_NotImplementedError))) {
@@ -218,22 +270,11 @@ CpRepeatedAtom_Unpack(CpRepeatedAtomObject* self, CpLayerObject* layer)
       PyErr_Clear();
       Py_XDECREF(res);
     } else {
-      Py_XDECREF(exc);
+      PyErr_SetRaisedException(exc);
       return res;
     }
   }
 
-  PyObject *obj = NULL, *length = NULL;
-  // First, get the amount of elements we have to parse
-  bool seq_greedy = false;
-  Py_ssize_t seq_length = 0;
-  length = CpRepeatedAtom_GetLength(self, (PyObject*)layer);
-  if (!length) {
-    goto fail;
-  }
-  if (_CpUnpack_EvalLength(layer, length, &seq_greedy, &seq_length) < 0) {
-    goto fail;
-  }
   CpSeqLayerObject* seq_layer = CpSeqLayer_New(layer->m_state, layer);
   if (!layer) {
     goto fail;
@@ -241,11 +282,13 @@ CpRepeatedAtom_Unpack(CpRepeatedAtomObject* self, CpLayerObject* layer)
 
   // REVISIT: add sequence factory here
   PyObject* seq = PyList_New(0);
+  PyObject* obj = NULL;
   if (!seq) {
     goto fail;
   }
 
-  CpSeqLayer_SetSequence(seq_layer, seq, seq_length, seq_greedy);
+  CpSeqLayer_SetSequence(
+    seq_layer, seq, lengthinfo->m_length, lengthinfo->m_greedy);
   while (seq_layer->s_greedy || (seq_layer->m_index < seq_layer->m_length)) {
     seq_layer->ob_base.m_path = PyUnicode_FromFormat(
       "%s.%d", _PyUnicode_AsString(layer->m_path), seq_layer->m_index);
@@ -272,6 +315,7 @@ CpRepeatedAtom_Unpack(CpRepeatedAtomObject* self, CpLayerObject* layer)
 success:
   Py_XDECREF(obj);
   Py_XDECREF(length);
+  Py_XDECREF(lengthinfo);
   CpLayer_Invalidate((CpLayerObject*)seq_layer);
   seq_layer = NULL;
   return Py_NewRef(seq);
@@ -279,6 +323,7 @@ success:
 fail:
   Py_XDECREF(obj);
   Py_XDECREF(length);
+  Py_XDECREF(lengthinfo);
   if (seq_layer) {
     CpLayer_Invalidate((CpLayerObject*)seq_layer);
   }

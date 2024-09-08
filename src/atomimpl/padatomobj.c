@@ -5,13 +5,13 @@
 #include <structmember.h>
 
 static PyObject*
-cp_paddingatom__type__(PyObject* self)
+cp_paddingatom_type(PyObject* self)
 {
   return Py_XNewRef(&_PyNone_Type);
 }
 
 static PyObject*
-cp_paddingatom__size__(PyObject* self, PyObject *ctx)
+cp_paddingatom_size(PyObject* self, PyObject* ctx)
 {
   /* NOTE:
   We are using the size of one byte here to allow padding atoms to be
@@ -32,8 +32,8 @@ cp_paddingatom_new(PyTypeObject* type, PyObject* args, PyObject* kwds)
       (packmanyfunc)CpPaddingAtom_PackMany;
     CpBuiltinAtom_CATOM(self).ob_unpack_many =
       (unpackmanyfunc)CpPaddingAtom_UnpackMany;
-    CpBuiltinAtom_CATOM(self).ob_size = (sizefunc)cp_paddingatom__size__;
-    CpBuiltinAtom_CATOM(self).ob_type = (typefunc)cp_paddingatom__type__;
+    CpBuiltinAtom_CATOM(self).ob_size = (sizefunc)cp_paddingatom_size;
+    CpBuiltinAtom_CATOM(self).ob_type = (typefunc)cp_paddingatom_type;
     CpBuiltinAtom_CATOM(self).ob_bits = NULL;
   }
   return (PyObject*)self;
@@ -90,63 +90,29 @@ CpPaddingAtom_Pack(CpPaddingAtomObject* self,
 int
 CpPaddingAtom_PackMany(CpPaddingAtomObject* self,
                        PyObject* value,
-                       CpLayerObject* layer)
+                       CpLayerObject* layer,
+                       CpLengthInfoObject* lengthinfo)
 {
-#if 0
-  /* value will be ignored here */
-  PyObject *res = NULL, *bytes = NULL, *objSize = NULL, *objLengh = NULL;
-  bool greedy = false;
-  Py_ssize_t length = 0;
-
-  if (!layer->m_field) {
-    PyErr_SetString(PyExc_TypeError, "layer must have a field");
-    return -1;
-  }
-
-  /* The following call will fail if the length is a prefixed statement
-   * (slice)*/
-  objLengh =
-    CpField_GetLength((CpFieldObject*)layer->m_field, (PyObject*)layer);
-  if (!objLengh) {
-    return -1;
-  }
-  if (_CpPack_EvalLength(layer, objLengh, -1, &greedy, &length) < 0) {
-    Py_XDECREF(objLengh);
-    return -1;
-  }
-  Py_XDECREF(objLengh);
-
-  if (length == 0) {
-    return 0;
-  } else if (length < 0) {
-    PyErr_SetString(PyExc_ValueError, "length must be >= 0");
-    return -1;
-  } else if (greedy) {
-    PyErr_SetString(PyExc_ValueError, "length must be >= 0 and not greedy!");
-    return -1;
-  }
-
-  objSize = PyLong_FromSsize_t(length);
+  PyObject* objSize = PyLong_FromSsize_t(lengthinfo->m_length);
   if (!objSize) {
     return -1;
   }
-  bytes = CpObject_CreateOneArg(&PyBytes_Type, objSize);
+
+  PyObject* bytes = CpObject_CreateOneArg(&PyBytes_Type, objSize);
   if (!bytes) {
     Py_DECREF(objSize);
     return -1;
   }
   /* unsafe { */
-  memset(PyBytes_AS_STRING(bytes), self->padding, length);
+  memset(PyBytes_AS_STRING(bytes), self->padding, lengthinfo->m_length);
   /* } */
-  res = CpState_Write(layer->m_state, bytes);
+  PyObject* res = CpState_Write(layer->m_state, bytes);
   Py_DECREF(bytes);
   Py_DECREF(objSize);
   if (!res) {
     return -1;
   }
   Py_XDECREF(res);
-  return 0;
-#endif
   return 0;
 }
 
@@ -159,43 +125,56 @@ CpPaddingAtom_Unpack(CpPaddingAtomObject* self, CpLayerObject* layer)
     return NULL;
   }
   Py_XDECREF(res);
-  return 0;
+  Py_RETURN_NONE;
 }
 
 /*CpAPI*/
 PyObject*
-CpPaddingAtom_UnpackMany(CpPaddingAtomObject* self, CpLayerObject* layer)
+CpPaddingAtom_UnpackMany(CpPaddingAtomObject* self,
+                         CpLayerObject* layer,
+                         CpLengthInfoObject* lengthinfo)
 {
-#if 0
-  PyObject *res = NULL, *bytes = NULL, *objLengh = NULL;
-  bool greedy = false;
-  Py_ssize_t length = 0, parsedLength = 0;
+  PyObject* res = NULL;
 
-  objLengh =
-    CpField_GetLength((CpFieldObject*)layer->m_field, (PyObject*)layer);
-  if (!objLengh) {
-    return NULL;
+  if (lengthinfo->m_greedy) {
+    res = CpState_ReadFully(layer->m_state);
+  } else {
+    res = CpState_Read(layer->m_state, lengthinfo->m_length);
   }
-  if (_CpPack_EvalLength(layer, objLengh, -1, &greedy, &length) < 0) {
-    Py_DECREF(objLengh);
-    return NULL;
-  }
-  Py_DECREF(objLengh);
 
-  res = CpState_Read(layer->m_state, length);
   if (!res) {
     return NULL;
   }
 
+  Py_ssize_t length = PyBytes_GET_SIZE(res);
+  Py_ssize_t offset = 0;
+  const char* ptr = PyBytes_AS_STRING(res);
+  while (offset < length && *(ptr + offset) == self->padding) {
+    offset++;
+  }
+  if (offset != length) {
+    PyErr_Format(PyExc_ValueError,
+                 ("The parsed padding contains invalid padding characters "
+                  "(possible padding overflow?). "
+                  "Expected %ld bytes of 0x%02x but parsed only %ld bytes."),
+                 length,
+                 self->padding,
+                 offset);
+    Py_XDECREF(res);
+    return NULL;
+  }
+
   Py_XDECREF(res);
-#endif
   Py_RETURN_NONE;
 }
 
 PyObject*
-cp_paddingatom__repr__(CpPaddingAtomObject* self)
+cp_paddingatom_repr(CpPaddingAtomObject* self)
 {
-  return PyUnicode_FromFormat("padding(0x%02x)", self->padding);
+  if (self->padding == 0) {
+    return PyUnicode_FromFormat("<padding>");
+  }
+  return PyUnicode_FromFormat("<padding [0x%02x]>", self->padding);
 }
 
 /* type setup */
@@ -203,7 +182,7 @@ PyTypeObject CpPaddingAtom_Type = {
   PyVarObject_HEAD_INIT(NULL, 0) _Cp_NameStr(CpPaddingAtom_NAME),
   .tp_basicsize = sizeof(CpPaddingAtomObject),
   .tp_dealloc = (destructor)cp_paddingatom_dealloc,
-  .tp_repr = (reprfunc)cp_paddingatom__repr__,
+  .tp_repr = (reprfunc)cp_paddingatom_repr,
   .tp_flags = Py_TPFLAGS_DEFAULT,
   .tp_doc = NULL,
   .tp_init = (initproc)cp_paddingatom_init,

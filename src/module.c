@@ -389,6 +389,7 @@ PyInit__C(void)
   CpModule_SetupType(&CpState_Type);
 
   CpModule_SetupType(&CpStructFieldInfo_Type);
+  CpModule_SetupType(&CpLengthInfo_Type);
 
   // builtins setup
   CpPrimitiveAtom_Type.tp_base = &CpAtom_Type;
@@ -449,6 +450,7 @@ PyInit__C(void)
   CpModule_AddObject("State", &CpState_Type);
   CpModule_AddObject("fieldinfo", &CpStructFieldInfo_Type);
   CpModule_AddObject("Struct", &CpStruct_Type);
+  CpModule_AddObject(CpLengthInfo_NAME, &CpLengthInfo_Type);
 
   CpModule_AddObject(CpPrimitiveAtom_NAME, &CpPrimitiveAtom_Type);
   CpModule_AddObject(CpBuiltinAtom_NAME, &CpBuiltinAtom_Type);

@@ -111,6 +111,19 @@ CpAtom_Pack(PyObject* atom, PyObject* attrname, PyObject* op, PyObject* ctx)
 }
 
 // ---------------------------------------------------------------------------
+// Length info
+
+struct _lengthinfoobj
+{
+  PyObject_HEAD
+
+  Py_ssize_t m_length;
+  int m_greedy;
+};
+
+#define CpLengthInfo_NAME "lengthinfo"
+
+// ---------------------------------------------------------------------------
 // CAtom
 
 /**
@@ -176,8 +189,20 @@ typedef int (*packfunc)(PyObject*, PyObject*, PyObject*);
  * This is another specialized version of the `packfunc` function, which
  * is used to pack multiple objects to the underlying stream. See `packfunc`
  * for more information.
+ *
+ * The signature of this function is as follows:
+ * @code {.cpp}
+ * int packmanyfunc(PyObject* self, PyObject* op, PyObject* ctx,
+ *                  CpLengthInfo* info);
+ * @endcode
+ *
+ * @param self the atom object (self)
+ * @param op the object to pack
+ * @param ctx the context object
+ * @param info the length information
+ * @return the result of the `__pack_many__` method
  */
-typedef int (*packmanyfunc)(PyObject*, PyObject*, PyObject*);
+typedef int (*packmanyfunc)(PyObject*, PyObject*, PyObject*, PyObject*);
 
 /**
  * @brief Unpack-Protocol
@@ -198,8 +223,19 @@ typedef PyObject* (*unpackfunc)(PyObject*, PyObject*);
  * This is another specialized version of the `unpackfunc` function, which
  * is used to unpack multiple objects from the underlying stream. See
  * `unpackfunc` for more information.
+ *
+ * The signature of this function is as follows:
+ * @code {.cpp}
+ * PyObject* unpackmanyfunc(PyObject* self, PyObject* ctx,
+ *                          CpLengthInfo* info);
+ * @endcode
+ *
+ * @param self the atom object (self)
+ * @param ctx the context object
+ * @param info the length information
+ * @return the result of the `__unpack_many__` method
  */
-typedef PyObject* (*unpackmanyfunc)(PyObject*, PyObject*);
+typedef PyObject* (*unpackmanyfunc)(PyObject*, PyObject*, PyObject*);
 
 /// Experimental API
 /**

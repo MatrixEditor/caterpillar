@@ -28,13 +28,14 @@ if caterpillar.native_support():
 
     def test_padding_unpack():
         # NOTE: unpack using the padding atom always returns None
-        # and DOES NOT validate the parsed value.
+        # and DOES validate the parsed value.
         assert unpack(b"\x00", padding) is None
         assert unpack(b"\x20", padding_t(0x20)) is None
 
         # Therefore, the following code IS valid if the underlying
         # stream does not throw an exception.
-        assert unpack(b"\x00" * 10, padding_t(0x02)[10]) is None
+        with pytest.raises(ValueError):
+            unpack(b"\x00" * 10, padding_t(0x02)[10])
 
     def test_padding_unpack_many():
         assert unpack(b"\x00" * 10, padding[10]) is None

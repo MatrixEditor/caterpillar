@@ -186,6 +186,12 @@ CpState_Read(CpStateObject* self, Py_ssize_t size)
   Py_DECREF(sizeobj);
 
   if (!res) {
+    if (!PyErr_Occurred()) {
+      PyErr_Format(PyExc_ValueError,
+                   "read() returned NULL without error (possible size "
+                   "overflow?). Tried to read %ld bytes",
+                   size);
+    }
     return NULL;
   }
 

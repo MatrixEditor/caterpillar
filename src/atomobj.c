@@ -111,11 +111,11 @@ static PyMethodDef CpAtom_Methods[] = {
 PyTypeObject CpAtom_Type = {
   PyVarObject_HEAD_INIT(NULL, 0) _Cp_Name(atom),
   .tp_basicsize = sizeof(CpAtomObject),
-  .tp_dealloc =(destructor)cp_atom_dealloc,
+  .tp_dealloc = (destructor)cp_atom_dealloc,
   .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
   .tp_doc = cp_atom_doc,
   .tp_methods = CpAtom_Methods,
-  .tp_init =(initproc)cp_atom_init,
+  .tp_init = (initproc)cp_atom_init,
   .tp_new = (newfunc)cp_atom_new,
 };
 
@@ -193,13 +193,16 @@ cp_catom_pack_many(CpCAtomObject* self, PyObject* args, PyObject* kw)
     return NULL;
   }
 
-  static char* kwlist[] = { "ops", "context", NULL };
-  PyObject *ops = NULL, *context = NULL;
-  if (PyArg_ParseTupleAndKeywords(args, kw, "OO", kwlist, &ops, &context) < 0) {
+  static char* kwlist[] = { "ops", "context", "lengthinfo", NULL };
+  PyObject *ops = NULL, *context = NULL, *lengthinfo = NULL;
+  if (PyArg_ParseTupleAndKeywords(
+        args, kw, "OOO", kwlist, &ops, &context, &lengthinfo) < 0) {
     return NULL;
   }
 
-  return self->ob_pack_many((PyObject*)self, ops, context) ? NULL : Py_NewRef(Py_None);
+  return self->ob_pack_many((PyObject*)self, ops, context, lengthinfo)
+           ? NULL
+           : Py_NewRef(Py_None);
 }
 
 static PyObject*
@@ -232,12 +235,12 @@ cp_catom_unpack_many(CpCAtomObject* self, PyObject* args, PyObject* kw)
     return NULL;
   }
 
-  static char* kwlist[] = { "context", NULL };
-  PyObject* context = NULL;
-  if (PyArg_ParseTupleAndKeywords(args, kw, "O", kwlist, &context) < 0) {
+  static char* kwlist[] = { "context", "lengthinfo", NULL };
+  PyObject *context = NULL, *lengthinfo = NULL;
+  if (PyArg_ParseTupleAndKeywords(args, kw, "OO", kwlist, &context, &lengthinfo) < 0) {
     return NULL;
   }
-  return self->ob_unpack_many((PyObject*)self, context);
+  return self->ob_unpack_many((PyObject*)self, context, lengthinfo);
 }
 
 static PyObject*
@@ -316,4 +319,55 @@ PyTypeObject CpCAtom_Type = {
   .tp_methods = CpCAtom_Methods,
   .tp_init = (initproc)cp_catom_init,
   .tp_new = (newfunc)cp_catom_new,
+};
+
+// ------------------------------------------------------------------------------
+// length info
+
+static PyObject*
+cp_lengthinfo_new(PyTypeObject* type, PyObject* args, PyObject* kw)
+{
+  return type->tp_alloc(type, 0);
+}
+
+static void
+cp_lengthinfo_dealloc(CpLengthInfoObject* self)
+{
+  Py_TYPE(self)->tp_free((PyObject*)self);
+}
+
+static int
+cp_lengthinfo_init(CpLengthInfoObject* self, PyObject* args, PyObject* kw)
+{
+  static char* kwlist[] = { "length", "greedy", NULL };
+  Py_ssize_t length = 0;
+  int greedy = 0;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kw, "|np", kwlist, &length, &greedy)) {
+    return -1;
+  }
+
+  self->m_length = length;
+  self->m_greedy = greedy;
+  return 0;
+}
+
+static PyObject*
+cp_lengthinfo_repr(CpLengthInfoObject* self)
+{
+  if (self->m_greedy) {
+    return PyUnicode_FromString("<lengthinfo [greedy]>");
+  }
+  return PyUnicode_FromFormat("<lengthinfo [%d]>", self->m_length);
+}
+
+PyTypeObject CpLengthInfo_Type = {
+  PyVarObject_HEAD_INIT(NULL, 0) _Cp_NameStr(CpLengthInfo_NAME),
+  .tp_basicsize = sizeof(CpLengthInfoObject),
+  .tp_dealloc = (destructor)cp_lengthinfo_dealloc,
+  .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
+  .tp_new = (newfunc)cp_lengthinfo_new,
+  .tp_init = (initproc)cp_lengthinfo_init,
+  .tp_repr = (reprfunc)cp_lengthinfo_repr,
+  .tp_doc = NULL,
 };
