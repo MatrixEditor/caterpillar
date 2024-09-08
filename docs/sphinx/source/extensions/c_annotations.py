@@ -27,20 +27,20 @@ class Annotations:
                 if line[:1] in ("", "#"):
                     # blank lines and comments
                     continue
-                parts = line.split(":", 2)
-                if len(parts) != 3:
-                    raise ValueError("Wrong field count in %r" % line)
-                function, type, refcount = parts
+                def_type, *parts = line.split(":")
+                if def_type != "func":
+                    continue
+
+                index, name, rtype, refcount = parts
                 # Get the entry, creating it if needed:
-                try:
-                    entry = self.refcount_data[function]
-                except KeyError:
-                    entry = self.refcount_data[function] = RCEntry(function)
+                entry = self.refcount_data.get(name)
+                if not entry:
+                    entry = self.refcount_data[name] = RCEntry(name)
                 if not refcount or refcount == "null":
                     refcount = None
                 else:
                     refcount = int(refcount)
-                entry.result_type = type
+                entry.result_type = rtype
                 entry.result_refs = refcount
 
     def add_annotations(self, app, doctree):

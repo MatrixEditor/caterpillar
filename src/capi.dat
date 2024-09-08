@@ -1,0 +1,175 @@
+# Caterpillar C API
+#
+# All types and API functions are described in this file. They are used to
+# generate the Caterpillar C API headers and to build the documentation.
+#
+# modified format from sphinx documentation
+# see https://github.com/python/cpython/blob/main/Doc/data/refcounts.dat
+#
+# There are currently four different types of statements:
+#
+#   type:INDEX:STRUCT_NAME:TYPEDEF_NAME:CAPI_TYPE
+#       Defines a C API type for a C structure. The index is optional and
+#       the CAPI_TYPE will be inferred as PyTypeObject if none set
+#
+#   obj:INDEX:NAME:TYPE
+#       Defines a C API object.
+#
+#   func:INDEX:NAME:RETURN_TYPE:REFCOUNT
+#       Defines a C API function. The function must be present within the
+#       source set of this file.
+#
+#   src:FILE
+#       Defines the source file (relative to this file) that contains the
+#       function definitions.
+
+src:field.c
+src:context.c
+src:arch.c
+src:atomobj.c
+src:option.c
+src:struct.c
+src:state.c
+src:layer.c
+src:parsing_pack.c
+src:parsing_unpack.c
+src:parsing_typeof.c
+src:parsing_sizeof.c
+src:atomimpl/boolatomobj.c
+src:atomimpl/floatatomobj.c
+src:atomimpl/charatomobj.c
+src:atomimpl/intatomobj.c
+src:atomimpl/padatomobj.c
+src:atomimpl/stringatomobj.c
+src:atomimpl/constatomobj.c
+src:atomimpl/builtins/builtinatomobj.c
+src:atomimpl/builtins/repeatedatomobj.c
+src:atomimpl/builtins/conditionatomobj.c
+src:atomimpl/builtins/switchatomobj.c
+
+# First index is reserved for the global module reference
+obj:null:CpModule:PyModuleDef
+
+type:-:_modulestate:_modulestate:-
+
+type:1:_atomobj:CpAtomObject:-
+type:2:_catomobj:CpCAtomObject:-
+type:3:_archobj:CpArchObject:-
+type:4:_endianobj:CpEndianObject:-
+type:5:_contextobj:CpContextObject:-
+type:6:_unaryexpr:CpUnaryExprObject:-
+type:7:_binaryexpr:CpBinaryExprObject:-
+type:8:_contextpath:CpContextPathObject:-
+type:9:_fieldobj:CpFieldObject:-
+type:10:_fieldatomobj:CpFieldAtomObject:-
+type:11:_fieldcatomobj:CpFieldCAtomObject:-
+
+obj:12:CpInvalidDefault_Type:-
+obj:13:CpDefaultOption_Type:-
+obj:14:_CpInvalidDefault_Object:PyObject
+obj:15:_CpDefaultOption_Object:PyObject
+
+type:16:_option:CpOptionObject:-
+type:17:_stateobj:CpStateObject:-
+type:18:_layerobj:CpLayerObject:-
+
+# REVISIT: maybe rename to _structfieldinfo
+type:19:CpStructFieldInfo:CpStructFieldInfoObject:-
+type:20:_structobj:CpStructObject:-
+type:21:_floatatomobj:CpFloatAtomObject:-
+type:22:_intatomobj:CpIntAtomObject:-
+type:23:_boolatomobj:CpBoolAtomObject:-
+type:24:_charatomobj:CpCharAtomObject:-
+type:25:_paddingatomobj:CpPaddingAtomObject:-
+type:26:_stringatomobj:CpStringAtomObject:-
+type:27:_constatomobj:CpConstAtomObject:-
+type:28:_builtinatomobj:CpBuiltinAtomObject:-
+type:29:_repeatedatomobj:CpRepeatedAtomObject:-
+type:30:_seqlayerobj:CpSeqLayerObject:-
+type:31:_objlayerobj:CpObjLayerObject:-
+type:32:_conditionatomobj:CpConditionAtomObject:-
+type:33:_switchatomobj:CpSwitchAtomObject:-
+
+func:50:CpEndian_IsLittleEndian:int:null
+func:53:CpContext_New:CpContextObject*:+1
+func:54:CpUnaryExpr_New:CpUnaryExprObject*:+1
+func:55:CpBinaryExpr_New:CpBinaryExprObject*:+1
+func:56:CpContextPath_New:CpContextPathObject*:+1
+func:57:CpContextPath_FromString:CpContextPathObject*:+1
+func:58:CpField_New:CpFieldObject*:null
+func:59:CpField_HasCondition:int:null
+func:60:CpField_IsEnabled:int:null
+func:61:CpField_GetOffset:Py_ssize_t:null
+func:62:CpField_EvalSwitch:PyObject*:+1
+func:63:CpField_GetLength:PyObject*:+1
+func:64:CpTypeOf:PyObject*:+1
+func:65:CpTypeOf_Field:PyObject*:+1
+func:66:CpTypeOf_Common:PyObject*:+1
+func:67:CpPack:int:null
+func:68:CpPack_Field:int:null
+func:69:CpPack_Common:int:null
+func:70:CpPack_Struct:int:null
+func:72:_CpPack_EvalLength:int:null
+func:73:CpSizeOf:PyObject*:+1
+func:74:CpSizeOf_Field:PyObject*:+1
+func:75:CpSizeOf_Struct:PyObject*:+1
+func:76:CpSizeOf_Common:PyObject*:+1
+func:77:_Cp_SizeOf:PyObject*:+1
+func:78:CpUnpack:PyObject*:+1
+func:79:CpUnpack_Field:PyObject*:+1
+func:80:CpUnpack_Common:PyObject*:+1
+func:81:CpUnpack_Struct:PyObject*:+1
+func:83:_CpUnpack_EvalLength:int:null
+func:84:CpUnpack_CAtom:PyObject*:+1
+func:85:CpPack_CAtom:int:null
+func:86:CpSizeOf_CAtom:PyObject*:+1
+func:87:CpTypeOf_CAtom:PyObject*:+1
+func:88:CpState_New:CpStateObject*:null
+func:89:CpState_Tell:PyObject*:+1
+func:90:CpState_Seek:PyObject*:+1
+func:91:CpState_Read:PyObject*:+1
+func:92:CpState_ReadFully:PyObject*:+1
+func:93:CpState_Write:PyObject*:+1
+func:94:CpState_SetGlobals:int:null
+func:95:CpLayer_New:CpLayerObject*:+1
+func:96:CpLayer_Invalidate:int:null
+func:98:CpStructFieldInfo_New:CpStructFieldInfoObject*:+1
+func:99:CpStruct_AddFieldInfo:int:null
+func:100:CpStruct_AddField:int:null
+func:101:CpStruct_New:CpStructObject*:+1
+func:102:CpStruct_GetAnnotations:PyObject*:+1
+func:103:CpStruct_ReplaceType:int:null
+func:104:CpStruct_HasOption:int:null
+func:105:CpStructModel_Check:int:null
+func:106:CpStructModel_GetStruct:PyObject*:+1
+func:107:CpSeqLayer_New:CpSeqLayerObject*:+1
+func:108:CpSeqLayer_SetSequence:int:null
+func:109:CpObjLayer_New:CpObjLayerObject*:+1
+
+# atom api
+func:120:CpIntAtom_Pack:int:null
+func:121:CpIntAtom_Unpack:PyObject*:+1
+func:122:CpFloatAtom_Pack:int:null
+func:123:CpFloatAtom_Unpack:PyObject*:+1
+func:124:CpBoolAtom_Pack:int:null
+func:125:CpBoolAtom_Unpack:PyObject*:+1
+func:126:CpCharAtom_Pack:int:null
+func:127:CpCharAtom_Unpack:PyObject*:+1
+func:128:CpPaddingAtom_Pack:int:null
+func:129:CpPaddingAtom_PackMany:int:null
+func:130:CpPaddingAtom_Unpack:PyObject*:+1
+func:131:CpPaddingAtom_UnpackMany:PyObject*:+1
+func:132:CpStringAtom_Pack:int:null
+func:133:CpStringAtom_Unpack:PyObject*:+1
+func:134:CpConstAtom_Pack:int:null
+func:135:CpConstAtom_Unpack:PyObject*:+1
+func:136:CpRepeatedAtom_Pack:int:null
+func:137:CpRepeatedAtom_Unpack:PyObject*:+1
+func:138:CpRepeatedAtom_GetLength:PyObject*:+1
+func:139:CpConditionAtom_Pack:int:null
+func:140:CpConditionAtom_Unpack:PyObject*:+1
+func:141:CpConditionAtom_IsEnabled:int:null
+func:142:CpSwitchAtom_GetNext:PyObject*:+1
+func:143:CpSwitchAtom_Pack:int:null
+func:144:CpSwitchAtom_Unpack:PyObject*:+1
+

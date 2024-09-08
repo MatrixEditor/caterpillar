@@ -6,7 +6,7 @@
 
 /* impl */
 static PyObject*
-cp_builtinatomobj_new(PyTypeObject* type, PyObject* args, PyObject* kw)
+cp_builtinatom_new(PyTypeObject* type, PyObject* args, PyObject* kw)
 {
   CpBuiltinAtomObject* self;
   self = (CpBuiltinAtomObject*)type->tp_alloc(type, 0);
@@ -23,7 +23,7 @@ cp_builtinatomobj_new(PyTypeObject* type, PyObject* args, PyObject* kw)
 }
 
 static void
-cp_builtinatomobj_dealloc(CpBuiltinAtomObject* self)
+cp_builtinatom_dealloc(CpBuiltinAtomObject* self)
 {
   self->ob_base.ob_bits = NULL;
   self->ob_base.ob_pack = NULL;
@@ -36,28 +36,45 @@ cp_builtinatomobj_dealloc(CpBuiltinAtomObject* self)
 }
 
 static int
-cp_builtinatomobj_init(CpBuiltinAtomObject* self, PyObject* args, PyObject* kw)
+cp_builtinatom_init(CpBuiltinAtomObject* self, PyObject* args, PyObject* kw)
 {
   _Cp_InitNoArgs(CpBuiltinAtomObject, args, kw);
 }
 
 // TODO member methods
 static PyObject*
-cp_builtinatomobj_as_mapping_getitem(CpBuiltinAtomObject* self,
-                                     PyObject* length)
+cp_builtinatom_as_mapping_getitem(CpBuiltinAtomObject* self, PyObject* length)
 {
   return (PyObject*)CpRepeatedAtom_New((PyObject*)self, length);
 }
 
+static PyObject*
+cp_builtinatom_as_number_rshift(PyObject* self, PyObject* other)
+{
+  return (PyObject*)CpSwitchAtom_New(self, other);
+}
+
+static PyObject*
+cp_builtinatom_as_number_floordiv(PyObject* self, PyObject* other)
+{
+  return (PyObject*)CpConditionAtom_New(self, other);
+}
+
 static PyMappingMethods CpFieldAtom_MappingMethods = {
-  .mp_subscript = (binaryfunc)cp_builtinatomobj_as_mapping_getitem,
+  .mp_subscript = (binaryfunc)cp_builtinatom_as_mapping_getitem,
+};
+
+static PyNumberMethods CpField_NumberMethods = {
+  .nb_rshift = (binaryfunc)cp_builtinatom_as_number_rshift,
+  .nb_floor_divide = (binaryfunc)cp_builtinatom_as_number_floordiv,
 };
 
 PyTypeObject CpBuiltinAtom_Type = {
   PyVarObject_HEAD_INIT(NULL, 0) "CpBuiltinAtom", // tp_name
   .tp_basicsize = sizeof(CpBuiltinAtomObject),
-  .tp_dealloc = (destructor)cp_builtinatomobj_dealloc,
-  .tp_init = (initproc)cp_builtinatomobj_init,
-  .tp_new = (newfunc)cp_builtinatomobj_new,
+  .tp_dealloc = (destructor)cp_builtinatom_dealloc,
+  .tp_init = (initproc)cp_builtinatom_init,
+  .tp_new = (newfunc)cp_builtinatom_new,
   .tp_as_mapping = &CpFieldAtom_MappingMethods,
+  .tp_as_number = &CpField_NumberMethods,
 };

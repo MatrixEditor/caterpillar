@@ -393,10 +393,12 @@ PyInit__C(void)
   CpBuiltinAtom_Type.tp_base = &CpCAtom_Type;
   CpRepeatedAtom_Type.tp_base = &CpBuiltinAtom_Type;
   CpConditionAtom_Type.tp_base = &CpBuiltinAtom_Type;
+  CpSwitchAtom_Type.tp_base = &CpBuiltinAtom_Type;
 
   CpModule_SetupType(&CpBuiltinAtom_Type);
   CpModule_SetupType(&CpRepeatedAtom_Type);
   CpModule_SetupType(&CpConditionAtom_Type);
+  CpModule_SetupType(&CpSwitchAtom_Type);
 
   CpIntAtom_Type.tp_base = &CpBuiltinAtom_Type;
   CpModule_SetupType(&CpIntAtom_Type);
@@ -451,6 +453,7 @@ PyInit__C(void)
   CpModule_AddObject(CpBuiltinAtom_NAME, &CpBuiltinAtom_Type);
   CpModule_AddObject(CpRepeatedAtom_NAME, &CpRepeatedAtom_Type);
   CpModule_AddObject(CpConditionAtom_NAME, &CpConditionAtom_Type);
+  CpModule_AddObject(CpSwitchAtom_NAME, &CpSwitchAtom_Type);
 
   CpModule_AddObject(CpIntAtom_NAME, &CpIntAtom_Type);
   CpModule_AddObject(CpFloatAtom_NAME, &CpFloatAtom_Type);

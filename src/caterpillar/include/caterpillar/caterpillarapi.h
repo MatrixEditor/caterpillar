@@ -28,14 +28,14 @@
 /* struct and typedefs */
 struct _modulestate;
 typedef struct _modulestate _modulestate;
-struct _endianobj;
-typedef struct _endianobj CpEndianObject;
-struct _archobj;
-typedef struct _archobj CpArchObject;
 struct _atomobj;
 typedef struct _atomobj CpAtomObject;
 struct _catomobj;
 typedef struct _catomobj CpCAtomObject;
+struct _archobj;
+typedef struct _archobj CpArchObject;
+struct _endianobj;
+typedef struct _endianobj CpEndianObject;
 struct _contextobj;
 typedef struct _contextobj CpContextObject;
 struct _unaryexpr;
@@ -84,6 +84,8 @@ struct _objlayerobj;
 typedef struct _objlayerobj CpObjLayerObject;
 struct _conditionatomobj;
 typedef struct _conditionatomobj CpConditionAtomObject;
+struct _switchatomobj;
+typedef struct _switchatomobj CpSwitchAtomObject;
 
 #ifdef _CPMODULE
 
@@ -93,6 +95,7 @@ are then used and implemented in the internal API.
 */
 
 extern PyModuleDef CpModule;
+extern PyTypeObject CpAtom_Type;
 extern PyTypeObject CpCAtom_Type;
 extern PyTypeObject CpArch_Type;
 extern PyTypeObject CpEndian_Type;
@@ -107,7 +110,6 @@ extern PyTypeObject CpInvalidDefault_Type;
 extern PyTypeObject CpDefaultOption_Type;
 extern PyObject _CpInvalidDefault_Object;
 extern PyObject _CpDefaultOption_Object;
-extern PyTypeObject CpAtom_Type;
 extern PyTypeObject CpOption_Type;
 extern PyTypeObject CpState_Type;
 extern PyTypeObject CpLayer_Type;
@@ -125,6 +127,7 @@ extern PyTypeObject CpRepeatedAtom_Type;
 extern PyTypeObject CpSeqLayer_Type;
 extern PyTypeObject CpObjLayer_Type;
 extern PyTypeObject CpConditionAtom_Type;
+extern PyTypeObject CpSwitchAtom_Type;
 int CpEndian_IsLittleEndian(CpEndianObject* endian, _modulestate* mod);
 CpContextObject* CpContext_New(void);
 CpUnaryExprObject* CpUnaryExpr_New(int op, PyObject* value);
@@ -202,6 +205,9 @@ PyObject* CpRepeatedAtom_GetLength(CpRepeatedAtomObject* self, PyObject* context
 int CpConditionAtom_Pack(CpConditionAtomObject* self, PyObject* op, PyObject* layer);
 PyObject* CpConditionAtom_Unpack(CpConditionAtomObject* self, CpLayerObject* layer);
 int CpConditionAtom_IsEnabled(CpConditionAtomObject* self, PyObject* context);
+PyObject* CpSwitchAtom_GetNext(CpSwitchAtomObject* self, PyObject* op, PyObject* context);
+int CpSwitchAtom_Pack(CpSwitchAtomObject* self, PyObject* obj, CpLayerObject* layer);
+PyObject* CpSwitchAtom_Unpack(CpSwitchAtomObject* self, CpLayerObject* layer);
 
 #else
 
@@ -212,21 +218,21 @@ internal API functions and types. Their indices are static and defined in
 caterpillar_api.py
 */
 #define CpModule (*(PyModuleDef *)Cp_API[0])
-#define CpCAtom_Type (*(PyTypeObject *)Cp_API[1])
-#define CpArch_Type (*(PyTypeObject *)Cp_API[2])
-#define CpEndian_Type (*(PyTypeObject *)Cp_API[3])
-#define CpContext_Type (*(PyTypeObject *)Cp_API[4])
-#define CpUnaryExpr_Type (*(PyTypeObject *)Cp_API[5])
-#define CpBinaryExpr_Type (*(PyTypeObject *)Cp_API[6])
-#define CpContextPath_Type (*(PyTypeObject *)Cp_API[7])
-#define CpField_Type (*(PyTypeObject *)Cp_API[8])
-#define CpFieldAtom_Type (*(PyTypeObject *)Cp_API[9])
-#define CpFieldCAtom_Type (*(PyTypeObject *)Cp_API[10])
-#define CpInvalidDefault_Type (*(PyTypeObject *)Cp_API[11])
-#define CpDefaultOption_Type (*(PyTypeObject *)Cp_API[12])
-#define _CpInvalidDefault_Object (*(PyObject *)Cp_API[13])
-#define _CpDefaultOption_Object (*(PyObject *)Cp_API[14])
-#define CpAtom_Type (*(PyTypeObject *)Cp_API[15])
+#define CpAtom_Type (*(PyTypeObject *)Cp_API[1])
+#define CpCAtom_Type (*(PyTypeObject *)Cp_API[2])
+#define CpArch_Type (*(PyTypeObject *)Cp_API[3])
+#define CpEndian_Type (*(PyTypeObject *)Cp_API[4])
+#define CpContext_Type (*(PyTypeObject *)Cp_API[5])
+#define CpUnaryExpr_Type (*(PyTypeObject *)Cp_API[6])
+#define CpBinaryExpr_Type (*(PyTypeObject *)Cp_API[7])
+#define CpContextPath_Type (*(PyTypeObject *)Cp_API[8])
+#define CpField_Type (*(PyTypeObject *)Cp_API[9])
+#define CpFieldAtom_Type (*(PyTypeObject *)Cp_API[10])
+#define CpFieldCAtom_Type (*(PyTypeObject *)Cp_API[11])
+#define CpInvalidDefault_Type (*(PyTypeObject *)Cp_API[12])
+#define CpDefaultOption_Type (*(PyTypeObject *)Cp_API[13])
+#define _CpInvalidDefault_Object (*(PyObject *)Cp_API[14])
+#define _CpDefaultOption_Object (*(PyObject *)Cp_API[15])
 #define CpOption_Type (*(PyTypeObject *)Cp_API[16])
 #define CpState_Type (*(PyTypeObject *)Cp_API[17])
 #define CpLayer_Type (*(PyTypeObject *)Cp_API[18])
@@ -244,6 +250,7 @@ caterpillar_api.py
 #define CpSeqLayer_Type (*(PyTypeObject *)Cp_API[30])
 #define CpObjLayer_Type (*(PyTypeObject *)Cp_API[31])
 #define CpConditionAtom_Type (*(PyTypeObject *)Cp_API[32])
+#define CpSwitchAtom_Type (*(PyTypeObject *)Cp_API[33])
 #define CpEndian_IsLittleEndian (*((int (*)(CpEndianObject* endian, _modulestate* mod)))Cp_API[50])
 #define CpContext_New (*((CpContextObject* (*)(void)))Cp_API[53])
 #define CpUnaryExpr_New (*((CpUnaryExprObject* (*)(int op, PyObject* value)))Cp_API[54])
@@ -321,6 +328,9 @@ caterpillar_api.py
 #define CpConditionAtom_Pack (*((int (*)(CpConditionAtomObject* self, PyObject* op, PyObject* layer)))Cp_API[139])
 #define CpConditionAtom_Unpack (*((PyObject* (*)(CpConditionAtomObject* self, CpLayerObject* layer)))Cp_API[140])
 #define CpConditionAtom_IsEnabled (*((int (*)(CpConditionAtomObject* self, PyObject* context)))Cp_API[141])
+#define CpSwitchAtom_GetNext (*((PyObject* (*)(CpSwitchAtomObject* self, PyObject* op, PyObject* context)))Cp_API[142])
+#define CpSwitchAtom_Pack (*((int (*)(CpSwitchAtomObject* self, PyObject* obj, CpLayerObject* layer)))Cp_API[143])
+#define CpSwitchAtom_Unpack (*((PyObject* (*)(CpSwitchAtomObject* self, CpLayerObject* layer)))Cp_API[144])
 
 /**
  * @brief Public C API for extension modules as reference table

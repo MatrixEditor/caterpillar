@@ -82,16 +82,7 @@ cp_repeatedatom_set_byteorder(CpRepeatedAtomObject* self,
                                  PyObject* args,
                                  PyObject* kw)
 {
-  static char* kwlist[] = { "byteorder", NULL };
-  PyObject* byteorder = NULL;
-  if (!PyArg_ParseTupleAndKeywords(args, kw, "O", kwlist, &byteorder)) {
-    return NULL;
-  }
-  if (!CpEndian_Check(byteorder)) {
-    PyErr_SetString(PyExc_TypeError, "byteorder must be an Endian object");
-    return NULL;
-  }
-
+  _CpEndian_KwArgsGetByteorder(NULL);
   PyObject* new_atom =
     CpEndian_SetEndian(self->m_atom, (CpEndianObject*)byteorder);
   if (!new_atom) {

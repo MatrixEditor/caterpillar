@@ -11,190 +11,60 @@ function.
 # !! heavily inspired by numpy !!
 
 import os
+import pathlib
+
+CAPI_PATH = pathlib.Path(__file__).parent.parent / "capi.dat"
+if not CAPI_PATH.exists():
+    raise FileNotFoundError(f"File not found: {CAPI_PATH}")
 
 # Reserved for future use
 __reserved__ = "__reserved__"
 
-cp_types = {
-    # struct and typedefs
-    "_modulestate":             "_modulestate",
-    "_endianobj":               "CpEndianObject",
-    "_archobj":                 "CpArchObject",
-    "_atomobj":                 "CpAtomObject",
-    "_catomobj":                "CpCAtomObject",
-    "_contextobj":              "CpContextObject",
-    "_unaryexpr":               "CpUnaryExprObject",
-    "_binaryexpr":              "CpBinaryExprObject",
-    "_contextpath":             "CpContextPathObject",
-    "_fieldobj":                "CpFieldObject",
-    "_fieldatomobj":            "CpFieldAtomObject",
-    "_fieldcatomobj":           "CpFieldCAtomObject",
-    "_option":                  "CpOptionObject",
-    "_stateobj":                "CpStateObject",
-    "_layerobj":                "CpLayerObject",
-    # REVISIT: maybe rename to _structfieldinfo
-    "CpStructFieldInfo":        "CpStructFieldInfoObject",
-    "_structobj":               "CpStructObject",
-    "_floatatomobj":            "CpFloatAtomObject",
-    "_intatomobj":              "CpIntAtomObject",
-    "_boolatomobj":             "CpBoolAtomObject",
-    "_charatomobj":             "CpCharAtomObject",
-    "_paddingatomobj":          "CpPaddingAtomObject",
-    "_stringatomobj":           "CpStringAtomObject",
-    "_constatomobj":            "CpConstAtomObject",
-    "_builtinatomobj":          "CpBuiltinAtomObject",
-    "_repeatedatomobj":         "CpRepeatedAtomObject",
-    "_seqlayerobj":             "CpSeqLayerObject",
-    "_objlayerobj":             "CpObjLayerObject",
-    "_conditionatomobj":        "CpConditionAtomObject",
-}
+cp_types = {} # struct and typedefs
+cp_type_api = {}
+cp_api_src = []
+cp_func_api = {} # <name>: <index> <<-->> <name>: (rtype, [args])
 
-cp_type_api = {
-    "CpModule":                     (0, "PyModuleDef"),
-    "CpCAtom_Type":                 (1,),
-    "CpArch_Type":                  (2,),
-    "CpEndian_Type":                (3,),
-    "CpContext_Type":               (4,),
-    "CpUnaryExpr_Type":             (5,),
-    "CpBinaryExpr_Type":            (6,),
-    "CpContextPath_Type":           (7,),
-    "CpField_Type":                 (8,),
-    "CpFieldAtom_Type":             (9,),
-    "CpFieldCAtom_Type":            (10,),
-    "CpInvalidDefault_Type":        (11,),
-    "CpDefaultOption_Type":         (12,),
-    "_CpInvalidDefault_Object":     (13, "PyObject"),
-    "_CpDefaultOption_Object":      (14, "PyObject"),
-    "CpAtom_Type":                  (15,),
-    "CpOption_Type":                (16,),
-    "CpState_Type":                 (17,),
-    "CpLayer_Type":                 (18,),
-    "CpStructFieldInfo_Type":       (19,),
-    "CpStruct_Type":                (20,),
-    "CpFloatAtom_Type":             (21,),
-    "CpIntAtom_Type":               (22,),
-    "CpBoolAtom_Type":              (23,),
-    "CpCharAtom_Type":              (24,),
-    "CpPaddingAtom_Type":           (25,),
-    "CpStringAtom_Type":            (26,),
-    "CpConstAtom_Type":             (27,),
-    "CpBuiltinAtom_Type":           (28,),
-    "CpRepeatedAtom_Type":          (29,),
-    "CpSeqLayer_Type":              (30,),
-    "CpObjLayer_Type":              (31,),
-    "CpConditionAtom_Type":         (32,),
-}
+for line in CAPI_PATH.read_text("utf-8").splitlines():
+    if line.startswith("#"):
+        continue
 
-cp_func_api = {
-    # <name>: <index> <<-->> <name>: (rtype, [args])
-    "CpEndian_IsLittleEndian": 50,
-    # "CpContext_GetAttr": 51,
-    # "CpContext_GetAttrString": 52,
-    "CpContext_New":                53,
-    "CpUnaryExpr_New":              54,
-    "CpBinaryExpr_New":             55,
-    "CpContextPath_New":            56,
-    "CpContextPath_FromString":     57,
-    "CpField_New":                  58,
-    "CpField_HasCondition":         59,
-    "CpField_IsEnabled":            60,
-    "CpField_GetOffset":            61,
-    "CpField_EvalSwitch":           62,
-    "CpField_GetLength":            63,
-    "CpTypeOf":                     64,
-    "CpTypeOf_Field":               65,
-    "CpTypeOf_Common":              66,
-    "CpPack":                       67,
-    "CpPack_Field":                 68,
-    "CpPack_Common":                69,
-    "CpPack_Struct":                70,
-    "_CpPack_EvalLength":           72,
-    "CpSizeOf":                     73,
-    "CpSizeOf_Field":               74,
-    "CpSizeOf_Struct":              75,
-    "CpSizeOf_Common":              76,
-    "_Cp_SizeOf":                   77,
-    "CpUnpack":                     78,
-    "CpUnpack_Field":               79,
-    "CpUnpack_Common":              80,
-    "CpUnpack_Struct":              81,
-    "_CpUnpack_EvalLength":         83,
-    "CpUnpack_CAtom":               84,
-    "CpPack_CAtom":                 85,
-    "CpSizeOf_CAtom":               86,
-    "CpTypeOf_CAtom":               87,
-    "CpState_New":                  88,
-    "CpState_Tell":                 89,
-    "CpState_Seek":                 90,
-    "CpState_Read":                 91,
-    "CpState_ReadFully":            92,
-    "CpState_Write":                93,
-    "CpState_SetGlobals":           94,
-    "CpLayer_New":                  95,
-    "CpLayer_Invalidate":           96,
-    "CpStructFieldInfo_New" :       98,
-    "CpStruct_AddFieldInfo":        99,
-    "CpStruct_AddField":           100,
-    "CpStruct_New":                101,
-    "CpStruct_GetAnnotations":     102,
-    "CpStruct_ReplaceType":        103,
-    "CpStruct_HasOption":          104,
-    "CpStructModel_Check":         105,
-    "CpStructModel_GetStruct":     106,
-    "CpSeqLayer_New":              107,
-    "CpSeqLayer_SetSequence":      108,
-    "CpObjLayer_New":              109,
+    line = line.strip()
+    if not line:
+        continue
 
+    def_type, *parts = line.split(":")
+    match def_type:
+        case "obj":
+            # obj:INDEX:NAME:TYPE
+            #   Defines a C API object.
+            index, name, type_ = parts
+            cp_type_api[name] = (int(index), type_ if type_ != "-" else "PyTypeObject")
 
-    # atom api
-    "CpIntAtom_Pack":              120,
-    "CpIntAtom_Unpack":            121,
-    "CpFloatAtom_Pack":            122,
-    "CpFloatAtom_Unpack":          123,
-    "CpBoolAtom_Pack":             124,
-    "CpBoolAtom_Unpack":           125,
-    "CpCharAtom_Pack":             126,
-    "CpCharAtom_Unpack":           127,
-    "CpPaddingAtom_Pack":          128,
-    "CpPaddingAtom_PackMany":      129,
-    "CpPaddingAtom_Unpack":        130,
-    "CpPaddingAtom_UnpackMany":    131,
-    "CpStringAtom_Pack":           132,
-    "CpStringAtom_Unpack":         133,
-    "CpConstAtom_Pack":            134,
-    "CpConstAtom_Unpack":          135,
-    "CpRepeatedAtom_Pack":         136,
-    "CpRepeatedAtom_Unpack":       137,
-    "CpRepeatedAtom_GetLength":    138,
-    "CpConditionAtom_Pack":        139,
-    "CpConditionAtom_Unpack":      140,
-    "CpConditionAtom_IsEnabled":   141,
-}
+        case "type":
+            # type:INDEX:STRUCT_NAME:TYPEDEF_NAME:CAPI_TYPE
+            #   Defines a C API type for a C structure. The index is optional and
+            #   the CAPI_TYPE will be inferred as PyTypeObject if none set
+            index, struct_name, typedef_name, c_api_type = parts
+            cp_types[struct_name] = typedef_name
+            if index != '-':
+                if typedef_name.endswith("Object"):
+                    typedef_name = typedef_name[:-6] + "_Type"
+                cp_type_api[typedef_name] = (int(index), c_api_type if c_api_type != "-" else "PyTypeObject")
 
-API_SRC = [
-    "field.c",
-    "context.c",
-    "arch.c",
-    "atomobj.c",
-    "option.c",
-    "struct.c",
-    "state.c",
-    "layer.c",
-    "parsing_pack.c",
-    "parsing_unpack.c",
-    "parsing_typeof.c",
-    "parsing_sizeof.c",
-    "atomimpl/boolatomobj.c",
-    "atomimpl/floatatomobj.c",
-    "atomimpl/charatomobj.c",
-    "atomimpl/intatomobj.c",
-    "atomimpl/padatomobj.c",
-    "atomimpl/stringatomobj.c",
-    "atomimpl/constatomobj.c",
-    "atomimpl/builtins/builtinatomobj.c",
-    "atomimpl/builtins/repeatedatomobj.c",
-    "atomimpl/builtins/conditionatomobj.c",
-]
+        case "src":
+            # src:FILE
+            #   Defines the source file (relative to this file) that contains the
+            #   function definitions.
+            cp_api_src.append(parts[0])
+
+        case "func":
+            # func:INDEX:NAME:RETURN_TYPE:REFCOUNT
+            #   Defines a C API function. The function must be present within the
+            #   source set of this file.
+            index, name, *_ = parts
+            if index != '-':
+                cp_func_api[name] = int(index)
 
 
 def cp_api_functions() -> dict[str, tuple]:
@@ -202,7 +72,7 @@ def cp_api_functions() -> dict[str, tuple]:
 
     func_api = {}
     # REVISIT: dirty parsing algorithm
-    for f in API_SRC:
+    for f in cp_api_src:
         with open(os.path.join(base_path, "..", f), "r", encoding="utf-8") as c_src:
             while True:
                 line = c_src.readline()

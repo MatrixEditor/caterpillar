@@ -4,6 +4,7 @@
 
 void *Cp_API[] = {
     (void *) &CpModule,
+    (void *) &CpAtom_Type,
     (void *) &CpCAtom_Type,
     (void *) &CpArch_Type,
     (void *) &CpEndian_Type,
@@ -18,7 +19,6 @@ void *Cp_API[] = {
     (void *) &CpDefaultOption_Type,
     (void *) &_CpInvalidDefault_Object,
     (void *) &_CpDefaultOption_Object,
-    (void *) &CpAtom_Type,
     (void *) &CpOption_Type,
     (void *) &CpState_Type,
     (void *) &CpLayer_Type,
@@ -36,7 +36,7 @@ void *Cp_API[] = {
     (void *) &CpSeqLayer_Type,
     (void *) &CpObjLayer_Type,
     (void *) &CpConditionAtom_Type,
-    NULL,
+    (void *) &CpSwitchAtom_Type,
     NULL,
     NULL,
     NULL,
@@ -144,6 +144,9 @@ void *Cp_API[] = {
     (void *) &CpRepeatedAtom_GetLength,
     (void *) &CpConditionAtom_Pack,
     (void *) &CpConditionAtom_Unpack,
-    (void *) &CpConditionAtom_IsEnabled
+    (void *) &CpConditionAtom_IsEnabled,
+    (void *) &CpSwitchAtom_GetNext,
+    (void *) &CpSwitchAtom_Pack,
+    (void *) &CpSwitchAtom_Unpack
 };
 

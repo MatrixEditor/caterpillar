@@ -28,7 +28,7 @@ static PyObject*
 cp_conditionatom_repr(CpConditionAtomObject* self)
 {
   return PyUnicode_FromFormat(
-    "<conditional [%R] %R>", self->m_condition, self->m_atom);
+    "<conditional [<%s>] %R>", Py_TYPE(self->m_condition)->tp_name, self->m_atom);
 }
 
 static PyObject*
@@ -58,6 +58,8 @@ cp_conditionatom_dealloc(CpConditionAtomObject* self)
   CpBuiltinAtom_CATOM(self).ob_unpack_many = NULL;
   CpBuiltinAtom_CATOM(self).ob_size = NULL;
   CpBuiltinAtom_CATOM(self).ob_type = NULL;
+  Py_CLEAR(self->m_atom);
+  Py_CLEAR(self->m_condition);
   Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
@@ -80,16 +82,7 @@ cp_conditionatom_set_byteorder(CpConditionAtomObject* self,
                                PyObject* args,
                                PyObject* kw)
 {
-  static char* kwlist[] = { "byteorder", NULL };
-  PyObject* byteorder = NULL;
-  if (!PyArg_ParseTupleAndKeywords(args, kw, "O", kwlist, &byteorder)) {
-    return NULL;
-  }
-  if (!CpEndian_Check(byteorder)) {
-    PyErr_SetString(PyExc_TypeError, "byteorder must be an Endian object");
-    return NULL;
-  }
-
+  _CpEndian_KwArgsGetByteorder(NULL);
   PyObject* new_atom =
     CpEndian_SetEndian(self->m_atom, (CpEndianObject*)byteorder);
   if (!new_atom) {
@@ -154,13 +147,13 @@ CpConditionAtom_Unpack(CpConditionAtomObject* self, CpLayerObject* layer)
   if (!CpConditionAtom_IsEnabled(self, (PyObject*)layer)) {
     return NULL;
   }
-  return _Cp_Unpack((PyObject*)self, layer);
+  return _Cp_Unpack(self->m_atom, layer);
 }
 
 /* docs */
 
 /* members */
-static PyMemberDef CpRepeatedAtom_Members[] = {
+static PyMemberDef CpConditionAtom_Members[] = {
   { "condition",
     T_OBJECT,
     offsetof(CpConditionAtomObject, m_condition),
@@ -181,7 +174,7 @@ PyTypeObject CpConditionAtom_Type = {
   .tp_basicsize = sizeof(CpConditionAtomObject),
   .tp_dealloc = (destructor)cp_conditionatom_dealloc,
   .tp_init = (initproc)cp_conditionatom_init,
-  .tp_members = CpRepeatedAtom_Members,
+  .tp_members = CpConditionAtom_Members,
   .tp_methods = CpConditionAtom_Methods,
   .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
   .tp_doc = NULL,

@@ -116,4 +116,15 @@ CpEndian_SetEndian(PyObject* op, CpEndianObject* endian)
       METH_VARARGS | METH_KEYWORDS, (docs)                                     \
   }
 
+#define _CpEndian_KwArgsGetByteorder(ret)                                      \
+  static char* kwlist[] = { "byteorder", NULL };                               \
+  PyObject* byteorder = NULL;                                                  \
+  if (!PyArg_ParseTupleAndKeywords(args, kw, "O", kwlist, &byteorder)) {       \
+    return ret;                                                                \
+  }                                                                            \
+  if (!CpEndian_Check(byteorder)) {                                            \
+    PyErr_SetString(PyExc_TypeError, "byteorder must be an Endian object");    \
+    return ret;                                                                \
+  }
+
 #endif

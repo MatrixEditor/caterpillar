@@ -80,7 +80,34 @@ struct _conditionatomobj
 static inline CpConditionAtomObject *
 CpConditionAtom_New(PyObject* atom, PyObject* condition)
 {
-  return (CpConditionAtomObject*)CpObject_Create(&CpConditionAtom_Type, "OO", atom, condition);
+  return (CpConditionAtomObject*)CpObject_Create(&CpConditionAtom_Type, "OO", condition, atom);
+}
+
+//------------------------------------------------------------------------------
+// Switch
+struct _switchatomobj
+{
+    CpBuiltinAtom_HEAD
+
+    /// Stores a reference to the actual parsing struct that will be used
+    /// to parse or build our data. This attribute is never null.
+    PyObject *m_atom;
+
+    // A dictionary or dynamic value to represent the cases.
+    PyObject *m_cases;
+
+    // -- internal ---
+    int s_callable;
+};
+
+#define CpSwitchAtom_NAME "switch"
+#define CpSwitchAtom_CheckExact(op) Py_IS_TYPE((op), &CpSwitchAtom_Type)
+#define CpSwitchAtom_Check(op) PyObject_IsType((op), &CpSwitchAtom_Type)
+
+static inline CpSwitchAtomObject *
+CpSwitchAtom_New(PyObject* atom, PyObject* cases)
+{
+  return (CpSwitchAtomObject*)CpObject_Create(&CpSwitchAtom_Type, "OO", atom, cases);
 }
 
 #endif
