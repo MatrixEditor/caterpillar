@@ -381,24 +381,29 @@ PyInit__C(void)
   CpModule_SetupType(&CpFieldAtom_Type);
   CpModule_SetupType(&CpFieldCAtom_Type);
   CpModule_SetupType(&CpLayer_Type);
+
+  CpSeqLayer_Type.tp_base = &CpLayer_Type;
+  CpObjLayer_Type.tp_base = &CpLayer_Type;
   CpModule_SetupType(&CpSeqLayer_Type);
   CpModule_SetupType(&CpObjLayer_Type);
   CpModule_SetupType(&CpState_Type);
 
   CpModule_SetupType(&CpStructFieldInfo_Type);
-  CpStruct_Type.tp_base = &CpFieldAtom_Type;
-  CpModule_SetupType(&CpStruct_Type);
 
   // builtins setup
   CpBuiltinAtom_Type.tp_base = &CpCAtom_Type;
   CpRepeatedAtom_Type.tp_base = &CpBuiltinAtom_Type;
   CpConditionAtom_Type.tp_base = &CpBuiltinAtom_Type;
   CpSwitchAtom_Type.tp_base = &CpBuiltinAtom_Type;
+  CpOffsetAtom_Type.tp_base = &CpBuiltinAtom_Type;
+  CpStruct_Type.tp_base = &CpBuiltinAtom_Type;
 
   CpModule_SetupType(&CpBuiltinAtom_Type);
   CpModule_SetupType(&CpRepeatedAtom_Type);
   CpModule_SetupType(&CpConditionAtom_Type);
   CpModule_SetupType(&CpSwitchAtom_Type);
+  CpModule_SetupType(&CpOffsetAtom_Type);
+  CpModule_SetupType(&CpStruct_Type);
 
   CpIntAtom_Type.tp_base = &CpBuiltinAtom_Type;
   CpModule_SetupType(&CpIntAtom_Type);
@@ -454,6 +459,7 @@ PyInit__C(void)
   CpModule_AddObject(CpRepeatedAtom_NAME, &CpRepeatedAtom_Type);
   CpModule_AddObject(CpConditionAtom_NAME, &CpConditionAtom_Type);
   CpModule_AddObject(CpSwitchAtom_NAME, &CpSwitchAtom_Type);
+  CpModule_AddObject(CpOffsetAtom_NAME, &CpOffsetAtom_Type);
 
   CpModule_AddObject(CpIntAtom_NAME, &CpIntAtom_Type);
   CpModule_AddObject(CpFloatAtom_NAME, &CpFloatAtom_Type);

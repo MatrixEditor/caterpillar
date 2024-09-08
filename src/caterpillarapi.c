@@ -37,7 +37,7 @@ void *Cp_API[] = {
     (void *) &CpObjLayer_Type,
     (void *) &CpConditionAtom_Type,
     (void *) &CpSwitchAtom_Type,
-    NULL,
+    (void *) &CpOffsetAtom_Type,
     NULL,
     NULL,
     NULL,
@@ -108,13 +108,13 @@ void *Cp_API[] = {
     (void *) &CpStruct_GetAnnotations,
     (void *) &CpStruct_ReplaceType,
     (void *) &CpStruct_HasOption,
+    (void *) &CpStruct_Pack,
+    (void *) &CpStruct_Unpack,
     (void *) &CpStructModel_Check,
     (void *) &CpStructModel_GetStruct,
     (void *) &CpSeqLayer_New,
     (void *) &CpSeqLayer_SetSequence,
     (void *) &CpObjLayer_New,
-    NULL,
-    NULL,
     NULL,
     NULL,
     NULL,
@@ -147,6 +147,9 @@ void *Cp_API[] = {
     (void *) &CpConditionAtom_IsEnabled,
     (void *) &CpSwitchAtom_GetNext,
     (void *) &CpSwitchAtom_Pack,
-    (void *) &CpSwitchAtom_Unpack
+    (void *) &CpSwitchAtom_Unpack,
+    (void *) &CpOffsetAtom_Pack,
+    (void *) &CpOffsetAtom_Unpack,
+    (void *) &CpOffsetAtom_GetOffset
 };
 

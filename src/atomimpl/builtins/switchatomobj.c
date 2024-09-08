@@ -6,6 +6,84 @@
 
 /* impl */
 static PyObject*
+cp_switchatom_type(CpSwitchAtomObject* self)
+{
+  _modulestate* mod = get_global_module_state();
+  if (!self->s_callable) {
+    return Py_NewRef(mod->Any_Type);
+  }
+
+  PyObject* types = PyList_New(0);
+  if (!types) {
+    return NULL;
+  }
+
+  PyObject* atomType = CpTypeOf(self->m_atom);
+  if (!atomType) {
+    Py_DECREF(types);
+    return NULL;
+  }
+
+  if (PyList_Append(types, atomType) < 0) {
+    Py_DECREF(types);
+    return NULL;
+  }
+
+  PyObject* values = PyDict_Values(self->m_cases);
+  if (!values) {
+    Py_XDECREF(types);
+    Py_XDECREF(atomType);
+    return NULL;
+  }
+
+  Py_ssize_t length = PyList_GET_SIZE(values);
+  PyObject* switch_type = NULL;
+  for (Py_ssize_t i = 0; i < length; i++) {
+    PyObject* value = PyList_GetItem(values, i);
+    if (!value) {
+      Py_XDECREF(values);
+      Py_XDECREF(types);
+      Py_XDECREF(switch_type);
+      return NULL;
+    }
+
+    switch_type = CpTypeOf(value);
+    if (!switch_type) {
+      Py_XDECREF(values);
+      Py_XDECREF(types);
+      return NULL;
+    }
+
+    if (!PySequence_Contains(types, switch_type)) {
+      PyList_Append(types, switch_type);
+    }
+    Py_XSETREF(switch_type, NULL);
+  }
+
+  Py_XDECREF(values);
+  PyObject* tuple = PyList_AsTuple(types);
+  Py_XDECREF(types);
+  if (!tuple) {
+    Py_XDECREF(atomType);
+    Py_XDECREF(switch_type);
+    return NULL;
+  }
+
+  PyObject* type = PyObject_GetItem(mod->Union_Type, tuple);
+  Py_XDECREF(tuple);
+  Py_XDECREF(atomType);
+  Py_XDECREF(switch_type);
+  return type;
+}
+
+static PyObject*
+cp_switchatom_size(CpSwitchAtomObject* self, CpLayerObject* layer)
+{
+  PyErr_SetString(PyExc_TypeError, "Switch atoms does not have a static size!");
+  return NULL;
+}
+
+static PyObject*
 cp_switchatom_new(PyTypeObject* type, PyObject* args, PyObject* kw)
 {
   CpSwitchAtomObject* self = (CpSwitchAtomObject*)type->tp_alloc(type, 0);
@@ -17,8 +95,8 @@ cp_switchatom_new(PyTypeObject* type, PyObject* args, PyObject* kw)
   CpBuiltinAtom_CATOM(self).ob_pack_many = NULL;
   CpBuiltinAtom_CATOM(self).ob_unpack = (unpackfunc)CpSwitchAtom_Unpack;
   CpBuiltinAtom_CATOM(self).ob_unpack_many = NULL;
-  CpBuiltinAtom_CATOM(self).ob_size = NULL;
-  CpBuiltinAtom_CATOM(self).ob_type = NULL;
+  CpBuiltinAtom_CATOM(self).ob_size = (sizefunc)cp_switchatom_size;
+  CpBuiltinAtom_CATOM(self).ob_type = (typefunc)cp_switchatom_type;
   self->s_callable = false;
   return (PyObject*)self;
 }
@@ -84,7 +162,8 @@ cp_switchatom_get_next(CpSwitchAtomObject* self, PyObject* args, PyObject* kw)
 static PyObject*
 cp_switchatom_repr(CpSwitchAtomObject* self)
 {
-  return PyUnicode_FromFormat("<switch [<%s>] %R>", Py_TYPE(self->m_cases)->tp_name, self->m_atom);
+  return PyUnicode_FromFormat(
+    "<switch [<%s>] %R>", Py_TYPE(self->m_cases)->tp_name, self->m_atom);
 }
 
 /* Public API */

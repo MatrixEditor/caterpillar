@@ -60,6 +60,12 @@ cp_builtinatom_as_number_floordiv(PyObject* self, PyObject* other)
   return (PyObject*)CpConditionAtom_New(self, other);
 }
 
+static PyObject*
+cp_builtinatom_as_number_matmul(PyObject* self, PyObject* other)
+{
+  return (PyObject*)CpOffsetAtom_New(self, other);
+}
+
 static PyMappingMethods CpFieldAtom_MappingMethods = {
   .mp_subscript = (binaryfunc)cp_builtinatom_as_mapping_getitem,
 };
@@ -67,6 +73,7 @@ static PyMappingMethods CpFieldAtom_MappingMethods = {
 static PyNumberMethods CpField_NumberMethods = {
   .nb_rshift = (binaryfunc)cp_builtinatom_as_number_rshift,
   .nb_floor_divide = (binaryfunc)cp_builtinatom_as_number_floordiv,
+  .nb_matrix_multiply = (binaryfunc)cp_builtinatom_as_number_matmul,
 };
 
 PyTypeObject CpBuiltinAtom_Type = {

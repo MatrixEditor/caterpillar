@@ -265,8 +265,8 @@ cp_objlayer_init(CpObjLayerObject* self, PyObject* args, PyObject* kw)
 
   Py_XSETREF(self->ob_base.m_state, (CpStateObject*)Py_NewRef(state));
   Py_XSETREF(self->m_obj, (PyObject*)CpContext_New());
-  Py_XSETREF(self->ob_base.m_path, Py_NewRef(path));
-  Py_XSETREF(self->ob_base.m_parent, (CpLayerObject*)Py_NewRef(parent));
+  Py_XSETREF(self->ob_base.m_path, Py_XNewRef(path));
+  Py_XSETREF(self->ob_base.m_parent, (CpLayerObject*)Py_XNewRef(parent));
   return 0;
 }
 
@@ -335,8 +335,8 @@ cp_objlayer_context_getattr(CpLayerObject* self, PyObject* args)
 CpObjLayerObject*
 CpObjLayer_New(CpStateObject* state, CpLayerObject* parent)
 {
-  CpObjLayerObject* self =
-    (CpObjLayerObject*)CpObject_Create(&CpObjLayer_Type, "O", state);
+  CpObjLayerObject* self = (CpObjLayerObject*)CpObject_CreateOneArg(
+    &CpObjLayer_Type, (PyObject*)state);
   if (!self) {
     return NULL;
   }
@@ -363,13 +363,13 @@ static PyMemberDef CpObjLayer_Members[] = {
 static PyMethodDef CpObjLayer_Methods[] = {
   { "__context_getattr__",
     (PyCFunction)cp_objlayer_context_getattr,
-    METH_VARARGS },
+    METH_VARARGS},
   { NULL } /* Sentinel */
 };
 
 PyTypeObject CpObjLayer_Type = {
   PyVarObject_HEAD_INIT(NULL, 0) _Cp_NameStr(CpObjLayer_NAME),
-  .tp_basicsize = sizeof(CpLayerObject),
+  .tp_basicsize = sizeof(CpObjLayerObject),
   .tp_dealloc = (destructor)cp_objlayer_dealloc,
   .tp_flags = Py_TPFLAGS_DEFAULT,
   .tp_doc = NULL,

@@ -25,7 +25,7 @@ C API
 -----
 
 - |check_| Implementation of parsing process (unpack, pack)
-- |check_| Struct class (:c:type:`CpStructObject`)
+- |uncheck_| Struct class (:c:type:`CpStructObject`)
 - |uncheck_| Struct wrapper function
 - |uncheck_| Python docs
 

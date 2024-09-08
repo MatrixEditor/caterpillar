@@ -7,7 +7,7 @@
 /* impl */
 
 static PyObject*
-cp_repeatedatomobj__type__(CpRepeatedAtomObject* self)
+cp_repeatedatomobj_type(CpRepeatedAtomObject* self)
 {
   PyObject* atom_type = CpTypeOf(self->m_atom);
   if (!atom_type)
@@ -19,9 +19,20 @@ cp_repeatedatomobj__type__(CpRepeatedAtomObject* self)
 }
 
 static PyObject*
-cp_repeatedatomobj__size__(CpRepeatedAtomObject* self, CpLayerObject* layer)
+cp_repeatedatomobj_size(CpRepeatedAtomObject* self, CpLayerObject* layer)
 {
-  return _Cp_SizeOf(self->m_atom, layer);
+  PyObject* length = CpRepeatedAtom_GetLength(self, (PyObject*)layer);
+  if (!length) {
+    return NULL;
+  }
+  PyObject* atom_size = _Cp_SizeOf(self->m_atom, layer);
+  if (!atom_size) {
+    return NULL;
+  }
+
+  PyObject* result = PyNumber_Multiply(atom_size, length);
+  Py_DECREF(length);
+  return result;
 }
 
 static PyObject*
@@ -43,8 +54,8 @@ cp_repeatedatomobj_new(PyTypeObject* type, PyObject* args, PyObject* kw)
   CpBuiltinAtom_CATOM(self).ob_pack_many = NULL;
   CpBuiltinAtom_CATOM(self).ob_unpack = (unpackfunc)CpRepeatedAtom_Unpack;
   CpBuiltinAtom_CATOM(self).ob_unpack_many = NULL;
-  CpBuiltinAtom_CATOM(self).ob_size = (sizefunc)cp_repeatedatomobj__size__;
-  CpBuiltinAtom_CATOM(self).ob_type = (typefunc)cp_repeatedatomobj__type__;
+  CpBuiltinAtom_CATOM(self).ob_size = (sizefunc)cp_repeatedatomobj_size;
+  CpBuiltinAtom_CATOM(self).ob_type = (typefunc)cp_repeatedatomobj_type;
   return (PyObject*)self;
 }
 
@@ -79,8 +90,8 @@ cp_repeatedatomobj_init(CpRepeatedAtomObject* self,
 
 static PyObject*
 cp_repeatedatom_set_byteorder(CpRepeatedAtomObject* self,
-                                 PyObject* args,
-                                 PyObject* kw)
+                              PyObject* args,
+                              PyObject* kw)
 {
   _CpEndian_KwArgsGetByteorder(NULL);
   PyObject* new_atom =

@@ -17,15 +17,15 @@
 #ifndef BUILTINS_H
 #define BUILTINS_H
 
-#include "caterpillar/caterpillarapi.h"
 #include "caterpillar/atomobj.h"
+#include "caterpillar/caterpillarapi.h"
 
 // PROPOSAL: Builtin atoms are similar to the Python class FieldMixin
 // but implement all parts of a field separately. For instance, the
 // builtin atom for a sequence only implements the sequence part.
 struct _builtinatomobj
 {
-    CpCAtom_HEAD
+  CpCAtom_HEAD
 };
 
 #define CpBuiltinAtom_NAME "builtinatom"
@@ -38,76 +38,119 @@ struct _builtinatomobj
 // Repeated
 struct _repeatedatomobj
 {
-    CpBuiltinAtom_HEAD
+  CpBuiltinAtom_HEAD
 
     /// Stores a reference to the actual parsing struct that will be used
     /// to parse or build our data. This attribute is never null.
-    PyObject *m_atom;
+    PyObject* m_atom;
 
-    /// A constant or dynamic value to represent the amount of structs. Zero
-    /// indicates there are no sequence types associated with this field.
-    PyObject* m_length;
+  /// A constant or dynamic value to represent the amount of structs. Zero
+  /// indicates there are no sequence types associated with this field.
+  PyObject* m_length;
 };
 
 #define CpRepeatedAtom_NAME "repeated"
 #define CpRepeatedAtom_CheckExact(op) Py_IS_TYPE((op), &CpRepeatedAtom_Type)
 #define CpRepeatedAtom_Check(op) PyObject_IsType((op), &CpRepeatedAtom_Type)
 
-inline CpRepeatedAtomObject *
+inline CpRepeatedAtomObject*
 CpRepeatedAtom_New(PyObject* atom, PyObject* length)
 {
-  return (CpRepeatedAtomObject*)CpObject_Create(&CpRepeatedAtom_Type, "OO", atom, length);
+  return (CpRepeatedAtomObject*)CpObject_Create(
+    &CpRepeatedAtom_Type, "OO", atom, length);
 }
 
 //------------------------------------------------------------------------------
 // Conditional
 struct _conditionatomobj
 {
-    CpBuiltinAtom_HEAD
+  CpBuiltinAtom_HEAD
 
     /// Stores a reference to the actual parsing struct that will be used
     /// to parse or build our data. This attribute is never null.
-    PyObject *m_atom;
+    PyObject* m_atom;
 
-    /// A constant or dynamic value to represent the condition.
-    PyObject *m_condition;
+  /// A constant or dynamic value to represent the condition.
+  PyObject* m_condition;
 };
 
 #define CpConditionAtom_NAME "condition"
 #define CpConditionAtom_CheckExact(op) Py_IS_TYPE((op), &CpConditionAtom_Type)
 #define CpConditionAtom_Check(op) PyObject_IsType((op), &CpConditionAtom_Type)
 
-static inline CpConditionAtomObject *
+static inline CpConditionAtomObject*
 CpConditionAtom_New(PyObject* atom, PyObject* condition)
 {
-  return (CpConditionAtomObject*)CpObject_Create(&CpConditionAtom_Type, "OO", condition, atom);
+  return (CpConditionAtomObject*)CpObject_Create(
+    &CpConditionAtom_Type, "OO", condition, atom);
 }
 
 //------------------------------------------------------------------------------
 // Switch
 struct _switchatomobj
 {
-    CpBuiltinAtom_HEAD
+  CpBuiltinAtom_HEAD
 
     /// Stores a reference to the actual parsing struct that will be used
     /// to parse or build our data. This attribute is never null.
-    PyObject *m_atom;
+    PyObject* m_atom;
 
-    // A dictionary or dynamic value to represent the cases.
-    PyObject *m_cases;
+  // A dictionary or dynamic value to represent the cases.
+  PyObject* m_cases;
 
-    // -- internal ---
-    int s_callable;
+  // -- internal ---
+  int s_callable;
 };
 
 #define CpSwitchAtom_NAME "switch"
 #define CpSwitchAtom_CheckExact(op) Py_IS_TYPE((op), &CpSwitchAtom_Type)
 #define CpSwitchAtom_Check(op) PyObject_IsType((op), &CpSwitchAtom_Type)
 
-static inline CpSwitchAtomObject *
+static inline CpSwitchAtomObject*
 CpSwitchAtom_New(PyObject* atom, PyObject* cases)
 {
-  return (CpSwitchAtomObject*)CpObject_Create(&CpSwitchAtom_Type, "OO", atom, cases);
+  return (CpSwitchAtomObject*)CpObject_Create(
+    &CpSwitchAtom_Type, "OO", atom, cases);
+}
+
+//------------------------------------------------------------------------------
+// Offset
+struct _offsetatomobj
+{
+  CpBuiltinAtom_HEAD
+
+    /// Stores a reference to the actual parsing struct that will be used
+    /// to parse or build our data. This attribute is never null.
+    PyObject* m_atom;
+
+  PyObject* m_offset;
+  PyObject* m_whence;
+
+  // -- internal ---
+  int s_is_number;
+};
+
+#define CpOffsetAtom_NAME "atoffset"
+#define CpOffsetAtom_CheckExact(op) Py_IS_TYPE((op), &CpOffsetAtom_Type)
+#define CpOffsetAtom_Check(op) PyObject_IsType((op), &CpOffsetAtom_Type)
+
+static inline CpOffsetAtomObject*
+CpOffsetAtom_FromSsize_t(PyObject* atom, Py_ssize_t offset)
+{
+  PyObject* o = PyLong_FromSsize_t(offset);
+  if (o == NULL)
+    return NULL;
+  CpOffsetAtomObject* a =
+    (CpOffsetAtomObject*)CpObject_Create(&CpOffsetAtom_Type, "OO", atom, o);
+  Py_DECREF(o);
+  return a;
+}
+
+static inline CpOffsetAtomObject*
+CpOffsetAtom_New(PyObject* atom, PyObject* offset)
+{
+  return (CpOffsetAtomObject*)CpObject_Create(
+    &CpOffsetAtom_Type, "OO", atom, offset);
 }
 
 #endif

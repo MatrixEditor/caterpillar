@@ -1,9 +1,8 @@
 /* struct and struct-field-info implementation */
 #include <stdbool.h>
 
-#include "caterpillar/arch.h"
-#include "caterpillar/module.h"
-#include "caterpillar/struct.h"
+#include "caterpillar/caterpillar.h"
+
 #include <structmember.h>
 
 /* struct-field-info implementation */
@@ -16,6 +15,7 @@ cp_struct_fieldinfo_new(PyTypeObject* type, PyObject* args, PyObject* kw)
     return NULL;
   }
   self->m_field = NULL;
+  self->m_name = NULL;
   self->s_excluded = false;
   return (PyObject*)self;
 }
@@ -24,6 +24,7 @@ static void
 cp_struct_fieldinfo_dealloc(CpStructFieldInfoObject* self)
 {
   Py_XDECREF(self->m_field);
+  Py_XDECREF(self->m_name);
   Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
@@ -32,12 +33,12 @@ cp_struct_fieldinfo_init(CpStructFieldInfoObject* self,
                          PyObject* args,
                          PyObject* kw)
 {
-  static char* kwlist[] = { "field", "excluded", NULL };
-  PyObject* field = NULL;
+  static char* kwlist[] = { "name", "field", "excluded", NULL };
+  PyObject *field = NULL, *name = NULL;
   int excluded = false;
 
   if (!PyArg_ParseTupleAndKeywords(
-        args, kw, "O|p", kwlist, &field, &excluded)) {
+        args, kw, "OO|p", kwlist, &name, &field, &excluded)) {
     return -1;
   }
 
@@ -46,12 +47,8 @@ cp_struct_fieldinfo_init(CpStructFieldInfoObject* self,
     return -1;
   }
 
-  if (!CpField_Check(field)) {
-    PyErr_SetString(PyExc_ValueError, "field is not a field!");
-    return -1;
-  }
-
-  Py_XSETREF(self->m_field, (CpFieldObject*)Py_XNewRef(field));
+  Py_XSETREF(self->m_field, Py_XNewRef(field));
+  Py_XSETREF(self->m_name, (PyObject*)Py_XNewRef(name));
   self->s_excluded = excluded;
   return 0;
 }
@@ -59,18 +56,17 @@ cp_struct_fieldinfo_init(CpStructFieldInfoObject* self,
 static PyObject*
 cp_struct_fieldinfo_repr(CpStructFieldInfoObject* self)
 {
-  return PyUnicode_FromFormat("<CpStructFieldInfo of %R>",
-                              self->m_field->m_name);
+  return PyUnicode_FromFormat("<fieldinfo %R %R>", self->m_name, self->m_field);
 }
 
 /* public API */
 
 /*CpAPI*/
 CpStructFieldInfoObject*
-CpStructFieldInfo_New(CpFieldObject* field)
+CpStructFieldInfo_New(PyObject* name, PyObject* field)
 {
-  return (CpStructFieldInfoObject*)CpObject_CreateOneArg(
-    &CpStructFieldInfo_Type, (PyObject*)field);
+  return (CpStructFieldInfoObject*)CpObject_Create(
+    &CpStructFieldInfo_Type, "OO", name, field);
 }
 
 /* docs */
@@ -80,6 +76,11 @@ static PyMemberDef CpStructFieldInfo_Members[] = {
   { "field",
     T_OBJECT,
     offsetof(CpStructFieldInfoObject, m_field),
+    READONLY,
+    NULL },
+  { "name",
+    T_OBJECT,
+    offsetof(CpStructFieldInfoObject, m_name),
     READONLY,
     NULL },
   { "excluded",
@@ -204,6 +205,13 @@ cp_struct_new(PyTypeObject* type, PyObject* args, PyObject* kw)
   if (!self->s_std_init_fields) {
     return NULL;
   }
+  CpBuiltinAtom_CATOM(self).ob_pack = (packfunc)CpStruct_Pack;
+  CpBuiltinAtom_CATOM(self).ob_unpack = (unpackfunc)CpStruct_Unpack;
+  CpBuiltinAtom_CATOM(self).ob_size = NULL;
+  CpBuiltinAtom_CATOM(self).ob_type = NULL;
+  CpBuiltinAtom_CATOM(self).ob_pack_many = NULL;
+  CpBuiltinAtom_CATOM(self).ob_unpack_many = NULL;
+  CpBuiltinAtom_CATOM(self).ob_bits = NULL;
   return (PyObject*)self;
 }
 
@@ -571,7 +579,7 @@ cp_struct_process_annotation(CpStructObject* self,
   // It is worthwhile to note that the default value specified here will be
   // assigned to the created field instance. There is no destinction between
   // class-level defaults and field-level defaults.
-  CpFieldObject* field = NULL;
+  PyObject* field = NULL;
   _modulestate* state = self->s_mod;
   {
     // 1. Annotated field:
@@ -579,7 +587,7 @@ cp_struct_process_annotation(CpStructObject* self,
     // it. Note thate we check against the *exact* type, which means that we
     // will not accept any subclass of CpField.
     if (CpField_CheckExact(annotation)) {
-      field = (CpFieldObject*)Py_NewRef(annotation);
+      field = Py_NewRef(annotation);
     }
 
     // 2. Atom object or protocol
@@ -590,10 +598,7 @@ cp_struct_process_annotation(CpStructObject* self,
     // only against packing, unpacking and size calculation. The type function
     // is optional and won't be covered here.
     else if (CpAtom_Check(annotation)) {
-      field = (CpFieldObject*)CpField_New(annotation);
-      if (!field) {
-        return -1;
-      }
+      field = Py_NewRef(annotation);
     }
 
     // 3. Type
@@ -605,11 +610,7 @@ cp_struct_process_annotation(CpStructObject* self,
         if (!struct_) {
           return -1;
         }
-        field = (CpFieldObject*)CpField_New(struct_);
-        Py_XDECREF(struct_);
-        if (!field) {
-          return -1;
-        }
+        field = Py_NewRef(struct_);
       }
     }
 
@@ -617,43 +618,48 @@ cp_struct_process_annotation(CpStructObject* self,
     // The annotation is a callable object and conforms to the ContextLambda
     // protocol. Note that we assume the right function signature.
     else if (PyCallable_Check(annotation)) {
-      field = (CpFieldObject*)CpField_New(annotation);
-      if (!field) {
-        return -1;
-      }
+      field = Py_NewRef(annotation);
+    }
+
+    else {
+      // REVISIT: Add support for other types here.
+      PyErr_Format(PyExc_ValueError,
+                   ("Field %R could not be created, because the placed "
+                    "annotation does not "
+                    "conform to any of the supported types.\n"
+                    "annotation: %R"),
+                   name,
+                   annotation);
+      return -1;
     }
   }
 
-  // Currently, there is no extension support for other types. That is
-  // a future feature.
-  if (!field) {
-    PyErr_Format(
-      PyExc_ValueError,
-      ("Field %R could not be created, because the placed annotation does not "
-       "conform to any of the supported types.\n"
-       "annotation: %R"),
-      name,
-      annotation);
-    return -1;
+  // TODO: arch
+  PyObject* next_field =
+    CpEndian_SetEndian(field, (CpEndianObject*)self->m_endian);
+  if (next_field) {
+    Py_SETREF(field, next_field);
+  } else {
+    PyErr_Clear();
   }
 
-  _Cp_SetObj(field->m_arch, self->m_arch);
-  _Cp_SetObj(field->m_endian, self->m_endian);
-  _Cp_SetObj(field->m_default, default_value);
-  _Cp_SetObj(field->m_name, name);
-  if (_PySet_Update(field->m_options, self->m_field_options) < 0) {
+  CpStructFieldInfoObject* field_info = CpStructFieldInfo_New(name, field);
+  if (!field_info) {
     Py_XDECREF(field);
     return -1;
   }
+  field_info->s_excluded = exclude;
+  _Cp_SetObj(field_info->m_default, default_value);
 
-  int res = CpStruct_AddField(self, field, exclude);
+  int res = CpStruct_AddFieldInfo(self, field_info);
   if (res < 0) {
+    Py_XDECREF(field_info);
     Py_XDECREF(field);
     return -1;
   }
 
   if (!Cp_IsInvalidDefault(default_value)) {
-    if (CpStructModel_SetDefault(self, field->m_name, default_value) < 0) {
+    if (CpStructModel_SetDefault(self, name, default_value) < 0) {
       Py_XDECREF(field);
       return -1;
     }
@@ -668,7 +674,7 @@ cp_struct_process_annotation(CpStructObject* self,
   }
 
   if (res) {
-    PyObject* type = CpTypeOf_Field(field);
+    PyObject* type = CpTypeOf(field);
     if (!type) {
       Py_XDECREF(field);
       return -1;
@@ -709,15 +715,15 @@ _cp_struct_model__init__(PyObject* self, PyObject* args, PyObject* kwnames)
     if (i >= argc) {
       // If the current positional field is defined as a keyword argument,
       // we should retrieve it from the keyword arguments.
-      if (!kwnames || !PyDict_Contains(kwnames, info->m_field->m_name)) {
+      if (!kwnames || !PyDict_Contains(kwnames, info->m_name)) {
         Py_XDECREF(struct_);
         PyErr_Format(PyExc_ValueError,
                      ("Missing argument for positional field %R"),
-                     info->m_field->m_name);
+                     info->m_name);
         return -1;
       }
 
-      value = PyDict_GetItem(kwnames, info->m_field->m_name);
+      value = PyDict_GetItem(kwnames, info->m_name);
     } else
       value = PyTuple_GetItem(args, i);
 
@@ -728,7 +734,7 @@ _cp_struct_model__init__(PyObject* self, PyObject* args, PyObject* kwnames)
 
     // as we store a borrowed reference in 'value', we don't need
     // to decref it.
-    if (PyObject_SetAttr(self, info->m_field->m_name, value) < 0) {
+    if (PyObject_SetAttr(self, info->m_name, value) < 0) {
       Py_XDECREF(struct_);
       return -1;
     }
@@ -747,10 +753,10 @@ _cp_struct_model__init__(PyObject* self, PyObject* args, PyObject* kwnames)
 
     // A custom value is only provided if it is in the given keyword
     // arguments.
-    if (!kwnames || !PyDict_Contains(kwnames, info->m_field->m_name)) {
-      value = info->m_field->m_default;
+    if (!kwnames || !PyDict_Contains(kwnames, info->m_name)) {
+      value = info->m_default;
     } else {
-      value = PyDict_GetItem(kwnames, info->m_field->m_name);
+      value = PyDict_GetItem(kwnames, info->m_name);
     }
 
     if (!value) {
@@ -759,7 +765,7 @@ _cp_struct_model__init__(PyObject* self, PyObject* args, PyObject* kwnames)
     }
 
     // same as before, we don't need to decref the value
-    if (PyObject_SetAttr(self, info->m_field->m_name, value) < 0) {
+    if (PyObject_SetAttr(self, info->m_name, value) < 0) {
       Py_XDECREF(struct_);
       return -1;
     }
@@ -980,7 +986,7 @@ cleanup:
 static PyObject*
 cp_struct_repr(CpStructObject* self)
 {
-  return PyUnicode_FromFormat("<CpStruct of '%s'>", self->m_model->tp_name);
+  return PyUnicode_FromFormat("<struct <%s>>", self->m_model->tp_name);
 }
 
 /* public API */
@@ -994,15 +1000,14 @@ CpStruct_AddFieldInfo(CpStructObject* o, CpStructFieldInfoObject* info)
     return -1;
   }
 
-  CpFieldObject* field = info->m_field;
-  if (PyMapping_HasKey(o->m_members, field->m_name)) {
+  if (PyMapping_HasKey(o->m_members, info->m_name)) {
     PyErr_Format(
-      PyExc_ValueError, "field with name %R already exists", field->m_name);
+      PyExc_ValueError, "field with name %R already exists", info->m_name);
     return -1;
   }
 
   if (!info->s_excluded) {
-    PyObject* list = Cp_IsInvalidDefault(field->m_default)
+    PyObject* list = Cp_IsInvalidDefault(info->m_default)
                        ? o->s_std_init_fields
                        : o->s_kwonly_init_fields;
 
@@ -1010,7 +1015,7 @@ CpStruct_AddFieldInfo(CpStructObject* o, CpStructFieldInfoObject* info)
       return -1;
     }
   }
-  return PyObject_SetItem(o->m_members, field->m_name, (PyObject*)info);
+  return PyObject_SetItem(o->m_members, info->m_name, (PyObject*)info);
 }
 
 /*CpAPI*/
@@ -1022,7 +1027,8 @@ CpStruct_AddField(CpStructObject* o, CpFieldObject* field, int exclude)
     return -1;
   }
 
-  CpStructFieldInfoObject* info = CpStructFieldInfo_New(field);
+  CpStructFieldInfoObject* info =
+    CpStructFieldInfo_New(field->m_name, (PyObject*)field);
   if (!info) {
     return -1;
   }
@@ -1127,6 +1133,81 @@ CpStruct_New(PyObject* model)
     return NULL;
   }
   return (CpStructObject*)CpObject_CreateOneArg(&CpStruct_Type, model);
+}
+
+/*CpAPI*/
+int
+CpStruct_Pack(CpStructObject* self, PyObject* obj, CpLayerObject* layer)
+{
+  CpObjLayerObject* obj_layer = CpObjLayer_New(layer->m_state, layer);
+  if (!obj_layer) {
+    return -1;
+  }
+
+  _Cp_SetObj(obj_layer->m_obj, Py_NewRef(obj));
+  CpStructFieldInfoObject* info = NULL;
+  // all borrowed references
+  PyObject *name = NULL, *value = NULL;
+  int res = 0;
+
+  Py_ssize_t pos = 0;
+  while (PyDict_Next(self->m_members, &pos, &name, (PyObject**)&info)) {
+    value = PyObject_GetAttr(obj, name);
+    if (!value) {
+      goto failure;
+    }
+
+    res = _Cp_Pack(value, (PyObject*)info->m_field, (CpLayerObject*)obj_layer);
+    Py_XSETREF(value, NULL);
+    if (res < 0) {
+      goto failure;
+    }
+  }
+
+  CpLayer_Invalidate((CpLayerObject*)obj_layer);
+  return 0;
+
+failure:
+  CpLayer_Invalidate((CpLayerObject*)obj_layer);
+  Py_XDECREF(value);
+  return -1;
+}
+
+/*CpAPI*/
+PyObject*
+CpStruct_Unpack(CpStructObject* self, CpLayerObject* layer)
+{
+  printf("creating layer....\n");
+  CpObjLayerObject* obj_layer = CpObjLayer_New(layer->m_state, layer);
+  if (!obj_layer) {
+    return NULL;
+  }
+
+  CpStructFieldInfoObject* info = NULL;
+  Py_ssize_t pos = 0;
+  PyObject *name = NULL, *value = NULL;
+  while (PyDict_Next(self->m_members, &pos, &name, (PyObject**)&info)) {
+    if (!info->m_field) {
+      return NULL;
+    }
+
+    printf("getting %s....\n", PyUnicode_AsUTF8(name));
+    value = _Cp_Unpack((PyObject*)info->m_field, (CpLayerObject*)obj_layer);
+    CpLayer_AppendPath(&obj_layer->ob_base, name);
+    if (!value || PyDict_SetItem(obj_layer->m_obj, name, value) < 0) {
+      Py_XDECREF(value);
+      Py_XDECREF(obj_layer);
+      return NULL;
+    }
+    Py_XDECREF(value);
+  }
+  printf("finished parsing....\n");
+  PyObject* args = PyTuple_New(0);
+  PyObject* obj =
+    PyObject_Call((PyObject*)self->m_model, args, obj_layer->m_obj);
+  Py_XDECREF(args);
+  Py_XDECREF(obj_layer);
+  return obj;
 }
 
 /* docs */

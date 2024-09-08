@@ -18,19 +18,25 @@
 #define CP_STRUCT_H
 
 #include "caterpillar/caterpillarapi.h"
-#include "caterpillar/field.h"
+#include "caterpillar/atoms/builtins.h"
 
 /* Caterpillar Struct C implementation */
 
 /**
  * @brief Internal class used to store information about a field
  */
-struct CpStructFieldInfo
+struct _fieldinfoobj
 {
   PyObject_HEAD
 
-    /// the referenced field object
-    CpFieldObject* m_field;
+  /// the referenced field object
+  PyObject *m_field;
+
+  /// the name of the field
+  PyObject *m_name;
+
+  /// The configured default value.
+  PyObject* m_default;
 
   // Excluded: True if the field is included in the struct
   int8_t s_excluded;
@@ -70,7 +76,8 @@ struct CpStructFieldInfo
  */
 struct _structobj
 {
-  CpFieldAtom_HEAD PyTypeObject* m_model; // underlying class
+  CpBuiltinAtom_HEAD
+  PyTypeObject* m_model; // underlying class
 
   PyObject* m_members; // Dict[str, FieldInfo]
   PyObject* m_options; // set[CpOption]
@@ -88,9 +95,6 @@ struct _structobj
 
   _modulestate* s_mod;
 };
-
-/// Struct object type
-// PyAPI_DATA(PyTypeObject) CpStruct_Type;
 
 /**
  * @brief Checks if the given object is a struct object

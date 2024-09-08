@@ -42,6 +42,7 @@ python_add_library(
   src/atomimpl/builtins/repeatedatomobj.c
   src/atomimpl/builtins/conditionatomobj.c
   src/atomimpl/builtins/switchatomobj.c
+  src/atomimpl/builtins/offsetatomobj.c
 
   WITH_SOABI
 )

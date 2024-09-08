@@ -46,9 +46,10 @@ src:atomimpl/builtins/builtinatomobj.c
 src:atomimpl/builtins/repeatedatomobj.c
 src:atomimpl/builtins/conditionatomobj.c
 src:atomimpl/builtins/switchatomobj.c
+src:atomimpl/builtins/offsetatomobj.c
 
 # First index is reserved for the global module reference
-obj:null:CpModule:PyModuleDef
+obj:0:CpModule:PyModuleDef
 
 type:-:_modulestate:_modulestate:-
 
@@ -74,7 +75,7 @@ type:17:_stateobj:CpStateObject:-
 type:18:_layerobj:CpLayerObject:-
 
 # REVISIT: maybe rename to _structfieldinfo
-type:19:CpStructFieldInfo:CpStructFieldInfoObject:-
+type:19:_fieldinfoobj:CpStructFieldInfoObject:-
 type:20:_structobj:CpStructObject:-
 type:21:_floatatomobj:CpFloatAtomObject:-
 type:22:_intatomobj:CpIntAtomObject:-
@@ -89,6 +90,7 @@ type:30:_seqlayerobj:CpSeqLayerObject:-
 type:31:_objlayerobj:CpObjLayerObject:-
 type:32:_conditionatomobj:CpConditionAtomObject:-
 type:33:_switchatomobj:CpSwitchAtomObject:-
+type:34:_offsetatomobj:CpOffsetAtomObject:-
 
 func:50:CpEndian_IsLittleEndian:int:null
 func:53:CpContext_New:CpContextObject*:+1
@@ -140,11 +142,13 @@ func:101:CpStruct_New:CpStructObject*:+1
 func:102:CpStruct_GetAnnotations:PyObject*:+1
 func:103:CpStruct_ReplaceType:int:null
 func:104:CpStruct_HasOption:int:null
-func:105:CpStructModel_Check:int:null
-func:106:CpStructModel_GetStruct:PyObject*:+1
-func:107:CpSeqLayer_New:CpSeqLayerObject*:+1
-func:108:CpSeqLayer_SetSequence:int:null
-func:109:CpObjLayer_New:CpObjLayerObject*:+1
+func:105:CpStruct_Pack:int:null
+func:106:CpStruct_Unpack:PyObject*:+1
+func:107:CpStructModel_Check:int:null
+func:108:CpStructModel_GetStruct:PyObject*:+1
+func:109:CpSeqLayer_New:CpSeqLayerObject*:+1
+func:110:CpSeqLayer_SetSequence:int:null
+func:111:CpObjLayer_New:CpObjLayerObject*:+1
 
 # atom api
 func:120:CpIntAtom_Pack:int:null
@@ -163,13 +167,20 @@ func:132:CpStringAtom_Pack:int:null
 func:133:CpStringAtom_Unpack:PyObject*:+1
 func:134:CpConstAtom_Pack:int:null
 func:135:CpConstAtom_Unpack:PyObject*:+1
+func:-:CpRepeatedAtom_New:CpRepeatedAtomObject*:+1
 func:136:CpRepeatedAtom_Pack:int:null
 func:137:CpRepeatedAtom_Unpack:PyObject*:+1
 func:138:CpRepeatedAtom_GetLength:PyObject*:+1
+func:-:CpConditionAtom_New:CpConditionAtomObject*:+1
 func:139:CpConditionAtom_Pack:int:null
 func:140:CpConditionAtom_Unpack:PyObject*:+1
 func:141:CpConditionAtom_IsEnabled:int:null
+func:-:CpSwitchAtom_New:CpSwitchAtomObject*:+1
 func:142:CpSwitchAtom_GetNext:PyObject*:+1
 func:143:CpSwitchAtom_Pack:int:null
 func:144:CpSwitchAtom_Unpack:PyObject*:+1
-
+func:-:CpOffsetAtom_FromSsize_t:CpOffsetAtomObject*:+1
+func:-:CpOffsetAtom_New:CpOffsetAtomObject*:+1
+func:145:CpOffsetAtom_Pack:int:null
+func:146:CpOffsetAtom_Unpack:PyObject*:+1
+func:147:CpOffsetAtom_GetOffset:PyObject*:+1

@@ -138,8 +138,8 @@ static PyObject*
 cp_state_seek(CpStateObject* self, PyObject* args)
 {
   PyObject* offset = NULL;
-  int whence = 0;
-  if (!PyArg_ParseTuple(args, "O|i", &offset, &whence)) {
+  PyObject* whence = NULL;
+  if (!PyArg_ParseTuple(args, "OO", &offset, &whence)) {
     return NULL;
   }
   return CpState_Seek(self, offset, whence);
@@ -170,7 +170,7 @@ CpState_Tell(CpStateObject* self)
 
 /*CpAPI*/
 PyObject*
-CpState_Seek(CpStateObject* self, PyObject* offset, int whence)
+CpState_Seek(CpStateObject* self, PyObject* offset, PyObject* whence)
 {
   return PyObject_CallMethodObjArgs(
     self->m_io, self->mod->str_seek, offset, whence);
