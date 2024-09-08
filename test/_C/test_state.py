@@ -4,7 +4,7 @@ import caterpillar
 
 if caterpillar.native_support():
 
-    from caterpillar._C import State, layer, ContextPath, Context
+    from caterpillar._C import State, layer, ContextPath, Context, objlayer
 
 
     # State and layer each implement the context protocol, we
@@ -25,8 +25,8 @@ if caterpillar.native_support():
         with pytest.raises(TypeError):
             _ = layer()
 
-        l = layer(State())
-        assert l.obj is None
+        l = objlayer(State())
+        assert l.obj is not None
         l.obj = 1
         assert l.obj == 1
 
@@ -57,7 +57,7 @@ if caterpillar.native_support():
         cp2 = ContextPath("obj.foo")
         # path always points to foo
         path2 = func(cp2)
-        l = layer(State(), obj=c)
+        l = objlayer(State(), obj=c)
         rval = path2(l)
         assert (
             rval == expected

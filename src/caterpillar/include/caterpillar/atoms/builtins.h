@@ -30,7 +30,7 @@ struct _builtinatomobj
 
 #define CpBuiltinAtom_NAME "builtinatom"
 #define CpBuiltinAtom_CheckExact(op) Py_IS_TYPE((op), &CpBuiltinAtom_Type)
-#define CpBuiltinAtom_Check(op) PyObject_IsType((op), &CpBuiltinAtom_Type)
+#define CpBuiltinAtom_Check(op) PyObject_TypeCheck((op), &CpBuiltinAtom_Type)
 #define CpBuiltinAtom_HEAD CpBuiltinAtomObject ob_base;
 #define CpBuiltinAtom_CATOM(self) (self)->ob_base.ob_base
 
@@ -51,7 +51,7 @@ struct _repeatedatomobj
 
 #define CpRepeatedAtom_NAME "repeated"
 #define CpRepeatedAtom_CheckExact(op) Py_IS_TYPE((op), &CpRepeatedAtom_Type)
-#define CpRepeatedAtom_Check(op) PyObject_IsType((op), &CpRepeatedAtom_Type)
+#define CpRepeatedAtom_Check(op) PyObject_TypeCheck((op), &CpRepeatedAtom_Type)
 
 inline CpRepeatedAtomObject*
 CpRepeatedAtom_New(PyObject* atom, PyObject* length)
@@ -76,7 +76,7 @@ struct _conditionatomobj
 
 #define CpConditionAtom_NAME "condition"
 #define CpConditionAtom_CheckExact(op) Py_IS_TYPE((op), &CpConditionAtom_Type)
-#define CpConditionAtom_Check(op) PyObject_IsType((op), &CpConditionAtom_Type)
+#define CpConditionAtom_Check(op) PyObject_TypeCheck((op), &CpConditionAtom_Type)
 
 static inline CpConditionAtomObject*
 CpConditionAtom_New(PyObject* atom, PyObject* condition)
@@ -104,7 +104,7 @@ struct _switchatomobj
 
 #define CpSwitchAtom_NAME "switch"
 #define CpSwitchAtom_CheckExact(op) Py_IS_TYPE((op), &CpSwitchAtom_Type)
-#define CpSwitchAtom_Check(op) PyObject_IsType((op), &CpSwitchAtom_Type)
+#define CpSwitchAtom_Check(op) PyObject_TypeCheck((op), &CpSwitchAtom_Type)
 
 static inline CpSwitchAtomObject*
 CpSwitchAtom_New(PyObject* atom, PyObject* cases)
@@ -132,7 +132,7 @@ struct _offsetatomobj
 
 #define CpOffsetAtom_NAME "atoffset"
 #define CpOffsetAtom_CheckExact(op) Py_IS_TYPE((op), &CpOffsetAtom_Type)
-#define CpOffsetAtom_Check(op) PyObject_IsType((op), &CpOffsetAtom_Type)
+#define CpOffsetAtom_Check(op) PyObject_TypeCheck((op), &CpOffsetAtom_Type)
 
 static inline CpOffsetAtomObject*
 CpOffsetAtom_FromSsize_t(PyObject* atom, Py_ssize_t offset)

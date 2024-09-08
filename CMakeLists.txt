@@ -43,6 +43,7 @@ python_add_library(
   src/atomimpl/builtins/conditionatomobj.c
   src/atomimpl/builtins/switchatomobj.c
   src/atomimpl/builtins/offsetatomobj.c
+  src/atomimpl/builtins/primitiveatomobj.c
 
   WITH_SOABI
 )

@@ -17,8 +17,21 @@
 #ifndef PRIMITIVEATOMOBJ_H
 #define PRIMITIVEATOMOBJ_H
 
-#include "caterpillar/caterpillarapi.h"
-#include "caterpillar/field.h"
+#include "caterpillar/atoms/builtins.h"
+
+
+//------------------------------------------------------------------------------
+// primitive atom
+struct _primitiveatomobj {
+  CpAtom_HEAD
+};
+
+#define CpPrimitiveAtom_NAME "patom"
+#define CpPrimitiveAtom_CheckExact(op) Py_IS_TYPE((op), &CpPrimitiveAtom_Type)
+#define CpPrimitiveAtom_Check(op) (PyObject_IsInstance((op), &CpPrimitiveAtom_Type))
+
+//------------------------------------------------------------------------------
+// Bool
 
 /// @struct _boolatomobj
 /// @brief Struct representing a bool atom object.
@@ -27,7 +40,7 @@
 /// family.
 struct _boolatomobj
 {
-  CpFieldCAtom_HEAD
+  CpBuiltinAtom_HEAD
 };
 
 /// @brief Bool atom object type
@@ -65,7 +78,7 @@ struct _boolatomobj
 // Char Atom
 struct _charatomobj
 {
-  CpFieldCAtom_HEAD
+  CpBuiltinAtom_HEAD
 };
 
 /// Char atom object type
@@ -81,7 +94,7 @@ struct _charatomobj
 // Padding
 struct _paddingatomobj
 {
-  CpFieldCAtom_HEAD
+  CpBuiltinAtom_HEAD
 
     char padding;
 };

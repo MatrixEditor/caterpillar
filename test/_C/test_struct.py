@@ -26,7 +26,7 @@ if caterpillar.native_support():
         assert s.model is Foo
         # The member dictionary will store Field instances,
         # which then store the default value
-        assert s.members["a"].field.default == 1
+        assert s.members["a"].default == 1
 
 
     def test_invalid_struct_model():

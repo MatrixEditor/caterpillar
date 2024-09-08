@@ -20,13 +20,13 @@ cp_boolatom_new(PyTypeObject* type, PyObject* args, PyObject* kwds)
 {
   CpBoolAtomObject* self = (CpBoolAtomObject*)type->tp_alloc(type, 0);
   if (self != NULL) {
-    CpFieldCAtom_CATOM(self).ob_pack = (packfunc)CpBoolAtom_Pack;
-    CpFieldCAtom_CATOM(self).ob_unpack = (unpackfunc)CpBoolAtom_Unpack;
-    CpFieldCAtom_CATOM(self).ob_pack_many = NULL;
-    CpFieldCAtom_CATOM(self).ob_unpack_many = NULL;
-    CpFieldCAtom_CATOM(self).ob_size = (sizefunc)cp_boolatom__size__;
-    CpFieldCAtom_CATOM(self).ob_type = (typefunc)cp_boolatom__type__;
-    CpFieldCAtom_CATOM(self).ob_bits = NULL;
+    CpBuiltinAtom_CATOM(self).ob_pack = (packfunc)CpBoolAtom_Pack;
+    CpBuiltinAtom_CATOM(self).ob_unpack = (unpackfunc)CpBoolAtom_Unpack;
+    CpBuiltinAtom_CATOM(self).ob_pack_many = NULL;
+    CpBuiltinAtom_CATOM(self).ob_unpack_many = NULL;
+    CpBuiltinAtom_CATOM(self).ob_size = (sizefunc)cp_boolatom__size__;
+    CpBuiltinAtom_CATOM(self).ob_type = (typefunc)cp_boolatom__type__;
+    CpBuiltinAtom_CATOM(self).ob_bits = NULL;
   }
   return (PyObject*)self;
 }

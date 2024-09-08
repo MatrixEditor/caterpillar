@@ -26,15 +26,15 @@ cp_paddingatom_new(PyTypeObject* type, PyObject* args, PyObject* kwds)
 {
   CpPaddingAtomObject* self = (CpPaddingAtomObject*)type->tp_alloc(type, 0);
   if (self != NULL) {
-    CpFieldCAtom_CATOM(self).ob_pack = (packfunc)CpPaddingAtom_Pack;
-    CpFieldCAtom_CATOM(self).ob_unpack = (unpackfunc)CpPaddingAtom_Unpack;
-    CpFieldCAtom_CATOM(self).ob_pack_many =
+    CpBuiltinAtom_CATOM(self).ob_pack = (packfunc)CpPaddingAtom_Pack;
+    CpBuiltinAtom_CATOM(self).ob_unpack = (unpackfunc)CpPaddingAtom_Unpack;
+    CpBuiltinAtom_CATOM(self).ob_pack_many =
       (packmanyfunc)CpPaddingAtom_PackMany;
-    CpFieldCAtom_CATOM(self).ob_unpack_many =
+    CpBuiltinAtom_CATOM(self).ob_unpack_many =
       (unpackmanyfunc)CpPaddingAtom_UnpackMany;
-    CpFieldCAtom_CATOM(self).ob_size = (sizefunc)cp_paddingatom__size__;
-    CpFieldCAtom_CATOM(self).ob_type = (typefunc)cp_paddingatom__type__;
-    CpFieldCAtom_CATOM(self).ob_bits = NULL;
+    CpBuiltinAtom_CATOM(self).ob_size = (sizefunc)cp_paddingatom__size__;
+    CpBuiltinAtom_CATOM(self).ob_type = (typefunc)cp_paddingatom__type__;
+    CpBuiltinAtom_CATOM(self).ob_bits = NULL;
   }
   return (PyObject*)self;
 }

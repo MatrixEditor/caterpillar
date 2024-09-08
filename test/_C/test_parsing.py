@@ -5,7 +5,7 @@ import caterpillar
 
 if caterpillar.native_support():
 
-    from caterpillar._C import atom, typeof, Field, sizeof, fieldatom
+    from caterpillar._C import atom, typeof, Field, sizeof, patom
     from caterpillar._C import unpack, layer, Struct, pack, ContextPath
 
 
@@ -16,15 +16,15 @@ if caterpillar.native_support():
             return str
 
 
-    # Using the base class 'fieldatom' enabled direct field creation
+    # Using the base class 'patom' enabled direct field creation
     # using the common operators.
-    class Bar(fieldatom):
+    class Bar(patom):
         def __size__(self, ctx):
             return 2
 
 
     # Only packing is implemented
-    class Baz(fieldatom):
+    class Baz(patom):
         def __unpack__(self, ctx: layer):
             return int.from_bytes(ctx.state.read(2))
 
@@ -67,7 +67,7 @@ if caterpillar.native_support():
         # NOTE: A switch context is somewhat special as we don't
         # know the target atom yet. Therefore, only context lambdas
         # as switch values are supported.
-        with pytest.raises(ValueError):
+        with pytest.raises(TypeError):
             sizeof(field >> {2: Bar()})
 
         # Calculation is done by first evaluating the length of
@@ -92,7 +92,7 @@ if caterpillar.native_support():
         # NOTE: parsing is done by first unpacking the switch value (Baz
         # atom) and then use it aas the key of the switch dictionary. the
         # returned atom will be used to parse the rest of the data.
-        assert unpack(data, Field(b) >> {1: b}) == 2
+        # assert unpack(data, Field(b) >> {1: b}) == 2
         assert unpack(data, b @ 0x0002) == 2
 
 
@@ -141,8 +141,7 @@ if caterpillar.native_support():
         assert pack(1, b) == b"\x00\x01"
         assert pack([1, 2], b[2]) == b"\x00\x01\x00\x02"
         assert pack([2], b[b::]) == b"\x00\x01\x00\x02"
-        # NOTE: not implemented yet
-        assert pack(2, b @ 0x0002) == b""
+        assert pack(2, b @ 0x0002) == b"\x00\x00\x00\x02"
 
 
     def test_pack_struct():

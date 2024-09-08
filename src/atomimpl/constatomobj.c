@@ -20,13 +20,13 @@ cp_constatom_new(PyTypeObject* type, PyObject* args, PyObject* kwds)
 {
   CpConstAtomObject* self = (CpConstAtomObject*)type->tp_alloc(type, 0);
   if (self != NULL) {
-    CpFieldCAtom_CATOM(self).ob_pack = (packfunc)CpConstAtom_Pack;
-    CpFieldCAtom_CATOM(self).ob_unpack = (unpackfunc)CpConstAtom_Unpack;
-    CpFieldCAtom_CATOM(self).ob_pack_many = NULL;
-    CpFieldCAtom_CATOM(self).ob_unpack_many = NULL;
-    CpFieldCAtom_CATOM(self).ob_size = (sizefunc)cp_constatom__size__;
-    CpFieldCAtom_CATOM(self).ob_type = (typefunc)cp_constatom__type__;
-    CpFieldCAtom_CATOM(self).ob_bits = NULL;
+    CpBuiltinAtom_CATOM(self).ob_pack = (packfunc)CpConstAtom_Pack;
+    CpBuiltinAtom_CATOM(self).ob_unpack = (unpackfunc)CpConstAtom_Unpack;
+    CpBuiltinAtom_CATOM(self).ob_pack_many = NULL;
+    CpBuiltinAtom_CATOM(self).ob_unpack_many = NULL;
+    CpBuiltinAtom_CATOM(self).ob_size = (sizefunc)cp_constatom__size__;
+    CpBuiltinAtom_CATOM(self).ob_type = (typefunc)cp_constatom__type__;
+    CpBuiltinAtom_CATOM(self).ob_bits = NULL;
 
     self->m_atom = NULL;
     self->m_value = NULL;

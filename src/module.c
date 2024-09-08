@@ -391,39 +391,34 @@ PyInit__C(void)
   CpModule_SetupType(&CpStructFieldInfo_Type);
 
   // builtins setup
+  CpPrimitiveAtom_Type.tp_base = &CpAtom_Type;
   CpBuiltinAtom_Type.tp_base = &CpCAtom_Type;
   CpRepeatedAtom_Type.tp_base = &CpBuiltinAtom_Type;
   CpConditionAtom_Type.tp_base = &CpBuiltinAtom_Type;
   CpSwitchAtom_Type.tp_base = &CpBuiltinAtom_Type;
   CpOffsetAtom_Type.tp_base = &CpBuiltinAtom_Type;
   CpStruct_Type.tp_base = &CpBuiltinAtom_Type;
+  CpBoolAtom_Type.tp_base = &CpBuiltinAtom_Type;
+  CpFloatAtom_Type.tp_base = &CpBuiltinAtom_Type;
+  CpIntAtom_Type.tp_base = &CpBuiltinAtom_Type;
+  CpCharAtom_Type.tp_base = &CpBuiltinAtom_Type;
+  CpPaddingAtom_Type.tp_base = &CpBuiltinAtom_Type;
+  CpStringAtom_Type.tp_base = &CpBuiltinAtom_Type;
+  CpConstAtom_Type.tp_base = &CpBuiltinAtom_Type;
 
   CpModule_SetupType(&CpBuiltinAtom_Type);
+  CpModule_SetupType(&CpPrimitiveAtom_Type);
   CpModule_SetupType(&CpRepeatedAtom_Type);
   CpModule_SetupType(&CpConditionAtom_Type);
   CpModule_SetupType(&CpSwitchAtom_Type);
   CpModule_SetupType(&CpOffsetAtom_Type);
   CpModule_SetupType(&CpStruct_Type);
-
-  CpIntAtom_Type.tp_base = &CpBuiltinAtom_Type;
   CpModule_SetupType(&CpIntAtom_Type);
-
-  CpFloatAtom_Type.tp_base = &CpFieldCAtom_Type;
   CpModule_SetupType(&CpFloatAtom_Type);
-
-  CpBoolAtom_Type.tp_base = &CpFieldCAtom_Type;
   CpModule_SetupType(&CpBoolAtom_Type);
-
-  CpCharAtom_Type.tp_base = &CpFieldCAtom_Type;
   CpModule_SetupType(&CpCharAtom_Type);
-
-  CpPaddingAtom_Type.tp_base = &CpFieldCAtom_Type;
   CpModule_SetupType(&CpPaddingAtom_Type);
-
-  CpStringAtom_Type.tp_base = &CpFieldCAtom_Type;
   CpModule_SetupType(&CpStringAtom_Type);
-
-  CpConstAtom_Type.tp_base = &CpFieldCAtom_Type;
   CpModule_SetupType(&CpConstAtom_Type);
 
   // module setup
@@ -455,6 +450,7 @@ PyInit__C(void)
   CpModule_AddObject("fieldinfo", &CpStructFieldInfo_Type);
   CpModule_AddObject("Struct", &CpStruct_Type);
 
+  CpModule_AddObject(CpPrimitiveAtom_NAME, &CpPrimitiveAtom_Type);
   CpModule_AddObject(CpBuiltinAtom_NAME, &CpBuiltinAtom_Type);
   CpModule_AddObject(CpRepeatedAtom_NAME, &CpRepeatedAtom_Type);
   CpModule_AddObject(CpConditionAtom_NAME, &CpConditionAtom_Type);

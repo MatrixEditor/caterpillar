@@ -47,6 +47,7 @@ src:atomimpl/builtins/repeatedatomobj.c
 src:atomimpl/builtins/conditionatomobj.c
 src:atomimpl/builtins/switchatomobj.c
 src:atomimpl/builtins/offsetatomobj.c
+src:atomimpl/builtins/primitiveatomobj.c
 
 # First index is reserved for the global module reference
 obj:0:CpModule:PyModuleDef
@@ -91,6 +92,7 @@ type:31:_objlayerobj:CpObjLayerObject:-
 type:32:_conditionatomobj:CpConditionAtomObject:-
 type:33:_switchatomobj:CpSwitchAtomObject:-
 type:34:_offsetatomobj:CpOffsetAtomObject:-
+type:35:_primitiveatomobj:CpPrimitiveAtomObject:-
 
 func:50:CpEndian_IsLittleEndian:int:null
 func:53:CpContext_New:CpContextObject*:+1
@@ -144,11 +146,12 @@ func:103:CpStruct_ReplaceType:int:null
 func:104:CpStruct_HasOption:int:null
 func:105:CpStruct_Pack:int:null
 func:106:CpStruct_Unpack:PyObject*:+1
-func:107:CpStructModel_Check:int:null
-func:108:CpStructModel_GetStruct:PyObject*:+1
-func:109:CpSeqLayer_New:CpSeqLayerObject*:+1
-func:110:CpSeqLayer_SetSequence:int:null
-func:111:CpObjLayer_New:CpObjLayerObject*:+1
+func:107:CpStruct_SizeOf:PyObject*:+1
+func:108:CpStructModel_Check:int:null
+func:109:CpStructModel_GetStruct:PyObject*:+1
+func:110:CpSeqLayer_New:CpSeqLayerObject*:+1
+func:111:CpSeqLayer_SetSequence:int:null
+func:112:CpObjLayer_New:CpObjLayerObject*:+1
 
 # atom api
 func:120:CpIntAtom_Pack:int:null

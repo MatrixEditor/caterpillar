@@ -132,7 +132,7 @@ CpOffsetAtom_Pack(CpOffsetAtomObject* self, PyObject* obj, CpLayerObject* layer)
   }
   Py_DECREF(res);
 
-  if (_Cp_Pack(self->m_atom, obj, layer) < 0) {
+  if (_Cp_Pack(obj, self->m_atom, layer) < 0) {
     return -1;
   }
 

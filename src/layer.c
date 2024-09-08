@@ -252,10 +252,10 @@ cp_objlayer_dealloc(CpObjLayerObject* self)
 static int
 cp_objlayer_init(CpObjLayerObject* self, PyObject* args, PyObject* kw)
 {
-  static char* kwlist[] = { "state", "path", "parent", NULL };
-  PyObject *state = NULL, *path = NULL, *parent = NULL;
+  static char* kwlist[] = { "state", "path", "parent", "obj", NULL };
+  PyObject *state = NULL, *path = NULL, *parent = NULL, *obj = NULL;
   if (!PyArg_ParseTupleAndKeywords(
-        args, kw, "O|OO", kwlist, &state, &path, &parent))
+        args, kw, "O|OOO", kwlist, &state, &path, &parent, &obj))
     return -1;
 
   if (!PyObject_IsInstance(state, (PyObject*)(&CpState_Type))) {
@@ -264,7 +264,7 @@ cp_objlayer_init(CpObjLayerObject* self, PyObject* args, PyObject* kw)
   }
 
   Py_XSETREF(self->ob_base.m_state, (CpStateObject*)Py_NewRef(state));
-  Py_XSETREF(self->m_obj, (PyObject*)CpContext_New());
+  Py_XSETREF(self->m_obj, obj ? Py_NewRef(obj) : (PyObject*)CpContext_New());
   Py_XSETREF(self->ob_base.m_path, Py_XNewRef(path));
   Py_XSETREF(self->ob_base.m_parent, (CpLayerObject*)Py_XNewRef(parent));
   return 0;
@@ -363,7 +363,7 @@ static PyMemberDef CpObjLayer_Members[] = {
 static PyMethodDef CpObjLayer_Methods[] = {
   { "__context_getattr__",
     (PyCFunction)cp_objlayer_context_getattr,
-    METH_VARARGS},
+    METH_VARARGS },
   { NULL } /* Sentinel */
 };
 

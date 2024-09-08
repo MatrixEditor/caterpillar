@@ -23,13 +23,13 @@ cp_floatatom_new(PyTypeObject* type, PyObject* args, PyObject* kwds)
     self->_m_bits = 0;
     self->_m_little_endian = true;
 
-    CpFieldCAtom_CATOM(self).ob_pack = (packfunc)CpFloatAtom_Pack;
-    CpFieldCAtom_CATOM(self).ob_unpack = (unpackfunc)CpFloatAtom_Unpack;
-    CpFieldCAtom_CATOM(self).ob_pack_many = NULL;
-    CpFieldCAtom_CATOM(self).ob_unpack_many = NULL;
-    CpFieldCAtom_CATOM(self).ob_size = (sizefunc)cp_floatatom__size__;
-    CpFieldCAtom_CATOM(self).ob_type = (typefunc)cp_floatatom__type__;
-    CpFieldCAtom_CATOM(self).ob_bits = NULL;
+    CpBuiltinAtom_CATOM(self).ob_pack = (packfunc)CpFloatAtom_Pack;
+    CpBuiltinAtom_CATOM(self).ob_unpack = (unpackfunc)CpFloatAtom_Unpack;
+    CpBuiltinAtom_CATOM(self).ob_pack_many = NULL;
+    CpBuiltinAtom_CATOM(self).ob_unpack_many = NULL;
+    CpBuiltinAtom_CATOM(self).ob_size = (sizefunc)cp_floatatom__size__;
+    CpBuiltinAtom_CATOM(self).ob_type = (typefunc)cp_floatatom__type__;
+    CpBuiltinAtom_CATOM(self).ob_bits = NULL;
   }
   return (PyObject*)self;
 }

@@ -17,12 +17,11 @@
 #ifndef STRINGATOMOBJ_H
 #define STRINGATOMOBJ_H
 
-#include "caterpillar/caterpillarapi.h"
-#include "caterpillar/field.h"
+#include "caterpillar/atoms/builtins.h"
 
 struct _stringatomobj
 {
-  CpFieldCAtom_HEAD
+  CpBuiltinAtom_HEAD
 
     PyObject* m_length;
   PyObject* m_errors;

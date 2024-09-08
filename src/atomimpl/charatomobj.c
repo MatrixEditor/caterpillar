@@ -20,13 +20,13 @@ cp_charatom_new(PyTypeObject* type, PyObject* args, PyObject* kwds)
 {
   CpCharAtomObject* self = (CpCharAtomObject*)type->tp_alloc(type, 0);
   if (self != NULL) {
-    CpFieldCAtom_CATOM(self).ob_pack = (packfunc)CpCharAtom_Pack;
-    CpFieldCAtom_CATOM(self).ob_unpack = (unpackfunc)CpCharAtom_Unpack;
-    CpFieldCAtom_CATOM(self).ob_pack_many = NULL;
-    CpFieldCAtom_CATOM(self).ob_unpack_many = NULL;
-    CpFieldCAtom_CATOM(self).ob_size = (sizefunc)cp_charatom__size__;
-    CpFieldCAtom_CATOM(self).ob_type = (typefunc)cp_charatom__type__;
-    CpFieldCAtom_CATOM(self).ob_bits = NULL;
+    CpBuiltinAtom_CATOM(self).ob_pack = (packfunc)CpCharAtom_Pack;
+    CpBuiltinAtom_CATOM(self).ob_unpack = (unpackfunc)CpCharAtom_Unpack;
+    CpBuiltinAtom_CATOM(self).ob_pack_many = NULL;
+    CpBuiltinAtom_CATOM(self).ob_unpack_many = NULL;
+    CpBuiltinAtom_CATOM(self).ob_size = (sizefunc)cp_charatom__size__;
+    CpBuiltinAtom_CATOM(self).ob_type = (typefunc)cp_charatom__type__;
+    CpBuiltinAtom_CATOM(self).ob_bits = NULL;
   }
   return (PyObject*)self;
 }

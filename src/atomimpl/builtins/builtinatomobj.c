@@ -66,22 +66,24 @@ cp_builtinatom_as_number_matmul(PyObject* self, PyObject* other)
   return (PyObject*)CpOffsetAtom_New(self, other);
 }
 
-static PyMappingMethods CpFieldAtom_MappingMethods = {
+static PyMappingMethods CpBuiltinAtom_MappingMethods = {
   .mp_subscript = (binaryfunc)cp_builtinatom_as_mapping_getitem,
 };
 
-static PyNumberMethods CpField_NumberMethods = {
+static PyNumberMethods CpBuiltinAtom_NumberMethods = {
   .nb_rshift = (binaryfunc)cp_builtinatom_as_number_rshift,
   .nb_floor_divide = (binaryfunc)cp_builtinatom_as_number_floordiv,
   .nb_matrix_multiply = (binaryfunc)cp_builtinatom_as_number_matmul,
 };
 
 PyTypeObject CpBuiltinAtom_Type = {
-  PyVarObject_HEAD_INIT(NULL, 0) "CpBuiltinAtom", // tp_name
+  PyVarObject_HEAD_INIT(NULL, 0) _Cp_NameStr(CpBuiltinAtom_NAME),
   .tp_basicsize = sizeof(CpBuiltinAtomObject),
   .tp_dealloc = (destructor)cp_builtinatom_dealloc,
   .tp_init = (initproc)cp_builtinatom_init,
   .tp_new = (newfunc)cp_builtinatom_new,
-  .tp_as_mapping = &CpFieldAtom_MappingMethods,
-  .tp_as_number = &CpField_NumberMethods,
+  .tp_as_mapping = &CpBuiltinAtom_MappingMethods,
+  .tp_as_number = &CpBuiltinAtom_NumberMethods,
+  .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
+  .tp_doc = NULL,
 };

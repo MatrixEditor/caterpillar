@@ -213,10 +213,10 @@ _Cp_SizeOf(PyObject* op, CpLayerObject* layer)
 
   if (CpField_CheckExact(op)) {
     result = CpSizeOf_Field((CpFieldObject*)op, layer);
-  } else if (CpStruct_CheckExact(op)) {
-    result = CpSizeOf_Struct((CpStructObject*)op, layer);
   } else if (CpCAtom_Check(op)) {
     result = CpSizeOf_CAtom((CpCAtomObject*)op, layer);
+  } else if (CpStruct_CheckExact(op)) {
+    result = CpSizeOf_Struct((CpStructObject*)op, layer);
   } else {
     result = CpSizeOf_Common(op, layer);
   }

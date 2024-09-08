@@ -17,12 +17,11 @@
 #ifndef CONSTATOMOBJ_H
 #define CONSTATOMOBJ_H
 
-#include "caterpillar/caterpillarapi.h"
-#include "caterpillar/field.h"
+#include "caterpillar/atoms/builtins.h"
 
 struct _constatomobj
 {
-  CpFieldCAtom_HEAD
+  CpBuiltinAtom_HEAD
 
   PyObject *m_value;
   PyObject *m_atom;

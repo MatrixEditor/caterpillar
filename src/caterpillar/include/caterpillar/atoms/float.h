@@ -17,12 +17,11 @@
 #ifndef FLOATATOMOBJ_H
 #define FLOATATOMOBJ_H
 
-#include "caterpillar/caterpillarapi.h"
-#include "caterpillar/field.h"
+#include "caterpillar/atoms/builtins.h"
 
 struct _floatatomobj
 {
-  CpFieldCAtom_HEAD
+  CpBuiltinAtom_HEAD
 
     /// Stores the amount of bytes this float atom
     /// has in total

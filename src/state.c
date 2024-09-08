@@ -173,7 +173,7 @@ PyObject*
 CpState_Seek(CpStateObject* self, PyObject* offset, PyObject* whence)
 {
   return PyObject_CallMethodObjArgs(
-    self->m_io, self->mod->str_seek, offset, whence);
+    self->m_io, self->mod->str_seek, offset, whence, NULL);
 }
 
 /*CpAPI*/

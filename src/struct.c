@@ -88,6 +88,7 @@ static PyMemberDef CpStructFieldInfo_Members[] = {
     offsetof(CpStructFieldInfoObject, s_excluded),
     READONLY,
     NULL },
+  { "default", T_OBJECT_EX, offsetof(CpStructFieldInfoObject, m_default), 0 },
   { NULL } /* Sentinel */
 };
 
@@ -178,6 +179,12 @@ CpStructModel_GetDefaultValue(CpStructObject* o, PyObject* name)
 
 /* impl */
 static PyObject*
+cp_struct_type(CpStructObject* self)
+{
+  return Py_NewRef(self->m_model);
+}
+
+static PyObject*
 cp_struct_new(PyTypeObject* type, PyObject* args, PyObject* kw)
 {
   CpStructObject* self = (CpStructObject*)type->tp_alloc(type, 0);
@@ -207,8 +214,8 @@ cp_struct_new(PyTypeObject* type, PyObject* args, PyObject* kw)
   }
   CpBuiltinAtom_CATOM(self).ob_pack = (packfunc)CpStruct_Pack;
   CpBuiltinAtom_CATOM(self).ob_unpack = (unpackfunc)CpStruct_Unpack;
-  CpBuiltinAtom_CATOM(self).ob_size = NULL;
-  CpBuiltinAtom_CATOM(self).ob_type = NULL;
+  CpBuiltinAtom_CATOM(self).ob_size = (sizefunc)CpStruct_SizeOf;
+  CpBuiltinAtom_CATOM(self).ob_type = (typefunc)cp_struct_type;
   CpBuiltinAtom_CATOM(self).ob_pack_many = NULL;
   CpBuiltinAtom_CATOM(self).ob_unpack_many = NULL;
   CpBuiltinAtom_CATOM(self).ob_bits = NULL;
@@ -415,21 +422,9 @@ cp_struct_prepare(CpStructObject* self)
       Py_XDECREF(discardable);
       return -1;
     }
-    // Constant values that are not in the form of fields. A special case are
-    // definitions using the 'Const' class for example.
-    if (CpField_Check(annotation)) {
-      atom = annotation;
-      // SPECIAL CASE: If the field has a condition linked to it, a default
-      // value of None is inferred.
-      if (CpField_HasCondition((CpFieldObject*)annotation) &&
-          Cp_IsInvalidDefault(default_)) {
-        _Cp_SetObj(default_, Py_None);
-      }
-    }
-
-    // SPECIAL CASE: If this struct is a union, we will infer None as the
-    // default value (if none has been set already)
-    if (self->s_union && Cp_IsInvalidDefault(default_)) {
+    // SPECIAL CASE: If the field has a condition linked to it, a default
+    // value of None is inferred.
+    if (CpConditionAtom_Check(atom) && Cp_IsInvalidDefault(default_)) {
       _Cp_SetObj(default_, Py_None);
     }
 
@@ -620,18 +615,18 @@ cp_struct_process_annotation(CpStructObject* self,
     else if (PyCallable_Check(annotation)) {
       field = Py_NewRef(annotation);
     }
+  }
 
-    else {
-      // REVISIT: Add support for other types here.
-      PyErr_Format(PyExc_ValueError,
-                   ("Field %R could not be created, because the placed "
-                    "annotation does not "
-                    "conform to any of the supported types.\n"
-                    "annotation: %R"),
-                   name,
-                   annotation);
-      return -1;
-    }
+  if (!field) {
+    // REVISIT: Add support for other types here.
+    PyErr_Format(PyExc_ValueError,
+                 ("Field %R could not be created, because the placed "
+                  "annotation does not "
+                  "conform to any of the supported types.\n"
+                  "annotation: %R"),
+                 name,
+                 annotation);
+    return -1;
   }
 
   // TODO: arch
@@ -1177,7 +1172,6 @@ failure:
 PyObject*
 CpStruct_Unpack(CpStructObject* self, CpLayerObject* layer)
 {
-  printf("creating layer....\n");
   CpObjLayerObject* obj_layer = CpObjLayer_New(layer->m_state, layer);
   if (!obj_layer) {
     return NULL;
@@ -1191,9 +1185,20 @@ CpStruct_Unpack(CpStructObject* self, CpLayerObject* layer)
       return NULL;
     }
 
-    printf("getting %s....\n", PyUnicode_AsUTF8(name));
-    value = _Cp_Unpack((PyObject*)info->m_field, (CpLayerObject*)obj_layer);
     CpLayer_AppendPath(&obj_layer->ob_base, name);
+
+    value = _Cp_Unpack((PyObject*)info->m_field, (CpLayerObject*)obj_layer);
+    if (!value && PyErr_Occurred()) {
+      if (!Cp_IsInvalidDefault(info->m_default)) {
+        Py_XSETREF(value, info->m_default);
+      }
+      if (!value) {
+        Py_XDECREF(obj_layer);
+        return NULL;
+      }
+      PyErr_Clear();
+    }
+
     if (!value || PyDict_SetItem(obj_layer->m_obj, name, value) < 0) {
       Py_XDECREF(value);
       Py_XDECREF(obj_layer);
@@ -1201,13 +1206,47 @@ CpStruct_Unpack(CpStructObject* self, CpLayerObject* layer)
     }
     Py_XDECREF(value);
   }
-  printf("finished parsing....\n");
   PyObject* args = PyTuple_New(0);
   PyObject* obj =
     PyObject_Call((PyObject*)self->m_model, args, obj_layer->m_obj);
   Py_XDECREF(args);
   Py_XDECREF(obj_layer);
   return obj;
+}
+
+/*CpAPI*/
+PyObject*
+CpStruct_SizeOf(CpStructObject* self, CpLayerObject* layer)
+{
+  PyObject *size = PyLong_FromLong(0), *tmp = NULL;
+  CpStructFieldInfoObject* info = NULL;
+  Py_ssize_t pos = 0;
+
+  CpLayerObject* obj_layer = CpLayer_New(layer->m_state, layer);
+  if (!obj_layer || !size) {
+    return NULL;
+  }
+
+  while (PyDict_Next(self->m_members, &pos, NULL, (PyObject**)&info)) {
+    tmp = _Cp_SizeOf((PyObject*)info->m_field, obj_layer);
+    if (!tmp) {
+      goto fail;
+    }
+    Py_XSETREF(tmp, PyNumber_Add(size, tmp));
+    if (!tmp) {
+      goto fail;
+    }
+    Py_XSETREF(size, tmp);
+  }
+  Py_XDECREF(tmp);
+  Py_XDECREF(obj_layer);
+  return size;
+
+fail:
+  Py_XDECREF(tmp);
+  Py_XDECREF(obj_layer);
+  Py_XDECREF(size);
+  return NULL;
 }
 
 /* docs */
@@ -1260,16 +1299,4 @@ PyTypeObject CpStruct_Type = {
   (initproc)cp_struct_init,                 /* tp_init */
   0,                                        /* tp_alloc */
   (newfunc)cp_struct_new,                   /* tp_new */
-  0,                                        /* tp_free */
-  0,                                        /* tp_is_gc */
-  0,                                        /* tp_bases */
-  0,                                        /* tp_mro */
-  0,                                        /* tp_cache */
-  0,                                        /* tp_subclasses */
-  0,                                        /* tp_weaklist */
-  0,                                        /* tp_del */
-  0,                                        /* tp_version_tag */
-  0,                                        /* tp_finalize */
-  0,                                        /* tp_vectorcall */
-  0,                                        /* tp_watched */
 };
