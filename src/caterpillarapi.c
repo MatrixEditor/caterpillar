@@ -35,7 +35,7 @@ void *Cp_API[] = {
     (void *) &CpRepeatedAtom_Type,
     (void *) &CpSeqLayer_Type,
     (void *) &CpObjLayer_Type,
-    NULL,
+    (void *) &CpConditionAtom_Type,
     NULL,
     NULL,
     NULL,
@@ -141,6 +141,9 @@ void *Cp_API[] = {
     (void *) &CpConstAtom_Unpack,
     (void *) &CpRepeatedAtom_Pack,
     (void *) &CpRepeatedAtom_Unpack,
-    (void *) &CpRepeatedAtom_GetLength
+    (void *) &CpRepeatedAtom_GetLength,
+    (void *) &CpConditionAtom_Pack,
+    (void *) &CpConditionAtom_Unpack,
+    (void *) &CpConditionAtom_IsEnabled
 };
 

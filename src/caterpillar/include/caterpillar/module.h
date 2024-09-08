@@ -52,6 +52,7 @@ struct _modulestate
   // typing constants
   PyObject* Any_Type;
   PyObject* List_Type;
+  PyObject* Optional_Type;
   PyObject* Union_Type;
   PyObject *BytesIO_Type;
 

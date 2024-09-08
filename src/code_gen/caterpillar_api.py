@@ -46,6 +46,7 @@ cp_types = {
     "_repeatedatomobj":         "CpRepeatedAtomObject",
     "_seqlayerobj":             "CpSeqLayerObject",
     "_objlayerobj":             "CpObjLayerObject",
+    "_conditionatomobj":        "CpConditionAtomObject",
 }
 
 cp_type_api = {
@@ -81,6 +82,7 @@ cp_type_api = {
     "CpRepeatedAtom_Type":          (29,),
     "CpSeqLayer_Type":              (30,),
     "CpObjLayer_Type":              (31,),
+    "CpConditionAtom_Type":         (32,),
 }
 
 cp_func_api = {
@@ -164,6 +166,9 @@ cp_func_api = {
     "CpRepeatedAtom_Pack":         136,
     "CpRepeatedAtom_Unpack":       137,
     "CpRepeatedAtom_GetLength":    138,
+    "CpConditionAtom_Pack":        139,
+    "CpConditionAtom_Unpack":      140,
+    "CpConditionAtom_IsEnabled":   141,
 }
 
 API_SRC = [
@@ -188,6 +193,7 @@ API_SRC = [
     "atomimpl/constatomobj.c",
     "atomimpl/builtins/builtinatomobj.c",
     "atomimpl/builtins/repeatedatomobj.c",
+    "atomimpl/builtins/conditionatomobj.c",
 ]
 
 

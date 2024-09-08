@@ -69,7 +69,25 @@ cp_floatatom_init(CpFloatAtomObject* self, PyObject* args, PyObject* kwds)
   return 0;
 }
 
-_CpEndian_ImplSetByteorder(floatatom, self->_m_little_endian);
+static PyObject*
+cp_floatatom_set_byteorder(CpFloatAtomObject* self, PyObject* args, PyObject* kw)
+{
+  static char* kwlist[] = { "byteorder", NULL };
+  PyObject* byteorder = NULL;
+  if (!PyArg_ParseTupleAndKeywords(args, kw, "O", kwlist, &byteorder)) {
+    return NULL;
+  }
+  if (!CpEndian_Check(byteorder)) {
+    PyErr_SetString(PyExc_TypeError, "byteorder must be an Endian object");
+    return NULL;
+  }
+
+  return CpObject_Create(&CpIntAtom_Type,
+                         "Ii",
+                         self->_m_bits,
+                         CpEndian_IsLittleEndian((CpEndianObject*)byteorder,
+                                                 get_global_module_state()));
+}
 
 /* Public API */
 /*CpAPI*/

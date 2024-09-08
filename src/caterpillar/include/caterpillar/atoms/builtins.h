@@ -59,4 +59,28 @@ CpRepeatedAtom_New(PyObject* atom, PyObject* length)
   return (CpRepeatedAtomObject*)CpObject_Create(&CpRepeatedAtom_Type, "OO", atom, length);
 }
 
+//------------------------------------------------------------------------------
+// Conditional
+struct _conditionatomobj
+{
+    CpBuiltinAtom_HEAD
+
+    /// Stores a reference to the actual parsing struct that will be used
+    /// to parse or build our data. This attribute is never null.
+    PyObject *m_atom;
+
+    /// A constant or dynamic value to represent the condition.
+    PyObject *m_condition;
+};
+
+#define CpConditionAtom_NAME "condition"
+#define CpConditionAtom_CheckExact(op) Py_IS_TYPE((op), &CpConditionAtom_Type)
+#define CpConditionAtom_Check(op) PyObject_IsType((op), &CpConditionAtom_Type)
+
+static inline CpConditionAtomObject *
+CpConditionAtom_New(PyObject* atom, PyObject* condition)
+{
+  return (CpConditionAtomObject*)CpObject_Create(&CpConditionAtom_Type, "OO", atom, condition);
+}
+
 #endif

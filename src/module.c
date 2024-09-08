@@ -274,6 +274,7 @@ cp_module_clear(PyObject* m)
     Py_CLEAR(state->Any_Type);
     Py_CLEAR(state->List_Type);
     Py_CLEAR(state->Union_Type);
+    Py_CLEAR(state->Optional_Type);
 
     // sttings
     Py_CLEAR(state->str_path_delim);
@@ -388,12 +389,14 @@ PyInit__C(void)
   CpStruct_Type.tp_base = &CpFieldAtom_Type;
   CpModule_SetupType(&CpStruct_Type);
 
-    // builtins setup
+  // builtins setup
   CpBuiltinAtom_Type.tp_base = &CpCAtom_Type;
-  CpModule_SetupType(&CpBuiltinAtom_Type);
-
   CpRepeatedAtom_Type.tp_base = &CpBuiltinAtom_Type;
+  CpConditionAtom_Type.tp_base = &CpBuiltinAtom_Type;
+
+  CpModule_SetupType(&CpBuiltinAtom_Type);
   CpModule_SetupType(&CpRepeatedAtom_Type);
+  CpModule_SetupType(&CpConditionAtom_Type);
 
   CpIntAtom_Type.tp_base = &CpBuiltinAtom_Type;
   CpModule_SetupType(&CpIntAtom_Type);
@@ -415,8 +418,6 @@ PyInit__C(void)
 
   CpConstAtom_Type.tp_base = &CpFieldCAtom_Type;
   CpModule_SetupType(&CpConstAtom_Type);
-
-
 
   // module setup
   m = PyModule_Create(&CpModule);
@@ -449,6 +450,7 @@ PyInit__C(void)
 
   CpModule_AddObject(CpBuiltinAtom_NAME, &CpBuiltinAtom_Type);
   CpModule_AddObject(CpRepeatedAtom_NAME, &CpRepeatedAtom_Type);
+  CpModule_AddObject(CpConditionAtom_NAME, &CpConditionAtom_Type);
 
   CpModule_AddObject(CpIntAtom_NAME, &CpIntAtom_Type);
   CpModule_AddObject(CpFloatAtom_NAME, &CpFloatAtom_Type);
@@ -611,6 +613,7 @@ PyInit__C(void)
   CpModuleState_Set(Any_Type, PyObject_GetAttrString(typing, "Any"));
   CpModuleState_Set(List_Type, PyObject_GetAttrString(typing, "List"));
   CpModuleState_Set(Union_Type, PyObject_GetAttrString(typing, "Union"));
+  CpModuleState_Set(Optional_Type, PyObject_GetAttrString(typing, "Optional"));
   Py_XDECREF(typing);
 
   // regex setup

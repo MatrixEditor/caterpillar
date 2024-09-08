@@ -78,7 +78,7 @@ cp_repeatedatomobj_init(CpRepeatedAtomObject* self,
 }
 
 static PyObject*
-cp_repeatedatomobj_set_byteorder(CpRepeatedAtomObject* self,
+cp_repeatedatom_set_byteorder(CpRepeatedAtomObject* self,
                                  PyObject* args,
                                  PyObject* kw)
 {
@@ -92,8 +92,13 @@ cp_repeatedatomobj_set_byteorder(CpRepeatedAtomObject* self,
     return NULL;
   }
 
-  return CpEndian_SetEndian(self->m_atom, (CpEndianObject*)byteorder) ? NULL
-                                                                      : Py_None;
+  PyObject* new_atom =
+    CpEndian_SetEndian(self->m_atom, (CpEndianObject*)byteorder);
+  if (!new_atom) {
+    return NULL;
+  }
+  _Cp_SetObj(self->m_atom, new_atom);
+  return (PyObject*)self;
 }
 
 /* Public API */
@@ -286,10 +291,7 @@ static PyMemberDef CpRepeatedAtom_Members[] = {
 };
 
 static PyMethodDef CpRepeatedAtom_Methods[] = {
-  { "__set_byteorder__",
-    (PyCFunction)cp_repeatedatomobj_set_byteorder,
-    METH_VARARGS,
-    NULL },
+  _CpEndian_ImplSetByteorder_MethDef(repeatedatom, NULL),
   {
     NULL,
   }

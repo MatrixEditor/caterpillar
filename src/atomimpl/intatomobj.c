@@ -89,7 +89,26 @@ cp_intatom_repr(CpIntAtomObject* self)
   return PyUnicode_FromFormat("<%ce %cint%d>", endian, sign, self->_m_bits);
 }
 
-_CpEndian_ImplSetByteorder(intatom, self->_m_little_endian);
+static PyObject*
+cp_intatom_set_byteorder(CpIntAtomObject* self, PyObject* args, PyObject* kw)
+{
+  static char* kwlist[] = { "byteorder", NULL };
+  PyObject* byteorder = NULL;
+  if (!PyArg_ParseTupleAndKeywords(args, kw, "O", kwlist, &byteorder)) {
+    return NULL;
+  }
+  if (!CpEndian_Check(byteorder)) {
+    PyErr_SetString(PyExc_TypeError, "byteorder must be an Endian object");
+    return NULL;
+  }
+
+  return CpObject_Create(&CpIntAtom_Type,
+                         "Iii",
+                         (unsigned int)self->_m_bits,
+                         self->_m_signed,
+                         CpEndian_IsLittleEndian((CpEndianObject*)byteorder,
+                                                 get_global_module_state()));
+}
 
 /* Public API */
 /*CpAPI*/

@@ -1,6 +1,6 @@
 /* CpArch and CpEndian */
-#include "caterpillar/caterpillar.h"
 #include "caterpillar/arch.h"
+#include "caterpillar/caterpillar.h"
 #include "caterpillar/field.h"
 #include "structmember.h"
 
@@ -101,7 +101,7 @@ PyTypeObject CpArch_Type = {
   .tp_dealloc = (destructor)cp_arch_dealloc,
   .tp_repr = (reprfunc)cp_arch_repr,
   .tp_hash = (hashfunc)cp_arch_hash,
-  .tp_richcompare =(richcmpfunc)cp_arch_richcmp,
+  .tp_richcompare = (richcmpfunc)cp_arch_richcmp,
   .tp_flags = Py_TPFLAGS_DEFAULT,
   .tp_doc = cp_arch_doc,
   .tp_members = CpArch_Members,
@@ -197,12 +197,12 @@ cp_endian_hash(CpEndianObject* self)
 static PyObject*
 cp_endian_as_number_add(CpEndianObject* self, PyObject* atom)
 {
-  CpFieldObject* field = (CpFieldObject*)CpField_New(atom);
-  if (!field) {
+  if (!atom) {
+    PyErr_SetString(PyExc_ValueError, "atom must be non-null");
     return NULL;
   }
-  _Cp_SetObj(field->m_endian, self);
-  return (PyObject*)field;
+
+  return CpEndian_SetEndian(atom, self);
 }
 
 /* Doc strings */

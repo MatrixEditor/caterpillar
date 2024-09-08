@@ -82,6 +82,8 @@ struct _seqlayerobj;
 typedef struct _seqlayerobj CpSeqLayerObject;
 struct _objlayerobj;
 typedef struct _objlayerobj CpObjLayerObject;
+struct _conditionatomobj;
+typedef struct _conditionatomobj CpConditionAtomObject;
 
 #ifdef _CPMODULE
 
@@ -122,6 +124,7 @@ extern PyTypeObject CpBuiltinAtom_Type;
 extern PyTypeObject CpRepeatedAtom_Type;
 extern PyTypeObject CpSeqLayer_Type;
 extern PyTypeObject CpObjLayer_Type;
+extern PyTypeObject CpConditionAtom_Type;
 int CpEndian_IsLittleEndian(CpEndianObject* endian, _modulestate* mod);
 CpContextObject* CpContext_New(void);
 CpUnaryExprObject* CpUnaryExpr_New(int op, PyObject* value);
@@ -196,6 +199,9 @@ PyObject* CpConstAtom_Unpack(CpConstAtomObject* self, CpLayerObject* layer);
 int CpRepeatedAtom_Pack(CpRepeatedAtomObject* self,PyObject* op,CpLayerObject* layer);
 PyObject* CpRepeatedAtom_Unpack(CpRepeatedAtomObject* self, CpLayerObject* layer);
 PyObject* CpRepeatedAtom_GetLength(CpRepeatedAtomObject* self, PyObject* context);
+int CpConditionAtom_Pack(CpConditionAtomObject* self, PyObject* op, PyObject* layer);
+PyObject* CpConditionAtom_Unpack(CpConditionAtomObject* self, CpLayerObject* layer);
+int CpConditionAtom_IsEnabled(CpConditionAtomObject* self, PyObject* context);
 
 #else
 
@@ -237,6 +243,7 @@ caterpillar_api.py
 #define CpRepeatedAtom_Type (*(PyTypeObject *)Cp_API[29])
 #define CpSeqLayer_Type (*(PyTypeObject *)Cp_API[30])
 #define CpObjLayer_Type (*(PyTypeObject *)Cp_API[31])
+#define CpConditionAtom_Type (*(PyTypeObject *)Cp_API[32])
 #define CpEndian_IsLittleEndian (*((int (*)(CpEndianObject* endian, _modulestate* mod)))Cp_API[50])
 #define CpContext_New (*((CpContextObject* (*)(void)))Cp_API[53])
 #define CpUnaryExpr_New (*((CpUnaryExprObject* (*)(int op, PyObject* value)))Cp_API[54])
@@ -311,6 +318,9 @@ caterpillar_api.py
 #define CpRepeatedAtom_Pack (*((int (*)(CpRepeatedAtomObject* self,PyObject* op,CpLayerObject* layer)))Cp_API[136])
 #define CpRepeatedAtom_Unpack (*((PyObject* (*)(CpRepeatedAtomObject* self, CpLayerObject* layer)))Cp_API[137])
 #define CpRepeatedAtom_GetLength (*((PyObject* (*)(CpRepeatedAtomObject* self, PyObject* context)))Cp_API[138])
+#define CpConditionAtom_Pack (*((int (*)(CpConditionAtomObject* self, PyObject* op, PyObject* layer)))Cp_API[139])
+#define CpConditionAtom_Unpack (*((PyObject* (*)(CpConditionAtomObject* self, CpLayerObject* layer)))Cp_API[140])
+#define CpConditionAtom_IsEnabled (*((int (*)(CpConditionAtomObject* self, PyObject* context)))Cp_API[141])
 
 /**
  * @brief Public C API for extension modules as reference table
