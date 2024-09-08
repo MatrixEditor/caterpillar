@@ -38,9 +38,9 @@ Atom Objects:
 - |check_| Char (C type: :c:type:`CpCharAtomObject`, Py type: :class:`char_t`), global instance: :code:`char` [:text-danger:`missing docs`]
 - |check_| Padding (C type: :c:type:`CpPaddingAtomObject`, Py type: :class:`padding_t`), global instance: :code:`padding` [:text-danger:`missing docs`]
 - |check_| String (C type: :c:type:`CpStringAtomObject`, Py type: :class:`string`) [:text-danger:`missing docs`]
-- |uncheck_| Const
+- |uncheck_| Const (C type: :c:type:`CpConstAtomObject`, Py type: :class:`const_t`) [:text-danger:`missing docs`]
 - |uncheck_| CString
-- |uncheck_| Bytes
+- |uncheck_| Bytes (C type: :c:type:`CpBytesAtomObject`, Py type: :class:`octetstring`)
 - |uncheck_| Enum
 - |uncheck_| Computed
 - |uncheck_| PString

@@ -28,10 +28,28 @@ struct _stringatomobj
   PyObject* m_encoding;
 };
 
-// PyAPI_DATA(PyTypeObject) CpStringAtom_Type;
 #define CpStringAtom_NAME "string"
-
 #define CpStringAtom_CheckExact(op) Py_IS_TYPE((op), &CpStringAtom_Type)
 #define CpStringAtom_Check(op) PyObject_TypeCheck((op), &CpStringAtom_Type)
+
+// TODO: CString, PString
+
+struct _bytesatomobj
+{
+  CpBuiltinAtom_HEAD
+
+    PyObject* m_length;
+    int s_callable;
+};
+
+#define CpBytesAtom_NAME "octetstring"
+#define CpBytesAtom_CheckExact(op) Py_IS_TYPE((op), &CpBytesAtom_Type)
+#define CpBytesAtom_Check(op) PyObject_TypeCheck((op), &CpBytesAtom_Type)
+
+static inline CpBytesAtomObject*
+CpBytesAtom_New(PyObject* length)
+{
+  return (CpBytesAtomObject*)CpObject_CreateOneArg(&CpBytesAtom_Type, length);
+}
 
 #endif

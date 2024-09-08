@@ -92,6 +92,8 @@ struct _primitiveatomobj;
 typedef struct _primitiveatomobj CpPrimitiveAtomObject;
 struct _lengthinfoobj;
 typedef struct _lengthinfoobj CpLengthInfoObject;
+struct _bytesatomobj;
+typedef struct _bytesatomobj CpBytesAtomObject;
 
 #ifdef _CPMODULE
 
@@ -137,6 +139,7 @@ extern PyTypeObject CpSwitchAtom_Type;
 extern PyTypeObject CpOffsetAtom_Type;
 extern PyTypeObject CpPrimitiveAtom_Type;
 extern PyTypeObject CpLengthInfo_Type;
+extern PyTypeObject CpBytesAtom_Type;
 int CpEndian_IsLittleEndian(CpEndianObject* endian, _modulestate* mod);
 CpContextObject* CpContext_New(void);
 CpUnaryExprObject* CpUnaryExpr_New(int op, PyObject* value);
@@ -217,6 +220,9 @@ PyObject* CpSwitchAtom_Unpack(CpSwitchAtomObject* self, CpLayerObject* layer);
 int CpOffsetAtom_Pack(CpOffsetAtomObject* self, PyObject* obj, CpLayerObject* layer);
 PyObject* CpOffsetAtom_Unpack(CpOffsetAtomObject* self, CpLayerObject* layer);
 PyObject* CpOffsetAtom_GetOffset(CpOffsetAtomObject* self, PyObject* layer);
+PyObject* CpBytesAtom_GetLength(CpBytesAtomObject* self, CpLayerObject* layer);
+int CpBytesAtom_Pack(CpBytesAtomObject* self, PyObject* value, CpLayerObject* layer);
+PyObject* CpBytesAtom_Unpack(CpBytesAtomObject* self, CpLayerObject* layer);
 
 #else
 
@@ -263,6 +269,7 @@ caterpillar_api.py
 #define CpOffsetAtom_Type (*(PyTypeObject *)Cp_API[34])
 #define CpPrimitiveAtom_Type (*(PyTypeObject *)Cp_API[35])
 #define CpLengthInfo_Type (*(PyTypeObject *)Cp_API[36])
+#define CpBytesAtom_Type (*(PyTypeObject *)Cp_API[37])
 #define CpEndian_IsLittleEndian (*((int (*)(CpEndianObject* endian, _modulestate* mod)))Cp_API[50])
 #define CpContext_New (*((CpContextObject* (*)(void)))Cp_API[53])
 #define CpUnaryExpr_New (*((CpUnaryExprObject* (*)(int op, PyObject* value)))Cp_API[54])
@@ -343,6 +350,9 @@ caterpillar_api.py
 #define CpOffsetAtom_Pack (*((int (*)(CpOffsetAtomObject* self, PyObject* obj, CpLayerObject* layer)))Cp_API[145])
 #define CpOffsetAtom_Unpack (*((PyObject* (*)(CpOffsetAtomObject* self, CpLayerObject* layer)))Cp_API[146])
 #define CpOffsetAtom_GetOffset (*((PyObject* (*)(CpOffsetAtomObject* self, PyObject* layer)))Cp_API[147])
+#define CpBytesAtom_GetLength (*((PyObject* (*)(CpBytesAtomObject* self, CpLayerObject* layer)))Cp_API[148])
+#define CpBytesAtom_Pack (*((int (*)(CpBytesAtomObject* self, PyObject* value, CpLayerObject* layer)))Cp_API[149])
+#define CpBytesAtom_Unpack (*((PyObject* (*)(CpBytesAtomObject* self, CpLayerObject* layer)))Cp_API[150])
 
 /**
  * @brief Public C API for extension modules as reference table

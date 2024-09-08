@@ -40,7 +40,7 @@ void *Cp_API[] = {
     (void *) &CpOffsetAtom_Type,
     (void *) &CpPrimitiveAtom_Type,
     (void *) &CpLengthInfo_Type,
-    NULL,
+    (void *) &CpBytesAtom_Type,
     NULL,
     NULL,
     NULL,
@@ -150,6 +150,9 @@ void *Cp_API[] = {
     (void *) &CpSwitchAtom_Unpack,
     (void *) &CpOffsetAtom_Pack,
     (void *) &CpOffsetAtom_Unpack,
-    (void *) &CpOffsetAtom_GetOffset
+    (void *) &CpOffsetAtom_GetOffset,
+    (void *) &CpBytesAtom_GetLength,
+    (void *) &CpBytesAtom_Pack,
+    (void *) &CpBytesAtom_Unpack
 };
 
