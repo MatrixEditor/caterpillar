@@ -41,7 +41,7 @@ void *Cp_API[] = {
     (void *) &CpPrimitiveAtom_Type,
     (void *) &CpLengthInfo_Type,
     (void *) &CpBytesAtom_Type,
-    NULL,
+    (void *) &CpPStringAtom_Type,
     NULL,
     NULL,
     NULL,
@@ -95,12 +95,13 @@ void *Cp_API[] = {
     (void *) &CpState_Tell,
     (void *) &CpState_Seek,
     (void *) &CpState_Read,
+    (void *) &CpState_ReadSsize_t,
     (void *) &CpState_ReadFully,
     (void *) &CpState_Write,
     (void *) &CpState_SetGlobals,
     (void *) &CpLayer_New,
-    (void *) &CpLayer_Invalidate,
     NULL,
+    (void *) &CpLayer_Invalidate,
     (void *) &CpStructFieldInfo_New,
     (void *) &CpStruct_AddFieldInfo,
     (void *) &CpStruct_AddField,
@@ -116,7 +117,6 @@ void *Cp_API[] = {
     (void *) &CpSeqLayer_New,
     (void *) &CpSeqLayer_SetSequence,
     (void *) &CpObjLayer_New,
-    NULL,
     NULL,
     NULL,
     NULL,
@@ -153,6 +153,9 @@ void *Cp_API[] = {
     (void *) &CpOffsetAtom_GetOffset,
     (void *) &CpBytesAtom_GetLength,
     (void *) &CpBytesAtom_Pack,
-    (void *) &CpBytesAtom_Unpack
+    (void *) &CpBytesAtom_Unpack,
+    NULL,
+    (void *) &CpPStringAtom_Pack,
+    (void *) &CpPStringAtom_Unpack
 };
 

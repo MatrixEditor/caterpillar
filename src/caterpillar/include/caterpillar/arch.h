@@ -127,4 +127,17 @@ CpEndian_SetEndian(PyObject* op, CpEndianObject* endian)
     return ret;                                                                \
   }
 
+#define _CpEndian_ImplSetByteorder(typename, name, field)                      \
+  static PyObject* cp_##name##_set_byteorder(                                  \
+    typename* self, PyObject* args, PyObject* kw)                              \
+  {                                                                            \
+    _CpEndian_KwArgsGetByteorder(NULL);                                        \
+    PyObject* ret = CpEndian_SetEndian(field, (CpEndianObject*)byteorder);     \
+    if (!ret) {                                                                \
+      return NULL;                                                             \
+    }                                                                          \
+    _Cp_SetObj(field, ret);                                                    \
+    return Py_NewRef((PyObject*)self);                                         \
+  }
+
 #endif

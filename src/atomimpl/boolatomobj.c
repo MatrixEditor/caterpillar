@@ -67,7 +67,7 @@ PyObject*
 CpBoolAtom_Unpack(CpBoolAtomObject* self, CpLayerObject* layer)
 {
   PyObject* res;
-  PyObject* value = CpState_Read(layer->m_state, 1);
+  PyObject* value = CpState_ReadSsize_t(layer->m_state, 1);
   if (!value) {
     return NULL;
   }

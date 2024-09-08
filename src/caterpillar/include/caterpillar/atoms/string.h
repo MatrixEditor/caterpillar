@@ -19,12 +19,20 @@
 
 #include "caterpillar/atoms/builtins.h"
 
+// ---------------------------------------------------------------------------
+// Default String
 struct _stringatomobj
 {
   CpBuiltinAtom_HEAD
 
+    /// The length of this string. It can be a constant integer
+    /// object or a ContextLambda.
     PyObject* m_length;
+
+  /// Whether this string should ignore errors when parsing
   PyObject* m_errors;
+
+  /// The encoding of this string
   PyObject* m_encoding;
 };
 
@@ -34,14 +42,21 @@ struct _stringatomobj
 
 // TODO: CString, PString
 
+// ---------------------------------------------------------------------------
+// Bytes
 struct _bytesatomobj
 {
   CpBuiltinAtom_HEAD
 
+    /// The length of this string. It can be a constant integer
+    /// object or a ContextLambda.
     PyObject* m_length;
-    int s_callable;
+
+  // -- internal ---
+  int s_callable;
 };
 
+// REVISIT: The name of this atom should be something similar to 'bytes'
 #define CpBytesAtom_NAME "octetstring"
 #define CpBytesAtom_CheckExact(op) Py_IS_TYPE((op), &CpBytesAtom_Type)
 #define CpBytesAtom_Check(op) PyObject_TypeCheck((op), &CpBytesAtom_Type)
@@ -50,6 +65,34 @@ static inline CpBytesAtomObject*
 CpBytesAtom_New(PyObject* length)
 {
   return (CpBytesAtomObject*)CpObject_CreateOneArg(&CpBytesAtom_Type, length);
+}
+
+// ---------------------------------------------------------------------------
+// PString
+
+struct _pstringatomobj
+{
+  CpBuiltinAtom_HEAD
+
+    /// The atom that parses the length of this string
+    PyObject* m_atom;
+
+  /// Whether this string should ignore errors when parsing
+  PyObject* m_errors;
+
+  /// The encoding of this string
+  PyObject* m_encoding;
+};
+
+#define CpPStringAtom_NAME "pstring"
+#define CpPStringAtom_CheckExact(op) Py_IS_TYPE((op), &CpPStringAtom_Type)
+#define CpPStringAtom_Check(op) PyObject_TypeCheck((op), &CpPStringAtom_Type)
+
+static inline CpPStringAtomObject*
+CpPStringAtom_New(PyObject* atom, PyObject* encoding)
+{
+  return (CpPStringAtomObject*)CpObject_Create(
+    &CpPStringAtom_Type, "OO", atom, encoding);
 }
 
 #endif

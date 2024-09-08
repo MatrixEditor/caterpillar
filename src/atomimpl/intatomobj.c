@@ -147,7 +147,7 @@ CpIntAtom_Pack(CpIntAtomObject* self, PyObject* op, CpLayerObject* layer)
 PyObject*
 CpIntAtom_Unpack(CpIntAtomObject* self, CpLayerObject* layer)
 {
-  PyObject* bytes = CpState_Read(layer->m_state, self->_m_byte_count);
+  PyObject* bytes = CpState_ReadSsize_t(layer->m_state, self->_m_byte_count);
   if (!bytes) {
     return NULL;
   }

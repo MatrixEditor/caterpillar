@@ -110,7 +110,7 @@ CpStringAtom_Unpack(CpStringAtomObject* self, CpLayerObject* layer)
   if (greedy) {
     res = CpState_ReadFully(layer->m_state);
   } else {
-    res = CpState_Read(layer->m_state, length);
+    res = CpState_ReadSsize_t(layer->m_state, length);
   }
   if (!res) {
     return NULL;

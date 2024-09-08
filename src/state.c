@@ -120,8 +120,8 @@ cp_state_write(CpStateObject* self, PyObject* args)
 static PyObject*
 cp_state_read(CpStateObject* self, PyObject* args)
 {
-  Py_ssize_t size = 0;
-  if (!PyArg_ParseTuple(args, "n", &size)) {
+  PyObject* size = 0;
+  if (!PyArg_ParseTuple(args, "O", &size)) {
     return NULL;
   }
 
@@ -178,9 +178,18 @@ CpState_Seek(CpStateObject* self, PyObject* offset, PyObject* whence)
 
 /*CpAPI*/
 PyObject*
-CpState_Read(CpStateObject* self, Py_ssize_t size)
+CpState_ReadSsize_t(CpStateObject* self, Py_ssize_t size)
 {
   PyObject* sizeobj = PyLong_FromSsize_t(size);
+  PyObject* res = CpState_Read(self, sizeobj);
+  Py_DECREF(sizeobj);
+  return res;
+}
+
+/*CpAPI*/
+PyObject*
+CpState_Read(CpStateObject* self, PyObject* sizeobj)
+{
   PyObject* res =
     PyObject_CallMethodOneArg(self->m_io, self->mod->str_read, sizeobj);
   Py_DECREF(sizeobj);
@@ -189,18 +198,18 @@ CpState_Read(CpStateObject* self, Py_ssize_t size)
     if (!PyErr_Occurred()) {
       PyErr_Format(PyExc_ValueError,
                    "read() returned NULL without error (possible size "
-                   "overflow?). Tried to read %ld bytes",
-                   size);
+                   "overflow?). Tried to read %R bytes",
+                   sizeobj);
     }
     return NULL;
   }
 
   Py_ssize_t length = 0;
-  if ((length = PyObject_Length(res)) != size) {
+  if ((length = PyObject_Length(res)) != PyLong_AsSsize_t(sizeobj)) {
     Py_DECREF(res);
     PyErr_Format(PyExc_ValueError,
-                 "read() expected to return buffer with length %ld, got %ld",
-                 size,
+                 "read() expected to return buffer with length %R, got %ld",
+                 sizeobj,
                  length);
     return NULL;
   }

@@ -120,7 +120,7 @@ CpPaddingAtom_PackMany(CpPaddingAtomObject* self,
 PyObject*
 CpPaddingAtom_Unpack(CpPaddingAtomObject* self, CpLayerObject* layer)
 {
-  PyObject* res = CpState_Read(layer->m_state, 1);
+  PyObject* res = CpState_ReadSsize_t(layer->m_state, 1);
   if (!res) {
     return NULL;
   }
@@ -139,7 +139,7 @@ CpPaddingAtom_UnpackMany(CpPaddingAtomObject* self,
   if (lengthinfo->m_greedy) {
     res = CpState_ReadFully(layer->m_state);
   } else {
-    res = CpState_Read(layer->m_state, lengthinfo->m_length);
+    res = CpState_ReadSsize_t(layer->m_state, lengthinfo->m_length);
   }
 
   if (!res) {

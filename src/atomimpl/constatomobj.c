@@ -56,6 +56,14 @@ cp_constatom_init(CpConstAtomObject* self, PyObject* args, PyObject* kwds)
   return 0;
 }
 
+static PyObject*
+cp_constatom_repr(CpConstAtomObject* self)
+{
+  return PyUnicode_FromFormat("<const [%R] %R>", self->m_value, self->m_atom);
+}
+
+_CpEndian_ImplSetByteorder(CpConstAtomObject, constatom, self->m_atom);
+
 /* Public API */
 
 /*CpAPI*/
@@ -88,6 +96,17 @@ CpConstAtom_Unpack(CpConstAtomObject* self, CpLayerObject* layer)
 
 /* type setup */
 
+static PyMemberDef cp_constatom_members[] = {
+  { "atom", T_OBJECT_EX, offsetof(CpConstAtomObject, m_atom), READONLY },
+  { "value", T_OBJECT_EX, offsetof(CpConstAtomObject, m_value), READONLY },
+  { NULL },
+};
+
+static PyMethodDef cp_constatom_methods[] = {
+  _CpEndian_ImplSetByteorder_MethDef(constatom, NULL),
+  { NULL }
+};
+
 PyTypeObject CpConstAtom_Type = {
   PyVarObject_HEAD_INIT(NULL, 0) _Cp_NameStr(CpConstAtom_NAME),
   .tp_basicsize = sizeof(CpConstAtomObject),
@@ -95,4 +114,7 @@ PyTypeObject CpConstAtom_Type = {
   .tp_init = (initproc)cp_constatom_init,
   .tp_flags = Py_TPFLAGS_DEFAULT,
   .tp_new = (newfunc)cp_constatom_new,
+  .tp_repr = (reprfunc)cp_constatom_repr,
+  .tp_members = cp_constatom_members,
+  .tp_methods = cp_constatom_methods
 };

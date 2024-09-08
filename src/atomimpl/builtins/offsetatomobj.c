@@ -77,20 +77,7 @@ cp_offsetatom_init(CpOffsetAtomObject* self, PyObject* args, PyObject* kw)
   return 0;
 }
 
-static PyObject*
-cp_offsetatom_set_byteorder(CpOffsetAtomObject* self,
-                            PyObject* args,
-                            PyObject* kw)
-{
-  _CpEndian_KwArgsGetByteorder(NULL);
-  PyObject* new_atom =
-    CpEndian_SetEndian(self->m_atom, (CpEndianObject*)byteorder);
-  if (!new_atom) {
-    return NULL;
-  }
-  _Cp_SetObj(self->m_atom, new_atom);
-  return (PyObject*)self;
-}
+_CpEndian_ImplSetByteorder(CpOffsetAtomObject, offsetatom, self->m_atom);
 
 static PyObject*
 cp_offsetatom_get_offset(CpOffsetAtomObject* self, PyObject* args, PyObject* kw)

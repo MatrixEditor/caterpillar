@@ -104,7 +104,7 @@ CpBytesAtom_Unpack(CpBytesAtomObject* self, CpLayerObject* layer)
   if (length == NULL) {
     return NULL;
   }
-  return CpState_Read(layer->m_state, PyLong_AS_LONG(length));
+  return CpState_Read(layer->m_state, length);
 }
 
 /* docs */

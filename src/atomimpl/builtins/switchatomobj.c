@@ -131,20 +131,7 @@ cp_switchatom_init(CpSwitchAtomObject* self, PyObject* args, PyObject* kw)
   return 0;
 }
 
-static PyObject*
-cp_switchatom_set_byteorder(CpSwitchAtomObject* self,
-                            PyObject* args,
-                            PyObject* kw)
-{
-  _CpEndian_KwArgsGetByteorder(NULL);
-  PyObject* new_atom =
-    CpEndian_SetEndian(self->m_atom, (CpEndianObject*)byteorder);
-  if (!new_atom) {
-    return NULL;
-  }
-  _Cp_SetObj(self->m_atom, new_atom);
-  return (PyObject*)self;
-}
+_CpEndian_ImplSetByteorder(CpSwitchAtomObject, switchatom, self->m_atom);
 
 static PyObject*
 cp_switchatom_get_next(CpSwitchAtomObject* self, PyObject* args, PyObject* kw)

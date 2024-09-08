@@ -70,7 +70,7 @@ CpCharAtom_Pack(CpCharAtomObject* self, PyObject* value, CpLayerObject* layer)
 PyObject*
 CpCharAtom_Unpack(CpCharAtomObject* self, CpLayerObject* layer)
 {
-  PyObject* res = CpState_Read(layer->m_state, 1);
+  PyObject* res = CpState_ReadSsize_t(layer->m_state, 1);
   if (!res) {
     return NULL;
   }

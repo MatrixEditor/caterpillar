@@ -38,6 +38,7 @@ python_add_library(
   src/atomimpl/stringatomobj.c
   src/atomimpl/constatomobj.c
   src/atomimpl/bytesatomobj.c
+  src/atomimpl/pstringatomobj.c
 
   src/atomimpl/builtins/builtinatomobj.c
   src/atomimpl/builtins/repeatedatomobj.c

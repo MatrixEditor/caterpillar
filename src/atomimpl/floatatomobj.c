@@ -146,7 +146,7 @@ CpFloatAtom_Pack(CpFloatAtomObject* self, PyObject* value, CpLayerObject* layer)
 PyObject*
 CpFloatAtom_Unpack(CpFloatAtomObject* self, CpLayerObject* layer)
 {
-  PyObject* bytes = CpState_Read(layer->m_state, self->_m_byte_count);
+  PyObject* bytes = CpState_ReadSsize_t(layer->m_state, self->_m_byte_count);
   if (!bytes) {
     return NULL;
   }
