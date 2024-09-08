@@ -74,6 +74,14 @@ struct _stringatomobj;
 typedef struct _stringatomobj CpStringAtomObject;
 struct _constatomobj;
 typedef struct _constatomobj CpConstAtomObject;
+struct _builtinatomobj;
+typedef struct _builtinatomobj CpBuiltinAtomObject;
+struct _repeatedatomobj;
+typedef struct _repeatedatomobj CpRepeatedAtomObject;
+struct _seqlayerobj;
+typedef struct _seqlayerobj CpSeqLayerObject;
+struct _objlayerobj;
+typedef struct _objlayerobj CpObjLayerObject;
 
 #ifdef _CPMODULE
 
@@ -110,6 +118,10 @@ extern PyTypeObject CpCharAtom_Type;
 extern PyTypeObject CpPaddingAtom_Type;
 extern PyTypeObject CpStringAtom_Type;
 extern PyTypeObject CpConstAtom_Type;
+extern PyTypeObject CpBuiltinAtom_Type;
+extern PyTypeObject CpRepeatedAtom_Type;
+extern PyTypeObject CpSeqLayer_Type;
+extern PyTypeObject CpObjLayer_Type;
 int CpEndian_IsLittleEndian(CpEndianObject* endian, _modulestate* mod);
 CpContextObject* CpContext_New(void);
 CpUnaryExprObject* CpUnaryExpr_New(int op, PyObject* value);
@@ -129,7 +141,6 @@ int CpPack(PyObject* op, PyObject* atom, PyObject* io, PyObject* globals);
 int CpPack_Field(PyObject* op, CpFieldObject* field, CpLayerObject* layer);
 int CpPack_Common(PyObject* op, PyObject* atom, CpLayerObject* layer);
 int CpPack_Struct(PyObject* op, CpStructObject* struct_, CpLayerObject* layer);
-int _Cp_Pack(PyObject* op, PyObject* atom, CpLayerObject* layer);
 int _CpPack_EvalLength(CpLayerObject* layer,PyObject* length,Py_ssize_t size,bool* greedy,Py_ssize_t* dstLength);
 PyObject* CpSizeOf(PyObject* op, PyObject* globals);
 PyObject* CpSizeOf_Field(CpFieldObject* field, CpLayerObject* layer);
@@ -140,7 +151,6 @@ PyObject* CpUnpack(PyObject* atom, PyObject* io, PyObject* globals);
 PyObject* CpUnpack_Field(CpFieldObject* field, CpLayerObject* layer);
 PyObject* CpUnpack_Common(PyObject* op, CpLayerObject* layer);
 PyObject* CpUnpack_Struct(CpStructObject* struct_, CpLayerObject* layer);
-PyObject* _Cp_Unpack(PyObject* atom, CpLayerObject* layer);
 int _CpUnpack_EvalLength(CpLayerObject* layer,PyObject* length,bool* seq_greedy,Py_ssize_t* seq_length);
 PyObject* CpUnpack_CAtom(CpCAtomObject* catom, CpLayerObject* layer);
 int CpPack_CAtom(PyObject* op, CpCAtomObject* catom, CpLayerObject* layer);
@@ -155,7 +165,6 @@ PyObject* CpState_Write(CpStateObject* self, PyObject* value);
 int CpState_SetGlobals(CpStateObject* self, PyObject* globals);
 CpLayerObject* CpLayer_New(CpStateObject* state, CpLayerObject* parent);
 int CpLayer_Invalidate(CpLayerObject* self);
-int CpLayer_SetSequence(CpLayerObject* self,PyObject* sequence,Py_ssize_t length,int8_t greedy);
 CpStructFieldInfoObject* CpStructFieldInfo_New(CpFieldObject* field);
 int CpStruct_AddFieldInfo(CpStructObject* o, CpStructFieldInfoObject* info);
 int CpStruct_AddField(CpStructObject* o, CpFieldObject* field, int exclude);
@@ -165,6 +174,9 @@ int CpStruct_ReplaceType(CpStructObject* o, PyObject* name, PyObject* type);
 int CpStruct_HasOption(CpStructObject* o, PyObject* option);
 int CpStructModel_Check(PyObject* model, _modulestate* state);
 PyObject* CpStructModel_GetStruct(PyObject* model, _modulestate* state);
+CpSeqLayerObject* CpSeqLayer_New(CpStateObject* state, CpLayerObject* parent);
+int CpSeqLayer_SetSequence(CpSeqLayerObject* self,PyObject* sequence,Py_ssize_t length,int8_t greedy);
+CpObjLayerObject* CpObjLayer_New(CpStateObject* state, CpLayerObject* parent);
 int CpIntAtom_Pack(CpIntAtomObject* self, PyObject* op, CpLayerObject* layer);
 PyObject* CpIntAtom_Unpack(CpIntAtomObject* self, CpLayerObject* layer);
 int CpFloatAtom_Pack(CpFloatAtomObject* self, PyObject* value, CpLayerObject* layer);
@@ -181,6 +193,9 @@ int CpStringAtom_Pack(CpStringAtomObject* self,PyObject* value,CpLayerObject* la
 PyObject* CpStringAtom_Unpack(CpStringAtomObject* self, CpLayerObject* layer);
 int CpConstAtom_Pack(CpConstAtomObject* self, PyObject* value, CpLayerObject* layer);
 PyObject* CpConstAtom_Unpack(CpConstAtomObject* self, CpLayerObject* layer);
+int CpRepeatedAtom_Pack(CpRepeatedAtomObject* self,PyObject* op,CpLayerObject* layer);
+PyObject* CpRepeatedAtom_Unpack(CpRepeatedAtomObject* self, CpLayerObject* layer);
+PyObject* CpRepeatedAtom_GetLength(CpRepeatedAtomObject* self, PyObject* context);
 
 #else
 
@@ -218,6 +233,10 @@ caterpillar_api.py
 #define CpPaddingAtom_Type (*(PyTypeObject *)Cp_API[25])
 #define CpStringAtom_Type (*(PyTypeObject *)Cp_API[26])
 #define CpConstAtom_Type (*(PyTypeObject *)Cp_API[27])
+#define CpBuiltinAtom_Type (*(PyTypeObject *)Cp_API[28])
+#define CpRepeatedAtom_Type (*(PyTypeObject *)Cp_API[29])
+#define CpSeqLayer_Type (*(PyTypeObject *)Cp_API[30])
+#define CpObjLayer_Type (*(PyTypeObject *)Cp_API[31])
 #define CpEndian_IsLittleEndian (*((int (*)(CpEndianObject* endian, _modulestate* mod)))Cp_API[50])
 #define CpContext_New (*((CpContextObject* (*)(void)))Cp_API[53])
 #define CpUnaryExpr_New (*((CpUnaryExprObject* (*)(int op, PyObject* value)))Cp_API[54])
@@ -237,7 +256,6 @@ caterpillar_api.py
 #define CpPack_Field (*((int (*)(PyObject* op, CpFieldObject* field, CpLayerObject* layer)))Cp_API[68])
 #define CpPack_Common (*((int (*)(PyObject* op, PyObject* atom, CpLayerObject* layer)))Cp_API[69])
 #define CpPack_Struct (*((int (*)(PyObject* op, CpStructObject* struct_, CpLayerObject* layer)))Cp_API[70])
-#define _Cp_Pack (*((int (*)(PyObject* op, PyObject* atom, CpLayerObject* layer)))Cp_API[71])
 #define _CpPack_EvalLength (*((int (*)(CpLayerObject* layer,PyObject* length,Py_ssize_t size,bool* greedy,Py_ssize_t* dstLength)))Cp_API[72])
 #define CpSizeOf (*((PyObject* (*)(PyObject* op, PyObject* globals)))Cp_API[73])
 #define CpSizeOf_Field (*((PyObject* (*)(CpFieldObject* field, CpLayerObject* layer)))Cp_API[74])
@@ -248,7 +266,6 @@ caterpillar_api.py
 #define CpUnpack_Field (*((PyObject* (*)(CpFieldObject* field, CpLayerObject* layer)))Cp_API[79])
 #define CpUnpack_Common (*((PyObject* (*)(PyObject* op, CpLayerObject* layer)))Cp_API[80])
 #define CpUnpack_Struct (*((PyObject* (*)(CpStructObject* struct_, CpLayerObject* layer)))Cp_API[81])
-#define _Cp_Unpack (*((PyObject* (*)(PyObject* atom, CpLayerObject* layer)))Cp_API[82])
 #define _CpUnpack_EvalLength (*((int (*)(CpLayerObject* layer,PyObject* length,bool* seq_greedy,Py_ssize_t* seq_length)))Cp_API[83])
 #define CpUnpack_CAtom (*((PyObject* (*)(CpCAtomObject* catom, CpLayerObject* layer)))Cp_API[84])
 #define CpPack_CAtom (*((int (*)(PyObject* op, CpCAtomObject* catom, CpLayerObject* layer)))Cp_API[85])
@@ -263,7 +280,6 @@ caterpillar_api.py
 #define CpState_SetGlobals (*((int (*)(CpStateObject* self, PyObject* globals)))Cp_API[94])
 #define CpLayer_New (*((CpLayerObject* (*)(CpStateObject* state, CpLayerObject* parent)))Cp_API[95])
 #define CpLayer_Invalidate (*((int (*)(CpLayerObject* self)))Cp_API[96])
-#define CpLayer_SetSequence (*((int (*)(CpLayerObject* self,PyObject* sequence,Py_ssize_t length,int8_t greedy)))Cp_API[97])
 #define CpStructFieldInfo_New (*((CpStructFieldInfoObject* (*)(CpFieldObject* field)))Cp_API[98])
 #define CpStruct_AddFieldInfo (*((int (*)(CpStructObject* o, CpStructFieldInfoObject* info)))Cp_API[99])
 #define CpStruct_AddField (*((int (*)(CpStructObject* o, CpFieldObject* field, int exclude)))Cp_API[100])
@@ -273,6 +289,9 @@ caterpillar_api.py
 #define CpStruct_HasOption (*((int (*)(CpStructObject* o, PyObject* option)))Cp_API[104])
 #define CpStructModel_Check (*((int (*)(PyObject* model, _modulestate* state)))Cp_API[105])
 #define CpStructModel_GetStruct (*((PyObject* (*)(PyObject* model, _modulestate* state)))Cp_API[106])
+#define CpSeqLayer_New (*((CpSeqLayerObject* (*)(CpStateObject* state, CpLayerObject* parent)))Cp_API[107])
+#define CpSeqLayer_SetSequence (*((int (*)(CpSeqLayerObject* self,PyObject* sequence,Py_ssize_t length,int8_t greedy)))Cp_API[108])
+#define CpObjLayer_New (*((CpObjLayerObject* (*)(CpStateObject* state, CpLayerObject* parent)))Cp_API[109])
 #define CpIntAtom_Pack (*((int (*)(CpIntAtomObject* self, PyObject* op, CpLayerObject* layer)))Cp_API[120])
 #define CpIntAtom_Unpack (*((PyObject* (*)(CpIntAtomObject* self, CpLayerObject* layer)))Cp_API[121])
 #define CpFloatAtom_Pack (*((int (*)(CpFloatAtomObject* self, PyObject* value, CpLayerObject* layer)))Cp_API[122])
@@ -289,6 +308,9 @@ caterpillar_api.py
 #define CpStringAtom_Unpack (*((PyObject* (*)(CpStringAtomObject* self, CpLayerObject* layer)))Cp_API[133])
 #define CpConstAtom_Pack (*((int (*)(CpConstAtomObject* self, PyObject* value, CpLayerObject* layer)))Cp_API[134])
 #define CpConstAtom_Unpack (*((PyObject* (*)(CpConstAtomObject* self, CpLayerObject* layer)))Cp_API[135])
+#define CpRepeatedAtom_Pack (*((int (*)(CpRepeatedAtomObject* self,PyObject* op,CpLayerObject* layer)))Cp_API[136])
+#define CpRepeatedAtom_Unpack (*((PyObject* (*)(CpRepeatedAtomObject* self, CpLayerObject* layer)))Cp_API[137])
+#define CpRepeatedAtom_GetLength (*((PyObject* (*)(CpRepeatedAtomObject* self, PyObject* context)))Cp_API[138])
 
 /**
  * @brief Public C API for extension modules as reference table

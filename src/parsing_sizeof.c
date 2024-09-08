@@ -60,7 +60,7 @@ CpSizeOf_Field(CpFieldObject* field, CpLayerObject* layer)
   }
 
   // prepare context
-  Py_XSETREF(layer->m_field, Py_NewRef(field));
+  // Py_XSETREF(layer->m_field, Py_NewRef(field));
   if (field->s_sequential) {
     count = CpField_GetLength(field, (PyObject*)layer);
     if (!count) {

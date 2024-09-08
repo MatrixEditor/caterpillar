@@ -42,6 +42,10 @@ cp_types = {
     "_paddingatomobj":          "CpPaddingAtomObject",
     "_stringatomobj":           "CpStringAtomObject",
     "_constatomobj":            "CpConstAtomObject",
+    "_builtinatomobj":          "CpBuiltinAtomObject",
+    "_repeatedatomobj":         "CpRepeatedAtomObject",
+    "_seqlayerobj":             "CpSeqLayerObject",
+    "_objlayerobj":             "CpObjLayerObject",
 }
 
 cp_type_api = {
@@ -73,6 +77,10 @@ cp_type_api = {
     "CpPaddingAtom_Type":           (25,),
     "CpStringAtom_Type":            (26,),
     "CpConstAtom_Type":             (27,),
+    "CpBuiltinAtom_Type":           (28,),
+    "CpRepeatedAtom_Type":          (29,),
+    "CpSeqLayer_Type":              (30,),
+    "CpObjLayer_Type":              (31,),
 }
 
 cp_func_api = {
@@ -98,7 +106,6 @@ cp_func_api = {
     "CpPack_Field":                 68,
     "CpPack_Common":                69,
     "CpPack_Struct":                70,
-    "_Cp_Pack":                     71,
     "_CpPack_EvalLength":           72,
     "CpSizeOf":                     73,
     "CpSizeOf_Field":               74,
@@ -109,7 +116,6 @@ cp_func_api = {
     "CpUnpack_Field":               79,
     "CpUnpack_Common":              80,
     "CpUnpack_Struct":              81,
-    "_Cp_Unpack":                   82,
     "_CpUnpack_EvalLength":         83,
     "CpUnpack_CAtom":               84,
     "CpPack_CAtom":                 85,
@@ -124,7 +130,6 @@ cp_func_api = {
     "CpState_SetGlobals":           94,
     "CpLayer_New":                  95,
     "CpLayer_Invalidate":           96,
-    "CpLayer_SetSequence":          97,
     "CpStructFieldInfo_New" :       98,
     "CpStruct_AddFieldInfo":        99,
     "CpStruct_AddField":           100,
@@ -134,6 +139,10 @@ cp_func_api = {
     "CpStruct_HasOption":          104,
     "CpStructModel_Check":         105,
     "CpStructModel_GetStruct":     106,
+    "CpSeqLayer_New":              107,
+    "CpSeqLayer_SetSequence":      108,
+    "CpObjLayer_New":              109,
+
 
     # atom api
     "CpIntAtom_Pack":              120,
@@ -152,6 +161,9 @@ cp_func_api = {
     "CpStringAtom_Unpack":         133,
     "CpConstAtom_Pack":            134,
     "CpConstAtom_Unpack":          135,
+    "CpRepeatedAtom_Pack":         136,
+    "CpRepeatedAtom_Unpack":       137,
+    "CpRepeatedAtom_GetLength":    138,
 }
 
 API_SRC = [
@@ -162,6 +174,7 @@ API_SRC = [
     "option.c",
     "struct.c",
     "state.c",
+    "layer.c",
     "parsing_pack.c",
     "parsing_unpack.c",
     "parsing_typeof.c",
@@ -173,6 +186,8 @@ API_SRC = [
     "atomimpl/padatomobj.c",
     "atomimpl/stringatomobj.c",
     "atomimpl/constatomobj.c",
+    "atomimpl/builtins/builtinatomobj.c",
+    "atomimpl/builtins/repeatedatomobj.c",
 ]
 
 

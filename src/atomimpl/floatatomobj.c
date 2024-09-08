@@ -69,6 +69,8 @@ cp_floatatom_init(CpFloatAtomObject* self, PyObject* args, PyObject* kwds)
   return 0;
 }
 
+_CpEndian_ImplSetByteorder(floatatom, self->_m_little_endian);
+
 /* Public API */
 /*CpAPI*/
 int
@@ -85,15 +87,6 @@ CpFloatAtom_Pack(CpFloatAtomObject* self, PyObject* value, CpLayerObject* layer)
   }
 
   int little_endian = self->_m_little_endian;
-  if (layer->m_field) {
-    _modulestate* mod = layer->m_state->mod;
-    PyObject* endian = ((CpFieldObject*)layer->m_field)->m_endian;
-
-    if (CpEndian_Check(endian))
-      /* If the field has an endian specified, use that. */
-      little_endian = CpEndian_IsLittleEndian((CpEndianObject*)endian, mod);
-  }
-
   int res = 0;
   switch (self->_m_byte_count) {
     case 2: {
@@ -141,16 +134,6 @@ CpFloatAtom_Unpack(CpFloatAtomObject* self, CpLayerObject* layer)
   }
 
   int little_endian = self->_m_little_endian;
-  if (layer->m_field) {
-    _modulestate* mod = layer->m_state->mod;
-    PyObject* endian = ((CpFieldObject*)layer->m_field)->m_endian;
-
-    if (CpEndian_Check(endian)) {
-      /* If the field has an endian specified, use that. */
-      little_endian = CpEndian_IsLittleEndian((CpEndianObject*)endian, mod);
-    }
-  }
-
   double res;
   switch (self->_m_byte_count) {
     case 2: {
@@ -185,9 +168,12 @@ static PyMemberDef CpFloatAtom_Members[] = {
     READONLY,
     NULL },
   { "bits", T_PYSSIZET, offsetof(CpFloatAtomObject, _m_bits), READONLY, NULL },
-  { "little_endian",
-    T_BOOL,
-    offsetof(CpFloatAtomObject, _m_little_endian)},
+  { "little_endian", T_BOOL, offsetof(CpFloatAtomObject, _m_little_endian) },
+  { NULL } /* Sentinel */
+};
+
+static PyMethodDef CpFloatAtom_Methods[] = {
+  _CpEndian_ImplSetByteorder_MethDef(floatatom, NULL),
   { NULL } /* Sentinel */
 };
 
@@ -198,6 +184,7 @@ PyTypeObject CpFloatAtom_Type = {
   .tp_flags = Py_TPFLAGS_DEFAULT,
   .tp_doc = NULL,
   .tp_members = CpFloatAtom_Members,
+  .tp_methods = CpFloatAtom_Methods,
   .tp_init = (initproc)cp_floatatom_init,
   .tp_new = (newfunc)cp_floatatom_new,
 };

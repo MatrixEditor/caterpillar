@@ -82,10 +82,7 @@ _CpPack_EvalLength(CpLayerObject* layer,
     if (!sizeobj) {
       return -1;
     }
-    // TODO: explain why
-    layer->s_sequential = false;
     success = _Cp_Pack(sizeobj, start, layer);
-    layer->s_sequential = true;
     Py_DECREF(sizeobj);
     Py_DECREF(start);
     if (success < 0) {
@@ -117,88 +114,90 @@ _CpPack_EvalLength(CpLayerObject* layer,
 int
 CpPack_Field(PyObject* op, CpFieldObject* field, CpLayerObject* layer)
 {
-  // we can assert that all provided objects are of the correct type
-  // REVISIT: really?
-  if (!op) {
-    PyErr_SetString(PyExc_ValueError, "object is NULL");
-    return -1;
-  }
-
-  CpLayer_AppendPath(layer, field->m_name);
-  if (!layer->m_path) {
-    return -1;
-  }
-
-  int res = CpField_IsEnabled(field, (PyObject*)layer);
-  if (!res) {
-    // disabled fields are not packed
-    return 0;
-  }
-  if (res < 0) {
-    return -1;
-  }
-
-  PyObject *base_stream = NULL, *fallback = NULL;
-  CpStateObject* state = layer->m_state;
-
-  Py_XSETREF(layer->m_field, Py_NewRef((PyObject*)field));
-  layer->s_sequential = field->s_sequential;
-
-  Py_ssize_t offset = CpField_GetOffset(field, (PyObject*)layer);
-  if (offset < 0 && PyErr_Occurred()) {
-    return -1;
-  }
-
-  if (offset == -1 || !field->s_keep_pos) {
-    if (!(fallback = CpState_Tell(layer->m_state))) {
-      return -1;
-    };
-  }
-
-  if (offset >= 0) {
-    // We write the current field into a temporary memory buffer
-    // and add it after all processing has finished.
-    base_stream = Py_XNewRef(layer->m_state->m_io);
-    layer->m_state->m_io = PyObject_CallNoArgs(state->mod->BytesIO_Type);
-    if (!state->m_io) {
+#if 0
+    // we can assert that all provided objects are of the correct type
+    // REVISIT: really?
+    if (!op) {
+      PyErr_SetString(PyExc_ValueError, "object is NULL");
       return -1;
     }
-  }
 
-  if (!PyCallable_Check(field->m_atom)) {
-    return _Cp_Pack(op, field->m_atom, layer);
-  } else {
-    PyObject* res = PyObject_CallOneArg(field->m_atom, (PyObject*)layer);
+    CpLayer_AppendPath(layer, field->m_name);
+    if (!layer->m_path) {
+      return -1;
+    }
+
+    int res = CpField_IsEnabled(field, (PyObject*)layer);
     if (!res) {
+      // disabled fields are not packed
+      return 0;
+    }
+    if (res < 0) {
       return -1;
     }
 
-    if (field->m_switch && field->m_switch != Py_None) {
-      PyObject* atom = CpField_EvalSwitch(field, res, (PyObject*)layer);
-      Py_DECREF(res);
-      if (!atom) {
-        return -1;
-      }
-      if (_Cp_Pack(op, atom, layer) < 0) {
-        return -1;
-      }
-    } else
-      Py_DECREF(res);
-  }
+    PyObject *base_stream = NULL, *fallback = NULL;
+    CpStateObject* state = layer->m_state;
 
-  if (offset == -1 || !field->s_keep_pos) {
-    if (!CpState_Seek(state, fallback, 0)) {
+    Py_XSETREF(layer->m_field, Py_NewRef((PyObject*)field));
+    layer->s_sequential = field->s_sequential;
+
+    Py_ssize_t offset = CpField_GetOffset(field, (PyObject*)layer);
+    if (offset < 0 && PyErr_Occurred()) {
       return -1;
     }
-  }
 
-  if (offset >= 0) {
-    if (PyObject_SetItem(
-          state->m_offset_table, PyLong_FromSsize_t(offset), state->m_io) < 0)
-      return -1;
+    if (offset == -1 || !field->s_keep_pos) {
+      if (!(fallback = CpState_Tell(layer->m_state))) {
+        return -1;
+      };
+    }
 
-    Py_XSETREF(state->m_io, base_stream);
-  }
+    if (offset >= 0) {
+      // We write the current field into a temporary memory buffer
+      // and add it after all processing has finished.
+      base_stream = Py_XNewRef(layer->m_state->m_io);
+      layer->m_state->m_io = PyObject_CallNoArgs(state->mod->BytesIO_Type);
+      if (!state->m_io) {
+        return -1;
+      }
+    }
+
+    if (!PyCallable_Check(field->m_atom)) {
+      return _Cp_Pack(op, field->m_atom, layer);
+    } else {
+      PyObject* res = PyObject_CallOneArg(field->m_atom, (PyObject*)layer);
+      if (!res) {
+        return -1;
+      }
+
+      if (field->m_switch && field->m_switch != Py_None) {
+        PyObject* atom = CpField_EvalSwitch(field, res, (PyObject*)layer);
+        Py_DECREF(res);
+        if (!atom) {
+          return -1;
+        }
+        if (_Cp_Pack(op, atom, layer) < 0) {
+          return -1;
+        }
+      } else
+        Py_DECREF(res);
+    }
+
+    if (offset == -1 || !field->s_keep_pos) {
+      if (!CpState_Seek(state, fallback, 0)) {
+        return -1;
+      }
+    }
+
+    if (offset >= 0) {
+      if (PyObject_SetItem(
+            state->m_offset_table, PyLong_FromSsize_t(offset), state->m_io) < 0)
+        return -1;
+
+      Py_XSETREF(state->m_io, base_stream);
+    }
+#endif
   return 0;
 }
 
@@ -206,99 +205,102 @@ CpPack_Field(PyObject* op, CpFieldObject* field, CpLayerObject* layer)
 int
 CpPack_Common(PyObject* op, PyObject* atom, CpLayerObject* layer)
 {
-
-  int success;
-  if (!layer->s_sequential) {
-    return PyObject_CallMethod(atom, "__pack__", "OO", op, layer) ? 0 : -1;
-  }
-
-  CpStateObject* state = layer->m_state;
-  if (PyObject_HasAttr(atom, state->mod->str___pack_many__)) {
-    // class explicitly defines __pack_many__ -> use it
-    PyObject* res =
-      CpAtom_Pack(atom, state->mod->str___pack_many__, op, (PyObject*)layer);
-    PyObject* exc = NULL;
-    if ((exc = PyErr_GetRaisedException(),
-         exc && PyErr_GivenExceptionMatches(exc, PyExc_NotImplementedError))) {
-      // Make sure this method continues to pack the given object
-      Py_XDECREF(exc);
-      PyErr_Clear();
-      Py_XDECREF(res);
-    } else {
-      success = res ? 0 : -1;
-      Py_XDECREF(res);
-      Py_XDECREF(exc);
-      return success;
+#if 0
+    int success;
+    if (!layer->s_sequential) {
+      return PyObject_CallMethod(atom, "__pack__", "OO", op, layer) ? 0 : -1;
     }
-  }
 
-  if (!PySequence_Check(op)) {
-    PyErr_Format(PyExc_ValueError, "input object (%R) is not a sequence", op);
-    return -1;
-  }
+    CpStateObject* state = layer->m_state;
+    if (PyObject_HasAttr(atom, state->mod->str___pack_many__)) {
+      // class explicitly defines __pack_many__ -> use it
+      PyObject* res =
+        CpAtom_Pack(atom, state->mod->str___pack_many__, op, (PyObject*)layer);
+      PyObject* exc = NULL;
+      if ((exc = PyErr_GetRaisedException(),
+           exc &&
+             PyErr_GivenExceptionMatches(exc, PyExc_NotImplementedError))) {
+        // Make sure this method continues to pack the given object
+        Py_XDECREF(exc);
+        PyErr_Clear();
+        Py_XDECREF(res);
+      } else {
+        success = res ? 0 : -1;
+        Py_XDECREF(res);
+        Py_XDECREF(exc);
+        return success;
+      }
+    }
 
-  // TODO: explain why
-  CpLayerObject* seq_layer = CpLayer_New(state, layer);
-  if (!seq_layer) {
-    return -1;
-  }
-  seq_layer->s_sequential = false;
+    if (!PySequence_Check(op)) {
+      PyErr_Format(PyExc_ValueError, "input object (%R) is not a sequence", op);
+      return -1;
+    }
 
-  Py_ssize_t size = PySequence_Size(op);
-  bool greedy = false;
-  Py_ssize_t layer_length = 0;
-  PyObject* length =
-    CpField_GetLength((CpFieldObject*)layer->m_field, (PyObject*)layer);
-  if (!length) {
-    return -1;
-  }
-  if (_CpPack_EvalLength(layer, length, size, &greedy, &layer_length) < 0) {
+    // TODO: explain why
+    CpLayerObject* seq_layer = CpLayer_New(state, layer);
+    if (!seq_layer) {
+      return -1;
+    }
+    seq_layer->s_sequential = false;
+
+    Py_ssize_t size = PySequence_Size(op);
+    bool greedy = false;
+    Py_ssize_t layer_length = 0;
+    PyObject* length =
+      CpField_GetLength((CpFieldObject*)layer->m_field, (PyObject*)layer);
+    if (!length) {
+      return -1;
+    }
+    if (_CpPack_EvalLength(layer, length, size, &greedy, &layer_length) < 0) {
+      Py_XDECREF(length);
+      return -1;
+    }
     Py_XDECREF(length);
-    return -1;
-  }
-  Py_XDECREF(length);
 
-  if (layer_length <= 0) {
-    // continue packing, here's nothing to store
-    Py_XDECREF(seq_layer);
-    return 0;
-  }
-  CpLayer_SetSequence(seq_layer, op, layer_length, greedy);
+    if (layer_length <= 0) {
+      // continue packing, here's nothing to store
+      Py_XDECREF(seq_layer);
+      return 0;
+    }
+    CpLayer_SetSequence(seq_layer, op, layer_length, greedy);
 
-  PyObject* obj = NULL;
-  for (seq_layer->m_index = 0; seq_layer->m_index < seq_layer->m_length;
-       seq_layer->m_index++) {
-    obj = PySequence_GetItem(op, seq_layer->m_index);
-    if (!obj) {
-      return -1;
+    PyObject* obj = NULL;
+    for (seq_layer->m_index = 0; seq_layer->m_index < seq_layer->m_length;
+         seq_layer->m_index++) {
+      obj = PySequence_GetItem(op, seq_layer->m_index);
+      if (!obj) {
+        return -1;
+      }
+      seq_layer->m_path = PyUnicode_FromFormat(
+        "%s.%d", _PyUnicode_AsString(layer->m_path), seq_layer->m_index);
+      if (!seq_layer->m_path) {
+        Py_XDECREF(obj);
+        return -1;
+      }
+      success = _Cp_Pack(obj, atom, seq_layer);
+      Py_XSETREF(obj, NULL);
+      if (success < 0) {
+        return -1;
+      }
     }
-    seq_layer->m_path = PyUnicode_FromFormat(
-      "%s.%d", _PyUnicode_AsString(layer->m_path), seq_layer->m_index);
-    if (!seq_layer->m_path) {
-      Py_XDECREF(obj);
-      return -1;
-    }
-    success = _Cp_Pack(obj, atom, seq_layer);
-    Py_XSETREF(obj, NULL);
-    if (success < 0) {
-      return -1;
-    }
-  }
-  CpLayer_Invalidate(seq_layer);
-  return 0;
-
-fail:
-  if (seq_layer) {
     CpLayer_Invalidate(seq_layer);
-  }
-  return -1;
+    return 0;
+
+  fail:
+    if (seq_layer) {
+      CpLayer_Invalidate(seq_layer);
+    }
+    return -1;
+#endif
+  return 0;
 }
 
 /*CpAPI*/
 int
 CpPack_Struct(PyObject* op, CpStructObject* struct_, CpLayerObject* layer)
 {
-
+#if 0
   if (layer->s_sequential) {
     // TODO: explain why
     return CpPack_Common(op, (PyObject*)struct_, layer);
@@ -394,14 +396,22 @@ cleanup:
   if (obj_layer) {
     CpLayer_Invalidate(obj_layer);
   }
-  return res;
+#endif
+  return 0;
 }
 
 /*CpAPI*/
 int
 CpPack_CAtom(PyObject* op, CpCAtomObject* catom, CpLayerObject* layer)
 {
-
+  if (catom->ob_pack == NULL) {
+    PyErr_Format(PyExc_NotImplementedError,
+                 "The atom of type '%s' cannot be packed (missing __pack__)",
+                 Py_TYPE(catom)->tp_name);
+    return -1;
+  }
+  return catom->ob_pack((PyObject*)catom, op, (PyObject*)layer);
+#if 0
   if (!layer->s_sequential) {
     if (catom->ob_pack == NULL) {
       PyErr_Format(PyExc_NotImplementedError,
@@ -418,31 +428,10 @@ CpPack_CAtom(PyObject* op, CpCAtomObject* catom, CpLayerObject* layer)
     //   "The atom of type '%s' cannot be packed (missing __pack_many__)",
     //   Py_TYPE(catom)->tp_name);
     // return -1;
-    return CpPack_Common(op, (PyObject *)catom, layer);
+    return CpPack_Common(op, (PyObject*)catom, layer);
   }
   return catom->ob_pack_many((PyObject*)catom, op, (PyObject*)layer);
-}
-
-/*CpAPI*/
-int
-_Cp_Pack(PyObject* op, PyObject* atom, CpLayerObject* layer)
-{
-  // 1. the current context-sensitive variables must be stored
-  // elsewhere.
-  //
-  // 2. the current context-sensitive variables must be restored
-  // to their original values.
-  int success;
-  if (CpField_CheckExact(atom)) {
-    success = CpPack_Field(op, (CpFieldObject*)atom, layer);
-  } else if (CpStruct_CheckExact(atom)) {
-    success = CpPack_Struct(op, (CpStructObject*)atom, layer);
-  } else if (CpCAtom_Check(atom)) {
-    return CpPack_CAtom(op, (CpCAtomObject*)atom, layer);
-  } else {
-    success = CpPack_Common(op, atom, layer);
-  }
-  return success;
+#endif
 }
 
 /*CpAPI*/

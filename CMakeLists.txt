@@ -23,6 +23,7 @@ python_add_library(
   src/context.c
   src/state.c
   src/struct.c
+  src/layer.c
 
   src/parsing_typeof.c
   src/parsing_sizeof.c
@@ -36,6 +37,9 @@ python_add_library(
   src/atomimpl/padatomobj.c
   src/atomimpl/stringatomobj.c
   src/atomimpl/constatomobj.c
+
+  src/atomimpl/builtins/builtinatomobj.c
+  src/atomimpl/builtins/repeatedatomobj.c
 
   WITH_SOABI
 )

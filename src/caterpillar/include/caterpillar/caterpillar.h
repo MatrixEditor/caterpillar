@@ -13,8 +13,10 @@
 #include "caterpillar/atomobj.h"
 #include "caterpillar/field.h"
 #include "caterpillar/state.h"
+#include "caterpillar/parsing.h"
 
 // Atom Objects
+#include "caterpillar/atoms/builtins.h"
 #include "caterpillar/atoms/int.h"
 #include "caterpillar/atoms/float.h"
 #include "caterpillar/atoms/primitive.h"

@@ -92,6 +92,7 @@ CpPaddingAtom_PackMany(CpPaddingAtomObject* self,
                        PyObject* value,
                        CpLayerObject* layer)
 {
+#if 0
   /* value will be ignored here */
   PyObject *res = NULL, *bytes = NULL, *objSize = NULL, *objLengh = NULL;
   bool greedy = false;
@@ -145,6 +146,8 @@ CpPaddingAtom_PackMany(CpPaddingAtomObject* self,
   }
   Py_XDECREF(res);
   return 0;
+#endif
+  return 0;
 }
 
 /*CpAPI*/
@@ -156,13 +159,14 @@ CpPaddingAtom_Unpack(CpPaddingAtomObject* self, CpLayerObject* layer)
     return NULL;
   }
   Py_XDECREF(res);
-  Py_RETURN_NONE;
+  return 0;
 }
 
 /*CpAPI*/
 PyObject*
 CpPaddingAtom_UnpackMany(CpPaddingAtomObject* self, CpLayerObject* layer)
 {
+#if 0
   PyObject *res = NULL, *bytes = NULL, *objLengh = NULL;
   bool greedy = false;
   Py_ssize_t length = 0, parsedLength = 0;
@@ -184,6 +188,7 @@ CpPaddingAtom_UnpackMany(CpPaddingAtomObject* self, CpLayerObject* layer)
   }
 
   Py_XDECREF(res);
+#endif
   Py_RETURN_NONE;
 }
 

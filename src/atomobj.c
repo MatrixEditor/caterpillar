@@ -264,6 +264,12 @@ cp_catom_size(CpCAtomObject* self, PyObject* args, PyObject* kw)
   if (PyArg_ParseTupleAndKeywords(args, kw, "O", kwlist, &context) < 0) {
     return NULL;
   }
+
+  if (context == Py_None || context == NULL) {
+    PyErr_SetString(PyExc_ValueError, "context must be set!");
+    return NULL;
+  }
+
   return self->ob_size((PyObject*)self, context);
 }
 

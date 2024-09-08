@@ -44,9 +44,7 @@ _CpUnpack_EvalLength(CpLayerObject* layer,
       PyErr_SetString(PyExc_ValueError, "start is None");
       return -1;
     }
-    layer->s_sequential = false;
     Py_XSETREF(length, _Cp_Unpack(start, layer));
-    layer->s_sequential = true;
     Py_DECREF(start);
     if (!length) {
       return -1;
@@ -81,6 +79,7 @@ _CpUnpack_EvalLength(CpLayerObject* layer,
 PyObject*
 CpUnpack_Common(PyObject* op, CpLayerObject* layer)
 {
+#if 0
   if (!op || !layer) {
     PyErr_SetString(PyExc_ValueError, "input or layer object is NULL!");
     return NULL;
@@ -172,12 +171,16 @@ fail:
     CpLayer_Invalidate(seq_layer);
   }
   return NULL;
+
+#endif
+  Py_RETURN_NONE;
 }
 
 /*CpAPI*/
 PyObject*
 CpUnpack_Field(CpFieldObject* field, CpLayerObject* layer)
 {
+#if 0
   if (!field || !layer) {
     PyErr_SetString(PyExc_ValueError, "input or layer object is NULL!");
     return NULL;
@@ -261,12 +264,15 @@ CpUnpack_Field(CpFieldObject* field, CpLayerObject* layer)
 cleanup:
   Py_XDECREF(fallback);
   return obj;
+#endif
+  Py_RETURN_NONE;
 }
 
 /*CpAPI*/
 PyObject*
 CpUnpack_Struct(CpStructObject* struct_, CpLayerObject* layer)
 {
+#if 0
   if (layer->s_sequential) {
     // TODO: explain why
     return CpUnpack_Common((PyObject*)struct_, layer);
@@ -350,27 +356,23 @@ cleanup:
     CpLayer_Invalidate(obj_layer);
   }
   return obj;
-}
-
-/*CpAPI*/
-PyObject*
-_Cp_Unpack(PyObject* atom, CpLayerObject* layer)
-{
-  if (CpField_CheckExact(atom)) {
-    return CpUnpack_Field((CpFieldObject*)atom, layer);
-  } else if (CpStruct_CheckExact(atom)) {
-    return CpUnpack_Struct((CpStructObject*)atom, layer);
-  } else if (CpCAtom_Check(atom)) {
-    return CpUnpack_CAtom((CpCAtomObject*)atom, layer);
-  } else {
-    return CpUnpack_Common(atom, layer);
-  }
+#endif
+  Py_RETURN_NONE;
 }
 
 /*CpAPI*/
 PyObject*
 CpUnpack_CAtom(CpCAtomObject* catom, CpLayerObject* layer)
 {
+  if (catom->ob_unpack == NULL) {
+    PyErr_Format(
+      PyExc_NotImplementedError,
+      "The atom of type '%s' cannot be unpacked (missing __unpack__)",
+      Py_TYPE(catom)->tp_name);
+    return NULL;
+  }
+  return catom->ob_unpack((PyObject*)catom, (PyObject*)layer);
+#if 0
   PyObject* result = NULL;
   if (!layer->s_sequential) {
     if (catom->ob_unpack == NULL) {
@@ -394,6 +396,8 @@ CpUnpack_CAtom(CpCAtomObject* catom, CpLayerObject* layer)
     result = catom->ob_unpack_many((PyObject *)catom, (PyObject *)layer);
   }
   return result;
+#endif
+  Py_RETURN_NONE;
 }
 
 /*CpAPI*/

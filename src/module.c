@@ -380,13 +380,22 @@ PyInit__C(void)
   CpModule_SetupType(&CpFieldAtom_Type);
   CpModule_SetupType(&CpFieldCAtom_Type);
   CpModule_SetupType(&CpLayer_Type);
+  CpModule_SetupType(&CpSeqLayer_Type);
+  CpModule_SetupType(&CpObjLayer_Type);
   CpModule_SetupType(&CpState_Type);
 
   CpModule_SetupType(&CpStructFieldInfo_Type);
   CpStruct_Type.tp_base = &CpFieldAtom_Type;
   CpModule_SetupType(&CpStruct_Type);
 
-  CpIntAtom_Type.tp_base = &CpFieldCAtom_Type;
+    // builtins setup
+  CpBuiltinAtom_Type.tp_base = &CpCAtom_Type;
+  CpModule_SetupType(&CpBuiltinAtom_Type);
+
+  CpRepeatedAtom_Type.tp_base = &CpBuiltinAtom_Type;
+  CpModule_SetupType(&CpRepeatedAtom_Type);
+
+  CpIntAtom_Type.tp_base = &CpBuiltinAtom_Type;
   CpModule_SetupType(&CpIntAtom_Type);
 
   CpFloatAtom_Type.tp_base = &CpFieldCAtom_Type;
@@ -406,6 +415,8 @@ PyInit__C(void)
 
   CpConstAtom_Type.tp_base = &CpFieldCAtom_Type;
   CpModule_SetupType(&CpConstAtom_Type);
+
+
 
   // module setup
   m = PyModule_Create(&CpModule);
@@ -430,9 +441,14 @@ PyInit__C(void)
   CpModule_AddObject("fieldatom", &CpFieldAtom_Type);
   CpModule_AddObject("fieldcatom", &CpFieldCAtom_Type);
   CpModule_AddObject("layer", &CpLayer_Type);
+  CpModule_AddObject(CpSeqLayer_NAME, &CpSeqLayer_Type);
+  CpModule_AddObject(CpObjLayer_NAME, &CpObjLayer_Type);
   CpModule_AddObject("State", &CpState_Type);
   CpModule_AddObject("fieldinfo", &CpStructFieldInfo_Type);
   CpModule_AddObject("Struct", &CpStruct_Type);
+
+  CpModule_AddObject(CpBuiltinAtom_NAME, &CpBuiltinAtom_Type);
+  CpModule_AddObject(CpRepeatedAtom_NAME, &CpRepeatedAtom_Type);
 
   CpModule_AddObject(CpIntAtom_NAME, &CpIntAtom_Type);
   CpModule_AddObject(CpFloatAtom_NAME, &CpFloatAtom_Type);

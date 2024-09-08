@@ -17,12 +17,11 @@
 #ifndef INTATOMOBJ_H
 #define INTATOMOBJ_H
 
-#include "caterpillar/caterpillarapi.h"
-#include "caterpillar/field.h"
+#include "caterpillar/atoms/builtins.h"
 
 struct _intatomobj
 {
-  CpFieldCAtom_HEAD
+  CpBuiltinAtom_HEAD
 
     /// Stores the amount of bits this integer atom
     /// has in total

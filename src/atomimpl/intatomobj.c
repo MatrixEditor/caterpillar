@@ -75,6 +75,22 @@ cp_intatom_init(CpIntAtomObject* self, PyObject* args, PyObject* kwds)
   return 0;
 }
 
+static PyObject*
+cp_intatom_repr(CpIntAtomObject* self)
+{
+  char sign = 'i';
+  if (!self->_m_signed) {
+    sign = 'u';
+  }
+  char endian = 'l';
+  if (!self->_m_little_endian) {
+    endian = 'b';
+  }
+  return PyUnicode_FromFormat("<%ce %cint%d>", endian, sign, self->_m_bits);
+}
+
+_CpEndian_ImplSetByteorder(intatom, self->_m_little_endian);
+
 /* Public API */
 /*CpAPI*/
 int
@@ -91,15 +107,6 @@ CpIntAtom_Pack(CpIntAtomObject* self, PyObject* op, CpLayerObject* layer)
   }
 
   int little_endian = self->_m_little_endian;
-  if (layer->m_field) {
-    _modulestate* mod = layer->m_state->mod;
-    PyObject* endian = ((CpFieldObject*)layer->m_field)->m_endian;
-
-    if (CpEndian_Check(endian))
-      /* If the field has an endian specified, use that. */
-      little_endian = CpEndian_IsLittleEndian((CpEndianObject*)endian, mod);
-  }
-
   int res = _PyLong_AsByteArray((PyLongObject*)op,
                                 (unsigned char*)PyBytes_AS_STRING(bytes),
                                 self->_m_byte_count,
@@ -127,15 +134,6 @@ CpIntAtom_Unpack(CpIntAtomObject* self, CpLayerObject* layer)
   }
 
   int little_endian = self->_m_little_endian;
-  if (layer->m_field) {
-    _modulestate* mod = layer->m_state->mod;
-    PyObject* endian = ((CpFieldObject*)layer->m_field)->m_endian;
-
-    if (CpEndian_Check(endian))
-      /* If the field has an endian specified, use that. */
-      little_endian = CpEndian_IsLittleEndian((CpEndianObject*)endian, mod);
-  }
-
   PyObject* obj =
     _PyLong_FromByteArray((unsigned char*)PyBytes_AS_STRING(bytes),
                           self->_m_byte_count,
@@ -160,13 +158,19 @@ static PyMemberDef CpIntAtom_Members[] = {
   { NULL } /* Sentinel */
 };
 
-PyTypeObject CpIntAtom_Type = {
-  PyVarObject_HEAD_INIT(NULL, 0) _Cp_NameStr(CpIntAtom_NAME),
-  .tp_basicsize = sizeof(CpIntAtomObject),
-  .tp_dealloc = (destructor)cp_intatom_dealloc,
-  .tp_flags = Py_TPFLAGS_DEFAULT,
-  .tp_doc = NULL,
-  .tp_members = CpIntAtom_Members,
-  .tp_new = (newfunc)cp_intatom_new,
-  .tp_init = (initproc)cp_intatom_init,
+static PyMethodDef CpIntAtom_Methods[] = {
+  _CpEndian_ImplSetByteorder_MethDef(intatom, NULL),
+  { NULL } /* Sentinel */
 };
+
+PyTypeObject CpIntAtom_Type = { PyVarObject_HEAD_INIT(NULL, 0)
+                                  _Cp_NameStr(CpIntAtom_NAME),
+                                .tp_basicsize = sizeof(CpIntAtomObject),
+                                .tp_dealloc = (destructor)cp_intatom_dealloc,
+                                .tp_flags = Py_TPFLAGS_DEFAULT,
+                                .tp_doc = NULL,
+                                .tp_members = CpIntAtom_Members,
+                                .tp_new = (newfunc)cp_intatom_new,
+                                .tp_init = (initproc)cp_intatom_init,
+                                .tp_repr = (reprfunc)cp_intatom_repr,
+                                .tp_methods = CpIntAtom_Methods };
