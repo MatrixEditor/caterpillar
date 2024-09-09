@@ -7,7 +7,7 @@
 // Inspired by https://github.com/google/cityhash/blob/master/src/city.cc
 #ifdef _MSC_VER
 #include <stdint.h>
-#define CP_BSWAP_U32(x) _byteswap_ulong(x)(x)
+#define CP_BSWAP_U32(x) _byteswap_ulong(x)
 #define CP_BSWAP_U64(x) _byteswap_uint64(x)
 
 #elif defined(__APPLE__)
