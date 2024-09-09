@@ -26,17 +26,6 @@ Context Objects
     Checks if the given object is instance of an :c:type:`CpContextObject`.
 
 
-.. c:function:: PyObject* CpContext_GetAttr(PyObject* context, PyObject* key, _coremodulestate* state)
-
-    Get an attribute from a context by using :code:`__context_getattr__`. Returns
-    *NULL* if the attribute is not found.
-
-
-.. c:function:: PyObject *CpContext_GetAttrString(PyObject* context, const char* key)
-
-    Get an attribute from a context by using :code:`__context_getattr__`. Returns
-    *NULL* if the attribute is not found.
-
 .. c:function:: CpContextObject *CpContext_New(void)
 
     Creates a new context and returns it. Returns *NULL* if an error occurs.
