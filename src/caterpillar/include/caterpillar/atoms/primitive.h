@@ -28,7 +28,7 @@ struct _primitiveatomobj {
 
 #define CpPrimitiveAtom_NAME "patom"
 #define CpPrimitiveAtom_CheckExact(op) Py_IS_TYPE((op), &CpPrimitiveAtom_Type)
-#define CpPrimitiveAtom_Check(op) (PyObject_IsInstance((op), &CpPrimitiveAtom_Type))
+#define CpPrimitiveAtom_Check(op) (PyObject_TypeCheck((op), &CpPrimitiveAtom_Type))
 
 //------------------------------------------------------------------------------
 // Bool
@@ -72,7 +72,7 @@ struct _boolatomobj
  * @return True if the object is of type CpBoolAtom_Type or a subtype,
  *         false otherwise.
  */
-#define CpBoolAtom_Check(op) (PyObject_IsInstance((op), &CpBoolAtom_Type))
+#define CpBoolAtom_Check(op) (PyObject_TypeCheck((op), &CpBoolAtom_Type))
 
 //------------------------------------------------------------------------------
 // Char Atom
@@ -88,7 +88,7 @@ struct _charatomobj
 /** @brief Checks if the given object is a char atom object */
 #define CpCharAtom_CheckExact(op) Py_IS_TYPE((op), &CpCharAtom_Type)
 /** @brief Checks if the given object is a char atom object */
-#define CpCharAtom_Check(op) (PyObject_IsInstance((op), &CpCharAtom_Type))
+#define CpCharAtom_Check(op) (PyObject_TypeCheck((op), &CpCharAtom_Type))
 
 //------------------------------------------------------------------------------
 // Padding
@@ -106,6 +106,6 @@ struct _paddingatomobj
 /** @brief Checks if the given object is a padding atom object */
 #define CpPaddingAtom_CheckExact(op) Py_IS_TYPE((op), &CpPaddingAtom_Type)
 /** @brief Checks if the given object is a padding atom object */
-#define CpPaddingAtom_Check(op) (PyObject_IsInstance((op), &CpPaddingAtom_Type))
+#define CpPaddingAtom_Check(op) (PyObject_TypeCheck((op), &CpPaddingAtom_Type))
 
 #endif

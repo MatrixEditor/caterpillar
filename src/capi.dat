@@ -45,6 +45,7 @@ src:atomimpl/constatomobj.c
 src:atomimpl/bytesatomobj.c
 src:atomimpl/pstringatomobj.c
 src:atomimpl/enumatomobj.c
+src:atomimpl/varintatomobj.c
 src:atomimpl/builtins/builtinatomobj.c
 src:atomimpl/builtins/repeatedatomobj.c
 src:atomimpl/builtins/conditionatomobj.c
@@ -100,6 +101,7 @@ type:36:_lengthinfoobj:CpLengthInfoObject:-
 type:37:_bytesatomobj:CpBytesAtomObject:-
 type:38:_pstringatomobj:CpPStringAtomObject:-
 type:39:_enumatomobj:CpEnumAtomObject:-
+type:40:_varintatomobj:CpVarIntAtomObject:-
 
 func:50:CpEndian_IsLittleEndian:int:null
 func:53:CpContext_New:CpContextObject*:+1
@@ -205,3 +207,10 @@ func:153:CpPStringAtom_Unpack:PyObject*:+1
 func:-:CpEnumAtom_New:CpEnumAtomObject*:+1
 func:154:CpEnumAtom_Pack:int:null
 func:155:CpEnumAtom_Unpack:PyObject*:+1
+func:-:CpVarIntAtom_New:CpVarIntAtomObject*:+1
+func:156:CpVarIntAtom_Pack:int:null
+func:157:CpVarIntAtom_Unpack:PyObject*:+1
+func:158:CpVarIntAtom_BSwap:PyObject*:+1
+func:159:CpVarIntAtom_BSwapUnsignedLongLong:ulonglong:null
+func:160:CpVarIntAtom_BSwapLongLong:longlong:null
+func:161:CpVarIntAtom_BSwapSsize_t:Py_ssize_t:null

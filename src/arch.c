@@ -1,8 +1,7 @@
 /* CpArch and CpEndian */
-#include "caterpillar/arch.h"
 #include "caterpillar/caterpillar.h"
-#include "caterpillar/field.h"
-#include "structmember.h"
+
+#include <structmember.h>
 
 /* CpArch */
 static PyObject*
@@ -54,8 +53,7 @@ cp_arch_init(CpArchObject* self, PyObject* args, PyObject* kw)
 static PyObject*
 cp_arch_repr(CpArchObject* self)
 {
-  return PyUnicode_FromFormat(
-    "CpArch(name=%R, ptr_size=%i)", self->name, self->pointer_size);
+  return PyUnicode_FromFormat("<arch [%d] %R>", self->pointer_size, self->name);
 }
 
 static PyObject*
@@ -174,8 +172,16 @@ cp_endian_init(CpEndianObject* self, PyObject* args, PyObject* kw)
 static PyObject*
 cp_endian_repr(CpEndianObject* self)
 {
-  return PyUnicode_FromFormat(
-    "CpEndian(name=%R, ch='%c')", self->name, self->id);
+  switch (self->id) {
+    case '=':
+      return PyUnicode_FromFormat("<native-endian>");
+    case '<':
+      return PyUnicode_FromFormat("<le>");
+    case '>':
+      return PyUnicode_FromFormat("<be>");
+    default:
+      return PyUnicode_FromFormat("<endian [%c] %R>", self->id, self->name);
+  }
 }
 
 static PyObject*

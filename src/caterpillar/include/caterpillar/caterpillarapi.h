@@ -98,6 +98,8 @@ struct _pstringatomobj;
 typedef struct _pstringatomobj CpPStringAtomObject;
 struct _enumatomobj;
 typedef struct _enumatomobj CpEnumAtomObject;
+struct _varintatomobj;
+typedef struct _varintatomobj CpVarIntAtomObject;
 
 #ifdef _CPMODULE
 
@@ -146,6 +148,7 @@ extern PyTypeObject CpLengthInfo_Type;
 extern PyTypeObject CpBytesAtom_Type;
 extern PyTypeObject CpPStringAtom_Type;
 extern PyTypeObject CpEnumAtom_Type;
+extern PyTypeObject CpVarIntAtom_Type;
 int CpEndian_IsLittleEndian(CpEndianObject* endian, _modulestate* mod);
 CpContextObject* CpContext_New(void);
 CpUnaryExprObject* CpUnaryExpr_New(int op, PyObject* value);
@@ -234,6 +237,12 @@ int CpPStringAtom_Pack(CpPStringAtomObject* self,PyObject* value,CpLayerObject* 
 PyObject* CpPStringAtom_Unpack(CpPStringAtomObject* self, CpLayerObject* layer);
 int CpEnumAtom_Pack(CpEnumAtomObject* self, PyObject* value, CpLayerObject* layer);
 PyObject* CpEnumAtom_Unpack(CpEnumAtomObject* self, CpLayerObject* layer);
+int CpVarIntAtom_Pack(CpVarIntAtomObject* self,PyObject* value,CpLayerObject* layer);
+PyObject* CpVarIntAtom_Unpack(CpVarIntAtomObject* self, CpLayerObject* layer);
+PyObject* CpVarIntAtom_BSwap(PyObject* number, bool little_endian);
+unsigned long long CpVarIntAtom_BSwapUnsignedLongLong(unsigned long long number,bool little_endian);
+long long CpVarIntAtom_BSwapLongLong(long long number, bool little_endian);
+Py_ssize_t CpVarIntAtom_BSwapSsize_t(Py_ssize_t number, bool little_endian);
 
 #else
 
@@ -283,6 +292,7 @@ caterpillar_api.py
 #define CpBytesAtom_Type (*(PyTypeObject *)Cp_API[37])
 #define CpPStringAtom_Type (*(PyTypeObject *)Cp_API[38])
 #define CpEnumAtom_Type (*(PyTypeObject *)Cp_API[39])
+#define CpVarIntAtom_Type (*(PyTypeObject *)Cp_API[40])
 #define CpEndian_IsLittleEndian (*((int (*)(CpEndianObject* endian, _modulestate* mod)))Cp_API[50])
 #define CpContext_New (*((CpContextObject* (*)(void)))Cp_API[53])
 #define CpUnaryExpr_New (*((CpUnaryExprObject* (*)(int op, PyObject* value)))Cp_API[54])
@@ -371,6 +381,12 @@ caterpillar_api.py
 #define CpPStringAtom_Unpack (*((PyObject* (*)(CpPStringAtomObject* self, CpLayerObject* layer)))Cp_API[153])
 #define CpEnumAtom_Pack (*((int (*)(CpEnumAtomObject* self, PyObject* value, CpLayerObject* layer)))Cp_API[154])
 #define CpEnumAtom_Unpack (*((PyObject* (*)(CpEnumAtomObject* self, CpLayerObject* layer)))Cp_API[155])
+#define CpVarIntAtom_Pack (*((int (*)(CpVarIntAtomObject* self,PyObject* value,CpLayerObject* layer)))Cp_API[156])
+#define CpVarIntAtom_Unpack (*((PyObject* (*)(CpVarIntAtomObject* self, CpLayerObject* layer)))Cp_API[157])
+#define CpVarIntAtom_BSwap (*((PyObject* (*)(PyObject* number, bool little_endian)))Cp_API[158])
+#define CpVarIntAtom_BSwapUnsignedLongLong (*((unsigned long long (*)(unsigned long long number,bool little_endian)))Cp_API[159])
+#define CpVarIntAtom_BSwapLongLong (*((long long (*)(long long number, bool little_endian)))Cp_API[160])
+#define CpVarIntAtom_BSwapSsize_t (*((Py_ssize_t (*)(Py_ssize_t number, bool little_endian)))Cp_API[161])
 
 /**
  * @brief Public C API for extension modules as reference table

@@ -411,6 +411,7 @@ PyInit__C(void)
   CpBytesAtom_Type.tp_base = &CpBuiltinAtom_Type;
   CpPStringAtom_Type.tp_base = &CpBuiltinAtom_Type;
   CpEnumAtom_Type.tp_base = &CpBuiltinAtom_Type;
+  CpVarIntAtom_Type.tp_base = &CpBuiltinAtom_Type;
 
   CpModule_SetupType(&CpBuiltinAtom_Type);
   CpModule_SetupType(&CpPrimitiveAtom_Type);
@@ -429,6 +430,7 @@ PyInit__C(void)
   CpModule_SetupType(&CpBytesAtom_Type);
   CpModule_SetupType(&CpPStringAtom_Type);
   CpModule_SetupType(&CpEnumAtom_Type);
+  CpModule_SetupType(&CpVarIntAtom_Type);
 
   // module setup
   m = PyModule_Create(&CpModule);
@@ -477,6 +479,7 @@ PyInit__C(void)
   CpModule_AddObject(CpBytesAtom_NAME, &CpBytesAtom_Type);
   CpModule_AddObject(CpPStringAtom_NAME, &CpPStringAtom_Type);
   CpModule_AddObject(CpEnumAtom_NAME, &CpEnumAtom_Type);
+  CpModule_AddObject(CpVarIntAtom_NAME, &CpVarIntAtom_Type);
 
   /* setup custom intatoms */
 #define CpModule_DefAtom(name, ...)                                            \
@@ -518,6 +521,8 @@ PyInit__C(void)
   CpModule_AddObject("boolean", CpObject_CreateNoArgs(&CpBoolAtom_Type));
   CpModule_AddObject("char", CpObject_CreateNoArgs(&CpCharAtom_Type));
   CpModule_AddObject("padding", CpObject_CreateNoArgs(&CpPaddingAtom_Type));
+  CpModule_AddObject("varint", CpVarIntAtom_New(true, false));
+  CpModule_AddObject("lsbvarint", CpVarIntAtom_New(true, true));
 
   /* setup state */
   _modulestate* state = get_module_state(m);

@@ -8,8 +8,10 @@ find_package(
 
 add_compile_definitions(_CPMODULE)
 
+# TODO: document this change
+set(CP_C_CONFIGURED DEFINED ENV{CP_ENABLE_NATIVE} OR DEFINED CP_ENABLE_NATIVE)
 
-if (DEFINED ENV{CP_ENABLE_NATIVE})
+if (CP_C_CONFIGURED)
 python_add_library(
   _C
   MODULE
@@ -40,6 +42,7 @@ python_add_library(
   src/atomimpl/bytesatomobj.c
   src/atomimpl/pstringatomobj.c
   src/atomimpl/enumatomobj.c
+  src/atomimpl/varintatomobj.c
 
   src/atomimpl/builtins/builtinatomobj.c
   src/atomimpl/builtins/repeatedatomobj.c
@@ -56,12 +59,18 @@ target_include_directories(_C PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/caterpilla
 message(STATUS "CMake ${CMAKE_VERSION}")
 message(STATUS "Python ${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}")
 
+set (CP_GENAPI_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/src/code_gen/genapi.py)
+set (CP_CAPI_HEADER ${CMAKE_CURRENT_SOURCE_DIR}/src/caterpillar/include/caterpillar/caterpillarapi.h.in)
+set (CP_CAPI_CSRC ${CMAKE_CURRENT_SOURCE_DIR}/src/caterpillarapi.c.in)
+set (CP_CAPI_HEADER_OUT ${CMAKE_CURRENT_SOURCE_DIR}/src/caterpillar/include/caterpillar/caterpillarapi.h)
+set (CP_CAPI_CSRC_OUT ${CMAKE_CURRENT_SOURCE_DIR}/src/caterpillarapi.c)
+
 add_custom_target(
  genapi ALL
  # execute python ./src/code_gen/genapi.py ./src/caterpillar/include/caterpillar/caterpillarapi.h.in ./src/caterpillarapi.c.in
  # in the root directory
- COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/src/code_gen/genapi.py ${CMAKE_CURRENT_SOURCE_DIR}/src/caterpillar/include/caterpillar/caterpillarapi.h.in ${CMAKE_CURRENT_SOURCE_DIR}/src/caterpillarapi.c.in
- BYPRODUCTS ${CMAKE_CURRENT_SOURCE_DIR}/src/caterpillar/include/caterpillar/caterpillarapi.h ${CMAKE_CURRENT_SOURCE_DIR}/src/caterpillarapi.c
+ COMMAND ${PYTHON_EXECUTABLE} ${CP_GENAPI_SCRIPT} ${CP_CAPI_HEADER} ${CP_CAPI_CSRC}
+ BYPRODUCTS ${CP_CAPI_HEADER_OUT} ${CP_CAPI_CSRC_OUT}
  COMMENT "Generating Public Caterpillar API"
 )
 

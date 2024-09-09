@@ -44,6 +44,34 @@ struct _intatomobj
 /** @brief Checks if the given object is an integer atom object */
 #define CpIntAtom_CheckExact(op) Py_IS_TYPE((op), &CpIntAtom_Type)
 /** @brief Checks if the given object is an integer atom object */
-#define CpIntAtom_Check(op) (PyObject_IsInstance((op), &CpIntAtom_Type))
+#define CpIntAtom_Check(op) (PyObject_TypeCheck((op), &CpIntAtom_Type))
+
+//------------------------------------------------------------------------------
+// varint atom
+
+struct _varintatomobj
+{
+  CpBuiltinAtom_HEAD
+
+    /// Stores whether or not the integer is little endian
+    int _m_little_endian;
+
+  /// Specifies that the last significant byte will use a ``1`` to identify
+  /// the end of the varint. Otherwise, zero will be used (which is the
+  /// default setting).
+  int _m_lsb;
+};
+
+#define CpVarIntAtom_NAME "varint_t"
+#define CpVarIntAtom_CheckExact(op) Py_IS_TYPE((op), &CpVarIntAtom_Type)
+#define CpVarIntAtom_Check(op) (PyObject_TypeCheck((op), &CpVarIntAtom_Type))
+
+static inline CpVarIntAtomObject*
+CpVarIntAtom_New(bool little_endian, bool lsb)
+{
+  return (CpVarIntAtomObject*)CpObject_Create(
+    &CpVarIntAtom_Type, "II", little_endian, lsb);
+}
+
 
 #endif
