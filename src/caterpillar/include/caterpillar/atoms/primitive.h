@@ -96,16 +96,12 @@ struct _paddingatomobj
 {
   CpBuiltinAtom_HEAD
 
-    char padding;
+    char _m_padding;
 };
 
-/// Padding atom object type
-// PyAPI_DATA(PyTypeObject) CpPaddingAtom_Type;
 #define CpPaddingAtom_NAME "padding_t"
-
-/** @brief Checks if the given object is a padding atom object */
 #define CpPaddingAtom_CheckExact(op) Py_IS_TYPE((op), &CpPaddingAtom_Type)
-/** @brief Checks if the given object is a padding atom object */
 #define CpPaddingAtom_Check(op) (PyObject_TypeCheck((op), &CpPaddingAtom_Type))
+
 
 #endif

@@ -42,7 +42,7 @@ cp_paddingatom_new(PyTypeObject* type, PyObject* args, PyObject* kwds)
 static void
 cp_paddingatom_dealloc(CpPaddingAtomObject* self)
 {
-  self->padding = 0;
+  self->_m_padding = 0;
   Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
@@ -55,7 +55,7 @@ cp_paddingatom_init(CpPaddingAtomObject* self, PyObject* args, PyObject* kwds)
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|b", kwlist, &value))
     return -1;
 
-  self->padding = value;
+  self->_m_padding = value;
   return 0;
 }
 
@@ -68,10 +68,10 @@ CpPaddingAtom_Pack(CpPaddingAtomObject* self,
 {
   /* value will be ignored here */
   PyObject* res;
-  if (!self->padding) {
+  if (!self->_m_padding) {
     res = CpState_Write(layer->m_state, layer->m_state->mod->cp_bytes__false);
   } else {
-    PyObject* bytes = PyBytes_FromStringAndSize((char*)&self->padding, 1);
+    PyObject* bytes = PyBytes_FromStringAndSize((char*)&self->_m_padding, 1);
     if (!bytes) {
       return -1;
     }
@@ -104,7 +104,7 @@ CpPaddingAtom_PackMany(CpPaddingAtomObject* self,
     return -1;
   }
   /* unsafe { */
-  memset(PyBytes_AS_STRING(bytes), self->padding, lengthinfo->m_length);
+  memset(PyBytes_AS_STRING(bytes), self->_m_padding, lengthinfo->m_length);
   /* } */
   PyObject* res = CpState_Write(layer->m_state, bytes);
   Py_DECREF(bytes);
@@ -149,7 +149,7 @@ CpPaddingAtom_UnpackMany(CpPaddingAtomObject* self,
   Py_ssize_t length = PyBytes_GET_SIZE(res);
   Py_ssize_t offset = 0;
   const char* ptr = PyBytes_AS_STRING(res);
-  while (offset < length && *(ptr + offset) == self->padding) {
+  while (offset < length && *(ptr + offset) == self->_m_padding) {
     offset++;
   }
   if (offset != length) {
@@ -158,7 +158,7 @@ CpPaddingAtom_UnpackMany(CpPaddingAtomObject* self,
                   "(possible padding overflow?). "
                   "Expected %ld bytes of 0x%02x but parsed only %ld bytes."),
                  length,
-                 self->padding,
+                 self->_m_padding,
                  offset);
     Py_XDECREF(res);
     return NULL;
@@ -171,10 +171,10 @@ CpPaddingAtom_UnpackMany(CpPaddingAtomObject* self,
 PyObject*
 cp_paddingatom_repr(CpPaddingAtomObject* self)
 {
-  if (self->padding == 0) {
+  if (self->_m_padding == 0) {
     return PyUnicode_FromFormat("<padding>");
   }
-  return PyUnicode_FromFormat("<padding [0x%02x]>", self->padding);
+  return PyUnicode_FromFormat("<padding [0x%02x]>", self->_m_padding);
 }
 
 /* type setup */

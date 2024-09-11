@@ -32,24 +32,24 @@ python_add_library(
   src/parsing_pack.c
   src/parsing_unpack.c
 
-  src/atomimpl/intatomobj.c
-  src/atomimpl/floatatomobj.c
-  src/atomimpl/boolatomobj.c
-  src/atomimpl/charatomobj.c
-  src/atomimpl/padatomobj.c
-  src/atomimpl/stringatomobj.c
-  src/atomimpl/constatomobj.c
-  src/atomimpl/bytesatomobj.c
-  src/atomimpl/pstringatomobj.c
-  src/atomimpl/enumatomobj.c
-  src/atomimpl/varintatomobj.c
+  src/atomimpl/int.c
+  src/atomimpl/float.c
+  "src/atomimpl/bool.c"
+  src/atomimpl/char.c
+  src/atomimpl/pad.c
+  "src/atomimpl/string.c"
+  src/atomimpl/const.c
+  src/atomimpl/bytes.c
+  src/atomimpl/pstring.c
+  src/atomimpl/enum.c
+  src/atomimpl/varint.c
 
-  src/atomimpl/builtins/builtinatomobj.c
-  src/atomimpl/builtins/repeatedatomobj.c
-  src/atomimpl/builtins/conditionatomobj.c
-  src/atomimpl/builtins/switchatomobj.c
-  src/atomimpl/builtins/offsetatomobj.c
-  src/atomimpl/builtins/primitiveatomobj.c
+  src/atomimpl/builtins/builtin.c
+  src/atomimpl/builtins/repeated.c
+  src/atomimpl/builtins/condition.c
+  src/atomimpl/builtins/switch.c
+  src/atomimpl/builtins/atoffset.c
+  src/atomimpl/builtins/primitive.c
 
   WITH_SOABI
 )
