@@ -122,6 +122,7 @@ struct _computedatomobj
 
 #define CpComputedAtom_VALUE(op) (((CpComputedAtomObject*)(op))->m_value)
 
+/*CpAPI*/
 static inline PyObject*
 CpComputedAtom_Value(CpComputedAtomObject* self, CpLayerObject* layer)
 {
@@ -129,10 +130,53 @@ CpComputedAtom_Value(CpComputedAtomObject* self, CpLayerObject* layer)
                           : Py_NewRef(self->m_value);
 }
 
+/*CpAPI*/
 static inline CpComputedAtomObject*
 CpComputedAtom_New(PyObject* value)
 {
   return (CpComputedAtomObject*)CpObject_Create(
     &CpComputedAtom_Type, "O", value);
 }
+
+//------------------------------------------------------------------------------
+// Lazy
+
+struct _lazyatomobj
+{
+  CpBuiltinAtom_HEAD
+
+    PyObject* m_fn;
+  PyObject* m_atom;
+  int s_always_lazy;
+};
+
+#define CpLazyAtom_NAME "lazy"
+#define CpLazyAtom_CheckExact(op) Py_IS_TYPE((op), &CpLazyAtom_Type)
+#define CpLazyAtom_Check(op) (PyObject_TypeCheck((op), &CpLazyAtom_Type))
+#define CpLazyAtom_ATOM(op) (((CpLazyAtomObject*)(op))->m_atom)
+
+/*CpAPI*/
+static inline PyObject*
+CpLazyAtom_Atom(CpLazyAtomObject* self)
+{
+  if (self->s_always_lazy)
+    return PyObject_CallNoArgs(self->m_fn);
+
+  if (!self->m_atom) {
+    Py_XSETREF(self->m_atom, PyObject_CallNoArgs(self->m_fn));
+    if (!self->m_atom)
+      return NULL;
+  }
+
+  return Py_NewRef(self->m_atom);
+}
+
+/*CpAPI*/
+static inline CpLazyAtomObject*
+CpLazyAtom_New(PyObject* fn, int always_lazy)
+{
+  return (CpLazyAtomObject*)CpObject_Create(
+    &CpLazyAtom_Type, "Oi", fn, always_lazy);
+}
+
 #endif

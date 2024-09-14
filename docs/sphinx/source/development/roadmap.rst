@@ -53,6 +53,8 @@ Atom Objects:
     Global instance: :code:`padding`,
     [:text-danger:`missing docs`]
 
+- |uncheck_| Bytes
+
 - |check_| String (C type: :c:type:`CpStringAtomObject`, Py type: :class:`string`)
     [:text-danger:`missing docs`],
     [:text-warning:`missing perftest`]
@@ -79,7 +81,12 @@ Atom Objects:
     [:text-warning:`missing perftest`]
 
 - |uncheck_| Prefixed
-- |uncheck_| Lazy
+    [:text-danger:`create issue (discuss relevance)`]
+
+- |check_| Lazy
+    [:text-danger:`missing docs`],
+    [:text-warning:`missing perftest`]
+
 - |uncheck_| uuid
 - |uncheck_| Conditional: If, Else, ElseIf
 - |check_| VarInt (C type: :c:type:`CpVarIntAtomObject`, Py type: :class:`varint_t`)

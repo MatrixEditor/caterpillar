@@ -47,6 +47,7 @@ src:atomimpl/pstring.c
 src:atomimpl/enum.c
 src:atomimpl/varint.c
 src:atomimpl/computed.c
+src:atomimpl/lazy.c
 src:atomimpl/builtins/builtin.c
 src:atomimpl/builtins/repeated.c
 src:atomimpl/builtins/condition.c
@@ -104,6 +105,7 @@ type:38:_pstringatomobj:CpPStringAtomObject:-
 type:39:_enumatomobj:CpEnumAtomObject:-
 type:40:_varintatomobj:CpVarIntAtomObject:-
 type:41:_computedatomobj:CpComputedAtomObject:-
+type:42:_lazyatomobj:CpLazyAtomObject:-
 
 func:50:CpEndian_IsLittleEndian:int:null
 func:53:CpContext_New:CpContextObject*:+1
@@ -220,3 +222,7 @@ func:-:CpComputedAtom_New:CpComputedAtomObject*:+1
 func:162:CpComputedAtom_Pack:int:null
 func:163:CpComputedAtom_Unpack:PyObject*:+1
 func:-:CpComputedAtom_Value:PyObject*:+1
+func:-:CpLazyAtom_New:CpLazyAtomObject*:+1
+func:164:CpLazyAtom_Pack:int:null
+func:165:CpLazyAtom_Unpack:PyObject*:+1
+func:-:CpLazyAtom_Atom:PyObject*:+1

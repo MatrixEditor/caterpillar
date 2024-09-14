@@ -413,6 +413,7 @@ PyInit__C(void)
   CpEnumAtom_Type.tp_base = &CpBuiltinAtom_Type;
   CpVarIntAtom_Type.tp_base = &CpBuiltinAtom_Type;
   CpComputedAtom_Type.tp_base = &CpBuiltinAtom_Type;
+  CpLazyAtom_Type.tp_base = &CpBuiltinAtom_Type;
 
   CpModule_SetupType(&CpBuiltinAtom_Type);
   CpModule_SetupType(&CpPrimitiveAtom_Type);
@@ -433,6 +434,7 @@ PyInit__C(void)
   CpModule_SetupType(&CpEnumAtom_Type);
   CpModule_SetupType(&CpVarIntAtom_Type);
   CpModule_SetupType(&CpComputedAtom_Type);
+  CpModule_SetupType(&CpLazyAtom_Type);
 
   // module setup
   m = PyModule_Create(&CpModule);
@@ -483,6 +485,7 @@ PyInit__C(void)
   CpModule_AddObject(CpEnumAtom_NAME, &CpEnumAtom_Type);
   CpModule_AddObject(CpVarIntAtom_NAME, &CpVarIntAtom_Type);
   CpModule_AddObject(CpComputedAtom_NAME, &CpComputedAtom_Type);
+  CpModule_AddObject(CpLazyAtom_NAME, &CpLazyAtom_Type);
 
   /* setup custom intatoms */
 #define CpModule_DefAtom(name, ...)                                            \
