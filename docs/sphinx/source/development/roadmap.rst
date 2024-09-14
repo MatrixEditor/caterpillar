@@ -53,8 +53,6 @@ Atom Objects:
     Global instance: :code:`padding`,
     [:text-danger:`missing docs`]
 
-- |uncheck_| Bytes
-
 - |check_| String (C type: :c:type:`CpStringAtomObject`, Py type: :class:`string`)
     [:text-danger:`missing docs`],
     [:text-warning:`missing perftest`]
@@ -63,7 +61,10 @@ Atom Objects:
     [:text-danger:`missing docs`],
     [:text-warning:`missing perftest`]
 
-- |uncheck_| CString
+- |uncheck_| CString (C type: :c:type:`CpCStringAtomObject`, Py type: :class:`cstring`)
+    [:text-danger:`missing docs`],
+    [:text-warning:`missing perftest`]
+
 - |check_| Bytes (C type: :c:type:`CpBytesAtomObject`, Py type: :class:`octetstring`)
     [:text-danger:`missing docs`],
     [:text-warning:`missing perftest`]
@@ -81,16 +82,21 @@ Atom Objects:
     [:text-warning:`missing perftest`]
 
 - |uncheck_| Prefixed
-    [:text-danger:`create issue (discuss relevance)`]
+    .. seealso:: *link issue here*
 
 - |check_| Lazy
     [:text-danger:`missing docs`],
     [:text-warning:`missing perftest`]
 
 - |uncheck_| uuid
+    .. seealso:: *link issue here*
+
 - |uncheck_| Conditional: If, Else, ElseIf
+    .. seealso:: *link issue here*
+
 - |check_| VarInt (C type: :c:type:`CpVarIntAtomObject`, Py type: :class:`varint_t`)
     [:text-danger:`missing docs`],
     [:text-warning:`missing perftest`]
 
 - |uncheck_| While
+    .. seealso:: *link issue here*

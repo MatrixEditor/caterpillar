@@ -88,6 +88,8 @@ struct _modulestate
   PyObject* str_bytesio_getvalue;
   PyObject* str_builder_process;
   PyObject* str_pattern_match;
+  PyObject* str_cstring_default_pad;
+  PyObject* str_utf8;
 
   // compiled regex for unnamed fields
   PyObject* cp_regex__unnamed;

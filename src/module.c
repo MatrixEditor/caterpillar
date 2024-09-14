@@ -306,6 +306,8 @@ cp_module_clear(PyObject* m)
     Py_CLEAR(state->str_strict);
     Py_CLEAR(state->str__value2member_map_);
     Py_CLEAR(state->str__member_map_);
+    Py_CLEAR(state->str_utf8);
+    Py_CLEAR(state->str_cstring_default_pad);
 
     Py_CLEAR(state->cp_regex__unnamed);
 
@@ -414,6 +416,7 @@ PyInit__C(void)
   CpVarIntAtom_Type.tp_base = &CpBuiltinAtom_Type;
   CpComputedAtom_Type.tp_base = &CpBuiltinAtom_Type;
   CpLazyAtom_Type.tp_base = &CpBuiltinAtom_Type;
+  CpCStringAtom_Type.tp_base = &CpBuiltinAtom_Type;
 
   CpModule_SetupType(&CpBuiltinAtom_Type);
   CpModule_SetupType(&CpPrimitiveAtom_Type);
@@ -435,6 +438,7 @@ PyInit__C(void)
   CpModule_SetupType(&CpVarIntAtom_Type);
   CpModule_SetupType(&CpComputedAtom_Type);
   CpModule_SetupType(&CpLazyAtom_Type);
+  CpModule_SetupType(&CpCStringAtom_Type);
 
   // module setup
   m = PyModule_Create(&CpModule);
@@ -486,6 +490,7 @@ PyInit__C(void)
   CpModule_AddObject(CpVarIntAtom_NAME, &CpVarIntAtom_Type);
   CpModule_AddObject(CpComputedAtom_NAME, &CpComputedAtom_Type);
   CpModule_AddObject(CpLazyAtom_NAME, &CpLazyAtom_Type);
+  CpModule_AddObject(CpCStringAtom_NAME, &CpCStringAtom_Type);
 
   /* setup custom intatoms */
 #define CpModule_DefAtom(name, ...)                                            \
@@ -621,6 +626,7 @@ PyInit__C(void)
   CACHED_STRING(str_strict, "strict");
   CACHED_STRING(str__member_map_, "_member_map_");
   CACHED_STRING(str__value2member_map_, "_value2member_map_");
+  CACHED_STRING(str_utf8, "utf-8");
 
 #undef CACHED_STRING
 
@@ -633,6 +639,12 @@ PyInit__C(void)
   CACHED_BYTES(cp_bytes__true, "\x01", 1);
 
 #undef CACHED_BYTES
+
+  if ((state->str_cstring_default_pad = PyUnicode_Decode(
+         PyBytes_AS_STRING(state->cp_bytes__false), 1, "utf-8", "replace")) ==
+      NULL) {
+    return NULL;
+  }
 
   // setup typing constants
   PyObject* typing = PyImport_ImportModule("typing");

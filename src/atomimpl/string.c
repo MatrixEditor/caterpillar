@@ -61,15 +61,19 @@ cp_stringatom_init(CpStringAtomObject* self, PyObject* args, PyObject* kwds)
   static char* kwlist[] = { "length", "encoding", "errors", NULL };
   PyObject *length = NULL, *encoding = NULL, *errors = NULL;
   if (!PyArg_ParseTupleAndKeywords(
-        args, kwds, "OU|U", kwlist, &length, &encoding, &errors)) {
+        args, kwds, "O|OO", kwlist, &length, &encoding, &errors)) {
     return -1;
   }
 
+  _modulestate* mod = get_global_module_state();
+
   _Cp_SetObj(self->m_length, length);
   _Cp_SetObj(self->m_encoding, encoding);
+  if (!self->m_encoding) {
+    _Cp_SetObj(self->m_encoding, mod->str_utf8);
+  }
   _Cp_SetObj(self->m_errors, errors);
   if (!self->m_errors) {
-    _modulestate* mod = get_global_module_state();
     _Cp_SetObj(self->m_errors, mod->str_strict);
   }
   return 0;

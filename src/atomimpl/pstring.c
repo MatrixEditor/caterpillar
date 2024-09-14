@@ -51,15 +51,18 @@ cp_pstringatom_init(CpPStringAtomObject* self, PyObject* args, PyObject* kwds)
   PyObject *encoding = NULL, *errors = NULL, *atom = NULL;
 
   if (!PyArg_ParseTupleAndKeywords(
-        args, kwds, "OO|O", kwlist, &atom, &encoding, &errors)) {
+        args, kwds, "O|OO", kwlist, &atom, &encoding, &errors)) {
     return -1;
   }
+  _modulestate* mod = get_global_module_state();
 
   _Cp_SetObj(self->m_atom, atom);
   _Cp_SetObj(self->m_encoding, encoding);
+  if (!self->m_encoding) {
+    _Cp_SetObj(self->m_encoding, mod->str_utf8);
+  }
   _Cp_SetObj(self->m_errors, errors);
   if (!self->m_errors) {
-    _modulestate* mod = get_global_module_state();
     _Cp_SetObj(self->m_errors, mod->str_strict);
   }
   return 0;

@@ -46,7 +46,7 @@ void *Cp_API[] = {
     (void *) &CpVarIntAtom_Type,
     (void *) &CpComputedAtom_Type,
     (void *) &CpLazyAtom_Type,
-    NULL,
+    (void *) &CpCStringAtom_Type,
     NULL,
     NULL,
     NULL,
@@ -168,6 +168,8 @@ void *Cp_API[] = {
     (void *) &CpComputedAtom_Pack,
     (void *) &CpComputedAtom_Unpack,
     (void *) &CpLazyAtom_Pack,
-    (void *) &CpLazyAtom_Unpack
+    (void *) &CpLazyAtom_Unpack,
+    (void *) &CpCStringAtom_Pack,
+    (void *) &CpCStringAtom_Unpack
 };
 

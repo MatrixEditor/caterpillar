@@ -18,6 +18,7 @@
 #define STRINGATOMOBJ_H
 
 #include "caterpillar/atoms/builtins.h"
+#include "caterpillar/parsing.h"
 
 // ---------------------------------------------------------------------------
 // Default String
@@ -93,6 +94,52 @@ CpPStringAtom_New(PyObject* atom, PyObject* encoding)
 {
   return (CpPStringAtomObject*)CpObject_Create(
     &CpPStringAtom_Type, "OO", atom, encoding);
+}
+
+// ---------------------------------------------------------------------------
+// CString
+
+struct _cstringatomobj
+{
+  CpBuiltinAtom_HEAD
+
+  PyObject *m_length;
+  PyObject *m_encoding;
+  PyObject *m_errors;
+  PyObject *m_terminator;
+  PyObject *_m_terminator_bytes;
+
+  int s_callable;
+  int s_number;
+  int s_keep_terminator;
+  int s_greedy;
+};
+
+#define CpCStringAtom_NAME "cstring"
+#define CpCStringAtom_CheckExact(op) Py_IS_TYPE((op), &CpCStringAtom_Type)
+#define CpCStringAtom_Check(op) PyObject_TypeCheck((op), &CpCStringAtom_Type)
+
+static inline CpCStringAtomObject*
+CpCStringAtom_New(PyObject* length, PyObject* encoding, PyObject* errors,
+                  PyObject* terminator)
+{
+  return (CpCStringAtomObject*)CpObject_Create(
+    &CpCStringAtom_Type, "OOOO", length, encoding, errors, terminator);
+}
+
+static inline PyObject*
+CpCStringAtom_Length(CpCStringAtomObject* self, CpLayerObject *layer)
+{
+  if (self->s_number) {
+    return Py_NewRef(self->m_length);
+  }
+  if (self->s_greedy) {
+    Py_RETURN_NONE;
+  }
+  if (self->s_callable) {
+    return PyObject_CallOneArg(self->m_length, (PyObject *)layer);
+  }
+  return _Cp_Unpack(self->m_length, layer);
 }
 
 #endif

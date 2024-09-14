@@ -4,12 +4,13 @@ import caterpillar
 
 if caterpillar.native_support():
     from caterpillar._C import unpack, pack, string, octetstring, pstring
-    from caterpillar._C import BIG_ENDIAN as be, u16, u8
+    from caterpillar._C import BIG_ENDIAN as be, u16, u8, cstring
 
     def test_stringatom_unpack():
         # The string atom works as a basic converter between
         # bytes and unicode objects.
         assert unpack(b"foo", string(3, "utf-8")) == "foo"
+        assert unpack(b"foo", string(3)) == "foo"
 
     def test_stringatom_pack():
         # The string atom works as a basic converter between
@@ -34,9 +35,25 @@ if caterpillar.native_support():
         assert pack("foo", pstring(u8, "utf-8")) == b"\x03foo"
         # NOTE that the byteorder operator will be applied to
         # the underlying struct.
-        assert pack("bar", be + pstring(u16, "utf-8")) == b"\x00\x03bar"
+        assert pack("bar", be + pstring(u16)) == b"\x00\x03bar"
 
     def test_pstringatom_unpack():
         # Same applies to parsing data
         assert unpack(b"\x03foo", pstring(u8, "utf-8")) == "foo"
         assert unpack(b"\x00\x03bar", be + pstring(u16, "utf-8")) == "bar"
+
+    def test_cstringatom_pack():
+        # C-Strings represent a string with a padding
+        s = cstring(..., "utf-8")
+        assert pack("foo", s) == b"foo\x00"
+        assert pack("bar", cstring(3, "utf-8")) == b"bar"
+        assert pack("baz", cstring(u8, "utf-8")) == b"\x04baz\x00"
+        assert pack("abc", cstring(4, terminator="\x20")) == b"abc\x20"
+
+    def test_cstringatom_unpack():
+        assert unpack(b"foo\x00", cstring(...)) == "foo"
+        assert unpack(b"ba\x00r", cstring(...)) == "ba"
+        assert unpack(b"baz\x00", cstring(3)) == "baz"
+        assert unpack(b"baz\x00", cstring(4)) == "baz"
+        assert unpack(b"\x04baz\x00", cstring(u8)) == "baz"
+        assert unpack(b"abc\x20", cstring(4, terminator="\x20")) == "abc"

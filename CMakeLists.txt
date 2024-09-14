@@ -45,6 +45,7 @@ python_add_library(
   src/atomimpl/varint.c
   src/atomimpl/computed.c
   src/atomimpl/lazy.c
+  src/atomimpl/cstring.c
 
   src/atomimpl/builtins/builtin.c
   src/atomimpl/builtins/repeated.c
