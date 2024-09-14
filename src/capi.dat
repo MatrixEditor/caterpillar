@@ -46,6 +46,7 @@ src:atomimpl/bytes.c
 src:atomimpl/pstring.c
 src:atomimpl/enum.c
 src:atomimpl/varint.c
+src:atomimpl/computed.c
 src:atomimpl/builtins/builtin.c
 src:atomimpl/builtins/repeated.c
 src:atomimpl/builtins/condition.c
@@ -102,7 +103,7 @@ type:37:_bytesatomobj:CpBytesAtomObject:-
 type:38:_pstringatomobj:CpPStringAtomObject:-
 type:39:_enumatomobj:CpEnumAtomObject:-
 type:40:_varintatomobj:CpVarIntAtomObject:-
-type:41:_prefixedatomobj:CpPrefixedAtomObject:-
+type:41:_computedatomobj:CpComputedAtomObject:-
 
 func:50:CpEndian_IsLittleEndian:int:null
 func:53:CpContext_New:CpContextObject*:+1
@@ -215,3 +216,7 @@ func:158:CpVarIntAtom_BSwap:PyObject*:+1
 func:159:CpVarIntAtom_BSwapUnsignedLongLong:ulonglong:null
 func:160:CpVarIntAtom_BSwapLongLong:longlong:null
 func:161:CpVarIntAtom_BSwapSsize_t:Py_ssize_t:null
+func:-:CpComputedAtom_New:CpComputedAtomObject*:+1
+func:162:CpComputedAtom_Pack:int:null
+func:163:CpComputedAtom_Unpack:PyObject*:+1
+func:-:CpComputedAtom_Value:PyObject*:+1

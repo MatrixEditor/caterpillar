@@ -43,6 +43,7 @@ python_add_library(
   src/atomimpl/pstring.c
   src/atomimpl/enum.c
   src/atomimpl/varint.c
+  src/atomimpl/computed.c
 
   src/atomimpl/builtins/builtin.c
   src/atomimpl/builtins/repeated.c

@@ -70,7 +70,10 @@ Atom Objects:
     [:text-danger:`missing docs`],
     [:text-warning:`missing perftest`]
 
-- |uncheck_| Computed
+- |check_| Computed (C type: :c:type:`CpComputedAtomObject`, Py type: :class:`computed`)
+    [:text-danger:`missing docs`],
+    [:text-warning:`missing perftest`]
+
 - |check_| PString (C type: :c:type:`CpPStringAtomObject`, Py type: :class:`pstring`)
     [:text-danger:`missing docs`],
     [:text-warning:`missing perftest`]
@@ -79,5 +82,8 @@ Atom Objects:
 - |uncheck_| Lazy
 - |uncheck_| uuid
 - |uncheck_| Conditional: If, Else, ElseIf
-- |uncheck_| VarInt
+- |check_| VarInt (C type: :c:type:`CpVarIntAtomObject`, Py type: :class:`varint_t`)
+    [:text-danger:`missing docs`],
+    [:text-warning:`missing perftest`]
+
 - |uncheck_| While

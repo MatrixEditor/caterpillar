@@ -19,16 +19,17 @@
 
 #include "caterpillar/atoms/builtins.h"
 
-
 //------------------------------------------------------------------------------
 // primitive atom
-struct _primitiveatomobj {
+struct _primitiveatomobj
+{
   CpAtom_HEAD
 };
 
 #define CpPrimitiveAtom_NAME "patom"
 #define CpPrimitiveAtom_CheckExact(op) Py_IS_TYPE((op), &CpPrimitiveAtom_Type)
-#define CpPrimitiveAtom_Check(op) (PyObject_TypeCheck((op), &CpPrimitiveAtom_Type))
+#define CpPrimitiveAtom_Check(op)                                              \
+  (PyObject_TypeCheck((op), &CpPrimitiveAtom_Type))
 
 //------------------------------------------------------------------------------
 // Bool
@@ -103,5 +104,35 @@ struct _paddingatomobj
 #define CpPaddingAtom_CheckExact(op) Py_IS_TYPE((op), &CpPaddingAtom_Type)
 #define CpPaddingAtom_Check(op) (PyObject_TypeCheck((op), &CpPaddingAtom_Type))
 
+//------------------------------------------------------------------------------
+// Computed
 
+struct _computedatomobj
+{
+  CpBuiltinAtom_HEAD
+
+    PyObject* m_value;
+  int s_callable;
+};
+
+#define CpComputedAtom_NAME "computed"
+#define CpComputedAtom_CheckExact(op) Py_IS_TYPE((op), &CpComputedAtom_Type)
+#define CpComputedAtom_Check(op)                                               \
+  (PyObject_TypeCheck((op), &CpComputedAtom_Type))
+
+#define CpComputedAtom_VALUE(op) (((CpComputedAtomObject*)(op))->m_value)
+
+static inline PyObject*
+CpComputedAtom_Value(CpComputedAtomObject* self, CpLayerObject* layer)
+{
+  return self->s_callable ? PyObject_CallOneArg(self->m_value, (PyObject*)layer)
+                          : Py_NewRef(self->m_value);
+}
+
+static inline CpComputedAtomObject*
+CpComputedAtom_New(PyObject* value)
+{
+  return (CpComputedAtomObject*)CpObject_Create(
+    &CpComputedAtom_Type, "O", value);
+}
 #endif

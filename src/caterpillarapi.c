@@ -44,7 +44,7 @@ void *Cp_API[] = {
     (void *) &CpPStringAtom_Type,
     (void *) &CpEnumAtom_Type,
     (void *) &CpVarIntAtom_Type,
-    NULL,
+    (void *) &CpComputedAtom_Type,
     NULL,
     NULL,
     NULL,
@@ -164,6 +164,8 @@ void *Cp_API[] = {
     (void *) &CpVarIntAtom_BSwap,
     (void *) &CpVarIntAtom_BSwapUnsignedLongLong,
     (void *) &CpVarIntAtom_BSwapLongLong,
-    (void *) &CpVarIntAtom_BSwapSsize_t
+    (void *) &CpVarIntAtom_BSwapSsize_t,
+    (void *) &CpComputedAtom_Pack,
+    (void *) &CpComputedAtom_Unpack
 };
 

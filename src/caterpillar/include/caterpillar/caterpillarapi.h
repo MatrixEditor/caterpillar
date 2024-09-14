@@ -100,6 +100,8 @@ struct _enumatomobj;
 typedef struct _enumatomobj CpEnumAtomObject;
 struct _varintatomobj;
 typedef struct _varintatomobj CpVarIntAtomObject;
+struct _computedatomobj;
+typedef struct _computedatomobj CpComputedAtomObject;
 
 #ifdef _CPMODULE
 
@@ -149,6 +151,7 @@ extern PyTypeObject CpBytesAtom_Type;
 extern PyTypeObject CpPStringAtom_Type;
 extern PyTypeObject CpEnumAtom_Type;
 extern PyTypeObject CpVarIntAtom_Type;
+extern PyTypeObject CpComputedAtom_Type;
 int CpEndian_IsLittleEndian(CpEndianObject* endian, _modulestate* mod);
 CpContextObject* CpContext_New(void);
 CpUnaryExprObject* CpUnaryExpr_New(int op, PyObject* value);
@@ -243,6 +246,8 @@ PyObject* CpVarIntAtom_BSwap(PyObject* number, bool little_endian);
 unsigned long long CpVarIntAtom_BSwapUnsignedLongLong(unsigned long long number,bool little_endian);
 long long CpVarIntAtom_BSwapLongLong(long long number, bool little_endian);
 Py_ssize_t CpVarIntAtom_BSwapSsize_t(Py_ssize_t number, bool little_endian);
+int CpComputedAtom_Pack(CpComputedAtomObject* self,PyObject* obj,CpLayerObject* layer);
+PyObject* CpComputedAtom_Unpack(CpComputedAtomObject* self, CpLayerObject* layer);
 
 #else
 
@@ -293,6 +298,7 @@ caterpillar_api.py
 #define CpPStringAtom_Type (*(PyTypeObject *)Cp_API[38])
 #define CpEnumAtom_Type (*(PyTypeObject *)Cp_API[39])
 #define CpVarIntAtom_Type (*(PyTypeObject *)Cp_API[40])
+#define CpComputedAtom_Type (*(PyTypeObject *)Cp_API[41])
 #define CpEndian_IsLittleEndian (*((int (*)(CpEndianObject* endian, _modulestate* mod)))Cp_API[50])
 #define CpContext_New (*((CpContextObject* (*)(void)))Cp_API[53])
 #define CpUnaryExpr_New (*((CpUnaryExprObject* (*)(int op, PyObject* value)))Cp_API[54])
@@ -387,6 +393,8 @@ caterpillar_api.py
 #define CpVarIntAtom_BSwapUnsignedLongLong (*((unsigned long long (*)(unsigned long long number,bool little_endian)))Cp_API[159])
 #define CpVarIntAtom_BSwapLongLong (*((long long (*)(long long number, bool little_endian)))Cp_API[160])
 #define CpVarIntAtom_BSwapSsize_t (*((Py_ssize_t (*)(Py_ssize_t number, bool little_endian)))Cp_API[161])
+#define CpComputedAtom_Pack (*((int (*)(CpComputedAtomObject* self,PyObject* obj,CpLayerObject* layer)))Cp_API[162])
+#define CpComputedAtom_Unpack (*((PyObject* (*)(CpComputedAtomObject* self, CpLayerObject* layer)))Cp_API[163])
 
 /**
  * @brief Public C API for extension modules as reference table
