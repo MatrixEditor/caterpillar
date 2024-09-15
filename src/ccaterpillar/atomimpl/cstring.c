@@ -64,7 +64,7 @@ static int
 cp_cstringatom_init(CpCStringAtomObject* self, PyObject* args, PyObject* kwds)
 {
   static char* kwlist[] = { "length",     "encoding", "errors",
-                            "terminator", "keep",     NULL };
+                            "sep", "keep",     NULL };
   PyObject* length = NULL;
   PyObject* encoding = NULL;
   PyObject* errors = NULL;
@@ -72,7 +72,7 @@ cp_cstringatom_init(CpCStringAtomObject* self, PyObject* args, PyObject* kwds)
   int keep_terminator = false;
   if (!PyArg_ParseTupleAndKeywords(args,
                                    kwds,
-                                   "O|OOOp",
+                                   "|OOOOp",
                                    kwlist,
                                    &length,
                                    &encoding,
@@ -85,6 +85,11 @@ cp_cstringatom_init(CpCStringAtomObject* self, PyObject* args, PyObject* kwds)
   _modulestate* mod = get_global_module_state();
 
   _Cp_SetObj(self->m_length, length);
+  if (!self->m_length) {
+    // TODO: document this
+    _Cp_SetObj(self->m_length, Py_Ellipsis);
+  }
+
   _Cp_SetObj(self->m_encoding, encoding);
   if (!self->m_encoding) {
     Py_XSETREF(self->m_encoding, mod->str_utf8);
@@ -294,7 +299,7 @@ static PyMemberDef CpCStringAtom_Members[] = {
 };
 
 PyTypeObject CpCStringAtom_Type = {
-  PyVarObject_HEAD_INIT(NULL, 0) _Cp_NameStr(CpStringAtom_NAME),
+  PyVarObject_HEAD_INIT(NULL, 0) _Cp_NameStr(CpCStringAtom_NAME),
   .tp_basicsize = sizeof(CpCStringAtomObject),
   .tp_itemsize = 0,
   .tp_dealloc = (destructor)cp_cstringatom_dealloc,

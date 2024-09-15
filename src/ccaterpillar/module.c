@@ -33,7 +33,6 @@
     return NULL;                                                               \
   }
 
-
 // ------------------------------------------------------------------------------
 // module
 static PyObject*
@@ -516,7 +515,7 @@ PyInit__C(void)
   CpModuleState_AddObject(
     cp_option__global_struct_options, "STRUCT_OPTIONS", PySet_New(NULL));
   CpModuleState_AddObject(
-    cp_option__global_struct_options, "FIELD_OPTIONS", PySet_New(NULL));
+    cp_option__global_field_options, "FIELD_OPTIONS", PySet_New(NULL));
 
   /* setup arch and endian */
   CpModuleState_AddObject(cp_endian__native,

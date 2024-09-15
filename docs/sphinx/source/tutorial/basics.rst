@@ -27,24 +27,52 @@ When dealing with binary data, numbers play a crucial role. Besides the default 
 (e.g., uint8, uint16, etc.), *caterpillar* introduces some special integer formats. The default
 types include:
 
-* Unsigned (:code:`u...`) and signed:
 
-  :attr:`~caterpillar.fields.int8`, :attr:`~caterpillar.fields.uint8`,
-  :attr:`~caterpillar.fields.int16`, :attr:`~caterpillar.fields.uint16`,
-  :attr:`~caterpillar.fields.int24`, :attr:`~caterpillar.fields.uint24`,
-  :attr:`~caterpillar.fields.int32`, :attr:`~caterpillar.fields.uint32`,
-  :attr:`~caterpillar.fields.int64`, :attr:`~caterpillar.fields.uint64`,
-  :attr:`~caterpillar.fields.ssize_t`, :attr:`~caterpillar.fields.size_t`,
+.. tab-set::
 
-* Floating point:
+    .. tab-item:: Python
 
-  :attr:`~caterpillar.fields.float16`, :attr:`~caterpillar.fields.float32`,
-  :attr:`~caterpillar.fields.float64`
+        * Unsigned (:code:`u...`) and signed:
 
-* Special primitives:
+        :attr:`~caterpillar.fields.int8`, :attr:`~caterpillar.fields.uint8`,
+        :attr:`~caterpillar.fields.int16`, :attr:`~caterpillar.fields.uint16`,
+        :attr:`~caterpillar.fields.int24`, :attr:`~caterpillar.fields.uint24`,
+        :attr:`~caterpillar.fields.int32`, :attr:`~caterpillar.fields.uint32`,
+        :attr:`~caterpillar.fields.int64`, :attr:`~caterpillar.fields.uint64`,
+        :attr:`~caterpillar.fields.ssize_t`, :attr:`~caterpillar.fields.size_t`,
 
-  :attr:`~caterpillar.fields.boolean`, :attr:`~caterpillar.fields.char`,
-  :attr:`~caterpillar.fields.void_ptr`
+        * Floating point:
+
+        :attr:`~caterpillar.fields.float16`, :attr:`~caterpillar.fields.float32`,
+        :attr:`~caterpillar.fields.float64`
+
+        * Special primitives:
+
+        :attr:`~caterpillar.fields.boolean`, :attr:`~caterpillar.fields.char`,
+        :attr:`~caterpillar.fields.void_ptr`
+
+
+    .. tab-item:: Caterpillar C
+
+        * Unsigned (:code:`u...`) and signed:
+
+        :attr:`~caterpillar.c.i8`, :attr:`~caterpillar.c.u8`,
+        :attr:`~caterpillar.c.i16`, :attr:`~caterpillar.c.u16`,
+        :attr:`~caterpillar.c.i24`, :attr:`~caterpillar.c.u24`,
+        :attr:`~caterpillar.c.i32`, :attr:`~caterpillar.c.u32`,
+        :attr:`~caterpillar.c.i64`, :attr:`~caterpillar.c.u64`,
+        :attr:`~caterpillar.c.i128`, :attr:`~caterpillar.c.u128`,
+
+        * Floating point:
+
+        :attr:`~caterpillar.c.f16`, :attr:`~caterpillar.c.f32`,
+        :attr:`~caterpillar.c.f64`
+
+        * Special primitives:
+
+        :attr:`~caterpillar.c.boolean`, :attr:`~caterpillar.c.char`
+
+
 
 Custom-sized integer
 ~~~~~~~~~~~~~~~~~~~~
@@ -53,18 +81,38 @@ It's also possible to use integers with a custom size (in bits). However, it's i
 that you have to define the struct with the bit count, and internally, only the occupied bytes
 will be used. For example:
 
->>> field = F(Int(24))      # three-byte signed integer
 
->>> field = F(UInt(40))     # five-byte unsigned integer
+.. tab-set::
+
+    .. tab-item:: Python
+
+        >>> field = F(Int(24))      # three-byte signed integer
+        >>> field = F(UInt(40))     # five-byte unsigned integer
+
+
+    .. tab-item:: Caterpillar C
+
+        >>> i48 = Int(48)               # six-byte signed integer
+        >>> u40 = Int(40, signed=False) # five-byte unsigned integer
 
 
 Variable-sized integer
 ~~~~~~~~~~~~~~~~~~~~~~
 
-The built-in struct :class:`~caterpillar.fields.VarInt` supports parsing and building integers with variable length. Its
+The built-in struct :class:`.py.VarInt`/:class:`.c.VarInt` supports parsing and building integers with variable length. Its
 documentation provides a detailed explanation of all different configurations.
 
->>> field = F(vint) # or F(VarInt())
+.. tab-set::
+
+    .. tab-item:: Python
+
+        >>> field = F(vint) # or F(VarInt())
+
+    .. tab-item:: Caterpillar C
+
+        >>> # use 'varint' directly or use VarInt()
+        >>> be_varint = BIG_ENDIAN + varint
+        >>> le_varint = VarInt(little_endian=True)
 
 
 Enumerations
@@ -76,21 +124,43 @@ standard Python enumerations - classes extending  :code:`enum.Enum` - with ease.
 Let's revisit `pHYS <https://www.w3.org/TR/png/#11pHYs>`_ chunk to add an enum to the
 last field.
 
-.. code-block:: python
-    :caption: Simple enumeration in a struct definition
+.. tab-set::
 
-    import enum
+    .. tab-item:: Python
 
-    class PHYSUnit(enum.IntEnum): # <-- the enum value doesn't have to be int
-        __struct__ = uint8        # <-- to make the code even more compact, use this
-        UNKNOWN = 0
-        METRE = 1
+        .. code-block:: python
+            :caption: Simple enumeration in a struct definition
 
-    @struct(order=BigEndian)         # <-- same as before
-    class PHYSChunk:
-        pixels_per_unit_x: uint32
-        pixels_per_unit_y: uint32
-        unit: PHYSUnit               # <-- now we have an auto-enumeration
+            import enum
+
+            class PHYSUnit(enum.IntEnum): # <-- the enum value doesn't have to be int
+                __struct__ = uint8        # <-- to make the code even more compact, use this
+                UNKNOWN = 0
+                METRE = 1
+
+            @struct(order=BigEndian)         # <-- same as before
+            class PHYSChunk:
+                pixels_per_unit_x: uint32
+                pixels_per_unit_y: uint32
+                unit: PHYSUnit               # <-- now we have an auto-enumeration
+
+
+    .. tab-item:: Caterpillar C
+
+        .. code-block:: python
+            :caption: Simple enumeration in a struct definition
+
+            import enum
+
+            class PHYSUnit(enum.IntEnum):       # <-- the enum value doesn't have to be int
+                UNKNOWN = 0
+                METRE = 1
+
+            @struct(endian=BIG_ENDIAN)          # <-- same as before
+            class PHYSChunk:
+                pixels_per_unit_x: u32
+                pixels_per_unit_y: u32
+                unit: enumeration(u8, PHYSUnit) # <-- atom is required here
 
 .. important::
     It's worth noting that a default value can be specified for the field as a fallback. If
@@ -107,7 +177,19 @@ simplifies this with item access for defining arrays of static or dynamic size.
 We started with the `PLTE <https://www.w3.org/TR/png/#11PLTE>`_ chunk, which stores three-byte
 sequences. We can define an array of RGB objects as follows:
 
->>> PLTEChunk = RGB[this.length / 3]
+.. tab-set::
+
+    .. tab-item:: Python
+
+        >>> PLTEChunk = RGB[this.length / 3]
+
+    .. tab-item:: Caterpillar C
+
+        >>> PLTEChunk = RGB.__struct__[ContextPath("obj.length") / 3]
+
+        .. versionadded:: 2.2.0
+            The syntax will be changed once `__class_getitem__` is implemented by
+            any :class:`.c.Struct` instance.
 
 Since this chunk has only one field, the array specifier is used to make it a list type. The
 length is calculated based on the chunk's length field divided by three because the RGB class
@@ -123,18 +205,50 @@ CString
 The CString in this library extends beyond a mere reference to C strings. It provides
 additional functionality, as demonstrated in the structure of the next chunk.
 
-.. code-block:: python
-    :caption: The `tEXt <https://www.w3.org/TR/png/#11tEXt>`_ chunk structure
+.. tab-set::
 
-    @struct
-    class TEXTChunk:
-        # dynamic sized string that ends with a null-byte
-        keyword: CString(encoding="ISO-8859-1")
-        # static sized string based on the current context. some notes:
-        #   - parent.length is the current chunkt's length
-        #   - lenof(...) is the runtime length of the context variable
-        #   - 1 because of the extra null-byte that is stripped from keyword
-        text: CString(encoding="ISO-8859-1", length=parent.length - lenof(this.keword) - 1)
+    .. tab-item:: Python
+
+        .. code-block:: python
+            :caption: The `tEXt <https://www.w3.org/TR/png/#11tEXt>`_ chunk structure
+
+            from caterpillar.py import *
+            from caterpillar.shortcuts import lenof
+
+            @struct
+            class TEXTChunk:
+                # dynamic sized string that ends with a null-byte
+                keyword: CString(encoding="ISO-8859-1")
+                # static sized string based on the current context. some notes:
+                #   - parent.length is the current chunkt's length
+                #   - lenof(...) is the runtime length of the context variable
+                #   - 1 because of the extra null-byte that is stripped from keyword
+                text: CString(encoding="ISO-8859-1", length=parent.length - lenof(this.keword) - 1)
+
+    .. tab-item:: Caterpillar C
+
+        .. code-block:: python
+            :caption: The `tEXt` chunk structure
+
+            from caterpillar.c import *                 # <-- main difference
+            from caterpillar.shortcuts import lenof
+            # NOTE: lenof works here, because Caterpillar C's Context implements
+            # the 'Context Protocol'.
+
+            parent = ContextPath("parent.obj")
+            this = ContextPath("obj")
+
+            @struct
+            class TEXTChunk:
+                # dynamic sized string that ends with a null-byte
+                keyword: cstring(encoding="ISO-8859-1")
+                # static sized string based on the current context. some notes:
+                #   - parent.length is the current chunkt's length
+                #   - lenof(...) is the runtime length of the context variable
+                #   - 1 because of the extra null-byte that is stripped from keyword
+                text: cstring(encoding="ISO-8859-1", length=parent.length - lenof(this.keword) - 1)
+
+
 
 .. admonition:: Challenge
 
@@ -145,25 +259,62 @@ additional functionality, as demonstrated in the structure of the next chunk.
 
         This solution serves as an example and isn't the only way to approach it!
 
-        .. code-block:: python
+        .. tab-set::
 
-            @struct
-            class ITXTChunk:
-                keyword: CString(encoding="utf-8")
-                compression_flag: uint8
-                # we actually don't need an Enum here
-                compression_method: uint8
-                language_tag: CString(encoding="ASCII")
-                translated_keyword: CString(encoding="utf-8")
-                # length is calculated with parent.length - len(keyword)+len(b"\x00") - ...
-                text: CString(
-                    encoding="utf-8",
-                    length=parent.length - lenof(this.translated_keyword) - lenof(this.keyword) - 5,
-                )
+            .. tab-item:: Python
+
+                .. code-block:: python
+                    :linenos:
+
+                    @struct
+                    class ITXTChunk:
+                        keyword: CString(encoding="utf-8")
+                        compression_flag: uint8
+                        # we actually don't need an Enum here
+                        compression_method: uint8
+                        language_tag: CString(encoding="ASCII")
+                        translated_keyword: CString(encoding="utf-8")
+                        # length is calculated with parent.length - len(keyword)+len(b"\x00") - ...
+                        text: CString(
+                            encoding="utf-8",
+                            length=parent.length - lenof(this.translated_keyword) - lenof(this.keyword) - 5,
+                        )
+
+            .. tab-item:: Caterpillar C
+
+                .. code-block:: python
+                    :linenos:
+
+                    from caterpillar.c import *                 # <-- main difference
+                    from caterpillar.shortcuts import lenof
+
+                    parent = ContextPath("parent.obj")
+                    this = ContextPath("obj")
+
+                    @struct
+                    class ITXTChunk:
+                        keyword: cstring() # default encoding is "utf-8"
+                        compression_flag: u8
+                        # we actually don't need an Enum here
+                        compression_method: u8
+                        language_tag: cstring(encoding="ASCII")
+                        translated_keyword: cstring(...) # explicit greedy parsing
+                        # length is calculated with parent.length - len(keyword)+len(b"\x00") - ...
+                        text: cstring(
+                            parent.length - lenof(this.translated_keyword) - lenof(this.keyword) - 5,
+                        )
 
 You can also apply your own termination character, for example:
 
->>> struct = CString(pad="\x0A")
+.. tab-set::
+
+    .. tab-item:: Python
+
+        >>> struct = CString(pad="\x0A")
+
+    .. tab-item:: Caterpillar C
+
+        >>> s = cstring(sep="\x0A")
 
 This struct will use a space as the termination character and strip all trailing
 padding bytes.
@@ -174,7 +325,16 @@ String
 Besides special the special *c strings* there's a default :class:`~caterpillar.fields.String` class that implements
 the basic behaviour of a string. It's crucial to specify the length for this struct.
 
->>> struct = String(100 or this.length) # static integer or context lambda
+.. tab-set::
+
+    .. tab-item:: Python
+
+        >>> struct = String(100 or this.length) # static integer or context lambda
+
+    .. tab-item:: Caterpillar C
+
+        >>> # takes static length, context lambda, another atom or ... for greedy parsing
+        >>> s = cstring(100)
 
 
 Prefixed
@@ -185,11 +345,23 @@ encoding is specified, the returned value will be of type :code:`bytes`. This cl
 using the given struct and then retrieves the corresponding number of bytes from the stream returned
 by that struct.
 
->>> field = F(Prefixed(uint8, encoding="utf-8"))
->>> pack("Hello, World!", field)
-b'\rHello, World!'
->>> unpack(field, _)
-'Hello, World!'
+.. tab-set::
+
+    .. tab-item:: Python
+
+        >>> field = F(Prefixed(uint8, encoding="utf-8"))
+        >>> pack("Hello, World!", field)
+        b'\rHello, World!'
+        >>> unpack(field, _)
+        'Hello, World!'
+
+    .. tab-item:: Caterpillar C
+
+        >>> s = pstring(u8)
+        >>> pack("Hello, World!", s)
+        b'\rHello, World!'
+        >>> unpack(_, s)
+        'Hello, World!'
 
 
 Byte Sequences
@@ -201,11 +373,19 @@ Memory
 When dealing with data that can be stored in memory and you intend to print out your
 unpacked object, the :class:`~caterpillar.fields.Memory` struct is recommended.
 
->>> m = F(Memory(5)) # static size; dynamic size is allowed too
->>> pack(bytes([i for i in range(5)], m))
-b'\x00\x01\x02\x03\x04'
->>> unpack(m, _)
-<memory at 0x00000204FDFA4411>
+.. tab-set::
+
+    .. tab-item:: Python
+
+        >>> m = F(Memory(5)) # static size; dynamic size is allowed too
+        >>> pack(bytes([i for i in range(5)], m))
+        b'\x00\x01\x02\x03\x04'
+        >>> unpack(m, _)
+        <memory at 0x00000204FDFA4411>
+
+    .. tab-item:: Caterpillar C
+
+        *Not supported yet.*
 
 Bytes
 ~~~~~
@@ -214,20 +394,48 @@ If direct access to the bytes is what you need, the :class:`~caterpillar.fields.
 converts the :code:`memoryview` to :code:`bytes`. Additionally, as mentioned earlier, you can
 use the :class:`~caterpillar.fields.Prefixed` class to unpack bytes of a prefixed size.
 
->>> field = F(Bytes(5)) # static, dynamic and greedy size allowed
+
+.. tab-set::
+
+    .. tab-item:: Python
+
+        >>> field = F(Bytes(5)) # static, dynamic and greedy size allowed
+
+
+    .. tab-item:: Caterpillar C
+
+        >>> b = octetstring(5) # static, dynamic size allowed
 
 
 With the gained knowledge, let's implement the struct for the `fDAT <https://www.w3.org/TR/png/#fdAT-chunk>`_
 chunk of our PNG format. It should look like this:
 
-.. code-block:: python
-    :caption: Implementation for the frame data chunk
 
-    @struct(order=BigEndian)                    # <-- endianess as usual
-    class FDATChunk:
-        sequence_number: uint32
-        # We rather use a memory instance here instead of Bytes()
-        frame_data: Memory(parent.length - 4)
+.. tab-set::
+
+    .. tab-item:: Python
+
+        .. code-block:: python
+            :caption: Implementation for the frame data chunk
+
+            @struct(order=BigEndian)                    # <-- endianess as usual
+            class FDATChunk:
+                sequence_number: uint32
+                # We rather use a memory instance here instead of Bytes()
+                frame_data: Memory(parent.length - 4)
+
+    .. tab-item:: Caterpillar C
+
+        .. code-block:: python
+            :caption: Implementation for the frame data chunk
+
+            parent = ContextPath("parent.obj")
+
+            @struct(endian=BIG_ENDIAN)
+            class FDATChunk:
+                sequence_number: u32
+                frame_data: octetstring(parent.length - 4)
+
 
 .. admonition:: Challenge
 
@@ -235,6 +443,8 @@ chunk of our PNG format. It should look like this:
     `zTXt <https://www.w3.org/TR/png/#11zTXt>`_ chunk for compressed textual data.
 
     .. dropdown:: Solution
+
+        Python API only:
 
         .. code-block:: python
             :caption: Sample implementation of the *zTXt* chunk

@@ -5,20 +5,20 @@ import caterpillar
 
 if caterpillar.native_support():
 
-    from caterpillar._C import unpack, pack, varint, varint_t
+    from caterpillar._C import unpack, pack, varint, VarInt
     from caterpillar._C import BIG_ENDIAN as be
 
     def test_varint_init():
         # The C varint atom implements a variable-length unsigned
         # integer for big-endian AND little-endian encoding. The
         # byteorder operator '+' can be applied as usual.
-        assert varint_t(True).little_endian is True
-        assert varint_t(False).little_endian is False
+        assert VarInt(True).little_endian is True
+        assert VarInt(False).little_endian is False
 
         # We can even control the least significant byte using
         # the 'lsb' flag.
-        assert varint_t(lsb=True).lsb is True
-        assert varint_t(lsb=False).lsb is False
+        assert VarInt(lsb=True).lsb is True
+        assert VarInt(lsb=False).lsb is False
 
         # These parameters are virible through the representation:
         #  little-endian: <le varint>

@@ -48,12 +48,12 @@ if caterpillar.native_support():
         assert pack("foo", s) == b"foo\x00"
         assert pack("bar", cstring(3, "utf-8")) == b"bar"
         assert pack("baz", cstring(u8, "utf-8")) == b"\x04baz\x00"
-        assert pack("abc", cstring(4, terminator="\x20")) == b"abc\x20"
+        assert pack("abc", cstring(4, sep="\x20")) == b"abc\x20"
 
     def test_cstringatom_unpack():
-        assert unpack(b"foo\x00", cstring(...)) == "foo"
-        assert unpack(b"ba\x00r", cstring(...)) == "ba"
+        assert unpack(b"foo\x00", cstring()) == "foo"
+        assert unpack(b"ba\x00r", cstring()) == "ba"
         assert unpack(b"baz\x00", cstring(3)) == "baz"
         assert unpack(b"baz\x00", cstring(4)) == "baz"
         assert unpack(b"\x04baz\x00", cstring(u8)) == "baz"
-        assert unpack(b"abc\x20", cstring(4, terminator="\x20")) == "abc"
+        assert unpack(b"abc\x20", cstring(4, sep="\x20")) == "abc"

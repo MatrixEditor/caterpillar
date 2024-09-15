@@ -16,15 +16,33 @@ efficient.
 structs that adjust their size based on the current context. This framework enables you
 to write complex structures in a compact and readable manner.
 
-.. code-block::
-   :caption: Simple example of a custom struct
+.. tab-set::
 
-   @struct
-   class Format:
-      magic: b"Foo"                       # constant values
-      name: CString(...)                  # C-String without a fixed length
-      value: le + uint16                  # little endian encoding
-      entries: be + CString[uint32::]     # arrays with big-endian prefixed length
+   .. tab-item:: Python
+
+      .. code-block::
+         :caption: Simple example of a custom struct
+
+         @struct
+         class Format:
+            magic: b"Foo"                       # constant values
+            name: CString(...)                  # C-String without a fixed length
+            value: le + uint16                  # little endian encoding
+            entries: be + CString[uint32::]     # arrays with big-endian prefixed length
+
+   .. tab-item:: Caterpillar C
+
+      .. code-block:: python
+         :caption: Simple example of a custom struct
+
+         from caterpillar.c import BIG_ENDIAN as be
+
+         @struct
+         class Format:
+            magic: const(b"Foo", octetstring(3))  # constant values
+            name: cstring(...)                    # C-String without a fixed length
+            value: u16                            # little endian encoding
+            entries: cstring(...)[be + u32::]     # arrays with big-endian prefixed length
 
 .. admonition:: Hold up, wait a minute!
 
