@@ -40,7 +40,11 @@ class APIType(APIObj):
 
     def cp_internal_def(self) -> str:
         # REVISIT: what about struct definitions?
-        return f"extern {self.type} {self.name};"
+        if self.type.startswith("Py"):
+            return f"extern {self.type} {self.name};"
+
+        extra_def = f"#define {self.name.replace('_Type', '')}_NAME \"{self.type}\""
+        return f"extern PyTypeObject {self.name};\n{extra_def}"
 
     def cp_external_def(self):
         """Return the external definition for this API object

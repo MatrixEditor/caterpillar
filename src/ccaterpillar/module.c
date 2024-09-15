@@ -387,28 +387,28 @@ PyInit__C(void)
     return NULL;
   }
 
-  CpModule_AddObject("atom", &CpAtom_Type);
-  CpModule_AddObject("catom", &CpCAtom_Type);
-  CpModule_AddObject("Option", &CpOption_Type);
-  CpModule_AddObject("Arch", &CpArch_Type);
-  CpModule_AddObject("Endian", &CpEndian_Type);
-  CpModule_AddObject("Context", &CpContext_Type);
-  CpModule_AddObject("BinaryExpr", &CpBinaryExpr_Type);
-  CpModule_AddObject("UnaryExpr", &CpUnaryExpr_Type);
-  CpModule_AddObject("ContextPath", &CpContextPath_Type);
+  CpModule_AddObject(CpAtom_NAME, &CpAtom_Type);
+  CpModule_AddObject(CpCAtom_NAME, &CpCAtom_Type);
+  CpModule_AddObject(CpOption_NAME, &CpOption_Type);
+  CpModule_AddObject(CpArch_NAME, &CpArch_Type);
+  CpModule_AddObject(CpEndian_NAME, &CpEndian_Type);
+  CpModule_AddObject(CpContext_NAME, &CpContext_Type);
+  CpModule_AddObject(CpBinaryExpr_NAME, &CpBinaryExpr_Type);
+  CpModule_AddObject(CpUnaryExpr_NAME, &CpUnaryExpr_Type);
+  CpModule_AddObject(CpContextPath_NAME, &CpContextPath_Type);
   CpModule_AddObject("InvalidDefaultType", &CpInvalidDefault_Type);
   CpModule_AddObject("InvalidDefault", CpInvalidDefault);
   CpModule_AddObject("DefaultOptionType", &CpDefaultOption_Type);
   CpModule_AddObject("DefaultOption", CpDefaultOption);
-  CpModule_AddObject("Field", &CpField_Type);
-  CpModule_AddObject("fieldatom", &CpFieldAtom_Type);
-  CpModule_AddObject("fieldcatom", &CpFieldCAtom_Type);
-  CpModule_AddObject("layer", &CpLayer_Type);
+  CpModule_AddObject(CpField_NAME, &CpField_Type);
+  CpModule_AddObject(CpFieldAtom_NAME, &CpFieldAtom_Type);
+  CpModule_AddObject(CpFieldCAtom_NAME, &CpFieldCAtom_Type);
+  CpModule_AddObject(CpLayer_NAME, &CpLayer_Type);
   CpModule_AddObject(CpSeqLayer_NAME, &CpSeqLayer_Type);
   CpModule_AddObject(CpObjLayer_NAME, &CpObjLayer_Type);
-  CpModule_AddObject("State", &CpState_Type);
-  CpModule_AddObject("fieldinfo", &CpStructFieldInfo_Type);
-  CpModule_AddObject("Struct", &CpStruct_Type);
+  CpModule_AddObject(CpState_NAME, &CpState_Type);
+  CpModule_AddObject(CpStructFieldInfo_NAME, &CpStructFieldInfo_Type);
+  CpModule_AddObject(CpStruct_NAME, &CpStruct_Type);
   CpModule_AddObject(CpLengthInfo_NAME, &CpLengthInfo_Type);
 
   CpModule_AddObject(CpPrimitiveAtom_NAME, &CpPrimitiveAtom_Type);

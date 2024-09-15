@@ -27,7 +27,8 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx_design",
     "breathe",
-    "c_annotations"
+    "c_annotations",
+    "sphinx_copybutton"
 ]
 
 templates_path = ["_templates"]

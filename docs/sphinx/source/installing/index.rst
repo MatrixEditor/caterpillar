@@ -9,9 +9,8 @@ to install it by providing the Git link. This library has no fixed dependencies,
 out of the box.
 
 There are several installation options you can use to install a desired part of the library.
-*caterpillar* ships with a native C extension and additional tools, that are using native
-extensions too. As not everyone wants to use C extensions, it's default installation candidate
-does not include the native extension.
+*caterpillar* ships with a native C extension and additional tools. As not everyone wants to
+use C extensions, it's default installation candidate does not include the native extension.
 
 .. code-block:: bash
 
@@ -28,6 +27,11 @@ If you want to use the native C extension you can specify the following environm
 * `CP_ENABLE_NATIVE` - Enables installation of the native C extension
 * `CP_ENABLE_TOOLS` - Enables installation of extra tools (proposed)
 
+**or** you can use the following command to install it directly:
+
+.. code-block:: bash
+
+    pip install git+https://github.com/MatrixEditor/caterpillar/#subdirectory=src/ccaterpillar
 
 This project comes with packaging extras. Therefore, if you want to enable specific structs, you
 have to install the corresponding extra. It can be done using pip again:

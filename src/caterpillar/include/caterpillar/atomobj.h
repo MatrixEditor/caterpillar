@@ -121,8 +121,6 @@ struct _lengthinfoobj
   int m_greedy;
 };
 
-#define CpLengthInfo_NAME "lengthinfo"
-
 // ---------------------------------------------------------------------------
 // CAtom
 

@@ -191,7 +191,6 @@ struct _seqlayerobj
   int8_t s_greedy;
 };
 
-#define CpSeqLayer_NAME "seqlayer"
 #define CpSeqLayer_CheckExact(v) Py_IS_TYPE((v), &CpSeqLayer_Type)
 #define CpSeqLayer_Check(v) PyObject_TypeCheck((v), &CpSeqLayer_Type)
 
@@ -210,7 +209,6 @@ struct _objlayerobj
   PyObject* m_obj;
 };
 
-#define CpObjLayer_NAME "objlayer"
 #define CpObjLayer_CheckExact(v) Py_IS_TYPE((v), &CpObjLayer_Type)
 #define CpObjLayer_Check(v) PyObject_TypeCheck((v), &CpObjLayer_Type)
 

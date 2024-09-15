@@ -37,7 +37,6 @@ struct _enumatomobj
   PyObject* m_enum_type;
 };
 
-#define CpEnumAtom_NAME "enumeration"
 #define CpEnumAtom_CheckExact(op) Py_IS_TYPE((op), &CpEnumAtom_Type)
 #define CpEnumAtom_Check(op) (PyObject_TypeCheck((op), &CpEnumAtom_Type))
 

@@ -6,9 +6,10 @@
 from os import path
 import docutils
 from docutils import nodes
+from sphinx.addnodes import pending_xref
 from sphinx.locale import _ as sphinx_gettext
 
-from sphinx import addnodes
+from sphinx import addnodes, application
 
 
 class RCEntry:
@@ -21,6 +22,7 @@ class RCEntry:
 class Annotations:
     def __init__(self, refcount_filename):
         self.refcount_data = {}
+        self.typedef_data = {}
         with open(refcount_filename, "r", encoding="utf-8") as fp:
             for line in fp:
                 line = line.strip()
@@ -28,49 +30,82 @@ class Annotations:
                     # blank lines and comments
                     continue
                 def_type, *parts = line.split(":")
-                if def_type != "func":
-                    continue
+                match def_type:
+                    case "func":
+                        index, name, rtype, refcount = parts
+                        # Get the entry, creating it if needed:
+                        entry = self.refcount_data.get(name)
+                        if not entry:
+                            entry = self.refcount_data[name] = RCEntry(name)
+                        if not refcount or refcount == "null":
+                            refcount = None
+                        else:
+                            refcount = int(refcount)
+                        entry.result_type = rtype
+                        entry.result_refs = refcount
 
-                index, name, rtype, refcount = parts
-                # Get the entry, creating it if needed:
-                entry = self.refcount_data.get(name)
-                if not entry:
-                    entry = self.refcount_data[name] = RCEntry(name)
-                if not refcount or refcount == "null":
-                    refcount = None
-                else:
-                    refcount = int(refcount)
-                entry.result_type = rtype
-                entry.result_refs = refcount
+                    case "type":
+                        index, struct_name, typedef_name, py_type = parts
+                        if py_type != "-":
+                            self.typedef_data[py_type] = typedef_name
+
+    def add_py_annotations(
+        self, app: application.Sphinx, node: docutils.nodes.Element, par
+    ):
+
+        if not par[0].has_key("ids") or not par[0]["ids"]:
+            return
+
+        name = par[0]["ids"][0]
+        if not name.startswith("caterpillar.c."):
+            return
+
+        if par["objtype"] != "class":
+            return
+
+        name = name[14:]
+        if name in self.typedef_data:
+            typedef_name = self.typedef_data[name]
+
+            rc = sphinx_gettext(f"C API Type: {typedef_name}")
+            node.insert(0, nodes.emphasis(rc, rc, classes=["refcount", "text-info"]))
+            node.insert(1, nodes.line())
+
+    def add_c_annotation(self, app, node, par):
+        if not par[0].has_key("ids") or not par[0]["ids"]:
+            return
+
+        name = par[0]["ids"][0]
+        if name.startswith("c."):
+            name = name[2:]
+
+        objtype = par["objtype"]
+        if objtype != "function":
+            return
+        entry = self.refcount_data.get(name)
+        if not entry:
+            return
+
+        if not entry.result_type.endswith("Object*"):
+            return
+
+        if entry.result_refs is None:
+            rc = sphinx_gettext("Return value: Always NULL.")
+        elif entry.result_refs:
+            rc = sphinx_gettext("Return value: New reference.")
+        else:
+            rc = sphinx_gettext("Return value: Borrowed reference.")
+        node.insert(0, nodes.emphasis(rc, rc, classes=["refcount", "text-info"]))
 
     def add_annotations(self, app, doctree):
         for node in doctree.findall(addnodes.desc_content):
             par = node.parent
-            if par["domain"] != "c":
-                continue
-            if not par[0].has_key("ids") or not par[0]["ids"]:
-                continue
-            name = par[0]["ids"][0]
-            if name.startswith("c."):
-                name = name[2:]
+            match par["domain"]:
+                case "c":
+                    self.add_c_annotation(app, node, par)
 
-            objtype = par["objtype"]
-            if objtype != "function":
-                continue
-            entry = self.refcount_data.get(name)
-            if not entry:
-                continue
-
-            if not entry.result_type.endswith("Object*"):
-                continue
-
-            if entry.result_refs is None:
-                rc = sphinx_gettext("Return value: Always NULL.")
-            elif entry.result_refs:
-                rc = sphinx_gettext("Return value: New reference.")
-            else:
-                rc = sphinx_gettext("Return value: Borrowed reference.")
-            node.insert(0, nodes.emphasis(rc, rc, classes=["refcount", "text-info"]))
+                case "py":
+                    self.add_py_annotations(app, node, par)
 
 
 def init_annotations(app):

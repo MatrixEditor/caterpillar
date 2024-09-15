@@ -8,9 +8,9 @@
 #
 # There are currently four different types of statements:
 #
-#   type:INDEX:STRUCT_NAME:TYPEDEF_NAME:CAPI_TYPE
+#   type:INDEX:STRUCT_NAME:TYPEDEF_NAME:CAPI_TYPE_NAME
 #       Defines a C API type for a C structure. The index is optional and
-#       the CAPI_TYPE will be inferred as PyTypeObject if none set
+#       the CAPI_TYPE_NAME will add an extra macro to the header file.
 #
 #   obj:INDEX:NAME:TYPE
 #       Defines a C API object.
@@ -61,53 +61,53 @@ obj:0:CpModule:PyModuleDef
 
 type:-:_modulestate:_modulestate:-
 
-type:1:_atomobj:CpAtomObject:-
-type:2:_catomobj:CpCAtomObject:-
-type:3:_archobj:CpArchObject:-
-type:4:_endianobj:CpEndianObject:-
-type:5:_contextobj:CpContextObject:-
-type:6:_unaryexpr:CpUnaryExprObject:-
-type:7:_binaryexpr:CpBinaryExprObject:-
-type:8:_contextpath:CpContextPathObject:-
-type:9:_fieldobj:CpFieldObject:-
-type:10:_fieldatomobj:CpFieldAtomObject:-
-type:11:_fieldcatomobj:CpFieldCAtomObject:-
+type:1:_atomobj:CpAtomObject:atom
+type:2:_catomobj:CpCAtomObject:catom
+type:3:_archobj:CpArchObject:Arch
+type:4:_endianobj:CpEndianObject:Endian
+type:5:_contextobj:CpContextObject:Context
+type:6:_unaryexpr:CpUnaryExprObject:unaryexpr
+type:7:_binaryexpr:CpBinaryExprObject:binaryexpr
+type:8:_contextpath:CpContextPathObject:ContextPath
+type:9:_fieldobj:CpFieldObject:Field
+type:10:_fieldatomobj:CpFieldAtomObject:fieldatom
+type:11:_fieldcatomobj:CpFieldCAtomObject:fieldcatom
 
 obj:12:CpInvalidDefault_Type:-
 obj:13:CpDefaultOption_Type:-
 obj:14:_CpInvalidDefault_Object:PyObject
 obj:15:_CpDefaultOption_Object:PyObject
 
-type:16:_option:CpOptionObject:-
-type:17:_stateobj:CpStateObject:-
-type:18:_layerobj:CpLayerObject:-
+type:16:_option:CpOptionObject:Option
+type:17:_stateobj:CpStateObject:State
+type:18:_layerobj:CpLayerObject:layer
 
 # REVISIT: maybe rename to _structfieldinfo
-type:19:_fieldinfoobj:CpStructFieldInfoObject:-
-type:20:_structobj:CpStructObject:-
-type:21:_floatatomobj:CpFloatAtomObject:-
-type:22:_intatomobj:CpIntAtomObject:-
-type:23:_boolatomobj:CpBoolAtomObject:-
-type:24:_charatomobj:CpCharAtomObject:-
-type:25:_paddingatomobj:CpPaddingAtomObject:-
-type:26:_stringatomobj:CpStringAtomObject:-
-type:27:_constatomobj:CpConstAtomObject:-
-type:28:_builtinatomobj:CpBuiltinAtomObject:-
-type:29:_repeatedatomobj:CpRepeatedAtomObject:-
-type:30:_seqlayerobj:CpSeqLayerObject:-
-type:31:_objlayerobj:CpObjLayerObject:-
-type:32:_conditionatomobj:CpConditionAtomObject:-
-type:33:_switchatomobj:CpSwitchAtomObject:-
-type:34:_offsetatomobj:CpOffsetAtomObject:-
-type:35:_primitiveatomobj:CpPrimitiveAtomObject:-
-type:36:_lengthinfoobj:CpLengthInfoObject:-
-type:37:_bytesatomobj:CpBytesAtomObject:-
-type:38:_pstringatomobj:CpPStringAtomObject:-
-type:39:_enumatomobj:CpEnumAtomObject:-
-type:40:_varintatomobj:CpVarIntAtomObject:-
-type:41:_computedatomobj:CpComputedAtomObject:-
-type:42:_lazyatomobj:CpLazyAtomObject:-
-type:43:_cstringatomobj:CpCStringAtomObject:-
+type:19:_fieldinfoobj:CpStructFieldInfoObject:fieldinfo
+type:20:_structobj:CpStructObject:Struct
+type:21:_floatatomobj:CpFloatAtomObject:Float
+type:22:_intatomobj:CpIntAtomObject:Int
+type:23:_boolatomobj:CpBoolAtomObject:Bool
+type:24:_charatomobj:CpCharAtomObject:Char
+type:25:_paddingatomobj:CpPaddingAtomObject:Padding
+type:26:_stringatomobj:CpStringAtomObject:string
+type:27:_constatomobj:CpConstAtomObject:const
+type:28:_builtinatomobj:CpBuiltinAtomObject:builtinatom
+type:29:_repeatedatomobj:CpRepeatedAtomObject:repeated
+type:30:_seqlayerobj:CpSeqLayerObject:seqlayer
+type:31:_objlayerobj:CpObjLayerObject:objlayer
+type:32:_conditionatomobj:CpConditionAtomObject:condition
+type:33:_switchatomobj:CpSwitchAtomObject:switch
+type:34:_offsetatomobj:CpOffsetAtomObject:atoffset
+type:35:_primitiveatomobj:CpPrimitiveAtomObject:patom
+type:36:_lengthinfoobj:CpLengthInfoObject:lengthinfo
+type:37:_bytesatomobj:CpBytesAtomObject:octetstring
+type:38:_pstringatomobj:CpPStringAtomObject:pstring
+type:39:_enumatomobj:CpEnumAtomObject:enumeration
+type:40:_varintatomobj:CpVarIntAtomObject:VarInt
+type:41:_computedatomobj:CpComputedAtomObject:computed
+type:42:_lazyatomobj:CpLazyAtomObject:lazy
+type:43:_cstringatomobj:CpCStringAtomObject:cstring
 
 func:50:CpEndian_IsLittleEndian:int:null
 func:53:CpContext_New:CpContextObject*:+1

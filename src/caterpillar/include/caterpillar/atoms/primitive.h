@@ -49,7 +49,6 @@ struct _boolatomobj
 /// This variable defines the type object for bool atom objects, allowing
 /// them to be used across the library.
 // PyAPI_DATA(PyTypeObject) CpBoolAtom_Type;
-#define CpBoolAtom_NAME "Bool"
 
 /**
  * @brief Checks if the given object is a bool atom object.
@@ -82,10 +81,6 @@ struct _charatomobj
   CpBuiltinAtom_HEAD
 };
 
-/// Char atom object type
-// PyAPI_DATA(PyTypeObject) CpCharAtom_Type;
-#define CpCharAtom_NAME "Char"
-
 /** @brief Checks if the given object is a char atom object */
 #define CpCharAtom_CheckExact(op) Py_IS_TYPE((op), &CpCharAtom_Type)
 /** @brief Checks if the given object is a char atom object */
@@ -100,7 +95,6 @@ struct _paddingatomobj
     char _m_padding;
 };
 
-#define CpPaddingAtom_NAME "Padding"
 #define CpPaddingAtom_CheckExact(op) Py_IS_TYPE((op), &CpPaddingAtom_Type)
 #define CpPaddingAtom_Check(op) (PyObject_TypeCheck((op), &CpPaddingAtom_Type))
 
@@ -115,7 +109,6 @@ struct _computedatomobj
   int s_callable;
 };
 
-#define CpComputedAtom_NAME "computed"
 #define CpComputedAtom_CheckExact(op) Py_IS_TYPE((op), &CpComputedAtom_Type)
 #define CpComputedAtom_Check(op)                                               \
   (PyObject_TypeCheck((op), &CpComputedAtom_Type))
@@ -150,7 +143,6 @@ struct _lazyatomobj
   int s_always_lazy;
 };
 
-#define CpLazyAtom_NAME "lazy"
 #define CpLazyAtom_CheckExact(op) Py_IS_TYPE((op), &CpLazyAtom_Type)
 #define CpLazyAtom_Check(op) (PyObject_TypeCheck((op), &CpLazyAtom_Type))
 #define CpLazyAtom_ATOM(op) (((CpLazyAtomObject*)(op))->m_atom)

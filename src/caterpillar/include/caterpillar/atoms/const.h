@@ -27,7 +27,6 @@ struct _constatomobj
   PyObject *m_atom;
 };
 
-#define CpConstAtom_NAME "const"
 #define CpConstAtom_CheckExact(op) Py_IS_TYPE((op), &CpConstAtom_Type)
 #define CpConstAtom_Check(op) PyObject_TypeCheck((op), &CpConstAtom_Type)
 

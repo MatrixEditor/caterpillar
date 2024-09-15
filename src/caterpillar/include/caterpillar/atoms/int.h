@@ -39,8 +39,6 @@ struct _intatomobj
   int _m_little_endian;
 };
 
-#define CpIntAtom_NAME "Int"
-
 /** @brief Checks if the given object is an integer atom object */
 #define CpIntAtom_CheckExact(op) Py_IS_TYPE((op), &CpIntAtom_Type)
 /** @brief Checks if the given object is an integer atom object */
@@ -62,7 +60,6 @@ struct _varintatomobj
   int _m_lsb;
 };
 
-#define CpVarIntAtom_NAME "varint_t"
 #define CpVarIntAtom_CheckExact(op) Py_IS_TYPE((op), &CpVarIntAtom_Type)
 #define CpVarIntAtom_Check(op) (PyObject_TypeCheck((op), &CpVarIntAtom_Type))
 

@@ -37,7 +37,6 @@ struct _stringatomobj
   PyObject* m_encoding;
 };
 
-#define CpStringAtom_NAME "string"
 #define CpStringAtom_CheckExact(op) Py_IS_TYPE((op), &CpStringAtom_Type)
 #define CpStringAtom_Check(op) PyObject_TypeCheck((op), &CpStringAtom_Type)
 
@@ -58,7 +57,6 @@ struct _bytesatomobj
 };
 
 // REVISIT: The name of this atom should be something similar to 'bytes'
-#define CpBytesAtom_NAME "octetstring"
 #define CpBytesAtom_CheckExact(op) Py_IS_TYPE((op), &CpBytesAtom_Type)
 #define CpBytesAtom_Check(op) PyObject_TypeCheck((op), &CpBytesAtom_Type)
 
@@ -85,7 +83,6 @@ struct _pstringatomobj
   PyObject* m_encoding;
 };
 
-#define CpPStringAtom_NAME "pstring"
 #define CpPStringAtom_CheckExact(op) Py_IS_TYPE((op), &CpPStringAtom_Type)
 #define CpPStringAtom_Check(op) PyObject_TypeCheck((op), &CpPStringAtom_Type)
 
@@ -115,7 +112,6 @@ struct _cstringatomobj
   int s_greedy;
 };
 
-#define CpCStringAtom_NAME "cstring"
 #define CpCStringAtom_CheckExact(op) Py_IS_TYPE((op), &CpCStringAtom_Type)
 #define CpCStringAtom_Check(op) PyObject_TypeCheck((op), &CpCStringAtom_Type)
 

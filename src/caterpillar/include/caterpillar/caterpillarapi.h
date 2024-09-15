@@ -116,48 +116,87 @@ are then used and implemented in the internal API.
 
 extern PyModuleDef CpModule;
 extern PyTypeObject CpAtom_Type;
+#define CpAtom_NAME "atom"
 extern PyTypeObject CpCAtom_Type;
+#define CpCAtom_NAME "catom"
 extern PyTypeObject CpArch_Type;
+#define CpArch_NAME "Arch"
 extern PyTypeObject CpEndian_Type;
+#define CpEndian_NAME "Endian"
 extern PyTypeObject CpContext_Type;
+#define CpContext_NAME "Context"
 extern PyTypeObject CpUnaryExpr_Type;
+#define CpUnaryExpr_NAME "unaryexpr"
 extern PyTypeObject CpBinaryExpr_Type;
+#define CpBinaryExpr_NAME "binaryexpr"
 extern PyTypeObject CpContextPath_Type;
+#define CpContextPath_NAME "ContextPath"
 extern PyTypeObject CpField_Type;
+#define CpField_NAME "Field"
 extern PyTypeObject CpFieldAtom_Type;
+#define CpFieldAtom_NAME "fieldatom"
 extern PyTypeObject CpFieldCAtom_Type;
+#define CpFieldCAtom_NAME "fieldcatom"
 extern PyTypeObject CpInvalidDefault_Type;
 extern PyTypeObject CpDefaultOption_Type;
 extern PyObject _CpInvalidDefault_Object;
 extern PyObject _CpDefaultOption_Object;
 extern PyTypeObject CpOption_Type;
+#define CpOption_NAME "Option"
 extern PyTypeObject CpState_Type;
+#define CpState_NAME "State"
 extern PyTypeObject CpLayer_Type;
+#define CpLayer_NAME "layer"
 extern PyTypeObject CpStructFieldInfo_Type;
+#define CpStructFieldInfo_NAME "fieldinfo"
 extern PyTypeObject CpStruct_Type;
+#define CpStruct_NAME "Struct"
 extern PyTypeObject CpFloatAtom_Type;
+#define CpFloatAtom_NAME "Float"
 extern PyTypeObject CpIntAtom_Type;
+#define CpIntAtom_NAME "Int"
 extern PyTypeObject CpBoolAtom_Type;
+#define CpBoolAtom_NAME "Bool"
 extern PyTypeObject CpCharAtom_Type;
+#define CpCharAtom_NAME "Char"
 extern PyTypeObject CpPaddingAtom_Type;
+#define CpPaddingAtom_NAME "Padding"
 extern PyTypeObject CpStringAtom_Type;
+#define CpStringAtom_NAME "string"
 extern PyTypeObject CpConstAtom_Type;
+#define CpConstAtom_NAME "const"
 extern PyTypeObject CpBuiltinAtom_Type;
+#define CpBuiltinAtom_NAME "builtinatom"
 extern PyTypeObject CpRepeatedAtom_Type;
+#define CpRepeatedAtom_NAME "repeated"
 extern PyTypeObject CpSeqLayer_Type;
+#define CpSeqLayer_NAME "seqlayer"
 extern PyTypeObject CpObjLayer_Type;
+#define CpObjLayer_NAME "objlayer"
 extern PyTypeObject CpConditionAtom_Type;
+#define CpConditionAtom_NAME "condition"
 extern PyTypeObject CpSwitchAtom_Type;
+#define CpSwitchAtom_NAME "switch"
 extern PyTypeObject CpOffsetAtom_Type;
+#define CpOffsetAtom_NAME "atoffset"
 extern PyTypeObject CpPrimitiveAtom_Type;
+#define CpPrimitiveAtom_NAME "patom"
 extern PyTypeObject CpLengthInfo_Type;
+#define CpLengthInfo_NAME "lengthinfo"
 extern PyTypeObject CpBytesAtom_Type;
+#define CpBytesAtom_NAME "octetstring"
 extern PyTypeObject CpPStringAtom_Type;
+#define CpPStringAtom_NAME "pstring"
 extern PyTypeObject CpEnumAtom_Type;
+#define CpEnumAtom_NAME "enumeration"
 extern PyTypeObject CpVarIntAtom_Type;
+#define CpVarIntAtom_NAME "VarInt"
 extern PyTypeObject CpComputedAtom_Type;
+#define CpComputedAtom_NAME "computed"
 extern PyTypeObject CpLazyAtom_Type;
+#define CpLazyAtom_NAME "lazy"
 extern PyTypeObject CpCStringAtom_Type;
+#define CpCStringAtom_NAME "cstring"
 int CpEndian_IsLittleEndian(CpEndianObject* endian, _modulestate* mod);
 CpContextObject* CpContext_New(void);
 CpUnaryExprObject* CpUnaryExpr_New(int op, PyObject* value);
@@ -268,49 +307,49 @@ internal API functions and types. Their indices are static and defined in
 caterpillar_api.py
 */
 #define CpModule (*(PyModuleDef *)Cp_API[0])
-#define CpAtom_Type (*(PyTypeObject *)Cp_API[1])
-#define CpCAtom_Type (*(PyTypeObject *)Cp_API[2])
-#define CpArch_Type (*(PyTypeObject *)Cp_API[3])
-#define CpEndian_Type (*(PyTypeObject *)Cp_API[4])
-#define CpContext_Type (*(PyTypeObject *)Cp_API[5])
-#define CpUnaryExpr_Type (*(PyTypeObject *)Cp_API[6])
-#define CpBinaryExpr_Type (*(PyTypeObject *)Cp_API[7])
-#define CpContextPath_Type (*(PyTypeObject *)Cp_API[8])
-#define CpField_Type (*(PyTypeObject *)Cp_API[9])
-#define CpFieldAtom_Type (*(PyTypeObject *)Cp_API[10])
-#define CpFieldCAtom_Type (*(PyTypeObject *)Cp_API[11])
+#define CpAtom_Type (*(atom *)Cp_API[1])
+#define CpCAtom_Type (*(catom *)Cp_API[2])
+#define CpArch_Type (*(Arch *)Cp_API[3])
+#define CpEndian_Type (*(Endian *)Cp_API[4])
+#define CpContext_Type (*(Context *)Cp_API[5])
+#define CpUnaryExpr_Type (*(unaryexpr *)Cp_API[6])
+#define CpBinaryExpr_Type (*(binaryexpr *)Cp_API[7])
+#define CpContextPath_Type (*(ContextPath *)Cp_API[8])
+#define CpField_Type (*(Field *)Cp_API[9])
+#define CpFieldAtom_Type (*(fieldatom *)Cp_API[10])
+#define CpFieldCAtom_Type (*(fieldcatom *)Cp_API[11])
 #define CpInvalidDefault_Type (*(PyTypeObject *)Cp_API[12])
 #define CpDefaultOption_Type (*(PyTypeObject *)Cp_API[13])
 #define _CpInvalidDefault_Object (*(PyObject *)Cp_API[14])
 #define _CpDefaultOption_Object (*(PyObject *)Cp_API[15])
-#define CpOption_Type (*(PyTypeObject *)Cp_API[16])
-#define CpState_Type (*(PyTypeObject *)Cp_API[17])
-#define CpLayer_Type (*(PyTypeObject *)Cp_API[18])
-#define CpStructFieldInfo_Type (*(PyTypeObject *)Cp_API[19])
-#define CpStruct_Type (*(PyTypeObject *)Cp_API[20])
-#define CpFloatAtom_Type (*(PyTypeObject *)Cp_API[21])
-#define CpIntAtom_Type (*(PyTypeObject *)Cp_API[22])
-#define CpBoolAtom_Type (*(PyTypeObject *)Cp_API[23])
-#define CpCharAtom_Type (*(PyTypeObject *)Cp_API[24])
-#define CpPaddingAtom_Type (*(PyTypeObject *)Cp_API[25])
-#define CpStringAtom_Type (*(PyTypeObject *)Cp_API[26])
-#define CpConstAtom_Type (*(PyTypeObject *)Cp_API[27])
-#define CpBuiltinAtom_Type (*(PyTypeObject *)Cp_API[28])
-#define CpRepeatedAtom_Type (*(PyTypeObject *)Cp_API[29])
-#define CpSeqLayer_Type (*(PyTypeObject *)Cp_API[30])
-#define CpObjLayer_Type (*(PyTypeObject *)Cp_API[31])
-#define CpConditionAtom_Type (*(PyTypeObject *)Cp_API[32])
-#define CpSwitchAtom_Type (*(PyTypeObject *)Cp_API[33])
-#define CpOffsetAtom_Type (*(PyTypeObject *)Cp_API[34])
-#define CpPrimitiveAtom_Type (*(PyTypeObject *)Cp_API[35])
-#define CpLengthInfo_Type (*(PyTypeObject *)Cp_API[36])
-#define CpBytesAtom_Type (*(PyTypeObject *)Cp_API[37])
-#define CpPStringAtom_Type (*(PyTypeObject *)Cp_API[38])
-#define CpEnumAtom_Type (*(PyTypeObject *)Cp_API[39])
-#define CpVarIntAtom_Type (*(PyTypeObject *)Cp_API[40])
-#define CpComputedAtom_Type (*(PyTypeObject *)Cp_API[41])
-#define CpLazyAtom_Type (*(PyTypeObject *)Cp_API[42])
-#define CpCStringAtom_Type (*(PyTypeObject *)Cp_API[43])
+#define CpOption_Type (*(Option *)Cp_API[16])
+#define CpState_Type (*(State *)Cp_API[17])
+#define CpLayer_Type (*(layer *)Cp_API[18])
+#define CpStructFieldInfo_Type (*(fieldinfo *)Cp_API[19])
+#define CpStruct_Type (*(Struct *)Cp_API[20])
+#define CpFloatAtom_Type (*(Float *)Cp_API[21])
+#define CpIntAtom_Type (*(Int *)Cp_API[22])
+#define CpBoolAtom_Type (*(Bool *)Cp_API[23])
+#define CpCharAtom_Type (*(Char *)Cp_API[24])
+#define CpPaddingAtom_Type (*(Padding *)Cp_API[25])
+#define CpStringAtom_Type (*(string *)Cp_API[26])
+#define CpConstAtom_Type (*(const *)Cp_API[27])
+#define CpBuiltinAtom_Type (*(builtinatom *)Cp_API[28])
+#define CpRepeatedAtom_Type (*(repeated *)Cp_API[29])
+#define CpSeqLayer_Type (*(seqlayer *)Cp_API[30])
+#define CpObjLayer_Type (*(objlayer *)Cp_API[31])
+#define CpConditionAtom_Type (*(condition *)Cp_API[32])
+#define CpSwitchAtom_Type (*(switch *)Cp_API[33])
+#define CpOffsetAtom_Type (*(atoffset *)Cp_API[34])
+#define CpPrimitiveAtom_Type (*(patom *)Cp_API[35])
+#define CpLengthInfo_Type (*(lengthinfo *)Cp_API[36])
+#define CpBytesAtom_Type (*(octetstring *)Cp_API[37])
+#define CpPStringAtom_Type (*(pstring *)Cp_API[38])
+#define CpEnumAtom_Type (*(enumeration *)Cp_API[39])
+#define CpVarIntAtom_Type (*(VarInt *)Cp_API[40])
+#define CpComputedAtom_Type (*(computed *)Cp_API[41])
+#define CpLazyAtom_Type (*(lazy *)Cp_API[42])
+#define CpCStringAtom_Type (*(cstring *)Cp_API[43])
 #define CpEndian_IsLittleEndian (*((int (*)(CpEndianObject* endian, _modulestate* mod)))Cp_API[50])
 #define CpContext_New (*((CpContextObject* (*)(void)))Cp_API[53])
 #define CpUnaryExpr_New (*((CpUnaryExprObject* (*)(int op, PyObject* value)))Cp_API[54])

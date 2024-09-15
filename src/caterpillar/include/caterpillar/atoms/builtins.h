@@ -28,7 +28,6 @@ struct _builtinatomobj
   CpCAtom_HEAD
 };
 
-#define CpBuiltinAtom_NAME "builtinatom"
 #define CpBuiltinAtom_CheckExact(op) Py_IS_TYPE((op), &CpBuiltinAtom_Type)
 #define CpBuiltinAtom_Check(op) PyObject_TypeCheck((op), &CpBuiltinAtom_Type)
 #define CpBuiltinAtom_HEAD CpBuiltinAtomObject ob_base;
@@ -49,7 +48,6 @@ struct _repeatedatomobj
   PyObject* m_length;
 };
 
-#define CpRepeatedAtom_NAME "repeated"
 #define CpRepeatedAtom_CheckExact(op) Py_IS_TYPE((op), &CpRepeatedAtom_Type)
 #define CpRepeatedAtom_Check(op) PyObject_TypeCheck((op), &CpRepeatedAtom_Type)
 
@@ -74,7 +72,6 @@ struct _conditionatomobj
   PyObject* m_condition;
 };
 
-#define CpConditionAtom_NAME "condition"
 #define CpConditionAtom_CheckExact(op) Py_IS_TYPE((op), &CpConditionAtom_Type)
 #define CpConditionAtom_Check(op) PyObject_TypeCheck((op), &CpConditionAtom_Type)
 
@@ -102,7 +99,6 @@ struct _switchatomobj
   int s_callable;
 };
 
-#define CpSwitchAtom_NAME "switch"
 #define CpSwitchAtom_CheckExact(op) Py_IS_TYPE((op), &CpSwitchAtom_Type)
 #define CpSwitchAtom_Check(op) PyObject_TypeCheck((op), &CpSwitchAtom_Type)
 
@@ -130,7 +126,6 @@ struct _offsetatomobj
   int s_is_number;
 };
 
-#define CpOffsetAtom_NAME "atoffset"
 #define CpOffsetAtom_CheckExact(op) Py_IS_TYPE((op), &CpOffsetAtom_Type)
 #define CpOffsetAtom_Check(op) PyObject_TypeCheck((op), &CpOffsetAtom_Type)
 
