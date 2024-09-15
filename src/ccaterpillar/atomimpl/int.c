@@ -163,6 +163,38 @@ CpIntAtom_Unpack(CpIntAtomObject* self, CpLayerObject* layer)
 }
 
 /* docs */
+// clang-format off
+PyDoc_STRVAR(cp_intatom_member__nbytes__doc,
+"Stores the amount of bytes in the atom (not the number of bits).");
+
+PyDoc_STRVAR(cp_intatom_member__nbits__doc,
+"Stores the amount of bits in the atom.");
+
+PyDoc_STRVAR(cp_intatom_member__signed__doc,
+"Stores whether the atom is signed or not.");
+
+PyDoc_STRVAR(cp_intatom_member__little_endian__doc,
+"Stores whether the atom is little endian or not.");
+
+PyDoc_STRVAR(cp_intatom__doc,
+"Int(bits, signed=True, little_endian=True)\n"
+"--\n"
+"\n"
+"Implements an integer atom with a variable amount of bits.\n"
+"\n"
+"bits\n"
+"  The amount of bits in the atom.\n"
+"signed\n"
+"  Whether the atom is signed or not.\n"
+"little_endian\n"
+"  Whether the atom is little endian or not.\n"
+"\n"
+"Unlike its Python counterpart (caterpillar.py.FormatField), this C-based "
+"class focuses solely on integer operations. It utilizes `int.from_bytes` and "
+"`int.to_bytes` internally, optimizing runtime performance. However, it is "
+"recommended to use the global instances of this class instead of creating "
+"new objects directly.");
+// clang-format on
 
 /* type */
 static PyMemberDef CpIntAtom_Members[] = {
@@ -170,10 +202,22 @@ static PyMemberDef CpIntAtom_Members[] = {
     T_PYSSIZET,
     offsetof(CpIntAtomObject, _m_byte_count),
     READONLY,
-    NULL },
-  { "nbits", T_PYSSIZET, offsetof(CpIntAtomObject, _m_bits), READONLY, NULL },
-  { "signed", T_BOOL, offsetof(CpIntAtomObject, _m_signed), READONLY, NULL },
-  { "little_endian", T_BOOL, offsetof(CpIntAtomObject, _m_little_endian) },
+    cp_intatom_member__nbytes__doc },
+  { "nbits",
+    T_PYSSIZET,
+    offsetof(CpIntAtomObject, _m_bits),
+    READONLY,
+    cp_intatom_member__nbits__doc },
+  { "signed",
+    T_BOOL,
+    offsetof(CpIntAtomObject, _m_signed),
+    READONLY,
+    cp_intatom_member__signed__doc },
+  { "little_endian",
+    T_BOOL,
+    offsetof(CpIntAtomObject, _m_little_endian),
+    READONLY,
+    cp_intatom_member__little_endian__doc },
   { NULL } /* Sentinel */
 };
 
@@ -182,14 +226,15 @@ static PyMethodDef CpIntAtom_Methods[] = {
   { NULL } /* Sentinel */
 };
 
-PyTypeObject CpIntAtom_Type = { PyVarObject_HEAD_INIT(NULL, 0)
-                                  _Cp_NameStr(CpIntAtom_NAME),
-                                .tp_basicsize = sizeof(CpIntAtomObject),
-                                .tp_dealloc = (destructor)cp_intatom_dealloc,
-                                .tp_flags = Py_TPFLAGS_DEFAULT,
-                                .tp_doc = NULL,
-                                .tp_members = CpIntAtom_Members,
-                                .tp_new = (newfunc)cp_intatom_new,
-                                .tp_init = (initproc)cp_intatom_init,
-                                .tp_repr = (reprfunc)cp_intatom_repr,
-                                .tp_methods = CpIntAtom_Methods };
+/* --- */ PyTypeObject CpIntAtom_Type = {
+  PyVarObject_HEAD_INIT(NULL, 0) _Cp_NameStr(CpIntAtom_NAME),
+  .tp_basicsize = sizeof(CpIntAtomObject),
+  .tp_dealloc = (destructor)cp_intatom_dealloc,
+  .tp_flags = Py_TPFLAGS_DEFAULT,
+  .tp_doc = cp_intatom__doc,
+  .tp_members = CpIntAtom_Members,
+  .tp_new = (newfunc)cp_intatom_new,
+  .tp_init = (initproc)cp_intatom_init,
+  .tp_repr = (reprfunc)cp_intatom_repr,
+  .tp_methods = CpIntAtom_Methods
+};

@@ -11,7 +11,7 @@ counterpart (:class:`FormatField`), this C-based class focuses solely on integer
 
 .. c:var:: PyTypeObject CpIntAtom_Type
 
-    The type object for the :c:type:`int_t` class.
+    The type object for the :class:`~caterpillar.c.Int` class.
 
 This implementation utilizes :code:`int.from_bytes` and :code:`int.to_bytes`. Direct C
 calls are optimized, reducing runtime overhead compared to Python.
@@ -53,26 +53,56 @@ calls are optimized, reducing runtime overhead compared to Python.
 
     Checks if the given object is an instance of an :c:type:`CpIntAtomObject`
 
-Recommendations
----------------
 
-The following examples illustrate how to effectively utilize the :c:type:`int_t` class
-and the associated methods:
+.. rubric:: Runtime Performance
+
+Measurements represent the accumulated runtime of one million calls to
+:code:`unpack` or :code:`pack` using the corresponding implementation
+in seconds.
+
+.. list-table::
+    :header-rows: 1
+    :widths: 20 20 20 20 20
+
+    * - Function
+      - Caterpillar   [0]_
+      - Caterpillar G [1]_
+      - Caterpillar C [2]_
+      - Construct     [3]_
+    * - :code:`unpack`
+      - 4.002179
+      - 2.782663
+      - 0.815902
+      - 1.581962
+    * - :code:`pack`
+      - 3.866999
+      - 2.707753
+      - 0.926041
+      - 1.587046
+
+
+.. [0] local field instance
+.. [1] global field instance
+.. [2] C implementation
+.. [3] Construct :code:`Int32sn`
+
+The *benchmark* has been performed using the following code snippets:
 
 .. code-block:: python
     :linenos:
 
-    from caterpillar._C import LITTLE_ENDIAN as le
-    from caterpillar._C import int_t, unpack, i16
+    from caterpillar import _C, model, fields
+    from construct import Int32sn
 
-    # Define a global 16-bit little-endian signed integer atom
-    I16_LE = le + i16
-    _I16_LE = int_t(16, signed=True, little_endian=True)
+    # Caterpillar
+    model.unpack(fields.Field(fields.int32), b"\x00\xFF\x00\xFF")
 
-    unpack(b"\x01\x02", _I16_LE)
-    unpack(b"\x01\x02", int_t(16, signed=True, little_endian=True))
-    unpack(b"\x01\x02", I16_LE)
-    unpack(b"\x01\x02", le + i16)
+    # Caterpillar (Global)
+    I32_G = fields.Field(fields.int32)
+    model.unpack(I32_G, b"\x00\xFF\x00\xFF")
 
-*TODO: describe the impact on runtime overhead of these four methods*
+    # Caterpillar (C)
+    _C.unpack(b"\x00\xFF\x00\xFF", _C.i32)
 
+    # Construct
+    Int32sn.parse(b"\x00\xFF\x00\xFF")
