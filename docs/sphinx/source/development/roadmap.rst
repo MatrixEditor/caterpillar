@@ -32,6 +32,15 @@ C API
 - |uncheck_| Struct wrapper function
 - |uncheck_| Python docs
 
+Struct Objects:
+^^^^^^^^^^^^^^^
+
+- |check_| Struct (C type: :c:type:`CpStructObject`, Py type: :class:`Struct`)
+    [:text-danger:`missing docs`],
+    [:text-warning:`missing perftest`]
+
+- |uncheck_| Bitfield
+
 Atom Objects:
 ^^^^^^^^^^^^^
 

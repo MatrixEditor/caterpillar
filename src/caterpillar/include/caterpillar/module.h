@@ -71,6 +71,7 @@ struct _modulestate
   PyObject* str___unpack_many__;
   PyObject* str___size__;
   PyObject* str___type__;
+  PyObject* str___bits__;
   PyObject* str___annotations__;
   PyObject* str___mro__;
   PyObject* str___struct__;

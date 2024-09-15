@@ -308,6 +308,7 @@ cp_module_clear(PyObject* m)
     Py_CLEAR(state->str__member_map_);
     Py_CLEAR(state->str_utf8);
     Py_CLEAR(state->str_cstring_default_pad);
+    Py_CLEAR(state->str___bits__);
 
     Py_CLEAR(state->cp_regex__unnamed);
 
@@ -627,6 +628,7 @@ PyInit__C(void)
   CACHED_STRING(str__member_map_, "_member_map_");
   CACHED_STRING(str__value2member_map_, "_value2member_map_");
   CACHED_STRING(str_utf8, "utf-8");
+  CACHED_STRING(str___bits__, "__bits__");
 
 #undef CACHED_STRING
 

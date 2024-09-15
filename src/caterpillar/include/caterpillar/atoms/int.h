@@ -39,7 +39,7 @@ struct _intatomobj
   int _m_little_endian;
 };
 
-#define CpIntAtom_NAME "int_t"
+#define CpIntAtom_NAME "Int"
 
 /** @brief Checks if the given object is an integer atom object */
 #define CpIntAtom_CheckExact(op) Py_IS_TYPE((op), &CpIntAtom_Type)

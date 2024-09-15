@@ -34,7 +34,7 @@ struct _floatatomobj
   int _m_little_endian;
 };
 
-#define CpFloatAtom_NAME "float_t"
+#define CpFloatAtom_NAME "Float"
 
 /** @brief Checks if the given object is an integer atom object */
 #define CpFloatAtom_CheckExact(op) Py_IS_TYPE((op), &CpFloatAtom_Type)
