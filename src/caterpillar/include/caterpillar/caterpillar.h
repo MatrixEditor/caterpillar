@@ -14,6 +14,7 @@
 #include "caterpillar/field.h"
 #include "caterpillar/state.h"
 #include "caterpillar/parsing.h"
+#include "caterpillar/default.h"
 
 // Atom Objects
 #include "caterpillar/atoms/builtins.h"

@@ -126,18 +126,6 @@ get_global_module_state(void)
   return get_module_state(PyState_FindModule(&CpModule));
 }
 
-/* immortal objects */
-// PyAPI_DATA(PyTypeObject) CpInvalidDefault_Type;
-// PyAPI_DATA(PyTypeObject) CpDefaultOption_Type;
-
-// PyAPI_DATA(PyObject) _CpInvalidDefault_Object;
-#define CpInvalidDefault (&_CpInvalidDefault_Object)
-#define Cp_IsInvalidDefault(o) ((o) == CpInvalidDefault)
-
-// PyAPI_DATA(PyObject) _CpDefaultOption_Object;
-#define CpDefaultOption (&_CpDefaultOption_Object)
-#define Cp_IsDefaultOption(o) ((o) == CpDefaultOption)
-
 /* utility macros */
 #define CpModule_SetupType(op)                                                 \
   if (PyType_Ready(op) < 0)                                                    \
