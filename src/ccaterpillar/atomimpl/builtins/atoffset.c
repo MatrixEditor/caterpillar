@@ -166,6 +166,7 @@ CpOffsetAtom_Unpack(CpOffsetAtomObject* self, CpLayerObject* layer)
 static PyMemberDef CpOffsetAtom_Members[] = {
   { "offset", T_OBJECT_EX, offsetof(CpOffsetAtomObject, m_offset), READONLY },
   { "whence", T_OBJECT_EX, offsetof(CpOffsetAtomObject, m_whence), READONLY },
+  { "atom", T_OBJECT_EX, offsetof(CpOffsetAtomObject, m_atom), READONLY },
   { NULL } /* Sentinel */
 };
 

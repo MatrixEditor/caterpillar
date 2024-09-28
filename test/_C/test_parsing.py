@@ -5,7 +5,8 @@ import caterpillar
 
 if caterpillar.native_support():
 
-    from caterpillar._C import atom, typeof, Field, sizeof, patom
+    from caterpillar._C import atom, typeof, sizeof, patom, repeated
+    from caterpillar._C import switch
     from caterpillar._C import unpack, layer, Struct, pack, ContextPath
 
 
@@ -42,16 +43,16 @@ if caterpillar.native_support():
 
         # That will change if we have a field with a length or a
         # switch statement.
-        field = Field(f, length=2)
+        field = repeated(f, 2)
         assert typeof(field) == typing.List[str]
 
-        field2 = Field(f, switch={1: atom()})
+        field2 = switch(f, {1: atom()})[2]
         # We can't know the type of a switch atom which does
         # not implement the __type__ method
-        assert typeof(Field(atom())) == typing.Any
-        assert typeof(field2) == typing.Union[typing.Any, str]
+        assert typeof(atom()) == typing.Any
+        assert typeof(field2) == typing.List[typing.Any]
         # switch and length can be combined as well
-        assert typeof(field2[2]) == typing.List[typing.Union[typing.Any, str]]
+        assert typeof(field2[2]) == typing.List[typing.List[typing.Any]]
 
 
     def test_sizeof():
@@ -73,8 +74,10 @@ if caterpillar.native_support():
         # Calculation is done by first evaluating the length of
         # the field's atom and then multiply the length of the evalutated
         # switch atom by the field's length.
-        field = Field(b, length=2, switch=(lambda ctx: Bar()))
-        assert sizeof(field) == 2 + (2 * 2)
+        # REVISIT: switch atoms does not have a static size
+        with pytest.raises(TypeError):
+            field = switch(b, (lambda ctx: Bar()))[2]
+            assert sizeof(field) == 2 + (2 * 2)
 
 
     def test_unpack_basic():

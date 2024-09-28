@@ -295,6 +295,11 @@ static PyMemberDef CpCStringAtom_Members[] = {
     offsetof(CpCStringAtomObject, s_keep_terminator),
     0,
     "whether to keep the terminator" },
+  { "length",
+    T_OBJECT_EX,
+    offsetof(CpCStringAtomObject, m_length),
+    0,
+    "the length of the string" },
   { NULL }
 };
 
@@ -304,7 +309,7 @@ PyTypeObject CpCStringAtom_Type = {
   .tp_itemsize = 0,
   .tp_dealloc = (destructor)cp_cstringatom_dealloc,
   .tp_repr = (reprfunc)cp_cstringatom_repr,
-  .tp_flags = Py_TPFLAGS_DEFAULT,
+  .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
   .tp_new = (newfunc)cp_cstringatom_new,
   .tp_members = CpCStringAtom_Members,
   .tp_init = (initproc)cp_cstringatom_init,

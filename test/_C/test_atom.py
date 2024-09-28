@@ -4,7 +4,7 @@ import caterpillar
 
 if caterpillar.native_support():
 
-    from caterpillar._C import atom, catom, fieldatom, fieldcatom
+    from caterpillar._C import atom, catom
 
 
     def test_atom_init():
@@ -26,8 +26,6 @@ if caterpillar.native_support():
 
         assert issubclass(Foo, atom)
         assert issubclass(catom, atom)
-        assert issubclass(fieldatom, atom)
-        assert issubclass(fieldcatom, catom)
 
 
     def test_atom_methods():

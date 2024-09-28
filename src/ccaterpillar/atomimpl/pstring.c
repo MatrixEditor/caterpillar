@@ -158,7 +158,7 @@ PyTypeObject CpPStringAtom_Type = {
   PyVarObject_HEAD_INIT(NULL, 0) _Cp_NameStr(CpPStringAtom_NAME),
   .tp_basicsize = sizeof(CpPStringAtomObject),
   .tp_dealloc = (destructor)cp_pstringatom_dealloc,
-  .tp_flags = Py_TPFLAGS_DEFAULT,
+  .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
   .tp_doc = NULL,
   .tp_members = CpPStringAtom_Members,
   .tp_init = (initproc)cp_pstringatom_init,

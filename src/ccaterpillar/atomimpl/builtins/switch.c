@@ -136,7 +136,7 @@ _CpEndian_ImplSetByteorder(CpSwitchAtomObject, switchatom, self->m_atom);
 static PyObject*
 cp_switchatom_get_next(CpSwitchAtomObject* self, PyObject* args, PyObject* kw)
 {
-  static char* kwlist[] = { "atom", "context", NULL };
+  static char* kwlist[] = { "obj", "context", NULL };
   PyObject* op = NULL;
   PyObject* context = NULL;
   if (!PyArg_ParseTupleAndKeywords(args, kw, "OO", kwlist, &op, &context)) {
