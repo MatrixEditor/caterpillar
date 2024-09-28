@@ -44,12 +44,6 @@ struct _binaryexpr;
 typedef struct _binaryexpr CpBinaryExprObject;
 struct _contextpath;
 typedef struct _contextpath CpContextPathObject;
-struct _fieldobj;
-typedef struct _fieldobj CpFieldObject;
-struct _fieldatomobj;
-typedef struct _fieldatomobj CpFieldAtomObject;
-struct _fieldcatomobj;
-typedef struct _fieldcatomobj CpFieldCAtomObject;
 struct _option;
 typedef struct _option CpOptionObject;
 struct _stateobj;
@@ -131,12 +125,6 @@ extern PyTypeObject CpBinaryExpr_Type;
 #define CpBinaryExpr_NAME "binaryexpr"
 extern PyTypeObject CpContextPath_Type;
 #define CpContextPath_NAME "ContextPath"
-extern PyTypeObject CpField_Type;
-#define CpField_NAME "Field"
-extern PyTypeObject CpFieldAtom_Type;
-#define CpFieldAtom_NAME "fieldatom"
-extern PyTypeObject CpFieldCAtom_Type;
-#define CpFieldCAtom_NAME "fieldcatom"
 extern PyTypeObject CpInvalidDefault_Type;
 extern PyTypeObject CpDefaultOption_Type;
 extern PyObject _CpInvalidDefault_Object;
@@ -203,19 +191,11 @@ CpUnaryExprObject* CpUnaryExpr_New(int op, PyObject* value);
 CpBinaryExprObject* CpBinaryExpr_New(int op, PyObject* left, PyObject* right);
 CpContextPathObject* CpContextPath_New(PyObject* path);
 CpContextPathObject* CpContextPath_FromString(const char* path);
-CpFieldObject* CpField_New(PyObject* atom);
-int CpField_HasCondition(CpFieldObject* self);
-int CpField_IsEnabled(CpFieldObject* self, PyObject* context);
-Py_ssize_t CpField_GetOffset(CpFieldObject* self, PyObject* context);
-PyObject* CpField_EvalSwitch(CpFieldObject* self, PyObject* op, PyObject* context);
-PyObject* CpField_GetLength(CpFieldObject* self, PyObject* context);
 PyObject* CpTypeOf(PyObject* op);
-PyObject* CpTypeOf_Field(CpFieldObject* op);
 PyObject* CpTypeOf_Common(PyObject* op);
 int CpPack(PyObject* op, PyObject* atom, PyObject* io, PyObject* globals);
 int _CpPack_EvalLength(CpLayerObject* layer,PyObject* length,Py_ssize_t size,bool* greedy,Py_ssize_t* dstLength);
 PyObject* CpSizeOf(PyObject* op, PyObject* globals);
-PyObject* CpSizeOf_Field(CpFieldObject* field, CpLayerObject* layer);
 PyObject* CpSizeOf_Struct(CpStructObject* struct_, CpLayerObject* layer);
 PyObject* CpSizeOf_Common(PyObject* op, CpLayerObject* layer);
 PyObject* _Cp_SizeOf(PyObject* op, CpLayerObject* layer);
@@ -237,7 +217,6 @@ CpLayerObject* CpLayer_New(CpStateObject* state, CpLayerObject* parent);
 int CpLayer_Invalidate(CpLayerObject* self);
 CpStructFieldInfoObject* CpStructFieldInfo_New(PyObject* name, PyObject* field);
 int CpStruct_AddFieldInfo(CpStructObject* o, CpStructFieldInfoObject* info);
-int CpStruct_AddField(CpStructObject* o, CpFieldObject* field, int exclude);
 CpStructObject* CpStruct_New(PyObject* model);
 PyObject* CpStruct_GetAnnotations(CpStructObject* o, int eval);
 int CpStruct_ReplaceType(CpStructObject* o, PyObject* name, PyObject* type);
@@ -315,9 +294,6 @@ caterpillar_api.py
 #define CpUnaryExpr_Type (*(unaryexpr *)Cp_API[6])
 #define CpBinaryExpr_Type (*(binaryexpr *)Cp_API[7])
 #define CpContextPath_Type (*(ContextPath *)Cp_API[8])
-#define CpField_Type (*(Field *)Cp_API[9])
-#define CpFieldAtom_Type (*(fieldatom *)Cp_API[10])
-#define CpFieldCAtom_Type (*(fieldcatom *)Cp_API[11])
 #define CpInvalidDefault_Type (*(PyTypeObject *)Cp_API[12])
 #define CpDefaultOption_Type (*(PyTypeObject *)Cp_API[13])
 #define _CpInvalidDefault_Object (*(PyObject *)Cp_API[14])
@@ -356,19 +332,11 @@ caterpillar_api.py
 #define CpBinaryExpr_New (*((CpBinaryExprObject* (*)(int op, PyObject* left, PyObject* right)))Cp_API[55])
 #define CpContextPath_New (*((CpContextPathObject* (*)(PyObject* path)))Cp_API[56])
 #define CpContextPath_FromString (*((CpContextPathObject* (*)(const char* path)))Cp_API[57])
-#define CpField_New (*((CpFieldObject* (*)(PyObject* atom)))Cp_API[58])
-#define CpField_HasCondition (*((int (*)(CpFieldObject* self)))Cp_API[59])
-#define CpField_IsEnabled (*((int (*)(CpFieldObject* self, PyObject* context)))Cp_API[60])
-#define CpField_GetOffset (*((Py_ssize_t (*)(CpFieldObject* self, PyObject* context)))Cp_API[61])
-#define CpField_EvalSwitch (*((PyObject* (*)(CpFieldObject* self, PyObject* op, PyObject* context)))Cp_API[62])
-#define CpField_GetLength (*((PyObject* (*)(CpFieldObject* self, PyObject* context)))Cp_API[63])
 #define CpTypeOf (*((PyObject* (*)(PyObject* op)))Cp_API[64])
-#define CpTypeOf_Field (*((PyObject* (*)(CpFieldObject* op)))Cp_API[65])
 #define CpTypeOf_Common (*((PyObject* (*)(PyObject* op)))Cp_API[66])
 #define CpPack (*((int (*)(PyObject* op, PyObject* atom, PyObject* io, PyObject* globals)))Cp_API[67])
 #define _CpPack_EvalLength (*((int (*)(CpLayerObject* layer,PyObject* length,Py_ssize_t size,bool* greedy,Py_ssize_t* dstLength)))Cp_API[72])
 #define CpSizeOf (*((PyObject* (*)(PyObject* op, PyObject* globals)))Cp_API[73])
-#define CpSizeOf_Field (*((PyObject* (*)(CpFieldObject* field, CpLayerObject* layer)))Cp_API[74])
 #define CpSizeOf_Struct (*((PyObject* (*)(CpStructObject* struct_, CpLayerObject* layer)))Cp_API[75])
 #define CpSizeOf_Common (*((PyObject* (*)(PyObject* op, CpLayerObject* layer)))Cp_API[76])
 #define _Cp_SizeOf (*((PyObject* (*)(PyObject* op, CpLayerObject* layer)))Cp_API[77])
@@ -390,7 +358,6 @@ caterpillar_api.py
 #define CpLayer_Invalidate (*((int (*)(CpLayerObject* self)))Cp_API[98])
 #define CpStructFieldInfo_New (*((CpStructFieldInfoObject* (*)(PyObject* name, PyObject* field)))Cp_API[99])
 #define CpStruct_AddFieldInfo (*((int (*)(CpStructObject* o, CpStructFieldInfoObject* info)))Cp_API[100])
-#define CpStruct_AddField (*((int (*)(CpStructObject* o, CpFieldObject* field, int exclude)))Cp_API[101])
 #define CpStruct_New (*((CpStructObject* (*)(PyObject* model)))Cp_API[102])
 #define CpStruct_GetAnnotations (*((PyObject* (*)(CpStructObject* o, int eval)))Cp_API[103])
 #define CpStruct_ReplaceType (*((int (*)(CpStructObject* o, PyObject* name, PyObject* type)))Cp_API[104])

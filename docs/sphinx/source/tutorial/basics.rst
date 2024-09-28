@@ -482,14 +482,29 @@ reference in detail.
 The current object that is being packed or parsed can be referenced with a shortcut :attr:`~caterpillar.context.this`.
 Additionally, the parent object (if any) can be referenced by using :attr:`~caterpillar.context.parent`.
 
+.. tab-set::
 
-.. code-block:: python
-    :caption: Understanding the *context*
+    .. tab-item:: Python
 
-    @struct
-    class Format:
-        length: uint8
-        foo: CString(this.length)   # <-- just reference the length field
+        .. code-block:: python
+            :caption: Understanding the *context*
+
+            @struct
+            class Format:
+                length: uint8
+                foo: CString(this.length)   # <-- just reference the length field
+
+    .. tab-item:: Caterpillar C
+
+        .. code-block:: python
+            :caption: Understanding the *context*
+
+            this = ContextPath("obj")
+
+            @struct
+            class Format:
+                length: u8
+                foo: cstring(this.length)
 
 .. note::
     You can apply any operation on context paths. However, be aware that conditional branches must

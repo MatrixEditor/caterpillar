@@ -542,6 +542,31 @@ cp_binaryexpr__call__(CpBinaryExprObject* self, PyObject* args, PyObject* kw)
   return result;
 }
 
+/* operations */
+#define _CpBinaryExpr_BinaryNumberMethod(name, op)                            \
+  static PyObject* cp_binaryexpr_as_number_##name(PyObject* self,             \
+                                                   PyObject* other)            \
+  {                                                                            \
+    return (PyObject*)CpBinaryExpr_New(op, self, other);                       \
+  }
+
+_CpBinaryExpr_BinaryNumberMethod(add, CpBinaryExpr_OpAdd);
+_CpBinaryExpr_BinaryNumberMethod(sub, CpBinaryExpr_OpSub);
+_CpBinaryExpr_BinaryNumberMethod(mul, CpBinaryExpr_OpMul);
+_CpBinaryExpr_BinaryNumberMethod(div, CpBinaryExpr_OpTrueDiv);
+_CpBinaryExpr_BinaryNumberMethod(truediv, CpBinaryExpr_OpTrueDiv);
+_CpBinaryExpr_BinaryNumberMethod(floordiv, CpBinaryExpr_OpFloorDiv);
+_CpBinaryExpr_BinaryNumberMethod(mod, CpBinaryExpr_OpMod);
+_CpBinaryExpr_BinaryNumberMethod(lshift, CpBinaryExpr_OpLShift);
+_CpBinaryExpr_BinaryNumberMethod(rshift, CpBinaryExpr_OpRShift);
+_CpBinaryExpr_BinaryNumberMethod(and, CpBinaryExpr_OpBitAnd);
+_CpBinaryExpr_BinaryNumberMethod(xor, CpBinaryExpr_OpBitXor);
+_CpBinaryExpr_BinaryNumberMethod(or, CpBinaryExpr_OpBitOr);
+_CpBinaryExpr_BinaryNumberMethod(pow, CpBinaryExpr_OpPow);
+_CpBinaryExpr_BinaryNumberMethod(matmul, CpBinaryExpr_OpMatMul);
+
+#undef _CpContextPath_BinaryNumberMethod
+
 /*CpAPI*/
 CpBinaryExprObject*
 CpBinaryExpr_New(int op, PyObject* left, PyObject* right)

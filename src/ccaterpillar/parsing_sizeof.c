@@ -17,118 +17,6 @@ CpSizeOf_Common(PyObject* op, CpLayerObject* layer)
 
 /*CpAPI*/
 PyObject*
-CpSizeOf_Field(CpFieldObject* field, CpLayerObject* layer)
-{
-  // Size calculation is done in a special way. The following situations have
-  // to be considered:
-  //
-  //  1. Disabled field: return 0
-  //  2. Dynamic field: raise an error
-  //  3. Sequential field: multiply the size of the underlying atom by the
-  //     number of elements
-  //  4. Constant field: just return the size of the atom
-  if (!field) {
-    PyErr_SetString(PyExc_ValueError, "field is NULL!");
-    return NULL;
-  }
-  if (!layer) {
-    PyErr_SetString(PyExc_ValueError, "state is NULL!");
-    return NULL;
-  }
-
-  // set path
-  CpLayer_AppendPath(layer, field->m_name);
-  if (!layer->m_path) {
-    return NULL;
-  }
-
-  if (!CpField_IsEnabled(field, (PyObject*)layer)) {
-    // see case 1.
-    return PyLong_FromLong(0);
-  }
-
-  _modulestate* mod = layer->m_state->mod;
-  PyObject *count = PyLong_FromLong(1), *size = NULL, *extraSize = NULL;
-  if (!count) {
-    return NULL;
-  }
-
-  if (PySet_Contains(field->m_options, mod->cp_option__dynamic)) {
-    // see case 2.
-    PyErr_SetString(PyExc_ValueError, "dynamic fields are not supported!");
-    return NULL;
-  }
-
-  // prepare context
-  // Py_XSETREF(layer->m_field, Py_NewRef(field));
-  if (field->s_sequential) {
-    count = CpField_GetLength(field, (PyObject*)layer);
-    if (!count) {
-      return NULL;
-    }
-
-    if (!PyLong_Check(count)) {
-      Py_XDECREF(count);
-      PyErr_SetString(PyExc_ValueError, "length is not an integer!");
-      return NULL;
-    }
-  }
-
-  PyObject* atom = Py_NewRef(field->m_atom);
-  size = _Cp_SizeOf(atom, layer);
-  if (!size) {
-    goto fail;
-  }
-
-  if (field->m_switch) {
-    // Static switch structures are supported only if the predecessor
-    // is a context lambda.
-    if (!PyCallable_Check(field->m_switch)) {
-      PyErr_SetString(
-        PyExc_ValueError,
-        "Switch statement without ContextLambda is danymic sized!");
-      goto fail;
-    }
-
-    PyObject* value = PyObject_CallOneArg(field->m_switch, (PyObject*)layer);
-    if (!value) {
-      goto fail;
-    }
-    Py_XSETREF(extraSize, size);
-    size = _Cp_SizeOf(value, layer);
-    if (!size) {
-      goto fail;
-    }
-    Py_XDECREF(value);
-  }
-
-  PyObject* result = PyNumber_Multiply(size, count);
-  if (!result) {
-    goto fail;
-  }
-  if (extraSize) {
-    Py_XSETREF(result, PyNumber_Add(result, extraSize));
-    if (!result) {
-      goto fail;
-    }
-  }
-
-  Py_XDECREF(size);
-  Py_XDECREF(count);
-  Py_XDECREF(atom);
-  Py_XDECREF(extraSize);
-  return result;
-
-fail:
-  Py_XDECREF(atom);
-  Py_XDECREF(count);
-  Py_XDECREF(size);
-  Py_XDECREF(extraSize);
-  return NULL;
-}
-
-/*CpAPI*/
-PyObject*
 CpSizeOf_Struct(CpStructObject* struct_, CpLayerObject* layer)
 {
   if (!struct_) {
@@ -211,9 +99,7 @@ _Cp_SizeOf(PyObject* op, CpLayerObject* layer)
     return NULL;
   }
 
-  if (CpField_CheckExact(op)) {
-    result = CpSizeOf_Field((CpFieldObject*)op, layer);
-  } else if (CpCAtom_Check(op)) {
+  if (CpCAtom_Check(op)) {
     result = CpSizeOf_CAtom((CpCAtomObject*)op, layer);
   } else if (CpStruct_CheckExact(op)) {
     result = CpSizeOf_Struct((CpStructObject*)op, layer);

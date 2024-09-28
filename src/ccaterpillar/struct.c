@@ -581,9 +581,9 @@ cp_struct_process_annotation(CpStructObject* self,
     // The annotation is already a CpField object, so we don't need to convert
     // it. Note thate we check against the *exact* type, which means that we
     // will not accept any subclass of CpField.
-    if (CpField_CheckExact(annotation)) {
-      field = Py_NewRef(annotation);
-    }
+    // if (CpField_CheckExact(annotation)) {
+    //   field = Py_NewRef(annotation);
+    // }
 
     // 2. Atom object or protocol
     // The annotation is an instance of a subclass of the CpAtom class OR it
@@ -592,7 +592,7 @@ cp_struct_process_annotation(CpStructObject* self,
     // The annotation conforms to the Atom protocol. Note that we check here
     // only against packing, unpacking and size calculation. The type function
     // is optional and won't be covered here.
-    else if (CpAtom_Check(annotation)) {
+    if (CpAtom_Check(annotation)) {
       field = Py_NewRef(annotation);
     }
 
@@ -1011,25 +1011,6 @@ CpStruct_AddFieldInfo(CpStructObject* o, CpStructFieldInfoObject* info)
     }
   }
   return PyObject_SetItem(o->m_members, info->m_name, (PyObject*)info);
-}
-
-/*CpAPI*/
-int
-CpStruct_AddField(CpStructObject* o, CpFieldObject* field, int exclude)
-{
-  if (!field) {
-    PyErr_SetString(PyExc_TypeError, "field must be a Field");
-    return -1;
-  }
-
-  CpStructFieldInfoObject* info =
-    CpStructFieldInfo_New(field->m_name, (PyObject*)field);
-  if (!info) {
-    return -1;
-  }
-  info->s_excluded = exclude;
-  int res = CpStruct_AddFieldInfo(o, info);
-  return res;
 }
 
 /*CpAPI*/

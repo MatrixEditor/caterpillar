@@ -318,12 +318,6 @@ PyInit__C(void)
   CpModule_SetupType(&CpBinaryExpr_Type);
   CpModule_SetupType(&CpUnaryExpr_Type);
   CpModule_SetupType(&CpContextPath_Type);
-  CpModule_SetupType(&CpField_Type);
-
-  CpFieldAtom_Type.tp_base = &CpAtom_Type;
-  CpFieldCAtom_Type.tp_base = &CpCAtom_Type;
-  CpModule_SetupType(&CpFieldAtom_Type);
-  CpModule_SetupType(&CpFieldCAtom_Type);
   CpModule_SetupType(&CpLayer_Type);
 
   CpSeqLayer_Type.tp_base = &CpLayer_Type;
@@ -399,9 +393,6 @@ PyInit__C(void)
   CpModule_AddObject("InvalidDefault", CpInvalidDefault);
   CpModule_AddObject("DefaultOptionType", &CpDefaultOption_Type);
   CpModule_AddObject("DefaultOption", CpDefaultOption);
-  CpModule_AddObject(CpField_NAME, &CpField_Type);
-  CpModule_AddObject(CpFieldAtom_NAME, &CpFieldAtom_Type);
-  CpModule_AddObject(CpFieldCAtom_NAME, &CpFieldCAtom_Type);
   CpModule_AddObject(CpLayer_NAME, &CpLayer_Type);
   CpModule_AddObject(CpSeqLayer_NAME, &CpSeqLayer_Type);
   CpModule_AddObject(CpObjLayer_NAME, &CpObjLayer_Type);

@@ -19,7 +19,6 @@ python_add_library(
   src/ccaterpillar/arch.c
   src/ccaterpillar/atomobj.c
   src/ccaterpillar/context.c
-  src/ccaterpillar/field.c
   src/ccaterpillar/option.c
   src/ccaterpillar/module.c
   src/ccaterpillar/context.c

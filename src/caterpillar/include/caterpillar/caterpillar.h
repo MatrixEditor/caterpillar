@@ -11,7 +11,6 @@
 #include "caterpillar/struct.h"
 #include "caterpillar/context.h"
 #include "caterpillar/atomobj.h"
-#include "caterpillar/field.h"
 #include "caterpillar/state.h"
 #include "caterpillar/parsing.h"
 #include "caterpillar/default.h"
