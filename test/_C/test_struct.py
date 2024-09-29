@@ -4,7 +4,7 @@ import caterpillar
 
 if caterpillar.native_support():
 
-    from caterpillar.c import atom, Struct, struct
+    from caterpillar.c import atom, Struct, struct, TYPE_MAP, u8, pack
 
 
     def test_struct_init():
@@ -59,3 +59,14 @@ if caterpillar.native_support():
 
         assert len(Foo.__struct__.members) == 1
         assert Foo().a == 1
+
+    def test_struct_type_handler():
+        TYPE_MAP[int] = u8
+
+        @struct
+        class Format:
+            a: int
+
+        assert len(Format.__struct__.members) == 1
+        assert Format(1).a == 1
+        assert pack(Format(1), Format.__struct__) == b"\x01"

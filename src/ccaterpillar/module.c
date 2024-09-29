@@ -75,7 +75,19 @@ cp_core_pack_into(PyObject* m, PyObject* args, PyObject* kw)
     PyErr_SetString(PyExc_ValueError, "output stream not set!");
     goto finish;
   }
-  res = CpPack(op, atom, io, globals);
+
+  _modulestate* state = get_module_state(m);
+  if (CpStructModel_Check(op, state)) {
+    atom = CpStructModel_GetStruct(op, state);
+    if (!atom) {
+      goto finish;
+    }
+    res = CpPack(op, atom, io, globals);
+    Py_DECREF(atom);
+  } else {
+    res = CpPack(op, atom, io, globals);
+  }
+
 finish:
   Py_XDECREF(globals);
   return res < 0 ? NULL : Py_None;
@@ -112,7 +124,17 @@ cp_core_pack(PyObject* m, PyObject* args, PyObject* kw)
     goto finish;
   }
 
-  res = CpPack(op, atom, io, globals);
+  if (CpStructModel_Check(op, state)) {
+    atom = CpStructModel_GetStruct(op, state);
+    if (!atom) {
+      goto finish;
+    }
+    res = CpPack(op, atom, io, globals);
+    Py_DECREF(atom);
+  } else {
+    res = CpPack(op, atom, io, globals);
+  }
+
 finish:
   Py_XDECREF(globals);
   if (res < 0) {
@@ -131,6 +153,16 @@ cp_core_sizeof(PyObject* m, PyObject* args, PyObject* kw)
   PyObject *op = NULL, *globals = NULL;
   if (!PyArg_ParseTupleAndKeywords(args, kw, "O|O", kwlist, &op, &globals)) {
     return NULL;
+  }
+  _modulestate* state = get_module_state(m);
+  if (CpStructModel_Check(op, state)) {
+    PyObject* atom = CpStructModel_GetStruct(op, state);
+    if (!atom) {
+      return NULL;
+    }
+    PyObject* res = CpSizeOf(atom, globals);
+    Py_DECREF(atom);
+    return res;
   }
   return CpSizeOf(op, globals);
 }
@@ -174,7 +206,17 @@ cp_core_unpack(PyObject* m, PyObject* args, PyObject* kw)
     goto finish;
   }
 
-  res = CpUnpack(atom, io, globals);
+  if (CpStructModel_Check(atom, state)) {
+    atom = CpStructModel_GetStruct(atom, state);
+    if (!atom) {
+      goto finish;
+    }
+    res = CpUnpack(atom, io, globals);
+    Py_DECREF(atom);
+  } else {
+    res = CpUnpack(atom, io, globals);
+  }
+
 finish:
   Py_XDECREF(globals);
   if (wrapped_io) {
@@ -253,6 +295,7 @@ cp_module_clear(PyObject* m)
 
     Py_CLEAR(state->cp_bytes__false);
     Py_CLEAR(state->cp_bytes__true);
+    Py_CLEAR(state->cp_typehandler_map);
   }
   return 0;
 }
@@ -507,6 +550,9 @@ PyInit__C(void)
     cp_option__global_struct_options, "STRUCT_OPTIONS", PySet_New(NULL));
   CpModuleState_AddObject(
     cp_option__global_field_options, "FIELD_OPTIONS", PySet_New(NULL));
+
+  /* typehandler map */
+  CpModuleState_AddObject(cp_typehandler_map, "TYPE_MAP", PyDict_New());
 
   /* setup arch and endian */
   CpModuleState_AddObject(cp_endian__native,

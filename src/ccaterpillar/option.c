@@ -37,7 +37,7 @@ static PyObject*
 cp_option_repr(CpOptionObject* self)
 {
   return PyUnicode_FromFormat(
-    "CpOption(name=%R value=%R)", self->name, self->value);
+    "<option %R=%R>", self->name, self->value);
 }
 
 static PyObject*

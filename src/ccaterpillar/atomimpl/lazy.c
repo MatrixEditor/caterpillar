@@ -153,7 +153,7 @@ PyTypeObject CpLazyAtom_Type = {
   PyVarObject_HEAD_INIT(NULL, 0) _Cp_NameStr(CpLazyAtom_NAME),
   .tp_basicsize = sizeof(CpLazyAtomObject),
   .tp_dealloc = (destructor)cp_lazyatom_dealloc,
-  .tp_flags = Py_TPFLAGS_DEFAULT,
+  .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
   .tp_doc = NULL,
   .tp_init = (initproc)cp_lazyatom_init,
   .tp_new = (newfunc)cp_lazyatom_new,

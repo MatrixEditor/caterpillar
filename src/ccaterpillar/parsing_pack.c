@@ -63,7 +63,6 @@ _CpPack_EvalLength(CpLayerObject* layer,
     greedy = false;
 
     PyObject* start = PyObject_GetAttr(length, layer->m_state->mod->str_start);
-    Py_XDECREF(length);
     if (!start) {
       return -1;
     }
@@ -91,14 +90,12 @@ _CpPack_EvalLength(CpLayerObject* layer,
     *dstLength = size;
   } else {
     if (!PyLong_Check(length)) {
-      Py_XDECREF(length);
       PyErr_SetString(PyExc_ValueError, "length is not an integer");
       return -1;
     }
 
     greedy = false;
     *dstLength = PyLong_AsSsize_t(length);
-    Py_XDECREF(length);
     if (*dstLength != size && size > 0) {
       PyErr_Format(PyExc_ValueError,
                    "given length %d does not match sequence size %d",

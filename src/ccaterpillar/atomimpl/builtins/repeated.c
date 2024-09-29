@@ -56,6 +56,8 @@ cp_repeatedatomobj_new(PyTypeObject* type, PyObject* args, PyObject* kw)
   CpBuiltinAtom_CATOM(self).ob_unpack_many = NULL;
   CpBuiltinAtom_CATOM(self).ob_size = (sizefunc)cp_repeatedatomobj_size;
   CpBuiltinAtom_CATOM(self).ob_type = (typefunc)cp_repeatedatomobj_type;
+  self->m_length = NULL;
+  self->m_atom = NULL;
   return (PyObject*)self;
 }
 
@@ -229,6 +231,9 @@ CpRepeatedAtom_Unpack(CpRepeatedAtomObject* self, CpLayerObject* layer)
   _modulestate* mod = layer->m_state->mod;
   CpLengthInfoObject* lengthinfo =
     (CpLengthInfoObject*)CpObject_CreateNoArgs(&CpLengthInfo_Type);
+  if (!lengthinfo) {
+    return NULL;
+  }
 
   bool unpack_many_attr =
     PyObject_HasAttr(self->m_atom, mod->str___unpack_many__);

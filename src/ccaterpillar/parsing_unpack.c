@@ -44,7 +44,7 @@ _CpUnpack_EvalLength(CpLayerObject* layer,
       PyErr_SetString(PyExc_ValueError, "start is None");
       return -1;
     }
-    Py_XSETREF(length, _Cp_Unpack(start, layer));
+    length = _Cp_Unpack(start, layer);
     Py_DECREF(start);
     if (!length) {
       return -1;

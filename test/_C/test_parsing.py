@@ -170,4 +170,4 @@ if caterpillar.native_support():
             # the data
 
         s = Struct(SBaz, alter_model=True)
-        assert pack(SBaz(a=1, b=[2]), s) == b"\x00\x01\x00\x02"
+        assert pack(SBaz(a=1, b=[2]), SBaz) == b"\x00\x01\x00\x02"

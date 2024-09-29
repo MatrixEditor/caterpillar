@@ -99,6 +99,9 @@ struct _modulestate
   // cached objects
   PyObject* cp_bytes__true;
   PyObject* cp_bytes__false;
+
+  // type handler map
+  PyObject* cp_typehandler_map;
 };
 
 /**

@@ -23,11 +23,18 @@ struct _constatomobj
 {
   CpBuiltinAtom_HEAD
 
-  PyObject *m_value;
-  PyObject *m_atom;
+    PyObject* m_value;
+  PyObject* m_atom;
 };
 
 #define CpConstAtom_CheckExact(op) Py_IS_TYPE((op), &CpConstAtom_Type)
 #define CpConstAtom_Check(op) PyObject_TypeCheck((op), &CpConstAtom_Type)
+
+static inline CpConstAtomObject*
+CpConstAtom_New(PyObject* value, PyObject* atom)
+{
+  return (CpConstAtomObject*)CpObject_Create(
+    &CpConstAtom_Type, "OO", atom, value);
+}
 
 #endif

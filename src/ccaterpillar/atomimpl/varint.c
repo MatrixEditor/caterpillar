@@ -115,7 +115,6 @@ cp_varintatom_set_byteorder(CpVarIntAtomObject* self,
   PyObject* new_varint =
     (PyObject*)CpVarIntAtom_New(little_endian, self->_m_lsb);
 
-  Py_DECREF(byteorder);
   return new_varint;
 }
 

@@ -191,6 +191,8 @@ CpUnaryExprObject* CpUnaryExpr_New(int op, PyObject* value);
 CpBinaryExprObject* CpBinaryExpr_New(int op, PyObject* left, PyObject* right);
 CpContextPathObject* CpContextPath_New(PyObject* path);
 CpContextPathObject* CpContextPath_FromString(const char* path);
+PyObject* CpTypeMap_Lookup(PyObject* annotation, _modulestate* mod);
+int CpTypeMap_Register(PyObject* annotation, PyObject* handler, _modulestate* mod);
 PyObject* CpTypeOf(PyObject* op);
 PyObject* CpTypeOf_Common(PyObject* op);
 int CpPack(PyObject* op, PyObject* atom, PyObject* io, PyObject* globals);
@@ -332,6 +334,8 @@ caterpillar_api.py
 #define CpBinaryExpr_New (*((CpBinaryExprObject* (*)(int op, PyObject* left, PyObject* right)))Cp_API[55])
 #define CpContextPath_New (*((CpContextPathObject* (*)(PyObject* path)))Cp_API[56])
 #define CpContextPath_FromString (*((CpContextPathObject* (*)(const char* path)))Cp_API[57])
+#define CpTypeMap_Lookup (*((PyObject* (*)(PyObject* annotation, _modulestate* mod)))Cp_API[58])
+#define CpTypeMap_Register (*((int (*)(PyObject* annotation, PyObject* handler, _modulestate* mod)))Cp_API[59])
 #define CpTypeOf (*((PyObject* (*)(PyObject* op)))Cp_API[64])
 #define CpTypeOf_Common (*((PyObject* (*)(PyObject* op)))Cp_API[66])
 #define CpPack (*((int (*)(PyObject* op, PyObject* atom, PyObject* io, PyObject* globals)))Cp_API[67])

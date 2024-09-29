@@ -230,7 +230,7 @@ static PyMethodDef CpIntAtom_Methods[] = {
   PyVarObject_HEAD_INIT(NULL, 0) _Cp_NameStr(CpIntAtom_NAME),
   .tp_basicsize = sizeof(CpIntAtomObject),
   .tp_dealloc = (destructor)cp_intatom_dealloc,
-  .tp_flags = Py_TPFLAGS_DEFAULT,
+  .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
   .tp_doc = cp_intatom__doc,
   .tp_members = CpIntAtom_Members,
   .tp_new = (newfunc)cp_intatom_new,

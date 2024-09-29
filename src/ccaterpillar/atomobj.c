@@ -3,6 +3,7 @@
 #include "caterpillar/atomobj.h"
 #include "caterpillar/macros.h"
 
+#include <structmember.h>
 #include <stddef.h>
 
 static PyObject*
@@ -360,6 +361,12 @@ cp_lengthinfo_repr(CpLengthInfoObject* self)
   }
   return PyUnicode_FromFormat("<lengthinfo [%d]>", self->m_length);
 }
+
+static PyMemberDef CpLengthInfo_Members[] = {
+  { "length", T_PYSSIZET, offsetof(CpLengthInfoObject, m_length), 0, NULL },
+  { "greedy", T_BOOL, offsetof(CpLengthInfoObject, m_greedy), 0, NULL },
+  { NULL } /* Sentinel */
+};
 
 PyTypeObject CpLengthInfo_Type = {
   PyVarObject_HEAD_INIT(NULL, 0) _Cp_NameStr(CpLengthInfo_NAME),

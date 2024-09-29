@@ -262,6 +262,49 @@ cp_unaryexpr__call__(CpUnaryExprObject* self, PyObject* args, PyObject* kw)
   return result;
 }
 
+static PyObject*
+cp_unaryexpr_as_number_neg(PyObject* self)
+{
+  return (PyObject*)CpUnaryExpr_New(CpUnaryExpr_OpNeg, self);
+}
+
+static PyObject*
+cp_unaryexpr_as_number_pos(PyObject* self)
+{
+  return (PyObject*)CpUnaryExpr_New(CpUnaryExpr_OpPos, self);
+}
+
+static PyObject*
+cp_unaryexpr_as_number_not(PyObject* self)
+{
+  return (PyObject*)CpUnaryExpr_New(CpUnaryExpr_OpNot, self);
+}
+
+/* operations */
+#define _CpUnaryExpr_BinaryNumberMethod(name, op)                             \
+  static PyObject* cp_unaryexpr_as_number_##name(PyObject* self,              \
+                                                  PyObject* other)             \
+  {                                                                            \
+    return (PyObject*)CpBinaryExpr_New(op, self, other);                       \
+  }
+
+_CpUnaryExpr_BinaryNumberMethod(add, CpBinaryExpr_OpAdd);
+_CpUnaryExpr_BinaryNumberMethod(sub, CpBinaryExpr_OpSub);
+_CpUnaryExpr_BinaryNumberMethod(mul, CpBinaryExpr_OpMul);
+_CpUnaryExpr_BinaryNumberMethod(div, CpBinaryExpr_OpTrueDiv);
+_CpUnaryExpr_BinaryNumberMethod(truediv, CpBinaryExpr_OpTrueDiv);
+_CpUnaryExpr_BinaryNumberMethod(floordiv, CpBinaryExpr_OpFloorDiv);
+_CpUnaryExpr_BinaryNumberMethod(mod, CpBinaryExpr_OpMod);
+_CpUnaryExpr_BinaryNumberMethod(lshift, CpBinaryExpr_OpLShift);
+_CpUnaryExpr_BinaryNumberMethod(rshift, CpBinaryExpr_OpRShift);
+_CpUnaryExpr_BinaryNumberMethod(and, CpBinaryExpr_OpBitAnd);
+_CpUnaryExpr_BinaryNumberMethod(xor, CpBinaryExpr_OpBitXor);
+_CpUnaryExpr_BinaryNumberMethod(or, CpBinaryExpr_OpBitOr);
+_CpUnaryExpr_BinaryNumberMethod(pow, CpBinaryExpr_OpPow);
+_CpUnaryExpr_BinaryNumberMethod(matmul, CpBinaryExpr_OpMatMul);
+
+#undef _CpUnaryExpr_BinaryNumberMethod
+
 /*CpAPI*/
 CpUnaryExprObject*
 CpUnaryExpr_New(int op, PyObject* value)
@@ -285,6 +328,27 @@ static PyMemberDef CpUnaryExpr_Members[] = {
   { NULL } /* Sentinel */
 };
 
+static PyNumberMethods CpBinaryExpr_NumberMethods = {
+  // unary
+  .nb_negative = (unaryfunc)cp_unaryexpr_as_number_neg,
+  .nb_positive = (unaryfunc)cp_unaryexpr_as_number_pos,
+  .nb_invert = (unaryfunc)cp_unaryexpr_as_number_not,
+  // binary
+  .nb_add = (binaryfunc)cp_unaryexpr_as_number_add,
+  .nb_subtract = (binaryfunc)cp_unaryexpr_as_number_sub,
+  .nb_multiply = (binaryfunc)cp_unaryexpr_as_number_mul,
+  .nb_true_divide = (binaryfunc)cp_unaryexpr_as_number_truediv,
+  .nb_floor_divide = (binaryfunc)cp_unaryexpr_as_number_floordiv,
+  .nb_remainder = (binaryfunc)cp_unaryexpr_as_number_mod,
+  .nb_power = (ternaryfunc)cp_unaryexpr_as_number_pow,
+  .nb_lshift = (binaryfunc)cp_unaryexpr_as_number_lshift,
+  .nb_rshift = (binaryfunc)cp_unaryexpr_as_number_rshift,
+  .nb_and = (binaryfunc)cp_unaryexpr_as_number_and,
+  .nb_xor = (binaryfunc)cp_unaryexpr_as_number_xor,
+  .nb_or = (binaryfunc)cp_unaryexpr_as_number_or,
+  .nb_matrix_multiply = (binaryfunc)cp_unaryexpr_as_number_matmul,
+};
+
 PyTypeObject CpUnaryExpr_Type = {
   PyVarObject_HEAD_INIT(NULL, 0) _Cp_Name(UnaryExpr),
   .tp_basicsize = sizeof(CpUnaryExprObject),
@@ -297,6 +361,7 @@ PyTypeObject CpUnaryExpr_Type = {
   .tp_members = CpUnaryExpr_Members,
   .tp_init = (initproc)cp_unaryexpr_init,
   .tp_new = (newfunc)cp_unaryexpr_new,
+  .tp_as_number = &CpBinaryExpr_NumberMethods,
 };
 
 //------------------------------------------------------------------------------
@@ -542,30 +607,48 @@ cp_binaryexpr__call__(CpBinaryExprObject* self, PyObject* args, PyObject* kw)
   return result;
 }
 
+static PyObject*
+cp_binaryexpr_as_number_neg(PyObject* self)
+{
+  return (PyObject*)CpUnaryExpr_New(CpUnaryExpr_OpNeg, self);
+}
+
+static PyObject*
+cp_binaryexpr_as_number_pos(PyObject* self)
+{
+  return (PyObject*)CpUnaryExpr_New(CpUnaryExpr_OpPos, self);
+}
+
+static PyObject*
+cp_binaryexpr_as_number_not(PyObject* self)
+{
+  return (PyObject*)CpUnaryExpr_New(CpUnaryExpr_OpNot, self);
+}
+
 /* operations */
-#define _CpBinaryExpr_BinaryNumberMethod(name, op)                            \
-  static PyObject* cp_binaryexpr_as_number_##name(PyObject* self,             \
-                                                   PyObject* other)            \
+#define _CpUnaryExpr_BinaryNumberMethod(name, op)                             \
+  static PyObject* cp_binaryexpr_as_number_##name(PyObject* self,              \
+                                                  PyObject* other)             \
   {                                                                            \
     return (PyObject*)CpBinaryExpr_New(op, self, other);                       \
   }
 
-_CpBinaryExpr_BinaryNumberMethod(add, CpBinaryExpr_OpAdd);
-_CpBinaryExpr_BinaryNumberMethod(sub, CpBinaryExpr_OpSub);
-_CpBinaryExpr_BinaryNumberMethod(mul, CpBinaryExpr_OpMul);
-_CpBinaryExpr_BinaryNumberMethod(div, CpBinaryExpr_OpTrueDiv);
-_CpBinaryExpr_BinaryNumberMethod(truediv, CpBinaryExpr_OpTrueDiv);
-_CpBinaryExpr_BinaryNumberMethod(floordiv, CpBinaryExpr_OpFloorDiv);
-_CpBinaryExpr_BinaryNumberMethod(mod, CpBinaryExpr_OpMod);
-_CpBinaryExpr_BinaryNumberMethod(lshift, CpBinaryExpr_OpLShift);
-_CpBinaryExpr_BinaryNumberMethod(rshift, CpBinaryExpr_OpRShift);
-_CpBinaryExpr_BinaryNumberMethod(and, CpBinaryExpr_OpBitAnd);
-_CpBinaryExpr_BinaryNumberMethod(xor, CpBinaryExpr_OpBitXor);
-_CpBinaryExpr_BinaryNumberMethod(or, CpBinaryExpr_OpBitOr);
-_CpBinaryExpr_BinaryNumberMethod(pow, CpBinaryExpr_OpPow);
-_CpBinaryExpr_BinaryNumberMethod(matmul, CpBinaryExpr_OpMatMul);
+_CpUnaryExpr_BinaryNumberMethod(add, CpBinaryExpr_OpAdd);
+_CpUnaryExpr_BinaryNumberMethod(sub, CpBinaryExpr_OpSub);
+_CpUnaryExpr_BinaryNumberMethod(mul, CpBinaryExpr_OpMul);
+_CpUnaryExpr_BinaryNumberMethod(div, CpBinaryExpr_OpTrueDiv);
+_CpUnaryExpr_BinaryNumberMethod(truediv, CpBinaryExpr_OpTrueDiv);
+_CpUnaryExpr_BinaryNumberMethod(floordiv, CpBinaryExpr_OpFloorDiv);
+_CpUnaryExpr_BinaryNumberMethod(mod, CpBinaryExpr_OpMod);
+_CpUnaryExpr_BinaryNumberMethod(lshift, CpBinaryExpr_OpLShift);
+_CpUnaryExpr_BinaryNumberMethod(rshift, CpBinaryExpr_OpRShift);
+_CpUnaryExpr_BinaryNumberMethod(and, CpBinaryExpr_OpBitAnd);
+_CpUnaryExpr_BinaryNumberMethod(xor, CpBinaryExpr_OpBitXor);
+_CpUnaryExpr_BinaryNumberMethod(or, CpBinaryExpr_OpBitOr);
+_CpUnaryExpr_BinaryNumberMethod(pow, CpBinaryExpr_OpPow);
+_CpUnaryExpr_BinaryNumberMethod(matmul, CpBinaryExpr_OpMatMul);
 
-#undef _CpContextPath_BinaryNumberMethod
+#undef _CpUnaryExpr_BinaryNumberMethod
 
 /*CpAPI*/
 CpBinaryExprObject*
@@ -598,6 +681,27 @@ static PyMemberDef CpBinaryExpr_Members[] = {
   { NULL } /* Sentinel */
 };
 
+static PyNumberMethods CpUnaryExpr_NumberMethods = {
+  // unary
+  .nb_negative = (unaryfunc)cp_binaryexpr_as_number_neg,
+  .nb_positive = (unaryfunc)cp_binaryexpr_as_number_pos,
+  .nb_invert = (unaryfunc)cp_binaryexpr_as_number_not,
+  // binary
+  .nb_add = (binaryfunc)cp_binaryexpr_as_number_add,
+  .nb_subtract = (binaryfunc)cp_binaryexpr_as_number_sub,
+  .nb_multiply = (binaryfunc)cp_binaryexpr_as_number_mul,
+  .nb_true_divide = (binaryfunc)cp_binaryexpr_as_number_truediv,
+  .nb_floor_divide = (binaryfunc)cp_binaryexpr_as_number_floordiv,
+  .nb_remainder = (binaryfunc)cp_binaryexpr_as_number_mod,
+  .nb_power = (ternaryfunc)cp_binaryexpr_as_number_pow,
+  .nb_lshift = (binaryfunc)cp_binaryexpr_as_number_lshift,
+  .nb_rshift = (binaryfunc)cp_binaryexpr_as_number_rshift,
+  .nb_and = (binaryfunc)cp_binaryexpr_as_number_and,
+  .nb_xor = (binaryfunc)cp_binaryexpr_as_number_xor,
+  .nb_or = (binaryfunc)cp_binaryexpr_as_number_or,
+  .nb_matrix_multiply = (binaryfunc)cp_binaryexpr_as_number_matmul,
+};
+
 PyTypeObject CpBinaryExpr_Type = {
   PyVarObject_HEAD_INIT(NULL, 0) _Cp_Name(BinaryExpr),
   .tp_basicsize = sizeof(CpBinaryExprObject),
@@ -609,6 +713,7 @@ PyTypeObject CpBinaryExpr_Type = {
   .tp_members = CpBinaryExpr_Members,
   .tp_init = (initproc)cp_binaryexpr_init,
   .tp_new = (newfunc)cp_binaryexpr_new,
+  .tp_as_number = &CpUnaryExpr_NumberMethods,
 };
 
 //------------------------------------------------------------------------------
@@ -655,7 +760,13 @@ cp_contextpath_init(CpContextPathObject* self, PyObject* args, PyObject* kw)
 static PyObject*
 cp_contextpath_repr(CpContextPathObject* self)
 {
-  return PyUnicode_FromFormat("CpPath(%R)", self->m_path);
+  return PyUnicode_FromFormat("<path %R>", self->m_path);
+}
+
+static PyObject*
+cp_contextpath_str(CpContextPathObject* self)
+{
+  return Py_XNewRef(self->m_path);
 }
 
 static Py_hash_t
@@ -784,7 +895,6 @@ CpContextPath_FromString(const char* path)
   return (CpContextPathObject*)CpObject_Create(&CpContextPath_Type, "s", path);
 }
 
-
 /* docs */
 PyDoc_STRVAR(cp_contextpath__doc__, "\
 ContextPath(path)\n\
@@ -832,18 +942,19 @@ static PyNumberMethods CpContextPath_NumberMethods = {
 /* type */
 PyTypeObject CpContextPath_Type = {
   PyVarObject_HEAD_INIT(NULL, 0) _Cp_Name(ContextPath),
-  .tp_basicsize =sizeof(CpContextPathObject),
-  .tp_dealloc =(destructor)cp_contextpath_dealloc,
-  .tp_getattr =(getattrfunc)cp_contextpath__getattr__,
-  .tp_repr =(reprfunc)cp_contextpath_repr,
-  .tp_as_number =&CpContextPath_NumberMethods,
-  .tp_hash =(hashfunc)cp_contextpath_hash,
-  .tp_call =(ternaryfunc)cp_contextpath__call__,
-  .tp_flags =Py_TPFLAGS_DEFAULT,
-  .tp_doc =cp_contextpath__doc__,
-  .tp_richcompare =(richcmpfunc)cp_contextpath_richcmp,
-  .tp_methods =CpContextPath_Methods,
-  .tp_members =CpContextPath_Members,
-  .tp_init =(initproc)cp_contextpath_init,
-  .tp_new =(newfunc)cp_contextpath_new,
+  .tp_basicsize = sizeof(CpContextPathObject),
+  .tp_dealloc = (destructor)cp_contextpath_dealloc,
+  .tp_getattr = (getattrfunc)cp_contextpath__getattr__,
+  .tp_repr = (reprfunc)cp_contextpath_repr,
+  .tp_as_number = &CpContextPath_NumberMethods,
+  .tp_hash = (hashfunc)cp_contextpath_hash,
+  .tp_call = (ternaryfunc)cp_contextpath__call__,
+  .tp_flags = Py_TPFLAGS_DEFAULT,
+  .tp_doc = cp_contextpath__doc__,
+  .tp_richcompare = (richcmpfunc)cp_contextpath_richcmp,
+  .tp_methods = CpContextPath_Methods,
+  .tp_members = CpContextPath_Members,
+  .tp_init = (initproc)cp_contextpath_init,
+  .tp_new = (newfunc)cp_contextpath_new,
+  .tp_str = (reprfunc)cp_contextpath_str,
 };

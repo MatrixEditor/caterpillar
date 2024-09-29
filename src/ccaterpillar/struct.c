@@ -5,6 +5,50 @@
 
 #include <structmember.h>
 
+/* type handler map */
+
+/*CpAPI*/
+PyObject*
+CpTypeMap_Lookup(PyObject* annotation, _modulestate* mod)
+{
+  if (!mod) {
+    mod = get_global_module_state();
+  }
+
+  if (!annotation) {
+    PyErr_SetString(PyExc_ValueError, "annotation is NULL!");
+    return NULL;
+  }
+
+  PyObject* handler = PyDict_GetItem(mod->cp_typehandler_map, annotation);
+  if (!handler) {
+    return NULL;
+  }
+
+  return Py_NewRef(handler);
+}
+
+/*CpAPI*/
+int
+CpTypeMap_Register(PyObject* annotation, PyObject* handler, _modulestate* mod)
+{
+  if (!mod) {
+    mod = get_global_module_state();
+  }
+
+  if (!annotation) {
+    PyErr_SetString(PyExc_ValueError, "annotation is NULL!");
+    return -1;
+  }
+
+  if (!handler) {
+    PyErr_SetString(PyExc_ValueError, "handler is NULL!");
+    return -1;
+  }
+
+  return PyDict_SetItem(mod->cp_typehandler_map, annotation, handler);
+}
+
 /* struct-field-info implementation */
 static PyObject*
 cp_struct_fieldinfo_new(PyTypeObject* type, PyObject* args, PyObject* kw)
@@ -615,18 +659,53 @@ cp_struct_process_annotation(CpStructObject* self,
     else if (PyCallable_Check(annotation)) {
       field = Py_NewRef(annotation);
     }
+
+    // 5. Constant values
+    else if (PyBytes_Check(annotation)) {
+      PyObject* length = PyLong_FromSsize_t(PyBytes_GET_SIZE(annotation));
+      if (!length) {
+        return -1;
+      }
+      PyObject* atom = (PyObject*)CpBytesAtom_New(length);
+      Py_DECREF(length);
+      if (!atom) {
+        return -1;
+      }
+
+      field = (PyObject*)CpConstAtom_New(annotation, atom);
+      Py_DECREF(atom);
+      if (!field) {
+        return -1;
+      }
+      Py_XSETREF(default_value, Py_NewRef(annotation));
+    }
   }
 
   if (!field) {
     // REVISIT: Add support for other types here.
-    PyErr_Format(PyExc_ValueError,
-                 ("Field %R could not be created, because the placed "
-                  "annotation does not "
-                  "conform to any of the supported types.\n"
-                  "annotation: %R"),
-                 name,
-                 annotation);
-    return -1;
+    PyObject* handler = CpTypeMap_Lookup(annotation, state);
+    if (!handler) {
+      PyErr_Clear();
+      PyErr_Format(PyExc_ValueError,
+                   ("Field %R could not be created, because the placed "
+                    "annotation does not "
+                    "conform to any of the supported types.\n"
+                    "annotation: %R"),
+                   name,
+                   annotation);
+      return -1;
+    }
+
+    if (PyCallable_Check(handler)) {
+      field = PyObject_CallOneArg(handler, annotation);
+      if (!field) {
+        return -1;
+      }
+    } else {
+      field = Py_NewRef(handler);
+    }
+
+    Py_DECREF(handler);
   }
 
   // TODO: arch
@@ -1167,9 +1246,13 @@ CpStruct_Unpack(CpStructObject* self, CpLayerObject* layer)
     }
 
     CpLayer_AppendPath(&obj_layer->ob_base, name);
-
     value = _Cp_Unpack((PyObject*)info->m_field, (CpLayerObject*)obj_layer);
     if (!value && PyErr_Occurred()) {
+      // constant values store a default value, but may raise important exceptions
+      if (CpConstAtom_Check(info->m_field)) {
+        return NULL;
+      }
+
       if (!Cp_IsInvalidDefault(info->m_default)) {
         Py_XSETREF(value, info->m_default);
       }

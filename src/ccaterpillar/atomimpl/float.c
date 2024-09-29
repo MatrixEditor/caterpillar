@@ -199,7 +199,7 @@ PyTypeObject CpFloatAtom_Type = {
   PyVarObject_HEAD_INIT(NULL, 0) _Cp_NameStr(CpFloatAtom_NAME),
   .tp_basicsize = sizeof(CpFloatAtomObject),
   .tp_dealloc = (destructor)cp_floatatom_dealloc,
-  .tp_flags = Py_TPFLAGS_DEFAULT,
+  .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
   .tp_doc = NULL,
   .tp_members = CpFloatAtom_Members,
   .tp_methods = CpFloatAtom_Methods,
