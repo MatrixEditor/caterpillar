@@ -14,6 +14,5 @@ Concrete Objects Layer
     contextpath
     state
     layer
-    fieldobj
     struct
     atoms/index.rst

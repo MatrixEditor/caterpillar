@@ -7,93 +7,93 @@ Common Structs
 Numeric Structs
 ---------------
 
-.. autoclass:: caterpillar.fields.FormatField
+.. autoclass:: caterpillar.py.FormatField
     :members:
 
-.. autoattribute:: caterpillar.fields.uint8
+.. autoattribute:: caterpillar.py.uint8
 
-.. autoattribute:: caterpillar.fields.int8
+.. autoattribute:: caterpillar.py.int8
 
-.. autoattribute:: caterpillar.fields.uint16
+.. autoattribute:: caterpillar.py.uint16
 
-.. autoattribute:: caterpillar.fields.int16
+.. autoattribute:: caterpillar.py.int16
 
-.. autoattribute:: caterpillar.fields.uint32
+.. autoattribute:: caterpillar.py.uint32
 
-.. autoattribute:: caterpillar.fields.int32
+.. autoattribute:: caterpillar.py.int32
 
-.. autoattribute:: caterpillar.fields.uint64
+.. autoattribute:: caterpillar.py.uint64
 
-.. autoattribute:: caterpillar.fields.int64
+.. autoattribute:: caterpillar.py.int64
 
-.. autoattribute:: caterpillar.fields.size_t
+.. autoattribute:: caterpillar.py.size_t
 
-.. autoattribute:: caterpillar.fields.ssize_t
+.. autoattribute:: caterpillar.py.ssize_t
 
-.. autoattribute:: caterpillar.fields.float16
+.. autoattribute:: caterpillar.py.float16
 
-.. autoattribute:: caterpillar.fields.float32
+.. autoattribute:: caterpillar.py.float32
 
-.. autoattribute:: caterpillar.fields.float64
+.. autoattribute:: caterpillar.py.float64
 
-.. autoattribute:: caterpillar.fields.void_ptr
+.. autoattribute:: caterpillar.py.void_ptr
 
-.. autoattribute:: caterpillar.fields.char
+.. autoattribute:: caterpillar.py.char
 
-.. autoattribute:: caterpillar.fields.boolean
+.. autoattribute:: caterpillar.py.boolean
 
-.. autoattribute:: caterpillar.fields.padding
+.. autoattribute:: caterpillar.py.padding
 
-.. autoclass:: caterpillar.fields.Int
+.. autoclass:: caterpillar.py.Int
     :members:
 
-.. autoclass:: caterpillar.fields.UInt
+.. autoclass:: caterpillar.py.UInt
     :members:
 
-.. autoattribute:: caterpillar.fields.vint
+.. autoattribute:: caterpillar.py.vint
 
-.. autoclass:: caterpillar.fields.VarInt
+.. autoclass:: caterpillar.py.VarInt
     :members:
 
 Bytes, Strings
 --------------
 
-.. autoclass:: caterpillar.fields.Memory
+.. autoclass:: caterpillar.py.Memory
     :members:
 
-.. autoclass:: caterpillar.fields.Bytes
+.. autoclass:: caterpillar.py.Bytes
     :members:
 
-.. autoclass:: caterpillar.fields.String
+.. autoclass:: caterpillar.py.String
     :members:
 
-.. autoclass:: caterpillar.fields.Prefixed
+.. autoclass:: caterpillar.py.Prefixed
     :members:
 
-.. autoclass:: caterpillar.fields.CString
+.. autoclass:: caterpillar.py.CString
     :members:
 
-.. autoclass:: caterpillar.fields.ConstString
+.. autoclass:: caterpillar.py.ConstString
     :members:
 
-.. autoclass:: caterpillar.fields.ConstBytes
+.. autoclass:: caterpillar.py.ConstBytes
     :members:
 
 
 Special Structs
 ---------------
 
-.. autoattribute:: caterpillar.fields.Pass
+.. autoattribute:: caterpillar.py.Pass
 
 
-.. autoclass:: caterpillar.fields.Computed
+.. autoclass:: caterpillar.py.Computed
     :members:
 
-.. autoclass:: caterpillar.fields.Transformer
+.. autoclass:: caterpillar.py.Transformer
     :members:
 
-.. autoclass:: caterpillar.fields.Enum
+.. autoclass:: caterpillar.py.Enum
     :members:
 
-.. autoclass:: caterpillar.fields.Const
+.. autoclass:: caterpillar.py.Const
     :members:

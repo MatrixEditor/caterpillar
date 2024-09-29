@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Data Model &#8212; Caterpillar 2.1.5 documentation</title>
+    <title>Data Model &#8212; Caterpillar 2.2.0 documentation</title>
   
   
   
@@ -29,6 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -36,9 +37,11 @@
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../_static/documentation_options.js?v=786ba454"></script>
+    <script src="../_static/documentation_options.js?v=b21de401"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'reference/datamodel';</script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -121,7 +124,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.1.5</p>
+    <p class="title logo__title">Caterpillar 2.2.0</p>
   
 </a></div>
     
@@ -358,36 +361,34 @@ document.write(`
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">C API Reference</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1 has-children"><a class="reference internal" href="capi/abstract.html">1. Abstract Objects Layer</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="capi/atom.html">1.1. Atom Protocol</a></li>
-<li class="toctree-l2"><a class="reference internal" href="capi/context.html">1.2. Context Protocol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="capi/extension.html">1. Using the C API</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="capi/abstract.html">2. Abstract Objects Layer</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="capi/atom.html">2.1. Atom Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="capi/context.html">2.2. Context Protocol</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="capi/objects/objimpl.html">2. Concrete Objects Layer</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="capi/objects/arch.html">2.1. Arch &amp; Endian Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="capi/objects/option.html">2.2. Option Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="capi/objects/contextobj.html">2.3. Context Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="capi/objects/contextexpr.html">2.4. Context Expressions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="capi/objects/contextpath.html">2.5. Context Path Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="capi/objects/state.html">2.6. State Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="capi/objects/layer.html">2.7. Layer Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="capi/objects/fieldobj.html">2.8. Field Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="capi/objects/struct.html">2.9. Struct Objects</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="capi/objects/atoms/index.html">2.10. Atom Objects</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="capi/objects/atoms/fieldatom.html">2.10.1. Field Atom Objects</a></li>
-<li class="toctree-l3"><a class="reference internal" href="capi/objects/atoms/intatom.html">2.10.2. Integer Atoms</a></li>
-<li class="toctree-l3"><a class="reference internal" href="capi/objects/atoms/charatom.html">2.10.3. Char Atoms</a></li>
-<li class="toctree-l3"><a class="reference internal" href="capi/objects/atoms/floatatom.html">2.10.4. Float Atoms</a></li>
-<li class="toctree-l3"><a class="reference internal" href="capi/objects/atoms/boolatom.html">2.10.5. Bool Atoms</a></li>
-<li class="toctree-l3"><a class="reference internal" href="capi/objects/atoms/paddingatom.html">2.10.6. Padding Atoms</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="capi/objects/objimpl.html">3. Concrete Objects Layer</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="capi/objects/arch.html">3.1. Arch &amp; Endian Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="capi/objects/option.html">3.2. Option Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="capi/objects/contextobj.html">3.3. Context Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="capi/objects/contextexpr.html">3.4. Context Expressions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="capi/objects/contextpath.html">3.5. Context Path Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="capi/objects/state.html">3.6. State Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="capi/objects/layer.html">3.7. Layer Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="capi/objects/struct.html">3.8. Struct Objects</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="capi/objects/atoms/index.html">3.9. Atom Objects</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="capi/objects/atoms/int.html">3.9.1. Integer Atoms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="capi/objects/atoms/char.html">3.9.2. Char Atoms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="capi/objects/atoms/float.html">3.9.3. Float Atoms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="capi/objects/atoms/bool.html">3.9.4. Bool Atoms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="capi/objects/atoms/padding.html">3.9.5. Padding Atoms</a></li>
 </ul>
 </details></li>
 </ul>
 </details></li>
-<li class="toctree-l1"><a class="reference internal" href="capi/parsing.html">3. Packing and Unpacking</a></li>
-<li class="toctree-l1"><a class="reference internal" href="capi/macros.html">4. Defined Macros</a></li>
-<li class="toctree-l1"><a class="reference internal" href="capi/module.html">5. Module API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="capi/extension.html">6. Using the C API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="capi/parsing.html">4. Packing and Unpacking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="capi/macros.html">5. Defined Macros</a></li>
+<li class="toctree-l1"><a class="reference internal" href="capi/module.html">6. Module API</a></li>
 </ul>
 </div>
 </nav></div>
@@ -455,14 +456,14 @@ objects. There are three possible types of structs:</p>
 <ul class="simple">
 <li><dl class="simple">
 <dt><em>Sequences</em>:</dt><dd><p>These structs operate independently of fields, making them field-agnostic. As
-such, they do not need to be attached to a <a class="reference internal" href="../library/fields/field_model.html#caterpillar.fields.Field" title="caterpillar.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a> instance. Typically,
+such, they do not need to be attached to a <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code> instance. Typically,
 they are are combined with specific requirements, which will be discussed later
 on.</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt><em>Primitive Structs</em>:</dt><dd><p>All defined primitive structs depent on being linked to a <a class="reference internal" href="../library/fields/field_model.html#caterpillar.fields.Field" title="caterpillar.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a>
+<dt><em>Primitive Structs</em>:</dt><dd><p>All defined primitive structs depent on being linked to a <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code>
 instance. They are designed to incorporate all attributes that can be set
 on a field.</p>
 </dd>
@@ -486,7 +487,7 @@ compatibility with older versions of the library, making them particularly impor
 <section id="sequence">
 <h3>Sequence<a class="headerlink" href="#sequence" title="Link to this heading">#</a></h3>
 <p>As previously explained, a sequence functions independently of fields. The library introduces
-the <a class="reference internal" href="../library/model.html#caterpillar.model.Sequence" title="caterpillar.model.Sequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a> as a named finite collection of <a class="reference internal" href="../library/fields/field_model.html#caterpillar.fields.Field" title="caterpillar.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a> objects. A <em>Sequence</em>
+the <a class="reference internal" href="../library/model.html#caterpillar.model.Sequence" title="caterpillar.model.Sequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a> as a named finite collection of <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code> objects. A <em>Sequence</em>
 operates on a model, which is a string-to-field mapping by default. Later, we will discuss
 the distinctions between a <em>Sequence</em> and a <em>Struct</em> regarding the model representation.</p>
 <p>A sequence definition entails the specification of a <a class="reference internal" href="../library/model.html#caterpillar.model.Sequence" title="caterpillar.model.Sequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a> object by directly
@@ -503,7 +504,7 @@ These fields are not visible in the unpacked result and are automatically packed
 concerns about them when the option <code class="docutils literal notranslate"><span class="pre">S_DISCARD_UNNAMED</span></code> is active. Their names usually
 begin with an underscore and must solely contain numbers (e.g., <code class="code docutils literal notranslate"><span class="pre">_123</span></code>).</p>
 </div>
-<p>The sequence follows the <a class="reference internal" href="../library/fields/field_model.html#caterpillar.fields.Field" title="caterpillar.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a> configuration model, allowing sequence and
+<p>The sequence follows the <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code> configuration model, allowing sequence and
 field-related options to be set. As mentioned earlier, the <code class="docutils literal notranslate"><span class="pre">S_DISCARD_UNNAMED</span></code> option can
 be used for example to exclude all unnamed fields from the final representation. A complete
 list of all configuration options and their impact can be found in <a class="reference internal" href="../library/options.html#options"><span class="std std-ref">Options</span></a>.</p>
@@ -718,11 +719,11 @@ added. As we start from bit position <code class="docutils literal notranslate">
 <h3>Field<a class="headerlink" href="#field" title="Link to this heading">#</a></h3>
 <p>The next core element of this library is the <em>Field</em>. It serves as a context storage to store configuration data
 about a struct. Even sequences and structs can be used as fields. The process is straightforward: each custom operator
-creates an instance of a <a class="reference internal" href="../library/fields/field_model.html#caterpillar.fields.Field" title="caterpillar.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a> with the applied configuration value. Most of the time, this value can be
+creates an instance of a <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code> with the applied configuration value. Most of the time, this value can be
 static or a <a class="reference internal" href="#context-lambda"><span class="std std-ref">Context lambda</span></a>. A field implements basic behavior that should not be duplicated, such as
 conditional execution, exception handling with default values, and support for a built-in switch-case structure.</p>
-<p>As mentioned earlier, some primitive structs depend on being linked to a <a class="reference internal" href="../library/fields/field_model.html#caterpillar.fields.Field" title="caterpillar.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a>. This is because all
-configuration elements are stored in a <a class="reference internal" href="../library/fields/field_model.html#caterpillar.fields.Field" title="caterpillar.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a> instance rather than in the target struct instance. More
+<p>As mentioned earlier, some primitive structs depend on being linked to a <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code>. This is because all
+configuration elements are stored in a <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code> instance rather than in the target struct instance. More
 information about each supported configuration can be found in <a class="reference internal" href="operators.html#operators"><span class="std std-ref">Operators</span></a>.</p>
 </section>
 <section id="greedy">
@@ -803,7 +804,7 @@ names are <code class="code docutils literal notranslate"><span class="pre">&quo
 <dl class="py attribute">
 <dt class="sig sig-object py" id="CTX_FIELD">
 <span class="sig-name descname"><span class="pre">CTX_FIELD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&quot;_field&quot;</span></em><a class="headerlink" href="#CTX_FIELD" title="Link to this definition">#</a></dt>
-<dd><p>In case a struct is linked to a field, the <a class="reference internal" href="../library/fields/field_model.html#caterpillar.fields.Field" title="caterpillar.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a> instance will always set this context variable
+<dd><p>In case a struct is linked to a field, the <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code> instance will always set this context variable
 to be accessible from within the underlying struct.</p>
 </dd></dl>
 
@@ -976,10 +977,10 @@ to note that the outcome of this function is ignored.</p>
 <dd><p>Called to desersialize objects from an input stream (the stream is stored in the given context).
 The result of <a class="reference internal" href="#object.__unpack__" title="object.__unpack__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__unpack__()</span></code></a> is not going to be ignored.</p>
 <p>Every implementation is tasked with the decision of whether to support the deserialization
-of multiple elements concurrently. By default, the <a class="reference internal" href="../library/fields/field_model.html#caterpillar.fields.Field" title="caterpillar.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a> class stores all essential
+of multiple elements concurrently. By default, the <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code> class stores all essential
 attributes required to determine the length of elements set for unpacking. The <a class="reference internal" href="#object.__unpack__" title="object.__unpack__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__unpack__()</span></code></a>
 method is activated through the <code class="code docutils literal notranslate"><span class="pre">unpack()</span></code> operation, integrated with the default
-struct classes — namely, <a class="reference internal" href="../library/model.html#caterpillar.model.Sequence" title="caterpillar.model.Sequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>, <a class="reference internal" href="../library/model.html#caterpillar.model.Struct" title="caterpillar.model.Struct"><code class="xref py py-class docutils literal notranslate"><span class="pre">Struct</span></code></a>, and <a class="reference internal" href="../library/fields/field_model.html#caterpillar.fields.Field" title="caterpillar.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a>.</p>
+struct classes — namely, <a class="reference internal" href="../library/model.html#caterpillar.model.Sequence" title="caterpillar.model.Sequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>, <a class="reference internal" href="../library/model.html#caterpillar.model.Struct" title="caterpillar.model.Struct"><code class="xref py py-class docutils literal notranslate"><span class="pre">Struct</span></code></a>, and <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code>.</p>
 <div class="versionchanged">
 <p><span class="versionmodified changed">Changed in version beta: </span>The <em>stream</em> parameter has been removed and was instead moved into the context.</p>
 </div>
@@ -1095,7 +1096,7 @@ should not be used elsewhere.</p>
 <span class="sig-prename descclassname"><span class="pre">object.</span></span><span class="sig-name descname"><span class="pre">__set_byteorder__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">byteorder</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#object.__set_byteorder__" title="Link to this definition">#</a></dt>
 <dd><p>In contrast to the attribute <a class="reference internal" href="#object.__byteorder__" title="object.__byteorder__"><code class="xref py py-attr docutils literal notranslate"><span class="pre">__byteorder__</span></code></a>, the <a class="reference internal" href="#object.__set_byteorder__" title="object.__set_byteorder__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__set_byteorder__()</span></code></a>
 method is invoked to apply the current byteorder to a struct. The default behavior,
-as described in <code class="xref py py-class docutils literal notranslate"><span class="pre">FieldMixin</span></code>, is to return a new <a class="reference internal" href="../library/fields/field_model.html#caterpillar.fields.Field" title="caterpillar.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a> instance with
+as described in <code class="xref py py-class docutils literal notranslate"><span class="pre">FieldMixin</span></code>, is to return a new <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code> instance with
 the byteorder applied. Note the use of another operator here.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">BigEndian</span> <span class="o">+</span> <span class="n">struct</span>
 </pre></div>

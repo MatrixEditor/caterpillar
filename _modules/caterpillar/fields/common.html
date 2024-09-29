@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>caterpillar.fields.common &#8212; Caterpillar 2.1.5 documentation</title>
+    <title>caterpillar.fields.common &#8212; Caterpillar 2.2.0 documentation</title>
   
   
   
@@ -28,6 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -35,9 +36,11 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=786ba454"></script>
+    <script src="../../../_static/documentation_options.js?v=b21de401"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/caterpillar/fields/common';</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -118,7 +121,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.1.5</p>
+    <p class="title logo__title">Caterpillar 2.2.0</p>
   
 </a></div>
     
@@ -438,7 +441,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="FormatField">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.FormatField">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.FormatField">[docs]</a>
 <span class="k">class</span> <span class="nc">FormatField</span><span class="p">(</span><span class="n">FieldStruct</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A field class representing a binary format.</span>
@@ -486,7 +489,7 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__bits__</span> <span class="o">//</span> <span class="mi">8</span>
 
 <div class="viewcode-block" id="FormatField.pack_single">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.FormatField.pack_single">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.FormatField.pack_single">[docs]</a>
     <span class="k">def</span> <span class="nf">pack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Pack a single value into the stream.</span>
@@ -511,7 +514,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="FormatField.pack_seq">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.FormatField.pack_seq">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.FormatField.pack_seq">[docs]</a>
     <span class="k">def</span> <span class="nf">pack_seq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seq</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Pack a sequence of values into the stream.</span>
@@ -526,7 +529,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="FormatField.unpack_single">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.FormatField.unpack_single">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.FormatField.unpack_single">[docs]</a>
     <span class="k">def</span> <span class="nf">unpack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Unpack a single value from the stream.</span>
@@ -544,7 +547,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="FormatField.unpack_seq">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.FormatField.unpack_seq">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.FormatField.unpack_seq">[docs]</a>
     <span class="k">def</span> <span class="nf">unpack_seq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Unpack a sequence of values from the stream.</span>
@@ -575,7 +578,7 @@ document.write(`
         <span class="k">return</span> <span class="n">dim</span>
 
 <div class="viewcode-block" id="FormatField.is_padding">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.FormatField.is_padding">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.FormatField.is_padding">[docs]</a>
     <span class="k">def</span> <span class="nf">is_padding</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check if the field represents padding.</span>
@@ -616,7 +619,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="Transformer">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Transformer">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Transformer">[docs]</a>
 <span class="k">class</span> <span class="nc">Transformer</span><span class="p">(</span><span class="n">FieldStruct</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A class that acts as a transformer for encoding and decoding data using a wrapped _StructLike object.</span>
@@ -649,7 +652,7 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">struct</span><span class="o">.</span><span class="n">__size__</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Transformer.encode">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Transformer.encode">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Transformer.encode">[docs]</a>
     <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Encode data using the wrapped _StructLike object.</span>
@@ -662,7 +665,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="Transformer.decode">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Transformer.decode">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Transformer.decode">[docs]</a>
     <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Decode data using the wrapped _StructLike object.</span>
@@ -675,7 +678,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="Transformer.pack_single">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Transformer.pack_single">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Transformer.pack_single">[docs]</a>
     <span class="k">def</span> <span class="nf">pack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Pack a single value into the stream using encoding.</span>
@@ -688,7 +691,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="Transformer.unpack_single">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Transformer.unpack_single">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Transformer.unpack_single">[docs]</a>
     <span class="k">def</span> <span class="nf">unpack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Unpack a single value from the stream and decode it.</span>
@@ -703,7 +706,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="Const">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Const">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Const">[docs]</a>
 <span class="k">class</span> <span class="nc">Const</span><span class="p">(</span><span class="n">Transformer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A specialized Transformer that enforces a constant value during encoding and decoding.</span>
@@ -719,7 +722,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
 
 <div class="viewcode-block" id="Const.encode">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Const.encode">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Const.encode">[docs]</a>
     <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Encode data using the constant value.</span>
@@ -732,7 +735,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="Const.decode">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Const.decode">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Const.decode">[docs]</a>
     <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Decode data and ensure it matches the constant value.</span>
@@ -752,7 +755,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="Enum">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Enum">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Enum">[docs]</a>
 <span class="k">class</span> <span class="nc">Enum</span><span class="p">(</span><span class="n">Transformer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A specialized Transformer for encoding and decoding enumeration values.</span>
@@ -781,7 +784,7 @@ document.write(`
         <span class="k">return</span> <span class="n">Union</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">struct</span><span class="o">.</span><span class="n">__type__</span><span class="p">()]</span>
 
 <div class="viewcode-block" id="Enum.encode">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Enum.encode">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Enum.encode">[docs]</a>
     <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Encode an enumeration value.</span>
@@ -801,7 +804,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="Enum.decode">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Enum.decode">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Enum.decode">[docs]</a>
     <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Decode an integer value to its corresponding enumeration value.</span>
@@ -837,7 +840,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="Memory">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Memory">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Memory">[docs]</a>
 <span class="k">class</span> <span class="nc">Memory</span><span class="p">(</span><span class="n">FieldStruct</span><span class="p">):</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;length&quot;</span><span class="p">,</span> <span class="s2">&quot;encoding&quot;</span><span class="p">)</span>
 
@@ -860,7 +863,7 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">(</span><span class="n">context</span><span class="p">)</span> <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">)</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span>
 
 <div class="viewcode-block" id="Memory.pack_single">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Memory.pack_single">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Memory.pack_single">[docs]</a>
     <span class="k">def</span> <span class="nf">pack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">memoryview</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">],</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Pack a single bytes object into the stream.</span>
@@ -874,7 +877,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="Memory.unpack_single">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Memory.unpack_single">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Memory.unpack_single">[docs]</a>
     <span class="k">def</span> <span class="nf">unpack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">memoryview</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Unpack a single bytes object from the stream.</span>
@@ -890,7 +893,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="Bytes">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Bytes">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Bytes">[docs]</a>
 <span class="k">class</span> <span class="nc">Bytes</span><span class="p">(</span><span class="n">Memory</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A specialized FieldStruct for handling byte sequences.</span>
@@ -907,7 +910,7 @@ document.write(`
         <span class="k">return</span> <span class="nb">bytes</span>
 
 <div class="viewcode-block" id="Bytes.unpack_single">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Bytes.unpack_single">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Bytes.unpack_single">[docs]</a>
     <span class="k">def</span> <span class="nf">unpack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Unpack a single bytes object from the stream.</span>
@@ -921,7 +924,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="String">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.String">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.String">[docs]</a>
 <span class="k">class</span> <span class="nc">String</span><span class="p">(</span><span class="n">Bytes</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A specialized field for handling string data.</span>
@@ -938,7 +941,7 @@ document.write(`
         <span class="k">return</span> <span class="nb">str</span>
 
 <div class="viewcode-block" id="String.unpack_single">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.String.unpack_single">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.String.unpack_single">[docs]</a>
     <span class="k">def</span> <span class="nf">unpack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Unpack a single string from the stream.</span>
@@ -952,7 +955,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="CString">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.CString">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.CString">[docs]</a>
 <span class="k">class</span> <span class="nc">CString</span><span class="p">(</span><span class="n">Bytes</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A specialized field for handling string data that ends with ``\\0x00``.</span>
@@ -988,7 +991,7 @@ document.write(`
         <span class="k">return</span> <span class="nb">str</span>
 
 <div class="viewcode-block" id="CString.pack_single">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.CString.pack_single">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.CString.pack_single">[docs]</a>
     <span class="k">def</span> <span class="nf">pack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Pack a single string into the stream.</span>
@@ -1007,7 +1010,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="CString.unpack_single">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.CString.unpack_single">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.CString.unpack_single">[docs]</a>
     <span class="k">def</span> <span class="nf">unpack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Unpack a single string from the stream.</span>
@@ -1038,7 +1041,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="ConstString">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.ConstString">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.ConstString">[docs]</a>
 <span class="k">class</span> <span class="nc">ConstString</span><span class="p">(</span><span class="n">Const</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A specialized constant field for handling string values.</span>
@@ -1057,7 +1060,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="ConstBytes">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.ConstBytes">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.ConstBytes">[docs]</a>
 <span class="k">class</span> <span class="nc">ConstBytes</span><span class="p">(</span><span class="n">Const</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A specialized constant field for handling bytes values.</span>
@@ -1074,7 +1077,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="Computed">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Computed">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Computed">[docs]</a>
 <span class="k">class</span> <span class="nc">Computed</span><span class="p">(</span><span class="n">FieldStruct</span><span class="p">):</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">,)</span>
 
@@ -1095,14 +1098,14 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">context</span><span class="p">)</span> <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span>
 
 <div class="viewcode-block" id="Computed.pack_single">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Computed.pack_single">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Computed.pack_single">[docs]</a>
     <span class="k">def</span> <span class="nf">pack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># No need for an implementation</span>
         <span class="k">pass</span></div>
 
 
 <div class="viewcode-block" id="Computed.unpack_single">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Computed.unpack_single">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Computed.unpack_single">[docs]</a>
     <span class="k">def</span> <span class="nf">unpack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># No need for an implementation</span>
         <span class="k">pass</span></div>
@@ -1139,7 +1142,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="Prefixed">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Prefixed">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Prefixed">[docs]</a>
 <span class="k">class</span> <span class="nc">Prefixed</span><span class="p">(</span><span class="n">FieldStruct</span><span class="p">):</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;encoding&quot;</span><span class="p">,</span> <span class="s2">&quot;prefix&quot;</span><span class="p">)</span>
 
@@ -1162,7 +1165,7 @@ document.write(`
         <span class="k">raise</span> <span class="n">DynamicSizeError</span><span class="p">(</span><span class="s2">&quot;Prefixed does not store a size&quot;</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Prefixed.pack_single">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Prefixed.pack_single">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Prefixed.pack_single">[docs]</a>
     <span class="k">def</span> <span class="nf">pack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Pack a single bytes object into the stream.</span>
@@ -1178,7 +1181,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="Prefixed.unpack_single">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Prefixed.unpack_single">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Prefixed.unpack_single">[docs]</a>
     <span class="k">def</span> <span class="nf">unpack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Unpack a single bytes object from the stream.</span>
@@ -1196,7 +1199,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="Int">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Int">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Int">[docs]</a>
 <span class="k">class</span> <span class="nc">Int</span><span class="p">(</span><span class="n">FieldStruct</span><span class="p">):</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;signed&quot;</span><span class="p">,</span> <span class="s2">&quot;size&quot;</span><span class="p">)</span>
 
@@ -1214,7 +1217,7 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span>
 
 <div class="viewcode-block" id="Int.pack_single">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Int.pack_single">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Int.pack_single">[docs]</a>
     <span class="k">def</span> <span class="nf">pack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">order</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_FIELD</span><span class="p">]</span><span class="o">.</span><span class="n">order</span>
         <span class="n">byteorder</span> <span class="o">=</span> <span class="s2">&quot;little&quot;</span> <span class="k">if</span> <span class="n">order</span> <span class="ow">is</span> <span class="n">LittleEndian</span> <span class="k">else</span> <span class="s2">&quot;big&quot;</span>
@@ -1224,7 +1227,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="Int.unpack_single">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Int.unpack_single">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Int.unpack_single">[docs]</a>
     <span class="k">def</span> <span class="nf">unpack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">memoryview</span><span class="p">:</span>
         <span class="n">order</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_FIELD</span><span class="p">]</span><span class="o">.</span><span class="n">order</span>
         <span class="n">byteorder</span> <span class="o">=</span> <span class="s2">&quot;little&quot;</span> <span class="k">if</span> <span class="n">order</span> <span class="ow">is</span> <span class="n">LittleEndian</span> <span class="k">else</span> <span class="s2">&quot;big&quot;</span>
@@ -1236,7 +1239,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="UInt">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.UInt">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.UInt">[docs]</a>
 <span class="k">class</span> <span class="nc">UInt</span><span class="p">(</span><span class="n">Int</span><span class="p">):</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
 

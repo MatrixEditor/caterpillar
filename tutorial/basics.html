@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>2. Basic Concepts &#8212; Caterpillar 2.1.5 documentation</title>
+    <title>2. Basic Concepts &#8212; Caterpillar 2.2.0 documentation</title>
   
   
   
@@ -29,6 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -36,9 +37,11 @@
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../_static/documentation_options.js?v=786ba454"></script>
+    <script src="../_static/documentation_options.js?v=b21de401"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'tutorial/basics';</script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -121,7 +124,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.1.5</p>
+    <p class="title logo__title">Caterpillar 2.2.0</p>
   
 </a></div>
     
@@ -350,7 +353,7 @@ document.write(`
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Roadmap</span></p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Python</span></p>
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="first_steps.html">1. First Steps</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">2. Basic Concepts</a></li>
@@ -418,7 +421,7 @@ document.write(`
 the stage for more advanced topics in the next chapter.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Some examples using the interpreter prompts make use of a shortcut to define <a class="reference internal" href="../library/fields/field_model.html#caterpillar.fields.Field" title="caterpillar.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a>
+<p>Some examples using the interpreter prompts make use of a shortcut to define <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code>
 objects:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">caterpillar.shortcuts</span> <span class="kn">import</span> <span class="n">F</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">F</span><span class="p">(</span><span class="n">uint8</span><span class="p">)</span>
@@ -432,42 +435,98 @@ objects:</p>
 <p>When dealing with binary data, numbers play a crucial role. Besides the default integer types
 (e.g., uint8, uint16, etc.), <em>caterpillar</em> introduces some special integer formats. The default
 types include:</p>
-<ul>
-<li><p>Unsigned (<code class="code docutils literal notranslate"><span class="pre">u...</span></code>) and signed:</p>
-<p><a class="reference internal" href="../library/fields/common.html#caterpillar.fields.int8" title="caterpillar.fields.int8"><code class="xref py py-attr docutils literal notranslate"><span class="pre">int8</span></code></a>, <a class="reference internal" href="../library/fields/common.html#caterpillar.fields.uint8" title="caterpillar.fields.uint8"><code class="xref py py-attr docutils literal notranslate"><span class="pre">uint8</span></code></a>,
-<a class="reference internal" href="../library/fields/common.html#caterpillar.fields.int16" title="caterpillar.fields.int16"><code class="xref py py-attr docutils literal notranslate"><span class="pre">int16</span></code></a>, <a class="reference internal" href="../library/fields/common.html#caterpillar.fields.uint16" title="caterpillar.fields.uint16"><code class="xref py py-attr docutils literal notranslate"><span class="pre">uint16</span></code></a>,
-<code class="xref py py-attr docutils literal notranslate"><span class="pre">int24</span></code>, <code class="xref py py-attr docutils literal notranslate"><span class="pre">uint24</span></code>,
-<a class="reference internal" href="../library/fields/common.html#caterpillar.fields.int32" title="caterpillar.fields.int32"><code class="xref py py-attr docutils literal notranslate"><span class="pre">int32</span></code></a>, <a class="reference internal" href="../library/fields/common.html#caterpillar.fields.uint32" title="caterpillar.fields.uint32"><code class="xref py py-attr docutils literal notranslate"><span class="pre">uint32</span></code></a>,
-<a class="reference internal" href="../library/fields/common.html#caterpillar.fields.int64" title="caterpillar.fields.int64"><code class="xref py py-attr docutils literal notranslate"><span class="pre">int64</span></code></a>, <a class="reference internal" href="../library/fields/common.html#caterpillar.fields.uint64" title="caterpillar.fields.uint64"><code class="xref py py-attr docutils literal notranslate"><span class="pre">uint64</span></code></a>,
-<a class="reference internal" href="../library/fields/common.html#caterpillar.fields.ssize_t" title="caterpillar.fields.ssize_t"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ssize_t</span></code></a>, <a class="reference internal" href="../library/fields/common.html#caterpillar.fields.size_t" title="caterpillar.fields.size_t"><code class="xref py py-attr docutils literal notranslate"><span class="pre">size_t</span></code></a>,</p>
-</li>
-<li><p>Floating point:</p>
-<p><a class="reference internal" href="../library/fields/common.html#caterpillar.fields.float16" title="caterpillar.fields.float16"><code class="xref py py-attr docutils literal notranslate"><span class="pre">float16</span></code></a>, <a class="reference internal" href="../library/fields/common.html#caterpillar.fields.float32" title="caterpillar.fields.float32"><code class="xref py py-attr docutils literal notranslate"><span class="pre">float32</span></code></a>,
-<a class="reference internal" href="../library/fields/common.html#caterpillar.fields.float64" title="caterpillar.fields.float64"><code class="xref py py-attr docutils literal notranslate"><span class="pre">float64</span></code></a></p>
-</li>
-<li><p>Special primitives:</p>
-<p><a class="reference internal" href="../library/fields/common.html#caterpillar.fields.boolean" title="caterpillar.fields.boolean"><code class="xref py py-attr docutils literal notranslate"><span class="pre">boolean</span></code></a>, <a class="reference internal" href="../library/fields/common.html#caterpillar.fields.char" title="caterpillar.fields.char"><code class="xref py py-attr docutils literal notranslate"><span class="pre">char</span></code></a>,
-<a class="reference internal" href="../library/fields/common.html#caterpillar.fields.void_ptr" title="caterpillar.fields.void_ptr"><code class="xref py py-attr docutils literal notranslate"><span class="pre">void_ptr</span></code></a></p>
-</li>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-0">
+Python</label><div class="sd-tab-content docutils">
+<ul class="simple">
+<li><p>Unsigned (<code class="code docutils literal notranslate"><span class="pre">u...</span></code>) and signed:</p></li>
 </ul>
+<p><code class="xref py py-attr docutils literal notranslate"><span class="pre">int8</span></code>, <code class="xref py py-attr docutils literal notranslate"><span class="pre">uint8</span></code>,
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">int16</span></code>, <code class="xref py py-attr docutils literal notranslate"><span class="pre">uint16</span></code>,
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">int24</span></code>, <code class="xref py py-attr docutils literal notranslate"><span class="pre">uint24</span></code>,
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">int32</span></code>, <code class="xref py py-attr docutils literal notranslate"><span class="pre">uint32</span></code>,
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">int64</span></code>, <code class="xref py py-attr docutils literal notranslate"><span class="pre">uint64</span></code>,
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">ssize_t</span></code>, <code class="xref py py-attr docutils literal notranslate"><span class="pre">size_t</span></code>,</p>
+<ul class="simple">
+<li><p>Floating point:</p></li>
+</ul>
+<p><code class="xref py py-attr docutils literal notranslate"><span class="pre">float16</span></code>, <code class="xref py py-attr docutils literal notranslate"><span class="pre">float32</span></code>,
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">float64</span></code></p>
+<ul class="simple">
+<li><p>Special primitives:</p></li>
+</ul>
+<p><code class="xref py py-attr docutils literal notranslate"><span class="pre">boolean</span></code>, <code class="xref py py-attr docutils literal notranslate"><span class="pre">char</span></code>,
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">void_ptr</span></code></p>
+</div>
+<input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-1">
+Caterpillar C</label><div class="sd-tab-content docutils">
+<ul class="simple">
+<li><p>Unsigned (<code class="code docutils literal notranslate"><span class="pre">u...</span></code>) and signed:</p></li>
+</ul>
+<p><a class="reference internal" href="../library/ctypes/int.html#caterpillar.c.i8" title="caterpillar.c.i8"><code class="xref py py-attr docutils literal notranslate"><span class="pre">i8</span></code></a>, <a class="reference internal" href="../library/ctypes/int.html#caterpillar.c.u8" title="caterpillar.c.u8"><code class="xref py py-attr docutils literal notranslate"><span class="pre">u8</span></code></a>,
+<a class="reference internal" href="../library/ctypes/int.html#caterpillar.c.i16" title="caterpillar.c.i16"><code class="xref py py-attr docutils literal notranslate"><span class="pre">i16</span></code></a>, <a class="reference internal" href="../library/ctypes/int.html#caterpillar.c.u16" title="caterpillar.c.u16"><code class="xref py py-attr docutils literal notranslate"><span class="pre">u16</span></code></a>,
+<a class="reference internal" href="../library/ctypes/int.html#caterpillar.c.i24" title="caterpillar.c.i24"><code class="xref py py-attr docutils literal notranslate"><span class="pre">i24</span></code></a>, <a class="reference internal" href="../library/ctypes/int.html#caterpillar.c.u24" title="caterpillar.c.u24"><code class="xref py py-attr docutils literal notranslate"><span class="pre">u24</span></code></a>,
+<a class="reference internal" href="../library/ctypes/int.html#caterpillar.c.i32" title="caterpillar.c.i32"><code class="xref py py-attr docutils literal notranslate"><span class="pre">i32</span></code></a>, <a class="reference internal" href="../library/ctypes/int.html#caterpillar.c.u32" title="caterpillar.c.u32"><code class="xref py py-attr docutils literal notranslate"><span class="pre">u32</span></code></a>,
+<a class="reference internal" href="../library/ctypes/int.html#caterpillar.c.i64" title="caterpillar.c.i64"><code class="xref py py-attr docutils literal notranslate"><span class="pre">i64</span></code></a>, <a class="reference internal" href="../library/ctypes/int.html#caterpillar.c.u64" title="caterpillar.c.u64"><code class="xref py py-attr docutils literal notranslate"><span class="pre">u64</span></code></a>,
+<a class="reference internal" href="../library/ctypes/int.html#caterpillar.c.i128" title="caterpillar.c.i128"><code class="xref py py-attr docutils literal notranslate"><span class="pre">i128</span></code></a>, <a class="reference internal" href="../library/ctypes/int.html#caterpillar.c.u128" title="caterpillar.c.u128"><code class="xref py py-attr docutils literal notranslate"><span class="pre">u128</span></code></a>,</p>
+<ul class="simple">
+<li><p>Floating point:</p></li>
+</ul>
+<p><code class="xref py py-attr docutils literal notranslate"><span class="pre">f16</span></code>, <code class="xref py py-attr docutils literal notranslate"><span class="pre">f32</span></code>,
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">f64</span></code></p>
+<ul class="simple">
+<li><p>Special primitives:</p></li>
+</ul>
+<p><code class="xref py py-attr docutils literal notranslate"><span class="pre">boolean</span></code>, <code class="xref py py-attr docutils literal notranslate"><span class="pre">char</span></code></p>
+</div>
+</div>
 <section id="custom-sized-integer">
 <h4><span class="section-number">2.1.1.1. </span>Custom-sized integer<a class="headerlink" href="#custom-sized-integer" title="Link to this heading">#</a></h4>
 <p>It’s also possible to use integers with a custom size (in bits). However, it’s important to note
 that you have to define the struct with the bit count, and internally, only the occupied bytes
 will be used. For example:</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-2" name="sd-tab-set-1" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-2">
+Python</label><div class="sd-tab-content docutils">
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">F</span><span class="p">(</span><span class="n">Int</span><span class="p">(</span><span class="mi">24</span><span class="p">))</span>      <span class="c1"># three-byte signed integer</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">F</span><span class="p">(</span><span class="n">UInt</span><span class="p">(</span><span class="mi">40</span><span class="p">))</span>     <span class="c1"># five-byte unsigned integer</span>
 </pre></div>
 </div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">F</span><span class="p">(</span><span class="n">UInt</span><span class="p">(</span><span class="mi">40</span><span class="p">))</span>     <span class="c1"># five-byte unsigned integer</span>
+</div>
+<input id="sd-tab-item-3" name="sd-tab-set-1" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-3">
+Caterpillar C</label><div class="sd-tab-content docutils">
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">i48</span> <span class="o">=</span> <span class="n">Int</span><span class="p">(</span><span class="mi">48</span><span class="p">)</span>               <span class="c1"># six-byte signed integer</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">u40</span> <span class="o">=</span> <span class="n">Int</span><span class="p">(</span><span class="mi">40</span><span class="p">,</span> <span class="n">signed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="c1"># five-byte unsigned integer</span>
 </pre></div>
+</div>
+</div>
 </div>
 </section>
 <section id="variable-sized-integer">
 <h4><span class="section-number">2.1.1.2. </span>Variable-sized integer<a class="headerlink" href="#variable-sized-integer" title="Link to this heading">#</a></h4>
-<p>The built-in struct <a class="reference internal" href="../library/fields/common.html#caterpillar.fields.VarInt" title="caterpillar.fields.VarInt"><code class="xref py py-class docutils literal notranslate"><span class="pre">VarInt</span></code></a> supports parsing and building integers with variable length. Its
+<p>The built-in struct <a class="reference internal" href="../library/fields/common.html#caterpillar.py.VarInt" title="caterpillar.py.VarInt"><code class="xref py py-class docutils literal notranslate"><span class="pre">py.VarInt</span></code></a>/<code class="xref py py-class docutils literal notranslate"><span class="pre">c.VarInt</span></code> supports parsing and building integers with variable length. Its
 documentation provides a detailed explanation of all different configurations.</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-4" name="sd-tab-set-2" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-4">
+Python</label><div class="sd-tab-content docutils">
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">F</span><span class="p">(</span><span class="n">vint</span><span class="p">)</span> <span class="c1"># or F(VarInt())</span>
 </pre></div>
+</div>
+</div>
+<input id="sd-tab-item-5" name="sd-tab-set-2" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-5">
+Caterpillar C</label><div class="sd-tab-content docutils">
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># use &#39;varint&#39; directly or use VarInt()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">be_varint</span> <span class="o">=</span> <span class="n">BIG_ENDIAN</span> <span class="o">+</span> <span class="n">varint</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">le_varint</span> <span class="o">=</span> <span class="n">VarInt</span><span class="p">(</span><span class="n">little_endian</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
 </div>
 </section>
 </section>
@@ -477,6 +536,10 @@ documentation provides a detailed explanation of all different configurations.</
 standard Python enumerations - classes extending  <code class="code docutils literal notranslate"><span class="pre">enum.Enum</span></code> - with ease.</p>
 <p>Let’s revisit <a class="reference external" href="https://www.w3.org/TR/png/#11pHYs">pHYS</a> chunk to add an enum to the
 last field.</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-6" name="sd-tab-set-3" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-6">
+Python</label><div class="sd-tab-content docutils">
 <div class="literal-block-wrapper docutils container" id="id1">
 <div class="code-block-caption"><span class="caption-text">Simple enumeration in a struct definition</span><a class="headerlink" href="#id1" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">enum</span>
@@ -494,6 +557,28 @@ last field.</p>
 </pre></div>
 </div>
 </div>
+</div>
+<input id="sd-tab-item-7" name="sd-tab-set-3" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-7">
+Caterpillar C</label><div class="sd-tab-content docutils">
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">Simple enumeration in a struct definition</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">enum</span>
+
+<span class="k">class</span> <span class="nc">PHYSUnit</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">IntEnum</span><span class="p">):</span>       <span class="c1"># &lt;-- the enum value doesn&#39;t have to be int</span>
+    <span class="n">UNKNOWN</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">METRE</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="nd">@struct</span><span class="p">(</span><span class="n">endian</span><span class="o">=</span><span class="n">BIG_ENDIAN</span><span class="p">)</span>          <span class="c1"># &lt;-- same as before</span>
+<span class="k">class</span> <span class="nc">PHYSChunk</span><span class="p">:</span>
+    <span class="n">pixels_per_unit_x</span><span class="p">:</span> <span class="n">u32</span>
+    <span class="n">pixels_per_unit_y</span><span class="p">:</span> <span class="n">u32</span>
+    <span class="n">unit</span><span class="p">:</span> <span class="n">enumeration</span><span class="p">(</span><span class="n">u8</span><span class="p">,</span> <span class="n">PHYSUnit</span><span class="p">)</span> <span class="c1"># &lt;-- atom is required here</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
 <p>It’s worth noting that a default value can be specified for the field as a fallback. If
@@ -507,8 +592,25 @@ will be triggered.</p>
 simplifies this with item access for defining arrays of static or dynamic size.</p>
 <p>We started with the <a class="reference external" href="https://www.w3.org/TR/png/#11PLTE">PLTE</a> chunk, which stores three-byte
 sequences. We can define an array of RGB objects as follows:</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-8" name="sd-tab-set-4" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-8">
+Python</label><div class="sd-tab-content docutils">
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">PLTEChunk</span> <span class="o">=</span> <span class="n">RGB</span><span class="p">[</span><span class="n">this</span><span class="o">.</span><span class="n">length</span> <span class="o">/</span> <span class="mi">3</span><span class="p">]</span>
 </pre></div>
+</div>
+</div>
+<input id="sd-tab-item-9" name="sd-tab-set-4" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-9">
+Caterpillar C</label><div class="sd-tab-content docutils">
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">PLTEChunk</span> <span class="o">=</span> <span class="n">RGB</span><span class="o">.</span><span class="n">__struct__</span><span class="p">[</span><span class="n">ContextPath</span><span class="p">(</span><span class="s2">&quot;obj.length&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="mi">3</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.2.0: </span>The syntax will be changed once <cite>__class_getitem__</cite> is implemented by
+any <code class="xref py py-class docutils literal notranslate"><span class="pre">c.Struct</span></code> instance.</p>
+</div>
+</div>
 </div>
 <p>Since this chunk has only one field, the array specifier is used to make it a list type. The
 length is calculated based on the chunk’s length field divided by three because the RGB class
@@ -520,9 +622,16 @@ occupies three bytes.</p>
 <h4><span class="section-number">2.1.4.1. </span>CString<a class="headerlink" href="#cstring" title="Link to this heading">#</a></h4>
 <p>The CString in this library extends beyond a mere reference to C strings. It provides
 additional functionality, as demonstrated in the structure of the next chunk.</p>
-<div class="literal-block-wrapper docutils container" id="id2">
-<div class="code-block-caption"><span class="caption-text">The <a class="reference external" href="https://www.w3.org/TR/png/#11tEXt">tEXt</a> chunk structure</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-10" name="sd-tab-set-5" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-10">
+Python</label><div class="sd-tab-content docutils">
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">The <a class="reference external" href="https://www.w3.org/TR/png/#11tEXt">tEXt</a> chunk structure</span><a class="headerlink" href="#id3" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">caterpillar.py</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">caterpillar.shortcuts</span> <span class="kn">import</span> <span class="n">lenof</span>
+
+<span class="nd">@struct</span>
 <span class="k">class</span> <span class="nc">TEXTChunk</span><span class="p">:</span>
     <span class="c1"># dynamic sized string that ends with a null-byte</span>
     <span class="n">keyword</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;ISO-8859-1&quot;</span><span class="p">)</span>
@@ -534,6 +643,34 @@ additional functionality, as demonstrated in the structure of the next chunk.</p
 </pre></div>
 </div>
 </div>
+</div>
+<input id="sd-tab-item-11" name="sd-tab-set-5" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-11">
+Caterpillar C</label><div class="sd-tab-content docutils">
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">The <cite>tEXt</cite> chunk structure</span><a class="headerlink" href="#id4" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">caterpillar.c</span> <span class="kn">import</span> <span class="o">*</span>                 <span class="c1"># &lt;-- main difference</span>
+<span class="kn">from</span> <span class="nn">caterpillar.shortcuts</span> <span class="kn">import</span> <span class="n">lenof</span>
+<span class="c1"># NOTE: lenof works here, because Caterpillar C&#39;s Context implements</span>
+<span class="c1"># the &#39;Context Protocol&#39;.</span>
+
+<span class="n">parent</span> <span class="o">=</span> <span class="n">ContextPath</span><span class="p">(</span><span class="s2">&quot;parent.obj&quot;</span><span class="p">)</span>
+<span class="n">this</span> <span class="o">=</span> <span class="n">ContextPath</span><span class="p">(</span><span class="s2">&quot;obj&quot;</span><span class="p">)</span>
+
+<span class="nd">@struct</span>
+<span class="k">class</span> <span class="nc">TEXTChunk</span><span class="p">:</span>
+    <span class="c1"># dynamic sized string that ends with a null-byte</span>
+    <span class="n">keyword</span><span class="p">:</span> <span class="n">cstring</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;ISO-8859-1&quot;</span><span class="p">)</span>
+    <span class="c1"># static sized string based on the current context. some notes:</span>
+    <span class="c1">#   - parent.length is the current chunkt&#39;s length</span>
+    <span class="c1">#   - lenof(...) is the runtime length of the context variable</span>
+    <span class="c1">#   - 1 because of the extra null-byte that is stripped from keyword</span>
+    <span class="n">text</span><span class="p">:</span> <span class="n">cstring</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;ISO-8859-1&quot;</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="n">parent</span><span class="o">.</span><span class="n">length</span> <span class="o">-</span> <span class="n">lenof</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">keword</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
 <div class="admonition-challenge admonition">
 <p class="admonition-title">Challenge</p>
 <p>You are now ready to implement the <a class="reference external" href="https://www.w3.org/TR/png/#11iTXt">iTXt</a> chunk. Try it yourself!</p>
@@ -541,50 +678,124 @@ additional functionality, as demonstrated in the structure of the next chunk.</p
 <summary class="sd-summary-title sd-card-header">
 <span class="sd-summary-icon"><svg version="1.1" width="1.0em" height="1.0em" class="sd-octicon sd-octicon-check" viewBox="0 0 16 16" aria-hidden="true"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path></svg></span><span class="sd-summary-text">Solution</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
 <p class="sd-card-text">This solution serves as an example and isn’t the only way to approach it!</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
-<span class="k">class</span> <span class="nc">ITXTChunk</span><span class="p">:</span>
-    <span class="n">keyword</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
-    <span class="n">compression_flag</span><span class="p">:</span> <span class="n">uint8</span>
-    <span class="c1"># we actually don&#39;t need an Enum here</span>
-    <span class="n">compression_method</span><span class="p">:</span> <span class="n">uint8</span>
-    <span class="n">language_tag</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;ASCII&quot;</span><span class="p">)</span>
-    <span class="n">translated_keyword</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
-    <span class="c1"># length is calculated with parent.length - len(keyword)+len(b&quot;\x00&quot;) - ...</span>
-    <span class="n">text</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span>
-        <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span>
-        <span class="n">length</span><span class="o">=</span><span class="n">parent</span><span class="o">.</span><span class="n">length</span> <span class="o">-</span> <span class="n">lenof</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">translated_keyword</span><span class="p">)</span> <span class="o">-</span> <span class="n">lenof</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">keyword</span><span class="p">)</span> <span class="o">-</span> <span class="mi">5</span><span class="p">,</span>
-    <span class="p">)</span>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-12" name="sd-tab-set-6" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-12">
+Python</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nd">@struct</span>
+<span class="linenos"> 2</span><span class="k">class</span> <span class="nc">ITXTChunk</span><span class="p">:</span>
+<span class="linenos"> 3</span>    <span class="n">keyword</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+<span class="linenos"> 4</span>    <span class="n">compression_flag</span><span class="p">:</span> <span class="n">uint8</span>
+<span class="linenos"> 5</span>    <span class="c1"># we actually don&#39;t need an Enum here</span>
+<span class="linenos"> 6</span>    <span class="n">compression_method</span><span class="p">:</span> <span class="n">uint8</span>
+<span class="linenos"> 7</span>    <span class="n">language_tag</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;ASCII&quot;</span><span class="p">)</span>
+<span class="linenos"> 8</span>    <span class="n">translated_keyword</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+<span class="linenos"> 9</span>    <span class="c1"># length is calculated with parent.length - len(keyword)+len(b&quot;\x00&quot;) - ...</span>
+<span class="linenos">10</span>    <span class="n">text</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span>
+<span class="linenos">11</span>        <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span>
+<span class="linenos">12</span>        <span class="n">length</span><span class="o">=</span><span class="n">parent</span><span class="o">.</span><span class="n">length</span> <span class="o">-</span> <span class="n">lenof</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">translated_keyword</span><span class="p">)</span> <span class="o">-</span> <span class="n">lenof</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">keyword</span><span class="p">)</span> <span class="o">-</span> <span class="mi">5</span><span class="p">,</span>
+<span class="linenos">13</span>    <span class="p">)</span>
 </pre></div>
+</div>
+</div>
+<input id="sd-tab-item-13" name="sd-tab-set-6" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-13">
+Caterpillar C</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">from</span> <span class="nn">caterpillar.c</span> <span class="kn">import</span> <span class="o">*</span>                 <span class="c1"># &lt;-- main difference</span>
+<span class="linenos"> 2</span><span class="kn">from</span> <span class="nn">caterpillar.shortcuts</span> <span class="kn">import</span> <span class="n">lenof</span>
+<span class="linenos"> 3</span>
+<span class="linenos"> 4</span><span class="n">parent</span> <span class="o">=</span> <span class="n">ContextPath</span><span class="p">(</span><span class="s2">&quot;parent.obj&quot;</span><span class="p">)</span>
+<span class="linenos"> 5</span><span class="n">this</span> <span class="o">=</span> <span class="n">ContextPath</span><span class="p">(</span><span class="s2">&quot;obj&quot;</span><span class="p">)</span>
+<span class="linenos"> 6</span>
+<span class="linenos"> 7</span><span class="nd">@struct</span>
+<span class="linenos"> 8</span><span class="k">class</span> <span class="nc">ITXTChunk</span><span class="p">:</span>
+<span class="linenos"> 9</span>    <span class="n">keyword</span><span class="p">:</span> <span class="n">cstring</span><span class="p">()</span> <span class="c1"># default encoding is &quot;utf-8&quot;</span>
+<span class="linenos">10</span>    <span class="n">compression_flag</span><span class="p">:</span> <span class="n">u8</span>
+<span class="linenos">11</span>    <span class="c1"># we actually don&#39;t need an Enum here</span>
+<span class="linenos">12</span>    <span class="n">compression_method</span><span class="p">:</span> <span class="n">u8</span>
+<span class="linenos">13</span>    <span class="n">language_tag</span><span class="p">:</span> <span class="n">cstring</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;ASCII&quot;</span><span class="p">)</span>
+<span class="linenos">14</span>    <span class="n">translated_keyword</span><span class="p">:</span> <span class="n">cstring</span><span class="p">(</span><span class="o">...</span><span class="p">)</span> <span class="c1"># explicit greedy parsing</span>
+<span class="linenos">15</span>    <span class="c1"># length is calculated with parent.length - len(keyword)+len(b&quot;\x00&quot;) - ...</span>
+<span class="linenos">16</span>    <span class="n">text</span><span class="p">:</span> <span class="n">cstring</span><span class="p">(</span>
+<span class="linenos">17</span>        <span class="n">parent</span><span class="o">.</span><span class="n">length</span> <span class="o">-</span> <span class="n">lenof</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">translated_keyword</span><span class="p">)</span> <span class="o">-</span> <span class="n">lenof</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">keyword</span><span class="p">)</span> <span class="o">-</span> <span class="mi">5</span><span class="p">,</span>
+<span class="linenos">18</span>    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
 </div>
 </div>
 </details></div>
 <p>You can also apply your own termination character, for example:</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-14" name="sd-tab-set-7" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-14">
+Python</label><div class="sd-tab-content docutils">
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span> <span class="o">=</span> <span class="n">CString</span><span class="p">(</span><span class="n">pad</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\x0A</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
+</div>
+</div>
+<input id="sd-tab-item-15" name="sd-tab-set-7" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-15">
+Caterpillar C</label><div class="sd-tab-content docutils">
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">cstring</span><span class="p">(</span><span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\x0A</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
 </div>
 <p>This struct will use a space as the termination character and strip all trailing
 padding bytes.</p>
 </section>
 <section id="string">
 <h4><span class="section-number">2.1.4.2. </span>String<a class="headerlink" href="#string" title="Link to this heading">#</a></h4>
-<p>Besides special the special <em>c strings</em> there’s a default <a class="reference internal" href="../library/fields/common.html#caterpillar.fields.String" title="caterpillar.fields.String"><code class="xref py py-class docutils literal notranslate"><span class="pre">String</span></code></a> class that implements
+<p>Besides special the special <em>c strings</em> there’s a default <code class="xref py py-class docutils literal notranslate"><span class="pre">String</span></code> class that implements
 the basic behaviour of a string. It’s crucial to specify the length for this struct.</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-16" name="sd-tab-set-8" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-16">
+Python</label><div class="sd-tab-content docutils">
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span> <span class="o">=</span> <span class="n">String</span><span class="p">(</span><span class="mi">100</span> <span class="ow">or</span> <span class="n">this</span><span class="o">.</span><span class="n">length</span><span class="p">)</span> <span class="c1"># static integer or context lambda</span>
 </pre></div>
+</div>
+</div>
+<input id="sd-tab-item-17" name="sd-tab-set-8" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-17">
+Caterpillar C</label><div class="sd-tab-content docutils">
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># takes static length, context lambda, another atom or ... for greedy parsing</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">cstring</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
 </div>
 </section>
 <section id="prefixed">
 <h4><span class="section-number">2.1.4.3. </span>Prefixed<a class="headerlink" href="#prefixed" title="Link to this heading">#</a></h4>
-<p>The <a class="reference internal" href="../library/fields/common.html#caterpillar.fields.Prefixed" title="caterpillar.fields.Prefixed"><code class="xref py py-class docutils literal notranslate"><span class="pre">Prefixed</span></code></a> class introduces so-called <em>Pascal strings</em> for raw bytes and strings. If no
+<p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">Prefixed</span></code> class introduces so-called <em>Pascal strings</em> for raw bytes and strings. If no
 encoding is specified, the returned value will be of type <code class="code docutils literal notranslate"><span class="pre">bytes</span></code>. This class reads a length
 using the given struct and then retrieves the corresponding number of bytes from the stream returned
 by that struct.</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-18" name="sd-tab-set-9" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-18">
+Python</label><div class="sd-tab-content docutils">
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">F</span><span class="p">(</span><span class="n">Prefixed</span><span class="p">(</span><span class="n">uint8</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="s2">&quot;Hello, World!&quot;</span><span class="p">,</span> <span class="n">field</span><span class="p">)</span>
 <span class="go">b&#39;\rHello, World!&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span>
 <span class="go">&#39;Hello, World!&#39;</span>
 </pre></div>
+</div>
+</div>
+<input id="sd-tab-item-19" name="sd-tab-set-9" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-19">
+Caterpillar C</label><div class="sd-tab-content docutils">
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">pstring</span><span class="p">(</span><span class="n">u8</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="s2">&quot;Hello, World!&quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+<span class="go">b&#39;\rHello, World!&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+<span class="go">&#39;Hello, World!&#39;</span>
+</pre></div>
+</div>
+</div>
 </div>
 </section>
 </section>
@@ -593,7 +804,11 @@ by that struct.</p>
 <section id="memory">
 <h4><span class="section-number">2.1.5.1. </span>Memory<a class="headerlink" href="#memory" title="Link to this heading">#</a></h4>
 <p>When dealing with data that can be stored in memory and you intend to print out your
-unpacked object, the <a class="reference internal" href="../library/fields/common.html#caterpillar.fields.Memory" title="caterpillar.fields.Memory"><code class="xref py py-class docutils literal notranslate"><span class="pre">Memory</span></code></a> struct is recommended.</p>
+unpacked object, the <code class="xref py py-class docutils literal notranslate"><span class="pre">Memory</span></code> struct is recommended.</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-20" name="sd-tab-set-10" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-20">
+Python</label><div class="sd-tab-content docutils">
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">F</span><span class="p">(</span><span class="n">Memory</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span> <span class="c1"># static size; dynamic size is allowed too</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="nb">bytes</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)],</span> <span class="n">m</span><span class="p">))</span>
 <span class="go">b&#39;\x00\x01\x02\x03\x04&#39;</span>
@@ -601,25 +816,66 @@ unpacked object, the <a class="reference internal" href="../library/fields/commo
 <span class="go">&lt;memory at 0x00000204FDFA4411&gt;</span>
 </pre></div>
 </div>
+</div>
+<input id="sd-tab-item-21" name="sd-tab-set-10" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-21">
+Caterpillar C</label><div class="sd-tab-content docutils">
+<p><em>Not supported yet.</em></p>
+</div>
+</div>
 </section>
 <section id="bytes">
 <h4><span class="section-number">2.1.5.2. </span>Bytes<a class="headerlink" href="#bytes" title="Link to this heading">#</a></h4>
-<p>If direct access to the bytes is what you need, the <a class="reference internal" href="../library/fields/common.html#caterpillar.fields.Bytes" title="caterpillar.fields.Bytes"><code class="xref py py-class docutils literal notranslate"><span class="pre">Bytes</span></code></a> struct comes in handy. It
+<p>If direct access to the bytes is what you need, the <code class="xref py py-class docutils literal notranslate"><span class="pre">Bytes</span></code> struct comes in handy. It
 converts the <code class="code docutils literal notranslate"><span class="pre">memoryview</span></code> to <code class="code docutils literal notranslate"><span class="pre">bytes</span></code>. Additionally, as mentioned earlier, you can
-use the <a class="reference internal" href="../library/fields/common.html#caterpillar.fields.Prefixed" title="caterpillar.fields.Prefixed"><code class="xref py py-class docutils literal notranslate"><span class="pre">Prefixed</span></code></a> class to unpack bytes of a prefixed size.</p>
+use the <code class="xref py py-class docutils literal notranslate"><span class="pre">Prefixed</span></code> class to unpack bytes of a prefixed size.</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-22" name="sd-tab-set-11" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-22">
+Python</label><div class="sd-tab-content docutils">
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">F</span><span class="p">(</span><span class="n">Bytes</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span> <span class="c1"># static, dynamic and greedy size allowed</span>
 </pre></div>
 </div>
+</div>
+<input id="sd-tab-item-23" name="sd-tab-set-11" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-23">
+Caterpillar C</label><div class="sd-tab-content docutils">
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">octetstring</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="c1"># static, dynamic size allowed</span>
+</pre></div>
+</div>
+</div>
+</div>
 <p>With the gained knowledge, let’s implement the struct for the <a class="reference external" href="https://www.w3.org/TR/png/#fdAT-chunk">fDAT</a>
 chunk of our PNG format. It should look like this:</p>
-<div class="literal-block-wrapper docutils container" id="id3">
-<div class="code-block-caption"><span class="caption-text">Implementation for the frame data chunk</span><a class="headerlink" href="#id3" title="Link to this code">#</a></div>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-24" name="sd-tab-set-12" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-24">
+Python</label><div class="sd-tab-content docutils">
+<div class="literal-block-wrapper docutils container" id="id5">
+<div class="code-block-caption"><span class="caption-text">Implementation for the frame data chunk</span><a class="headerlink" href="#id5" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span>                    <span class="c1"># &lt;-- endianess as usual</span>
 <span class="k">class</span> <span class="nc">FDATChunk</span><span class="p">:</span>
     <span class="n">sequence_number</span><span class="p">:</span> <span class="n">uint32</span>
     <span class="c1"># We rather use a memory instance here instead of Bytes()</span>
     <span class="n">frame_data</span><span class="p">:</span> <span class="n">Memory</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">length</span> <span class="o">-</span> <span class="mi">4</span><span class="p">)</span>
 </pre></div>
+</div>
+</div>
+</div>
+<input id="sd-tab-item-25" name="sd-tab-set-12" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-25">
+Caterpillar C</label><div class="sd-tab-content docutils">
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-text">Implementation for the frame data chunk</span><a class="headerlink" href="#id6" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">parent</span> <span class="o">=</span> <span class="n">ContextPath</span><span class="p">(</span><span class="s2">&quot;parent.obj&quot;</span><span class="p">)</span>
+
+<span class="nd">@struct</span><span class="p">(</span><span class="n">endian</span><span class="o">=</span><span class="n">BIG_ENDIAN</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">FDATChunk</span><span class="p">:</span>
+    <span class="n">sequence_number</span><span class="p">:</span> <span class="n">u32</span>
+    <span class="n">frame_data</span><span class="p">:</span> <span class="n">octetstring</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">length</span> <span class="o">-</span> <span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
 </div>
 </div>
 <div class="admonition-challenge admonition">
@@ -629,8 +885,9 @@ chunk of our PNG format. It should look like this:</p>
 <details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
 <summary class="sd-summary-title sd-card-header">
 <span class="sd-summary-text">Solution</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
-<div class="literal-block-wrapper docutils container" id="id4">
-<div class="code-block-caption"><span class="caption-text">Sample implementation of the <em>zTXt</em> chunk</span><a class="headerlink" href="#id4" title="Link to this code">#</a></div>
+<p class="sd-card-text">Python API only:</p>
+<div class="literal-block-wrapper docutils container" id="id7">
+<div class="code-block-caption"><span class="caption-text">Sample implementation of the <em>zTXt</em> chunk</span><a class="headerlink" href="#id7" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>                             <span class="c1"># &lt;-- actually, we don&#39;t need a specific byteorder</span>
 <span class="k">class</span> <span class="nc">ZTXTChunk</span><span class="p">:</span>
     <span class="n">keyword</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>           <span class="c1"># &lt;-- variable length</span>
@@ -649,7 +906,7 @@ chunk of our PNG format. It should look like this:</p>
 <h3><span class="section-number">2.1.6. </span>Padding<a class="headerlink" href="#padding" title="Link to this heading">#</a></h3>
 <p>In certain scenarios, you may need to apply padding to your structs. <em>caterpillar</em> doesn’t
 store any data associated with paddings. If you need to retain the content of a padding,
-you can use <a class="reference internal" href="../library/fields/common.html#caterpillar.fields.Bytes" title="caterpillar.fields.Bytes"><code class="xref py py-class docutils literal notranslate"><span class="pre">Bytes</span></code></a> or <a class="reference internal" href="../library/fields/common.html#caterpillar.fields.Memory" title="caterpillar.fields.Memory"><code class="xref py py-class docutils literal notranslate"><span class="pre">Memory</span></code></a> again. For example:</p>
+you can use <code class="xref py py-class docutils literal notranslate"><span class="pre">Bytes</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">Memory</span></code> again. For example:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">padding</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span>  <span class="c1"># padding always with a length</span>
 </pre></div>
 </div>
@@ -666,13 +923,34 @@ process. A context contains special variables, which are discussed in the <a cla
 reference in detail.</p>
 <p>The current object that is being packed or parsed can be referenced with a shortcut <a class="reference internal" href="../library/context.html#caterpillar.context.this" title="caterpillar.context.this"><code class="xref py py-attr docutils literal notranslate"><span class="pre">this</span></code></a>.
 Additionally, the parent object (if any) can be referenced by using <a class="reference internal" href="../library/context.html#caterpillar.context.parent" title="caterpillar.context.parent"><code class="xref py py-attr docutils literal notranslate"><span class="pre">parent</span></code></a>.</p>
-<div class="literal-block-wrapper docutils container" id="id5">
-<div class="code-block-caption"><span class="caption-text">Understanding the <em>context</em></span><a class="headerlink" href="#id5" title="Link to this code">#</a></div>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-26" name="sd-tab-set-13" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-26">
+Python</label><div class="sd-tab-content docutils">
+<div class="literal-block-wrapper docutils container" id="id8">
+<div class="code-block-caption"><span class="caption-text">Understanding the <em>context</em></span><a class="headerlink" href="#id8" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
 <span class="k">class</span> <span class="nc">Format</span><span class="p">:</span>
     <span class="n">length</span><span class="p">:</span> <span class="n">uint8</span>
     <span class="n">foo</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">length</span><span class="p">)</span>   <span class="c1"># &lt;-- just reference the length field</span>
 </pre></div>
+</div>
+</div>
+</div>
+<input id="sd-tab-item-27" name="sd-tab-set-13" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-27">
+Caterpillar C</label><div class="sd-tab-content docutils">
+<div class="literal-block-wrapper docutils container" id="id9">
+<div class="code-block-caption"><span class="caption-text">Understanding the <em>context</em></span><a class="headerlink" href="#id9" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">this</span> <span class="o">=</span> <span class="n">ContextPath</span><span class="p">(</span><span class="s2">&quot;obj&quot;</span><span class="p">)</span>
+
+<span class="nd">@struct</span>
+<span class="k">class</span> <span class="nc">Format</span><span class="p">:</span>
+    <span class="n">length</span><span class="p">:</span> <span class="n">u8</span>
+    <span class="n">foo</span><span class="p">:</span> <span class="n">cstring</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">length</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
 </div>
 </div>
 <div class="admonition note">
@@ -705,8 +983,8 @@ the constructor every time.</p>
 <h4><span class="section-number">2.3.1.1. </span>ConstBytes<a class="headerlink" href="#constbytes" title="Link to this heading">#</a></h4>
 <p>These constants can be defined implicitly by annotating a field in a struct class with bytes.
 For example, in the case of starting the <em>main</em> PNG struct:</p>
-<div class="literal-block-wrapper docutils container" id="id6">
-<div class="code-block-caption"><span class="caption-text">Starting the <em>main</em> PNG struct</span><a class="headerlink" href="#id6" title="Link to this code">#</a></div>
+<div class="literal-block-wrapper docutils container" id="id10">
+<div class="code-block-caption"><span class="caption-text">Starting the <em>main</em> PNG struct</span><a class="headerlink" href="#id10" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span> <span class="c1"># &lt;-- will be relevant later on</span>
 <span class="k">class</span> <span class="nc">PNG</span><span class="p">:</span>
     <span class="n">magic</span><span class="p">:</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x89</span><span class="s2">PNG</span><span class="se">\x0D\x0A\x1A\x0A</span><span class="s2">&quot;</span>
@@ -751,8 +1029,8 @@ a <code class="xref py py-class docutils literal notranslate"><span class="pre">
 <details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
 <summary class="sd-summary-title sd-card-header">
 <span class="sd-summary-text">Solution</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
-<div class="literal-block-wrapper docutils container" id="id7">
-<div class="code-block-caption"><span class="caption-text">Example implementation of the <em>gAMA</em> chunk</span><a class="headerlink" href="#id7" title="Link to this code">#</a></div>
+<div class="literal-block-wrapper docutils container" id="id11">
+<div class="code-block-caption"><span class="caption-text">Example implementation of the <em>gAMA</em> chunk</span><a class="headerlink" href="#id11" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span>    <span class="c1"># &lt;-- same as usual</span>
 <span class="k">class</span> <span class="nc">GAMAChunk</span><span class="p">:</span>
     <span class="n">gamma</span><span class="p">:</span> <span class="n">uint32</span>
@@ -762,7 +1040,7 @@ a <code class="xref py py-class docutils literal notranslate"><span class="pre">
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p class="sd-card-text">Question: Do we really need to introduce the gamma_value using a <a class="reference internal" href="../library/fields/common.html#caterpillar.fields.Computed" title="caterpillar.fields.Computed"><code class="xref py py-class docutils literal notranslate"><span class="pre">Computed</span></code></a> struct here
+<p class="sd-card-text">Question: Do we really need to introduce the gamma_value using a <code class="xref py py-class docutils literal notranslate"><span class="pre">Computed</span></code> struct here
 or can we just define a method?</p>
 </div>
 </div>
@@ -770,7 +1048,7 @@ or can we just define a method?</p>
 </section>
 <section id="pass">
 <h4><span class="section-number">2.3.3.2. </span>Pass<a class="headerlink" href="#pass" title="Link to this heading">#</a></h4>
-<p>In case nothing should be done, just use <a class="reference internal" href="../library/fields/common.html#caterpillar.fields.Pass" title="caterpillar.fields.Pass"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pass</span></code></a>. This struct won’t affect the stream in any way.</p>
+<p>In case nothing should be done, just use <code class="xref py py-class docutils literal notranslate"><span class="pre">Pass</span></code>. This struct won’t affect the stream in any way.</p>
 <hr><div class="admonition important">
 <p class="admonition-title">Important</p>
 <p>Congratulations! You have successfully mastered the basics of <em>caterpillar</em>! Are you

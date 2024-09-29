@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>caterpillar.fields._base &#8212; Caterpillar 2.1.5 documentation</title>
+    <title>caterpillar.fields._base &#8212; Caterpillar 2.2.0 documentation</title>
   
   
   
@@ -28,6 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -35,9 +36,11 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=786ba454"></script>
+    <script src="../../../_static/documentation_options.js?v=b21de401"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/caterpillar/fields/_base';</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -118,7 +121,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.1.5</p>
+    <p class="title logo__title">Caterpillar 2.2.0</p>
   
 </a></div>
     
@@ -453,7 +456,7 @@ document.write(`
 
 <span class="c1"># @dataclass(init=False)</span>
 <div class="viewcode-block" id="Field">
-<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.Field">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.py.Field">[docs]</a>
 <span class="k">class</span> <span class="nc">Field</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents a field in a data structure.&quot;&quot;&quot;</span>
 
@@ -644,7 +647,7 @@ document.write(`
     <span class="fm">__isub__</span> <span class="o">=</span> <span class="fm">__rsub__</span>
 
 <div class="viewcode-block" id="Field.is_seq">
-<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.Field.is_seq">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.py.Field.is_seq">[docs]</a>
     <span class="k">def</span> <span class="nf">is_seq</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns whether this field is sequential.</span>
 
@@ -656,7 +659,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="Field.is_enabled">
-<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.Field.is_enabled">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.py.Field.is_enabled">[docs]</a>
     <span class="k">def</span> <span class="nf">is_enabled</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Evaluates the condition of this field.</span>
 
@@ -669,14 +672,14 @@ document.write(`
 
 
 <div class="viewcode-block" id="Field.has_condition">
-<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.Field.has_condition">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.py.Field.has_condition">[docs]</a>
     <span class="k">def</span> <span class="nf">has_condition</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns whether this field is linked to a condition&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">condition</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">True</span></div>
 
 
 <div class="viewcode-block" id="Field.has_flag">
-<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.Field.has_flag">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.py.Field.has_flag">[docs]</a>
     <span class="k">def</span> <span class="nf">has_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flag</span><span class="p">:</span> <span class="n">Flag</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Checks whether this field stores the given flag.</span>
 
@@ -690,7 +693,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="Field.length">
-<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.Field.length">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.py.Field.length">[docs]</a>
     <span class="k">def</span> <span class="nf">length</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">_GreedyType</span><span class="p">,</span> <span class="n">_PrefixedType</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculates the sequence length of this field.</span>
 
@@ -710,7 +713,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="Field.get_struct">
-<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.Field.get_struct">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.py.Field.get_struct">[docs]</a>
     <span class="k">def</span> <span class="nf">get_struct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_StructLike</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the struct from stored options.</span>
 
@@ -742,14 +745,14 @@ document.write(`
 
 
 <div class="viewcode-block" id="Field.get_offset">
-<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.Field.get_offset">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.py.Field.get_offset">[docs]</a>
     <span class="k">def</span> <span class="nf">get_offset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the offset position of this field&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span><span class="n">context</span><span class="p">)</span> <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">)</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span></div>
 
 
 <div class="viewcode-block" id="Field.get_type">
-<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.Field.get_type">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.py.Field.get_type">[docs]</a>
     <span class="k">def</span> <span class="nf">get_type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the annotation type for this field</span>
 

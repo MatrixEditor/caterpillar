@@ -8,7 +8,7 @@ Float Atoms
 
 .. c:var:: PyTypeObject CpFloatAtom_Type
 
-    The type object for the :c:type:`floatatom` class.
+    The type object for the :c:type:`CpFloatAtomObject` class.
 
 
 .. c:type:: CpFloatAtomObject
@@ -19,6 +19,11 @@ Float Atoms
 
 .. c:function:: PyObject* CpFloatAtom_Unpack(CpFloatAtomObject* self, CpLayerObject* layer)
 
+
+.. c:function:: int CpFloatAtom_Check(PyObject *op)
+
+
+.. c:function:: int CpFloatAtom_CheckExact(PyObject *op)
 
 
 Runtime Performance

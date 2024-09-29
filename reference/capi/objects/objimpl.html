@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>2. Concrete Objects Layer &#8212; Caterpillar 2.1.5 documentation</title>
+    <title>3. Concrete Objects Layer &#8212; Caterpillar 2.2.0 documentation</title>
   
   
   
@@ -29,6 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -36,15 +37,17 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=786ba454"></script>
+    <script src="../../../_static/documentation_options.js?v=b21de401"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'reference/capi/objects/objimpl';</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="2.1. Arch &amp; Endian Objects" href="arch.html" />
-    <link rel="prev" title="1.2. Context Protocol" href="../context.html" />
+    <link rel="next" title="3.1. Arch &amp; Endian Objects" href="arch.html" />
+    <link rel="prev" title="2.2. Context Protocol" href="../context.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -121,7 +124,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.1.5</p>
+    <p class="title logo__title">Caterpillar 2.2.0</p>
   
 </a></div>
     
@@ -358,36 +361,34 @@ document.write(`
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">C API Reference</span></p>
 <ul class="current nav bd-sidenav">
-<li class="toctree-l1 has-children"><a class="reference internal" href="../abstract.html">1. Abstract Objects Layer</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="../atom.html">1.1. Atom Protocol</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../context.html">1.2. Context Protocol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../extension.html">1. Using the C API</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../abstract.html">2. Abstract Objects Layer</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../atom.html">2.1. Atom Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../context.html">2.2. Context Protocol</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">2. Concrete Objects Layer</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="arch.html">2.1. Arch &amp; Endian Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="option.html">2.2. Option Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="contextobj.html">2.3. Context Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="contextexpr.html">2.4. Context Expressions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="contextpath.html">2.5. Context Path Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="state.html">2.6. State Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="layer.html">2.7. Layer Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fieldobj.html">2.8. Field Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="struct.html">2.9. Struct Objects</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="atoms/index.html">2.10. Atom Objects</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="atoms/fieldatom.html">2.10.1. Field Atom Objects</a></li>
-<li class="toctree-l3"><a class="reference internal" href="atoms/intatom.html">2.10.2. Integer Atoms</a></li>
-<li class="toctree-l3"><a class="reference internal" href="atoms/charatom.html">2.10.3. Char Atoms</a></li>
-<li class="toctree-l3"><a class="reference internal" href="atoms/floatatom.html">2.10.4. Float Atoms</a></li>
-<li class="toctree-l3"><a class="reference internal" href="atoms/boolatom.html">2.10.5. Bool Atoms</a></li>
-<li class="toctree-l3"><a class="reference internal" href="atoms/paddingatom.html">2.10.6. Padding Atoms</a></li>
+<li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">3. Concrete Objects Layer</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="arch.html">3.1. Arch &amp; Endian Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="option.html">3.2. Option Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contextobj.html">3.3. Context Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contextexpr.html">3.4. Context Expressions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contextpath.html">3.5. Context Path Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="state.html">3.6. State Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="layer.html">3.7. Layer Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="struct.html">3.8. Struct Objects</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="atoms/index.html">3.9. Atom Objects</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="atoms/int.html">3.9.1. Integer Atoms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="atoms/char.html">3.9.2. Char Atoms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="atoms/float.html">3.9.3. Float Atoms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="atoms/bool.html">3.9.4. Bool Atoms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="atoms/padding.html">3.9.5. Padding Atoms</a></li>
 </ul>
 </details></li>
 </ul>
 </details></li>
-<li class="toctree-l1"><a class="reference internal" href="../parsing.html">3. Packing and Unpacking</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../macros.html">4. Defined Macros</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../module.html">5. Module API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../extension.html">6. Using the C API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parsing.html">4. Packing and Unpacking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../macros.html">5. Defined Macros</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../module.html">6. Module API</a></li>
 </ul>
 </div>
 </nav></div>
@@ -446,33 +447,31 @@ document.write(`
                 <article class="bd-article">
                   
   <section id="concrete-objects-layer">
-<span id="reference-capi-objimpl"></span><h1><span class="section-number">2. </span>Concrete Objects Layer<a class="headerlink" href="#concrete-objects-layer" title="Link to this heading">#</a></h1>
+<span id="reference-capi-objimpl"></span><h1><span class="section-number">3. </span>Concrete Objects Layer<a class="headerlink" href="#concrete-objects-layer" title="Link to this heading">#</a></h1>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="arch.html">2.1. Arch &amp; Endian Objects</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="arch.html#arch-objects">2.1.1. Arch Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="arch.html#endian-objects">2.1.2. Endian Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="arch.html">3.1. Arch &amp; Endian Objects</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="arch.html#arch-objects">3.1.1. Arch Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch.html#endian-objects">3.1.2. Endian Objects</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="option.html">2.2. Option Objects</a></li>
-<li class="toctree-l1"><a class="reference internal" href="contextobj.html">2.3. Context Objects</a></li>
-<li class="toctree-l1"><a class="reference internal" href="contextexpr.html">2.4. Context Expressions</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="contextexpr.html#unary-expressions">2.4.1. Unary Expressions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="contextexpr.html#binary-expressions">2.4.2. Binary Expressions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="option.html">3.2. Option Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contextobj.html">3.3. Context Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contextexpr.html">3.4. Context Expressions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="contextexpr.html#unary-expressions">3.4.1. Unary Expressions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contextexpr.html#binary-expressions">3.4.2. Binary Expressions</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="contextpath.html">2.5. Context Path Objects</a></li>
-<li class="toctree-l1"><a class="reference internal" href="state.html">2.6. State Objects</a></li>
-<li class="toctree-l1"><a class="reference internal" href="layer.html">2.7. Layer Objects</a></li>
-<li class="toctree-l1"><a class="reference internal" href="fieldobj.html">2.8. Field Objects</a></li>
-<li class="toctree-l1"><a class="reference internal" href="struct.html">2.9. Struct Objects</a></li>
-<li class="toctree-l1"><a class="reference internal" href="atoms/index.html">2.10. Atom Objects</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="atoms/fieldatom.html">2.10.1. Field Atom Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="atoms/intatom.html">2.10.2. Integer Atoms</a></li>
-<li class="toctree-l2"><a class="reference internal" href="atoms/charatom.html">2.10.3. Char Atoms</a></li>
-<li class="toctree-l2"><a class="reference internal" href="atoms/floatatom.html">2.10.4. Float Atoms</a></li>
-<li class="toctree-l2"><a class="reference internal" href="atoms/boolatom.html">2.10.5. Bool Atoms</a></li>
-<li class="toctree-l2"><a class="reference internal" href="atoms/paddingatom.html">2.10.6. Padding Atoms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contextpath.html">3.5. Context Path Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="state.html">3.6. State Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="layer.html">3.7. Layer Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="struct.html">3.8. Struct Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="atoms/index.html">3.9. Atom Objects</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="atoms/int.html">3.9.1. Integer Atoms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="atoms/char.html">3.9.2. Char Atoms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="atoms/float.html">3.9.3. Float Atoms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="atoms/bool.html">3.9.4. Bool Atoms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="atoms/padding.html">3.9.5. Padding Atoms</a></li>
 </ul>
 </li>
 </ul>
@@ -495,7 +494,7 @@ document.write(`
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title"><span class="section-number">1.2. </span>Context Protocol</p>
+        <p class="prev-next-title"><span class="section-number">2.2. </span>Context Protocol</p>
       </div>
     </a>
     <a class="right-next"
@@ -503,7 +502,7 @@ document.write(`
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">2.1. </span>Arch &amp; Endian Objects</p>
+        <p class="prev-next-title"><span class="section-number">3.1. </span>Arch &amp; Endian Objects</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

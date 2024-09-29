@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Installation &#8212; Caterpillar 2.1.5 documentation</title>
+    <title>Installation &#8212; Caterpillar 2.2.0 documentation</title>
   
   
   
@@ -29,6 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -36,9 +37,11 @@
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../_static/documentation_options.js?v=786ba454"></script>
+    <script src="../_static/documentation_options.js?v=b21de401"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'installing/index';</script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -121,7 +124,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.1.5</p>
+    <p class="title logo__title">Caterpillar 2.2.0</p>
   
 </a></div>
     
@@ -400,9 +403,8 @@ document.write(`
 to install it by providing the Git link. This library has no fixed dependencies, so it can run
 out of the box.</p>
 <p>There are several installation options you can use to install a desired part of the library.
-<em>caterpillar</em> ships with a native C extension and additional tools, that are using native
-extensions too. As not everyone wants to use C extensions, it’s default installation candidate
-does not include the native extension.</p>
+<em>caterpillar</em> ships with a native C extension and additional tools. As not everyone wants to
+use C extensions, it’s default installation candidate does not include the native extension.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>git+https://github.com/MatrixEditor/caterpillar.git
 </pre></div>
 </div>
@@ -416,6 +418,10 @@ it enables developer mode.</p>
 <li><p><cite>CP_ENABLE_NATIVE</cite> - Enables installation of the native C extension</p></li>
 <li><p><cite>CP_ENABLE_TOOLS</cite> - Enables installation of extra tools (proposed)</p></li>
 </ul>
+<p><strong>or</strong> you can use the following command to install it directly:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>git+https://github.com/MatrixEditor/caterpillar/#subdirectory<span class="o">=</span>src/ccaterpillar
+</pre></div>
+</div>
 <p>This project comes with packaging extras. Therefore, if you want to enable specific structs, you
 have to install the corresponding extra. It can be done using pip again:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;caterpillar[</span><span class="nv">$NAME</span><span class="s2">]@git+https://github.com/MatrixEditor/caterpillar.git&quot;</span>

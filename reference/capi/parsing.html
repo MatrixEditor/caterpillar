@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>3. Packing and Unpacking &#8212; Caterpillar 2.1.5 documentation</title>
+    <title>4. Packing and Unpacking &#8212; Caterpillar 2.2.0 documentation</title>
   
   
   
@@ -29,6 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -36,15 +37,17 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../_static/documentation_options.js?v=786ba454"></script>
+    <script src="../../_static/documentation_options.js?v=b21de401"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'reference/capi/parsing';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="4. Defined Macros" href="macros.html" />
-    <link rel="prev" title="2.10.6. Padding Atoms" href="objects/atoms/paddingatom.html" />
+    <link rel="next" title="5. Defined Macros" href="macros.html" />
+    <link rel="prev" title="3.9.5. Padding Atoms" href="objects/atoms/padding.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -121,7 +124,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.1.5</p>
+    <p class="title logo__title">Caterpillar 2.2.0</p>
   
 </a></div>
     
@@ -358,36 +361,34 @@ document.write(`
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">C API Reference</span></p>
 <ul class="current nav bd-sidenav">
-<li class="toctree-l1 has-children"><a class="reference internal" href="abstract.html">1. Abstract Objects Layer</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="atom.html">1.1. Atom Protocol</a></li>
-<li class="toctree-l2"><a class="reference internal" href="context.html">1.2. Context Protocol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="extension.html">1. Using the C API</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="abstract.html">2. Abstract Objects Layer</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="atom.html">2.1. Atom Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="context.html">2.2. Context Protocol</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="objects/objimpl.html">2. Concrete Objects Layer</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="objects/arch.html">2.1. Arch &amp; Endian Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="objects/option.html">2.2. Option Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="objects/contextobj.html">2.3. Context Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="objects/contextexpr.html">2.4. Context Expressions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="objects/contextpath.html">2.5. Context Path Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="objects/state.html">2.6. State Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="objects/layer.html">2.7. Layer Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="objects/fieldobj.html">2.8. Field Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="objects/struct.html">2.9. Struct Objects</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="objects/atoms/index.html">2.10. Atom Objects</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="objects/atoms/fieldatom.html">2.10.1. Field Atom Objects</a></li>
-<li class="toctree-l3"><a class="reference internal" href="objects/atoms/intatom.html">2.10.2. Integer Atoms</a></li>
-<li class="toctree-l3"><a class="reference internal" href="objects/atoms/charatom.html">2.10.3. Char Atoms</a></li>
-<li class="toctree-l3"><a class="reference internal" href="objects/atoms/floatatom.html">2.10.4. Float Atoms</a></li>
-<li class="toctree-l3"><a class="reference internal" href="objects/atoms/boolatom.html">2.10.5. Bool Atoms</a></li>
-<li class="toctree-l3"><a class="reference internal" href="objects/atoms/paddingatom.html">2.10.6. Padding Atoms</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="objects/objimpl.html">3. Concrete Objects Layer</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="objects/arch.html">3.1. Arch &amp; Endian Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="objects/option.html">3.2. Option Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="objects/contextobj.html">3.3. Context Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="objects/contextexpr.html">3.4. Context Expressions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="objects/contextpath.html">3.5. Context Path Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="objects/state.html">3.6. State Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="objects/layer.html">3.7. Layer Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="objects/struct.html">3.8. Struct Objects</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="objects/atoms/index.html">3.9. Atom Objects</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="objects/atoms/int.html">3.9.1. Integer Atoms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="objects/atoms/char.html">3.9.2. Char Atoms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="objects/atoms/float.html">3.9.3. Float Atoms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="objects/atoms/bool.html">3.9.4. Bool Atoms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="objects/atoms/padding.html">3.9.5. Padding Atoms</a></li>
 </ul>
 </details></li>
 </ul>
 </details></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">3. Packing and Unpacking</a></li>
-<li class="toctree-l1"><a class="reference internal" href="macros.html">4. Defined Macros</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module.html">5. Module API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="extension.html">6. Using the C API</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">4. Packing and Unpacking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="macros.html">5. Defined Macros</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module.html">6. Module API</a></li>
 </ul>
 </div>
 </nav></div>
@@ -446,12 +447,12 @@ document.write(`
                 <article class="bd-article">
                   
   <section id="packing-and-unpacking">
-<span id="reference-capi-parsing"></span><h1><span class="section-number">3. </span>Packing and Unpacking<a class="headerlink" href="#packing-and-unpacking" title="Link to this heading">#</a></h1>
+<span id="reference-capi-parsing"></span><h1><span class="section-number">4. </span>Packing and Unpacking<a class="headerlink" href="#packing-and-unpacking" title="Link to this heading">#</a></h1>
 <dl class="c function">
 <dt class="sig sig-object c" id="c.CpTypeOf">
 <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">CpTypeOf</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">value</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpTypeOf" title="Link to this definition">#</a><br /></dt>
 <dt class="sig sig-object c" id="c.CpTypeOf_Field">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">CpTypeOf_Field</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="objects/fieldobj.html#c.CpFieldObject" title="CpFieldObject"><span class="n"><span class="pre">CpFieldObject</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">field</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpTypeOf_Field" title="Link to this definition">#</a><br /></dt>
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">CpTypeOf_Field</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">CpFieldObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">field</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpTypeOf_Field" title="Link to this definition">#</a><br /></dt>
 <dt class="sig sig-object c" id="c.CpTypeOf_Common">
 <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">CpTypeOf_Common</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">op</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpTypeOf_Common" title="Link to this definition">#</a><br /></dt>
 <dd><em class="refcount text-info">Return value: New reference.</em><p>Returns the type of the given atom object.</p>
@@ -460,12 +461,6 @@ document.write(`
 <dl class="c function">
 <dt class="sig sig-object c" id="c.CpSizeOf">
 <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">CpSizeOf</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">atom</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">globals</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpSizeOf" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c.CpSizeOf_Field">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">CpSizeOf_Field</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="objects/fieldobj.html#c.CpFieldObject" title="CpFieldObject"><span class="n"><span class="pre">CpFieldObject</span></span></a><span class="p"><span class="pre">*</span></span>, <a class="reference internal" href="objects/layer.html#c.CpLayerObject" title="CpLayerObject"><span class="n"><span class="pre">CpLayerObject</span></span></a><span class="p"><span class="pre">*</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpSizeOf_Field" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c.CpSizeOf_Struct">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">CpSizeOf_Struct</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="objects/struct.html#c.CpStructObject" title="CpStructObject"><span class="n"><span class="pre">CpStructObject</span></span></a><span class="p"><span class="pre">*</span></span>, <a class="reference internal" href="objects/layer.html#c.CpLayerObject" title="CpLayerObject"><span class="n"><span class="pre">CpLayerObject</span></span></a><span class="p"><span class="pre">*</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpSizeOf_Struct" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c.CpSizeOf_Common">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">CpSizeOf_Common</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="p"><span class="pre">*</span></span>, <a class="reference internal" href="objects/layer.html#c.CpLayerObject" title="CpLayerObject"><span class="n"><span class="pre">CpLayerObject</span></span></a><span class="p"><span class="pre">*</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpSizeOf_Common" title="Link to this definition">#</a><br /></dt>
 <dd><em class="refcount text-info">Return value: New reference.</em><p>Returns the size of the given atom object.</p>
 </dd></dl>
 
@@ -475,55 +470,11 @@ document.write(`
 <dd><p>Packs the given value using the given atom object and returns :code::<cite>0</cite> if
 successful. Returns <code class="code docutils literal notranslate"><span class="pre">-1</span></code> if an error occurs. The <em>globals</em> parameter may
 be <em>NULL</em>.</p>
-<p>Serializing objects follows specific rules when it comes to CpLayerObject
-creation. The first layer (root layer) will be assigned with the path
-‘&lt;root&gt;’. By default, cp_pack will automatically create a new layer object
-when called. Therefore, it is recommended to utilize cp_pack_internal for
-C calls to avoid unnecessary layer creation.</p>
-<p>Currently, the following conditions allow the creation of a new layer:</p>
-<ul class="simple">
-<li><p>Start packing an object</p></li>
-<li><p>Serializing a sequence object that requires to iterate over all elements individually. Note that atoms that support <code class="code docutils literal notranslate"><span class="pre">__unpack_many__</span></code> won’t be called with the newly created sequence layer.</p></li>
-<li><p>Struct object or named sequences of fields in general will always introduce a new layer object.</p></li>
-</ul>
-<p>There are some built-in types that are designed to fasten calls by providing
-a native C implementation. It is recommended to implement new classes in C
-to leverage its speed rather than define new Python atom classes.</p>
-<p>A full workflow of cp_pack with all layers displayed would be the following:</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>1. cp_pack: create new state and root layer         | l: &lt;root&gt;
-2. cp_pack_internal: measure atom type and call     |         &lt;--+-+-+
-   according C method                               | l: &lt;root&gt;  | | |
-3. One of the following methods will be called:                  | | |
-  a. cp_pack_catom: calls native C method           | l: &lt;root&gt;  | | |
-  b. cp_pack_atom: call python pack method          | l: &lt;root&gt;  | | |
-  c. cp_pack_field: inserts the field instance into              | | |
-     the current layer and calls cp_pack_internal                | | |
-     again.                                         | l: &lt;root&gt; -+ | |
-  d. cp_pack_struct: creates a new object layer                    | |
-     that addresses only the current struct&#39;s                      | |
-     values. Calls cp_pack_internal on each field   | l: &lt;obj&gt;  ---+ |
-  e. cp_pack_common: createsa a new layer if                         |
-     multiple objects should be packed AND                           |
-     __[un]pack_many__ is not implemented.          | l: &lt;seq|root&gt; -+
-</pre></div>
-</div>
-<p>The following functions are defined and called within the packing process:</p>
-<dl class="c function">
-<dt class="sig sig-object c" id="c.CpPack.CpPack_Field">
-<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CpPack_Field</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="p"><span class="pre">*</span></span>, <a class="reference internal" href="objects/fieldobj.html#c.CpFieldObject" title="CpFieldObject"><span class="n"><span class="pre">CpFieldObject</span></span></a><span class="p"><span class="pre">*</span></span>, <a class="reference internal" href="objects/layer.html#c.CpLayerObject" title="CpLayerObject"><span class="n"><span class="pre">CpLayerObject</span></span></a><span class="p"><span class="pre">*</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpPack.CpPack_Field" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c.CpPack.CpPack_Struct">
-<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CpPack_Struct</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="p"><span class="pre">*</span></span>, <a class="reference internal" href="objects/struct.html#c.CpStructObject" title="CpStructObject"><span class="n"><span class="pre">CpStructObject</span></span></a><span class="p"><span class="pre">*</span></span>, <a class="reference internal" href="objects/layer.html#c.CpLayerObject" title="CpLayerObject"><span class="n"><span class="pre">CpLayerObject</span></span></a><span class="p"><span class="pre">*</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpPack.CpPack_Struct" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c.CpPack.CpPack_CAtom">
-<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CpPack_CAtom</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="p"><span class="pre">*</span></span>, <span class="n"><span class="pre">CpCAtomObject</span></span><span class="p"><span class="pre">*</span></span>, <a class="reference internal" href="objects/layer.html#c.CpLayerObject" title="CpLayerObject"><span class="n"><span class="pre">CpLayerObject</span></span></a><span class="p"><span class="pre">*</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpPack.CpPack_CAtom" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c.CpPack.CpPack_Common">
-<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CpPack_Common</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="p"><span class="pre">*</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="p"><span class="pre">*</span></span>, <a class="reference internal" href="objects/layer.html#c.CpLayerObject" title="CpLayerObject"><span class="n"><span class="pre">CpLayerObject</span></span></a><span class="p"><span class="pre">*</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpPack.CpPack_Common" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c.CpPack._Cp_Pack">
-<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">_Cp_Pack</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="p"><span class="pre">*</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="p"><span class="pre">*</span></span>, <a class="reference internal" href="objects/layer.html#c.CpLayerObject" title="CpLayerObject"><span class="n"><span class="pre">CpLayerObject</span></span></a><span class="p"><span class="pre">*</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpPack._Cp_Pack" title="Link to this definition">#</a><br /></dt>
-<dd></dd></dl>
+</dd></dl>
 
 <dl class="c function">
-<dt class="sig sig-object c" id="c.CpPack._CpPack_EvalLength">
-<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">_CpPack_EvalLength</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="objects/layer.html#c.CpLayerObject" title="CpLayerObject"><span class="n"><span class="pre">CpLayerObject</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">layer</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">length</span></span>, <span class="n"><span class="pre">Py_ssize_t</span></span><span class="w"> </span><span class="n"><span class="pre">size</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">seq_greedy</span></span>, <span class="n"><span class="pre">Py_ssize_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">seq_length</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpPack._CpPack_EvalLength" title="Link to this definition">#</a><br /></dt>
+<dt class="sig sig-object c" id="c._CpPack_EvalLength">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">_CpPack_EvalLength</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="objects/layer.html#c.CpLayerObject" title="CpLayerObject"><span class="n"><span class="pre">CpLayerObject</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">layer</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">length</span></span>, <span class="n"><span class="pre">Py_ssize_t</span></span><span class="w"> </span><span class="n"><span class="pre">size</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">seq_greedy</span></span>, <span class="n"><span class="pre">Py_ssize_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">seq_length</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c._CpPack_EvalLength" title="Link to this definition">#</a><br /></dt>
 <dd><p>Evaluates the length of the sequence to pack.</p>
 <p>This funtion can be utilized to evaluate the length of the sequence to
 pack. It uses the <code class="code docutils literal notranslate"><span class="pre">size</span></code> parameter to validate the input sequence.
@@ -544,28 +495,10 @@ Although, the <code class="code docutils literal notranslate"><span class="pre">
 </dl>
 </dd></dl>
 
-</dd></dl>
-
 <dl class="c function">
 <dt class="sig sig-object c" id="c.CpUnpack">
 <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">CpUnpack</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">atom</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">io</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">globals</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpUnpack" title="Link to this definition">#</a><br /></dt>
-<dd><p>Unlike serializing objects, unpacking returns fully qualified objects as a
-result. In addition, the internal ‘obj’ within a struct layer will be a
-<a class="reference internal" href="objects/contextobj.html#c.CpContextObject" title="CpContextObject"><code class="xref c c-type docutils literal notranslate"><span class="pre">CpContextObject</span></code></a> instance.</p>
-<p>The following functions are defined and called within the unpacking process:</p>
-<dl class="c function">
-<dt class="sig sig-object c" id="c.CpUnpack._Cp_Unpack">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">_Cp_Unpack</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="p"><span class="pre">*</span></span>, <a class="reference internal" href="objects/layer.html#c.CpLayerObject" title="CpLayerObject"><span class="n"><span class="pre">CpLayerObject</span></span></a><span class="p"><span class="pre">*</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpUnpack._Cp_Unpack" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c.CpUnpack.CpUnpack_Field">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">CpUnpack_Field</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="objects/fieldobj.html#c.CpFieldObject" title="CpFieldObject"><span class="n"><span class="pre">CpFieldObject</span></span></a><span class="p"><span class="pre">*</span></span>, <a class="reference internal" href="objects/layer.html#c.CpLayerObject" title="CpLayerObject"><span class="n"><span class="pre">CpLayerObject</span></span></a><span class="p"><span class="pre">*</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpUnpack.CpUnpack_Field" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c.CpUnpack.CpUnpack_Struct">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">CpUnpack_Struct</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="objects/struct.html#c.CpStructObject" title="CpStructObject"><span class="n"><span class="pre">CpStructObject</span></span></a><span class="p"><span class="pre">*</span></span>, <a class="reference internal" href="objects/layer.html#c.CpLayerObject" title="CpLayerObject"><span class="n"><span class="pre">CpLayerObject</span></span></a><span class="p"><span class="pre">*</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpUnpack.CpUnpack_Struct" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c.CpUnpack.CpUnpack_CAtom">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">CpUnpack_CAtom</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">CpCAtomObject</span></span><span class="p"><span class="pre">*</span></span>, <a class="reference internal" href="objects/layer.html#c.CpLayerObject" title="CpLayerObject"><span class="n"><span class="pre">CpLayerObject</span></span></a><span class="p"><span class="pre">*</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpUnpack.CpUnpack_CAtom" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c.CpUnpack.CpUnpack_Common">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">CpUnpack_Common</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="p"><span class="pre">*</span></span>, <a class="reference internal" href="objects/layer.html#c.CpLayerObject" title="CpLayerObject"><span class="n"><span class="pre">CpLayerObject</span></span></a><span class="p"><span class="pre">*</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpUnpack.CpUnpack_Common" title="Link to this definition">#</a><br /></dt>
-<dd></dd></dl>
-
+<dd><em class="refcount text-info">Return value: New reference.</em><p><em>TODO</em></p>
 </dd></dl>
 
 </section>
@@ -581,12 +514,12 @@ result. In addition, the internal ‘obj’ within a struct layer will be a
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="objects/atoms/paddingatom.html"
+       href="objects/atoms/padding.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title"><span class="section-number">2.10.6. </span>Padding Atoms</p>
+        <p class="prev-next-title"><span class="section-number">3.9.5. </span>Padding Atoms</p>
       </div>
     </a>
     <a class="right-next"
@@ -594,7 +527,7 @@ result. In addition, the internal ‘obj’ within a struct layer will be a
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">4. </span>Defined Macros</p>
+        <p class="prev-next-title"><span class="section-number">5. </span>Defined Macros</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

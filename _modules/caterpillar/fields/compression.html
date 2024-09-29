@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>caterpillar.fields.compression &#8212; Caterpillar 2.1.5 documentation</title>
+    <title>caterpillar.fields.compression &#8212; Caterpillar 2.2.0 documentation</title>
   
   
   
@@ -28,6 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -35,9 +36,11 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=786ba454"></script>
+    <script src="../../../_static/documentation_options.js?v=b21de401"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/caterpillar/fields/compression';</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -118,7 +121,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.1.5</p>
+    <p class="title logo__title">Caterpillar 2.2.0</p>
   
 </a></div>
     
@@ -429,7 +432,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="Compressed">
-<a class="viewcode-back" href="../../../library/fields/compression.html#caterpillar.fields.Compressed">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/compression.html#caterpillar.py.Compressed">[docs]</a>
 <span class="k">class</span> <span class="nc">Compressed</span><span class="p">(</span><span class="n">Transformer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A class representing a compressed transformer.</span>
@@ -463,7 +466,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">decomp_args</span> <span class="o">=</span> <span class="n">decomp_kwargs</span> <span class="ow">or</span> <span class="p">{}</span>
 
 <div class="viewcode-block" id="Compressed.encode">
-<a class="viewcode-back" href="../../../library/fields/compression.html#caterpillar.fields.Compressed.encode">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/compression.html#caterpillar.py.Compressed.encode">[docs]</a>
     <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compress the input data.</span>
@@ -479,7 +482,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="Compressed.decode">
-<a class="viewcode-back" href="../../../library/fields/compression.html#caterpillar.fields.Compressed.decode">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/compression.html#caterpillar.py.Compressed.decode">[docs]</a>
     <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Decompress the input data.</span>
@@ -516,7 +519,7 @@ document.write(`
     <span class="kn">import</span> <span class="nn">zlib</span>
 
 <div class="viewcode-block" id="ZLibCompressed">
-<a class="viewcode-back" href="../../../library/fields/compression.html#caterpillar.fields.ZLibCompressed">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/compression.html#caterpillar.py.ZLibCompressed">[docs]</a>
     <span class="k">def</span> <span class="nf">ZLibCompressed</span><span class="p">(</span>
         <span class="n">obj</span><span class="p">:</span> <span class="n">_LengthOrStruct</span><span class="p">,</span>
         <span class="n">comp_kwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -535,7 +538,7 @@ document.write(`
     <span class="kn">import</span> <span class="nn">bz2</span>
 
 <div class="viewcode-block" id="Bz2Compressed">
-<a class="viewcode-back" href="../../../library/fields/compression.html#caterpillar.fields.Bz2Compressed">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/compression.html#caterpillar.py.Bz2Compressed">[docs]</a>
     <span class="k">def</span> <span class="nf">Bz2Compressed</span><span class="p">(</span>
         <span class="n">obj</span><span class="p">:</span> <span class="n">_LengthOrStruct</span><span class="p">,</span>
         <span class="n">comp_kwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -554,7 +557,7 @@ document.write(`
     <span class="kn">import</span> <span class="nn">lzma</span>
 
 <div class="viewcode-block" id="LZMACompressed">
-<a class="viewcode-back" href="../../../library/fields/compression.html#caterpillar.fields.LZMACompressed">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/compression.html#caterpillar.py.LZMACompressed">[docs]</a>
     <span class="k">def</span> <span class="nf">LZMACompressed</span><span class="p">(</span>
         <span class="n">obj</span><span class="p">:</span> <span class="n">_LengthOrStruct</span><span class="p">,</span>
         <span class="n">comp_kwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -574,7 +577,7 @@ document.write(`
     <span class="kn">import</span> <span class="nn">lzallright</span>
 
 <div class="viewcode-block" id="LZOCompressed">
-<a class="viewcode-back" href="../../../library/fields/compression.html#caterpillar.fields.LZOCompressed">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/compression.html#caterpillar.py.LZOCompressed">[docs]</a>
     <span class="k">def</span> <span class="nf">LZOCompressed</span><span class="p">(</span>
         <span class="n">obj</span><span class="p">:</span> <span class="n">_LengthOrStruct</span><span class="p">,</span>
         <span class="n">comp_kwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>

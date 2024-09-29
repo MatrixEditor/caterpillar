@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>3. Advanced Concepts &#8212; Caterpillar 2.1.5 documentation</title>
+    <title>3. Advanced Concepts &#8212; Caterpillar 2.2.0 documentation</title>
   
   
   
@@ -29,6 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -36,9 +37,11 @@
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../_static/documentation_options.js?v=786ba454"></script>
+    <script src="../_static/documentation_options.js?v=b21de401"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'tutorial/advanced';</script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -121,7 +124,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.1.5</p>
+    <p class="title logo__title">Caterpillar 2.2.0</p>
   
 </a></div>
     
@@ -350,7 +353,7 @@ document.write(`
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Roadmap</span></p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Python</span></p>
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="first_steps.html">1. First Steps</a></li>
 <li class="toctree-l1"><a class="reference internal" href="basics.html">2. Basic Concepts</a></li>
@@ -469,7 +472,7 @@ the common chunk type:</p>
 that was previously written to the stream. This library will solve that problem for you
 automatically!</p>
 <p>In general, you can use the <code class="code docutils literal notranslate"><span class="pre">&#64;</span></code> operator with structs and fields, but not custom defined class
-structs. They have to be wrapped by a <a class="reference internal" href="../library/fields/field_model.html#caterpillar.fields.Field" title="caterpillar.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a> first:</p>
+structs. They have to be wrapped by a <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code> first:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">uint32</span> <span class="o">@</span> <span class="mh">0x1234</span>     <span class="c1"># ok</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span> <span class="o">=</span> <span class="n">Format</span> <span class="o">@</span> <span class="mh">0x1234</span>    <span class="c1"># not okay</span>
 <span class="gt">Traceback (most recent call last):</span>
@@ -557,7 +560,7 @@ condition. Using native support for context lambdas, we can simply write:</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>It is recommended <strong>not</strong> to use <code class="code docutils literal notranslate"><span class="pre">Else</span></code>, because it could cause unintended
-side effects. Use <a class="reference internal" href="../library/fields/field_model.html#caterpillar.fields.ElseIf" title="caterpillar.fields.ElseIf"><code class="xref py py-class docutils literal notranslate"><span class="pre">ElseIf</span></code></a> with the inverted condition
+side effects. Use <code class="xref py py-class docutils literal notranslate"><span class="pre">ElseIf</span></code> with the inverted condition
 instead.</p>
 </div>
 </section>

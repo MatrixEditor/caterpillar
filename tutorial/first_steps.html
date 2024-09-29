@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>1. First Steps &#8212; Caterpillar 2.1.5 documentation</title>
+    <title>1. First Steps &#8212; Caterpillar 2.2.0 documentation</title>
   
   
   
@@ -29,6 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -36,9 +37,11 @@
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../_static/documentation_options.js?v=786ba454"></script>
+    <script src="../_static/documentation_options.js?v=b21de401"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'tutorial/first_steps';</script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -121,7 +124,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.1.5</p>
+    <p class="title logo__title">Caterpillar 2.2.0</p>
   
 </a></div>
     
@@ -350,7 +353,7 @@ document.write(`
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Roadmap</span></p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Python</span></p>
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">1. First Steps</a></li>
 <li class="toctree-l1"><a class="reference internal" href="basics.html">2. Basic Concepts</a></li>
@@ -438,10 +441,13 @@ definition will be introduced later due to the impossibility of forward declarat
 <p>Given the important role of structs in this library, let’s start by understanding their definition. Our
 starting point is the <a class="reference external" href="https://www.w3.org/TR/png/#11PLTE">PLTE</a> chunk, which uses three-byte entries
 for its data.</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-0">
+Python</label><div class="sd-tab-content docutils">
 <div class="literal-block-wrapper docutils container" id="id4">
 <div class="code-block-caption"><span class="caption-text">RGB struct for the PLTE chunk</span><a class="headerlink" href="#id4" title="Link to this code">#</a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">caterpillar.model</span> <span class="kn">import</span> <span class="n">struct</span>    <span class="c1"># &lt;-- these imports are important</span>
-<span class="kn">from</span> <span class="nn">caterpillar.fields</span> <span class="kn">import</span> <span class="o">*</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">caterpillar.py</span> <span class="kn">import</span> <span class="o">*</span> <span class="c1"># &lt;-- just import everything</span>
 
 <span class="nd">@struct</span>         <span class="c1"># &lt;-- just decorate the class with the struct() function</span>
 <span class="k">class</span> <span class="nc">RGB</span><span class="p">:</span>
@@ -449,6 +455,24 @@ for its data.</p>
     <span class="n">g</span><span class="p">:</span> <span class="n">uint8</span>
     <span class="n">b</span><span class="p">:</span> <span class="n">uint8</span>
 </pre></div>
+</div>
+</div>
+</div>
+<input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-1">
+Caterpillar C</label><div class="sd-tab-content docutils">
+<div class="literal-block-wrapper docutils container" id="id5">
+<div class="code-block-caption"><span class="caption-text">RGB struct for the PLTE chunk (using Caterpillar C)</span><a class="headerlink" href="#id5" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">caterpillar.c</span> <span class="kn">import</span> <span class="o">*</span> <span class="c1"># &lt;-- just import everything</span>
+
+<span class="nd">@struct</span>         <span class="c1"># &lt;-- just decorate the class with the struct() function</span>
+<span class="k">class</span> <span class="nc">RGB</span><span class="p">:</span>
+    <span class="n">r</span><span class="p">:</span> <span class="n">u8</span>       <span class="c1"># &lt;-- a field can be defined just like this</span>
+    <span class="n">g</span><span class="p">:</span> <span class="n">u8</span>
+    <span class="n">b</span><span class="p">:</span> <span class="n">u8</span>
+</pre></div>
+</div>
+</div>
 </div>
 </div>
 <p>With this simple annotation, the struct class becomes universally applicable. You can
@@ -459,7 +483,8 @@ integrate it into other struct definitions or instantiate objects of the class.<
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>To optimize memory space and get faster attribute access times, you have to explicitly
-enable the <a class="reference internal" href="../library/options.html#caterpillar.options.S_SLOTS" title="caterpillar.options.S_SLOTS"><code class="xref py py-attr docutils literal notranslate"><span class="pre">S_SLOTS</span></code></a> option. More information can be taken from  <a class="reference internal" href="../library/options.html#options"><span class="std std-ref">Options</span></a>.</p>
+enable the <a class="reference internal" href="../library/options.html#caterpillar.options.S_SLOTS" title="caterpillar.options.S_SLOTS"><code class="xref py py-attr docutils literal notranslate"><span class="pre">S_SLOTS</span></code></a> option. More information can be taken from
+<a class="reference internal" href="../library/options.html#options"><span class="std std-ref">Options</span></a>.</p>
 </div>
 <p>Wow, thats it? That was less than expected? Let’s move directly to working with the defined class.</p>
 </section>
@@ -474,19 +499,48 @@ automatically applied, removing concerns about them.</p>
 module. When packing data, a struct and an input object are needed.</p>
 <p>Thanks to the RGB class encapsulating its struct instance, explicitly stating the struct to use
 becomes unnecessary.</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-2" name="sd-tab-set-1" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-2">
+Python</label><div class="sd-tab-content docutils">
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span> <span class="o">=</span> <span class="n">RGB</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="c1"># equivalent to pack(obj, RGB)</span>
 <span class="go">b&#39;\x01\x02\x03&#39;</span>
 </pre></div>
+</div>
+</div>
+<input id="sd-tab-item-3" name="sd-tab-set-1" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-3">
+Caterpillar C</label><div class="sd-tab-content docutils">
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span> <span class="o">=</span> <span class="n">RGB</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">RGB</span><span class="p">)</span> <span class="c1"># required as of version 2.2.0</span>
+<span class="go">b&#39;\x01\x02\x03&#39;</span>
+</pre></div>
+</div>
+</div>
 </div>
 </section>
 <section id="unpacking-data">
 <h3><span class="section-number">1.2.2. </span>Unpacking data<a class="headerlink" href="#unpacking-data" title="Link to this heading">#</a></h3>
 <p>Recreating data from binary streams is as easy as serializing objects. Here, providing the struct directly
 or our struct class is necessary.</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-4" name="sd-tab-set-2" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-4">
+Python</label><div class="sd-tab-content docutils">
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">RGB</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x01\x02\x03</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="go">RGB(r=1, g=2, b=3)</span>
 </pre></div>
+</div>
+</div>
+<input id="sd-tab-item-5" name="sd-tab-set-2" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-5">
+Caterpillar C</label><div class="sd-tab-content docutils">
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x01\x02\x03</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">RGB</span><span class="p">)</span>
+<span class="go">RGB(r=1, g=2, b=3)</span>
+</pre></div>
+</div>
+</div>
 </div>
 <p>And no, we’re not done yet - we’ve just wrapped up the warm-up!</p>
 </section>
@@ -502,14 +556,40 @@ configure the struct to correctly decode these integer fields.</p>
 <a class="reference external" href="https://stackoverflow.com/questions/21449/types-of-endianness">StackOverflow</a> or
 <a class="reference external" href="https://en.wikipedia.org/wiki/Endianness">Wikipedia</a></p>
 </div>
-<div class="literal-block-wrapper docutils container" id="id5">
-<div class="code-block-caption"><span class="caption-text">Configuring a struct-wide endianess</span><a class="headerlink" href="#id5" title="Link to this code">#</a></div>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-6" name="sd-tab-set-3" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-6">
+Python</label><div class="sd-tab-content docutils">
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-text">Configuring a struct-wide endianess</span><a class="headerlink" href="#id6" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span>        <span class="c1"># &lt;-- extra argument to apply the order to all fields.</span>
 <span class="k">class</span> <span class="nc">PHYSChunk</span><span class="p">:</span>
     <span class="n">pixels_per_unit_x</span><span class="p">:</span> <span class="n">uint32</span>   <span class="c1"># &lt;-- same definition as above</span>
     <span class="n">pixels_per_unit_y</span><span class="p">:</span> <span class="n">uint32</span>
     <span class="n">unit</span><span class="p">:</span> <span class="n">uint8</span>                 <span class="c1"># &lt;-- endianess meaningless, only one byte</span>
 </pre></div>
+</div>
+</div>
+</div>
+<input id="sd-tab-item-7" name="sd-tab-set-3" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-7">
+Caterpillar C</label><div class="sd-tab-content docutils">
+<div class="literal-block-wrapper docutils container" id="id7">
+<div class="code-block-caption"><span class="caption-text">Configuring a struct-wide endianess</span><a class="headerlink" href="#id7" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span><span class="p">(</span><span class="n">endian</span><span class="o">=</span><span class="n">BIG_ENDIAN</span><span class="p">)</span>   <span class="c1"># &lt;-- extra argument to apply the order to all fields.</span>
+<span class="k">class</span> <span class="nc">PHYSChunk</span><span class="p">:</span>
+    <span class="n">pixels_per_unit_x</span><span class="p">:</span> <span class="n">u32</span>   <span class="c1"># &lt;-- same definition as above</span>
+    <span class="n">pixels_per_unit_y</span><span class="p">:</span> <span class="n">u32</span>
+    <span class="n">unit</span><span class="p">:</span> <span class="n">u8</span>                 <span class="c1"># &lt;-- endianess meaningless, only one byte</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Even though, there will be <code class="code docutils literal notranslate"><span class="pre">&lt;le</span> <span class="pre">uint32&gt;</span></code> visible in the annotations
+of the class, the created struct stores the modified big endian integer
+atom.</p>
+</div>
 </div>
 </div>
 <p>If your structs depend on the architecture associated with the binary, you can also specify a
@@ -521,17 +601,35 @@ as a challenge.</p>
 <details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
 <summary class="sd-summary-title sd-card-header">
 <span class="sd-summary-icon"><svg version="1.1" width="1.0em" height="1.0em" class="sd-octicon sd-octicon-check" viewBox="0 0 16 16" aria-hidden="true"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path></svg></span><span class="sd-summary-text">Solution</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
-<div class="literal-block-wrapper docutils container" id="id6">
-<div class="code-block-caption"><span class="caption-text">Example implementation</span><a class="headerlink" href="#id6" title="Link to this code">#</a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">TIMEChunk</span><span class="p">:</span>
-    <span class="n">year</span><span class="p">:</span> <span class="n">uint16</span>        <span class="c1"># &lt;-- we could also use: BigEndian + uint16</span>
-    <span class="n">month</span><span class="p">:</span> <span class="n">uint8</span>
-    <span class="n">day</span><span class="p">:</span> <span class="n">uint8</span>
-    <span class="n">hour</span><span class="p">:</span> <span class="n">uint8</span>
-    <span class="n">minute</span><span class="p">:</span> <span class="n">uint8</span>
-    <span class="n">second</span><span class="p">:</span> <span class="n">uint8</span>
+<p class="sd-card-text">Example implementation</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-8" name="sd-tab-set-4" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-8">
+Python</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span>
+<span class="linenos">2</span><span class="k">class</span> <span class="nc">TIMEChunk</span><span class="p">:</span>
+<span class="linenos">3</span>    <span class="n">year</span><span class="p">:</span> <span class="n">uint16</span>        <span class="c1"># &lt;-- we could also use: BigEndian + uint16</span>
+<span class="linenos">4</span>    <span class="n">month</span><span class="p">:</span> <span class="n">uint8</span>
+<span class="linenos">5</span>    <span class="n">day</span><span class="p">:</span> <span class="n">uint8</span>
+<span class="linenos">6</span>    <span class="n">hour</span><span class="p">:</span> <span class="n">uint8</span>
+<span class="linenos">7</span>    <span class="n">minute</span><span class="p">:</span> <span class="n">uint8</span>
+<span class="linenos">8</span>    <span class="n">second</span><span class="p">:</span> <span class="n">uint8</span>
 </pre></div>
+</div>
+</div>
+<input id="sd-tab-item-9" name="sd-tab-set-4" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-9">
+Caterpillar C</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nd">@struct</span><span class="p">(</span><span class="n">endian</span><span class="o">=</span><span class="n">BIG_ENDIAN</span><span class="p">)</span>
+<span class="linenos">2</span><span class="k">class</span> <span class="nc">TIMEChunk</span><span class="p">:</span>
+<span class="linenos">3</span>    <span class="n">year</span><span class="p">:</span> <span class="n">u16</span>        <span class="c1"># &lt;-- we could also use: BIG_ENDIAN + u16</span>
+<span class="linenos">4</span>    <span class="n">month</span><span class="p">:</span> <span class="n">u8</span>
+<span class="linenos">5</span>    <span class="n">day</span><span class="p">:</span> <span class="n">u8</span>
+<span class="linenos">6</span>    <span class="n">hour</span><span class="p">:</span> <span class="n">u8</span>
+<span class="linenos">7</span>    <span class="n">minute</span><span class="p">:</span> <span class="n">u8</span>
+<span class="linenos">8</span>    <span class="n">second</span><span class="p">:</span> <span class="n">u8</span>
+</pre></div>
+</div>
 </div>
 </div>
 </div>
@@ -542,12 +640,30 @@ as a challenge.</p>
 <p>To minimize changes to your codebase or require as little adaptation as possible from users of
 this library, there’s a documentation feature. By utilizing the ability to globally apply
 options, you just need the following code:</p>
-<div class="literal-block-wrapper docutils container" id="id7">
-<div class="code-block-caption"><span class="caption-text">Enable documentation feature</span><a class="headerlink" href="#id7" title="Link to this code">#</a></div>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-10" name="sd-tab-set-5" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-10">
+Python</label><div class="sd-tab-content docutils">
+<div class="literal-block-wrapper docutils container" id="id8">
+<div class="code-block-caption"><span class="caption-text">Enable documentation feature</span><a class="headerlink" href="#id8" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">caterpillar.shortcuts</span> <span class="kn">import</span> <span class="n">opt</span>
 
 <span class="n">opt</span><span class="o">.</span><span class="n">set_struct_flags</span><span class="p">(</span><span class="n">opt</span><span class="o">.</span><span class="n">S_REPLACE_TYPES</span><span class="p">)</span>
 </pre></div>
+</div>
+</div>
+</div>
+<input id="sd-tab-item-11" name="sd-tab-set-5" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-11">
+Caterpillar C</label><div class="sd-tab-content docutils">
+<div class="literal-block-wrapper docutils container" id="id9">
+<div class="code-block-caption"><span class="caption-text">Enable documentation feature</span><a class="headerlink" href="#id9" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">caterpillar.c</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">STRUCT_OPTIONS</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">S_REPLACE_TYPES</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
 </div>
 </div>
 <div class="admonition tip">

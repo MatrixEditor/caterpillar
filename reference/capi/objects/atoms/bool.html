@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>2.10.2. Integer Atoms &#8212; Caterpillar 2.1.5 documentation</title>
+    <title>3.9.4. Bool Atoms &#8212; Caterpillar 2.2.0 documentation</title>
   
   
   
@@ -29,6 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -36,15 +37,17 @@
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../../_static/documentation_options.js?v=786ba454"></script>
+    <script src="../../../../_static/documentation_options.js?v=b21de401"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../../../_static/design-tabs.js?v=f930bc37"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'reference/capi/objects/atoms/intatom';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'reference/capi/objects/atoms/bool';</script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
-    <link rel="next" title="2.10.3. Char Atoms" href="charatom.html" />
-    <link rel="prev" title="2.10.1. Field Atom Objects" href="fieldatom.html" />
+    <link rel="next" title="3.9.5. Padding Atoms" href="padding.html" />
+    <link rel="prev" title="3.9.3. Float Atoms" href="float.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -121,7 +124,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.1.5</p>
+    <p class="title logo__title">Caterpillar 2.2.0</p>
   
 </a></div>
     
@@ -358,36 +361,34 @@ document.write(`
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">C API Reference</span></p>
 <ul class="current nav bd-sidenav">
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../abstract.html">1. Abstract Objects Layer</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../atom.html">1.1. Atom Protocol</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../context.html">1.2. Context Protocol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../extension.html">1. Using the C API</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../abstract.html">2. Abstract Objects Layer</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../atom.html">2.1. Atom Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../context.html">2.2. Context Protocol</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="../objimpl.html">2. Concrete Objects Layer</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="../arch.html">2.1. Arch &amp; Endian Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../option.html">2.2. Option Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../contextobj.html">2.3. Context Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../contextexpr.html">2.4. Context Expressions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../contextpath.html">2.5. Context Path Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../state.html">2.6. State Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../layer.html">2.7. Layer Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../fieldobj.html">2.8. Field Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../struct.html">2.9. Struct Objects</a></li>
-<li class="toctree-l2 current active has-children"><a class="reference internal" href="index.html">2.10. Atom Objects</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="fieldatom.html">2.10.1. Field Atom Objects</a></li>
-<li class="toctree-l3 current active"><a class="current reference internal" href="#">2.10.2. Integer Atoms</a></li>
-<li class="toctree-l3"><a class="reference internal" href="charatom.html">2.10.3. Char Atoms</a></li>
-<li class="toctree-l3"><a class="reference internal" href="floatatom.html">2.10.4. Float Atoms</a></li>
-<li class="toctree-l3"><a class="reference internal" href="boolatom.html">2.10.5. Bool Atoms</a></li>
-<li class="toctree-l3"><a class="reference internal" href="paddingatom.html">2.10.6. Padding Atoms</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../objimpl.html">3. Concrete Objects Layer</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../arch.html">3.1. Arch &amp; Endian Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../option.html">3.2. Option Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contextobj.html">3.3. Context Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contextexpr.html">3.4. Context Expressions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contextpath.html">3.5. Context Path Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../state.html">3.6. State Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../layer.html">3.7. Layer Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../struct.html">3.8. Struct Objects</a></li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="index.html">3.9. Atom Objects</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="int.html">3.9.1. Integer Atoms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="char.html">3.9.2. Char Atoms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="float.html">3.9.3. Float Atoms</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">3.9.4. Bool Atoms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="padding.html">3.9.5. Padding Atoms</a></li>
 </ul>
 </details></li>
 </ul>
 </details></li>
-<li class="toctree-l1"><a class="reference internal" href="../../parsing.html">3. Packing and Unpacking</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../macros.html">4. Defined Macros</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module.html">5. Module API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../extension.html">6. Using the C API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parsing.html">4. Packing and Unpacking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../macros.html">5. Defined Macros</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module.html">6. Module API</a></li>
 </ul>
 </div>
 </nav></div>
@@ -434,7 +435,7 @@ document.write(`
     <li class="breadcrumb-item"><i class="fa-solid fa-ellipsis"></i></li>
     
     
-    <li class="breadcrumb-item"><a href="index.html" class="nav-link"><span class="section-number">2.10. </span>Atom Objects</a></li>
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link"><span class="section-number">3.9. </span>Atom Objects</a></li>
     
     <li class="breadcrumb-item active" aria-current="page"><span...</li>
   </ul>
@@ -453,62 +454,77 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="integer-atoms">
-<span id="reference-capi-intatom"></span><h1><span class="section-number">2.10.2. </span>Integer Atoms<a class="headerlink" href="#integer-atoms" title="Link to this heading">#</a></h1>
-<p>The <a class="reference internal" href="#c.CpIntAtomObject" title="CpIntAtomObject"><code class="xref c c-type docutils literal notranslate"><span class="pre">CpIntAtomObject</span></code></a> is a specialized implementation for handling integers,
-providing efficient mechanisms to pack and unpack sized integers. Unlike its Python
-counterpart (<code class="xref py py-class docutils literal notranslate"><span class="pre">FormatField</span></code>), this C-based class focuses solely on integer operations.</p>
+  <section id="bool-atoms">
+<span id="reference-capi-boolatom"></span><h1><span class="section-number">3.9.4. </span>Bool Atoms<a class="headerlink" href="#bool-atoms" title="Link to this heading">#</a></h1>
+<p><em>TODO: under construction</em></p>
 <dl class="c var">
-<dt class="sig sig-object c" id="c.CpIntAtom_Type">
-<span class="n"><span class="pre">PyTypeObject</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CpIntAtom_Type</span></span></span><a class="headerlink" href="#c.CpIntAtom_Type" title="Link to this definition">#</a><br /></dt>
-<dd><p>The type object for the <code class="xref c c-type docutils literal notranslate"><span class="pre">intatom</span></code> class.</p>
+<dt class="sig sig-object c" id="c.CpBoolAtom_Type">
+<span class="n"><span class="pre">PyTypeObject</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CpBoolAtom_Type</span></span></span><a class="headerlink" href="#c.CpBoolAtom_Type" title="Link to this definition">#</a><br /></dt>
+<dd><p>The type object for the <code class="xref c c-type docutils literal notranslate"><span class="pre">boolatom</span></code> class.</p>
 </dd></dl>
 
-<p>This implementation utilizes <code class="code docutils literal notranslate"><span class="pre">int.from_bytes</span></code> and <code class="code docutils literal notranslate"><span class="pre">int.to_bytes</span></code>. Direct C
-calls are optimized, reducing runtime overhead compared to Python.</p>
 <dl class="c type">
-<dt class="sig sig-object c" id="c.CpIntAtomObject">
-<span class="k"><span class="pre">type</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CpIntAtomObject</span></span></span><a class="headerlink" href="#c.CpIntAtomObject" title="Link to this definition">#</a><br /></dt>
-<dd><p>A fundamental class for managing fixed-size integers. Further recommendations for optimal
-use are detailed below.</p>
-<dl class="c var">
-<dt class="sig sig-object c" id="c.CpIntAtomObject.m_byte_count">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">m_byte_count</span></span></span><a class="headerlink" href="#c.CpIntAtomObject.m_byte_count" title="Link to this definition">#</a><br /></dt>
-<dd><p>Represents the number of bytes in the integer. This can be accessed in Python using the attribute <code class="code docutils literal notranslate"><span class="pre">nbytes</span></code>.</p>
-</dd></dl>
+<dt class="sig sig-object c" id="c.CpBoolAtomObject">
+<span class="k"><span class="pre">type</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CpBoolAtomObject</span></span></span><a class="headerlink" href="#c.CpBoolAtomObject" title="Link to this definition">#</a><br /></dt>
+<dd></dd></dl>
 
-<dl class="c var">
-<dt class="sig sig-object c" id="c.CpIntAtomObject._m_signed">
-<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">_m_signed</span></span></span><a class="headerlink" href="#c.CpIntAtomObject._m_signed" title="Link to this definition">#</a><br /></dt>
-<dd><p>Indicates whether the integer is signed. A value of <code class="docutils literal notranslate"><span class="pre">1</span></code> means signed, and <code class="docutils literal notranslate"><span class="pre">0</span></code> means unsigned.</p>
-</dd></dl>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.CpBoolAtom_Pack">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CpBoolAtom_Pack</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.CpBoolAtomObject" title="CpBoolAtomObject"><span class="n"><span class="pre">CpBoolAtomObject</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">self</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">value</span></span>, <a class="reference internal" href="../layer.html#c.CpLayerObject" title="CpLayerObject"><span class="n"><span class="pre">CpLayerObject</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">layer</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpBoolAtom_Pack" title="Link to this definition">#</a><br /></dt>
+<dd></dd></dl>
 
-<dl class="c var">
-<dt class="sig sig-object c" id="c.CpIntAtomObject._m_little_endian">
-<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">_m_little_endian</span></span></span><a class="headerlink" href="#c.CpIntAtomObject._m_little_endian" title="Link to this definition">#</a><br /></dt>
-<dd><p>Indicates the endianness of the integer. A value of <code class="docutils literal notranslate"><span class="pre">1</span></code> signifies little-endian, while <code class="docutils literal notranslate"><span class="pre">0</span></code> signifies big-endian.</p>
-</dd></dl>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.CpBoolAtom_Unpack">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">CpBoolAtom_Unpack</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.CpBoolAtomObject" title="CpBoolAtomObject"><span class="n"><span class="pre">CpBoolAtomObject</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">self</span></span>, <a class="reference internal" href="../layer.html#c.CpLayerObject" title="CpLayerObject"><span class="n"><span class="pre">CpLayerObject</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">layer</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpBoolAtom_Unpack" title="Link to this definition">#</a><br /></dt>
+<dd><em class="refcount text-info">Return value: New reference.</em></dd></dl>
 
-</dd></dl>
-
-<section id="recommendations">
-<h2><span class="section-number">2.10.2.1. </span>Recommendations<a class="headerlink" href="#recommendations" title="Link to this heading">#</a></h2>
-<p>The following examples illustrate how to effectively utilize the <code class="xref c c-type docutils literal notranslate"><span class="pre">intatom</span></code> class
-and the associated methods:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">from</span> <span class="nn">caterpillar._C</span> <span class="kn">import</span> <span class="n">LITTLE_ENDIAN</span> <span class="k">as</span> <span class="n">le</span>
-<span class="linenos"> 2</span><span class="kn">from</span> <span class="nn">caterpillar._C</span> <span class="kn">import</span> <span class="n">intatom</span><span class="p">,</span> <span class="n">unpack</span><span class="p">,</span> <span class="n">i16</span>
-<span class="linenos"> 3</span>
-<span class="linenos"> 4</span><span class="c1"># Define a global 16-bit little-endian signed integer atom</span>
-<span class="linenos"> 5</span><span class="n">I16_LE</span> <span class="o">=</span> <span class="n">le</span> <span class="o">+</span> <span class="n">i16</span>
-<span class="linenos"> 6</span><span class="n">_I16_LE</span> <span class="o">=</span> <span class="n">intatom</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="n">signed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">little_endian</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="linenos"> 7</span>
-<span class="linenos"> 8</span><span class="n">unpack</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x01\x02</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">_I16_LE</span><span class="p">)</span>
-<span class="linenos"> 9</span><span class="n">unpack</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x01\x02</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">intatom</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="n">signed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">little_endian</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
-<span class="linenos">10</span><span class="n">unpack</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x01\x02</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">I16_LE</span><span class="p">)</span>
-<span class="linenos">11</span><span class="n">unpack</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x01\x02</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">le</span> <span class="o">+</span> <span class="n">i16</span><span class="p">)</span>
-</pre></div>
+<section id="runtime-performance">
+<h2><span class="section-number">3.9.4.1. </span>Runtime Performance<a class="headerlink" href="#runtime-performance" title="Link to this heading">#</a></h2>
+<p>Measurements represent the accumulated runtime of one million calls to
+<code class="code docutils literal notranslate"><span class="pre">unpack</span></code> or <code class="code docutils literal notranslate"><span class="pre">pack</span></code> using the corresponding implementation
+in seconds.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 25.0%" />
+<col style="width: 25.0%" />
+<col style="width: 25.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Function</p></th>
+<th class="head"><p>Caterpillar C <a class="footnote-reference brackets" href="#id6" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>0<span class="fn-bracket">]</span></a></p></th>
+<th class="head"><p>Caterpillar G <a class="footnote-reference brackets" href="#id5" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a></p></th>
+<th class="head"><p>Caterpillar   <a class="footnote-reference brackets" href="#id4" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="code docutils literal notranslate"><span class="pre">unpack</span></code></p></td>
+<td><p>0.716998s</p></td>
+<td><p>2.109347s</p></td>
+<td><p>2.999292s</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="code docutils literal notranslate"><span class="pre">pack</span></code></p></td>
+<td><p>0.883599s</p></td>
+<td><p>2.036922s</p></td>
+<td><p>2.815762s</p></td>
+</tr>
+</tbody>
+</table>
 </div>
-<p><em>TODO: describe the impact on runtime overhead of these four methods</em></p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id4" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">2</a><span class="fn-bracket">]</span></span>
+<p>local field instance</p>
+</aside>
+<aside class="footnote brackets" id="id5" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">1</a><span class="fn-bracket">]</span></span>
+<p>global field instance</p>
+</aside>
+<aside class="footnote brackets" id="id6" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">0</a><span class="fn-bracket">]</span></span>
+<p>C implementation</p>
+</aside>
+</aside>
 </section>
 </section>
 
@@ -523,20 +539,20 @@ and the associated methods:</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="fieldatom.html"
+       href="float.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title"><span class="section-number">2.10.1. </span>Field Atom Objects</p>
+        <p class="prev-next-title"><span class="section-number">3.9.3. </span>Float Atoms</p>
       </div>
     </a>
     <a class="right-next"
-       href="charatom.html"
+       href="padding.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">2.10.3. </span>Char Atoms</p>
+        <p class="prev-next-title"><span class="section-number">3.9.5. </span>Padding Atoms</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -558,14 +574,14 @@ and the associated methods:</p>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#recommendations">2.10.2.1. Recommendations</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#runtime-performance">3.9.4.1. Runtime Performance</a></li>
 </ul>
   </nav></div>
 
   <div class="sidebar-secondary-item">
 
   <div class="tocsection sourcelink">
-    <a href="../../../../_sources/reference/capi/objects/atoms/intatom.rst.txt">
+    <a href="../../../../_sources/reference/capi/objects/atoms/bool.rst.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>

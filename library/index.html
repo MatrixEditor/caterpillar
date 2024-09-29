@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Library &#8212; Caterpillar 2.1.5 documentation</title>
+    <title>Library &#8212; Caterpillar 2.2.0 documentation</title>
   
   
   
@@ -29,6 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -36,15 +37,17 @@
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../_static/documentation_options.js?v=786ba454"></script>
+    <script src="../_static/documentation_options.js?v=b21de401"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'library/index';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Byteorder and Architecture" href="byteorder.html" />
-    <link rel="prev" title="6. Using the C API" href="../reference/capi/extension.html" />
+    <link rel="prev" title="6. Module API" href="../reference/capi/module.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -121,7 +124,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.1.5</p>
+    <p class="title logo__title">Caterpillar 2.2.0</p>
   
 </a></div>
     
@@ -350,19 +353,13 @@ document.write(`
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Basic Core classes</span></p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Python API</span></p>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="byteorder.html">Byteorder and Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="options.html">Options</a></li>
 <li class="toctree-l1"><a class="reference internal" href="abc.html">Abstract base classes</a></li>
-</ul>
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Context and Exceptions</span></p>
-<ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="context.html">Context</a></li>
 <li class="toctree-l1"><a class="reference internal" href="exceptions.html">Exceptions</a></li>
-</ul>
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Struct model</span></p>
-<ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="model.html">Struct Model</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="fields/index.html">Fields</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="fields/field_model.html">Field Model</a></li>
@@ -371,6 +368,10 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="fields/crypto.html">Cryptographic Structs</a></li>
 </ul>
 </details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">C API Python Types</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="ctypes/int.html">Integer Types</a></li>
 </ul>
 </div>
 </nav></div>
@@ -429,7 +430,7 @@ document.write(`
 <span id="library-index"></span><h1>Library<a class="headerlink" href="#library" title="Link to this heading">#</a></h1>
 <p><em>descriptions are WIP</em></p>
 <div class="toctree-wrapper compound">
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Basic Core classes</span></p>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Python API</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="byteorder.html">Byteorder and Architecture</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="byteorder.html#id1">Byteorder</a></li>
@@ -448,11 +449,6 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="abc.html#standard-interface">Standard interface</a></li>
 </ul>
 </li>
-</ul>
-</div>
-<div class="toctree-wrapper compound">
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Context and Exceptions</span></p>
-<ul>
 <li class="toctree-l1"><a class="reference internal" href="context.html">Context</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="context.html#context-classes">Context classes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="context.html#special-paths">Special paths</a></li>
@@ -465,11 +461,6 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="exceptions.html#formal-exceptions">Formal exceptions</a></li>
 </ul>
 </li>
-</ul>
-</div>
-<div class="toctree-wrapper compound">
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Struct model</span></p>
-<ul>
 <li class="toctree-l1"><a class="reference internal" href="model.html">Struct Model</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="model.html#base-classes">Base classes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="model.html#standard-functions">Standard functions</a></li>
@@ -481,6 +472,16 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="fields/common.html">Common Structs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fields/compression.html">Compression Structs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fields/crypto.html">Cryptographic Structs</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">C API Python Types</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ctypes/int.html">Integer Types</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ctypes/int.html#caterpillar.c.Int"><code class="docutils literal notranslate"><span class="pre">caterpillar.c.Int</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="ctypes/int.html#pre-defined-integer-types-global">Pre-Defined Integer Types (global)</a></li>
 </ul>
 </li>
 </ul>
@@ -498,12 +499,12 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="../reference/capi/extension.html"
+       href="../reference/capi/module.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title"><span class="section-number">6. </span>Using the C API</p>
+        <p class="prev-next-title"><span class="section-number">6. </span>Module API</p>
       </div>
     </a>
     <a class="right-next"
