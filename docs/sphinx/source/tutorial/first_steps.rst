@@ -99,7 +99,7 @@ becomes unnecessary.
     .. tab-item:: Caterpillar C
 
         >>> obj = RGB(r=1, g=2, b=3)
-        >>> pack(obj, RGB.__struct__) # required as of version 2.2.0
+        >>> pack(obj, RGB) # required as of version 2.2.0
         b'\x01\x02\x03'
 
 
@@ -118,7 +118,7 @@ or our struct class is necessary.
 
     .. tab-item:: Caterpillar C
 
-        >>> unpack(b"\x01\x02\x03", RGB.__struct__)
+        >>> unpack(b"\x01\x02\x03", RGB)
         RGB(r=1, g=2, b=3)
 
 
