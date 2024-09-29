@@ -1,5 +1,5 @@
 # type: ignore
-from caterpillar._Py import (
+from caterpillar.py import (
     vint,
     VARINT_LSB,
     pack,

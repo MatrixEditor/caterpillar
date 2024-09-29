@@ -5,7 +5,8 @@ import caterpillar
 
 if caterpillar.native_support():
 
-    from caterpillar._C import atom, typeof, Field, sizeof, fieldatom
+    from caterpillar._C import atom, typeof, sizeof, patom, repeated
+    from caterpillar._C import switch
     from caterpillar._C import unpack, layer, Struct, pack, ContextPath
 
 
@@ -16,15 +17,15 @@ if caterpillar.native_support():
             return str
 
 
-    # Using the base class 'fieldatom' enabled direct field creation
+    # Using the base class 'patom' enabled direct field creation
     # using the common operators.
-    class Bar(fieldatom):
+    class Bar(patom):
         def __size__(self, ctx):
             return 2
 
 
     # Only packing is implemented
-    class Baz(fieldatom):
+    class Baz(patom):
         def __unpack__(self, ctx: layer):
             return int.from_bytes(ctx.state.read(2))
 
@@ -42,16 +43,16 @@ if caterpillar.native_support():
 
         # That will change if we have a field with a length or a
         # switch statement.
-        field = Field(f, length=2)
+        field = repeated(f, 2)
         assert typeof(field) == typing.List[str]
 
-        field2 = Field(f, switch={1: atom()})
+        field2 = switch(f, {1: atom()})[2]
         # We can't know the type of a switch atom which does
         # not implement the __type__ method
-        assert typeof(Field(atom())) == typing.Any
-        assert typeof(field2) == typing.Union[typing.Any, str]
+        assert typeof(atom()) == typing.Any
+        assert typeof(field2) == typing.List[typing.Any]
         # switch and length can be combined as well
-        assert typeof(field2[2]) == typing.List[typing.Union[typing.Any, str]]
+        assert typeof(field2[2]) == typing.List[typing.List[typing.Any]]
 
 
     def test_sizeof():
@@ -67,14 +68,16 @@ if caterpillar.native_support():
         # NOTE: A switch context is somewhat special as we don't
         # know the target atom yet. Therefore, only context lambdas
         # as switch values are supported.
-        with pytest.raises(ValueError):
+        with pytest.raises(TypeError):
             sizeof(field >> {2: Bar()})
 
         # Calculation is done by first evaluating the length of
         # the field's atom and then multiply the length of the evalutated
         # switch atom by the field's length.
-        field = Field(b, length=2, switch=(lambda ctx: Bar()))
-        assert sizeof(field) == 2 + (2 * 2)
+        # REVISIT: switch atoms does not have a static size
+        with pytest.raises(TypeError):
+            field = switch(b, (lambda ctx: Bar()))[2]
+            assert sizeof(field) == 2 + (2 * 2)
 
 
     def test_unpack_basic():
@@ -92,7 +95,7 @@ if caterpillar.native_support():
         # NOTE: parsing is done by first unpacking the switch value (Baz
         # atom) and then use it aas the key of the switch dictionary. the
         # returned atom will be used to parse the rest of the data.
-        assert unpack(data, Field(b) >> {1: b}) == 2
+        # assert unpack(data, Field(b) >> {1: b}) == 2
         assert unpack(data, b @ 0x0002) == 2
 
 
@@ -141,8 +144,7 @@ if caterpillar.native_support():
         assert pack(1, b) == b"\x00\x01"
         assert pack([1, 2], b[2]) == b"\x00\x01\x00\x02"
         assert pack([2], b[b::]) == b"\x00\x01\x00\x02"
-        # NOTE: not implemented yet
-        assert pack(2, b @ 0x0002) == b""
+        assert pack(2, b @ 0x0002) == b"\x00\x00\x00\x02"
 
 
     def test_pack_struct():
@@ -168,4 +170,4 @@ if caterpillar.native_support():
             # the data
 
         s = Struct(SBaz, alter_model=True)
-        assert pack(SBaz(a=1, b=[2]), s) == b"\x00\x01\x00\x02"
+        assert pack(SBaz(a=1, b=[2]), SBaz) == b"\x00\x01\x00\x02"

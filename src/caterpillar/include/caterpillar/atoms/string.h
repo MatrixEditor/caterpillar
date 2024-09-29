@@ -17,28 +17,125 @@
 #ifndef STRINGATOMOBJ_H
 #define STRINGATOMOBJ_H
 
-#include "caterpillar/caterpillarapi.h"
-#include "caterpillar/field.h"
+#include "caterpillar/atoms/builtins.h"
+#include "caterpillar/parsing.h"
 
+// ---------------------------------------------------------------------------
+// Default String
 struct _stringatomobj
 {
-  CpFieldCAtom_HEAD
+  CpBuiltinAtom_HEAD
 
+    /// The length of this string. It can be a constant integer
+    /// object or a ContextLambda.
     PyObject* m_length;
+
+  /// Whether this string should ignore errors when parsing
   PyObject* m_errors;
+
+  /// The encoding of this string
   PyObject* m_encoding;
 };
-
-// PyAPI_DATA(PyTypeObject) CpStringAtom_Type;
 
 #define CpStringAtom_CheckExact(op) Py_IS_TYPE((op), &CpStringAtom_Type)
 #define CpStringAtom_Check(op) PyObject_TypeCheck((op), &CpStringAtom_Type)
 
-PyAPI_FUNC(int) CpStringAtom_Pack(CpStringAtomObject* self,
-                                  PyObject* value,
-                                  CpLayerObject* layer);
+// TODO: CString, PString
 
-PyAPI_FUNC(PyObject*)
-  CpStringAtom_Unpack(CpStringAtomObject* self, CpLayerObject* layer);
+// ---------------------------------------------------------------------------
+// Bytes
+struct _bytesatomobj
+{
+  CpBuiltinAtom_HEAD
+
+    /// The length of this string. It can be a constant integer
+    /// object or a ContextLambda.
+    PyObject* m_length;
+
+  // -- internal ---
+  int s_callable;
+};
+
+// REVISIT: The name of this atom should be something similar to 'bytes'
+#define CpBytesAtom_CheckExact(op) Py_IS_TYPE((op), &CpBytesAtom_Type)
+#define CpBytesAtom_Check(op) PyObject_TypeCheck((op), &CpBytesAtom_Type)
+
+static inline CpBytesAtomObject*
+CpBytesAtom_New(PyObject* length)
+{
+  return (CpBytesAtomObject*)CpObject_CreateOneArg(&CpBytesAtom_Type, length);
+}
+
+// ---------------------------------------------------------------------------
+// PString
+
+struct _pstringatomobj
+{
+  CpBuiltinAtom_HEAD
+
+    /// The atom that parses the length of this string
+    PyObject* m_atom;
+
+  /// Whether this string should ignore errors when parsing
+  PyObject* m_errors;
+
+  /// The encoding of this string
+  PyObject* m_encoding;
+};
+
+#define CpPStringAtom_CheckExact(op) Py_IS_TYPE((op), &CpPStringAtom_Type)
+#define CpPStringAtom_Check(op) PyObject_TypeCheck((op), &CpPStringAtom_Type)
+
+static inline CpPStringAtomObject*
+CpPStringAtom_New(PyObject* atom, PyObject* encoding)
+{
+  return (CpPStringAtomObject*)CpObject_Create(
+    &CpPStringAtom_Type, "OO", atom, encoding);
+}
+
+// ---------------------------------------------------------------------------
+// CString
+
+struct _cstringatomobj
+{
+  CpBuiltinAtom_HEAD
+
+  PyObject *m_length;
+  PyObject *m_encoding;
+  PyObject *m_errors;
+  PyObject *m_terminator;
+  PyObject *_m_terminator_bytes;
+
+  int s_callable;
+  int s_number;
+  int s_keep_terminator;
+  int s_greedy;
+};
+
+#define CpCStringAtom_CheckExact(op) Py_IS_TYPE((op), &CpCStringAtom_Type)
+#define CpCStringAtom_Check(op) PyObject_TypeCheck((op), &CpCStringAtom_Type)
+
+static inline CpCStringAtomObject*
+CpCStringAtom_New(PyObject* length, PyObject* encoding, PyObject* errors,
+                  PyObject* terminator)
+{
+  return (CpCStringAtomObject*)CpObject_Create(
+    &CpCStringAtom_Type, "OOOO", length, encoding, errors, terminator);
+}
+
+static inline PyObject*
+CpCStringAtom_Length(CpCStringAtomObject* self, CpLayerObject *layer)
+{
+  if (self->s_number) {
+    return Py_NewRef(self->m_length);
+  }
+  if (self->s_greedy) {
+    Py_RETURN_NONE;
+  }
+  if (self->s_callable) {
+    return PyObject_CallOneArg(self->m_length, (PyObject *)layer);
+  }
+  return _Cp_Unpack(self->m_length, layer);
+}
 
 #endif

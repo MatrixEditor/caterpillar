@@ -88,4 +88,56 @@ struct _endianobj
  */
 #define CpEndian_Check(op) PyObject_TypeCheck((PyObject*)(op), &CpEndian_Type)
 
+/**
+ * @brief Set the byteorder of the given object
+ *
+ * @param op the object to set
+ * @param endian the new byteorder
+ * @return 0 on success, -1 on error
+ */
+static inline PyObject*
+CpEndian_SetEndian(PyObject* op, CpEndianObject* endian)
+{
+  PyObject* attr = PyObject_GetAttrString(op, "__set_byteorder__");
+  if (!attr) {
+    return NULL;
+  }
+  PyObject* ret = PyObject_CallOneArg(attr, (PyObject*)endian);
+  if (!ret) {
+    return NULL;
+  }
+  Py_DECREF(attr);
+  return ret;
+}
+
+#define _CpEndian_ImplSetByteorder_MethDef(name, docs)                         \
+  {                                                                            \
+    "__set_byteorder__", (PyCFunction)cp_##name##_set_byteorder,               \
+      METH_VARARGS | METH_KEYWORDS, (docs)                                     \
+  }
+
+#define _CpEndian_KwArgsGetByteorder(ret)                                      \
+  static char* kwlist[] = { "byteorder", NULL };                               \
+  PyObject* byteorder = NULL;                                                  \
+  if (!PyArg_ParseTupleAndKeywords(args, kw, "O", kwlist, &byteorder)) {       \
+    return ret;                                                                \
+  }                                                                            \
+  if (!CpEndian_Check(byteorder)) {                                            \
+    PyErr_SetString(PyExc_TypeError, "byteorder must be an Endian object");    \
+    return ret;                                                                \
+  }
+
+#define _CpEndian_ImplSetByteorder(typename, name, field)                      \
+  static PyObject* cp_##name##_set_byteorder(                                  \
+    typename* self, PyObject* args, PyObject* kw)                              \
+  {                                                                            \
+    _CpEndian_KwArgsGetByteorder(NULL);                                        \
+    PyObject* ret = CpEndian_SetEndian(field, (CpEndianObject*)byteorder);     \
+    if (!ret) {                                                                \
+      return NULL;                                                             \
+    }                                                                          \
+    _Cp_SetObj(field, ret);                                                    \
+    return Py_NewRef((PyObject*)self);                                         \
+  }
+
 #endif

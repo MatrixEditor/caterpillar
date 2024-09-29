@@ -22,10 +22,11 @@ For those ready to dig deeper or contribute to the framework, the :ref:`library-
 is an important resource to start from.
 
 .. toctree::
-    :caption: Roadmap
+    :caption: Python
     :numbered:
     :maxdepth: 4
 
     first_steps.rst
     basics.rst
     advanced.rst
+

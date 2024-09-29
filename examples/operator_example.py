@@ -1,5 +1,5 @@
 # type: ignore
-from caterpillar._Py import struct, uint16, Operator, S_REPLACE_TYPES
+from caterpillar.py import struct, uint16, Operator, S_REPLACE_TYPES
 
 # Here, we define a custom operator named 'M' that will multiply
 # the second argument by 2.

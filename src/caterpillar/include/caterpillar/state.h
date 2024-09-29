@@ -74,36 +74,25 @@ struct _stateobj
 
 //-----------------------------------------------------------------------------
 // layer
+enum {
+  CpLayerClass_Default = 0,
+  CpLayerClass_Sequence = 1,
+  CpLayerClass_Object = 2,
+};
 
 /**
- * @brief TODO
+ * @brief Top level layer class with a reference to its parent and the global
+ * parsing state.
  */
 struct _layerobj
 {
   PyObject_HEAD
 
-    /// The parent layer
-    struct _layerobj* m_parent;
+  /// The parent layer
+  struct _layerobj* m_parent;
 
   /// the global parsing state
   CpStateObject* m_state;
-
-  // --- Context sensitive variables ---
-
-  /// In case a struct is linked to a field, the `Field` instance will always
-  /// set this layer to be accessible from within the underlying struct.
-  PyObject* m_field;
-
-  /// When packing or unpacking objects, the current object attributes are
-  /// stored within an object context. This is a special context that allows
-  /// access to previously parsed fields or attributes of the input object. To
-  /// minimize the number of calls using this attribute, a shortcut named `this`
-  /// was defined, which automatically inserts a path to the object context.
-  PyObject* m_obj;
-
-  /// In case a switch-case statement is activated in a field, the layer will
-  /// store the parsed value in this variable temporarily.
-  PyObject* m_value;
 
   /// Although it is optional to provide the current parsing or building path,
   /// it is recommended. All nesting structures implement a behavior that
@@ -112,24 +101,46 @@ struct _layerobj
   /// elements
   PyObject* m_path;
 
-  /// Same as `m_obj` but for the sequential elements.
-  PyObject* m_sequence;
+  // REVISIT: do we need them?
+  /// Lazily loaded context sensitive variables (this field remains NULL until
+  /// the first item gets added to it)
+  // PyObject *m_locals;
 
-  /// The length of the current collection.
-  Py_ssize_t m_length;
+  /// The type of the layer
+  int8_t m_class;
 
-  /// When packing or unpacking collections of elements, the current working
-  /// index is given under this layer variable. It is set only in this specific
-  /// situation.
-  Py_ssize_t m_index;
+  // --- Context sensitive variables ---
 
-  // --- Internal state variables ---
-  int8_t s_greedy;
-  int8_t s_sequential;
+  // /// In case a struct is linked to a field, the `Field` instance will always
+  // /// set this layer to be accessible from within the underlying struct.
+  // PyObject* m_field;
+
+  // /// When packing or unpacking objects, the current object attributes are
+  // /// stored within an object context. This is a special context that allows
+  // /// access to previously parsed fields or attributes of the input object. To
+  // /// minimize the number of calls using this attribute, a shortcut named `this`
+  // /// was defined, which automatically inserts a path to the object context.
+  // PyObject* m_obj;
+
+  // /// In case a switch-case statement is activated in a field, the layer will
+  // /// store the parsed value in this variable temporarily.
+  // PyObject* m_value;
+
+  // /// Same as `m_obj` but for the sequential elements.
+  // PyObject* m_sequence;
+
+  // /// The length of the current collection.
+  // Py_ssize_t m_length;
+
+  // /// When packing or unpacking collections of elements, the current working
+  // /// index is given under this layer variable. It is set only in this specific
+  // /// situation.
+  // Py_ssize_t m_index;
+
+  // // --- Internal state variables ---
+  // int8_t s_greedy;
+  // int8_t s_sequential;
 };
-
-/// Layer type
-// PyAPI_DATA(PyTypeObject) CpLayer_Type;
 
 /**
  * @brief Check whether the given object is a layer
@@ -148,7 +159,7 @@ struct _layerobj
  * @return false if the object is not a layer
  */
 #define CpLayer_Check(v) PyObject_TypeCheck((v), &CpLayer_Type)
-
+#define CpLayer_HEAD CpLayerObject ob_base;
 
 #define CpLayer_AppendPath(layer, newpath)                                     \
   Py_XSETREF(                                                                  \
@@ -158,5 +169,59 @@ struct _layerobj
                                                ? (layer)->m_parent->m_path     \
                                                : (layer)->m_path),             \
                          _PyUnicode_AsString((newpath))));
+
+//-----------------------------------------------------------------------------
+// seq layer
+
+struct _seqlayerobj
+{
+  CpLayer_HEAD
+
+  /// Same as `m_obj` but for the sequential elements.
+  PyObject* m_sequence;
+
+  /// The length of the current collection.
+  Py_ssize_t m_length;
+
+  /// When packing or unpacking collections of elements, the current working
+  /// index is given under this layer variable. It is set only in this specific
+  /// situation.
+  Py_ssize_t m_index;
+
+  int8_t s_greedy;
+};
+
+#define CpSeqLayer_CheckExact(v) Py_IS_TYPE((v), &CpSeqLayer_Type)
+#define CpSeqLayer_Check(v) PyObject_TypeCheck((v), &CpSeqLayer_Type)
+
+//-----------------------------------------------------------------------------
+// obj layer
+
+struct _objlayerobj
+{
+  CpLayer_HEAD
+
+  /// When packing or unpacking objects, the current object attributes are
+  /// stored within an object context. This is a special context that allows
+  /// access to previously parsed fields or attributes of the input object. To
+  /// minimize the number of calls using this attribute, a shortcut named `this`
+  /// was defined, which automatically inserts a path to the object context.
+  PyObject* m_obj;
+};
+
+#define CpObjLayer_CheckExact(v) Py_IS_TYPE((v), &CpObjLayer_Type)
+#define CpObjLayer_Check(v) PyObject_TypeCheck((v), &CpObjLayer_Type)
+
+//-----------------------------------------------------------------------------
+// field layer
+
+struct _fieldlayerobj
+{
+  CpLayer_HEAD
+
+    /// In case a struct is linked to a field, the `Field` instance will always
+    /// set this layer to be accessible from within the underlying struct.
+    PyObject* m_field;
+};
 
 #endif

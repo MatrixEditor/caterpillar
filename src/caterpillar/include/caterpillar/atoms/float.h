@@ -17,12 +17,11 @@
 #ifndef FLOATATOMOBJ_H
 #define FLOATATOMOBJ_H
 
-#include "caterpillar/caterpillarapi.h"
-#include "caterpillar/field.h"
+#include "caterpillar/atoms/builtins.h"
 
 struct _floatatomobj
 {
-  CpFieldCAtom_HEAD
+  CpBuiltinAtom_HEAD
 
     /// Stores the amount of bytes this float atom
     /// has in total
@@ -35,18 +34,7 @@ struct _floatatomobj
   int _m_little_endian;
 };
 
-// PyAPI_DATA(PyTypeObject) CpFloatAtom_Type;
-
-/** @brief Checks if the given object is an integer atom object */
 #define CpFloatAtom_CheckExact(op) Py_IS_TYPE((op), &CpFloatAtom_Type)
-/** @brief Checks if the given object is an integer atom object */
-#define CpFloatAtom_Check(op) (PyObject_IsInstance((op), &CpFloatAtom_Type))
-
-PyAPI_FUNC(int) CpFloatAtom_Pack(CpFloatAtomObject* self,
-                                 PyObject* value,
-                                 CpLayerObject* layer);
-
-PyAPI_FUNC(PyObject*)
-  CpFloatAtom_Unpack(CpFloatAtomObject* self, CpLayerObject* layer);
+#define CpFloatAtom_Check(op) (PyObject_TypeCheck((op), &CpFloatAtom_Type))
 
 #endif

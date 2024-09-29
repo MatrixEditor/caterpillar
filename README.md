@@ -28,10 +28,10 @@ options will be added in the future. Documentation is [here >](https://matrixedi
 * it helps you to create cleaner and more compact code.
 * You can even extend Caterpillar and write your parsing logic in C or C++!!
 
-## What does it look like?
+## Give me some code!
 
 ```python
-from caterpillar._Py import *
+from caterpillar.py import *
 
 @struct(order=LittleEndian)
 class Format:
@@ -61,23 +61,18 @@ on its powerful features, explore the official [documentation](https://matrixedi
 > As of Caterpillar v2.1.2 it is possible to install the library without the need of
 > compiling the C extension.
 
-Simply use pip to install the package with all tools, all extra packages and the C extension:
+### Python-only installation
+
 ```bash
-pip install "caterpillar[all]@git+https://github.com/MatrixEditor/caterpillar.git"
+pip install "caterpillar[all]@git+https://github.com/MatrixEditor/caterpillar"
 ```
 
-If you want to use the native C extension you can specify the following environment variables:
+### C-extension installation
 
-* `CP_ENABLE_NATIVE` - Enables installation of the native C extension
-* `CP_ENABLE_TOOLS` - Enables installation of extra tools (proposed)
-
-For instance, the following command will install the `caterpillar` package with
-a native interface and with extra tools:
 ```bash
-CP_ENABLE_NATIVE=1 \
-CP_ENABLE_TOOLS=1 \
-pip install git+https://github.com/MatrixEditor/caterpillar
+pip install "caterpillar[all]@git+https://github.com/MatrixEditor/caterpillar/#subdirectory=src/ccaterpillar"
 ```
+
 
 ## Starting Point
 

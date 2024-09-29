@@ -33,6 +33,7 @@ if caterpillar.native_support():
 
         STRUCT_OPTIONS.add(option)
         assert option in STRUCT_OPTIONS
+        STRUCT_OPTIONS.remove(option) # necessary for other tests
 
 
     @pytest.mark.parametrize(

@@ -23,14 +23,15 @@ documentation.
 If you want to switch to the C API instead, please refer to the sections described in the CAPI reference.
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
    :numbered:
    :caption: C API Reference
 
+   capi/extension
    capi/abstract
    capi/objects/objimpl
    capi/parsing
    capi/macros
    capi/module
-   capi/extension
+
 

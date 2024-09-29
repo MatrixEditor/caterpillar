@@ -17,8 +17,22 @@
 #ifndef PRIMITIVEATOMOBJ_H
 #define PRIMITIVEATOMOBJ_H
 
-#include "caterpillar/caterpillarapi.h"
-#include "caterpillar/field.h"
+#include "caterpillar/atoms/builtins.h"
+
+//------------------------------------------------------------------------------
+// primitive atom
+struct _primitiveatomobj
+{
+  CpAtom_HEAD
+};
+
+#define CpPrimitiveAtom_NAME "patom"
+#define CpPrimitiveAtom_CheckExact(op) Py_IS_TYPE((op), &CpPrimitiveAtom_Type)
+#define CpPrimitiveAtom_Check(op)                                              \
+  (PyObject_TypeCheck((op), &CpPrimitiveAtom_Type))
+
+//------------------------------------------------------------------------------
+// Bool
 
 /// @struct _boolatomobj
 /// @brief Struct representing a bool atom object.
@@ -27,7 +41,7 @@
 /// family.
 struct _boolatomobj
 {
-  CpFieldCAtom_HEAD
+  CpBuiltinAtom_HEAD
 };
 
 /// @brief Bool atom object type
@@ -58,81 +72,103 @@ struct _boolatomobj
  * @return True if the object is of type CpBoolAtom_Type or a subtype,
  *         false otherwise.
  */
-#define CpBoolAtom_Check(op) (PyObject_IsInstance((op), &CpBoolAtom_Type))
-
-/**
- * @brief Packs a value into the underlying stream.
- *
- * @param self The bool atom object
- * @param value The boolean value to be packed.
- * @param layer The layer object providing the context for packing.
- * @return Integer status code (typically 0 for success, non-zero for error).
- */
-PyAPI_FUNC(int) CpBoolAtom_Pack(CpBoolAtomObject* self,
-                                PyObject* value,
-                                CpLayerObject* layer);
-
-/**
- * @brief Unpacks a value from the underlying stream.
- *
- * @param self The bool atom object instance.
- * @param layer The layer object providing the context for unpacking.
- * @return The unpacked boolean value as a PyObject.
- */
-PyAPI_FUNC(PyObject*)
-  CpBoolAtom_Unpack(CpBoolAtomObject* self, CpLayerObject* layer);
+#define CpBoolAtom_Check(op) (PyObject_TypeCheck((op), &CpBoolAtom_Type))
 
 //------------------------------------------------------------------------------
 // Char Atom
 struct _charatomobj
 {
-  CpFieldCAtom_HEAD
+  CpBuiltinAtom_HEAD
 };
-
-/// Char atom object type
-// PyAPI_DATA(PyTypeObject) CpCharAtom_Type;
 
 /** @brief Checks if the given object is a char atom object */
 #define CpCharAtom_CheckExact(op) Py_IS_TYPE((op), &CpCharAtom_Type)
 /** @brief Checks if the given object is a char atom object */
-#define CpCharAtom_Check(op) (PyObject_IsInstance((op), &CpCharAtom_Type))
-
-PyAPI_FUNC(int) CpCharAtom_Pack(CpCharAtomObject* self,
-                                PyObject* value,
-                                CpLayerObject* layer);
-
-PyAPI_FUNC(PyObject*)
-  CpCharAtom_Unpack(CpCharAtomObject* self, CpLayerObject* layer);
+#define CpCharAtom_Check(op) (PyObject_TypeCheck((op), &CpCharAtom_Type))
 
 //------------------------------------------------------------------------------
 // Padding
 struct _paddingatomobj
 {
-  CpFieldCAtom_HEAD
+  CpBuiltinAtom_HEAD
 
-    char padding;
+    char _m_padding;
 };
 
-/// Padding atom object type
-// PyAPI_DATA(PyTypeObject) CpPaddingAtom_Type;
-
-/** @brief Checks if the given object is a padding atom object */
 #define CpPaddingAtom_CheckExact(op) Py_IS_TYPE((op), &CpPaddingAtom_Type)
-/** @brief Checks if the given object is a padding atom object */
-#define CpPaddingAtom_Check(op) (PyObject_IsInstance((op), &CpPaddingAtom_Type))
+#define CpPaddingAtom_Check(op) (PyObject_TypeCheck((op), &CpPaddingAtom_Type))
 
-PyAPI_FUNC(int) CpPaddingAtom_Pack(CpPaddingAtomObject* self,
-                                   PyObject* _,
-                                   CpLayerObject* layer);
+//------------------------------------------------------------------------------
+// Computed
 
-PyAPI_FUNC(int) CpPaddingAtom_PackMany(CpPaddingAtomObject* self,
-                                       PyObject* _,
-                                       CpLayerObject* layer);
+struct _computedatomobj
+{
+  CpBuiltinAtom_HEAD
 
-PyAPI_FUNC(PyObject*)
-  CpPaddingAtom_Unpack(CpPaddingAtomObject* self, CpLayerObject* layer);
+    PyObject* m_value;
+  int s_callable;
+};
 
-PyAPI_FUNC(PyObject*)
-  CpPaddingAtom_UnpackMany(CpPaddingAtomObject* self, CpLayerObject* layer);
+#define CpComputedAtom_CheckExact(op) Py_IS_TYPE((op), &CpComputedAtom_Type)
+#define CpComputedAtom_Check(op)                                               \
+  (PyObject_TypeCheck((op), &CpComputedAtom_Type))
+
+#define CpComputedAtom_VALUE(op) (((CpComputedAtomObject*)(op))->m_value)
+
+/*CpAPI*/
+static inline PyObject*
+CpComputedAtom_Value(CpComputedAtomObject* self, CpLayerObject* layer)
+{
+  return self->s_callable ? PyObject_CallOneArg(self->m_value, (PyObject*)layer)
+                          : Py_NewRef(self->m_value);
+}
+
+/*CpAPI*/
+static inline CpComputedAtomObject*
+CpComputedAtom_New(PyObject* value)
+{
+  return (CpComputedAtomObject*)CpObject_Create(
+    &CpComputedAtom_Type, "O", value);
+}
+
+//------------------------------------------------------------------------------
+// Lazy
+
+struct _lazyatomobj
+{
+  CpBuiltinAtom_HEAD
+
+    PyObject* m_fn;
+  PyObject* m_atom;
+  int s_always_lazy;
+};
+
+#define CpLazyAtom_CheckExact(op) Py_IS_TYPE((op), &CpLazyAtom_Type)
+#define CpLazyAtom_Check(op) (PyObject_TypeCheck((op), &CpLazyAtom_Type))
+#define CpLazyAtom_ATOM(op) (((CpLazyAtomObject*)(op))->m_atom)
+
+/*CpAPI*/
+static inline PyObject*
+CpLazyAtom_Atom(CpLazyAtomObject* self)
+{
+  if (self->s_always_lazy)
+    return PyObject_CallNoArgs(self->m_fn);
+
+  if (!self->m_atom) {
+    Py_XSETREF(self->m_atom, PyObject_CallNoArgs(self->m_fn));
+    if (!self->m_atom)
+      return NULL;
+  }
+
+  return Py_NewRef(self->m_atom);
+}
+
+/*CpAPI*/
+static inline CpLazyAtomObject*
+CpLazyAtom_New(PyObject* fn, int always_lazy)
+{
+  return (CpLazyAtomObject*)CpObject_Create(
+    &CpLazyAtom_Type, "Oi", fn, always_lazy);
+}
 
 #endif

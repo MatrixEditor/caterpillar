@@ -27,7 +27,8 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx_design",
     "breathe",
-    "c_annotations"
+    "c_annotations",
+    "sphinx_copybutton"
 ]
 
 templates_path = ["_templates"]
@@ -61,7 +62,7 @@ pygments_style = "sphinx"
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
 
-refcount_file = 'extensions/refcounts.dat'
+refcount_file = '../../../src/capi.dat'
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output

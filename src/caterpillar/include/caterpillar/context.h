@@ -59,21 +59,6 @@ struct _contextobj
  */
 #define CpContext_Check(op) PyObject_TypeCheck((op), &CpContext_Type)
 
-/**
- * @brief Get an attribute from a context by using __context_getattr__.
- *
- * @return the attribute, or NULL on failure
- */
-PyAPI_FUNC(PyObject*)
-  CpContext_GetAttr(PyObject* ctx, PyObject* key, _modulestate* m);
-
-/**
- * @brief Get an attribute from a context by using __context_getattr__.
- *
- * @return the attribute, or NULL on failure
- */
-PyAPI_FUNC(PyObject*) CpContext_GetAttrString(PyObject* ctx, const char* key);
-
 // -----------------------------------------------------------------------------
 // unary expression
 enum

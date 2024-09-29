@@ -4,7 +4,7 @@ import caterpillar
 
 if caterpillar.native_support():
 
-    from caterpillar._C import atom, Struct
+    from caterpillar.c import atom, Struct, struct, TYPE_MAP, u8, pack
 
 
     def test_struct_init():
@@ -26,7 +26,7 @@ if caterpillar.native_support():
         assert s.model is Foo
         # The member dictionary will store Field instances,
         # which then store the default value
-        assert s.members["a"].field.default == 1
+        assert s.members["a"].default == 1
 
 
     def test_invalid_struct_model():
@@ -51,3 +51,22 @@ if caterpillar.native_support():
         # value for 'a'.
         assert Foo().a == 1
         assert Foo(a=2).a == 2
+
+    def test_struct_decorator():
+        @struct
+        class Foo:
+            a: atom() = 1
+
+        assert len(Foo.__struct__.members) == 1
+        assert Foo().a == 1
+
+    def test_struct_type_handler():
+        TYPE_MAP[int] = u8
+
+        @struct
+        class Format:
+            a: int
+
+        assert len(Format.__struct__.members) == 1
+        assert Format(1).a == 1
+        assert pack(Format(1), Format.__struct__) == b"\x01"

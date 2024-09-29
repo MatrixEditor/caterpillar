@@ -1,0 +1,50 @@
+# Installation via pip:
+# pip install "caterpillar[all]@git+https://github.com/MatrixEditor/caterpillar/#subdirectory=src/ccaterpillar"
+
+[build-system]
+requires = ["scikit-build-core"]
+build-backend = "scikit_build_core.build"
+
+[tool.scikit-build]
+build-dir = "build/{wheel_tag}"
+sdist.include = ["*.pyi", "*.h"]
+wheel.py-api = "cp312"
+cmake.source-dir = "../.."
+wheel.packages = ["../../src/caterpillar"]
+
+[tool.scikit-build.cmake.define]
+# We have to set this variable in order to enable the C API.
+CP_ENABLE_NATIVE = "1"
+
+[project]
+name = "caterpillar"
+version = "2.2.0"
+
+description="Library to pack and unpack structurized binary data."
+authors = [
+  { name="MatrixEditor", email="not@supported.com" },
+]
+readme = "../../README.md"
+classifiers = [
+    'Intended Audience :: Science/Research',
+    'License :: OSI Approved :: MIT License',
+
+    'Programming Language :: Python :: 3.12',
+  ]
+
+[project.urls]
+"Homepage" = "https://github.com/MatrixEditor/caterpillar"
+"API-Docs" = "https://matrixeditor.github.io/caterpillar"
+
+[project.optional-dependencies]
+# compression
+lzo = [
+  "lzallright"
+]
+crypt = [
+  "cryptography"
+]
+all = [
+  "lzallright",
+  "cryptography"
+]

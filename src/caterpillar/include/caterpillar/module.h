@@ -52,8 +52,9 @@ struct _modulestate
   // typing constants
   PyObject* Any_Type;
   PyObject* List_Type;
+  PyObject* Optional_Type;
   PyObject* Union_Type;
-  PyObject *BytesIO_Type;
+  PyObject* BytesIO_Type;
 
   // string constants
   // strings
@@ -70,6 +71,7 @@ struct _modulestate
   PyObject* str___unpack_many__;
   PyObject* str___size__;
   PyObject* str___type__;
+  PyObject* str___bits__;
   PyObject* str___annotations__;
   PyObject* str___mro__;
   PyObject* str___struct__;
@@ -78,6 +80,8 @@ struct _modulestate
   PyObject* str___weakref__;
   PyObject* str___dict__;
   PyObject* str___qualname__;
+  PyObject* str__member_map_;
+  PyObject* str__value2member_map_;
 
   PyObject* str_start;
   PyObject* str_ctx__root;
@@ -85,16 +89,20 @@ struct _modulestate
   PyObject* str_bytesio_getvalue;
   PyObject* str_builder_process;
   PyObject* str_pattern_match;
+  PyObject* str_cstring_default_pad;
+  PyObject* str_utf8;
 
   // compiled regex for unnamed fields
   PyObject* cp_regex__unnamed;
   PyObject* inspect_getannotations;
 
   // cached objects
-  PyObject *cp_bytes__true;
-  PyObject *cp_bytes__false;
-};
+  PyObject* cp_bytes__true;
+  PyObject* cp_bytes__false;
 
+  // type handler map
+  PyObject* cp_typehandler_map;
+};
 
 /**
  * @brief Get the module state object
@@ -120,18 +128,6 @@ get_global_module_state(void)
 {
   return get_module_state(PyState_FindModule(&CpModule));
 }
-
-/* immortal objects */
-// PyAPI_DATA(PyTypeObject) CpInvalidDefault_Type;
-// PyAPI_DATA(PyTypeObject) CpDefaultOption_Type;
-
-// PyAPI_DATA(PyObject) _CpInvalidDefault_Object;
-#define CpInvalidDefault (&_CpInvalidDefault_Object)
-#define Cp_IsInvalidDefault(o) ((o) == CpInvalidDefault)
-
-// PyAPI_DATA(PyObject) _CpDefaultOption_Object;
-#define CpDefaultOption (&_CpDefaultOption_Object)
-#define Cp_IsDefaultOption(o) ((o) == CpDefaultOption)
 
 /* utility macros */
 #define CpModule_SetupType(op)                                                 \

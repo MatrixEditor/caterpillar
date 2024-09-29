@@ -41,7 +41,7 @@ State Objects
     Returns the current position of the state. Returns *NULL* if an error occurs.
 
 
-.. c:function:: PyObject *CpState_Seek(CpStateObject *state, Py_ssize_t pos, int whence)
+.. c:function:: PyObject *CpState_Seek(CpStateObject *state, Py_ssize_t pos, PyObject whence)
 
     Seeks to the given position. Returns :code:`0` if successful. Returns :code:`-1`
     if an error occurs.
