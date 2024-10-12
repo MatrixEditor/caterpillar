@@ -39,8 +39,7 @@ cp_arch_init(CpArchObject* self, PyObject* args, PyObject* kw)
     return -1;
 
   if (name) {
-    Py_XSETREF(self->name, name);
-    Py_INCREF(self->name);
+    _Cp_SetObj(self->name, name);
   }
   self->pointer_size = value;
   if (PyUnicode_GET_LENGTH(self->name) == 0) {
