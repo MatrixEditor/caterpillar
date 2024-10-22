@@ -9,9 +9,9 @@ find_package(
 add_compile_definitions(_CPMODULE)
 
 # TODO: document this change
-set(CP_C_CONFIGURED DEFINED ENV{CP_ENABLE_NATIVE} OR DEFINED CP_ENABLE_NATIVE)
+if (DEFINED ENV{CP_ENABLE_NATIVE} OR DEFINED CP_ENABLE_NATIVE)
+message(STATUS "Building Caterpillar C extension")
 
-if (CP_C_CONFIGURED)
 python_add_library(
   _C
   MODULE
