@@ -126,11 +126,12 @@ CpIntAtom_Pack(CpIntAtomObject* self, PyObject* op, CpLayerObject* layer)
   }
 
   int little_endian = self->_m_little_endian;
-  int res = _PyLong_AsByteArray((PyLongObject*)op,
-                                (unsigned char*)PyBytes_AS_STRING(bytes),
-                                self->_m_byte_count,
-                                little_endian,
-                                self->_m_signed);
+  int res = (int)CpCompat_PyLong_AsBuffer(op,
+                                          PyBytes_AS_STRING(bytes),
+                                          self->_m_byte_count,
+                                          little_endian,
+                                          self->_m_signed);
+
   if (res == -1) {
     return -1;
   }
@@ -153,11 +154,10 @@ CpIntAtom_Unpack(CpIntAtomObject* self, CpLayerObject* layer)
   }
 
   int little_endian = self->_m_little_endian;
-  PyObject* obj =
-    _PyLong_FromByteArray((unsigned char*)PyBytes_AS_STRING(bytes),
-                          self->_m_byte_count,
-                          little_endian,
-                          self->_m_signed);
+  PyObject* obj = CpCompat_PyLong_FromBuffer(PyBytes_AS_STRING(bytes),
+                                             self->_m_byte_count,
+                                             little_endian,
+                                             self->_m_signed);
   Py_DECREF(bytes);
   return obj;
 }

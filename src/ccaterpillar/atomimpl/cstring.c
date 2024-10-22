@@ -266,7 +266,7 @@ CpCStringAtom_Unpack(CpCStringAtomObject* self, CpLayerObject* layer)
   }
 
   if (!self->s_keep_terminator) {
-    Py_XSETREF(string, _PyUnicode_XStrip(string, 1, self->m_terminator));
+    Py_XSETREF(string, CpCompat_PyUnicode_Strip(string, self->m_terminator));
   }
   return string;
 }

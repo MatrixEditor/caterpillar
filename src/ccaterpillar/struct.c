@@ -347,8 +347,8 @@ cp_struct_init(CpStructObject* self, PyObject* args, PyObject* kw)
     Py_XSETREF(self->m_options, Py_NewRef(options));
   }
 
-  if (_PySet_Update(self->m_options,
-                    self->s_mod->cp_option__global_struct_options) < 0) {
+  if (!PyNumber_InPlaceOr(self->m_options,
+                          self->s_mod->cp_option__global_struct_options)) {
     return -1;
   };
 
@@ -933,7 +933,7 @@ _cp_struct_inherited_slots(CpStructObject* self)
         goto cleanup;
       }
     } else if (PyIter_Check(type_slots)) {
-      if (_PySet_Update(inherited_slots, type_slots) < 0) {
+      if (!PyNumber_InPlaceOr(inherited_slots, type_slots)) {
         res = NULL;
         goto cleanup;
       }

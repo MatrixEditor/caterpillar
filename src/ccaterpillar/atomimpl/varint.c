@@ -173,21 +173,16 @@ CpVarIntAtom_BSwap(PyObject* number, bool little_endian)
     Py_DECREF(bytesSize);
     return NULL;
   }
-
-  int res = _PyLong_AsByteArray((PyLongObject*)number,
-                                (unsigned char*)PyBytes_AS_STRING(bytes),
-                                nbytes,
-                                little_endian,
-                                false);
+  int res = (int)CpCompat_PyLong_AsBuffer(
+    number, PyBytes_AS_STRING(bytes), nbytes, little_endian, false);
   if (res == -1) {
     Py_DECREF(bytesSize);
     Py_DECREF(bytes);
     return NULL;
   }
 
-  PyObject* result = _PyLong_FromByteArray(
-    (unsigned char*)PyBytes_AS_STRING(bytes), nbytes, !little_endian, false);
-
+  PyObject* result = CpCompat_PyLong_FromBuffer(
+    PyBytes_AS_STRING(bytes), nbytes, !little_endian, false);
   Py_DECREF(bytesSize);
   Py_DECREF(bytes);
   return result;

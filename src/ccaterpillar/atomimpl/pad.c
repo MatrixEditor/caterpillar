@@ -7,7 +7,7 @@
 static PyObject*
 cp_paddingatom_type(PyObject* self)
 {
-  return Py_XNewRef(&_PyNone_Type);
+  return Py_XNewRef(Py_None->ob_type);
 }
 
 static PyObject*
