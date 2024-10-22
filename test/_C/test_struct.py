@@ -70,3 +70,16 @@ if caterpillar.native_support():
         assert len(Format.__struct__.members) == 1
         assert Format(1).a == 1
         assert pack(Format(1), Format.__struct__) == b"\x01"
+
+    def test_struct_inheritance():
+        @struct
+        class Foo:
+            a: atom() = 1
+
+        @struct
+        class Bar(Foo):
+            b: atom() = 2
+
+        assert len(Bar.__struct__.members) == 2
+        assert Bar().a == 1
+        assert Bar().b == 2

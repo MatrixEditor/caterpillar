@@ -20,6 +20,18 @@
 #include "caterpillar/atoms/builtins.h"
 #include "caterpillar/parsing.h"
 
+#if PY_3_13_PLUS
+// Python3.13 comes with a new API
+#define CpCompat_PyUnicode_Strip(obj, chars)                                   \
+  PyObject_CallMethod((obj), "strip", "O", (chars))
+
+#else
+
+#define CpCompat_PyUnicode_Strip(obj, chars)                                   \
+  _PyUnicode_XStrip((obj), 1, (chars))
+
+#endif
+
 // ---------------------------------------------------------------------------
 // Default String
 struct _stringatomobj
@@ -100,11 +112,11 @@ struct _cstringatomobj
 {
   CpBuiltinAtom_HEAD
 
-  PyObject *m_length;
-  PyObject *m_encoding;
-  PyObject *m_errors;
-  PyObject *m_terminator;
-  PyObject *_m_terminator_bytes;
+    PyObject* m_length;
+  PyObject* m_encoding;
+  PyObject* m_errors;
+  PyObject* m_terminator;
+  PyObject* _m_terminator_bytes;
 
   int s_callable;
   int s_number;
@@ -116,7 +128,9 @@ struct _cstringatomobj
 #define CpCStringAtom_Check(op) PyObject_TypeCheck((op), &CpCStringAtom_Type)
 
 static inline CpCStringAtomObject*
-CpCStringAtom_New(PyObject* length, PyObject* encoding, PyObject* errors,
+CpCStringAtom_New(PyObject* length,
+                  PyObject* encoding,
+                  PyObject* errors,
                   PyObject* terminator)
 {
   return (CpCStringAtomObject*)CpObject_Create(
@@ -124,7 +138,7 @@ CpCStringAtom_New(PyObject* length, PyObject* encoding, PyObject* errors,
 }
 
 static inline PyObject*
-CpCStringAtom_Length(CpCStringAtomObject* self, CpLayerObject *layer)
+CpCStringAtom_Length(CpCStringAtomObject* self, CpLayerObject* layer)
 {
   if (self->s_number) {
     return Py_NewRef(self->m_length);
@@ -133,7 +147,7 @@ CpCStringAtom_Length(CpCStringAtomObject* self, CpLayerObject *layer)
     Py_RETURN_NONE;
   }
   if (self->s_callable) {
-    return PyObject_CallOneArg(self->m_length, (PyObject *)layer);
+    return PyObject_CallOneArg(self->m_length, (PyObject*)layer);
   }
   return _Cp_Unpack(self->m_length, layer);
 }

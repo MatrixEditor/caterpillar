@@ -347,8 +347,8 @@ cp_struct_init(CpStructObject* self, PyObject* args, PyObject* kw)
     Py_XSETREF(self->m_options, Py_NewRef(options));
   }
 
-  if (_PySet_Update(self->m_options,
-                    self->s_mod->cp_option__global_struct_options) < 0) {
+  if (!PyNumber_InPlaceOr(self->m_options,
+                          self->s_mod->cp_option__global_struct_options)) {
     return -1;
   };
 
@@ -565,12 +565,16 @@ cp_struct_import_bases(CpStructObject* self)
   // All object references here are borrowed.
   PyObject *base = NULL, *field = NULL, *name = NULL;
   CpStructObject* struct_ = NULL;
-  Py_ssize_t bases_length = PyTuple_GET_SIZE(bases);
+  Py_ssize_t bases_length = PyTuple_GET_SIZE(bases), pos = 0;
+
   for (Py_ssize_t i = 0; i < bases_length; i++) {
     // For simplicity, we will discard all invalid base classes
     // that can't be displayed as types, e.g. partial template
     // types.
     base = PyTuple_GetItem(bases, i);
+    if (!base) {
+      return -1;
+    }
     if (!PyType_Check(base)) {
       continue;
     }
@@ -588,14 +592,16 @@ cp_struct_import_bases(CpStructObject* self)
       return -1;
     }
 
-    while (PyDict_Next(struct_->m_members, NULL, &name, &field)) {
+    ;
+
+    while (PyDict_Next(struct_->m_members, &pos, &name, &field)) {
       // The check for duplicates is done in the called function.
       if (CpStruct_AddFieldInfo(self, (CpStructFieldInfoObject*)field) < 0) {
         Py_XDECREF(struct_);
         return -1;
       }
     }
-    Py_XDECREF(struct_);
+    // Py_XDECREF(struct_);
   }
   return 0;
 }
@@ -620,67 +626,64 @@ cp_struct_process_annotation(CpStructObject* self,
   // class-level defaults and field-level defaults.
   PyObject* field = NULL;
   _modulestate* state = self->s_mod;
-  {
-    // 1. Annotated field:
-    // The annotation is already a CpField object, so we don't need to convert
-    // it. Note thate we check against the *exact* type, which means that we
-    // will not accept any subclass of CpField.
-    // if (CpField_CheckExact(annotation)) {
-    //   field = Py_NewRef(annotation);
-    // }
+  // 1. Annotated field:
+  // The annotation is already a CpField object, so we don't need to convert
+  // it. Note thate we check against the *exact* type, which means that we
+  // will not accept any subclass of CpField.
+  // if (CpField_CheckExact(annotation)) {
+  //   field = Py_NewRef(annotation);
+  // }
 
-    // 2. Atom object or protocol
-    // The annotation is an instance of a subclass of the CpAtom class OR it
-    // conforms to the Atom protocol.
-    //
-    // The annotation conforms to the Atom protocol. Note that we check here
-    // only against packing, unpacking and size calculation. The type function
-    // is optional and won't be covered here.
-    if (CpAtom_Check(annotation)) {
-      field = Py_NewRef(annotation);
-    }
+  // 2. Atom object or protocol
+  // The annotation is an instance of a subclass of the CpAtom class OR it
+  // conforms to the Atom protocol.
+  //
+  // The annotation conforms to the Atom protocol. Note that we check here
+  // only against packing, unpacking and size calculation. The type function
+  // is optional and won't be covered here.
+  if (CpAtom_Check(annotation)) {
+    field = Py_NewRef(annotation);
+  }
 
-    // 3. Type
-    // Here, the annotation may be a custom struct type or an enum type.
-    // Currently, only struct container are supported.
-    else if (PyType_Check(annotation)) {
-      if (CpStructModel_Check(annotation, state)) {
-        PyObject* struct_ = CpStructModel_GetStruct(annotation, state);
-        if (!struct_) {
-          return -1;
-        }
-        field = Py_NewRef(struct_);
-      }
-    }
-
-    // 4. Callable
-    // The annotation is a callable object and conforms to the ContextLambda
-    // protocol. Note that we assume the right function signature.
-    else if (PyCallable_Check(annotation)) {
-      field = Py_NewRef(annotation);
-    }
-
-    // 5. Constant values
-    else if (PyBytes_Check(annotation)) {
-      PyObject* length = PyLong_FromSsize_t(PyBytes_GET_SIZE(annotation));
-      if (!length) {
+  // 3. Type
+  // Here, the annotation may be a custom struct type or an enum type.
+  // Currently, only struct container are supported.
+  else if (PyType_Check(annotation)) {
+    if (CpStructModel_Check(annotation, state)) {
+      PyObject* struct_ = CpStructModel_GetStruct(annotation, state);
+      if (!struct_) {
         return -1;
       }
-      PyObject* atom = (PyObject*)CpBytesAtom_New(length);
-      Py_DECREF(length);
-      if (!atom) {
-        return -1;
-      }
-
-      field = (PyObject*)CpConstAtom_New(annotation, atom);
-      Py_DECREF(atom);
-      if (!field) {
-        return -1;
-      }
-      Py_XSETREF(default_value, Py_NewRef(annotation));
+      field = Py_NewRef(struct_);
     }
   }
 
+  // 4. Callable
+  // The annotation is a callable object and conforms to the ContextLambda
+  // protocol. Note that we assume the right function signature.
+  else if (PyCallable_Check(annotation)) {
+    field = Py_NewRef(annotation);
+  }
+
+  // 5. Constant values
+  else if (PyBytes_Check(annotation)) {
+    PyObject* length = PyLong_FromSsize_t(PyBytes_GET_SIZE(annotation));
+    if (!length) {
+      return -1;
+    }
+    PyObject* atom = (PyObject*)CpBytesAtom_New(length);
+    Py_DECREF(length);
+    if (!atom) {
+      return -1;
+    }
+
+    field = (PyObject*)CpConstAtom_New(annotation, atom);
+    Py_DECREF(atom);
+    if (!field) {
+      return -1;
+    }
+    Py_XSETREF(default_value, Py_NewRef(annotation));
+  }
   if (!field) {
     // REVISIT: Add support for other types here.
     PyObject* handler = CpTypeMap_Lookup(annotation, state);
@@ -930,7 +933,7 @@ _cp_struct_inherited_slots(CpStructObject* self)
         goto cleanup;
       }
     } else if (PyIter_Check(type_slots)) {
-      if (_PySet_Update(inherited_slots, type_slots) < 0) {
+      if (!PyNumber_InPlaceOr(inherited_slots, type_slots)) {
         res = NULL;
         goto cleanup;
       }
@@ -1133,6 +1136,11 @@ CpStructModel_GetStruct(PyObject* model, _modulestate* state)
                      ? ((PyTypeObject*)model)->tp_dict
                      : model->ob_type->tp_dict;
 
+  if (!dict) {
+    PyErr_SetString(PyExc_ValueError, "model does not store a dictionary");
+    return NULL;
+  }
+
   if (!state) {
     return PyMapping_GetItemString(dict, "__struct__");
   } else {
@@ -1248,7 +1256,8 @@ CpStruct_Unpack(CpStructObject* self, CpLayerObject* layer)
     CpLayer_AppendPath(&obj_layer->ob_base, name);
     value = _Cp_Unpack((PyObject*)info->m_field, (CpLayerObject*)obj_layer);
     if (!value && PyErr_Occurred()) {
-      // constant values store a default value, but may raise important exceptions
+      // constant values store a default value, but may raise important
+      // exceptions
       if (CpConstAtom_Check(info->m_field)) {
         return NULL;
       }
