@@ -1,4 +1,4 @@
-# Copyright (C) MatrixEditor 2023
+# Copyright (C) MatrixEditor 2023-2024
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -109,7 +109,6 @@ class _StructLike(Protocol):
         pass
 
 
-
 class _ContainsStruct(Protocol):
     """
     An abstract base class indicating that a class contains a _StructLike object.
@@ -156,14 +155,18 @@ def hasstruct(obj: Any) -> bool:
     return STRUCT_FIELD in cls_dict
 
 
-def getstruct(obj: Any, __default: Any = None) -> _StructLike:
+def getstruct(obj: Any, /, __default: Any = None) -> _StructLike:
     """
     Get the structure attribute of the given object.
 
     :param obj: The object to get the structure attribute from.
     :return: The structure attribute of the object.
     """
-    cls_dict = getattr(obj.__class__ if not isinstance(obj, type) else obj, "__dict__")
+    obj = obj.__class__ if not isinstance(obj, type) else obj
+    cls_dict = getattr(obj, "__dict__", None)
+    if cls_dict is None:
+        return getattr(obj, "__struct__")
+
     return (
         cls_dict[STRUCT_FIELD]
         if __default is None

@@ -1,4 +1,4 @@
-# Copyright (C) MatrixEditor 2023
+# Copyright (C) MatrixEditor 2023-2024
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,8 +22,9 @@ from types import FrameType
 from dataclasses import dataclass
 
 
-from caterpillar.abc import _ContextLambda, _ContextLike
+from caterpillar.abc import _ContextLambda, _ContextLike, getstruct
 from caterpillar.exception import StructException
+from caterpillar.registry import to_struct
 
 CTX_PARENT = "_parent"
 CTX_OBJECT = "_obj"
@@ -275,7 +276,18 @@ class ConditionContext:
                     field //= self.func
             else:
                 # create a field (other attributes will be modified later)
-                self.annotations[name] = Field(field, condition=self.func)
+
+                # ISSUE #15: The annotation must be converted to a _StructLike
+                # object. In case we have struct classes, the special __struct__
+                # attribute must be used.
+                struct_obj = to_struct(field)
+                print(struct_obj)
+                if not isinstance(struct_obj, Field):
+                    struct_obj = Field(struct_obj)
+
+                struct_obj.condition = self.func
+                self.annotations[name] = struct_obj
+
         self.annotations = None
         self.namelist = None
 

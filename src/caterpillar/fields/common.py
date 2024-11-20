@@ -1,4 +1,4 @@
-# Copyright (C) MatrixEditor 2023
+# Copyright (C) MatrixEditor 2023-2024
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,12 +17,12 @@ import pickle
 
 from typing import Callable
 from typing import Sequence, Any, Optional, Union, List
-from types import NoneType
+from types import EllipsisType, NoneType
 from functools import cached_property
 from enum import Enum as _EnumType
 from uuid import UUID
 
-from caterpillar.abc import _StructLike, _ContextLambda
+from caterpillar.abc import _StructLike, _ContextLambda, getstruct
 from caterpillar.abc import _EnumLike, _StreamType
 from caterpillar.abc import _ContextLike
 
@@ -35,6 +35,8 @@ from caterpillar.exception import (
 from caterpillar.context import CTX_FIELD, CTX_STREAM, CTX_SEQ
 from caterpillar.options import Flag, GLOBAL_FIELD_FLAGS
 from caterpillar.byteorder import LittleEndian
+from caterpillar import registry
+
 from ._base import Field, INVALID_DEFAULT, singleton
 from ._mixin import FieldStruct
 
@@ -390,11 +392,28 @@ class Enum(Transformer):
         return default
 
 
+class _EnumTypeConverter(registry.TypeConverter):
+    def matches(self, annotation: Any) -> bool:
+        return isinstance(annotation, type) and issubclass(annotation, _EnumType)
+
+    def convert(self, annotation: Any, kwargs: dict) -> _StructLike:
+        struct_obj = getstruct(annotation)
+        if not struct_obj:
+            raise ValidationError(
+                f"Could not infer Enum struct: could not find __struct__ attribute on annotation {annotation!r}"
+            )
+        return Enum(annotation, struct_obj)
+
+
+# TODO: document why this has to be at first position
+registry.annotation_registry.insert(0, _EnumTypeConverter())
+
+
 class Memory(FieldStruct):
     __slots__ = ("length", "encoding")
 
     def __init__(
-        self, length: Union[int, _ContextLambda], encoding: Optional[str] = None
+        self, length: Union[int, _ContextLambda, EllipsisType], encoding: Optional[str] = None
     ) -> None:
         self.length = length
         self.encoding = encoding or "utf-8"
@@ -577,6 +596,14 @@ class ConstString(Const):
         self.__bits__ = len(value) * 8
 
 
+@registry.TypeConverter(str)
+def _str_type_converter(annotation: str, kwargs: dict) -> ConstString:
+    return ConstString(annotation)
+
+
+registry.annotation_registry.append(_str_type_converter)
+
+
 class ConstBytes(Const):
     """
     A specialized constant field for handling bytes values.
@@ -586,9 +613,17 @@ class ConstBytes(Const):
 
     __slots__ = ()
 
-    def __init__(self, value: str) -> None:
+    def __init__(self, value: bytes) -> None:
         super().__init__(value, Bytes(len(value)))
         self.__bits__ = len(value) * 8
+
+
+@registry.TypeConverter(bytes)
+def _bytes_type_converter(annotation: bytes, kwargs: dict) -> ConstBytes:
+    return ConstBytes(annotation)
+
+
+registry.annotation_registry.append(_bytes_type_converter)
 
 
 class Computed(FieldStruct):
