@@ -19,6 +19,7 @@ from .abc import (
     _StreamType,
     STRUCT_FIELD,
 )
+from .registry import TypeConverter, annotation_registry, to_struct
 from .byteorder import (
     ByteOrder,
     SysNative,
@@ -43,7 +44,7 @@ from .byteorder import (
     x86_64,
     AMD,
     AMD64,
-    BYTEORDER_FIELD
+    BYTEORDER_FIELD,
 )
 from .context import (
     Context,

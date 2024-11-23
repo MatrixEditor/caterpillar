@@ -1,4 +1,4 @@
-# Copyright (C) MatrixEditor 2023
+# Copyright (C) MatrixEditor 2023-2024
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -44,10 +44,19 @@ from caterpillar.fields import (
     Enum,
 )
 from caterpillar._common import unpack_seq, pack_seq
+from caterpillar import registry
 
 
 class Sequence(FieldMixin):
-    """Default implementation for a sequence of fields."""
+    """Default implementation for a sequence of fields.
+
+    The native Python type mapped to this struct class is :code:`dict`. To convert
+    a dictionary into a sequence, you can either use the contructor directly or apply
+    the type converter for this class:
+
+    >>> to_struct({'a': uint8})
+    Sequence(fields=['a'])
+    """
 
     model: Any
     """
@@ -232,36 +241,7 @@ class Sequence(FieldMixin):
     def _process_annotation(
         self, annotation: Any, default: Optional[Any], order: ByteOrder, arch: Arch
     ) -> Union[_StructLike, Field]:
-        fd = None
-        match annotation:
-            case Field():
-                fd = annotation
-            # As Field is a direct subclass of _StructLike, we have to put this check
-            # below the Field one.
-            case _StructLike():
-                fd = Field(annotation, order, arch=arch, default=default)
-            case type():
-                struct = getstruct(annotation)
-                if issubclass(annotation, enum.Enum):
-                    # Special case: we have an enum class that stores its struct
-                    fd = Enum(annotation, struct)
-                else:
-                    fd = struct
-            case str():
-                fd = ConstString(annotation)
-            case bytes():
-                fd = ConstBytes(annotation)
-            case _ContextLambda():
-                fd = annotation
-            case dict():
-                # anonymous inner sequence
-                fd = Sequence(model=annotation, order=self.order, arch=self.arch)
-            case _:
-                # callables are treates as context lambdas
-                if callable(annotation):
-                    fd = annotation
-
-        return fd
+        return registry.to_struct(annotation, arch=arch, order=order)
 
     def _process_field(
         self, name: str, annotation: Any, default: Optional[Any]
@@ -458,3 +438,14 @@ class Sequence(FieldMixin):
 
     def __str__(self) -> str:
         return self.__repr__()
+
+
+# --- private sequence tyoe converter ---
+@registry.TypeConverter(dict)
+def _type_converter(annotation: Any, kwargs: dict) -> _StructLike:
+    arch = kwargs.pop("arch", None)
+    order = kwargs.pop("order", None)
+    return Sequence(model=annotation, order=order, arch=arch)
+
+
+registry.annotation_registry.insert(0, _type_converter)

@@ -1,4 +1,4 @@
-# Copyright (C) MatrixEditor 2023
+# Copyright (C) MatrixEditor 2023-2024
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-from typing import Self, Union, Set, Any, Dict, Optional, List
+from typing import Self, Union, Set, Any, Dict, Optional, List, Callable
 from io import BytesIO
 from caterpillar.abc import (
     _StructLike,
@@ -44,6 +44,7 @@ from caterpillar.options import (
 from caterpillar.context import CTX_OFFSETS, CTX_STREAM
 from caterpillar.context import CTX_FIELD, CTX_POS
 from caterpillar.context import CTX_VALUE, CTX_SEQ
+from caterpillar import registry
 
 
 def singleton(cls):
@@ -148,7 +149,7 @@ class Field:
     def __init__(
         self,
         struct: Union[_StructLike, _ContextLambda],
-        order: ByteOrder = SysNative,
+        order: ByteOrder | None = None,
         offset: Union[_ContextLambda, int] = -1,
         flags: Set[Flag] = None,
         amount: Union[_ContextLambda, int, _PrefixedType] = 0,
@@ -160,7 +161,7 @@ class Field:
     ) -> None:
         # NOTE: we use a custom init method to automatically set flags
         self.struct = struct
-        self.order = order
+        self.order = order or SysNative
         self.flags = {hash(x): x for x in flags or set([F_KEEP_POSITION])}
         self.bits = bits
 
@@ -543,3 +544,30 @@ class Field:
 
     def __repr__(self) -> str:
         return self.__str__()
+
+
+# --- private type converter ---
+@registry.TypeConverter(_StructLike)
+def _type_converter(annotation: _StructLike, kwargs: dict) -> Field:
+    # REVISIT: more options ?
+    arch = kwargs.pop("arch", None)
+    order = kwargs.pop("order", None)
+    return Field(annotation, order=order, arch=arch)
+
+
+registry.annotation_registry.append(_type_converter)
+
+
+class _CallableTypeConverter(registry.TypeConverter):
+    def matches(self, annotation: Any) -> bool:
+        # must be a callable but not a type
+        return callable(annotation) and not isinstance(annotation, type)
+
+    def convert(self, annotation: Any, kwargs: dict) -> _StructLike:
+        arch = kwargs.pop("arch", None)
+        order = kwargs.pop("order", None)
+        # callables are treates as context lambdas
+        return Field(annotation, order=order, arch=arch)
+
+
+registry.annotation_registry.append(_CallableTypeConverter())

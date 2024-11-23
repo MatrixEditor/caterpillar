@@ -1,4 +1,4 @@
-# Copyright (C) MatrixEditor 2023
+# Copyright (C) MatrixEditor 2023-2024
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -37,7 +37,9 @@ from caterpillar.options import (
     GLOBAL_STRUCT_OPTIONS,
     GLOBAL_UNION_OPTIONS,
 )
-from caterpillar.fields import Field, INVALID_DEFAULT, FieldStruct
+from caterpillar.fields import Field, INVALID_DEFAULT
+from caterpillar import registry
+
 from ._base import Sequence
 
 
@@ -132,6 +134,22 @@ class Struct(Sequence):
 
     def get_value(self, obj: Any, name: str, field: Field) -> Optional[Any]:
         return getattr(obj, name, None)
+
+
+# --- private type converter ---
+# TODO: documentation
+class _StructTypeConverter(registry.TypeConverter):
+    def __init__(self) -> None:
+        super().__init__()
+
+    def matches(self, annotation: Any) -> bool:
+        return isinstance(annotation, type) and getstruct(annotation) is not None
+
+    def convert(self, annotation: Any, kwargs: dict) -> _StructLike:
+        return getstruct(annotation)
+
+
+registry.annotation_registry.append(_StructTypeConverter())
 
 
 def _struct_bytes(model: Struct) -> Callable:
