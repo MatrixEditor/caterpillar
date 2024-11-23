@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Struct Model &#8212; Caterpillar 2.2.1 documentation</title>
+    <title>Struct Model &#8212; Caterpillar 2.2.2 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
 
-    <script src="../_static/documentation_options.js?v=16656018"></script>
+    <script src="../_static/documentation_options.js?v=219dea72"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,11 +49,11 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'library/model';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Fields" href="fields/index.html" />
+    <link rel="next" title="Annotation Registry" href="registry.html" />
     <link rel="prev" title="Exceptions" href="exceptions.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.2.1" />
+  <meta name="docsearch:version" content="2.2.2" />
   </head>
   
   
@@ -116,7 +116,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.2.1</p>
+    <p class="title logo__title">Caterpillar 2.2.2</p>
   
 </a></div>
     
@@ -338,6 +338,7 @@
 <li class="toctree-l1"><a class="reference internal" href="context.html">Context</a></li>
 <li class="toctree-l1"><a class="reference internal" href="exceptions.html">Exceptions</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Struct Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="registry.html">Annotation Registry</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="fields/index.html">Fields</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="fields/field_model.html">Field Model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fields/common.html">Common Structs</a></li>
@@ -413,6 +414,13 @@
 <dt class="sig sig-object py" id="caterpillar.model.Sequence">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.model.</span></span><span class="sig-name descname"><span class="pre">Sequence</span></span><a class="reference internal" href="../_modules/caterpillar/model/_base.html#Sequence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.Sequence" title="Link to this definition">#</a></dt>
 <dd><p>Default implementation for a sequence of fields.</p>
+<p>The native Python type mapped to this struct class is <code class="code docutils literal notranslate"><span class="pre">dict</span></code>. To convert
+a dictionary into a sequence, you can either use the contructor directly or apply
+the type converter for this class:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">to_struct</span><span class="p">({</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="n">uint8</span><span class="p">})</span>
+<span class="go">Sequence(fields=[&#39;a&#39;])</span>
+</pre></div>
+</div>
 <dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.model.Sequence.add_field">
 <span class="sig-name descname"><span class="pre">add_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="fields/field_model.html#caterpillar.py.Field" title="caterpillar.fields._base.Field"><span class="pre">Field</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">included</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/caterpillar/model/_base.html#Sequence.add_field"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.Sequence.add_field" title="Link to this definition">#</a></dt>
@@ -786,11 +794,11 @@ template class definition.</p>
       </div>
     </a>
     <a class="right-next"
-       href="fields/index.html"
+       href="registry.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Fields</p>
+        <p class="prev-next-title">Annotation Registry</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

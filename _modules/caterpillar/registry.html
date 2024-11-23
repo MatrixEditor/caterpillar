@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>caterpillar.exception &#8212; Caterpillar 2.2.2 documentation</title>
+    <title>caterpillar.registry &#8212; Caterpillar 2.2.2 documentation</title>
   
   
   
@@ -45,7 +45,7 @@
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../_static/design-tabs.js?v=f930bc37"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/caterpillar/exception';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/caterpillar/registry';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -353,7 +353,7 @@
     
     <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Module code</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">caterpillar.exception</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">caterpillar.registry</span></li>
   </ul>
 </nav>
 </div>
@@ -370,7 +370,7 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <h1>Source code for caterpillar.exception</h1><div class="highlight"><pre>
+  <h1>Source code for caterpillar.registry</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Copyright (C) MatrixEditor 2023-2024</span>
 <span class="c1">#</span>
 <span class="c1"># This program is free software: you can redistribute it and/or modify</span>
@@ -386,95 +386,125 @@
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
 
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
 
-<div class="viewcode-block" id="StructException">
-<a class="viewcode-back" href="../../library/exceptions.html#caterpillar.exception.StructException">[docs]</a>
-<span class="k">class</span> <span class="nc">StructException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for all struct-related exceptions&quot;&quot;&quot;</span>
-
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">context</span>
-        <span class="k">if</span> <span class="n">context</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">add_note</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Context-Path: </span><span class="si">{</span><span class="n">context</span><span class="p">[</span><span class="s1">&#39;_path&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+<span class="kn">from</span> <span class="nn">caterpillar.abc</span> <span class="kn">import</span> <span class="n">_StructLike</span>
+<span class="kn">from</span> <span class="nn">caterpillar.exception</span> <span class="kn">import</span> <span class="n">ValidationError</span>
 
 
-
-<div class="viewcode-block" id="DynamicSizeError">
-<a class="viewcode-back" href="../../library/exceptions.html#caterpillar.exception.DynamicSizeError">[docs]</a>
-<span class="k">class</span> <span class="nc">DynamicSizeError</span><span class="p">(</span><span class="n">StructException</span><span class="p">):</span>
+<div class="viewcode-block" id="TypeConverter">
+<a class="viewcode-back" href="../../library/registry.html#caterpillar.registry.TypeConverter">[docs]</a>
+<span class="k">class</span> <span class="nc">TypeConverter</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Exception raised for errors related to dynamic sizes in structs.</span>
+<span class="sd">    A utility class to define and manage type conversion handlers for annotations.</span>
 
-<span class="sd">    This can be used when there are issues with determining the size of a struct element at runtime.</span>
-<span class="sd">    &quot;&quot;&quot;</span></div>
+<span class="sd">    Type converters take the placed annotation and convert it into</span>
+<span class="sd">    a :code:`_StructLike` object. For instance, a simple converter that</span>
+<span class="sd">    always returns :code:`uint32` for an object of the Python `int` class might look</span>
+<span class="sd">    like this:</span>
 
+<span class="sd">    &gt;&gt;&gt; tc = TypeConverter(int, lambda a, _: Const(a, uint16))</span>
 
+<span class="sd">    or directly as annotation</span>
 
-<div class="viewcode-block" id="OptionError">
-<a class="viewcode-back" href="../../library/exceptions.html#caterpillar.exception.OptionError">[docs]</a>
-<span class="k">class</span> <span class="nc">OptionError</span><span class="p">(</span><span class="n">StructException</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Exception raised for errors related to options in structs.</span>
+<span class="sd">    &gt;&gt;&gt; @TypeConverter(int)</span>
+<span class="sd">    ... def int_converter(annotation, kwargs):</span>
+<span class="sd">    ...     return Const(annotation, uint16)</span>
+<span class="sd">    ...</span>
 
-<span class="sd">    This can be used when there are issues with handling options or choices within a struct.</span>
-<span class="sd">    &quot;&quot;&quot;</span></div>
+<span class="sd">    :param target: the target type, defaults to None</span>
+<span class="sd">    :type target: Type, optional</span>
+<span class="sd">    :param delegate: optional delegation function, defaults to None</span>
+<span class="sd">    :type delegate: Callable[[Any, dict], _StructLike], optional</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">delegate</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">target</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delegate</span> <span class="o">=</span> <span class="n">delegate</span>
 
+<div class="viewcode-block" id="TypeConverter.matches">
+<a class="viewcode-back" href="../../library/registry.html#caterpillar.registry.TypeConverter.matches">[docs]</a>
+    <span class="k">def</span> <span class="nf">matches</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">annotation</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if this converter matches the given annotation type.</span>
 
-<div class="viewcode-block" id="ValidationError">
-<a class="viewcode-back" href="../../library/exceptions.html#caterpillar.exception.ValidationError">[docs]</a>
-<span class="k">class</span> <span class="nc">ValidationError</span><span class="p">(</span><span class="n">StructException</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Exception raised for errors related to validation in structs.</span>
-
-<span class="sd">    This can be used when there are issues with validating the structure or content of a struct.</span>
-<span class="sd">    &quot;&quot;&quot;</span></div>
-
-
-
-<div class="viewcode-block" id="UnsupportedOperation">
-<a class="viewcode-back" href="../../library/exceptions.html#caterpillar.exception.UnsupportedOperation">[docs]</a>
-<span class="k">class</span> <span class="nc">UnsupportedOperation</span><span class="p">(</span><span class="n">StructException</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Exception raised for unsupported operations in structs.</span>
-
-<span class="sd">    This can be used when attempting an operation that is not supported or allowed in the context of structs.</span>
-<span class="sd">    &quot;&quot;&quot;</span></div>
-
-
-
-<div class="viewcode-block" id="InvalidValueError">
-<a class="viewcode-back" href="../../library/exceptions.html#caterpillar.exception.InvalidValueError">[docs]</a>
-<span class="k">class</span> <span class="nc">InvalidValueError</span><span class="p">(</span><span class="n">StructException</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    An exception raised for invalid configuration values.</span>
-<span class="sd">    &quot;&quot;&quot;</span></div>
+<span class="sd">        :param annotation: he type or object to match against the target.</span>
+<span class="sd">        :type annotation: Any</span>
+<span class="sd">        :return: True if the annotation matches the target type; otherwise False.</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="kc">False</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">annotation</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="TypeConverter.convert">
+<a class="viewcode-back" href="../../library/registry.html#caterpillar.registry.TypeConverter.convert">[docs]</a>
+    <span class="k">def</span> <span class="nf">convert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">annotation</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_StructLike</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert the given annotation (uses the delegate function by default).</span>
 
-<div class="viewcode-block" id="StreamError">
-<a class="viewcode-back" href="../../library/exceptions.html#caterpillar.exception.StreamError">[docs]</a>
-<span class="k">class</span> <span class="nc">StreamError</span><span class="p">(</span><span class="n">StructException</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    An exception raised for read and write issues.</span>
-<span class="sd">    &quot;&quot;&quot;</span></div>
+<span class="sd">        :param annotation: The object to be converted.</span>
+<span class="sd">        :type annotation: Any</span>
+<span class="sd">        :param kwargs: Additional arguments for the conversion.</span>
+<span class="sd">        :type kwargs: dict</span>
+<span class="sd">        :raises NotImplementedError: If no delegate is defined for the converter.</span>
+<span class="sd">        :return: The converted object.</span>
+<span class="sd">        :rtype: _StructLike</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">delegate</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;NOT IMPLEMENTED&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">delegate</span><span class="p">(</span><span class="n">annotation</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delegate</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the delegate function for this converter and return the instance.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delegate</span> <span class="o">=</span> <span class="n">delegate</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a string representation of the TypeConverter instance.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&gt;&quot;</span>
+
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&gt;&quot;</span></div>
 
 
 
-<div class="viewcode-block" id="DelegationError">
-<a class="viewcode-back" href="../../library/exceptions.html#caterpillar.exception.DelegationError">[docs]</a>
-<span class="k">class</span> <span class="nc">DelegationError</span><span class="p">(</span><span class="n">StructException</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    An exception used if underlying calls fail.</span>
-<span class="sd">    &quot;&quot;&quot;</span></div>
+<span class="c1"># A global registry to store type converters.</span>
+<span class="n">annotation_registry</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">TypeConverter</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
 
+<div class="viewcode-block" id="to_struct">
+<a class="viewcode-back" href="../../library/registry.html#caterpillar.registry.to_struct">[docs]</a>
+<span class="k">def</span> <span class="nf">to_struct</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_StructLike</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert an object to a :code:`_StruckLike` object using registered type converters.</span>
 
-<div class="viewcode-block" id="Stop">
-<a class="viewcode-back" href="../../library/exceptions.html#caterpillar.exception.Stop">[docs]</a>
-<span class="k">class</span> <span class="nc">Stop</span><span class="p">(</span><span class="n">StructException</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Stops the current parsing process&quot;&quot;&quot;</span></div>
+<span class="sd">    This function will not convert any objects that are already</span>
+<span class="sd">    implementing the functions of :code:`_StructLike`.</span>
+
+<span class="sd">    :param obj: The object to be converted.</span>
+<span class="sd">    :type obj: Any</span>
+<span class="sd">    :param kwargs: Additional arguments passed to the conversion handler.</span>
+<span class="sd">    :raises ValidationError: If no matching type converter is found for the object.</span>
+<span class="sd">    :return: the converted object</span>
+<span class="sd">    :rtype: _StructLike</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># If the object is already a structured-like instance, return it.</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">_StructLike</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">obj</span>
+
+    <span class="k">global</span> <span class="n">annotation_registry</span>
+
+    <span class="c1"># Find and use only the first registered converter that matches the object&#39;s type.</span>
+    <span class="n">handler</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">matches</span><span class="p">(</span><span class="n">obj</span><span class="p">),</span> <span class="n">annotation_registry</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">handler</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;The object of type &#39;</span><span class="si">{</span><span class="n">obj</span><span class="o">.</span><span class="vm">__class__</span><span class="si">}</span><span class="s2">&#39; could not be converted to a struct, because &quot;</span>
+            <span class="s2">&quot;the placed annotation does not have a corresponding handler:</span><span class="se">\n</span><span class="s2"> &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="si">}</span><span class="s2">,</span><span class="se">\n</span><span class="s2"> annotation: </span><span class="si">{</span><span class="n">obj</span><span class="si">!r}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">handler</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span></div>
 
 </pre></div>
 
