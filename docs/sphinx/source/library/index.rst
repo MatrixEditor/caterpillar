@@ -16,6 +16,7 @@ Library
    context.rst
    exceptions.rst
    model.rst
+   registry
    fields/index.rst
 
 

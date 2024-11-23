@@ -25,16 +25,16 @@ class TypeConverter:
 
     Type converters take the placed annotation and convert it into
     a :code:`_StructLike` object. For instance, a simple converter that
-    always returns :code:`uint32` for the Python `int` class might look
+    always returns :code:`uint32` for an object of the Python `int` class might look
     like this:
 
-    >>> tc = TypeConverter(int, lambda _, _: uint32)
+    >>> tc = TypeConverter(int, lambda a, _: Const(a, uint16))
 
     or directly as annotation
 
     >>> @TypeConverter(int)
     ... def int_converter(annotation, kwargs):
-    ...     return uint32
+    ...     return Const(annotation, uint16)
     ...
 
     :param target: the target type, defaults to None
@@ -119,5 +119,5 @@ def to_struct(obj: Any, **kwargs) -> _StructLike:
             f"type: {type(obj)},\n annotation: {obj!r}"
         )
         raise ValidationError(msg)
-    print(handler)
+
     return handler.convert(obj, kwargs)
