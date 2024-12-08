@@ -281,7 +281,6 @@ class ConditionContext:
                 # object. In case we have struct classes, the special __struct__
                 # attribute must be used.
                 struct_obj = to_struct(field)
-                print(struct_obj)
                 if not isinstance(struct_obj, Field):
                     struct_obj = Field(struct_obj)
 
