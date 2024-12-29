@@ -28,7 +28,6 @@ from caterpillar.abc import _ContextLike
 
 from caterpillar.exception import (
     ValidationError,
-    StructException,
     InvalidValueError,
     DynamicSizeError,
 )
@@ -278,7 +277,24 @@ class Transformer(FieldStruct):
 
 class Const(Transformer):
     """
-    A specialized Transformer that enforces a constant value during encoding and decoding.
+    A specialized Transformer that enforces a constant value during
+    encoding and decoding.
+
+    This class ensures that the encoded value is always the same
+    constant, and when decoding, it checks if the value matches the
+    expected constant. If the value doesn't match, a `ValidationError`
+    is raised.
+
+    Example usage:
+
+    >>> # Define a constant value to enforce during encoding/decoding
+    >>> const_value = 42
+    >>> struct = SomeStruct() # must parse 'const_value`
+    >>> field = Const(const_value, struct)
+    >>> pack(None, field)
+    b"\\x2a"
+    >>> unpack(field, b"\\x2a")
+    42
 
     :param value: The constant value to be enforced during encoding and decoding.
     :param struct: The _StructLike object to be wrapped.
@@ -292,27 +308,44 @@ class Const(Transformer):
 
     def encode(self, obj: Any, context: _ContextLike) -> Any:
         """
-        Encode data using the constant value.
+        Encode data using the constant value. This method will always return
+        the constant value, regardless of the input. Therefore, :code:`None`
+        can be passed as the `obj` parameter.
 
-        :param obj: The original data to be encoded (ignored).
-        :param context: The current context.
+        :param obj: The original data to be encoded (ignored in this transformer).
+        :param context: The current context (optional, not used in this implementation).
         :return: The constant value.
+
+        Example:
+            >>> constant_value = 42
+            >>> transformer = Const(constant_value, SomeStruct())
+            >>> transformer.encode(None, context) # context is optional
+            42
         """
         return self.value
 
     def decode(self, parsed: Any, context: _ContextLike) -> Any:
         """
-        Decode data and ensure it matches the constant value.
+        Decode data and ensure it matches the constant value. If the
+        parsed value doesn't match, a `ValidationError` is raised.
 
-        :param parsed: The parsed data to be decoded.
-        :param context: The current context.
-        :return: The constant value.
+        :param parsed: The parsed data to be decoded (must match the constant value).
+        :param context: The current context (optional, not used in this implementation).
+        :return: The constant value if parsed matches the expected constant.
         :raises ValidationError: If the parsed value does not match the constant value.
+
+        Example:
+        >>> constant_value = 42
+        >>> field = Const(constant_value, SomeStruct())
+        >>> unpack(field, b"\\x2a")
+        42
+        >>> unpack(field, b"\\x24")
+        Traceback (most recent call last):
+        ...
+        ValidationError: Expected 42, got 36
         """
         if parsed != self.value:
-            raise ValidationError(
-                f"Expected {str(self.value)}, got {str(parsed)}", context
-            )
+            raise ValidationError(f"Expected {self.value!r}, got {parsed!r}", context)
         return self.value
 
 
@@ -413,7 +446,9 @@ class Memory(FieldStruct):
     __slots__ = ("length", "encoding")
 
     def __init__(
-        self, length: Union[int, _ContextLambda, EllipsisType], encoding: Optional[str] = None
+        self,
+        length: Union[int, _ContextLambda, EllipsisType],
+        encoding: Optional[str] = None,
     ) -> None:
         self.length = length
         self.encoding = encoding or "utf-8"

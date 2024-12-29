@@ -363,25 +363,55 @@ def pack_into(
     buffer: _StreamType,
     struct: Optional[_StructLike] = None,
     use_tempfile: bool = False,
+    as_field: bool = False,
     **kwds,
 ) -> None:
     """
     Pack an object into the specified buffer using the specified struct.
 
-    :param obj: The object to pack.
-    :param buffer: The buffer to pack the object into.
-    :param struct: The struct to use for packing.
+    This function serializes an object (`obj`) into a given buffer, using
+    a struct to define how the object should be packed. Optionally, the
+    function can handle temporary files for packing, use a `Field` wrapper
+    around the struct, and support additional keyword arguments. The packed
+    data is written to the `buffer`.
+
+    Example 1: Packing an object into a bytes buffer
+    >>> buffer = BytesIO()
+    >>> my_obj = SomeObject()  # Assume SomeObject is a valid object to be packed
+    >>> pack_into(my_obj, buffer, struct=SomeStruct())  # Using a specific struct
+    >>> buffer.getvalue()
+    b"..."
+
+    Example 2: Packing into a file-like stream (e.g., file)
+    >>> with open('packed_data.bin', 'wb') as f:
+    ...     pack_into(my_obj, f, struct=SomeStruct())  # Pack into a file
+
+    Example 3: Using `as_field` to wrap the struct in a Field before packing
+    >>> buffer = BytesIO()
+    >>> pack_into(42, buffer, struct=uint8, as_field=True)
+    >>> buffer.getvalue()
+    b"\\x2a"
+
+    :param obj: The object to pack (could be a plain object or a structure-like object).
+    :param buffer: The buffer to pack the object into (a writable stream such as `BytesIO` or a file).
+    :param struct: The struct to use for packing. If not specified, will infer from `obj`.
+    :param use_tempfile: Whether to use a temporary file for packing (experimental).
+    :param as_field: Whether to wrap the struct in a `Field` before packing.
     :param kwds: Additional keyword arguments to pass to the pack function.
 
-    :return: None
+    :raises TypeError: If no `struct` is specified and cannot be inferred from the object.
     """
-
     offsets: Dict[int, memoryview] = OrderedDict()
     context = Context(_parent=None, _path="<root>", _pos=0, _offsets=offsets, **kwds)
     if struct is None:
         struct = getstruct(obj)
+    elif as_field:
+        struct = Field(struct)
     elif hasstruct(struct):
         struct = getstruct(struct)
+
+    if struct is None:
+        raise TypeError("struct must be specified")
 
     start = 0
     if use_tempfile:
@@ -440,23 +470,41 @@ def pack_file(
 def unpack(
     struct: Union[_SupportsUnpack, _ContainsStruct],
     buffer: Union[bytes, _StreamType],
+    as_field: bool = False,
     **kwds,
 ) -> Any:
     """
     Unpack an object from a bytes buffer or stream using the specified struct.
 
-    :param struct: The struct to use for unpacking.
+    This function takes a `struct` that defines how data should be unpacked,
+    a `buffer` (either bytes or a stream) containing the serialized data, and
+    returns the unpacked object. If `as_field` is set to True, the `struct` is
+    wrapped by a `Field`. Additional keyword arguments are passed to the root
+    context as attributes.
+
+    Example:
+    >>> buffer = b'\\x00\\x01\\x02\\x03'
+    >>> struct = SomeStruct()
+    >>> unpack(struct, buffer)
+    ...
+
+    :param struct: The struct to use for unpacking (could be a `SupportsUnpack` or `ContainsStruct` object).
     :param buffer: The bytes buffer or stream to unpack from.
+    :param as_field: Whether to wrap the struct in a `Field` transformer before unpacking.
     :param kwds: Additional keyword arguments to pass to the unpack function.
 
-    :return: The unpacked object.
+    :return: The unpacked object, which is the result of calling `struct.__unpack__(context)`.
+
+    :raises TypeError: If the `struct` is not a valid struct instance.
     """
     # prepare the data stream
     stream = buffer if isinstance(buffer, IOBase) else BytesIO(buffer)
     context = Context(
         _path="<root>", _parent=None, _io=stream, **kwds, _pos=0, _is_seq=False
     )
-    if hasstruct(struct):
+    if as_field:
+        struct = Field(struct)
+    elif hasstruct(struct):
         struct = getstruct(struct)
 
     if not isinstance(struct, _SupportsUnpack):
