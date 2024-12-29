@@ -13,20 +13,22 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from io import BytesIO
-import struct as libstruct
-import pickle
+import struct as PyStruct
 
-from typing import Callable, Type
-from typing import Sequence, Any, Optional, Union, List
+from typing import Sequence, Any, Optional, Union, List, Callable
 from types import EllipsisType, NoneType
 from functools import cached_property
 from enum import Enum as _EnumType
 from uuid import UUID
 
-from caterpillar.abc import _StructLike, _ContextLambda, getstruct
-from caterpillar.abc import _EnumLike, _StreamType
-from caterpillar.abc import _ContextLike
-
+from caterpillar.abc import (
+    _StructLike,
+    _ContextLambda,
+    getstruct,
+    _EnumLike,
+    _StreamType,
+    _ContextLike,
+)
 from caterpillar.exception import (
     ValidationError,
     InvalidValueError,
@@ -45,9 +47,21 @@ from ._mixin import FieldStruct
 ENUM_STRICT = Flag("enum.strict")
 
 
-class FormatField(FieldStruct):
+class PyStructFormattedField(FieldStruct):
     """
-    A field class representing a binary format.
+    A field class representing a binary format using format characters (e.g., 'i', 'x', etc.).
+
+    This class allows you to define fields for binary struct formats using format characters,
+    which are often used in Python's `struct` module. Each field is associated with a format character
+    (like 'x' for padding or 'i' for a signed integer), and it determines how data is packed and unpacked.
+
+    Example usage:
+    >>> field = PyStructFormattedField('i', int)
+    >>> field.__repr__()
+    "<PyStructFormattedField(int) 'i' 32>"
+
+    :param ch: The format character (e.g., 'i', 'x', 'f') that defines how the field is packed and unpacked.
+    :param type_: The Python type that corresponds to the format character.
     """
 
     __slots__ = {
@@ -59,10 +73,16 @@ class FormatField(FieldStruct):
     def __init__(self, ch: str, type_: type) -> None:
         self.text = ch
         self.ty = type_
-        self.__bits__ = libstruct.calcsize(self.text) * 8
+        self.__bits__ = PyStruct.calcsize(self.text) * 8
         self._padding_ = self.text == "x"
 
     def __fmt__(self) -> str:
+        """
+        Get the format character for this field.
+
+        :return: The format character (e.g., 'i', 'x').
+        :rtype: str
+        """
         return self.text
 
     def __repr__(self) -> str:
@@ -78,47 +98,52 @@ class FormatField(FieldStruct):
         """
         Get the Python type associated with the format specifier.
 
-        :return: The Python type.
+        :return: The Python type (e.g., `int`, `float`, etc.).
+        :rtype: type
         """
         return self.ty
 
     def __size__(self, context: _ContextLike) -> int:
         """
-        Calculate the size of the field (single element).
+        Calculate the size of the field in bytes.
 
-        :param context: The current context.
-        :return: The size of the field.
+        The size is calculated by dividing the bit size by 8 (since 1 byte = 8 bits).
+
+        :param context: The context for the current field (can be used for calculating dynamic sizes).
+        :return: The size of the field in bytes.
+        :rtype: int
         """
         return self.__bits__ // 8
 
     def pack_single(self, obj: Any, context: _ContextLike) -> None:
         """
-        Pack a single value into the stream.
+        Pack a single value into the stream using the defined format character.
 
-        :param obj: The value to pack.
-        :param stream: The output stream.
-        :param context: The current context.
+        :param obj: The value to pack (can be of the type defined by the format character).
+        :param context: The context that provides the stream and field-specific information.
         """
         if obj is None and not self._padding_:
-            return
+            return  # Skip packing if the value is None and the field is not padding
 
         len_ = self.get_length(context)
         fmt = f"{context[CTX_FIELD].order.ch}{len_}{self.text}"
         if self._padding_:
-            data = libstruct.pack(fmt)
+            data = PyStruct.pack(fmt)
         elif len_ > 1:
             # Unfortunately, we have to use the *unpack operation here
-            data = libstruct.pack(fmt, *obj)
+            data = PyStruct.pack(fmt, *obj)
         else:
-            data = libstruct.pack(fmt, obj)
+            data = PyStruct.pack(fmt, obj)
         context[CTX_STREAM].write(data)
 
     def pack_seq(self, seq: Sequence, context: _ContextLike) -> None:
         """
         Pack a sequence of values into the stream.
 
-        :param seq: The sequence of values.
-        :param context: The current context.
+        If the context specifies a fixed amount, it will pack the sequence accordingly.
+
+        :param seq: The sequence of values to pack.
+        :param context: The context providing packing information.
         """
         if context[CTX_FIELD].amount is not Ellipsis:
             self.pack_single(seq, context)
@@ -129,12 +154,12 @@ class FormatField(FieldStruct):
         """
         Unpack a single value from the stream.
 
-        :param context: The current context.
-        :return: The unpacked value.
+        :param context: The context that provides the stream and field-specific information.
+        :return: The unpacked value, converted to the field's corresponding Python type.
         """
         len_ = self.get_length(context)
         size = (self.__bits__ // 8) * len_
-        value = libstruct.unpack(
+        value = PyStruct.unpack(
             f"{context[CTX_FIELD].order.ch}{len_}{self.text}",
             context[CTX_STREAM].read(size),
         )
@@ -144,7 +169,7 @@ class FormatField(FieldStruct):
         """
         Unpack a sequence of values from the stream.
 
-        :param context: The current context.
+        :param context: The context that provides the stream and field-specific information.
         :return: A list of unpacked values.
         """
         # We don't want to call .length() here as it would
@@ -160,9 +185,16 @@ class FormatField(FieldStruct):
         # REVISIT:
         fmt = f"{field.order.ch}{length}{self.text}"
         size = (self.__bits__ // 8) * length
-        return list(libstruct.unpack(fmt, context[CTX_STREAM].read(size)))
+        return list(PyStruct.unpack(fmt, context[CTX_STREAM].read(size)))
 
     def get_length(self, context: _ContextLike) -> int:
+        """
+        Get the length of the field, which may be dynamically determined based on the context.
+
+        :param context: The context providing the length information.
+        :return: The length of the field (1 if no length is specified).
+        :rtype: int
+        """
         dim = context[CTX_FIELD].length(context)
         if dim is Ellipsis or not context[CTX_SEQ]:
             dim = 1
@@ -172,35 +204,36 @@ class FormatField(FieldStruct):
         """
         Check if the field represents padding.
 
-        :return: True if the field is padding, False otherwise.
+        :return: True if the field is padding (i.e., 'x' format character), False otherwise.
+        :rtype: bool
         """
         return self._padding_
 
 
 # Instances of FormatField with specific format specifiers
-padding = FormatField("x", NoneType)
-char = FormatField("c", str)
-boolean = FormatField("?", bool)
+padding = PyStructFormattedField("x", NoneType)
+char = PyStructFormattedField("c", str)
+boolean = PyStructFormattedField("?", bool)
 
-int8 = FormatField("b", int)
-uint8 = FormatField("B", int)
-int16 = FormatField("h", int)
-uint16 = FormatField("H", int)
-int32 = FormatField("i", int)
-uint32 = FormatField("I", int)
-int64 = FormatField("q", int)
-uint64 = FormatField("Q", int)
+int8 = PyStructFormattedField("b", int)
+uint8 = PyStructFormattedField("B", int)
+int16 = PyStructFormattedField("h", int)
+uint16 = PyStructFormattedField("H", int)
+int32 = PyStructFormattedField("i", int)
+uint32 = PyStructFormattedField("I", int)
+int64 = PyStructFormattedField("q", int)
+uint64 = PyStructFormattedField("Q", int)
 
 
-ssize_t = FormatField("n", int)
-size_t = FormatField("N", int)
+ssize_t = PyStructFormattedField("n", int)
+size_t = PyStructFormattedField("N", int)
 
-float16 = FormatField("e", float)
-float32 = FormatField("f", float)
-float64 = FormatField("d", float)
+float16 = PyStructFormattedField("e", float)
+float32 = PyStructFormattedField("f", float)
+float64 = PyStructFormattedField("d", float)
 double = float64
 
-void_ptr = FormatField("P", int)
+void_ptr = PyStructFormattedField("P", int)
 
 _ConstType = Union[str, bytes, Any]
 
@@ -362,6 +395,7 @@ class Enum(Transformer):
     a default value in case an invalid or unrecognized value is encountered during decoding.
 
     Example usage:
+
     >>> from enum import Enum as PyEnum
     >>> class Color(PyEnum):
     ...     RED = 1
@@ -557,13 +591,13 @@ class Memory(FieldStruct):
         the expected size.
 
         Examples:
-            # Example 1: Packing a fixed-size byte object into the stream
+
         >>> memory = Memory(10)
         >>> pack(b"1234567890", memory, as_field=True) # Packs exactly 10 bytes into the stream
         b"1234567890"
         >>> pack(b"1", memory, as_field=True)
         Traceback (most recent call last):
-            ...
+        ...
         ValidationError: Memory field expected 10 bytes, but got 1 bytes instead
 
         :param obj: The byte object to be packed. This can be either a `memoryview` or a `bytes` object.
@@ -686,6 +720,7 @@ class CString(FieldStruct):
     the remaining space.
 
     Example usage:
+
     >>> cstring = CString(10, encoding='utf-8') # encoding is optional
     >>> pack(cstring, "Hello, World!")
     b"Hello, World\\x00"
@@ -805,7 +840,7 @@ class CString(FieldStruct):
         """
         if self.length is Ellipsis:
             # Parse actual C-String
-            stream: _StreamType = context[CTX_STREAM]
+            stream = context[CTX_STREAM]
             data = bytearray()
             while True:
                 value = stream.read(1)
@@ -839,6 +874,7 @@ class ConstString(Const):
     annotation evaluation.
 
     Examples:
+
     >>> # Define a constant string value to enforce during encoding/decoding
     >>> const_str = ConstString("Hello, World!")
     >>> pack(None, const_str, as_field=True)
@@ -1262,6 +1298,7 @@ class Aligned(FieldStruct):
     that the field starts or ends at a memory address that is a multiple of the alignment.
 
     Example usage:
+
     >>> @struct
     ... class Format:
     ...     a: Aligned(int16, alignment=4, after=True)
@@ -1420,6 +1457,7 @@ def align(alignment: Union[int, _ContextLambda]) -> _ContextLambda:
     or a context lambda that computes the alignment dynamically based on the current context.
 
     Example usage:
+
     >>> @struct
     ... class Format:
     ...     a: uint8
@@ -1453,6 +1491,7 @@ class Lazy(FieldStruct):
     The `struct_fn` function is invoked to generate the struct when the field is accessed.
 
     Example usage:
+
     >>> @struct
     ... class Format:
     ...     a: Lazy(lambda: SecondFormat)  # Lazy instantiation of the struct
@@ -1544,6 +1583,7 @@ class Uuid(FieldStruct):
     field (128 bits) and supports both little-endian and big-endian formats.
 
     Example usage:
+
     >>> unpack(Uuid, b'e3215476e89b12d3', as_field=True)
     UUID('65333231-3534-3736-6538-396231326433')
 

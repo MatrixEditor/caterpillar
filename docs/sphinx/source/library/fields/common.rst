@@ -7,7 +7,7 @@ Common Structs
 Numeric Structs
 ---------------
 
-.. autoclass:: caterpillar.py.FormatField
+.. autoclass:: caterpillar.py.PyStructFormattedField
     :members:
 
 .. autoattribute:: caterpillar.py.uint8
@@ -85,6 +85,13 @@ Special Structs
 
 .. autoattribute:: caterpillar.py.Pass
 
+    See source code for details
+
+
+.. autoclass:: caterpillar.py.Aligned
+    :members:
+
+.. autofunction:: caterpillar.py.align
 
 .. autoclass:: caterpillar.py.Computed
     :members:

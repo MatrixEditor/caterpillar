@@ -15,7 +15,7 @@
 from ._base import Field, INVALID_DEFAULT, DEFAULT_OPTION, singleton
 from ._mixin import FieldMixin, FieldStruct, Chain, Operator
 from .common import (
-    FormatField,
+    PyStructFormattedField,
     Transformer,
     Const,
     ConstBytes,
