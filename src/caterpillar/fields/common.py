@@ -12,6 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+from io import BytesIO
 import struct as libstruct
 import pickle
 
@@ -35,9 +36,10 @@ from caterpillar.context import CTX_FIELD, CTX_STREAM, CTX_SEQ
 from caterpillar.options import Flag, GLOBAL_FIELD_FLAGS
 from caterpillar.byteorder import LittleEndian
 from caterpillar import registry
+from caterpillar._common import WithoutContextVar
 
 from ._base import Field, INVALID_DEFAULT, singleton
-from ._mixin import FieldStruct, FieldMixin
+from ._mixin import FieldStruct
 
 
 ENUM_STRICT = Flag("enum.strict")
@@ -214,6 +216,7 @@ class Transformer(FieldStruct):
         self.struct = struct
         self.__bits__ = getattr(self.struct, "__bits__", None)
 
+    # TODO: document this
     def __fmt__(self) -> str:
         return self.struct.__fmt__()
 
@@ -531,7 +534,7 @@ class Memory(FieldStruct):
         """
         return memoryview
 
-    def __size__(self, context: _ContextLike) -> int | EllipsisType:
+    def __size__(self, context: _ContextLike) -> int:
         """
         Calculate the size of the memory field based on the `length` parameter.
 
@@ -598,15 +601,16 @@ class Memory(FieldStruct):
 
 
 class Bytes(Memory):
-    """
-    A specialized FieldStruct for handling byte sequences.
+    """Byte sequences.
+
+    Same class as :class:`Memory` but with a type of `bytes` instead of `memoryview`.
     """
 
     __slots__ = ()
 
     def __type__(self) -> type:
         """
-        Return the type associated with this Bytes field.
+        Return the type associated with this `Bytes` field, which is `bytes`.
 
         :return: The type (bytes).
         """
@@ -614,50 +618,99 @@ class Bytes(Memory):
 
     def unpack_single(self, context: _ContextLike) -> Any:
         """
-        Unpack a single bytes object from the stream.
+        Unpack a single byte sequence (bytes) from the stream.
 
-        :param context: The current context.
-        :return: The unpacked bytes object.
+        :param context: The current context, which provides access to the stream and
+                        other necessary metadata for unpacking.
+        :return: A `bytes` object representing the unpacked data from the stream.
+
         """
         # as we read bytes from the stream, this will return a bytes object
         return super().unpack_single(context).obj
 
 
-class String(Bytes):
-    """
-    A specialized field for handling string data.
+class String(Memory):
+    """String sequences.
+
+    Same class as :class:`Memory` but with a type of `str` instead of `memoryview`.
+
+    :param length: The length of the string to pack or unpack. It can be:
+                   - An integer specifying the number of bytes (e.g., `10`).
+                   - A callable that dynamically returns the number of bytes based on the context (e.g., `lambda ctx: ctx["length"]`).
+                   - Ellipsis (`...`), meaning the entire available stream should be read, regardless of size.
+    :param encoding: The encoding to use for converting bytes to a string during unpacking. If not specified, defaults to `None`.
+                     If specified, the string will be decoded using this encoding (e.g., `utf-8`).
     """
 
-    __slots__ = ()
+    __slots__ = ("encoding",)
+
+    def __init__(
+        self,
+        length: Union[int, _ContextLambda, EllipsisType],
+        encoding: Optional[str] = None,
+    ) -> None:
+        super().__init__(length)
+        self.encoding = encoding or "utf-8"
 
     def __type__(self) -> type:
         """
-        Return the type associated with this String field.
+        Return the type associated with this `String` field.
 
-        :return: The type (str).
+        :return: `str` - the type associated with the `String` field.
         """
         return str
+
+    def pack_single(self, obj: str, context: _ContextLike) -> None:
+        """Packs a single string into the stream."""
+        return super().pack_single(obj.encode(self.encoding), context)
 
     def unpack_single(self, context: _ContextLike) -> Any:
         """
         Unpack a single string from the stream.
 
         :param context: The current context.
-        :return: The unpacked string.
+        :return: A `str` representing the unpacked string, decoded from bytes using the specified encoding.
         """
-        return super().unpack_single(context).decode(self.encoding)
+        return super().unpack_single(context).obj.decode(self.encoding)
 
 
-class CString(Bytes):
+class CString(FieldStruct):
     """
-    A specialized field for handling string data that ends with ``\\0x00``.
+    C-style strings (null-terminated or padded).
+
+    This class is designed for handling strings that are padded to a
+    fixed length, typically with zero-padding or any custom padding
+    character. It is useful for encoding and decoding data that follows
+    the C-style string conventions, where strings are often represented
+    by a fixed length, and padding (e.g., null bytes) is used to fill
+    the remaining space.
+
+    Example usage:
+    >>> cstring = CString(10, encoding='utf-8') # encoding is optional
+    >>> pack(cstring, "Hello, World!")
+    b"Hello, World\\x00"
+    >>> unpack(cstring, b"Hello, World\\x00")
+    'Hello, World!'
+
+    This class also supports direct getitem access to create a list:
+
+    >>> cstrings = CString[10] # array of ten strings (variable size)
+
+    :param length: The fixed length of the C-string or a callable that determines
+                   the length based on the context. If `None` or `Ellipsis`, the
+                   string will be unpacked until the padding character is found.
+    :param encoding: The encoding to use for converting the byte data to a string.
+                    Defaults to `utf-8`. If `None`, the default encoding is used.
+    :param pad: The padding character to use (usually `0` for null padding). If a
+                string is provided, it must be a single character. If not specified,
+                defaults to `0` (null byte).
     """
 
-    __slots__ = ("pad", "raw_pad")
+    __slots__ = ("encoding", "pad", "_raw_pad")
 
     def __init__(
         self,
-        length: Union[int, _ContextLambda, None] = None,
+        length: Union[int, _ContextLambda, None, EllipsisType] = None,
         encoding: Optional[str] = None,
         pad: Union[str, int, None] = None,
     ) -> None:
@@ -667,43 +720,88 @@ class CString(Bytes):
         :param length: The fixed length or a context lambda to determine the length dynamically.
         :param encoding: The encoding to use for string encoding/decoding (default is UTF-8).
         """
-        super().__init__(length or ...)
+        self.length = length or ...
         self.encoding = encoding or "utf-8"
         self.pad = pad or 0
         if isinstance(self.pad, str):
+            if len(self.pad) != 1:
+                raise ValueError(
+                    f"Invalid padding {pad!r}. Padding must be a single character."
+                )
             self.pad = ord(self.pad)
-        self.raw_pad = self.pad.to_bytes(1, byteorder="big")
+
+        if not isinstance(self.pad, int):
+            raise ValueError(
+                f"Invalid padding {pad!r}. Padding must be a an integer or a single character."
+            )
+        self._raw_pad = self.pad.to_bytes(1)
+
+    def __class_getitem__(cls, dim) -> Field:
+        """
+        Allows indexing for `CString` class to support field dimensioning.
+
+        :param dim: The dimension or index of the field.
+        :return: A new instance of `CString` with the specified dimension.
+        """
+        return CString(...)[dim]
+
+    def __size__(self, context: _ContextLike) -> Any:
+        """
+        Returns the size of the `CString` field.
+
+        :param context: The context used to determine the size.
+        :return: The length of the field in bytes.
+        """
+        return self.length(context) if callable(self.length) else self.length
 
     def __type__(self) -> type:
         """
-        Return the type associated with this String field.
+        Returns the type associated with the `CString` field.
 
-        :return: The type (str).
+        :return: The `str` type, as the field stores string data.
         """
         return str
 
     def pack_single(self, obj: str, context: _ContextLike) -> None:
         """
-        Pack a single string into the stream.
+        Pack a single string into the stream with padding.
 
-        :param obj: The string to pack.
+        This method encodes the string into bytes and pads it to the
+        fixed length, if applicable. If the length is dynamic or
+        unspecified, padding is added until the total length is achieved.
+
+        :param obj: The string to pack into the stream.
         :param context: The current context.
+        :raises ValidationError: If the string is too long for the fixed length.
         """
         encoded = obj.encode(self.encoding)
+        stream = context[CTX_STREAM]
         if self.length is not Ellipsis:
             length = self.__size__(context)
             obj_length = len(obj)
-            payload = encoded + self.raw_pad * (length - obj_length)
+            if obj_length > length:
+                raise ValidationError(
+                    f"String {obj!r} is too long for the fixed length of {length} bytes."
+                )
+            stream.write(encoded)
+            stream.write(self._raw_pad * (length - obj_length))
         else:
-            payload = encoded + self.raw_pad
-        super().pack_single(payload, context)
+            stream.write(encoded)
+            stream.write(self._raw_pad)
 
     def unpack_single(self, context: _ContextLike) -> Any:
         """
-        Unpack a single string from the stream.
+        Unpack a single C-style string from the stream.
 
-        :param context: The current context.
-        :return: The unpacked string.
+        This method reads bytes from the stream until a padding
+        character is found. If the length is fixed, it will unpack
+        exactly that number of bytes. If length is unspecified, it
+        unpacks until the padding character is encountered.
+
+        :param context: The current context, which provides access to the
+                        stream and other necessary metadata.
+        :return: The unpacked string, stripped of padding, decoded with
+                 the specified encoding.
         """
         if self.length is Ellipsis:
             # Parse actual C-String
@@ -711,33 +809,57 @@ class CString(Bytes):
             data = bytearray()
             while True:
                 value = stream.read(1)
-                if not value or value == self.raw_pad:
+                if not value or value[0] == self._raw_pad[0]:
                     break
-                data += value
-            value = bytes(data)
+                data.extend(value)
         else:
-            length = self.length(context) if callable(self.length) else self.length
+            length = self.__size__(context)
             value: bytes = context[CTX_STREAM].read(length)
 
-        return value.rstrip(self.raw_pad).decode(self.encoding)
-
-    def __class_getitem__(cls, dim) -> Field:
-        return CString(...)[dim]
+        return value.rstrip(self._raw_pad).decode(self.encoding)
 
 
 class ConstString(Const):
     """
-    A specialized constant field for handling string values.
+    A specialized constant field for handling fixed string values.
 
-    :param value: The constant string value.
-    :param encoding: The encoding to use for string encoding (default is UTF-8).
+    This class is used to define a field that always holds a constant
+    string value. The value is validated during both encoding and
+    decoding to ensure that the expected constant string is preserved.
+    The string can optionally be encoded in a specific encoding.
+
+    Additionally, this class provides a type converter that can be used
+    to convert a string annotation to a `ConstString` field.
+
+    >>> @struct
+    ... class MyStruct:
+    ...     value: "const str" # <-- will be converted to ConstString
+
+    Note that the type declaration above won't work if you enable
+    annotation evaluation.
+
+    Examples:
+    >>> # Define a constant string value to enforce during encoding/decoding
+    >>> const_str = ConstString("Hello, World!")
+    >>> pack(None, const_str, as_field=True)
+    b"Hello, World!"
+    >>> unpack(const_str, b"Hello, World!", as_field=True)
+    "Hello, World!"
+
+    :param value: The constant string value to be encoded/decoded.
+    :param encoding: The encoding to use for the string (default is UTF-8).
+                     If `None`, the default system encoding is used.
     """
 
     __slots__ = ()
 
     def __init__(self, value: str, encoding: Optional[str] = None) -> None:
+        if not isinstance(value, str):
+            raise TypeError("value must be a string")
+
         struct = String(len(value), encoding)
-        super().__init__(value.encode(struct.encoding), struct)
+        super().__init__(value, struct)
+        # REVISIT: rework bitfield
         self.__bits__ = len(value) * 8
 
 
@@ -751,9 +873,21 @@ registry.annotation_registry.append(_str_type_converter)
 
 class ConstBytes(Const):
     """
-    A specialized constant field for handling bytes values.
+    A constant field for handling fixed bytes values.
 
-    :param value: The constant bytes value.
+    This class is used to define a field that always holds a constant
+    bytes value. The value is validated during both encoding and
+    decoding to ensure that the expected constant byte sequence is
+    preserved.
+
+    This class provides a type converter that can be used to convert
+    a bytes annotation to a `ConstBytes` field.
+
+    >>> @struct
+    ... class MyStruct:
+    ...     value: b"const bytes" # <-- will be converted to ConstBytes
+
+    :param value: The constant bytes value to be encoded/decoded.
     """
 
     __slots__ = ()
@@ -772,6 +906,29 @@ registry.annotation_registry.append(_bytes_type_converter)
 
 
 class Computed(FieldStruct):
+    """
+    A specialized field for representing computed or dynamically calculated values.
+
+    This class is used to define a field that holds a computed value. The value
+    can either be a constant or a function (lambda) that computes the value
+    dynamically based on the context during packing or unpacking.
+
+    The computed value is not directly stored; instead, it is evaluated using
+    the provided lambda function or constant value during encoding and decoding.
+
+    Examples:
+
+    >>> # Define a computed field with a constant value
+    >>> computed = Computed(42)
+    >>> unpack(computed, b"\\x00\\x01", as_field=True)
+    42
+    >>> pack(None, computed, as_field=True)
+    b"" # won't affect the stream
+
+    :param value: A constant value or a lambda function that computes the value
+                  based on the context.
+    """
+
     __slots__ = ("value",)
 
     def __init__(self, value: Union[_ConstType, _ContextLambda]) -> None:
@@ -779,35 +936,117 @@ class Computed(FieldStruct):
         self.__bits__ = 0
 
     def __type__(self) -> type:
+        """
+        Return the type of the computed field.
+
+        :return: `Any` if callable, otherwise the type of the constant value.
+        """
         return Any if callable(self.value) else type(self.value)
 
     def __pack__(self, obj: Any, context: _ContextLike) -> None:
+        """
+        No packing is needed for computed fields, as the value is computed dynamically.
+
+        This function exists to satisfy the `FieldStruct` interface, but does not
+        perform any packing.
+
+        :param obj: The object to pack.
+        :param context: The current context.
+        """
         pass
 
     def __size__(self, context: _ContextLike) -> int:
+        """
+        Return the size of the computed field.
+
+        Since the field is computed dynamically, the size is fixed as `0`.
+
+        :param context: The current context.
+        :return: Always returns `0` for computed fields.
+        """
         return 0
 
     def __unpack__(self, context: _ContextLike) -> Any:
+        """
+        Unpack the computed value based on the context.
+
+        If the value is a callable (lambda), it will be invoked with the context
+        to calculate the value. Otherwise, the constant value is returned directly.
+
+        :param context: The current context.
+        :return: The computed value or the constant value.
+        """
         return self.value(context) if callable(self.value) else self.value
 
     def pack_single(self, obj: Any, context: _ContextLike) -> None:
+        """
+        No packing is needed for computed fields.
+
+        :param obj: The object to pack.
+        :param context: The current context.
+        """
         # No need for an implementation
         pass
 
     def unpack_single(self, context: _ContextLike) -> None:
+        """
+        No unpacking is needed for computed fields.
+
+        :param context: The current context.
+        """
         # No need for an implementation
         pass
 
 
 @singleton
 class Pass(FieldStruct):
+    """
+    A specialized field that does nothing during packing and unpacking.
+
+    This class is used to define a field that effectively "passes" through
+    the packing and unpacking process without any modifications or
+    transformations. It serves as a placeholder that doesn't store or process
+    any data. This can be useful in cases where you need a field in a structure
+    but don't want it to affect the overall packing or unpacking logic.
+
+    The `Pass` field always returns `None` during unpacking and does not
+    perform any operations during packing.
+
+    Example usage:
+
+    >>> @struct
+    >>> class MyStruct:
+    ...     abc: Pass
+    ...
+    >>> obj = unpack(MyStruct, b"\\x00\\x01")
+    MyStruct(abc=None)
+    >>> pack(MyStruct(abc=None))
+    b""
+    """
+
     __slots__ = ()
 
     def __bits__(self) -> int:
+        """
+        Return the size in bits for the Pass field.
+
+        Since the `Pass` field doesn't hold any data, it is considered to have a
+        size of `0` bits.
+
+        :return: Always returns `0` for the Pass field.
+        """
         return 0
 
     def __type__(self) -> type:
-        return type(None)
+        """
+        Return the type associated with this Pass field.
+
+        The `Pass` field doesn't have a type associated with actual data. It
+        effectively represents a `None` type when unpacked.
+
+        :return: `NoneType`.
+        """
+        return None.__class__
 
     def __pack__(self, obj: Any, context: _ContextLike) -> None:
         pass
@@ -828,54 +1067,117 @@ class Pass(FieldStruct):
 
 
 class Prefixed(FieldStruct):
-    __slots__ = ("encoding", "prefix")
+    """
+    A specialized field for handling data with a prefix (typically indicating length or size).
+
+    This class is used when you want to prefix a data structure with a size or other identifying
+    information. The prefix is typically packed first, followed by the actual data. The field
+    allows for handling both prefixed data with a structure and simple byte sequences, depending
+    on the presence of the `struct` argument. However, the returned prefix value must be
+    an integer.
+
+    Example usage:
+
+    >>> prefixed = Prefixed(uint32, Bytes(4))
+    >>> pack(b"abcd", prefixed, as_field=True)
+    b"\x00\x00\x00\x04abcd"
+    >>> unpack(prefixed, b"\x00\x00\x00\x04abcd", as_field=True)
+    b"abcd"
+
+    The prefix is packed and unpacked independently and is used to determine the size of the
+    following data.
+
+    :param prefix: The struct that defines the prefix (e.g., a length field).
+    :param struct: The struct that defines the data to follow the prefix (e.g., `Bytes` or another field).
+    """
+
+    __slots__ = ("prefix", "struct")
 
     def __init__(
-        self, prefix: Optional[_StructLike] = None, encoding: Optional[str] = None
+        self,
+        prefix: _StructLike,
+        struct: Optional[_StructLike] = None,
     ):
-        self.encoding = encoding
-        self.prefix = prefix or uint32
+        self.prefix = prefix
+        self.struct = struct
 
-    def __type__(self) -> type:
-        return bytes if not self.encoding else str
+    def __type__(self) -> Optional[Union[type, str]]:
+        """
+        Return the type associated with this Prefixed field.
+
+        If the `struct` is provided, it returns the type of the `struct`. Otherwise, it returns
+        `bytes` as the default type for a prefixed field.
+
+        :return: The type associated with the Prefixed field (`bytes` or the type of the struct).
+        """
+        return bytes if self.struct is None else self.struct.__type__()
 
     def __size__(self, context: _ContextLike) -> int:
         """
-        Calculate the size of the Prefixed field.
+        Prefixed fields do not have a fixed size.
 
-        :param context: The current context.
-        :return: The size of the Bytes field.
+        The size of a `Prefixed` field is dynamic, as it depends on the prefix and the data length,
+        which can vary. Therefore, calling this method will raise an error.
+
+        :raises DynamicSizeError: Always raises an error as the size is not fixed.
         """
         raise DynamicSizeError("Prefixed does not store a size", context)
 
-    def pack_single(self, obj: bytes, context: _ContextLike) -> None:
+    def pack_single(self, obj: Any, context: _ContextLike) -> None:
         """
-        Pack a single bytes object into the stream.
+        Pack a single object into the stream, with the prefix indicating the size.
 
-        :param obj: The bytes object to pack.
+        This method first packs the length of the data (the prefix), and then writes the actual data.
+
+        :param obj: The object to pack (should be a byte sequence).
         :param context: The current context.
+        :raises TypeError: If the packed data is not of type `bytes`.
         """
-        self.prefix.__pack__(len(obj), context)
+        if self.struct is not None:
+            data = self.struct.__pack__(obj, context)
+        else:
+            data = obj
 
-        if self.encoding:
-            obj = obj.encode(self.encoding)
+        if not isinstance(data, bytes):
+            raise TypeError(f"Expected bytes, got {type(data)}")
+
+        self.prefix.__pack__(len(obj), context)
         context[CTX_STREAM].write(obj)
 
     def unpack_single(self, context: _ContextLike) -> Any:
         """
-        Unpack a single bytes object from the stream.
+        Unpack a single object from the stream, using the prefix to determine the size.
+
+        This method first unpacks the prefix (which indicates the size), then reads the data
+        from the stream based on that size. If a `struct` is provided, the data is then passed
+        through the specified structure for further unpacking.
 
         :param context: The current context.
-        :return: The unpacked bytes object.
+        :return: The unpacked object, which is either raw bytes or the data structure.
         """
         size = self.prefix.__unpack__(context)
+        if not isinstance(size, int):
+            raise TypeError(f"Expected int, got {type(size)}")
+
         data = context[CTX_STREAM].read(size)
-        if self.encoding:
-            data = data.decode(self.encoding)
-        return data
+        obj = data
+        if self.struct is not None:
+            with WithoutContextVar(context, CTX_STREAM, BytesIO(data)):
+                obj = self.struct.__unpack__(context)
+        return obj
 
 
 class Int(FieldStruct):
+    """Generic Integer
+
+    This class handles packing and unpacking integer values with a specified bit size, either
+    signed or unsigned. The size of the integer is defined in bits, and the class ensures the
+    appropriate byte representation is used for packing and unpacking.
+
+    :param bits: The bit width of the integer (e.g., 8, 16, 32, 64).
+    :param signed: Whether the integer is signed (default is True).
+    """
+
     __slots__ = ("signed", "size")
 
     def __init__(self, bits: int, signed: bool = True) -> None:
@@ -886,19 +1188,51 @@ class Int(FieldStruct):
         self.size = self.__bits__ // 8
 
     def __type__(self) -> type:
+        """
+        Return the type associated with this Int field.
+
+        :return: The type of the field, which is `int`.
+        """
         return int
 
     def __size__(self, context: _ContextLike) -> int:
+        """
+        Return the size of the integer in bytes.
+
+        :param context: The current context.
+        :return: The size of the integer in bytes.
+        """
         return self.size
 
     def pack_single(self, obj: int, context: _ContextLike) -> None:
+        """
+        Pack a single integer value into the stream.
+
+        This method converts the integer value into a byte representation using the specified
+        byte order. The byte order is determined from the context's field order
+        (either little-endian or big-endian).
+
+        :param obj: The integer value to pack.
+        :param context: The current context, which provides the byte order (little-endian or big-endian).
+        :raises ValueError: If the integer is too large or small for the given bit width.
+        """
         order = context[CTX_FIELD].order
         byteorder = "little" if order is LittleEndian else "big"
         context[CTX_STREAM].write(
             obj.to_bytes(self.size, byteorder, signed=self.signed)
         )
 
-    def unpack_single(self, context: _ContextLike) -> memoryview:
+    def unpack_single(self, context: _ContextLike) -> int:
+        """
+        Unpack a single integer value from the stream.
+
+        This method reads a byte sequence from the stream, interprets it as an integer using the
+        specified byte order and signedness, and returns the integer value.
+
+        :param context: The current context, which provides the byte order (little-endian or big-endian).
+        :return: The unpacked integer value.
+        :raises ValueError: If the data cannot be unpacked as an integer of the specified size.
+        """
         order = context[CTX_FIELD].order
         byteorder = "little" if order is LittleEndian else "big"
         return int.from_bytes(
@@ -907,6 +1241,8 @@ class Int(FieldStruct):
 
 
 class UInt(Int):
+    """Generic unsigned integer."""
+
     __slots__ = ()
 
     def __init__(self, bits: int) -> None:
@@ -915,6 +1251,193 @@ class UInt(Int):
 
 int24 = Int(24)
 uint24 = UInt(24)
+
+
+class Aligned(FieldStruct):
+    """
+    Alignment of a struct (before or after)
+
+    This class ensures that the associated `struct` is properly aligned according to
+    the specified alignment. It allows for padding before or after the field, ensuring
+    that the field starts or ends at a memory address that is a multiple of the alignment.
+
+    Example usage:
+    >>> @struct
+    >>> class Format:
+    ...     a: Aligned(int16, alignment=4, after=True)
+    ...     b: uint8
+    ...
+    >>> unpack(Format, b"\\x00\\x01\\xFF\\xFF\\x01")
+    Traceback (most recent call last):
+    ...
+    ValueError: Expected 2 bytes of padding (value=0), got 0
+    >>> unpack(Format, b"\\x00\\x01\\x00\\x00\\x01")
+    Format(a=256, b=1)
+
+    This example shows a `Format` structure where:
+    - `a` is an aligned integer (with 4-byte alignment) and padding is applied after the field.
+    - `b` is an unsigned byte (`uint8`), which follows `a` after the padding.
+
+    :param struct: The structure that is to be aligned.
+    :param alignment: The alignment value in bytes, which must be a power of 2.
+                      This can be an integer or a context lambda for dynamic alignment.
+    :param after: If `True`, padding is applied after the structure (align after).
+    :param before: If `True`, padding is applied before the structure (align before).
+    :param filler: The byte value to use for padding. It can be an integer or a string
+                   (default is zero-padding). If no filler is provided, `b"\x00"` will
+                   be used as the padding byte.
+    :raises ValueError: If neither `before` nor `after` is specified, if the filler is not a
+                        single byte, or if the padding does not match the expected value.
+    :raises DynamicSizeError: If dynamic alignment is used and the size cannot be determined.
+    """
+
+    __slots__ = ("struct", "_after", "_before", "_filler", "alignment")
+
+    def __init__(
+        self,
+        struct: _StructLike,
+        alignment: Union[int, _ContextLambda],
+        after: bool = False,
+        before: bool = False,
+        filler: Union[int, str, None] = None,
+    ) -> None:
+        if not before and not after:
+            raise ValueError("Must specify either before or after")
+
+        self.struct = struct
+        self.alignment = alignment
+        self._after = after
+        self._before = before
+        if filler is None:
+            self._filler = 0x00
+        else:
+            if isinstance(filler, str):
+                self._filler = ord(filler)
+            else:
+                self._filler = filler
+
+        if not isinstance(self._filler, int):
+            raise ValueError(f"Filler must be a single byte - got {filler!r}")
+
+    def __type__(self) -> Optional[Union[type, str]]:
+        """
+        Return the type associated with this aligned field.
+
+        :return: The type of the struct (usually `bytes` or another custom type).
+        """
+        return self.struct.__type__()
+
+    def __size__(self, context: _ContextLike) -> int:
+        """
+        Calculate the size of the aligned field, accounting for padding based on the alignment.
+
+        :param context: The current context.
+        :return: The size of the aligned field, including padding if necessary.
+        :raises DynamicSizeError: If the alignment is dynamic and cannot be determined.
+        """
+        if callable(self.alignment):
+            raise DynamicSizeError(
+                "Aligned fields with dynamic alignment don't have a fixed size"
+            )
+
+        struct_size = self.struct.__size__(context)
+        return struct_size + (self.alignment - (struct_size % self.alignment))
+
+    def unpack_alignment(self, context: _ContextLike):
+        """
+        Unpack padding for the alignment, verifying that the correct amount of padding is present.
+
+        :param context: The current context.
+        :raises ValueError: If the padding does not match the expected value.
+        """
+        value = self.alignment(context) if callable(self.alignment) else self.alignment
+        if not isinstance(value, int):
+            raise ValueError(f"Alignment must be an integer - got {value!r}")
+
+        if value % 2 != 0:
+            raise ValueError(f"Alignment must be a power of 2 - got {value!r}")
+
+        stream = context[CTX_STREAM]
+        pos = stream.tell()
+        size = value - (pos % value)
+        data = stream.read(size)
+        if data.count(self._filler) != size:
+            raise ValueError(
+                f"Expected {size} bytes of padding (value={self._filler!r}), got {data.count(self._filler)}"
+            )
+
+    def unpack_single(self, context: _ContextLike) -> Any:
+        """
+        Unpack a single aligned field from the stream.
+
+        This method ensures that padding is applied before or after the field as needed
+        based on the `before` and `after` parameters.
+
+        :param context: The current context.
+        :return: The unpacked structure, properly aligned.
+        """
+        if self._before:
+            self.unpack_alignment(context)
+        obj = self.struct.__unpack__(context)
+        if self._after:
+            self.unpack_alignment(context)
+        return obj
+
+    def pack_alignment(self, context: _ContextLike):
+        """
+        Apply padding for the alignment before or after the structure, depending on
+        the `before` and `after` settings.
+
+        :param context: The current context.
+        """
+        value = self.alignment(context) if callable(self.alignment) else self.alignment
+        stream = context[CTX_STREAM]
+        size = value - (stream.tell() % value)
+        stream.write(bytes([self._filler] * size))
+
+    def pack_single(self, obj: Any, context: _ContextLike) -> None:
+        """
+        Pack a single aligned field into the stream, applying padding if necessary.
+
+        :param obj: The structure to pack.
+        :param context: The current context.
+        """
+        if self._before:
+            self.pack_alignment(context)
+        self.struct.__pack__(obj, context)
+        if self._after:
+            self.pack_alignment(context)
+
+
+def align(alignment: Union[int, _ContextLambda]) -> _ContextLambda:
+    """
+    Create a context lambda to calculate the alignment padding required at the current stream position.
+
+    This function generates a lambda that can be used to compute the amount of padding required
+    to ensure that the next structure in the stream is aligned to the specified alignment.
+
+    The alignment value can either be a fixed integer (representing the alignment in bytes)
+    or a context lambda that computes the alignment dynamically based on the current context.
+
+    Example usage:
+    >>> @struct
+    >>> class Format:
+    ...     a: uint8
+    ...     b: padding[align(4)]
+    ...
+    >>> unpack(Format, b"\\x01\\x00\\x00\\x00")
+    Format(a=1, b=None)
+
+    :param alignment: The alignment value in bytes, which must be a power of 2.
+                      This can be either an integer or a context lambda.
+    :return: A context lambda function that returns the number of bytes to align the next structure.
+    """
+    def _get_aligned_size(context: _ContextLike) -> Any:
+        pos = context[CTX_STREAM].tell()
+        value = alignment(context) if callable(alignment) else alignment
+        return value - (pos % value)
+
+    return _get_aligned_size
 
 
 class Lazy(FieldStruct):

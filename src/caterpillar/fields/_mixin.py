@@ -267,8 +267,9 @@ class Chain(FieldStruct):
         data = None
         for i, struct in enumerate(self._elements):
             stream = BytesIO(data) if i != 0 else context[CTX_STREAM]
-            with WithoutContextVar(context, CTX_STREAM, stream), WithoutContextVar(
-                context, CTX_SEQ, False
+            with (
+                WithoutContextVar(context, CTX_STREAM, stream),
+                WithoutContextVar(context, CTX_SEQ, False),
             ):
                 data = struct.__unpack__(context)
 
@@ -289,9 +290,11 @@ class Chain(FieldStruct):
                 struct.__pack__(obj, context)
             else:
                 # Not the last struct, use a temporary BytesIO object
-                with BytesIO() as stream, WithoutContextVar(
-                    context, CTX_STREAM, stream
-                ), WithoutContextVar(context, CTX_SEQ, False):
+                with (
+                    BytesIO() as stream,
+                    WithoutContextVar(context, CTX_STREAM, stream),
+                    WithoutContextVar(context, CTX_SEQ, False),
+                ):
                     struct.__pack__(obj, context)
                     obj = stream.getvalue()
 
@@ -333,12 +336,11 @@ class Operator:
     def __truediv__(self, arg2) -> _StructLike:
         return self.func(arg2)
 
-    def __rtruediv__(self, arg1) -> '_infix_':
+    def __rtruediv__(self, arg1) -> "_infix_":
         return Operator(partial(self.func, arg1))
 
     def __call__(self, arg1, arg2) -> _StructLike:
         return self.func(arg1, arg2)
-
 
 
 # utility methods

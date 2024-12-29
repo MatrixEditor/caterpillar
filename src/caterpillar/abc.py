@@ -54,7 +54,7 @@ class _ContextLambda(Protocol):
     """
 
     @abstractmethod
-    def __call__(self, context: _ContextLike, **kwds):
+    def __call__(self, context: _ContextLike) -> Any:
         pass
 
 
