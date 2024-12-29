@@ -1015,7 +1015,7 @@ class Pass(FieldStruct):
     Example usage:
 
     >>> @struct
-    >>> class MyStruct:
+    ... class MyStruct:
     ...     abc: Pass
     ...
     >>> obj = unpack(MyStruct, b"\\x00\\x01")
@@ -1263,7 +1263,7 @@ class Aligned(FieldStruct):
 
     Example usage:
     >>> @struct
-    >>> class Format:
+    ... class Format:
     ...     a: Aligned(int16, alignment=4, after=True)
     ...     b: uint8
     ...
@@ -1421,7 +1421,7 @@ def align(alignment: Union[int, _ContextLambda]) -> _ContextLambda:
 
     Example usage:
     >>> @struct
-    >>> class Format:
+    ... class Format:
     ...     a: uint8
     ...     b: padding[align(4)]
     ...
@@ -1432,6 +1432,7 @@ def align(alignment: Union[int, _ContextLambda]) -> _ContextLambda:
                       This can be either an integer or a context lambda.
     :return: A context lambda function that returns the number of bytes to align the next structure.
     """
+
     def _get_aligned_size(context: _ContextLike) -> Any:
         pos = context[CTX_STREAM].tell()
         value = alignment(context) if callable(alignment) else alignment
@@ -1442,18 +1443,44 @@ def align(alignment: Union[int, _ContextLambda]) -> _ContextLambda:
 
 class Lazy(FieldStruct):
     """
-    A lazy field struct that defers the creation of the underlying struct until needed.
+    A lazy field struct that defers the creation of the underlying struct until it is needed.
 
-    :param struct: A callable that returns the underlying struct.
+    This class allows the definition of a field where the underlying struct is not created until
+    the field is actually accessed. This can help with optimization in scenarios where certain
+    fields may not always be used.
+
+    The underlying struct is defined by a callable that returns an instance of a struct.
+    The `struct_fn` function is invoked to generate the struct when the field is accessed.
+
+    Example usage:
+    >>> @struct
+    ... class Format:
+    ...     a: Lazy(lambda: SecondFormat)  # Lazy instantiation of the struct
+    ...     b: uint8
+    ...
+    >>> @struct
+    ... class SecondFormat:
+    ...     a: uint8
+    ...
+    >>> unpack(Format, b"\\x01\\x02\\xFF")
+    Format(a=SecondFormat(a=1), b=255)
+
+    :param struct: A callable that returns the underlying struct, which will be lazily created
+                   when the field is accessed.
     """
 
     def __init__(self, struct: Callable[[], _StructLike]) -> None:
+        if not callable(struct):
+            raise TypeError(f"struct must be a callable - got {struct!r}")
+
         self.struct_fn = struct
 
     @cached_property
     def struct(self) -> _StructLike:
         """
-        Get the underlying struct.
+        Get the underlying struct by invoking the callable.
+
+        This method ensures that the struct is only created once, and it is cached for subsequent use.
 
         :return: The underlying struct.
         :rtype: _StructLike
@@ -1462,44 +1489,44 @@ class Lazy(FieldStruct):
 
     def __bits__(self) -> str:
         """
-        Get the bit representation of the Lazy struct.
+        Get the bit representation of the Lazy struct by delegating to the underlying struct.
 
-        :return: The bit representation.
+        :return: The bit representation of the struct.
         :rtype: str
         """
         return self.struct.__bits__()
 
     def __type__(self) -> type:
         """
-        Get the type associated with the Lazy struct.
+        Get the type associated with the Lazy struct by delegating to the underlying struct.
 
-        :return: The type associated with the Lazy struct.
+        :return: The type associated with the struct.
         :rtype: type
         """
         return self.struct.__type__()
 
     def __size__(self, context: _ContextLike) -> int:
         """
-        Get the size of the Lazy struct.
+        Get the size of the Lazy struct by delegating to the underlying struct.
 
         :param context: The context for size calculation.
-        :return: The size of the Lazy struct.
+        :return: The size of the struct.
         :rtype: int
         """
         return self.struct.__size__(context)
 
     def pack_single(self, obj: Any, context: _ContextLike) -> None:
         """
-        Pack a single value using the Lazy struct.
+        Pack a single value using the Lazy struct by delegating to the underlying struct.
 
-        :param Any obj: The value to pack.
+        :param obj: The value to pack.
         :param context: The context for packing.
         """
         self.struct.__pack__(obj, context)
 
     def unpack_single(self, context: _ContextLike) -> Any:
         """
-        Unpack a single value using the Lazy struct.
+        Unpack a single value using the Lazy struct by delegating to the underlying struct.
 
         :param context: The context for unpacking.
         :return: The unpacked value.
@@ -1508,20 +1535,82 @@ class Lazy(FieldStruct):
 
 
 @singleton
-class uuid(Transformer):
+class Uuid(FieldStruct):
+    """
+    A field for handling UUID values.
+
+    This class is responsible for serializing and deserializing UUIDs to and
+    from their binary representation. The UUID is represented as a 16-byte
+    field (128 bits) and supports both little-endian and big-endian formats.
+
+    Example usage:
+    >>> unpack(Uuid, b'e3215476e89b12d3', as_field=True)
+    UUID('65333231-3534-3736-6538-396231326433')
+
+    :param value: The UUID value, which is typically a `UUID` object from the
+                  `uuid` module.
+    :param context: The context for packing and unpacking the UUID. The
+                    context includes stream order information for byte
+                    order (little-endian or big-endian).
+    """
+
     __slots__ = ()
 
-    def __init__(self) -> None:
-        super().__init__(Bytes(16))
-
     def __type__(self) -> type:
+        """
+        Get the type associated with the UUID field.
+
+        :return: The type `UUID`.
+        :rtype: type
+        """
         return UUID
 
-    def decode(self, parsed: bytes, context) -> UUID:
-        return UUID(bytes=parsed)
+    def __size__(self, context: _ContextLike) -> int:
+        """
+        Get the size of the UUID field.
 
-    def encode(self, obj: UUID, context) -> bytes:
-        return obj.bytes
+        :param context: The context for size calculation.
+        :return: The size of the UUID in bytes (16 bytes).
+        :rtype: int
+        """
+        return 16
+
+    def __bits__(self) -> int:
+        """
+        Get the bit representation of the UUID field.
+
+        :return: The bit size of the UUID field (128 bits).
+        :rtype: int
+        """
+        return 128
+
+    def __pack__(self, obj: UUID, context: _ContextLike) -> None:
+        """
+        Pack a UUID object into the stream.
+
+        Depending on the byte order (little-endian or big-endian) specified
+        in the context, the UUID will be packed in the corresponding byte order.
+
+        :param obj: The `UUID` object to pack.
+        :param context: The current context, which includes the stream and byte order.
+        """
+        is_le = context[CTX_FIELD].order is LittleEndian
+        super().__pack__(obj.bytes_le if is_le else obj.bytes, context)
+
+    def __unpack__(self, context: _ContextLike) -> UUID:
+        """
+        Unpack a UUID from the stream.
+
+        Depending on the byte order (little-endian or big-endian) specified
+        in the context, the UUID will be unpacked in the corresponding byte order.
+
+        :param context: The current context, which includes the stream and byte order.
+        :return: The unpacked `UUID` object.
+        :rtype: UUID
+        """
+        is_le = context[CTX_FIELD].order is LittleEndian
+        data = context[CTX_STREAM].read(16)
+        return UUID(bytes_le=data) if is_le else UUID(bytes=data)
 
 
 class Pickled(Transformer):

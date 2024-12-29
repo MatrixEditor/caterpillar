@@ -50,7 +50,9 @@ from .common import (
     float64,
     double,
     void_ptr,
-    uuid,
+    Uuid,
+    Aligned,
+    align
 )
 from .varint import VarInt, VARINT_LSB, vint
 from .compression import (
