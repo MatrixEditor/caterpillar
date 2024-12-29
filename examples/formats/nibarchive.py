@@ -85,7 +85,7 @@ class NIBClassName:
 
 # Note that the returned string instance here may contain extra null-bytes
 # at the end.
-NIBKey = Prefixed(vint, "utf-8")
+NIBKey = Prefixed(vint, String(...))
 
 
 class ValueType(enum.Enum):
