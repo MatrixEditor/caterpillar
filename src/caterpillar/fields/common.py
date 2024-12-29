@@ -37,7 +37,7 @@ from caterpillar.byteorder import LittleEndian
 from caterpillar import registry
 
 from ._base import Field, INVALID_DEFAULT, singleton
-from ._mixin import FieldStruct
+from ._mixin import FieldStruct, FieldMixin
 
 
 ENUM_STRICT = Flag("enum.strict")
@@ -481,45 +481,116 @@ registry.annotation_registry.insert(0, _EnumTypeConverter())
 
 
 class Memory(FieldStruct):
-    __slots__ = ("length", "encoding")
+    """
+    A class representing a memory field that handles packing and unpacking byte-like objects
+    of a specified length.
+
+    The `Memory` class is used to manage fields that contain raw byte data. It allows you to
+    pack a byte object (either `bytes` or `memoryview`) into a stream and unpack byte data
+    from a stream into a `memoryview`. The length of the memory field can be fixed or dynamically
+    determined based on the context. If the length is unspecified, the entire available data in
+    the stream is read.
+
+    This class can handle the following scenarios for the `length` argument:
+    - **Fixed length**: A specific number of bytes (e.g., `10`).
+    - **Dynamic length**: A callable that returns the length based on the current context (e.g., `lambda ctx: ctx["length"]`).
+    - **Greedy length**: Using `Ellipsis` (`...`), meaning the entire stream is read regardless of the size.
+
+    Examples:
+
+    >>> # Memory with a fixed length of 10 bytes
+    >>> memory = Memory(10)
+    >>> memory_dynamic = Memory(lambda ctx: ctx._root.length) # dynamic length based on context
+    >>> memory_greedy = Memory(...)
+    >>> pack(b"1234567890", memory, as_field=True)
+    b"1234567890"
+    >>> pack(b"1234567890", memory_dynamic, as_field=True, length=10)
+    b"1234567890"
+    >>> unpack(b"1234567890", memory_greedy, as_field=True)
+    b"1234567890"
+
+    :param length: The length of the memory to pack or unpack. It can be:
+                   - An integer specifying the number of bytes to handle.
+                   - A callable that dynamically returns the number of bytes based on the context.
+                   - Ellipsis (`...`), indicating the length is unspecified and the entire stream should be read.
+    """
+
+    __slots__ = ("length",)
 
     def __init__(
         self,
         length: Union[int, _ContextLambda, EllipsisType],
-        encoding: Optional[str] = None,
     ) -> None:
         self.length = length
-        self.encoding = encoding or "utf-8"
 
     def __type__(self) -> type:
+        """
+        Return the type of the field, which is `memoryview` for this class.
+
+        :return: `memoryview`
+        """
         return memoryview
 
-    def __size__(self, context: _ContextLike) -> int:
+    def __size__(self, context: _ContextLike) -> int | EllipsisType:
         """
-        Calculate the size of the Bytes field.
+        Calculate the size of the memory field based on the `length` parameter.
+
+        If the `length` is callable, it will be invoked with the context to get the size.
+        If the `length` is `Ellipsis`, the size is unspecified and the entire stream will be read.
 
         :param context: The current context.
-        :return: The size of the Bytes field.
+        :return: The size of the field in bytes, or `Ellipsis` if the length is unspecified.
         """
         return self.length(context) if callable(self.length) else self.length
 
     def pack_single(self, obj: Union[memoryview, bytes], context: _ContextLike) -> None:
         """
-        Pack a single bytes object into the stream.
+        Pack a single byte object (memoryview or bytes) into the stream.
 
-        :param obj: The bytes object to pack.
-        :param context: The current context.
+        This method writes a byte object (`memoryview` or `bytes`) into the stream,
+        ensuring that the size of the object matches the expected length defined by
+        the `Memory` field. If the expected size is fixed (not `Ellipsis`), a
+        validation is performed to ensure that the length of the `obj` matches
+        the expected size.
+
+        Examples:
+            # Example 1: Packing a fixed-size byte object into the stream
+        >>> memory = Memory(10)
+        >>> pack(b"1234567890", memory, as_field=True) # Packs exactly 10 bytes into the stream
+        b"1234567890"
+        >>> pack(b"1", memory, as_field=True)
+        Traceback (most recent call last):
+            ...
+        ValidationError: Memory field expected 10 bytes, but got 1 bytes instead
+
+        :param obj: The byte object to be packed. This can be either a `memoryview` or a `bytes` object.
+        :param context: The current context, which provides access to the stream and any additional metadata needed
+                        for packing.
+
+        :raises ValidationError: If the length of the `obj` does not match the expected size.
         """
-        if isinstance(obj, str):
-            obj = obj.encode(self.encoding)
+        size = self.__size__(context)
+        if size is not Ellipsis:
+            if len(obj) != size:
+                raise ValidationError(
+                    f"Memory field expected {size} bytes, but got {len(obj)} bytes instead",
+                    context,
+                )
         context[CTX_STREAM].write(obj)
 
-    def unpack_single(self, context: _ContextLike) -> memoryview:
+    def unpack_single(self, context: _ContextLike) -> Any:
         """
-        Unpack a single bytes object from the stream.
+        Unpack a single byte object (memoryview) from the stream.
 
-        :param context: The current context.
-        :return: The unpacked bytes object.
+        This method reads bytes from the stream into a `memoryview`. The size
+        of the object to be unpacked is determined by the `Memory` field's length.
+        If the length is fixed (not `Ellipsis`), it reads exactly that number of
+        bytes. If the length is unspecified (i.e., `Ellipsis`), it reads until the
+        end of the stream.
+
+        :param context: The current context, which provides access to the stream and
+                        any additional metadata needed for unpacking.
+        :return: A `memoryview` object representing the unpacked byte data.
         """
         stream: _StreamType = context[CTX_STREAM]
         size = self.__size__(context)
@@ -548,7 +619,8 @@ class Bytes(Memory):
         :param context: The current context.
         :return: The unpacked bytes object.
         """
-        return bytes(super().unpack_single(context))
+        # as we read bytes from the stream, this will return a bytes object
+        return super().unpack_single(context).obj
 
 
 class String(Bytes):

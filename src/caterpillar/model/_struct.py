@@ -23,7 +23,7 @@ from collections import OrderedDict
 from shutil import copyfileobj
 
 from caterpillar.abc import getstruct, hasstruct, STRUCT_FIELD
-from caterpillar.abc import _StructLike, _StreamType, _SupportsUnpack
+from caterpillar.abc import _StructLike, _StreamType, _SupportsUnpack, _SupportsPack
 from caterpillar.abc import _ContainsStruct, _ContextLike, _SupportsSize
 from caterpillar.context import Context, CTX_STREAM
 from caterpillar.byteorder import ByteOrder, Arch
@@ -341,7 +341,7 @@ def union(cls: type = None, /, *, options: Iterable[Flag] = None, **kwds):
 
 def pack(
     obj: Union[Any, _ContainsStruct],
-    struct: Optional[_StructLike] = None,
+    struct: Optional[_SupportsPack] = None,
     **kwds,
 ) -> bytes:
     """

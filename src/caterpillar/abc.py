@@ -42,6 +42,10 @@ class _ContextLike(Protocol):
     def _root(self) -> Optional["_ContextLike"]:
         pass
 
+    @abstractmethod
+    def __getitem__(self, key: str) -> Any:
+        pass
+
 
 @runtime_checkable
 class _ContextLambda(Protocol):
