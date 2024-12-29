@@ -1611,19 +1611,3 @@ class Uuid(FieldStruct):
         is_le = context[CTX_FIELD].order is LittleEndian
         data = context[CTX_STREAM].read(16)
         return UUID(bytes_le=data) if is_le else UUID(bytes=data)
-
-
-class Pickled(Transformer):
-    __slots__ = ()
-
-    def __init__(self, length: Union[int, _ContextLambda]) -> None:
-        super().__init__(Bytes(length))
-
-    def __type__(self) -> type:
-        return Any
-
-    def decode(self, parsed: bytes, context) -> UUID:
-        return pickle.loads(parsed)
-
-    def encode(self, obj: Any, context) -> bytes:
-        return pickle.dumps(obj)
