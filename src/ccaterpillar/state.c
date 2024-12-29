@@ -165,6 +165,10 @@ CpState_SetGlobals(CpStateObject* self, PyObject* globals)
 PyObject*
 CpState_Tell(CpStateObject* self)
 {
+  if (!self->m_io) {
+    PyErr_SetString(PyExc_ValueError, "io is NULL!");
+    return NULL;
+  }
   return PyObject_CallMethodNoArgs(self->m_io, self->mod->str_tell);
 }
 
@@ -172,6 +176,10 @@ CpState_Tell(CpStateObject* self)
 PyObject*
 CpState_Seek(CpStateObject* self, PyObject* offset, PyObject* whence)
 {
+  if (!self->m_io) {
+    PyErr_SetString(PyExc_ValueError, "io is NULL!");
+    return NULL;
+  }
   return PyObject_CallMethodObjArgs(
     self->m_io, self->mod->str_seek, offset, whence, NULL);
 }
@@ -190,6 +198,10 @@ CpState_ReadSsize_t(CpStateObject* self, Py_ssize_t size)
 PyObject*
 CpState_Read(CpStateObject* self, PyObject* sizeobj)
 {
+  if (!self->m_io) {
+    PyErr_SetString(PyExc_ValueError, "io is NULL!");
+    return NULL;
+  }
   PyObject* res =
     PyObject_CallMethodOneArg(self->m_io, self->mod->str_read, sizeobj);
   Py_DECREF(sizeobj);
@@ -220,6 +232,10 @@ CpState_Read(CpStateObject* self, PyObject* sizeobj)
 PyObject*
 CpState_ReadFully(CpStateObject* self)
 {
+  if (!self->m_io) {
+    PyErr_SetString(PyExc_ValueError, "io is NULL!");
+    return NULL;
+  }
   return PyObject_CallMethodNoArgs(self->m_io, self->mod->str_read);
 }
 
@@ -227,6 +243,10 @@ CpState_ReadFully(CpStateObject* self)
 PyObject*
 CpState_Write(CpStateObject* self, PyObject* value)
 {
+  if (!self->m_io) {
+    PyErr_SetString(PyExc_ValueError, "io is NULL!");
+    return NULL;
+  }
   return PyObject_CallMethodOneArg(self->m_io, self->mod->str_write, value);
 }
 

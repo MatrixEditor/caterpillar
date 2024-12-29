@@ -64,6 +64,118 @@ CpLayer_New(CpStateObject* state, CpLayerObject* parent)
   return self;
 }
 
+enum : int
+{
+  CpCompat_Ctx_Parent = 0x01,
+};
+
+/*CpAPI*/
+PyObject*
+CpLayer_ContextGetAttr(CpLayerObject* layer, PyObject* path)
+{
+  _modulestate* state = get_global_module_state();
+  PyObject *tmp = NULL, *lastKey = NULL, *key = NULL, *obj = NULL;
+  if (layer == NULL) {
+    PyErr_SetString(PyExc_TypeError, "Input layer object is NULL!");
+    return NULL;
+  }
+  if (path == NULL) {
+    PyErr_SetString(PyExc_TypeError, "Input path object is NULL!");
+    return NULL;
+  }
+
+  PyObject* values = PyUnicode_Split(path, state->str_path_delim, -1);
+  if (!values) {
+    return NULL;
+  }
+
+  size_t length = PyList_Size(values);
+  if (length == 0) {
+    Py_XDECREF(values);
+    PyErr_SetString(PyExc_ValueError, "Empty path");
+    return NULL;
+  }
+
+  key = PyList_GetItem(values, 0);
+  if (!key) {
+    Py_XDECREF(values);
+    return NULL;
+  }
+
+  tmp = PyObject_GenericGetAttr((PyObject*)layer, key);
+  if (!tmp) {
+    PyErr_Clear();
+
+    // COMPAT:
+    // The layer implementation in Caterpillar-C should be compatible to the
+    // Context class in Python. Therefore, we have to check against common
+    // attributes. For instance, the '_parent' attribute will be mapped to
+    // the 'parent' attribute available by default within CpLayer objects.
+    if (PyObject_RichCompareBool(key, state->str__ctx_object, Py_EQ) > 0) {
+      // 1. '_obj'
+      // The object attribute is only present within object layers created
+      // by structs.
+      if (layer->m_class != CpLayerClass_Object) {
+        PyErr_SetString(
+          PyExc_TypeError,
+          "To access an object within the context, you need an ObjLayer "
+          "object. All other layers won't store an .obj attribute.");
+        return NULL;
+      }
+      return Py_XNewRef(((CpObjLayerObject*)layer)->m_obj);
+    } else if (PyObject_RichCompareBool(key, state->str__ctx_parent, Py_EQ) > 0) {
+      // 2. '_parent'
+      // Accessible in any layer object
+      return Py_NewRef(layer->m_parent ? (PyObject*)layer->m_parent : Py_None);
+    } else if (PyObject_RichCompareBool(key, state->str__ctx_stream, Py_EQ) > 0) {
+      // 3. '_io'
+      // Accessible in any layer object as it is stored in the State object
+      return Py_NewRef(layer->m_state->m_io);
+    } else if (PyObject_RichCompareBool(key, state->str__ctx_pos, Py_EQ) > 0) {
+      // NOT SUPPORTED
+      PyErr_SetString(PyExc_NotImplementedError, "'_pos' has been deprecated");
+      return NULL;
+    } else if (PyObject_RichCompareBool(key, state->str__ctx_index, Py_EQ) > 0) {
+      // 4. '_index'
+      // only available in sequence layers
+      if (layer->m_class != CpLayerClass_Object) {
+        PyErr_SetString(PyExc_TypeError,
+                        "'_index' access in a non-sequence layer!");
+        return NULL;
+      }
+      return PyLong_FromSsize_t(((CpSeqLayerObject*)layer)->m_index);
+    }
+
+    PyErr_Format(PyExc_ValueError, "CpLayer has no attribute '%s'", key);
+    Py_XDECREF(values);
+    return NULL;
+  }
+
+  obj = tmp;
+  Py_XSETREF(lastKey, Py_XNewRef(key));
+  for (size_t i = 1; i < length; i++) {
+    key = PyList_GetItem(values, i);
+    if (!key) {
+      Py_XDECREF(values);
+      return NULL;
+    }
+
+    tmp = PyObject_GetAttr(obj, key);
+    if (!tmp) {
+      PyErr_Clear();
+      PyErr_Format(
+        PyExc_ValueError, "'%s' has no attribute '%s'", lastKey, key);
+      Py_XDECREF(values);
+      return NULL;
+    }
+
+    Py_XSETREF(obj, tmp);
+    Py_XSETREF(lastKey, Py_XNewRef(key));
+  }
+  Py_XDECREF(values);
+  return obj;
+}
+
 /*CpAPI*/
 int
 CpLayer_Invalidate(CpLayerObject* self)
@@ -80,6 +192,17 @@ CpLayer_Invalidate(CpLayerObject* self)
   return 0;
 }
 
+static PyObject*
+cp_layer_context_getattr(CpLayerObject* self, PyObject* args)
+{
+  _modulestate* state = get_global_module_state();
+  PyObject* lineValue = NULL;
+  if (!PyArg_ParseTuple(args, "O", &lineValue)) {
+    return NULL;
+  }
+  return CpLayer_ContextGetAttr(self, lineValue);
+}
+
 /* docs */
 
 /* type */
@@ -90,6 +213,13 @@ static PyMemberDef CpLayer_Members[] = {
   { NULL } /* Sentinel */
 };
 
+static PyMethodDef CpLayer_Methods[] = {
+  { "__context_getattr__",
+    (PyCFunction)cp_layer_context_getattr,
+    METH_VARARGS },
+  { NULL } /* Sentinel */
+};
+
 PyTypeObject CpLayer_Type = {
   PyVarObject_HEAD_INIT(NULL, 0) _Cp_Name(layer),
   .tp_basicsize = sizeof(CpLayerObject),
@@ -97,6 +227,7 @@ PyTypeObject CpLayer_Type = {
   .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
   .tp_doc = NULL,
   .tp_members = CpLayer_Members,
+  .tp_methods = CpLayer_Methods,
   .tp_init = (initproc)cp_layer_init,
   .tp_new = (newfunc)cp_layer_new,
 };

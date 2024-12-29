@@ -22,7 +22,7 @@ from types import FrameType
 from dataclasses import dataclass
 
 
-from caterpillar.abc import _ContextLambda, _ContextLike, getstruct
+from caterpillar.abc import _ContextLambda, _ContextLike
 from caterpillar.exception import StructException
 from caterpillar.registry import to_struct
 
