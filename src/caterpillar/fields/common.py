@@ -15,7 +15,7 @@
 import struct as libstruct
 import pickle
 
-from typing import Callable
+from typing import Callable, Type
 from typing import Sequence, Any, Optional, Union, List
 from types import EllipsisType, NoneType
 from functools import cached_property
@@ -353,23 +353,49 @@ class Enum(Transformer):
     """
     A specialized Transformer for encoding and decoding enumeration values.
 
-    :param model: The enumeration model (an object with _member_map_ and _value2member_map_ attributes).
+    This class is used for transforming between enumeration values and their corresponding
+    encoded representations (typically integers). It provides encoding and decoding methods
+    to ensure that enum values are serialized and deserialized correctly. Additionally, it supports
+    a default value in case an invalid or unrecognized value is encountered during decoding.
+
+    Example usage:
+    >>> from enum import Enum as PyEnum
+    >>> class Color(PyEnum):
+    ...     RED = 1
+    ...     GREEN = 2
+    ...     BLUE = 3
+    ...
+    >>> cp_enum = Enum(Color, uint8)
+    >>> pack(Color.RED, cp_enum, as_field=True)
+    b"\\x01"
+    >>> unpack(cp_enum, b"\\x01", as_field=True)
+    Color.RED
+
+    :param model: The enumeration model (an object with `_member_map_` and `_value2member_map_` attributes).
     :param struct: The _StructLike object to be wrapped.
+    :param default: The default value to return if decoding encounters an unrecognized value.
+                    Default is `INVALID_DEFAULT`.
     """
 
     __slots__ = ("model", "default")
 
     def __init__(
         self,
-        model: _EnumLike,
+        model: type,
         struct: _StructLike,
-        default: Optional[_EnumLike] = INVALID_DEFAULT,
+        default: Optional[_EnumLike | Any] = INVALID_DEFAULT,
     ) -> None:
         super().__init__(struct)
         self.model = model
         self.default = default
 
     def __type__(self) -> type:
+        """
+        Determine the type for this transformation, which is either the enum type
+        or a union of the enum and struct types, depending on the global field flags.
+
+        :return: The type (either the enum model or a union of enum and struct types).
+        """
         # pylint: disable-next=protected-access
         if ENUM_STRICT._hash_ in GLOBAL_FIELD_FLAGS:
             return self.model
@@ -378,12 +404,16 @@ class Enum(Transformer):
 
     def encode(self, obj: Any, context: _ContextLike) -> Any:
         """
-        Encode an enumeration value.
+        Encode an enumeration value into its corresponding encoded representation.
 
-        :param obj: The original enumeration value.
+        :param obj: The original enumeration value to encode (e.g., `Color.RED`).
         :param context: The current context.
-        :return: The encoded value (integer).
-        :raises ValidationError: If the input is not an enumeration type.
+        :return: The encoded value (usually an integer representing the enum).
+        :raises ValidationError: If the input value is not a valid enum type.
+
+        Example:
+        >>> cp_enum.encode(Color.GREEN, context)
+        2 # (the integer value of Color.GREEN)
         """
         if not isinstance(obj, _EnumType):
             # pylint: disable-next=protected-access
@@ -395,11 +425,19 @@ class Enum(Transformer):
 
     def decode(self, parsed: Any, context: _ContextLike) -> Any:
         """
-        Decode an integer value to its corresponding enumeration value.
+        Decode an encoded value (typically an integer) back to its corresponding
+        enumeration value.
 
-        :param parsed: The parsed integer value.
+        :param parsed: The parsed value (usually an integer).
         :param context: The current context.
         :return: The corresponding enumeration value.
+        :raises InvalidValueError: If the parsed value cannot be mapped to a valid enum.
+
+        Example:
+        >>> cp_enum.decode(1, context)
+        Color.RED
+        >>> unpack(1, cp_enum, as_field=True)
+        Color.RED
         """
         # pylint: disable-next=protected-access
         by_name = self.model._member_map_.get(parsed)
