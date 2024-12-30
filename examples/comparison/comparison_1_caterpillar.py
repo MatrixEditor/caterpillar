@@ -1,5 +1,5 @@
-from caterpillar.shortcuts import struct, LittleEndian, bitfield, unpack, pack, opt
-from caterpillar.fields import uint8, UInt, CString, Prefixed, uint32
+from caterpillar.shortcuts import struct, LittleEndian, bitfield, unpack, pack
+from caterpillar.fields import uint8, uint24, CString, Prefixed, uint32
 
 # The __slots__ options does not affect the packing or
 # unpacking process.
@@ -16,10 +16,15 @@ class Flags:
 @struct(order=LittleEndian)
 class Item:
     num1: uint8
-    num2: UInt(24)
+    num2: uint24
     flags: Flags
     fixedarray1: uint8[3]
-    name1: CString(encoding="utf-8")
+    name1: CString()
+    # Replacing the encoding with String(...) makes a huge difference
+    # as we don't call .decode() directly
+    #
+    # Time goes down from 0.0119 to 0.0099 for unpacking
+    # and from 0.0094 to 0.0082 for packing
     name2: Prefixed(uint8, encoding="utf-8")
 
 

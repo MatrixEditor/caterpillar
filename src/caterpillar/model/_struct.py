@@ -17,7 +17,7 @@ import dataclasses as dc
 
 from tempfile import TemporaryFile
 from io import BytesIO, IOBase
-from typing import Optional, Union, Callable
+from typing import Optional, Type, TypeVar, Union, Callable
 from typing import Dict, Any, Iterable
 from collections import OrderedDict
 from shutil import copyfileobj
@@ -39,8 +39,11 @@ from caterpillar.options import (
 )
 from caterpillar.fields import Field, INVALID_DEFAULT
 from caterpillar import registry
+from caterpillar.shared import MODE_PACK, MODE_UNPACK
 
 from ._base import Sequence
+
+_T = TypeVar("_T")
 
 
 # REVISIT: remove dataclasses dependency
@@ -65,13 +68,13 @@ class Struct(Sequence):
         model: type,
         order: Optional[ByteOrder] = None,
         arch: Optional[Arch] = None,
-        options: Iterable[Flag] = None,
-        field_options: Iterable[Flag] = None,
+        options: Iterable[Flag] | None = None,
+        field_options: Iterable[Flag] | None = None,
         kw_only: bool = False,
         hook_cls: Optional[type] = None,
     ) -> None:
         self.kw_only = kw_only
-        options = options or set()
+        options = set(options or [])
         options.update(
             GLOBAL_UNION_OPTIONS if S_UNION in options else GLOBAL_STRUCT_OPTIONS
         )
@@ -204,7 +207,7 @@ def _make_struct(
     return _.model
 
 
-def struct(cls: type = None, /, **kwds):
+def struct(cls: Type[_T] | None = None, /, **kwds) -> Type[_T]:
     """
     Decorator to create a Struct class.
 
@@ -402,7 +405,9 @@ def pack_into(
     :raises TypeError: If no `struct` is specified and cannot be inferred from the object.
     """
     offsets: Dict[int, memoryview] = OrderedDict()
-    context = Context(_parent=None, _path="<root>", _pos=0, _offsets=offsets, **kwds)
+    context = Context(
+        _parent=None, _path="<root>", _pos=0, _offsets=offsets, mode=MODE_PACK, **kwds
+    )
     if struct is None:
         struct = getstruct(obj)
     elif as_field:
@@ -500,7 +505,13 @@ def unpack(
     # prepare the data stream
     stream = buffer if isinstance(buffer, IOBase) else BytesIO(buffer)
     context = Context(
-        _path="<root>", _parent=None, _io=stream, **kwds, _pos=0, _is_seq=False
+        _path="<root>",
+        _parent=None,
+        _io=stream,
+        **kwds,
+        _pos=0,
+        _is_seq=False,
+        mode=MODE_UNPACK,
     )
     if as_field:
         struct = Field(struct)

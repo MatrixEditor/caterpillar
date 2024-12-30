@@ -52,7 +52,7 @@ from .common import (
     void_ptr,
     Uuid,
     Aligned,
-    align
+    align,
 )
 from .varint import VarInt, VARINT_LSB, vint
 from .compression import (
@@ -66,3 +66,5 @@ from .crypto import Encrypted, Xor, Or, And
 from .net import IPv4Address, IPv6Address, MAC, MACAddress
 from .pointer import uintptr, intptr, offintptr, offuintptr, Pointer
 from .conditional import ConditionalChain, If, Else, ElseIf
+from .hook import IOHook
+from .digest import Digest, Algorithm

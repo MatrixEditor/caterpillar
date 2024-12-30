@@ -147,7 +147,7 @@ class MACAddress(Transformer):
         mac = re.sub(MACAddress.DELIMITERS, b"", obj)
         return binascii.unhexlify(mac)
 
-    def decode(self, parsed: bytes, context: _ContextLike) -> ipaddress.IPv6Address:
+    def decode(self, parsed: bytes, context: _ContextLike) -> bytes:
         """
         Decode an encoded MAC address.
 

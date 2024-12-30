@@ -13,19 +13,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import re
-import enum
 
 from typing import Optional, Self
 from typing import List, Dict, Any
 from typing import Set, Iterable, Union
 
 
-from caterpillar.abc import _StructLike, _ContextLike
-from caterpillar.abc import _StreamType, _ContextLambda
-from caterpillar.abc import getstruct
+from caterpillar.abc import _StructLike, _ContextLike, _StreamType, _Action
 from caterpillar.context import Context, CTX_PATH, CTX_OBJECT, CTX_STREAM, CTX_SEQ
-from caterpillar.byteorder import BYTEORDER_FIELD, ByteOrder, SysNative
-from caterpillar.byteorder import Arch, system_arch
+from caterpillar.byteorder import (
+    BYTEORDER_FIELD,
+    ByteOrder,
+    SysNative,
+    Arch,
+    system_arch,
+)
 from caterpillar.exception import StructException, ValidationError
 from caterpillar.options import (
     S_DISCARD_CONST,
@@ -37,13 +39,11 @@ from caterpillar.options import (
 from caterpillar.fields import (
     Field,
     INVALID_DEFAULT,
-    ConstBytes,
-    ConstString,
     FieldMixin,
     Const,
-    Enum,
 )
 from caterpillar._common import unpack_seq, pack_seq
+from caterpillar.shared import ATTR_ACTION
 from caterpillar import registry
 
 
@@ -63,7 +63,7 @@ class Sequence(FieldMixin):
     Specifies the target class/dictionary used as the base model.
     """
 
-    fields: List[Field]
+    fields: List[Field | _Action]
     """A list of all fields defined in this struct.
 
     This attribute stores the fields in an *ordered* collection, whereby ordered
@@ -108,8 +108,8 @@ class Sequence(FieldMixin):
         model: Optional[Dict[str, Field]] = None,
         order: Optional[ByteOrder] = None,
         arch: Optional[Arch] = None,
-        options: Iterable[Flag] = None,
-        field_options: Iterable[Flag] = None,
+        options: Iterable[Flag] | None = None,
+        field_options: Iterable[Flag] | None = None,
     ) -> None:
         self.model = model
         self.arch = arch
@@ -119,7 +119,7 @@ class Sequence(FieldMixin):
 
         # these fields will be set or used while processing the model type
         self._member_map_: Dict[str, Field] = {}
-        self.fields: List[Field] = []
+        self.fields = []
         self.is_union = S_UNION in self.options
         # Process all fields in the model
         self._process_model()
@@ -127,18 +127,22 @@ class Sequence(FieldMixin):
     def __add__(self, sequence: "Sequence") -> Self:
         # We will try to import all fields from the given sequence
         for field in sequence.fields:
-            name = field.__name__
-            if name not in self._member_map_:
-                is_included = name and name in sequence._member_map_
-                self.add_field(name, field, is_included)
+            if isinstance(field, _Action):
+                self.add_action(field)
+            else:
+                name = field.__name__
+                if name not in self._member_map_:
+                    is_included = name and name in sequence._member_map_
+                    self.add_field(name, field, is_included)
         return self
 
     def __sub__(self, sequence: "Sequence") -> Self:
         # By default, we are only removing existing fields.
         for field in sequence.fields:
-            name = field.__name__
-            if field in self.fields or (name and name in self._member_map_):
-                self.del_field(name, field)
+            if isinstance(field, Field):
+                name = field.__name__
+                if field in self.fields or (name and name in self._member_map_):
+                    self.del_field(name, field)
         return self
 
     __iadd__ = __add__
@@ -216,6 +220,10 @@ class Sequence(FieldMixin):
         annotations = self._prepare_fields()
         had_default = False
         for name, annotation in annotations.items():
+            if isinstance(annotation, _Action):
+                self.add_action(annotation)
+                removables.append(name)
+                continue
             # Process each field and its annotation. In addition, fields with a name in
             # the form of '_[0-9]*' will be removed (if enabled)
             default = self._process_default(name, annotation, had_default)
@@ -294,6 +302,9 @@ class Sequence(FieldMixin):
         if included:
             self._member_map_[name] = field
 
+    def add_action(self, action: _Action) -> None:
+        self.fields.append(action)
+
     def del_field(self, name: str, field: Field) -> None:
         """
         Remomves a field from this struct.
@@ -325,19 +336,24 @@ class Sequence(FieldMixin):
     def unpack_one(self, context: _ContextLike) -> Optional[Any]:
         # At first, we define the object context where the parsed values
         # will be stored
-        stream: _StreamType = context[CTX_STREAM]
         init_data: Dict[str, Any] = Context()
         context[CTX_OBJECT] = Context(_parent=context)
 
         base_path = context[CTX_PATH]
         if self.is_union:
-            start = stream.tell()
+            start = context[CTX_STREAM].tell()
             max_size = 0
 
         for field in self.fields:
-            if self.is_union:
-                pos = stream.tell()
+            action = getattr(field, ATTR_ACTION, None)
+            if action:
+                action(context)
+                continue
 
+            if self.is_union:
+                pos = context[CTX_STREAM].tell()
+
+            # REVISIT: make this a real attribute
             name = field.__name__
             # The context path has to be changed accordingly
             context[CTX_PATH] = f"{base_path}.{name}"
@@ -349,8 +365,8 @@ class Sequence(FieldMixin):
 
             if self.is_union:
                 # This union implementation will cover the max size
-                max_size = max(max_size, stream.tell() - pos)
-                stream.seek(start)
+                max_size = max(context[CTX_STREAM], stream.tell() - pos)
+                context[CTX_STREAM].seek(start)
 
         obj = init_data
         if self.is_union:
@@ -386,6 +402,10 @@ class Sequence(FieldMixin):
         base_path: str = context[CTX_PATH]
 
         for field in self.fields:
+            action = getattr(field, ATTR_ACTION, None)
+            if action:
+                action(context)
+                continue
             # The name has to be set (important for current context)
             name = field.__name__
             if self.is_union:

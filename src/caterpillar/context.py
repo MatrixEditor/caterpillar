@@ -82,6 +82,14 @@ class Context(dict):
 
         return obj
 
+    def __context_setattr__(self, path: str, value: Any) -> None:
+        nodes = path.rsplit(".", 1)
+        if len(nodes) == 1:
+            self[path] = value
+        else:
+            obj = self.__context_getattr__(nodes[0])
+            setattr(obj, nodes[1], value)
+
     @property
     def _root(self) -> _ContextLike:
         current = self

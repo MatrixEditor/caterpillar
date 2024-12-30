@@ -23,6 +23,7 @@ _StreamFactory = Callable[[], _StreamType]
 
 _GreedyType = type(...)
 _PrefixedType = slice
+_ContextPathStr = str
 
 
 @runtime_checkable
@@ -34,7 +35,12 @@ class _ContextLike(Protocol):
     """
 
     @abstractmethod
-    def __context_getattr__(self, key: str) -> Any:
+    def __context_getattr__(self, path: str) -> Any:
+        pass
+
+    # TODO
+    @abstractmethod
+    def __context_setattr__(self, path: str, value: Any) -> None:
         pass
 
     @property
@@ -46,6 +52,10 @@ class _ContextLike(Protocol):
     def __getitem__(self, key: str) -> Any:
         pass
 
+    @abstractmethod
+    def __setitem__(self, key: str, value: Any) -> None:
+        pass
+
 
 @runtime_checkable
 class _ContextLambda(Protocol):
@@ -55,6 +65,13 @@ class _ContextLambda(Protocol):
 
     @abstractmethod
     def __call__(self, context: _ContextLike) -> Any:
+        pass
+
+
+@runtime_checkable
+class _Action(Protocol):
+    @abstractmethod
+    def __action__(self, context: _ContextLike) -> None:
         pass
 
 
