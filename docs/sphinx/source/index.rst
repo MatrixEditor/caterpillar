@@ -117,7 +117,7 @@ what configuration options can be used. Alternatively you can follow the :ref:`t
       Changelog and contributing information.
 
    .. grid-item-card:: C Reference
-      :link: reference/capi/index.html
+      :link: reference/capi/extension.html
 
       Caterpillar C API Reference and extension development.
 

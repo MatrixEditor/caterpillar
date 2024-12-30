@@ -6,6 +6,7 @@ import sys
 import os
 
 sys.path.insert(0, os.path.abspath("./extensions/"))
+sys.path.insert(0, os.path.abspath("../../../examples/"))
 sys.path.insert(0, os.path.abspath("../../.."))
 
 # -- Project information -----------------------------------------------------
@@ -63,6 +64,7 @@ pygments_style = "sphinx"
 todo_include_todos = False
 
 refcount_file = '../../../src/capi.dat'
+autodoc_member_order = 'bysource'
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
