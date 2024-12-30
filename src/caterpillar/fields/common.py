@@ -56,6 +56,7 @@ class PyStructFormattedField(FieldStruct):
     (like 'x' for padding or 'i' for a signed integer), and it determines how data is packed and unpacked.
 
     Example usage:
+
     >>> field = PyStructFormattedField('i', int)
     >>> field.__repr__()
     "<PyStructFormattedField(int) 'i' 32>"

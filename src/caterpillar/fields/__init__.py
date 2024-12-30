@@ -53,6 +53,7 @@ from .common import (
     Uuid,
     Aligned,
     align,
+    Lazy
 )
 from .varint import VarInt, VARINT_LSB, vint
 from .compression import (

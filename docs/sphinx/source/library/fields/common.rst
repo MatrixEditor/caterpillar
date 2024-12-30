@@ -10,6 +10,9 @@ Numeric Structs
 .. autoclass:: caterpillar.py.PyStructFormattedField
     :members:
 
+    .. versionchanged:: 2.4.0
+        :code:`FormatField` renamed to :code:`PyStructFormattedField`
+
 .. autoattribute:: caterpillar.py.uint8
 
 .. autoattribute:: caterpillar.py.int8
@@ -61,6 +64,9 @@ Bytes, Strings
 .. autoclass:: caterpillar.py.Memory
     :members:
 
+    .. versionchanged:: 2.4.0
+        Removed :code:`encoding` argument
+
 .. autoclass:: caterpillar.py.Bytes
     :members:
 
@@ -69,6 +75,9 @@ Bytes, Strings
 
 .. autoclass:: caterpillar.py.Prefixed
     :members:
+
+    .. versionadded:: 2.4.0
+        Added support for arbitrary structs
 
 .. autoclass:: caterpillar.py.CString
     :members:
@@ -91,7 +100,11 @@ Special Structs
 .. autoclass:: caterpillar.py.Aligned
     :members:
 
+    .. versionadded:: 2.4.0
+
 .. autofunction:: caterpillar.py.align
+
+    .. versionadded:: 2.4.0
 
 .. autoclass:: caterpillar.py.Computed
     :members:
@@ -104,3 +117,12 @@ Special Structs
 
 .. autoclass:: caterpillar.py.Const
     :members:
+
+.. autoclass:: caterpillar.py.Lazy
+    :members:
+
+.. autoclass:: caterpillar.py.Uuid
+    :members:
+
+    .. versionchanged:: 2.4.0
+        :code:`uuid` renamed to :code:`Uuid`

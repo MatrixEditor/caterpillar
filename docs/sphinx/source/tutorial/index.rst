@@ -27,6 +27,6 @@ is an important resource to start from.
     :maxdepth: 4
 
     first_steps/index.rst
-    basics.rst
+    basics/index.rst
     advanced/index.rst
 

@@ -64,7 +64,7 @@ CpLayer_New(CpStateObject* state, CpLayerObject* parent)
   return self;
 }
 
-enum : int
+enum
 {
   CpCompat_Ctx_Parent = 0x01,
 };
