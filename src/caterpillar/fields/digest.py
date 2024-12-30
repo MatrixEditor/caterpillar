@@ -293,7 +293,7 @@ class Digest:
                     "Make sure that each checksum uses a unique name."
                 )
             )
-        annotations[start_action_name] = Action(self.begin)
+        annotations[start_action_name] = Action(self.begin, self.begin)
         return self
 
     def __exit__(self, *_) -> None:
@@ -315,11 +315,11 @@ class Digest:
                     "Make sure that each checksum uses a unique name."
                 )
             )
-        annotations[end_action_name] = Action(self.end)
+        annotations[end_action_name] = Action(self.end_pack, self.end_unpack)
         annotations[self.name] = Field(self.struct)
         frame.f_locals[self.name] = _DigestValue()
         if self._verify:
-            annotations[f"{self.name}_verify"] = Action(self.verfiy)
+            annotations[f"{self.name}_verify"] = Action(unpack=self.verfiy)
 
     def begin(self, context: _ContextLike) -> None:
         """
@@ -334,7 +334,7 @@ class Digest:
         self._hook.init(context)
         self._obj = self.algo.create(context)
 
-    def end(self, context: _ContextLike) -> None:
+    def end_pack(self, context: _ContextLike) -> None:
         """
         Finalize the digest calculation at the end of packing/unpacking.
 
@@ -344,9 +344,19 @@ class Digest:
         :type context: _ContextLike
         """
         self._digest = self.algo.digest(self._obj, context)
-        if context._root.mode == MODE_PACK:
-            # set value to attribute
-            context.__context_setattr__(self.path or self.name, self._digest)
+        context.__context_setattr__(self.path or self.name, self._digest)
+        self._hook.finish(context)
+
+    def end_unpack(self, context: _ContextLike) -> None:
+        """
+        Finalize the digest calculation at the end of unpacking.
+
+        This method retrieves the digest from the context and updates the checksum.
+
+        :param context: The current context during unpacking.
+        :type context: _ContextLike
+        """
+        self._digest = self.algo.digest(self._obj, context)
         self._hook.finish(context)
 
     def update(self, data: bytes, context: _ContextLike) -> None:
@@ -510,6 +520,7 @@ try:
             key: bytes | _ContextLambda,
             algorithm: hashes.HashAlgorithm,
         ) -> None:
+            super().__init__(name=f"hmac_{algorithm.name}")
             self._key = key
             self._algorithm = algorithm
 

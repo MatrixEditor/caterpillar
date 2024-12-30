@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import re
 
-from typing import Optional, Self
+from typing import Optional, Self, Tuple
 from typing import List, Dict, Any
 from typing import Set, Iterable, Union
 
@@ -43,7 +43,7 @@ from caterpillar.fields import (
     Const,
 )
 from caterpillar._common import unpack_seq, pack_seq
-from caterpillar.shared import ATTR_ACTION
+from caterpillar.shared import ATTR_ACTION_PACK, ATTR_ACTION_UNPACK, Action
 from caterpillar import registry
 
 
@@ -63,7 +63,8 @@ class Sequence(FieldMixin):
     Specifies the target class/dictionary used as the base model.
     """
 
-    fields: List[Field | _Action]
+    # second value with action in tuple is reserved
+    fields: List[Field | Tuple[_Action, None]]
     """A list of all fields defined in this struct.
 
     This attribute stores the fields in an *ordered* collection, whereby ordered
@@ -127,7 +128,7 @@ class Sequence(FieldMixin):
     def __add__(self, sequence: "Sequence") -> Self:
         # We will try to import all fields from the given sequence
         for field in sequence.fields:
-            if isinstance(field, _Action):
+            if Action.is_action(field):
                 self.add_action(field)
             else:
                 name = field.__name__
@@ -220,7 +221,7 @@ class Sequence(FieldMixin):
         annotations = self._prepare_fields()
         had_default = False
         for name, annotation in annotations.items():
-            if isinstance(annotation, _Action):
+            if Action.is_action(annotation):
                 self.add_action(annotation)
                 removables.append(name)
                 continue
@@ -303,7 +304,7 @@ class Sequence(FieldMixin):
             self._member_map_[name] = field
 
     def add_action(self, action: _Action) -> None:
-        self.fields.append(action)
+        self.fields.append((action, None))
 
     def del_field(self, name: str, field: Field) -> None:
         """
@@ -345,9 +346,11 @@ class Sequence(FieldMixin):
             max_size = 0
 
         for field in self.fields:
-            action = getattr(field, ATTR_ACTION, None)
-            if action:
-                action(context)
+            if field.__class__ is tuple:
+                action, _ = field
+                action = getattr(action, ATTR_ACTION_UNPACK, None)
+                if action:
+                    action(context)
                 continue
 
             if self.is_union:
@@ -402,9 +405,11 @@ class Sequence(FieldMixin):
         base_path: str = context[CTX_PATH]
 
         for field in self.fields:
-            action = getattr(field, ATTR_ACTION, None)
-            if action:
-                action(context)
+            if field.__class__ is tuple:
+                action, _ = field
+                action = getattr(action, ATTR_ACTION_PACK, None)
+                if action:
+                    action(context)
                 continue
             # The name has to be set (important for current context)
             name = field.__name__

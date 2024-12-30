@@ -3,7 +3,7 @@ import pytest
 from caterpillar.exception import ValidationError
 from caterpillar.py import Bytes, unpack, pack, struct
 from caterpillar.fields.digest import Md5, Sha2_256, _DigestValue
-from caterpillar.shared import ATTR_ACTION
+from caterpillar.shared import ATTR_ACTION_PACK
 
 
 @struct
@@ -14,7 +14,8 @@ class FormatMd5:
 
 def test_digest_init():
     # must be an action
-    assert hasattr(FormatMd5.__struct__.fields[0], ATTR_ACTION)
+    # actions are stored in tuples
+    assert hasattr(FormatMd5.__struct__.fields[0][0], ATTR_ACTION_PACK)
 
     obj = FormatMd5(user_data=b"1234567890")
     assert obj.hash.__class__ is _DigestValue
@@ -34,8 +35,6 @@ def test_digest_verify():
     class FormatSha2_256:
         with Sha2_256("hash", verify=True):
             user_data: Bytes(10)
-
-    obj = FormatSha2_256(user_data=b"1234567890")
 
     invalid = b"1234567890" + b"\x00" * 32
     with pytest.raises(ValidationError):

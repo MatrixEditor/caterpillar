@@ -71,7 +71,11 @@ class _ContextLambda(Protocol):
 @runtime_checkable
 class _Action(Protocol):
     @abstractmethod
-    def __action__(self, context: _ContextLike) -> None:
+    def __action_pack__(self, context: _ContextLike) -> None:
+        pass
+
+    @abstractmethod
+    def __action_unpack__(self, context: _ContextLike) -> None:
         pass
 
 

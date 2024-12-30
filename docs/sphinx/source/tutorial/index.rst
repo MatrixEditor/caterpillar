@@ -28,5 +28,5 @@ is an important resource to start from.
 
     first_steps.rst
     basics.rst
-    advanced.rst
+    advanced/index.rst
 
