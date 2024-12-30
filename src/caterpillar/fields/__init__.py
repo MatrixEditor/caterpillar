@@ -53,7 +53,7 @@ from .common import (
     Uuid,
     Aligned,
     align,
-    Lazy
+    Lazy,
 )
 from .varint import VarInt, VARINT_LSB, vint
 from .compression import (
@@ -68,4 +68,20 @@ from .net import IPv4Address, IPv6Address, MAC, MACAddress
 from .pointer import uintptr, intptr, offintptr, offuintptr, Pointer
 from .conditional import ConditionalChain, If, Else, ElseIf
 from .hook import IOHook
-from .digest import Digest, Algorithm
+from .digest import (
+    Digest,
+    Algorithm,
+    Md5,
+    Sha1,
+    Sha2_256,
+    Sha2_224,
+    Sha2_384,
+    Sha2_512,
+    Sha3_224,
+    Sha3_256,
+    Sha3_384,
+    Sha3_512,
+    Crc32,
+    Adler,
+    HMAC
+)

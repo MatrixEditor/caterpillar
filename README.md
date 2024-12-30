@@ -40,15 +40,20 @@ class Format:
     b: int32
     length: uint8             # String fields with computed lengths
     name: String(this.length) #  -> you can also use Prefixed(uint8)
-    names: CString[uint8::]   # Sequences with prefixed, computed lengths
+    with Md5(name="hash", verify=True): # wraps all following fields and creates a new attr
+        names: CString[uint8::]    # Sequences with prefixed, computed lengths
+
 
 # Instantiation (keyword-only arguments, magic is auto-inferred):
 obj = Format(a=1, b=2, length=3, name="foo", names=["a", "b"])
-# Packing the object:
-blob = pack(obj) # objects of struct classes can be packed right away
-# results in: b'ITS MAGIC\x01\x02\x00\x00\x00\x03foo\x02a\x00b\x00'
-# Unpacking the binary data:
-obj2 = unpack(blob, Format)
+# Packing the object, reads as 'PACK obj FROM Format'
+# objects of struct classes can be packed right away
+blob = pack(obj, Format)
+# results in: b'ITS MAGIC\x01\x02\x00\x00\x00\x03foo\x02a\x00b\x00\xf55...
+
+# Unpacking the binary data, reads as 'UNPACK Format FROM blob'
+obj2 = unpack(Format, blob)
+assert obj2.hash == obj.hash
 ```
 
 This library offers extensive functionality beyond basic struct handling. For further details

@@ -384,10 +384,6 @@ class Digest:
         :raises ValidationError: If the digest verification fails.
         """
         # we assume self._verify is True
-        if context._root.mode == MODE_PACK:
-            # we don'T verify in packing mode as we created that digest
-            return
-
         digest = context.__context_getattr__(self.path or self.name)
         if digest != self._digest:
             digest_raw = digest.hex() if isinstance(digest, bytes) else digest
@@ -491,11 +487,7 @@ try:
     Sha3_256_Algo = _cryptography_hash_algo(hashes.SHA3_256)
     Sha3_384_Algo = _cryptography_hash_algo(hashes.SHA3_384)
     Sha3_512_Algo = _cryptography_hash_algo(hashes.SHA3_512)
-
     Md5_Algo = _cryptography_hash_algo(hashes.MD5)
-    Blake2b_Algo = _cryptography_hash_algo(hashes.BLAKE2b)
-    Blake2s_Algo = _cryptography_hash_algo(hashes.BLAKE2s)
-    Sm3_Algo = _cryptography_hash_algo(hashes.SM3)
 
     Sha1 = _hash_digest(Sha1_Algo, Bytes(20))
     Sha2_224 = _hash_digest(Sha2_224_Algo, Bytes(28))
