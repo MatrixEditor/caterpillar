@@ -1116,26 +1116,31 @@ class Prefixed(FieldStruct):
 
     >>> prefixed = Prefixed(uint32, Bytes(4))
     >>> pack(b"abcd", prefixed, as_field=True)
-    b"\x00\x00\x00\x04abcd"
-    >>> unpack(prefixed, b"\x00\x00\x00\x04abcd", as_field=True)
+    b"\\x00\\x00\\x00\\x04abcd"
+    >>> unpack(prefixed, b"\\x00\\x00\\x00\\x04abcd", as_field=True)
     b"abcd"
 
     The prefix is packed and unpacked independently and is used to determine the size of the
     following data.
 
+    **Please note that this class will have a huge impact on the resulting packing and
+    unpacking time and will increase it significantly.**
+
     :param prefix: The struct that defines the prefix (e.g., a length field).
     :param struct: The struct that defines the data to follow the prefix (e.g., `Bytes` or another field).
     """
 
-    __slots__ = ("prefix", "struct")
+    __slots__ = ("prefix", "struct", "encoding")
 
     def __init__(
         self,
         prefix: _StructLike,
         struct: Optional[_StructLike] = None,
+        encoding: Optional[str] = None,
     ):
         self.prefix = prefix
         self.struct = struct
+        self.encoding = None
 
     def __type__(self) -> Optional[Union[type, str]]:
         """
@@ -1167,15 +1172,17 @@ class Prefixed(FieldStruct):
 
         :param obj: The object to pack (should be a byte sequence).
         :param context: The current context.
-        :raises TypeError: If the packed data is not of type `bytes`.
         """
+        # REVISIT: We can only provide a value with __len__ here
         if self.struct is not None:
-            data = self.struct.__pack__(obj, context)
-        else:
-            data = obj
+            data = BytesIO()
+            with WithoutContextVar(context, CTX_STREAM, data):
+                self.struct.__pack__(obj, context)
 
-        if not isinstance(data, bytes):
-            raise TypeError(f"Expected bytes, got {type(data)}")
+            obj = data.getvalue()
+
+        elif self.encoding:
+            obj = obj.encode(self.encoding)
 
         self.prefix.__pack__(len(obj), context)
         context[CTX_STREAM].write(obj)
@@ -1198,8 +1205,13 @@ class Prefixed(FieldStruct):
         data = context[CTX_STREAM].read(size)
         obj = data
         if self.struct is not None:
-            with WithoutContextVar(context, CTX_STREAM, BytesIO(data)):
+            with (
+                WithoutContextVar(context, CTX_STREAM, BytesIO(data)),
+                WithoutContextVar(context, CTX_SEQ, False),
+            ):
                 obj = self.struct.__unpack__(context)
+        elif self.encoding:
+            obj = data.decode(self.encoding)
         return obj
 
 
