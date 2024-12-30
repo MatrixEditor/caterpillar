@@ -17,13 +17,13 @@ import dataclasses as dc
 
 from tempfile import TemporaryFile
 from io import BytesIO, IOBase
-from typing import Optional, Union, Callable
+from typing import Optional, Type, TypeVar, Union, Callable
 from typing import Dict, Any, Iterable
 from collections import OrderedDict
 from shutil import copyfileobj
 
 from caterpillar.abc import getstruct, hasstruct, STRUCT_FIELD
-from caterpillar.abc import _StructLike, _StreamType, _SupportsUnpack
+from caterpillar.abc import _StructLike, _StreamType, _SupportsUnpack, _SupportsPack
 from caterpillar.abc import _ContainsStruct, _ContextLike, _SupportsSize
 from caterpillar.context import Context, CTX_STREAM
 from caterpillar.byteorder import ByteOrder, Arch
@@ -39,8 +39,11 @@ from caterpillar.options import (
 )
 from caterpillar.fields import Field, INVALID_DEFAULT
 from caterpillar import registry
+from caterpillar.shared import MODE_PACK, MODE_UNPACK
 
 from ._base import Sequence
+
+_T = TypeVar("_T")
 
 
 # REVISIT: remove dataclasses dependency
@@ -65,13 +68,13 @@ class Struct(Sequence):
         model: type,
         order: Optional[ByteOrder] = None,
         arch: Optional[Arch] = None,
-        options: Iterable[Flag] = None,
-        field_options: Iterable[Flag] = None,
+        options: Iterable[Flag] | None = None,
+        field_options: Iterable[Flag] | None = None,
         kw_only: bool = False,
         hook_cls: Optional[type] = None,
     ) -> None:
         self.kw_only = kw_only
-        options = options or set()
+        options = set(options or [])
         options.update(
             GLOBAL_UNION_OPTIONS if S_UNION in options else GLOBAL_STRUCT_OPTIONS
         )
@@ -94,7 +97,7 @@ class Struct(Sequence):
             setattr(self.model, "__init__", _union_init(self._union_hook))
             setattr(self.model, "__setattr__", _union_setattr(self._union_hook))
         if self.has_option(S_ADD_BYTES):
-            setattr(self.model, "__bytes__", _struct_bytes)
+            setattr(self.model, "__bytes__", _struct_bytes(self))
 
     def __type__(self) -> type:
         return self.model
@@ -204,7 +207,7 @@ def _make_struct(
     return _.model
 
 
-def struct(cls: type = None, /, **kwds):
+def struct(cls: Type[_T] | None = None, /, **kwds) -> Type[_T]:
     """
     Decorator to create a Struct class.
 
@@ -341,7 +344,7 @@ def union(cls: type = None, /, *, options: Iterable[Flag] = None, **kwds):
 
 def pack(
     obj: Union[Any, _ContainsStruct],
-    struct: Optional[_StructLike] = None,
+    struct: Optional[_SupportsPack] = None,
     **kwds,
 ) -> bytes:
     """
@@ -363,25 +366,57 @@ def pack_into(
     buffer: _StreamType,
     struct: Optional[_StructLike] = None,
     use_tempfile: bool = False,
+    as_field: bool = False,
     **kwds,
 ) -> None:
     """
     Pack an object into the specified buffer using the specified struct.
 
-    :param obj: The object to pack.
-    :param buffer: The buffer to pack the object into.
-    :param struct: The struct to use for packing.
+    This function serializes an object (`obj`) into a given buffer, using
+    a struct to define how the object should be packed. Optionally, the
+    function can handle temporary files for packing, use a `Field` wrapper
+    around the struct, and support additional keyword arguments. The packed
+    data is written to the `buffer`.
+
+    Example 1: Packing an object into a bytes buffer
+    >>> buffer = BytesIO()
+    >>> my_obj = SomeObject()  # Assume SomeObject is a valid object to be packed
+    >>> pack_into(my_obj, buffer, struct=SomeStruct())  # Using a specific struct
+    >>> buffer.getvalue()
+    b"..."
+
+    Example 2: Packing into a file-like stream (e.g., file)
+    >>> with open('packed_data.bin', 'wb') as f:
+    ...     pack_into(my_obj, f, struct=SomeStruct())  # Pack into a file
+
+    Example 3: Using `as_field` to wrap the struct in a Field before packing
+    >>> buffer = BytesIO()
+    >>> pack_into(42, buffer, struct=uint8, as_field=True)
+    >>> buffer.getvalue()
+    b"\\x2a"
+
+    :param obj: The object to pack (could be a plain object or a structure-like object).
+    :param buffer: The buffer to pack the object into (a writable stream such as `BytesIO` or a file).
+    :param struct: The struct to use for packing. If not specified, will infer from `obj`.
+    :param use_tempfile: Whether to use a temporary file for packing (experimental).
+    :param as_field: Whether to wrap the struct in a `Field` before packing.
     :param kwds: Additional keyword arguments to pass to the pack function.
 
-    :return: None
+    :raises TypeError: If no `struct` is specified and cannot be inferred from the object.
     """
-
     offsets: Dict[int, memoryview] = OrderedDict()
-    context = Context(_parent=None, _path="<root>", _pos=0, _offsets=offsets, **kwds)
+    context = Context(
+        _parent=None, _path="<root>", _pos=0, _offsets=offsets, mode=MODE_PACK, **kwds
+    )
     if struct is None:
         struct = getstruct(obj)
+    elif as_field:
+        struct = Field(struct)
     elif hasstruct(struct):
         struct = getstruct(struct)
+
+    if struct is None:
+        raise TypeError("struct must be specified")
 
     start = 0
     if use_tempfile:
@@ -440,23 +475,47 @@ def pack_file(
 def unpack(
     struct: Union[_SupportsUnpack, _ContainsStruct],
     buffer: Union[bytes, _StreamType],
+    as_field: bool = False,
     **kwds,
 ) -> Any:
     """
     Unpack an object from a bytes buffer or stream using the specified struct.
 
-    :param struct: The struct to use for unpacking.
+    This function takes a `struct` that defines how data should be unpacked,
+    a `buffer` (either bytes or a stream) containing the serialized data, and
+    returns the unpacked object. If `as_field` is set to True, the `struct` is
+    wrapped by a `Field`. Additional keyword arguments are passed to the root
+    context as attributes.
+
+    Example:
+    >>> buffer = b'\\x00\\x01\\x02\\x03'
+    >>> struct = SomeStruct()
+    >>> unpack(struct, buffer)
+    ...
+
+    :param struct: The struct to use for unpacking (could be a `SupportsUnpack` or `ContainsStruct` object).
     :param buffer: The bytes buffer or stream to unpack from.
+    :param as_field: Whether to wrap the struct in a `Field` transformer before unpacking.
     :param kwds: Additional keyword arguments to pass to the unpack function.
 
-    :return: The unpacked object.
+    :return: The unpacked object, which is the result of calling `struct.__unpack__(context)`.
+
+    :raises TypeError: If the `struct` is not a valid struct instance.
     """
     # prepare the data stream
     stream = buffer if isinstance(buffer, IOBase) else BytesIO(buffer)
     context = Context(
-        _path="<root>", _parent=None, _io=stream, **kwds, _pos=0, _is_seq=False
+        _path="<root>",
+        _parent=None,
+        _io=stream,
+        **kwds,
+        _pos=0,
+        _is_seq=False,
+        mode=MODE_UNPACK,
     )
-    if hasstruct(struct):
+    if as_field:
+        struct = Field(struct)
+    elif hasstruct(struct):
         struct = getstruct(struct)
 
     if not isinstance(struct, _SupportsUnpack):

@@ -4,8 +4,16 @@
 Cryptographic Structs
 *********************
 
-Core structs
-------------
+
+Hashes
+------
+
+.. autoclass:: caterpillar.py.Algorithm
+
+.. autoclass:: caterpillar.py.Digest
+
+Ciphers
+-------
 
 .. autoclass:: caterpillar.fields.Encrypted
     :members:

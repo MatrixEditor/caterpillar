@@ -102,6 +102,19 @@ struct _modulestate
 
   // type handler map
   PyObject* cp_typehandler_map;
+
+  // COMPAT: hashes for all compatibility context objects
+  PyObject* str__ctx_parent;
+  PyObject* str__ctx_object;
+  PyObject* str__ctx_offsets;
+  PyObject* str__ctx_stream;
+  PyObject* str__ctx_field;
+  PyObject* str__ctx_value;
+  PyObject* str__ctx_pos;
+  PyObject* str__ctx_index;
+  PyObject* str__ctx_path;
+  PyObject* str__ctx_is_seq;
+  PyObject* str__ctx_arch;
 };
 
 /**

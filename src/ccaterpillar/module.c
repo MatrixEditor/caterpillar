@@ -290,6 +290,12 @@ cp_module_clear(PyObject* m)
     Py_CLEAR(state->str_utf8);
     Py_CLEAR(state->str_cstring_default_pad);
     Py_CLEAR(state->str___bits__);
+    // Py_CLEAR(state->str__ctx_arch);
+    // Py_CLEAR(state->str__ctx_field);
+    // Py_CLEAR(state->str__ctx_index);
+    // Py_CLEAR(state->str__ctx_is_seq);
+    // Py_CLEAR(state->str__ctx_object);
+    // Py_CLEAR(state->str__ctx_pos);
 
     Py_CLEAR(state->cp_regex__unnamed);
 
@@ -605,6 +611,11 @@ PyInit__C(void)
   CACHED_STRING(str__value2member_map_, "_value2member_map_");
   CACHED_STRING(str_utf8, "utf-8");
   CACHED_STRING(str___bits__, "__bits__");
+  CACHED_STRING(str__ctx_index, "_index");
+  CACHED_STRING(str__ctx_stream, "_io");
+  CACHED_STRING(str__ctx_parent, "_parent");
+  CACHED_STRING(str__ctx_object, "_obj");
+  CACHED_STRING(str__ctx_pos, "_pos");
 
 #undef CACHED_STRING
 

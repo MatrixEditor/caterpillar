@@ -15,7 +15,7 @@
 from ._base import Field, INVALID_DEFAULT, DEFAULT_OPTION, singleton
 from ._mixin import FieldMixin, FieldStruct, Chain, Operator
 from .common import (
-    FormatField,
+    PyStructFormattedField,
     Transformer,
     Const,
     ConstBytes,
@@ -50,7 +50,10 @@ from .common import (
     float64,
     double,
     void_ptr,
-    uuid,
+    Uuid,
+    Aligned,
+    align,
+    Lazy,
 )
 from .varint import VarInt, VARINT_LSB, vint
 from .compression import (
@@ -64,3 +67,21 @@ from .crypto import Encrypted, Xor, Or, And
 from .net import IPv4Address, IPv6Address, MAC, MACAddress
 from .pointer import uintptr, intptr, offintptr, offuintptr, Pointer
 from .conditional import ConditionalChain, If, Else, ElseIf
+from .hook import IOHook
+from .digest import (
+    Digest,
+    Algorithm,
+    Md5,
+    Sha1,
+    Sha2_256,
+    Sha2_224,
+    Sha2_384,
+    Sha2_512,
+    Sha3_224,
+    Sha3_256,
+    Sha3_384,
+    Sha3_512,
+    Crc32,
+    Adler,
+    HMAC
+)

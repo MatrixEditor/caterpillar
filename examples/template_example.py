@@ -9,7 +9,7 @@ from caterpillar.py import (
     template,
     derive,
     pack,
-    this
+    this,
 )
 
 try:

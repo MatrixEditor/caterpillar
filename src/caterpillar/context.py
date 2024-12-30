@@ -22,7 +22,7 @@ from types import FrameType
 from dataclasses import dataclass
 
 
-from caterpillar.abc import _ContextLambda, _ContextLike, getstruct
+from caterpillar.abc import _ContextLambda, _ContextLike
 from caterpillar.exception import StructException
 from caterpillar.registry import to_struct
 
@@ -81,6 +81,14 @@ class Context(dict):
             obj = getattr(obj, nodes[i])
 
         return obj
+
+    def __context_setattr__(self, path: str, value: Any) -> None:
+        nodes = path.rsplit(".", 1)
+        if len(nodes) == 1:
+            self[path] = value
+        else:
+            obj = self.__context_getattr__(nodes[0])
+            setattr(obj, nodes[1], value)
 
     @property
     def _root(self) -> _ContextLike:

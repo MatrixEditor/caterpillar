@@ -59,6 +59,8 @@ class NIBHeader:
 
     # Primitive types can be used just like this
     unknown_1: int32
+    """second field doc comment"""
+
     unknown_2: int32
     object_count: int32
     offset_objects: int32
@@ -85,7 +87,7 @@ class NIBClassName:
 
 # Note that the returned string instance here may contain extra null-bytes
 # at the end.
-NIBKey = Prefixed(vint, "utf-8")
+NIBKey = Prefixed(vint, String(...))
 
 
 class ValueType(enum.Enum):
