@@ -97,7 +97,7 @@ class Struct(Sequence):
             setattr(self.model, "__init__", _union_init(self._union_hook))
             setattr(self.model, "__setattr__", _union_setattr(self._union_hook))
         if self.has_option(S_ADD_BYTES):
-            setattr(self.model, "__bytes__", _struct_bytes)
+            setattr(self.model, "__bytes__", _struct_bytes(self))
 
     def __type__(self) -> type:
         return self.model
