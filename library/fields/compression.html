@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Compression Structs &#8212; Caterpillar 2.2.3 documentation</title>
+    <title>Compression Structs &#8212; Caterpillar 2.4.0-rc documentation</title>
   
   
   
@@ -16,8 +16,8 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
-  <!-- 
-    this give us a css class that will be invisible only if js is disabled 
+  <!--
+    this give us a css class that will be invisible only if js is disabled
   -->
   <noscript>
     <style>
@@ -27,20 +27,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
-  <script src="../../_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=85e56e6b"></script>
+    <script src="../../_static/documentation_options.js?v=b074b842"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -53,7 +53,7 @@
     <link rel="prev" title="Common Structs" href="common.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.2.3" />
+  <meta name="docsearch:version" content="2.4.0-rc" />
   </head>
   
   
@@ -116,7 +116,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.2.3</p>
+    <p class="title logo__title">Caterpillar 2.4.0-rc</p>
   
 </a></div>
     
@@ -357,9 +357,14 @@
   
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
-  
-  <div id="rtd-footer-container"></div>
 
 
       </div>
@@ -415,28 +420,33 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="caterpillar.py.Compressed">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.py.</span></span><span class="sig-name descname"><span class="pre">Compressed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">compressor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_Compressor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">struct</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../abc.html#caterpillar.abc._ContainsStruct" title="caterpillar.abc._ContainsStruct"><span class="pre">_ContainsStruct</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../abc.html#caterpillar.abc._StructLike" title="caterpillar.abc._StructLike"><span class="pre">_StructLike</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">comp_kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decomp_kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/compression.html#Compressed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.py.Compressed" title="Link to this definition">#</a></dt>
-<dd><p>A class representing a compressed transformer.</p>
+<dd><p>A transformer class for handling compression and decompression of data.</p>
+<p>This class takes a compression algorithm that implements the <cite>_Compressor</cite> protocol and
+applies it to the data for compression or decompression operations. It allows for
+additional customization through the <cite>comp_kwargs</cite> and <cite>decomp_kwargs</cite> parameters.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>compressor</strong> (<em>_Compressor</em>) – The compression algorithm.</p></li>
-<li><p><strong>length</strong> (<em>Union</em><em>[</em><a class="reference internal" href="../abc.html#caterpillar.abc._ContextLambda" title="caterpillar.abc._ContextLambda"><em>_ContextLambda</em></a><em>, </em><em>Any</em><em>]</em>) – The length of the transformer.</p></li>
+<li><p><strong>compressor</strong> (<em>_Compressor</em>) – The compression algorithm that implements the _Compressor protocol.</p></li>
+<li><p><strong>struct</strong> (<em>Union</em><em>[</em><a class="reference internal" href="../abc.html#caterpillar.abc._ContainsStruct" title="caterpillar.abc._ContainsStruct"><em>_ContainsStruct</em></a><em>, </em><a class="reference internal" href="../abc.html#caterpillar.abc._StructLike" title="caterpillar.abc._StructLike"><em>_StructLike</em></a><em>]</em>) – The struct to be compressed or decompressed, should implement _ContainsStruct or _StructLike.</p></li>
+<li><p><strong>comp_kwargs</strong> (<em>Optional</em><em>[</em><em>dict</em><em>]</em>) – Optional keyword arguments for the compression method.</p></li>
+<li><p><strong>decomp_kwargs</strong> (<em>Optional</em><em>[</em><em>dict</em><em>]</em>) – Optional keyword arguments for the decompression method.</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="caterpillar.py.Compressed.decode">
-<span class="sig-name descname"><span class="pre">decode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parsed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../abc.html#caterpillar.abc._ContextLike" title="caterpillar.abc._ContextLike"><span class="pre">_ContextLike</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/compression.html#Compressed.decode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.py.Compressed.decode" title="Link to this definition">#</a></dt>
-<dd><p>Decompress the input data.</p>
+<dt class="sig sig-object py" id="caterpillar.py.Compressed.encode">
+<span class="sig-name descname"><span class="pre">encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../abc.html#caterpillar.abc._ContextLike" title="caterpillar.abc._ContextLike"><span class="pre">_ContextLike</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/compression.html#Compressed.encode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.py.Compressed.encode" title="Link to this definition">#</a></dt>
+<dd><p>Compress the input data using the provided compressor.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>parsed</strong> (<em>bytes</em>) – The compressed data to be decompressed.</p></li>
-<li><p><strong>context</strong> (<a class="reference internal" href="../abc.html#caterpillar.abc._ContextLike" title="caterpillar.abc._ContextLike"><em>_ContextLike</em></a>) – The context information.</p></li>
+<li><p><strong>obj</strong> (<em>bytes</em>) – The data to be compressed.</p></li>
+<li><p><strong>context</strong> (<a class="reference internal" href="../abc.html#caterpillar.abc._ContextLike" title="caterpillar.abc._ContextLike"><em>_ContextLike</em></a>) – Context information for compression (e.g., field-specific metadata).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The decompressed data.</p>
+<dd class="field-even"><p>The compressed data.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>bytes</p>
@@ -445,18 +455,18 @@
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="caterpillar.py.Compressed.encode">
-<span class="sig-name descname"><span class="pre">encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../abc.html#caterpillar.abc._ContextLike" title="caterpillar.abc._ContextLike"><span class="pre">_ContextLike</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/compression.html#Compressed.encode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.py.Compressed.encode" title="Link to this definition">#</a></dt>
-<dd><p>Compress the input data.</p>
+<dt class="sig sig-object py" id="caterpillar.py.Compressed.decode">
+<span class="sig-name descname"><span class="pre">decode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parsed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../abc.html#caterpillar.abc._ContextLike" title="caterpillar.abc._ContextLike"><span class="pre">_ContextLike</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/compression.html#Compressed.decode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.py.Compressed.decode" title="Link to this definition">#</a></dt>
+<dd><p>Decompress the input data using the provided compressor.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>obj</strong> (<em>bytes</em>) – The input data to be compressed.</p></li>
-<li><p><strong>context</strong> (<a class="reference internal" href="../abc.html#caterpillar.abc._ContextLike" title="caterpillar.abc._ContextLike"><em>_ContextLike</em></a>) – The context information.</p></li>
+<li><p><strong>parsed</strong> (<em>bytes</em>) – The compressed data to be decompressed.</p></li>
+<li><p><strong>context</strong> (<a class="reference internal" href="../abc.html#caterpillar.abc._ContextLike" title="caterpillar.abc._ContextLike"><em>_ContextLike</em></a>) – Context information for decompression (e.g., field-specific metadata).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The compressed data.</p>
+<dd class="field-even"><p>The decompressed data.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>bytes</p>
@@ -545,8 +555,8 @@
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#basic-structs">Basic structs</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.py.Compressed"><code class="docutils literal notranslate"><span class="pre">Compressed</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.py.Compressed.decode"><code class="docutils literal notranslate"><span class="pre">Compressed.decode()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.py.Compressed.encode"><code class="docutils literal notranslate"><span class="pre">Compressed.encode()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.py.Compressed.decode"><code class="docutils literal notranslate"><span class="pre">Compressed.decode()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -562,13 +572,13 @@
   </nav></div>
 
   <div class="sidebar-secondary-item">
-
-  <div class="tocsection sourcelink">
-    <a href="../../_sources/library/fields/compression.rst.txt">
-      <i class="fa-solid fa-file-lines"></i> Show Source
-    </a>
-  </div>
-</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/library/fields/compression.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
 
 </div></div>
               
@@ -583,8 +593,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
-<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -617,7 +627,8 @@
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.0.
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
 </p></div>
       
     </div>

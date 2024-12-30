@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>caterpillar.model._base &#8212; Caterpillar 2.2.3 documentation</title>
+    <title>caterpillar.model._base &#8212; Caterpillar 2.4.0-rc documentation</title>
   
   
   
@@ -15,8 +15,8 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
-  <!-- 
-    this give us a css class that will be invisible only if js is disabled 
+  <!--
+    this give us a css class that will be invisible only if js is disabled
   -->
   <noscript>
     <style>
@@ -26,20 +26,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
-  <script src="../../../_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
+  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=85e56e6b"></script>
+    <script src="../../../_static/documentation_options.js?v=b074b842"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -50,7 +50,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.2.3" />
+  <meta name="docsearch:version" content="2.4.0-rc" />
   </head>
   
   
@@ -113,7 +113,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.2.3</p>
+    <p class="title logo__title">Caterpillar 2.4.0-rc</p>
   
 </a></div>
     
@@ -322,9 +322,14 @@
   
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
-  
-  <div id="rtd-footer-container"></div>
 
 
       </div>
@@ -386,19 +391,21 @@
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
 <span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">import</span> <span class="nn">enum</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Self</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Self</span><span class="p">,</span> <span class="n">Tuple</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Union</span>
 
 
-<span class="kn">from</span> <span class="nn">caterpillar.abc</span> <span class="kn">import</span> <span class="n">_StructLike</span><span class="p">,</span> <span class="n">_ContextLike</span>
-<span class="kn">from</span> <span class="nn">caterpillar.abc</span> <span class="kn">import</span> <span class="n">_StreamType</span><span class="p">,</span> <span class="n">_ContextLambda</span>
-<span class="kn">from</span> <span class="nn">caterpillar.abc</span> <span class="kn">import</span> <span class="n">getstruct</span>
+<span class="kn">from</span> <span class="nn">caterpillar.abc</span> <span class="kn">import</span> <span class="n">_StructLike</span><span class="p">,</span> <span class="n">_ContextLike</span><span class="p">,</span> <span class="n">_StreamType</span><span class="p">,</span> <span class="n">_Action</span>
 <span class="kn">from</span> <span class="nn">caterpillar.context</span> <span class="kn">import</span> <span class="n">Context</span><span class="p">,</span> <span class="n">CTX_PATH</span><span class="p">,</span> <span class="n">CTX_OBJECT</span><span class="p">,</span> <span class="n">CTX_STREAM</span><span class="p">,</span> <span class="n">CTX_SEQ</span>
-<span class="kn">from</span> <span class="nn">caterpillar.byteorder</span> <span class="kn">import</span> <span class="n">BYTEORDER_FIELD</span><span class="p">,</span> <span class="n">ByteOrder</span><span class="p">,</span> <span class="n">SysNative</span>
-<span class="kn">from</span> <span class="nn">caterpillar.byteorder</span> <span class="kn">import</span> <span class="n">Arch</span><span class="p">,</span> <span class="n">system_arch</span>
+<span class="kn">from</span> <span class="nn">caterpillar.byteorder</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">BYTEORDER_FIELD</span><span class="p">,</span>
+    <span class="n">ByteOrder</span><span class="p">,</span>
+    <span class="n">SysNative</span><span class="p">,</span>
+    <span class="n">Arch</span><span class="p">,</span>
+    <span class="n">system_arch</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">caterpillar.exception</span> <span class="kn">import</span> <span class="n">StructException</span><span class="p">,</span> <span class="n">ValidationError</span>
 <span class="kn">from</span> <span class="nn">caterpillar.options</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">S_DISCARD_CONST</span><span class="p">,</span>
@@ -410,13 +417,11 @@
 <span class="kn">from</span> <span class="nn">caterpillar.fields</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">Field</span><span class="p">,</span>
     <span class="n">INVALID_DEFAULT</span><span class="p">,</span>
-    <span class="n">ConstBytes</span><span class="p">,</span>
-    <span class="n">ConstString</span><span class="p">,</span>
     <span class="n">FieldMixin</span><span class="p">,</span>
     <span class="n">Const</span><span class="p">,</span>
-    <span class="n">Enum</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">caterpillar._common</span> <span class="kn">import</span> <span class="n">unpack_seq</span><span class="p">,</span> <span class="n">pack_seq</span>
+<span class="kn">from</span> <span class="nn">caterpillar.shared</span> <span class="kn">import</span> <span class="n">ATTR_ACTION_PACK</span><span class="p">,</span> <span class="n">ATTR_ACTION_UNPACK</span><span class="p">,</span> <span class="n">Action</span>
 <span class="kn">from</span> <span class="nn">caterpillar</span> <span class="kn">import</span> <span class="n">registry</span>
 
 
@@ -438,7 +443,8 @@
 <span class="sd">    Specifies the target class/dictionary used as the base model.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">fields</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Field</span><span class="p">]</span>
+    <span class="c1"># second value with action in tuple is reserved</span>
+    <span class="n">fields</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Field</span> <span class="o">|</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">_Action</span><span class="p">,</span> <span class="kc">None</span><span class="p">]]</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A list of all fields defined in this struct.</span>
 
 <span class="sd">    This attribute stores the fields in an *ordered* collection, whereby ordered</span>
@@ -483,8 +489,8 @@
         <span class="n">model</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Field</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">order</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ByteOrder</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">arch</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Arch</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">options</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Flag</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">field_options</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Flag</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">options</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Flag</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">field_options</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Flag</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">arch</span> <span class="o">=</span> <span class="n">arch</span>
@@ -494,7 +500,7 @@
 
         <span class="c1"># these fields will be set or used while processing the model type</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_member_map_</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Field</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Field</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fields</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_union</span> <span class="o">=</span> <span class="n">S_UNION</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span>
         <span class="c1"># Process all fields in the model</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_process_model</span><span class="p">()</span>
@@ -502,18 +508,22 @@
     <span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="s2">&quot;Sequence&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
         <span class="c1"># We will try to import all fields from the given sequence</span>
         <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">sequence</span><span class="o">.</span><span class="n">fields</span><span class="p">:</span>
-            <span class="n">name</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="vm">__name__</span>
-            <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_member_map_</span><span class="p">:</span>
-                <span class="n">is_included</span> <span class="o">=</span> <span class="n">name</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">sequence</span><span class="o">.</span><span class="n">_member_map_</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">add_field</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">is_included</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">Action</span><span class="o">.</span><span class="n">is_action</span><span class="p">(</span><span class="n">field</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_action</span><span class="p">(</span><span class="n">field</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="vm">__name__</span>
+                <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_member_map_</span><span class="p">:</span>
+                    <span class="n">is_included</span> <span class="o">=</span> <span class="n">name</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">sequence</span><span class="o">.</span><span class="n">_member_map_</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">add_field</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">is_included</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="k">def</span> <span class="fm">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="s2">&quot;Sequence&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
         <span class="c1"># By default, we are only removing existing fields.</span>
         <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">sequence</span><span class="o">.</span><span class="n">fields</span><span class="p">:</span>
-            <span class="n">name</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="vm">__name__</span>
-            <span class="k">if</span> <span class="n">field</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fields</span> <span class="ow">or</span> <span class="p">(</span><span class="n">name</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_member_map_</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">del_field</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">field</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">Field</span><span class="p">):</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="vm">__name__</span>
+                <span class="k">if</span> <span class="n">field</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fields</span> <span class="ow">or</span> <span class="p">(</span><span class="n">name</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_member_map_</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">del_field</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">field</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="fm">__iadd__</span> <span class="o">=</span> <span class="fm">__add__</span>
@@ -594,6 +604,10 @@
         <span class="n">annotations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_fields</span><span class="p">()</span>
         <span class="n">had_default</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">annotation</span> <span class="ow">in</span> <span class="n">annotations</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">Action</span><span class="o">.</span><span class="n">is_action</span><span class="p">(</span><span class="n">annotation</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_action</span><span class="p">(</span><span class="n">annotation</span><span class="p">)</span>
+                <span class="n">removables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                <span class="k">continue</span>
             <span class="c1"># Process each field and its annotation. In addition, fields with a name in</span>
             <span class="c1"># the form of &#39;_[0-9]*&#39; will be removed (if enabled)</span>
             <span class="n">default</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_default</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">annotation</span><span class="p">,</span> <span class="n">had_default</span><span class="p">)</span>
@@ -675,6 +689,9 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_member_map_</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span></div>
 
 
+    <span class="k">def</span> <span class="nf">add_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">:</span> <span class="n">_Action</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">action</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+
 <div class="viewcode-block" id="Sequence.del_field">
 <a class="viewcode-back" href="../../../library/model.html#caterpillar.model.Sequence.del_field">[docs]</a>
     <span class="k">def</span> <span class="nf">del_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">field</span><span class="p">:</span> <span class="n">Field</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -709,19 +726,26 @@
     <span class="k">def</span> <span class="nf">unpack_one</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
         <span class="c1"># At first, we define the object context where the parsed values</span>
         <span class="c1"># will be stored</span>
-        <span class="n">stream</span><span class="p">:</span> <span class="n">_StreamType</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_STREAM</span><span class="p">]</span>
         <span class="n">init_data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">Context</span><span class="p">()</span>
         <span class="n">context</span><span class="p">[</span><span class="n">CTX_OBJECT</span><span class="p">]</span> <span class="o">=</span> <span class="n">Context</span><span class="p">(</span><span class="n">_parent</span><span class="o">=</span><span class="n">context</span><span class="p">)</span>
 
         <span class="n">base_path</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_PATH</span><span class="p">]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_union</span><span class="p">:</span>
-            <span class="n">start</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_STREAM</span><span class="p">]</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
             <span class="n">max_size</span> <span class="o">=</span> <span class="mi">0</span>
 
         <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_union</span><span class="p">:</span>
-                <span class="n">pos</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">field</span><span class="o">.</span><span class="vm">__class__</span> <span class="ow">is</span> <span class="nb">tuple</span><span class="p">:</span>
+                <span class="n">action</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">field</span>
+                <span class="n">action</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="n">ATTR_ACTION_UNPACK</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">action</span><span class="p">:</span>
+                    <span class="n">action</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+                <span class="k">continue</span>
 
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_union</span><span class="p">:</span>
+                <span class="n">pos</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_STREAM</span><span class="p">]</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
+
+            <span class="c1"># REVISIT: make this a real attribute</span>
             <span class="n">name</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="vm">__name__</span>
             <span class="c1"># The context path has to be changed accordingly</span>
             <span class="n">context</span><span class="p">[</span><span class="n">CTX_PATH</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_path</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -733,8 +757,8 @@
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_union</span><span class="p">:</span>
                 <span class="c1"># This union implementation will cover the max size</span>
-                <span class="n">max_size</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">max_size</span><span class="p">,</span> <span class="n">stream</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">-</span> <span class="n">pos</span><span class="p">)</span>
-                <span class="n">stream</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">start</span><span class="p">)</span>
+                <span class="n">max_size</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">context</span><span class="p">[</span><span class="n">CTX_STREAM</span><span class="p">],</span> <span class="n">stream</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">-</span> <span class="n">pos</span><span class="p">)</span>
+                <span class="n">context</span><span class="p">[</span><span class="n">CTX_STREAM</span><span class="p">]</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">start</span><span class="p">)</span>
 
         <span class="n">obj</span> <span class="o">=</span> <span class="n">init_data</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_union</span><span class="p">:</span>
@@ -770,6 +794,12 @@
         <span class="n">base_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_PATH</span><span class="p">]</span>
 
         <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">field</span><span class="o">.</span><span class="vm">__class__</span> <span class="ow">is</span> <span class="nb">tuple</span><span class="p">:</span>
+                <span class="n">action</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">field</span>
+                <span class="n">action</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="n">ATTR_ACTION_PACK</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">action</span><span class="p">:</span>
+                    <span class="n">action</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+                <span class="k">continue</span>
             <span class="c1"># The name has to be set (important for current context)</span>
             <span class="n">name</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="vm">__name__</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_union</span><span class="p">:</span>
@@ -863,8 +893,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
-<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -897,7 +927,8 @@
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.0.
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
 </p></div>
       
     </div>

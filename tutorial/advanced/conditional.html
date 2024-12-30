@@ -1,0 +1,639 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>3.4. Conditional Fields &#8212; Caterpillar 2.4.0-rc documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=b074b842"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tutorial/advanced/conditional';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="3.5. Actions" href="actions.html" />
+    <link rel="prev" title="3.3. Chaining" href="chaining.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2.4.0-rc" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+  <aside class="bd-header-announcement d-print-none d-none" aria-label="Announcement" data-pst-announcement-url="https://raw.githubusercontent.com/MatrixEditor/caterpillar/master/docs/sphinx/source/_templates/announcement.html"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Caterpillar 2.4.0-rc</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../installing/index.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    Tutorial
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../reference/index.html">
+    Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../library/index.html">
+    Library
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../development/index.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/MatrixEditor/caterpillar" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../installing/index.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    Tutorial
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../reference/index.html">
+    Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../library/index.html">
+    Library
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../development/index.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/MatrixEditor/caterpillar" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Python</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../first_steps/index.html">1. First Steps</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../first_steps/structdef.html">1.1. Defining Structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../first_steps/parsing.html">1.2. Working with Structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../first_steps/configuration.html">1.3. Configuring structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../first_steps/documentation.html">1.4. Documenting Structs</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../basics/index.html">2. Basic Concepts</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../basics/stdtypes.html">2.1. Standard Types</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../basics/stdnumeric.html">2.1.1. Numeric Types</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../basics/stdenum.html">2.1.2. Enumerations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../basics/stdlist.html">2.1.3. Arrays / Lists</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../basics/string.html">2.2. String Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../basics/bytes.html">2.3. Byte Sequences</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../basics/padding.html">2.4. Padding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../basics/context.html">2.5. Context</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../basics/other.html">2.6. Common Structures</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">3. Advanced Concepts</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 has-children"><a class="reference internal" href="operators.html">3.1. Operators</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="op-switch.html">3.1.1. Switch</a></li>
+<li class="toctree-l3"><a class="reference internal" href="op-offset.html">3.1.2. Offsets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="op-custom.html">3.1.3. Custom Operators</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="pointers.html">3.2. Pointers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chaining.html">3.3. Chaining</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">3.4. Conditional Fields</a></li>
+<li class="toctree-l2"><a class="reference internal" href="actions.html">3.5. Actions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bitfield.html">3.6. Bitfields</a></li>
+<li class="toctree-l2"><a class="reference internal" href="union.html">3.7. Unions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="templates.html">3.8. Templates</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Tutorial</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link"><span class="section-number">3. </span>Advanced Concepts</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">3.4. </span>Conditional Fields</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="conditional-fields">
+<span id="tutorial-advanced-conditionals"></span><h1><span class="section-number">3.4. </span>Conditional Fields<a class="headerlink" href="#conditional-fields" title="Link to this heading">#</a></h1>
+<p><em>Conditional fields</em> allow you to define fields in a struct that are included
+or excluded based on certain conditions. This feature is especially useful when
+working with versioned formats or optional fields that depend on runtime
+conditions. You can easily achieve this using context-based lambdas, which are
+built into the library.</p>
+<section id="how-it-works">
+<h2><span class="section-number">3.4.1. </span>How it works<a class="headerlink" href="#how-it-works" title="Link to this heading">#</a></h2>
+<p>By using the <cite>with</cite> keyword in combination with conditional expressions, you can
+bind certain fields to a specific condition. This allows you to include or exclude
+fields dynamically, depending on the value of other fields or context.</p>
+<p>Here’s an example demonstrating how to use conditional fields for versioned structs:</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">Conditional fields (e.g. for versioned structs)</span><a class="headerlink" href="#id1" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
+<span class="k">class</span> <span class="nc">Format</span><span class="p">:</span>
+    <span class="n">version</span><span class="p">:</span> <span class="n">uint32</span>
+    <span class="c1"># all following fields will be bound to the condition</span>
+    <span class="k">with</span> <span class="n">this</span><span class="o">.</span><span class="n">version</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">header</span><span class="p">:</span> <span class="n">uint8</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="key-concepts">
+<h2><span class="section-number">3.4.2. </span>Key Concepts<a class="headerlink" href="#key-concepts" title="Link to this heading">#</a></h2>
+<ol class="arabic simple">
+<li><p><strong>`with` and Conditionals</strong>:
+The <code class="code docutils literal notranslate"><span class="pre">with</span></code> keyword is used to define a block of fields that should only be
+included if the condition evaluates to <code class="code docutils literal notranslate"><span class="pre">True</span></code>. In the example above, the
+fields inside <code class="code docutils literal notranslate"><span class="pre">with</span> <span class="pre">this.version</span> <span class="pre">==</span> <span class="pre">1</span></code> are included only when the <code class="code docutils literal notranslate"><span class="pre">version</span></code>
+field has a value of <code class="code docutils literal notranslate"><span class="pre">1</span></code>.</p></li>
+<li><p><strong>`ElseIf` for Multiple Conditions</strong>:
+For multiple conditions, use <code class="code docutils literal notranslate"><span class="pre">ElseIf</span></code> rather than <code class="code docutils literal notranslate"><span class="pre">Else</span></code>. The <code class="code docutils literal notranslate"><span class="pre">ElseIf</span></code>
+construct ensures that the next condition is checked only if the previous
+one was false. This is safer and more predictable than using a generic
+<code class="code docutils literal notranslate"><span class="pre">Else</span></code> clause, which could introduce unintended side effects by executing
+under unanticipated conditions.</p></li>
+</ol>
+<section id="example-versioned-struct">
+<h3><span class="section-number">3.4.2.1. </span>Example: Versioned Struct<a class="headerlink" href="#example-versioned-struct" title="Link to this heading">#</a></h3>
+<p>Conditional fields are particularly useful when dealing with versioned structs,
+where the structure of the data may change based on the version number or other
+factors. For example:</p>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">Conditional fields (e.g. for versioned structs)</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
+<span class="k">class</span> <span class="nc">Format</span><span class="p">:</span>
+    <span class="n">version</span><span class="p">:</span> <span class="n">uint32</span>
+    <span class="c1"># all following fields will be bound to the condition</span>
+    <span class="k">with</span> <span class="n">this</span><span class="o">.</span><span class="n">version</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">length</span><span class="p">:</span> <span class="n">uint8</span>
+        <span class="n">extra</span><span class="p">:</span> <span class="n">uint8</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">Bytes</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">length</span><span class="p">)</span>
+    <span class="c1"># Use else-if over &#39;Else&#39; alone</span>
+    <span class="k">with</span> <span class="n">ElseIf</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">version</span> <span class="o">==</span> <span class="mi">2</span><span class="p">):</span>
+        <span class="n">name</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">Prefixed</span><span class="p">(</span><span class="n">uint8</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+<section id="best-practices">
+<h2><span class="section-number">3.4.3. </span>Best Practices<a class="headerlink" href="#best-practices" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>Avoid Using `Else`</strong>:
+It is <strong>strongly recommended</strong> to <strong>avoid</strong> using <code class="code docutils literal notranslate"><span class="pre">Else</span></code> for conditional field
+inclusion, as it can introduce unintended behavior if not properly managed.
+Instead, always use <code class="code docutils literal notranslate"><span class="pre">ElseIf</span></code> with an inverted condition to ensure more
+predictable and controlled struct parsing.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When using conditional fields, it’s essential to remember that the struct’s
+layout can change dynamically depending on the conditions. This flexibility
+makes it possible to define complex, version-dependent data structures.</p>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="chaining.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title"><span class="section-number">3.3. </span>Chaining</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="actions.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><span class="section-number">3.5. </span>Actions</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-it-works">3.4.1. How it works</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-concepts">3.4.2. Key Concepts</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#example-versioned-struct">3.4.2.1. Example: Versioned Struct</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#best-practices">3.4.3. Best Practices</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/tutorial/advanced/conditional.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, MatrixEditor.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

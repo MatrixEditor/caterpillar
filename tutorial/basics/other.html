@@ -1,0 +1,634 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>2.6. Common Structures &#8212; Caterpillar 2.4.0-rc documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=b074b842"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tutorial/basics/other';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="3. Advanced Concepts" href="../advanced/index.html" />
+    <link rel="prev" title="2.5. Context" href="context.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2.4.0-rc" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+  <aside class="bd-header-announcement d-print-none d-none" aria-label="Announcement" data-pst-announcement-url="https://raw.githubusercontent.com/MatrixEditor/caterpillar/master/docs/sphinx/source/_templates/announcement.html"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Caterpillar 2.4.0-rc</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../installing/index.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    Tutorial
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../reference/index.html">
+    Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../library/index.html">
+    Library
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../development/index.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/MatrixEditor/caterpillar" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../installing/index.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    Tutorial
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../reference/index.html">
+    Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../library/index.html">
+    Library
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../development/index.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/MatrixEditor/caterpillar" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Python</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../first_steps/index.html">1. First Steps</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../first_steps/structdef.html">1.1. Defining Structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../first_steps/parsing.html">1.2. Working with Structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../first_steps/configuration.html">1.3. Configuring structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../first_steps/documentation.html">1.4. Documenting Structs</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">2. Basic Concepts</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 has-children"><a class="reference internal" href="stdtypes.html">2.1. Standard Types</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="stdnumeric.html">2.1.1. Numeric Types</a></li>
+<li class="toctree-l3"><a class="reference internal" href="stdenum.html">2.1.2. Enumerations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="stdlist.html">2.1.3. Arrays / Lists</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="string.html">2.2. String Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bytes.html">2.3. Byte Sequences</a></li>
+<li class="toctree-l2"><a class="reference internal" href="padding.html">2.4. Padding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="context.html">2.5. Context</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">2.6. Common Structures</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../advanced/index.html">3. Advanced Concepts</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../advanced/operators.html">3.1. Operators</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../advanced/op-switch.html">3.1.1. Switch</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../advanced/op-offset.html">3.1.2. Offsets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../advanced/op-custom.html">3.1.3. Custom Operators</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../advanced/pointers.html">3.2. Pointers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advanced/chaining.html">3.3. Chaining</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advanced/conditional.html">3.4. Conditional Fields</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advanced/actions.html">3.5. Actions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advanced/bitfield.html">3.6. Bitfields</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advanced/union.html">3.7. Unions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advanced/templates.html">3.8. Templates</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Tutorial</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link"><span class="section-number">2. </span>Basic Concepts</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">2.6. </span>Common Structures</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="common-structures">
+<span id="tutorial-basic-other"></span><h1><span class="section-number">2.6. </span>Common Structures<a class="headerlink" href="#common-structures" title="Link to this heading">#</a></h1>
+<p>In addition to the basic field types we’ve already covered, <em>Caterpillar</em> offers more
+advanced struct types for handling complex data structures. These types can simplify
+parsing and packing operations, especially when dealing with constants, compression,
+or specialized data handling.</p>
+<section id="constants">
+<h2><span class="section-number">2.6.1. </span>Constants<a class="headerlink" href="#constants" title="Link to this heading">#</a></h2>
+<p>In many binary formats, constants or “magic bytes” are used to identify the start
+of a file or data stream. <em>Caterpillar</em> allows you to define and automatically
+validate these constants against the parsed data, saving you from manually adding
+them in every time.</p>
+<p>For instance, a PNG file starts with a known sequence of magic bytes:
+<code class="code docutils literal notranslate"><span class="pre">x89PNGx0Dx0Ax1Ax0A</span></code>. You can define these constants directly in your
+struct like so:</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">Starting the <em>main</em> PNG struct</span><a class="headerlink" href="#id1" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span> <span class="c1"># &lt;-- will be relevant later on</span>
+<span class="k">class</span> <span class="nc">PNG</span><span class="p">:</span>
+    <span class="n">magic</span><span class="p">:</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x89</span><span class="s2">PNG</span><span class="se">\x0D\x0A\x1A\x0A</span><span class="s2">&quot;</span>
+    <span class="c1"># other fields will be defined at the end of this tutorial.</span>
+</pre></div>
+</div>
+</div>
+<p>For raw constant values, <em>Caterpillar</em> provides the <a class="reference internal" href="../../library/fields/common.html#caterpillar.py.Const" title="caterpillar.py.Const"><code class="xref py py-class docutils literal notranslate"><span class="pre">Const</span></code></a>
+struct, which allows you to define constant values that need to be packed or
+unpacked.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">const</span> <span class="o">=</span> <span class="n">Const</span><span class="p">(</span><span class="mh">0xbeef</span><span class="p">,</span> <span class="n">uint32</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="compression">
+<h2><span class="section-number">2.6.2. </span>Compression<a class="headerlink" href="#compression" title="Link to this heading">#</a></h2>
+<p><em>Caterpillar</em> also supports common compression formats such as <cite>zlib</cite>, <cite>lzma</cite>, <cite>bz2</cite>,
+and, if the library is installed, <cite>lzo</cite>. This allows you to handle compressed data
+within your struct definitions easily.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">compressed</span> <span class="o">=</span> <span class="n">ZLibCompressed</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span> <span class="c1"># length or struct here applicable</span>
+</pre></div>
+</div>
+</section>
+<section id="specials">
+<h2><span class="section-number">2.6.3. </span>Specials<a class="headerlink" href="#specials" title="Link to this heading">#</a></h2>
+<p>There are several special structs for handling more advanced or less common scenarios.</p>
+<section id="computed">
+<h3><span class="section-number">2.6.3.1. </span>Computed<a class="headerlink" href="#computed" title="Link to this heading">#</a></h3>
+<p>The <cite>Computed</cite> struct allows you to define a runtime computed variable that doesn’t
+actually pack any data. While you could use a <code class="code docutils literal notranslate"><span class="pre">&#64;property</span></code> or method to represent
+this, <code class="code docutils literal notranslate"><span class="pre">Computed</span></code> is useful when you need to calculate a value during the packing
+or unpacking process.</p>
+<p>You might want to compute the real gamma value for a PNG chunk, based on another field
+in the struct:</p>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">Example implementation of the <em>gAMA</em> chunk</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span>    <span class="c1"># &lt;-- same as usual</span>
+<span class="k">class</span> <span class="nc">GAMAChunk</span><span class="p">:</span>
+    <span class="n">gamma</span><span class="p">:</span> <span class="n">uint32</span>
+    <span class="n">gamma_value</span><span class="p">:</span> <span class="n">Computed</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">gamma</span> <span class="o">/</span> <span class="mi">100000</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="pass">
+<h3><span class="section-number">2.6.3.2. </span>Pass<a class="headerlink" href="#pass" title="Link to this heading">#</a></h3>
+<p>The <code class="code docutils literal notranslate"><span class="pre">Pass</span></code> struct is used when no action should be taken during the packing or unpacking
+process. It doesn’t affect the data stream in any way.</p>
+<p>You can use <cite>Pass</cite> when you simply need to skip over certain parts of the data without modifying them:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@struct</span>
+<span class="gp">... </span><span class="k">class</span> <span class="nc">Format</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">foo</span><span class="p">:</span> <span class="n">Pass</span>  <span class="c1"># This won&#39;t affect the stream and will store None</span>
+<span class="gp">...</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="context.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title"><span class="section-number">2.5. </span>Context</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../advanced/index.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><span class="section-number">3. </span>Advanced Concepts</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#constants">2.6.1. Constants</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#compression">2.6.2. Compression</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#specials">2.6.3. Specials</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#computed">2.6.3.1. Computed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pass">2.6.3.2. Pass</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/tutorial/basics/other.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, MatrixEditor.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

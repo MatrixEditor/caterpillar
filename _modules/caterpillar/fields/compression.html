@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>caterpillar.fields.compression &#8212; Caterpillar 2.2.3 documentation</title>
+    <title>caterpillar.fields.compression &#8212; Caterpillar 2.4.0-rc documentation</title>
   
   
   
@@ -15,8 +15,8 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
-  <!-- 
-    this give us a css class that will be invisible only if js is disabled 
+  <!--
+    this give us a css class that will be invisible only if js is disabled
   -->
   <noscript>
     <style>
@@ -26,20 +26,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
-  <script src="../../../_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
+  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=85e56e6b"></script>
+    <script src="../../../_static/documentation_options.js?v=b074b842"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -50,7 +50,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.2.3" />
+  <meta name="docsearch:version" content="2.4.0-rc" />
   </head>
   
   
@@ -113,7 +113,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.2.3</p>
+    <p class="title logo__title">Caterpillar 2.4.0-rc</p>
   
 </a></div>
     
@@ -322,9 +322,14 @@
   
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
-  
-  <div id="rtd-footer-container"></div>
 
 
       </div>
@@ -385,7 +390,8 @@
 <span class="c1">#</span>
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Protocol</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Protocol</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">runtime_checkable</span>
 
 <span class="kn">from</span> <span class="nn">caterpillar.abc</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">_ContextLike</span><span class="p">,</span>
@@ -398,24 +404,61 @@
 <span class="kn">from</span> <span class="nn">.common</span> <span class="kn">import</span> <span class="n">Transformer</span><span class="p">,</span> <span class="n">Bytes</span>
 
 
+<span class="nd">@runtime_checkable</span>
 <span class="k">class</span> <span class="nc">_Compressor</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">compress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Data should get compressed here&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A protocol for compression algorithms, requiring two methods:</span>
+<span class="sd">    - compress: to compress data</span>
+<span class="sd">    - decompress: to decompress data</span>
 
+<span class="sd">    Any class implementing this protocol must define these methods.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">compress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compress the provided data.</span>
+
+<span class="sd">        :param data: The data to be compressed.</span>
+<span class="sd">        :type data: bytes</span>
+<span class="sd">        :param kwds: Additional keyword arguments specific to the compression method.</span>
+<span class="sd">        :return: The compressed data.</span>
+<span class="sd">        :rtype: bytes</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+
+    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">decompress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Data should get decompressed here&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Decompress the provided data.</span>
+
+<span class="sd">        :param data: The compressed data to be decompressed.</span>
+<span class="sd">        :type data: bytes</span>
+<span class="sd">        :param kwds: Additional keyword arguments specific to the decompression method.</span>
+<span class="sd">        :return: The decompressed data.</span>
+<span class="sd">        :rtype: bytes</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
 
 
 <div class="viewcode-block" id="Compressed">
 <a class="viewcode-back" href="../../../library/fields/compression.html#caterpillar.py.Compressed">[docs]</a>
 <span class="k">class</span> <span class="nc">Compressed</span><span class="p">(</span><span class="n">Transformer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A class representing a compressed transformer.</span>
+<span class="sd">    A transformer class for handling compression and decompression of data.</span>
 
-<span class="sd">    :param compressor: The compression algorithm.</span>
+<span class="sd">    This class takes a compression algorithm that implements the `_Compressor` protocol and</span>
+<span class="sd">    applies it to the data for compression or decompression operations. It allows for</span>
+<span class="sd">    additional customization through the `comp_kwargs` and `decomp_kwargs` parameters.</span>
+
+<span class="sd">    :param compressor: The compression algorithm that implements the _Compressor protocol.</span>
 <span class="sd">    :type compressor: _Compressor</span>
-<span class="sd">    :param length: The length of the transformer.</span>
-<span class="sd">    :type length: Union[_ContextLambda, Any]</span>
+<span class="sd">    :param struct: The struct to be compressed or decompressed, should implement _ContainsStruct or _StructLike.</span>
+<span class="sd">    :type struct: Union[_ContainsStruct, _StructLike]</span>
+<span class="sd">    :param comp_kwargs: Optional keyword arguments for the compression method.</span>
+<span class="sd">    :type comp_kwargs: Optional[dict]</span>
+<span class="sd">    :param decomp_kwargs: Optional keyword arguments for the decompression method.</span>
+<span class="sd">    :type decomp_kwargs: Optional[dict]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -425,14 +468,6 @@
         <span class="n">comp_kwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">decomp_kwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initialize a Compressed instance.</span>
-
-<span class="sd">        :param compressor: The compression algorithm.</span>
-<span class="sd">        :type compressor: _Compressor</span>
-<span class="sd">        :param length: The length of the transformer.</span>
-<span class="sd">        :type length: Union[_ContextLambda, Any]</span>
-<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">hasstruct</span><span class="p">(</span><span class="n">struct</span><span class="p">):</span>
             <span class="n">struct</span> <span class="o">=</span> <span class="n">getstruct</span><span class="p">(</span><span class="n">struct</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">struct</span><span class="p">)</span>
@@ -444,11 +479,11 @@
 <a class="viewcode-back" href="../../../library/fields/compression.html#caterpillar.py.Compressed.encode">[docs]</a>
     <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Compress the input data.</span>
+<span class="sd">        Compress the input data using the provided compressor.</span>
 
-<span class="sd">        :param obj: The input data to be compressed.</span>
+<span class="sd">        :param obj: The data to be compressed.</span>
 <span class="sd">        :type obj: bytes</span>
-<span class="sd">        :param context: The context information.</span>
+<span class="sd">        :param context: Context information for compression (e.g., field-specific metadata).</span>
 <span class="sd">        :type context: _ContextLike</span>
 <span class="sd">        :return: The compressed data.</span>
 <span class="sd">        :rtype: bytes</span>
@@ -460,11 +495,11 @@
 <a class="viewcode-back" href="../../../library/fields/compression.html#caterpillar.py.Compressed.decode">[docs]</a>
     <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Decompress the input data.</span>
+<span class="sd">        Decompress the input data using the provided compressor.</span>
 
 <span class="sd">        :param parsed: The compressed data to be decompressed.</span>
 <span class="sd">        :type parsed: bytes</span>
-<span class="sd">        :param context: The context information.</span>
+<span class="sd">        :param context: Context information for decompression (e.g., field-specific metadata).</span>
 <span class="sd">        :type context: _ContextLike</span>
 <span class="sd">        :return: The decompressed data.</span>
 <span class="sd">        :rtype: bytes</span>
@@ -595,8 +630,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
-<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -629,7 +664,8 @@
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.0.
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
 </p></div>
       
     </div>
