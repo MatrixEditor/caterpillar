@@ -83,5 +83,5 @@ from .digest import (
     Sha3_512,
     Crc32,
     Adler,
-    HMAC
+    HMAC,
 )
