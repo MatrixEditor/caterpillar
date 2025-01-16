@@ -12,15 +12,18 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-import inspect
-
 from io import BytesIO
-from typing import Any, List, Union, Optional, Iterable, Callable
-from abc import ABC, abstractmethod
+from types import EllipsisType
+from typing import Any, Collection, List, Union, Iterable, Callable
 from functools import partial
 
-from caterpillar.abc import _ContextLike, _StructLike, _ContextLambda, _Switch
-from caterpillar.abc import _ContainsStruct, getstruct
+from caterpillar.abc import (
+    _ContextLike,
+    _StructLike,
+    _ContextLambda,
+    _Switch,
+    getstruct,
+)
 from caterpillar.byteorder import ByteOrder, byteorder
 from caterpillar.options import Flag
 from caterpillar.context import CTX_SEQ, CTX_STREAM
@@ -44,7 +47,7 @@ class FieldMixin:
         """Creates a field that should start at the given offset."""
         return Field(self, byteorder(self)) @ offset
 
-    def __getitem__(self, dim: Union[_ContextLambda, int]) -> Field:
+    def __getitem__(self, dim: Union[_ContextLambda, int, EllipsisType]) -> Field:
         """Returns a sequenced field."""
         return Field(self, byteorder(self))[dim]
 
@@ -113,7 +116,7 @@ class FieldStruct(FieldMixin):
         """
         raise NotImplementedError
 
-    def pack_seq(self, seq: Iterable, context: _ContextLike) -> None:
+    def pack_seq(self, seq: Collection, context: _ContextLike) -> None:
         """
         Pack a sequence of elements using the provided context.
 

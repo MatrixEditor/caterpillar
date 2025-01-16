@@ -1141,7 +1141,7 @@ class Prefixed(FieldStruct):
     ):
         self.prefix = prefix
         self.struct = struct
-        self.encoding = None
+        self.encoding = encoding
 
     def __type__(self) -> Optional[Union[type, str]]:
         """

@@ -14,14 +14,13 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import itertools
 
-from typing import List, Any, Union
+from typing import Collection, List, Any
 
-from caterpillar.abc import _GreedyType, _ContextLike, _StreamType, _PrefixedType
+from caterpillar.abc import _ContextLike, _StreamType, _PrefixedType
 from caterpillar.context import (
     Context,
     CTX_PATH,
     CTX_FIELD,
-    CTX_POS,
     CTX_INDEX,
     CTX_OBJECT,
     CTX_STREAM,
@@ -63,7 +62,7 @@ def unpack_seq(context: _ContextLike, unpack_one) -> List[Any]:
     field = context[CTX_FIELD]
     assert field and context[CTX_SEQ]
 
-    length: Union[int, _GreedyType] = field.length(context)
+    length = field.length(context)
     base_path = context[CTX_PATH]
     # Special elements '_index' and '_length' can be referenced within
     # the new context. The '_pos' attribute will be adjusted automatically.
@@ -114,7 +113,7 @@ def unpack_seq(context: _ContextLike, unpack_one) -> List[Any]:
     return values
 
 
-def pack_seq(seq: List[Any], context: _ContextLike, pack_one) -> None:
+def pack_seq(seq: Collection[Any], context: _ContextLike, pack_one) -> None:
     """Generic function to pack sequenced elements.
 
     :param seq: the iterable of elements

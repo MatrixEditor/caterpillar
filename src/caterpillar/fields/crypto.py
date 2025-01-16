@@ -18,7 +18,7 @@ try:
     from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
     from cryptography.hazmat.primitives.padding import PaddingContext
 except ImportError:
-    Cipher = algorithms = modes = PaddingContext = None
+    Cipher = algorithms = modes = PaddingContext = Any
 
 
 from caterpillar.abc import _StructLike, _ContextLike
