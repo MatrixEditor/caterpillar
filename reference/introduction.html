@@ -30,7 +30,7 @@
   <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
@@ -453,7 +453,7 @@ be beneficial including</p>
 dependencies). Additionally, the minimal lines of code required to define structures speak for themselves, as
 demonstrated in the following example from <cite>examples/formats/caf</cite>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span>
-<span class="linenos"> 2</span><span class="k">class</span> <span class="nc">CAFChunk</span><span class="p">:</span>
+<span class="linenos"> 2</span><span class="k">class</span><span class="w"> </span><span class="nc">CAFChunk</span><span class="p">:</span>
 <span class="linenos"> 3</span>    <span class="c1"># Include other structs just like that</span>
 <span class="linenos"> 4</span>    <span class="n">chunk_header</span><span class="p">:</span> <span class="n">CAFChunkHeader</span>
 <span class="linenos"> 5</span>    <span class="c1"># Built-in support for switch-case structures</span>
@@ -473,7 +473,7 @@ demonstrated in the following example from <cite>examples/formats/caf</cite>:</p
 <p><em>Caterpillar</em> utilizes Python’s annotations to build its model from processing class definitions. With the use
 of Python 3.12, there are no conflicts in using annotations for defining fields.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
-<span class="k">class</span> <span class="nc">Format</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
     <span class="c1"># &lt;name&gt; : &lt;field&gt; [ = &lt;default_value&gt; ]</span>
 </pre></div>
 </div>
@@ -496,19 +496,19 @@ Construct. The files used in the benchmark are provided below:</p>
 <input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
 <label class="sd-tab-label" for="sd-tab-item-0">
 caterpillar</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">caterpillar.shortcuts</span> <span class="kn">import</span> <span class="n">struct</span><span class="p">,</span> <span class="n">LittleEndian</span><span class="p">,</span> <span class="n">bitfield</span><span class="p">,</span> <span class="n">unpack</span><span class="p">,</span> <span class="n">pack</span>
-<span class="kn">from</span> <span class="nn">caterpillar.fields</span> <span class="kn">import</span> <span class="n">uint8</span><span class="p">,</span> <span class="n">UInt</span><span class="p">,</span> <span class="n">CString</span><span class="p">,</span> <span class="n">Prefixed</span><span class="p">,</span> <span class="n">uint32</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.shortcuts</span><span class="w"> </span><span class="kn">import</span> <span class="n">struct</span><span class="p">,</span> <span class="n">LittleEndian</span><span class="p">,</span> <span class="n">bitfield</span><span class="p">,</span> <span class="n">unpack</span><span class="p">,</span> <span class="n">pack</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.fields</span><span class="w"> </span><span class="kn">import</span> <span class="n">uint8</span><span class="p">,</span> <span class="n">UInt</span><span class="p">,</span> <span class="n">CString</span><span class="p">,</span> <span class="n">Prefixed</span><span class="p">,</span> <span class="n">uint32</span>
 
 
 <span class="nd">@bitfield</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">LittleEndian</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">Flags</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Flags</span><span class="p">:</span>
     <span class="n">bool1</span> <span class="p">:</span> <span class="mi">1</span>
     <span class="n">num4</span>  <span class="p">:</span> <span class="mi">3</span>
     <span class="c1"># padding is generated automatically</span>
 
 
 <span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">LittleEndian</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">Item</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Item</span><span class="p">:</span>
     <span class="n">num1</span><span class="p">:</span> <span class="n">uint8</span>
     <span class="n">num2</span><span class="p">:</span> <span class="n">UInt</span><span class="p">(</span><span class="mi">24</span><span class="p">)</span>
     <span class="n">flags</span><span class="p">:</span> <span class="n">Flags</span>
@@ -529,7 +529,7 @@ a struct class.</p>
 <input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
 <label class="sd-tab-label" for="sd-tab-item-1">
 construct</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">construct</span> <span class="kn">import</span> <span class="o">*</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">construct</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 
 <span class="n">d</span> <span class="o">=</span> <span class="n">Struct</span><span class="p">(</span>
     <span class="s2">&quot;count&quot;</span> <span class="o">/</span> <span class="n">Int32ul</span><span class="p">,</span>
@@ -609,15 +609,15 @@ kaitai</label><div class="sd-tab-content docutils">
 <input id="sd-tab-item-3" name="sd-tab-set-0" type="radio">
 <label class="sd-tab-label" for="sd-tab-item-3">
 hachoir</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hachoir.field</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">hachoir.stream</span> <span class="kn">import</span> <span class="n">StringInputStream</span>
-<span class="kn">from</span> <span class="nn">hachoir.core.bits</span> <span class="kn">import</span> <span class="n">LITTLE_ENDIAN</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">hachoir.field</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hachoir.stream</span><span class="w"> </span><span class="kn">import</span> <span class="n">StringInputStream</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hachoir.core.bits</span><span class="w"> </span><span class="kn">import</span> <span class="n">LITTLE_ENDIAN</span>
 
 
-<span class="k">class</span> <span class="nc">Entry</span><span class="p">(</span><span class="n">FieldSet</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Entry</span><span class="p">(</span><span class="n">FieldSet</span><span class="p">):</span>
     <span class="n">endian</span> <span class="o">=</span> <span class="n">LITTLE_ENDIAN</span>
 
-    <span class="k">def</span> <span class="nf">createFields</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">createFields</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">yield</span> <span class="n">UInt8</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;num1&quot;</span><span class="p">)</span>
         <span class="k">yield</span> <span class="n">UInt24</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;num2&quot;</span><span class="p">)</span>
         <span class="k">yield</span> <span class="n">Bit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;bool1&quot;</span><span class="p">)</span>
@@ -629,10 +629,10 @@ hachoir</label><div class="sd-tab-content docutils">
         <span class="k">yield</span> <span class="n">PascalString8</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;name2&quot;</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">Format</span><span class="p">(</span><span class="n">Parser</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">(</span><span class="n">Parser</span><span class="p">):</span>
     <span class="n">endian</span> <span class="o">=</span> <span class="n">LITTLE_ENDIAN</span>
 
-    <span class="k">def</span> <span class="nf">createFields</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">createFields</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">yield</span> <span class="n">UInt32</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;count&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;count&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">):</span>
             <span class="k">yield</span> <span class="n">Entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;entry[]&quot;</span><span class="p">)</span>
@@ -642,12 +642,12 @@ hachoir</label><div class="sd-tab-content docutils">
 <input id="sd-tab-item-4" name="sd-tab-set-0" type="radio">
 <label class="sd-tab-label" for="sd-tab-item-4">
 mrcrowbar</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mrcrowbar.fields</span> <span class="kn">import</span> <span class="n">Bits8</span><span class="p">,</span> <span class="n">UInt24_LE</span><span class="p">,</span> <span class="n">UInt32_LE</span><span class="p">,</span> <span class="n">BlockField</span><span class="p">,</span> <span class="n">UInt8</span>
-<span class="kn">from</span> <span class="nn">mrcrowbar.models</span> <span class="kn">import</span> <span class="n">Block</span><span class="p">,</span> <span class="n">CString</span><span class="p">,</span> <span class="n">CStringN</span>
-<span class="kn">from</span> <span class="nn">mrcrowbar.refs</span> <span class="kn">import</span> <span class="n">Ref</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">mrcrowbar.fields</span><span class="w"> </span><span class="kn">import</span> <span class="n">Bits8</span><span class="p">,</span> <span class="n">UInt24_LE</span><span class="p">,</span> <span class="n">UInt32_LE</span><span class="p">,</span> <span class="n">BlockField</span><span class="p">,</span> <span class="n">UInt8</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mrcrowbar.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Block</span><span class="p">,</span> <span class="n">CString</span><span class="p">,</span> <span class="n">CStringN</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mrcrowbar.refs</span><span class="w"> </span><span class="kn">import</span> <span class="n">Ref</span>
 
 
-<span class="k">class</span> <span class="nc">Entry</span><span class="p">(</span><span class="n">Block</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Entry</span><span class="p">(</span><span class="n">Block</span><span class="p">):</span>
     <span class="n">num1</span> <span class="o">=</span> <span class="n">UInt8</span><span class="p">()</span>
     <span class="n">num2</span> <span class="o">=</span> <span class="n">UInt24_LE</span><span class="p">()</span>
     <span class="n">bool1</span> <span class="o">=</span> <span class="n">Bits8</span><span class="p">(</span><span class="mh">0x0004</span><span class="p">,</span> <span class="n">bits</span><span class="o">=</span><span class="mb">0b10000000</span><span class="p">,</span> <span class="n">endian</span><span class="o">=</span><span class="s2">&quot;little&quot;</span><span class="p">)</span>
@@ -657,7 +657,7 @@ mrcrowbar</label><div class="sd-tab-content docutils">
     <span class="n">name2</span> <span class="o">=</span> <span class="n">CString</span><span class="p">(</span><span class="n">length_field</span><span class="o">=</span><span class="n">UInt8</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">Format</span><span class="p">(</span><span class="n">Block</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">(</span><span class="n">Block</span><span class="p">):</span>
     <span class="n">count</span> <span class="o">=</span> <span class="n">UInt32_LE</span><span class="p">(</span><span class="mh">0x0000</span><span class="p">)</span>
     <span class="n">entries</span> <span class="o">=</span> <span class="n">BlockField</span><span class="p">(</span><span class="n">Entry</span><span class="p">,</span> <span class="mh">0x0004</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="n">Ref</span><span class="p">(</span><span class="s2">&quot;count&quot;</span><span class="p">))</span>
 </pre></div>

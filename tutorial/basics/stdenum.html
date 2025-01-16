@@ -30,7 +30,7 @@
   <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
@@ -450,15 +450,15 @@ the unit of measurement (like “meter”). Here’s how you would define it:</p
 Python</label><div class="sd-tab-content docutils">
 <div class="literal-block-wrapper docutils container" id="id1">
 <div class="code-block-caption"><span class="caption-text">Simple enumeration in a struct definition</span><a class="headerlink" href="#id1" title="Link to this code">#</a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">enum</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">enum</span>
 
-<span class="k">class</span> <span class="nc">PHYSUnit</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">IntEnum</span><span class="p">):</span> <span class="c1"># &lt;-- the enum value doesn&#39;t have to be int</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PHYSUnit</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">IntEnum</span><span class="p">):</span> <span class="c1"># &lt;-- the enum value doesn&#39;t have to be int</span>
     <span class="n">__struct__</span> <span class="o">=</span> <span class="n">uint8</span>        <span class="c1"># &lt;-- to make the code even more compact, use this</span>
     <span class="n">UNKNOWN</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">METRE</span> <span class="o">=</span> <span class="mi">1</span>
 
 <span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span>         <span class="c1"># &lt;-- same as before</span>
-<span class="k">class</span> <span class="nc">PHYSChunk</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PHYSChunk</span><span class="p">:</span>
     <span class="n">pixels_per_unit_x</span><span class="p">:</span> <span class="n">uint32</span>
     <span class="n">pixels_per_unit_y</span><span class="p">:</span> <span class="n">uint32</span>
     <span class="n">unit</span><span class="p">:</span> <span class="n">PHYSUnit</span>               <span class="c1"># &lt;-- now we have an auto-enumeration</span>
@@ -471,14 +471,14 @@ Python</label><div class="sd-tab-content docutils">
 Caterpillar C</label><div class="sd-tab-content docutils">
 <div class="literal-block-wrapper docutils container" id="id2">
 <div class="code-block-caption"><span class="caption-text">Simple enumeration in a struct definition</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">enum</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">enum</span>
 
-<span class="k">class</span> <span class="nc">PHYSUnit</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">IntEnum</span><span class="p">):</span>       <span class="c1"># &lt;-- the enum value doesn&#39;t have to be int</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PHYSUnit</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">IntEnum</span><span class="p">):</span>       <span class="c1"># &lt;-- the enum value doesn&#39;t have to be int</span>
     <span class="n">UNKNOWN</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">METRE</span> <span class="o">=</span> <span class="mi">1</span>
 
 <span class="nd">@struct</span><span class="p">(</span><span class="n">endian</span><span class="o">=</span><span class="n">BIG_ENDIAN</span><span class="p">)</span>          <span class="c1"># &lt;-- same as before</span>
-<span class="k">class</span> <span class="nc">PHYSChunk</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PHYSChunk</span><span class="p">:</span>
     <span class="n">pixels_per_unit_x</span><span class="p">:</span> <span class="n">u32</span>
     <span class="n">pixels_per_unit_y</span><span class="p">:</span> <span class="n">u32</span>
     <span class="n">unit</span><span class="p">:</span> <span class="n">enumeration</span><span class="p">(</span><span class="n">u8</span><span class="p">,</span> <span class="n">PHYSUnit</span><span class="p">)</span> <span class="c1"># &lt;-- atom is required here</span>

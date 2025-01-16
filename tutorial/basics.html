@@ -30,7 +30,7 @@
   <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
@@ -385,7 +385,7 @@ the stage for more advanced topics in the next chapter.</p>
 <p class="admonition-title">Note</p>
 <p>Some examples using the interpreter prompts make use of a shortcut to define <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code>
 objects:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">caterpillar.shortcuts</span> <span class="kn">import</span> <span class="n">F</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.shortcuts</span><span class="w"> </span><span class="kn">import</span> <span class="n">F</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">F</span><span class="p">(</span><span class="n">uint8</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -504,15 +504,15 @@ last field.</p>
 Python</label><div class="sd-tab-content docutils">
 <div class="literal-block-wrapper docutils container" id="id1">
 <div class="code-block-caption"><span class="caption-text">Simple enumeration in a struct definition</span><a class="headerlink" href="#id1" title="Link to this code">#</a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">enum</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">enum</span>
 
-<span class="k">class</span> <span class="nc">PHYSUnit</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">IntEnum</span><span class="p">):</span> <span class="c1"># &lt;-- the enum value doesn&#39;t have to be int</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PHYSUnit</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">IntEnum</span><span class="p">):</span> <span class="c1"># &lt;-- the enum value doesn&#39;t have to be int</span>
     <span class="n">__struct__</span> <span class="o">=</span> <span class="n">uint8</span>        <span class="c1"># &lt;-- to make the code even more compact, use this</span>
     <span class="n">UNKNOWN</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">METRE</span> <span class="o">=</span> <span class="mi">1</span>
 
 <span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span>         <span class="c1"># &lt;-- same as before</span>
-<span class="k">class</span> <span class="nc">PHYSChunk</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PHYSChunk</span><span class="p">:</span>
     <span class="n">pixels_per_unit_x</span><span class="p">:</span> <span class="n">uint32</span>
     <span class="n">pixels_per_unit_y</span><span class="p">:</span> <span class="n">uint32</span>
     <span class="n">unit</span><span class="p">:</span> <span class="n">PHYSUnit</span>               <span class="c1"># &lt;-- now we have an auto-enumeration</span>
@@ -525,14 +525,14 @@ Python</label><div class="sd-tab-content docutils">
 Caterpillar C</label><div class="sd-tab-content docutils">
 <div class="literal-block-wrapper docutils container" id="id2">
 <div class="code-block-caption"><span class="caption-text">Simple enumeration in a struct definition</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">enum</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">enum</span>
 
-<span class="k">class</span> <span class="nc">PHYSUnit</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">IntEnum</span><span class="p">):</span>       <span class="c1"># &lt;-- the enum value doesn&#39;t have to be int</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PHYSUnit</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">IntEnum</span><span class="p">):</span>       <span class="c1"># &lt;-- the enum value doesn&#39;t have to be int</span>
     <span class="n">UNKNOWN</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">METRE</span> <span class="o">=</span> <span class="mi">1</span>
 
 <span class="nd">@struct</span><span class="p">(</span><span class="n">endian</span><span class="o">=</span><span class="n">BIG_ENDIAN</span><span class="p">)</span>          <span class="c1"># &lt;-- same as before</span>
-<span class="k">class</span> <span class="nc">PHYSChunk</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PHYSChunk</span><span class="p">:</span>
     <span class="n">pixels_per_unit_x</span><span class="p">:</span> <span class="n">u32</span>
     <span class="n">pixels_per_unit_y</span><span class="p">:</span> <span class="n">u32</span>
     <span class="n">unit</span><span class="p">:</span> <span class="n">enumeration</span><span class="p">(</span><span class="n">u8</span><span class="p">,</span> <span class="n">PHYSUnit</span><span class="p">)</span> <span class="c1"># &lt;-- atom is required here</span>
@@ -590,11 +590,11 @@ additional functionality, as demonstrated in the structure of the next chunk.</p
 Python</label><div class="sd-tab-content docutils">
 <div class="literal-block-wrapper docutils container" id="id3">
 <div class="code-block-caption"><span class="caption-text">The <a class="reference external" href="https://www.w3.org/TR/png/#11tEXt">tEXt</a> chunk structure</span><a class="headerlink" href="#id3" title="Link to this code">#</a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">caterpillar.py</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">caterpillar.shortcuts</span> <span class="kn">import</span> <span class="n">lenof</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.py</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.shortcuts</span><span class="w"> </span><span class="kn">import</span> <span class="n">lenof</span>
 
 <span class="nd">@struct</span>
-<span class="k">class</span> <span class="nc">TEXTChunk</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TEXTChunk</span><span class="p">:</span>
     <span class="c1"># dynamic sized string that ends with a null-byte</span>
     <span class="n">keyword</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;ISO-8859-1&quot;</span><span class="p">)</span>
     <span class="c1"># static sized string based on the current context. some notes:</span>
@@ -611,8 +611,8 @@ Python</label><div class="sd-tab-content docutils">
 Caterpillar C</label><div class="sd-tab-content docutils">
 <div class="literal-block-wrapper docutils container" id="id4">
 <div class="code-block-caption"><span class="caption-text">The <cite>tEXt</cite> chunk structure</span><a class="headerlink" href="#id4" title="Link to this code">#</a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">caterpillar.c</span> <span class="kn">import</span> <span class="o">*</span>                 <span class="c1"># &lt;-- main difference</span>
-<span class="kn">from</span> <span class="nn">caterpillar.shortcuts</span> <span class="kn">import</span> <span class="n">lenof</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.c</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>                 <span class="c1"># &lt;-- main difference</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.shortcuts</span><span class="w"> </span><span class="kn">import</span> <span class="n">lenof</span>
 <span class="c1"># NOTE: lenof works here, because Caterpillar C&#39;s Context implements</span>
 <span class="c1"># the &#39;Context Protocol&#39;.</span>
 
@@ -620,7 +620,7 @@ Caterpillar C</label><div class="sd-tab-content docutils">
 <span class="n">this</span> <span class="o">=</span> <span class="n">ContextPath</span><span class="p">(</span><span class="s2">&quot;obj&quot;</span><span class="p">)</span>
 
 <span class="nd">@struct</span>
-<span class="k">class</span> <span class="nc">TEXTChunk</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TEXTChunk</span><span class="p">:</span>
     <span class="c1"># dynamic sized string that ends with a null-byte</span>
     <span class="n">keyword</span><span class="p">:</span> <span class="n">cstring</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;ISO-8859-1&quot;</span><span class="p">)</span>
     <span class="c1"># static sized string based on the current context. some notes:</span>
@@ -645,7 +645,7 @@ Caterpillar C</label><div class="sd-tab-content docutils">
 <label class="sd-tab-label" for="sd-tab-item-12">
 Python</label><div class="sd-tab-content docutils">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nd">@struct</span>
-<span class="linenos"> 2</span><span class="k">class</span> <span class="nc">ITXTChunk</span><span class="p">:</span>
+<span class="linenos"> 2</span><span class="k">class</span><span class="w"> </span><span class="nc">ITXTChunk</span><span class="p">:</span>
 <span class="linenos"> 3</span>    <span class="n">keyword</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
 <span class="linenos"> 4</span>    <span class="n">compression_flag</span><span class="p">:</span> <span class="n">uint8</span>
 <span class="linenos"> 5</span>    <span class="c1"># we actually don&#39;t need an Enum here</span>
@@ -663,14 +663,14 @@ Python</label><div class="sd-tab-content docutils">
 <input id="sd-tab-item-13" name="sd-tab-set-6" type="radio">
 <label class="sd-tab-label" for="sd-tab-item-13">
 Caterpillar C</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">from</span> <span class="nn">caterpillar.c</span> <span class="kn">import</span> <span class="o">*</span>                 <span class="c1"># &lt;-- main difference</span>
-<span class="linenos"> 2</span><span class="kn">from</span> <span class="nn">caterpillar.shortcuts</span> <span class="kn">import</span> <span class="n">lenof</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.c</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>                 <span class="c1"># &lt;-- main difference</span>
+<span class="linenos"> 2</span><span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.shortcuts</span><span class="w"> </span><span class="kn">import</span> <span class="n">lenof</span>
 <span class="linenos"> 3</span>
 <span class="linenos"> 4</span><span class="n">parent</span> <span class="o">=</span> <span class="n">ContextPath</span><span class="p">(</span><span class="s2">&quot;parent.obj&quot;</span><span class="p">)</span>
 <span class="linenos"> 5</span><span class="n">this</span> <span class="o">=</span> <span class="n">ContextPath</span><span class="p">(</span><span class="s2">&quot;obj&quot;</span><span class="p">)</span>
 <span class="linenos"> 6</span>
 <span class="linenos"> 7</span><span class="nd">@struct</span>
-<span class="linenos"> 8</span><span class="k">class</span> <span class="nc">ITXTChunk</span><span class="p">:</span>
+<span class="linenos"> 8</span><span class="k">class</span><span class="w"> </span><span class="nc">ITXTChunk</span><span class="p">:</span>
 <span class="linenos"> 9</span>    <span class="n">keyword</span><span class="p">:</span> <span class="n">cstring</span><span class="p">()</span> <span class="c1"># default encoding is &quot;utf-8&quot;</span>
 <span class="linenos">10</span>    <span class="n">compression_flag</span><span class="p">:</span> <span class="n">u8</span>
 <span class="linenos">11</span>    <span class="c1"># we actually don&#39;t need an Enum here</span>
@@ -816,7 +816,7 @@ Python</label><div class="sd-tab-content docutils">
 <div class="literal-block-wrapper docutils container" id="id5">
 <div class="code-block-caption"><span class="caption-text">Implementation for the frame data chunk</span><a class="headerlink" href="#id5" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span>                    <span class="c1"># &lt;-- endianess as usual</span>
-<span class="k">class</span> <span class="nc">FDATChunk</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">FDATChunk</span><span class="p">:</span>
     <span class="n">sequence_number</span><span class="p">:</span> <span class="n">uint32</span>
     <span class="c1"># We rather use a memory instance here instead of Bytes()</span>
     <span class="n">frame_data</span><span class="p">:</span> <span class="n">Memory</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">length</span> <span class="o">-</span> <span class="mi">4</span><span class="p">)</span>
@@ -832,7 +832,7 @@ Caterpillar C</label><div class="sd-tab-content docutils">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">parent</span> <span class="o">=</span> <span class="n">ContextPath</span><span class="p">(</span><span class="s2">&quot;parent.obj&quot;</span><span class="p">)</span>
 
 <span class="nd">@struct</span><span class="p">(</span><span class="n">endian</span><span class="o">=</span><span class="n">BIG_ENDIAN</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">FDATChunk</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">FDATChunk</span><span class="p">:</span>
     <span class="n">sequence_number</span><span class="p">:</span> <span class="n">u32</span>
     <span class="n">frame_data</span><span class="p">:</span> <span class="n">octetstring</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">length</span> <span class="o">-</span> <span class="mi">4</span><span class="p">)</span>
 </pre></div>
@@ -851,7 +851,7 @@ Caterpillar C</label><div class="sd-tab-content docutils">
 <div class="literal-block-wrapper docutils container" id="id7">
 <div class="code-block-caption"><span class="caption-text">Sample implementation of the <em>zTXt</em> chunk</span><a class="headerlink" href="#id7" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>                             <span class="c1"># &lt;-- actually, we don&#39;t need a specific byteorder</span>
-<span class="k">class</span> <span class="nc">ZTXTChunk</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ZTXTChunk</span><span class="p">:</span>
     <span class="n">keyword</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>           <span class="c1"># &lt;-- variable length</span>
     <span class="n">compression_method</span><span class="p">:</span> <span class="n">uint8</span>
     <span class="c1"># Okay, we haven&#39;t introduced this struct yet, but Memory() or Bytes()</span>
@@ -892,7 +892,7 @@ Python</label><div class="sd-tab-content docutils">
 <div class="literal-block-wrapper docutils container" id="id8">
 <div class="code-block-caption"><span class="caption-text">Understanding the <em>context</em></span><a class="headerlink" href="#id8" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
-<span class="k">class</span> <span class="nc">Format</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
     <span class="n">length</span><span class="p">:</span> <span class="n">uint8</span>
     <span class="n">foo</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">length</span><span class="p">)</span>   <span class="c1"># &lt;-- just reference the length field</span>
 </pre></div>
@@ -907,7 +907,7 @@ Caterpillar C</label><div class="sd-tab-content docutils">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">this</span> <span class="o">=</span> <span class="n">ContextPath</span><span class="p">(</span><span class="s2">&quot;obj&quot;</span><span class="p">)</span>
 
 <span class="nd">@struct</span>
-<span class="k">class</span> <span class="nc">Format</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
     <span class="n">length</span><span class="p">:</span> <span class="n">u8</span>
     <span class="n">foo</span><span class="p">:</span> <span class="n">cstring</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">length</span><span class="p">)</span>
 </pre></div>
@@ -948,7 +948,7 @@ For example, in the case of starting the <em>main</em> PNG struct:</p>
 <div class="literal-block-wrapper docutils container" id="id10">
 <div class="code-block-caption"><span class="caption-text">Starting the <em>main</em> PNG struct</span><a class="headerlink" href="#id10" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span> <span class="c1"># &lt;-- will be relevant later on</span>
-<span class="k">class</span> <span class="nc">PNG</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PNG</span><span class="p">:</span>
     <span class="n">magic</span><span class="p">:</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x89</span><span class="s2">PNG</span><span class="se">\x0D\x0A\x1A\x0A</span><span class="s2">&quot;</span>
     <span class="c1"># other fields will be defined at the end of this tutorial.</span>
 </pre></div>
@@ -994,7 +994,7 @@ a <code class="xref py py-class docutils literal notranslate"><span class="pre">
 <div class="literal-block-wrapper docutils container" id="id11">
 <div class="code-block-caption"><span class="caption-text">Example implementation of the <em>gAMA</em> chunk</span><a class="headerlink" href="#id11" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span>    <span class="c1"># &lt;-- same as usual</span>
-<span class="k">class</span> <span class="nc">GAMAChunk</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GAMAChunk</span><span class="p">:</span>
     <span class="n">gamma</span><span class="p">:</span> <span class="n">uint32</span>
     <span class="n">gamma_value</span><span class="p">:</span> <span class="n">Computed</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">gamma</span> <span class="o">/</span> <span class="mi">100000</span><span class="p">)</span>
 </pre></div>

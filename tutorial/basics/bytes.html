@@ -30,7 +30,7 @@
   <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
@@ -490,7 +490,7 @@ Python</label><div class="sd-tab-content docutils">
 <div class="literal-block-wrapper docutils container" id="id1">
 <div class="code-block-caption"><span class="caption-text">Implementation for the frame data chunk</span><a class="headerlink" href="#id1" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span>                    <span class="c1"># &lt;-- endianess as usual</span>
-<span class="k">class</span> <span class="nc">FDATChunk</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">FDATChunk</span><span class="p">:</span>
     <span class="n">sequence_number</span><span class="p">:</span> <span class="n">uint32</span>
     <span class="c1"># We rather use a memory instance here instead of Bytes()</span>
     <span class="n">frame_data</span><span class="p">:</span> <span class="n">Memory</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">length</span> <span class="o">-</span> <span class="mi">4</span><span class="p">)</span>
@@ -506,7 +506,7 @@ Caterpillar C</label><div class="sd-tab-content docutils">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">parent</span> <span class="o">=</span> <span class="n">ContextPath</span><span class="p">(</span><span class="s2">&quot;parent.obj&quot;</span><span class="p">)</span>
 
 <span class="nd">@struct</span><span class="p">(</span><span class="n">endian</span><span class="o">=</span><span class="n">BIG_ENDIAN</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">FDATChunk</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">FDATChunk</span><span class="p">:</span>
     <span class="n">sequence_number</span><span class="p">:</span> <span class="n">u32</span>
     <span class="n">frame_data</span><span class="p">:</span> <span class="n">octetstring</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">length</span> <span class="o">-</span> <span class="mi">4</span><span class="p">)</span>
 </pre></div>
@@ -525,7 +525,7 @@ Caterpillar C</label><div class="sd-tab-content docutils">
 <div class="literal-block-wrapper docutils container" id="id3">
 <div class="code-block-caption"><span class="caption-text">Sample implementation of the <em>zTXt</em> chunk</span><a class="headerlink" href="#id3" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>                             <span class="c1"># &lt;-- actually, we don&#39;t need a specific byteorder</span>
-<span class="k">class</span> <span class="nc">ZTXTChunk</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ZTXTChunk</span><span class="p">:</span>
     <span class="n">keyword</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>           <span class="c1"># &lt;-- variable length</span>
     <span class="n">compression_method</span><span class="p">:</span> <span class="n">uint8</span>
     <span class="c1"># Okay, we haven&#39;t introduced this struct yet, but Memory() or Bytes()</span>

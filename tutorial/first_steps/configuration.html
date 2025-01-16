@@ -30,7 +30,7 @@
   <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
@@ -454,7 +454,7 @@ Python</label><div class="sd-tab-content docutils">
 <div class="literal-block-wrapper docutils container" id="id1">
 <div class="code-block-caption"><span class="caption-text">Configuring a struct-wide endianess</span><a class="headerlink" href="#id1" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span>        <span class="c1"># &lt;-- extra argument to apply the order to all fields.</span>
-<span class="k">class</span> <span class="nc">PHYSChunk</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PHYSChunk</span><span class="p">:</span>
     <span class="n">pixels_per_unit_x</span><span class="p">:</span> <span class="n">uint32</span>   <span class="c1"># &lt;-- same definition as above</span>
     <span class="n">pixels_per_unit_y</span><span class="p">:</span> <span class="n">uint32</span>
     <span class="n">unit</span><span class="p">:</span> <span class="n">uint8</span>                 <span class="c1"># &lt;-- endianess meaningless, only one byte</span>
@@ -468,7 +468,7 @@ Caterpillar C</label><div class="sd-tab-content docutils">
 <div class="literal-block-wrapper docutils container" id="id2">
 <div class="code-block-caption"><span class="caption-text">Configuring a struct-wide endianess</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span><span class="p">(</span><span class="n">endian</span><span class="o">=</span><span class="n">BIG_ENDIAN</span><span class="p">)</span>   <span class="c1"># &lt;-- extra argument to apply the order to all fields.</span>
-<span class="k">class</span> <span class="nc">PHYSChunk</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PHYSChunk</span><span class="p">:</span>
     <span class="n">pixels_per_unit_x</span><span class="p">:</span> <span class="n">u32</span>   <span class="c1"># &lt;-- same definition as above</span>
     <span class="n">pixels_per_unit_y</span><span class="p">:</span> <span class="n">u32</span>
     <span class="n">unit</span><span class="p">:</span> <span class="n">u8</span>                 <span class="c1"># &lt;-- endianess meaningless, only one byte</span>
@@ -501,7 +501,7 @@ as a challenge.</p>
 <label class="sd-tab-label" for="sd-tab-item-2">
 Python</label><div class="sd-tab-content docutils">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span>
-<span class="linenos">2</span><span class="k">class</span> <span class="nc">TIMEChunk</span><span class="p">:</span>
+<span class="linenos">2</span><span class="k">class</span><span class="w"> </span><span class="nc">TIMEChunk</span><span class="p">:</span>
 <span class="linenos">3</span>    <span class="n">year</span><span class="p">:</span> <span class="n">uint16</span>        <span class="c1"># &lt;-- we could also use: BigEndian + uint16</span>
 <span class="linenos">4</span>    <span class="n">month</span><span class="p">:</span> <span class="n">uint8</span>
 <span class="linenos">5</span>    <span class="n">day</span><span class="p">:</span> <span class="n">uint8</span>
@@ -515,7 +515,7 @@ Python</label><div class="sd-tab-content docutils">
 <label class="sd-tab-label" for="sd-tab-item-3">
 Caterpillar C</label><div class="sd-tab-content docutils">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nd">@struct</span><span class="p">(</span><span class="n">endian</span><span class="o">=</span><span class="n">BIG_ENDIAN</span><span class="p">)</span>
-<span class="linenos">2</span><span class="k">class</span> <span class="nc">TIMEChunk</span><span class="p">:</span>
+<span class="linenos">2</span><span class="k">class</span><span class="w"> </span><span class="nc">TIMEChunk</span><span class="p">:</span>
 <span class="linenos">3</span>    <span class="n">year</span><span class="p">:</span> <span class="n">u16</span>        <span class="c1"># &lt;-- we could also use: BIG_ENDIAN + u16</span>
 <span class="linenos">4</span>    <span class="n">month</span><span class="p">:</span> <span class="n">u8</span>
 <span class="linenos">5</span>    <span class="n">day</span><span class="p">:</span> <span class="n">u8</span>

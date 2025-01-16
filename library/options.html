@@ -30,7 +30,7 @@
   <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
@@ -423,8 +423,8 @@
 <dd><p>To control the returned array type, a factory class or method can be set
 in this option using its attached value. For instance, we can incorporate
 the <code class="code docutils literal notranslate"><span class="pre">numpy.ndarray</span></code> into our unpacked objects:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">caterpillar.options</span> <span class="kn">import</span> <span class="n">O_ARRAY_FACTORY</span>
-<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">array</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.options</span><span class="w"> </span><span class="kn">import</span> <span class="n">O_ARRAY_FACTORY</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="n">array</span>
 
 <span class="c1"># just set the option&#39;s value</span>
 <span class="n">O_ARRAY_FACTORY</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">array</span>
@@ -527,7 +527,7 @@ example:</p>
 <dd><p>Feature option that will create a new class with the <code class="code docutils literal notranslate"><span class="pre">__slots__</span></code> attribute
 to lower required space. Take the following two structs into consideration:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
-<span class="k">class</span> <span class="nc">DictClass</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DictClass</span><span class="p">:</span>
     <span class="n">a</span><span class="p">:</span> <span class="n">uint8</span>
     <span class="n">b</span><span class="p">:</span> <span class="n">uint8</span>
     <span class="n">c</span><span class="p">:</span> <span class="n">uint8</span>
@@ -537,7 +537,7 @@ to lower required space. Take the following two structs into consideration:</p>
     <span class="n">g</span><span class="p">:</span> <span class="n">uint8</span>
 
 <span class="nd">@struct</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="n">opt</span><span class="o">.</span><span class="n">S_SLOTS</span><span class="p">})</span>
-<span class="k">class</span> <span class="nc">SlotsClass</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SlotsClass</span><span class="p">:</span>
     <span class="n">a</span><span class="p">:</span> <span class="n">uint8</span>
     <span class="n">b</span><span class="p">:</span> <span class="n">uint8</span>
     <span class="n">c</span><span class="p">:</span> <span class="n">uint8</span>
@@ -563,7 +563,7 @@ retrieve the amount of occupied bytes per object:</p>
 </div>
 <p>In addition, the overall used memory will be reduced, because the defined type will
 also occupy less memory:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sys</span> <span class="kn">import</span> <span class="n">getsizeof</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">sys</span><span class="w"> </span><span class="kn">import</span> <span class="n">getsizeof</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">getsizeof</span><span class="p">(</span><span class="n">DictClass</span><span class="p">)</span>
 <span class="go">1704</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">getsizeof</span><span class="p">(</span><span class="n">SlotsClass</span><span class="p">)</span>
@@ -580,7 +580,7 @@ used in that context only. It will alter the class’ annotations and remove
 all <code class="xref py py-class docutils literal notranslate"><span class="pre">caterpillar.fields.Field</span></code> instances.</p>
 <p>Consider the following struct:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
-<span class="k">class</span> <span class="nc">Format</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
     <span class="n">a</span><span class="p">:</span> <span class="n">uint8</span>
     <span class="n">b</span><span class="p">:</span> <span class="n">String</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
     <span class="n">c</span><span class="p">:</span> <span class="n">uuid</span>

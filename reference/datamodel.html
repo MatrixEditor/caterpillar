@@ -30,7 +30,7 @@
   <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
@@ -586,7 +586,7 @@ evaluates all strings, introducing a potential security risk. Exercise with caut
 </div>
 <p>Specifying structs is as simple as defining <a class="reference external" href="https://docs.python.org/3/reference/compound_stmts.html#class">Python Classes</a>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@struct</span>
-<span class="gp">... </span><span class="k">class</span> <span class="nc">BaseFormat</span><span class="p">:</span>
+<span class="gp">... </span><span class="k">class</span><span class="w"> </span><span class="nc">BaseFormat</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="n">magic</span><span class="p">:</span> <span class="sa">b</span><span class="s2">&quot;MAGIC&quot;</span>
 <span class="gp">... </span>    <span class="n">a</span><span class="p">:</span> <span class="n">uint8</span>
 <span class="gp">...</span>
@@ -598,7 +598,7 @@ for documentation purposes should be enabled, as shown in <a class="reference in
 <p>As described above, this class introduces an easy-to-use inheritance system using the method
 resolution order of Python:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@struct</span>
-<span class="gp">... </span><span class="k">class</span> <span class="nc">Format</span><span class="p">(</span><span class="n">BaseFormat</span><span class="p">):</span>
+<span class="gp">... </span><span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">(</span><span class="n">BaseFormat</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="n">b</span><span class="p">:</span> <span class="n">uint32</span>
 <span class="gp">... </span>    <span class="n">c</span><span class="p">:</span> <span class="n">uint16</span>
 <span class="gp">...</span>
@@ -612,7 +612,7 @@ resolution order of Python:</p>
 by default. That means, so-called <em>anonymous inner</em> structs can be defined within a class
 definition.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@struct</span>
-<span class="gp">... </span><span class="k">class</span> <span class="nc">Format</span><span class="p">:</span>
+<span class="gp">... </span><span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="n">a</span><span class="p">:</span> <span class="n">uint32</span>
 <span class="gp">... </span>    <span class="n">b</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;c&quot;</span><span class="p">:</span> <span class="n">uint8</span><span class="p">}</span>
 <span class="gp">...</span>
@@ -632,7 +632,7 @@ size.</p>
 <p><strong>In essence, they behave similarly to C unions.</strong> A traditional function hook will be installed on
 the model to capture field assignments. What that means will be illustrated by the following example:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@union</span>
-<span class="gp">... </span><span class="k">class</span> <span class="nc">Format</span><span class="p">:</span>
+<span class="gp">... </span><span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="n">foo</span><span class="p">:</span> <span class="n">uint16</span>
 <span class="gp">... </span>    <span class="n">bar</span><span class="p">:</span> <span class="n">uint32</span>
 <span class="gp">... </span>    <span class="n">baz</span><span class="p">:</span> <span class="n">boolean</span>
@@ -677,7 +677,7 @@ mapping and a collection of all fields but also introduces a special organizatio
 and a mapping of fields to their relative bit position in the current group, along with the field’s
 width. In the following example, three groups are created:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@bitfield</span>
-<span class="gp">... </span><span class="k">class</span> <span class="nc">Format</span><span class="p">:</span>
+<span class="gp">... </span><span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="n">a</span> <span class="p">:</span> <span class="n">uint8</span>           <span class="c1"># Group 1, pos=0, size=8</span>
 <span class="gp">... </span>    <span class="n">_</span> <span class="p">:</span> <span class="mi">0</span>               <span class="c1"># Group 2, pos=8, size=8</span>
 <span class="gp">... </span>    <span class="n">b</span> <span class="p">:</span> <span class="mi">15</span> <span class="o">-</span> <span class="n">uint16</span>     <span class="c1"># \</span>
@@ -889,7 +889,7 @@ is supplied.</p>
 <p>A template class is defined like a struct, union or bitfield class, but without being a
 dataclass nor storing a struct instance.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@template</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">)</span>
-<span class="gp">... </span><span class="k">class</span> <span class="nc">FormatTemplate</span><span class="p">:</span>
+<span class="gp">... </span><span class="k">class</span><span class="w"> </span><span class="nc">FormatTemplate</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="n">foo</span><span class="p">:</span> <span class="n">A</span>
 <span class="gp">... </span>    <span class="n">bar</span><span class="p">:</span> <span class="n">B</span>
 <span class="gp">... </span>    <span class="n">baz</span><span class="p">:</span> <span class="n">uint32</span>

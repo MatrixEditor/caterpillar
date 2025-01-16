@@ -30,7 +30,7 @@
   <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
@@ -449,7 +449,7 @@ later with specific types or values.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="n">TemplateTypeVar</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">)</span>
 
 <span class="nd">@template</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">)</span>       <span class="c1"># &lt;-- either strings or global variables</span>
-<span class="k">class</span> <span class="nc">FormatTemplate</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">FormatTemplate</span><span class="p">:</span>
     <span class="n">foo</span><span class="p">:</span> <span class="n">A</span><span class="p">[</span><span class="n">uint8</span><span class="p">::]</span>     <span class="c1"># &lt;-- prefixed generic array</span>
     <span class="n">bar</span><span class="p">:</span> <span class="n">B</span>              <span class="c1"># &lt;-- this won&#39;t throw an exception, because</span>
                         <span class="c1"># &#39;B&#39; is created temporarily.</span>
@@ -472,7 +472,7 @@ e.g. creating specialized structs.</p>
 <div class="literal-block-wrapper docutils container" id="id2">
 <div class="code-block-caption"><span class="caption-text">Creating template derivations</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
-<span class="k">class</span> <span class="nc">Format32</span><span class="p">(</span><span class="n">derive</span><span class="p">(</span><span class="n">FormatTemplate</span><span class="p">,</span> <span class="n">A</span><span class="o">=</span><span class="n">uint32</span><span class="p">,</span> <span class="n">B</span><span class="o">=</span><span class="n">uint32</span><span class="p">)):</span> <span class="c1"># &lt;- Derived Struct</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Format32</span><span class="p">(</span><span class="n">derive</span><span class="p">(</span><span class="n">FormatTemplate</span><span class="p">,</span> <span class="n">A</span><span class="o">=</span><span class="n">uint32</span><span class="p">,</span> <span class="n">B</span><span class="o">=</span><span class="n">uint32</span><span class="p">)):</span> <span class="c1"># &lt;- Derived Struct</span>
     <span class="n">baz</span><span class="p">:</span> <span class="n">uint32</span>
 </pre></div>
 </div>

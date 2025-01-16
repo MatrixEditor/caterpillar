@@ -30,7 +30,7 @@
   <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
   
@@ -374,7 +374,7 @@ Python</label><div class="sd-tab-content docutils">
 <div class="literal-block-wrapper docutils container" id="id1">
 <div class="code-block-caption"><span class="caption-text">Simple example of a custom struct</span><a class="headerlink" href="#id1" title="Link to this code">#</a></div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
-<span class="k">class</span> <span class="nc">Format</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
    <span class="n">magic</span><span class="p">:</span> <span class="sa">b</span><span class="s2">&quot;Foo&quot;</span>                       <span class="c1"># constant values</span>
    <span class="n">name</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>                  <span class="c1"># C-String without a fixed length</span>
    <span class="n">value</span><span class="p">:</span> <span class="n">le</span> <span class="o">+</span> <span class="n">uint16</span>                  <span class="c1"># little endian encoding</span>
@@ -388,10 +388,10 @@ Python</label><div class="sd-tab-content docutils">
 Caterpillar C</label><div class="sd-tab-content docutils">
 <div class="literal-block-wrapper docutils container" id="id2">
 <div class="code-block-caption"><span class="caption-text">Simple example of a custom struct</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">caterpillar.c</span> <span class="kn">import</span> <span class="n">BIG_ENDIAN</span> <span class="k">as</span> <span class="n">be</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.c</span><span class="w"> </span><span class="kn">import</span> <span class="n">BIG_ENDIAN</span> <span class="k">as</span> <span class="n">be</span>
 
 <span class="nd">@struct</span>
-<span class="k">class</span> <span class="nc">Format</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
    <span class="n">magic</span><span class="p">:</span> <span class="sa">b</span><span class="s2">&quot;Foo&quot;</span>                         <span class="c1"># constant values</span>
    <span class="n">name</span><span class="p">:</span> <span class="n">cstring</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>                    <span class="c1"># C-String without a fixed length</span>
    <span class="n">value</span><span class="p">:</span> <span class="n">u16</span>                            <span class="c1"># little endian encoding</span>

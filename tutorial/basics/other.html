@@ -30,7 +30,7 @@
   <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
@@ -450,7 +450,7 @@ struct like so:</p>
 <div class="literal-block-wrapper docutils container" id="id1">
 <div class="code-block-caption"><span class="caption-text">Starting the <em>main</em> PNG struct</span><a class="headerlink" href="#id1" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span> <span class="c1"># &lt;-- will be relevant later on</span>
-<span class="k">class</span> <span class="nc">PNG</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PNG</span><span class="p">:</span>
     <span class="n">magic</span><span class="p">:</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x89</span><span class="s2">PNG</span><span class="se">\x0D\x0A\x1A\x0A</span><span class="s2">&quot;</span>
     <span class="c1"># other fields will be defined at the end of this tutorial.</span>
 </pre></div>
@@ -486,7 +486,7 @@ in the struct:</p>
 <div class="literal-block-wrapper docutils container" id="id2">
 <div class="code-block-caption"><span class="caption-text">Example implementation of the <em>gAMA</em> chunk</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span>    <span class="c1"># &lt;-- same as usual</span>
-<span class="k">class</span> <span class="nc">GAMAChunk</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GAMAChunk</span><span class="p">:</span>
     <span class="n">gamma</span><span class="p">:</span> <span class="n">uint32</span>
     <span class="n">gamma_value</span><span class="p">:</span> <span class="n">Computed</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">gamma</span> <span class="o">/</span> <span class="mi">100000</span><span class="p">)</span>
 </pre></div>
@@ -499,7 +499,7 @@ in the struct:</p>
 process. It doesn’t affect the data stream in any way.</p>
 <p>You can use <cite>Pass</cite> when you simply need to skip over certain parts of the data without modifying them:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@struct</span>
-<span class="gp">... </span><span class="k">class</span> <span class="nc">Format</span><span class="p">:</span>
+<span class="gp">... </span><span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="n">foo</span><span class="p">:</span> <span class="n">Pass</span>  <span class="c1"># This won&#39;t affect the stream and will store None</span>
 <span class="gp">...</span>
 </pre></div>

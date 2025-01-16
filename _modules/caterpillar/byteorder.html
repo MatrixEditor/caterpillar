@@ -29,7 +29,7 @@
   <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
@@ -390,10 +390,10 @@
 <span class="c1">#</span>
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
-<span class="kn">from</span> <span class="nn">sys</span> <span class="kn">import</span> <span class="n">maxsize</span>
-<span class="kn">from</span> <span class="nn">platform</span> <span class="kn">import</span> <span class="n">machine</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sys</span><span class="w"> </span><span class="kn">import</span> <span class="n">maxsize</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">platform</span><span class="w"> </span><span class="kn">import</span> <span class="n">machine</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
 
 <span class="c1"># constant to identify the byteorder of an object</span>
 <span class="n">BYTEORDER_FIELD</span> <span class="o">=</span> <span class="s2">&quot;__byteorder__&quot;</span>
@@ -402,7 +402,7 @@
 <div class="viewcode-block" id="ByteOrder">
 <a class="viewcode-back" href="../../library/byteorder.html#caterpillar.byteorder.ByteOrder">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">ByteOrder</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ByteOrder</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Represents byte order information, including alignment and size.</span>
 
@@ -420,7 +420,7 @@
 
 <div class="viewcode-block" id="ByteOrder.Alignment">
 <a class="viewcode-back" href="../../library/byteorder.html#caterpillar.byteorder.ByteOrder.Alignment">[docs]</a>
-    <span class="k">class</span> <span class="nc">Alignment</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Alignment</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
         <span class="n">NONE</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">NATIVE</span> <span class="o">=</span> <span class="mi">1</span></div>
 
@@ -429,7 +429,7 @@
 
 <div class="viewcode-block" id="ByteOrder.Size">
 <a class="viewcode-back" href="../../library/byteorder.html#caterpillar.byteorder.ByteOrder.Size">[docs]</a>
-    <span class="k">class</span> <span class="nc">Size</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Size</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
         <span class="n">STANDARD</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">NATIVE</span> <span class="o">=</span> <span class="mi">1</span></div>
 
@@ -438,7 +438,7 @@
 
 <div class="viewcode-block" id="ByteOrder.apply">
 <a class="viewcode-back" href="../../library/byteorder.html#caterpillar.byteorder.ByteOrder.apply">[docs]</a>
-    <span class="k">def</span> <span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Applies the byte order information to another object.</span>
 
@@ -447,7 +447,7 @@
         <span class="nb">setattr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">BYTEORDER_FIELD</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds the byte order information to another object using the</span>
 <span class="sd">        `__set_byteorder__` method.</span>
@@ -457,7 +457,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">other</span><span class="o">.</span><span class="n">__set_byteorder__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__or__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__or__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Applies the byte order information to another object using the `apply` method.</span>
 
@@ -481,7 +481,7 @@
 
 <div class="viewcode-block" id="byteorder">
 <a class="viewcode-back" href="../../library/byteorder.html#caterpillar.byteorder.byteorder">[docs]</a>
-<span class="k">def</span> <span class="nf">byteorder</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">default</span><span class="p">:</span> <span class="n">ByteOrder</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ByteOrder</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">byteorder</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">default</span><span class="p">:</span> <span class="n">ByteOrder</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ByteOrder</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the byte order of an object, defaulting to SysNative if not explicitly set.</span>
 
@@ -495,7 +495,7 @@
 <div class="viewcode-block" id="Arch">
 <a class="viewcode-back" href="../../library/byteorder.html#caterpillar.byteorder.Arch">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">Arch</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Arch</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Represents a system architecture with a name and an indication of whether it is 64-bit.</span>
 

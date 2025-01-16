@@ -30,7 +30,7 @@
   <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
@@ -446,7 +446,7 @@ processing at different stages.</p>
 <p>An action can be as simple as executing a function during packing or unpacking.
 For example:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
-<span class="k">class</span> <span class="nc">Format</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
     <span class="n">_</span><span class="p">:</span> <span class="n">Action</span><span class="p">(</span><span class="n">pack</span><span class="o">=</span><span class="k">lambda</span> <span class="n">ctx</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Hello, World!&quot;</span><span class="p">))</span>
     <span class="n">a</span><span class="p">:</span> <span class="n">uint8</span>
 </pre></div>
@@ -461,7 +461,7 @@ checksums or cryptographic hash values before or after processing fields. For
 example, you can use an action to automatically wrap a sequence of fields with a
 specialized message digest like SHA256 (see <a class="reference internal" href="../../library/fields/crypto.html#caterpillar.py.Digest" title="caterpillar.py.Digest"><code class="xref py py-class docutils literal notranslate"><span class="pre">Digest</span></code></a>):</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
-<span class="k">class</span> <span class="nc">Format</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
     <span class="n">a</span><span class="p">:</span> <span class="n">uint8</span>
     <span class="k">with</span> <span class="n">Sha2_256</span><span class="p">(</span><span class="s2">&quot;hash&quot;</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="n">user_data</span><span class="p">:</span> <span class="n">Bytes</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span>

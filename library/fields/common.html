@@ -30,7 +30,7 @@
   <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
@@ -1060,7 +1060,7 @@ The string can optionally be encoded in a specific encoding.</p>
 <p>Additionally, this class provides a type converter that can be used
 to convert a string annotation to a <cite>ConstString</cite> field.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@struct</span>
-<span class="gp">... </span><span class="k">class</span> <span class="nc">MyStruct</span><span class="p">:</span>
+<span class="gp">... </span><span class="k">class</span><span class="w"> </span><span class="nc">MyStruct</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="n">value</span><span class="p">:</span> <span class="s2">&quot;const str&quot;</span> <span class="c1"># &lt;-- will be converted to ConstString</span>
 </pre></div>
 </div>
@@ -1097,7 +1097,7 @@ preserved.</p>
 <p>This class provides a type converter that can be used to convert
 a bytes annotation to a <cite>ConstBytes</cite> field.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@struct</span>
-<span class="gp">... </span><span class="k">class</span> <span class="nc">MyStruct</span><span class="p">:</span>
+<span class="gp">... </span><span class="k">class</span><span class="w"> </span><span class="nc">MyStruct</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="n">value</span><span class="p">:</span> <span class="sa">b</span><span class="s2">&quot;const bytes&quot;</span> <span class="c1"># &lt;-- will be converted to ConstBytes</span>
 </pre></div>
 </div>
@@ -1126,7 +1126,7 @@ the specified alignment. It allows for padding before or after the field, ensuri
 that the field starts or ends at a memory address that is a multiple of the alignment.</p>
 <p>Example usage:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@struct</span>
-<span class="gp">... </span><span class="k">class</span> <span class="nc">Format</span><span class="p">:</span>
+<span class="gp">... </span><span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="n">a</span><span class="p">:</span> <span class="n">Aligned</span><span class="p">(</span><span class="n">int16</span><span class="p">,</span> <span class="n">alignment</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">after</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">... </span>    <span class="n">b</span><span class="p">:</span> <span class="n">uint8</span>
 <span class="gp">...</span>
@@ -1233,7 +1233,7 @@ to ensure that the next structure in the stream is aligned to the specified alig
 or a context lambda that computes the alignment dynamically based on the current context.</p>
 <p>Example usage:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@struct</span>
-<span class="gp">... </span><span class="k">class</span> <span class="nc">Format</span><span class="p">:</span>
+<span class="gp">... </span><span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="n">a</span><span class="p">:</span> <span class="n">uint8</span>
 <span class="gp">... </span>    <span class="n">b</span><span class="p">:</span> <span class="n">padding</span><span class="p">[</span><span class="n">align</span><span class="p">(</span><span class="mi">4</span><span class="p">)]</span>
 <span class="gp">...</span>
@@ -1383,8 +1383,8 @@ encoded representations (typically integers). It provides encoding and decoding 
 to ensure that enum values are serialized and deserialized correctly. Additionally, it supports
 a default value in case an invalid or unrecognized value is encountered during decoding.</p>
 <p>Example usage:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span> <span class="k">as</span> <span class="n">PyEnum</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Color</span><span class="p">(</span><span class="n">PyEnum</span><span class="p">):</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span> <span class="k">as</span> <span class="n">PyEnum</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span><span class="w"> </span><span class="nc">Color</span><span class="p">(</span><span class="n">PyEnum</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="n">RED</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="gp">... </span>    <span class="n">GREEN</span> <span class="o">=</span> <span class="mi">2</span>
 <span class="gp">... </span>    <span class="n">BLUE</span> <span class="o">=</span> <span class="mi">3</span>
@@ -1556,12 +1556,12 @@ fields may not always be used.</p>
 The <cite>struct_fn</cite> function is invoked to generate the struct when the field is accessed.</p>
 <p>Example usage:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@struct</span>
-<span class="gp">... </span><span class="k">class</span> <span class="nc">Format</span><span class="p">:</span>
+<span class="gp">... </span><span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="n">a</span><span class="p">:</span> <span class="n">Lazy</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">SecondFormat</span><span class="p">)</span>  <span class="c1"># Lazy instantiation of the struct</span>
 <span class="gp">... </span>    <span class="n">b</span><span class="p">:</span> <span class="n">uint8</span>
 <span class="gp">...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nd">@struct</span>
-<span class="gp">... </span><span class="k">class</span> <span class="nc">SecondFormat</span><span class="p">:</span>
+<span class="gp">... </span><span class="k">class</span><span class="w"> </span><span class="nc">SecondFormat</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="n">a</span><span class="p">:</span> <span class="n">uint8</span>
 <span class="gp">...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">Format</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x01\x02\xFF</span><span class="s2">&quot;</span><span class="p">)</span>
