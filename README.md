@@ -40,8 +40,11 @@ class Format:
     b: int32
     length: uint8             # String fields with computed lengths
     name: String(this.length) #  -> you can also use Prefixed(uint8)
-    with Md5(name="hash", verify=True): # wraps all following fields and creates a new attr
-        names: CString[uint8::]    # Sequences with prefixed, computed lengths
+
+    # wraps all following fields and creates a new attr
+    with Md5(name="hash", verify=True):
+        # Sequences with prefixed, computed lengths
+        names: CString[uint8::]
 
 
 # Instantiation (keyword-only arguments, magic is auto-inferred):
