@@ -848,6 +848,7 @@ class CString(FieldStruct):
                 if not value or value[0] == self._raw_pad[0]:
                     break
                 data.extend(value)
+            value = bytes(data)
         else:
             length = self.__size__(context)
             value: bytes = context[CTX_STREAM].read(length)
