@@ -77,7 +77,7 @@ Bytes, Strings
     :members:
 
     .. versionadded:: 2.4.0
-        Added support for arbitrary structs
+        Added support for arbitrary structs. **Warning: the second parameter is now a struct instead of the encoding string.**
 
 .. autoclass:: caterpillar.py.CString
     :members:

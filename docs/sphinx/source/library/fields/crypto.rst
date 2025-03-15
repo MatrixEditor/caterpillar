@@ -10,7 +10,11 @@ Hashes
 
 .. autoclass:: caterpillar.py.Algorithm
 
+    .. versionadded:: 2.4.0
+
 .. autoclass:: caterpillar.py.Digest
+
+    .. versionadded:: 2.4.0
 
 Ciphers
 -------

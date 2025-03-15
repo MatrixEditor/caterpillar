@@ -1,4 +1,4 @@
-# Copyright (C) MatrixEditor 2023-2024
+# Copyright (C) MatrixEditor 2023-2025
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ from typing import Any, Callable, Optional, Self, Type
 from caterpillar.abc import _ContextLike, _StructLike, _ContextLambda
 from caterpillar.context import CTX_OBJECT, CTX_STREAM
 from caterpillar.exception import StructException, ValidationError
-from caterpillar.shared import MODE_PACK, Action
+from caterpillar.shared import Action
 from caterpillar.fields.hook import (
     IOHook,
 )
@@ -290,9 +290,19 @@ class Digest:
             raise ValueError(
                 (
                     f"Digest with start action {self.name!r} already exists! "
-                    "Make sure that each checksum uses a unique name."
+                    "Make sure that each digest uses a unique name."
                 )
             )
+
+        if self.name in annotations:
+            raise ValueError(
+                (
+                    f"Digest with name {self.name!r} already exists "
+                    "before the start action. Make sure that each digest "
+                    "uses a unique name."
+                )
+            )
+
         annotations[start_action_name] = Action(self.begin, self.begin)
         return self
 
