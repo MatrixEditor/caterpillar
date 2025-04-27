@@ -12,6 +12,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+import sys
+import warnings
+
 from typing import Union, Any
 from typing import Optional
 from caterpillar.abc import _ContextLambda, _StructLike
@@ -38,6 +41,11 @@ class ConditionalChain:
     __slots__ = "chain", "conditions"
 
     def __init__(self, struct: _StructLike, condition: _ContextLambda) -> None:
+        if (sys.version_info.major, sys.version_info.minor) >= (3, 14):
+            warnings.warn(
+                "Python3.14 breaks support for Contitional fields. Conditional "
+                "statements must be defined manually until a fix has been released."
+            )
         self.chain = {}
         self.conditions = []
         self.add(struct, condition)

@@ -1003,7 +1003,12 @@ cp_struct_add_slots(CpStructObject* self)
     }
   }
 
-  // Get rid of the __dict__ attribute
+// Get rid of the __dict__ attribute
+#if PY_3_13_PLUS
+  PyDict_Pop(dict, state->str___dict__, NULL);
+  PyDict_Pop(dict, state->str___weakref__, NULL);
+
+#else
   PyObject* tmp = _PyDict_Pop(dict, state->str___dict__, NULL);
   Py_XDECREF(tmp);
 
@@ -1011,6 +1016,7 @@ cp_struct_add_slots(CpStructObject* self)
   // because it belongs to the previous type.
   tmp = _PyDict_Pop(dict, state->str___weakref__, NULL);
   Py_XDECREF(tmp);
+#endif
 
   PyObject* tuple = PyList_AsTuple(slots);
   if (!tuple) {

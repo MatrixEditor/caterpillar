@@ -12,6 +12,12 @@
 > This project is still in beta/testing phase. Expect bugs, naming changes and errors while using this
 > library. C API Reference is WIP, C extensions are supported since v2.1.0.
 
+> [!NOTE]
+> Python 3.14 breaks `with` statements in class definitions since `__annotations__` are added at the end
+> of a class definition. Therefore, `Digest` and contiaitonal statements **ARE NOT SUPPORTED** in Python 3.14+.
+
+
+
 Caterpillar is a Python 3.12+ library to pack and unpack structurized binary data. It
 enhances the capabilities of [Python Struct](https://docs.python.org/3/library/struct.html)
 by enabling direct class declaration. More information about the different configuration
@@ -42,6 +48,7 @@ class Format:
     name: String(this.length) #  -> you can also use Prefixed(uint8)
 
     # wraps all following fields and creates a new attr
+    # only for Python <= 3.13
     with Md5(name="hash", verify=True):
         # Sequences with prefixed, computed lengths
         names: CString[uint8::]

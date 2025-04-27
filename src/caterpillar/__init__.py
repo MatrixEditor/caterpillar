@@ -12,6 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+import warnings
 
 __version__ = "2.4.2"
 __release__ = None
@@ -27,3 +28,7 @@ def native_support():
         return True
     except ImportError:
         return False
+
+
+# Explicitly report deprecation warnings
+warnings.filterwarnings("default", module="caterpillar")

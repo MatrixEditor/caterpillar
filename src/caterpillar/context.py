@@ -12,10 +12,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-from __future__ import annotations
-
 import operator
 import sys
+import warnings
 
 from typing import Callable, Any, Union, Self
 from types import FrameType
@@ -107,108 +106,108 @@ class ExprMixin:
     A mixin class providing methods for creating binary and unary expressions.
     """
 
-    def __add__(self, other) -> ExprMixin:
+    def __add__(self, other):
         return BinaryExpression(operator.add, self, other)
 
-    def __sub__(self, other) -> ExprMixin:
+    def __sub__(self, other):
         return BinaryExpression(operator.sub, self, other)
 
-    def __mul__(self, other) -> ExprMixin:
+    def __mul__(self, other):
         return BinaryExpression(operator.mul, self, other)
 
-    def __floordiv__(self, other) -> ExprMixin:
+    def __floordiv__(self, other):
         return BinaryExpression(operator.floordiv, self, other)
 
-    def __truediv__(self, other) -> ExprMixin:
+    def __truediv__(self, other):
         return BinaryExpression(operator.truediv, self, other)
 
-    def __mod__(self, other) -> ExprMixin:
+    def __mod__(self, other):
         return BinaryExpression(operator.mod, self, other)
 
-    def __pow__(self, other) -> ExprMixin:
+    def __pow__(self, other):
         return BinaryExpression(operator.pow, self, other)
 
-    def __xor__(self, other) -> ExprMixin:
+    def __xor__(self, other):
         return BinaryExpression(operator.xor, self, other)
 
-    def __and__(self, other) -> ExprMixin:
+    def __and__(self, other):
         return BinaryExpression(operator.and_, self, other)
 
-    def __or__(self, other) -> ExprMixin:
+    def __or__(self, other):
         return BinaryExpression(operator.or_, self, other)
 
-    def __rshift__(self, other) -> ExprMixin:
+    def __rshift__(self, other):
         return BinaryExpression(operator.rshift, self, other)
 
-    def __lshift__(self, other) -> ExprMixin:
+    def __lshift__(self, other):
         return BinaryExpression(operator.lshift, self, other)
 
     __div__ = __truediv__
 
-    def __radd__(self, other) -> ExprMixin:
+    def __radd__(self, other):
         return BinaryExpression(operator.add, other, self)
 
-    def __rsub__(self, other) -> ExprMixin:
+    def __rsub__(self, other):
         return BinaryExpression(operator.sub, other, self)
 
-    def __rmul__(self, other) -> ExprMixin:
+    def __rmul__(self, other):
         return BinaryExpression(operator.mul, other, self)
 
-    def __rfloordiv__(self, other) -> ExprMixin:
+    def __rfloordiv__(self, other):
         return BinaryExpression(operator.floordiv, other, self)
 
-    def __rtruediv__(self, other) -> ExprMixin:
+    def __rtruediv__(self, other):
         return BinaryExpression(operator.truediv, other, self)
 
-    def __rmod__(self, other) -> ExprMixin:
+    def __rmod__(self, other):
         return BinaryExpression(operator.mod, other, self)
 
-    def __rpow__(self, other) -> ExprMixin:
+    def __rpow__(self, other):
         return BinaryExpression(operator.pow, other, self)
 
-    def __rxor__(self, other) -> ExprMixin:
+    def __rxor__(self, other):
         return BinaryExpression(operator.xor, other, self)
 
-    def __rand__(self, other) -> ExprMixin:
+    def __rand__(self, other):
         return BinaryExpression(operator.and_, other, self)
 
-    def __ror__(self, other) -> ExprMixin:
+    def __ror__(self, other):
         return BinaryExpression(operator.or_, other, self)
 
-    def __rrshift__(self, other) -> ExprMixin:
+    def __rrshift__(self, other):
         return BinaryExpression(operator.rshift, other, self)
 
-    def __rlshift__(self, other) -> ExprMixin:
+    def __rlshift__(self, other):
         return BinaryExpression(operator.lshift, other, self)
 
-    def __neg__(self) -> ExprMixin:
+    def __neg__(self):
         return UnaryExpression("neg", operator.neg, self)
 
-    def __pos__(self) -> ExprMixin:
+    def __pos__(self):
         return UnaryExpression("pos", operator.pos, self)
 
-    def __invert__(self) -> ExprMixin:
+    def __invert__(self):
         return UnaryExpression("invert", operator.not_, self)
 
-    def __contains__(self, other) -> ExprMixin:
+    def __contains__(self, other):
         return BinaryExpression(operator.contains, self, other)
 
-    def __gt__(self, other) -> ExprMixin:
+    def __gt__(self, other):
         return BinaryExpression(operator.gt, self, other)
 
-    def __ge__(self, other) -> ExprMixin:
+    def __ge__(self, other):
         return BinaryExpression(operator.ge, self, other)
 
-    def __lt__(self, other) -> ExprMixin:
+    def __lt__(self, other):
         return BinaryExpression(operator.lt, self, other)
 
-    def __le__(self, other) -> ExprMixin:
+    def __le__(self, other):
         return BinaryExpression(operator.le, self, other)
 
-    def __eq__(self, other) -> ExprMixin:
+    def __eq__(self, other):
         return BinaryExpression(operator.eq, self, other)
 
-    def __ne__(self, other) -> ExprMixin:
+    def __ne__(self, other):
         return BinaryExpression(operator.ne, self, other)
 
 
@@ -239,6 +238,11 @@ class ConditionContext:
     __slots__ = "func", "annotations", "namelist", "depth"
 
     def __init__(self, condition: Union[_ContextLambda, bool], depth=2):
+        if (sys.version_info.major, sys.version_info.minor) >= (3, 14):
+            warnings.warn(
+                "Python3.14 breaks support for Contitional fields. Conditional "
+                "statements must be defined manually until a fix has been released."
+            )
         self.func = condition
         self.annotations = None
         self.namelist = None

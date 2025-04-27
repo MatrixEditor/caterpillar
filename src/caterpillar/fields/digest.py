@@ -14,6 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import sys
 import hashlib
+import warnings
 import zlib
 
 from typing import Any, Callable, Optional, Self, Type
@@ -29,7 +30,6 @@ from ._base import Field
 from .common import Bytes, uint32
 
 DEFAULT_DIGEST_PATH = "digest"
-
 
 class _DigestValue:
     """
@@ -236,11 +236,17 @@ class Digest:
         verify: bool = False,
         path: Optional[str] = None,
     ) -> None:
+        if (sys.version_info.major, sys.version_info.minor) >= (3, 14):
+            warnings.warn(
+                "Python3.14 breaks support for Digest fields. The hash must be calculated "
+                "manually until a fix has been released."
+            )
+
         self.algo = algorithm
         self.name = name or DEFAULT_DIGEST_PATH
         if "." in self.name:
             raise ValueError(
-                "Digest name must not contain '.' character. " "Use path instead."
+                "Digest name must not contain '.' character. Use path instead."
             )
 
         # IO will be initialized in self.begin
@@ -262,8 +268,12 @@ class Digest:
         :raises StructException: If annotations cannot be retrieved from the frame.
         """
         try:
+            # This will not work on Python3.14+ but supresses errors
+            if "__annotations__" not in frame.f_locals:
+                frame.f_locals["__annotations__"] = {}
+
             return frame.f_locals["__annotations__"]
-        except AttributeError as exc:
+        except KeyError as exc:
             module = frame.f_locals.get("__module__")
             qualname = frame.f_locals.get("__qualname__")
             msg = f"Could not get annotations in {module} (context={qualname!r})"
@@ -591,3 +601,6 @@ except ImportError:
     Sha3_512 = _hash_digest(Sha3_512_Algo, Bytes(64))
     Md5 = _hash_digest(Md5_Algo, Bytes(16))
     Sm3 = None
+
+    HMACAlgorithm = None
+    HMAC = None

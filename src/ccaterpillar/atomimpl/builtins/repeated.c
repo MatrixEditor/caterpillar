@@ -205,7 +205,7 @@ CpRepeatedAtom_Pack(CpRepeatedAtomObject* self,
       goto failure;
     }
     seq_layer->ob_base.m_path = PyUnicode_FromFormat(
-      "%s.%d", _PyUnicode_AsString(layer->m_path), seq_layer->m_index);
+      "%s.%d", PyUnicode_AsUTF8AndSize(layer->m_path, NULL), seq_layer->m_index);
     if (!seq_layer->ob_base.m_path) {
       Py_XDECREF(obj);
       goto failure;
@@ -283,7 +283,7 @@ CpRepeatedAtom_Unpack(CpRepeatedAtomObject* self, CpLayerObject* layer)
     seq_layer, seq, lengthinfo->m_length, lengthinfo->m_greedy);
   while (seq_layer->s_greedy || (seq_layer->m_index < seq_layer->m_length)) {
     seq_layer->ob_base.m_path = PyUnicode_FromFormat(
-      "%s.%d", _PyUnicode_AsString(layer->m_path), seq_layer->m_index);
+      "%s.%d", PyUnicode_AsUTF8AndSize(layer->m_path, NULL), seq_layer->m_index);
     if (!seq_layer->ob_base.m_path) {
       goto fail;
     }
