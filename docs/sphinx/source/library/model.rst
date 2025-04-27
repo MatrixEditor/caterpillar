@@ -10,6 +10,10 @@ Struct Model
 Base classes
 ------------
 
+.. autoclass:: caterpillar.py.Action
+
+    .. versionadded:: 2.4.0
+
 .. autoclass:: caterpillar.model.Sequence()
     :members:
 

@@ -53,7 +53,6 @@ struct _stateobj
   PyObject* m_offset_table;
 };
 
-
 /**
  * @brief Check whether the given object is a state
  *
@@ -74,7 +73,8 @@ struct _stateobj
 
 //-----------------------------------------------------------------------------
 // layer
-enum {
+enum
+{
   CpLayerClass_Default = 0,
   CpLayerClass_Sequence = 1,
   CpLayerClass_Object = 2,
@@ -88,8 +88,8 @@ struct _layerobj
 {
   PyObject_HEAD
 
-  /// The parent layer
-  struct _layerobj* m_parent;
+    /// The parent layer
+    struct _layerobj* m_parent;
 
   /// the global parsing state
   CpStateObject* m_state;
@@ -117,8 +117,10 @@ struct _layerobj
 
   // /// When packing or unpacking objects, the current object attributes are
   // /// stored within an object context. This is a special context that allows
-  // /// access to previously parsed fields or attributes of the input object. To
-  // /// minimize the number of calls using this attribute, a shortcut named `this`
+  // /// access to previously parsed fields or attributes of the input object.
+  // To
+  // /// minimize the number of calls using this attribute, a shortcut named
+  // `this`
   // /// was defined, which automatically inserts a path to the object context.
   // PyObject* m_obj;
 
@@ -133,7 +135,8 @@ struct _layerobj
   // Py_ssize_t m_length;
 
   // /// When packing or unpacking collections of elements, the current working
-  // /// index is given under this layer variable. It is set only in this specific
+  // /// index is given under this layer variable. It is set only in this
+  // specific
   // /// situation.
   // Py_ssize_t m_index;
 
@@ -165,10 +168,11 @@ struct _layerobj
   Py_XSETREF(                                                                  \
     (layer)->m_path,                                                           \
     PyUnicode_FromFormat("%s.%s",                                              \
-                         _PyUnicode_AsString((layer)->m_parent                 \
-                                               ? (layer)->m_parent->m_path     \
-                                               : (layer)->m_path),             \
-                         _PyUnicode_AsString((newpath))));
+                         PyUnicode_AsUTF8AndSize((layer)->m_parent             \
+                                                   ? (layer)->m_parent->m_path \
+                                                   : (layer)->m_path,          \
+                                                 NULL),                        \
+                         PyUnicode_AsUTF8AndSize((newpath), NULL)));
 
 //-----------------------------------------------------------------------------
 // seq layer
@@ -177,8 +181,8 @@ struct _seqlayerobj
 {
   CpLayer_HEAD
 
-  /// Same as `m_obj` but for the sequential elements.
-  PyObject* m_sequence;
+    /// Same as `m_obj` but for the sequential elements.
+    PyObject* m_sequence;
 
   /// The length of the current collection.
   Py_ssize_t m_length;
@@ -201,12 +205,13 @@ struct _objlayerobj
 {
   CpLayer_HEAD
 
-  /// When packing or unpacking objects, the current object attributes are
-  /// stored within an object context. This is a special context that allows
-  /// access to previously parsed fields or attributes of the input object. To
-  /// minimize the number of calls using this attribute, a shortcut named `this`
-  /// was defined, which automatically inserts a path to the object context.
-  PyObject* m_obj;
+    /// When packing or unpacking objects, the current object attributes are
+    /// stored within an object context. This is a special context that allows
+    /// access to previously parsed fields or attributes of the input object. To
+    /// minimize the number of calls using this attribute, a shortcut named
+    /// `this` was defined, which automatically inserts a path to the object
+    /// context.
+      PyObject* m_obj;
 };
 
 #define CpObjLayer_CheckExact(v) Py_IS_TYPE((v), &CpObjLayer_Type)

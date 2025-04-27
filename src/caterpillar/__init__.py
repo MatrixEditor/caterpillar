@@ -1,4 +1,4 @@
-# Copyright (C) MatrixEditor 2023-2024
+# Copyright (C) MatrixEditor 2023-2025
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -12,8 +12,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+import warnings
 
-__version__ = "2.4.2"
+__version__ = "2.4.3"
 __release__ = None
 __author__ = "MatrixEditor"
 
@@ -27,3 +28,7 @@ def native_support():
         return True
     except ImportError:
         return False
+
+
+# Explicitly report deprecation warnings
+warnings.filterwarnings("default", module="caterpillar")

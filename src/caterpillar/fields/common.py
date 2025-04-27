@@ -1,4 +1,4 @@
-# Copyright (C) MatrixEditor 2023-2024
+# Copyright (C) MatrixEditor 2023-2025
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -12,9 +12,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-from io import BytesIO
 import struct as PyStruct
+import warnings
 
+from io import BytesIO
 from typing import Sequence, Any, Optional, Union, List, Callable
 from types import EllipsisType, NoneType
 from functools import cached_property
@@ -43,6 +44,8 @@ from caterpillar._common import WithoutContextVar
 from ._base import Field, INVALID_DEFAULT, singleton
 from ._mixin import FieldStruct
 
+# Explicitly report deprecation warnings
+warnings.filterwarnings("default", category=DeprecationWarning, module=__name__)
 
 ENUM_STRICT = Flag("enum.strict")
 
@@ -1128,8 +1131,12 @@ class Prefixed(FieldStruct):
     **Please note that this class will have a huge impact on the resulting packing and
     unpacking time and will increase it significantly.**
 
+    Starting from v2.4.0, this class uses the `struct` as its second parameter, moving the
+    'encoding' parameter to the third parameter.
+
     :param prefix: The struct that defines the prefix (e.g., a length field).
     :param struct: The struct that defines the data to follow the prefix (e.g., `Bytes` or another field).
+    :param encoding: The encoding to use for the prefix.
     """
 
     __slots__ = ("prefix", "struct", "encoding")
@@ -1143,6 +1150,13 @@ class Prefixed(FieldStruct):
         self.prefix = prefix
         self.struct = struct
         self.encoding = encoding
+        # Support str as second argument
+        if isinstance(struct, str):
+            warnings.warn(
+                "Using a string as the second argument is deprecated since 2.4.0. Please use encoding=... instead!",
+                DeprecationWarning,
+            )
+            self.encoding, self.struct = struct, None
 
     def __type__(self) -> Optional[Union[type, str]]:
         """

@@ -1,4 +1,4 @@
-# Copyright (C) MatrixEditor 2023-2024
+# Copyright (C) MatrixEditor 2023-2025
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -12,6 +12,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+import sys
+import warnings
+
 from typing import Union, Any
 from typing import Optional
 from caterpillar.abc import _ContextLambda, _StructLike
@@ -38,6 +41,11 @@ class ConditionalChain:
     __slots__ = "chain", "conditions"
 
     def __init__(self, struct: _StructLike, condition: _ContextLambda) -> None:
+        if (sys.version_info.major, sys.version_info.minor) >= (3, 14):
+            warnings.warn(
+                "Python3.14 breaks support for Contitional fields. Conditional "
+                "statements must be defined manually until a fix has been released."
+            )
         self.chain = {}
         self.conditions = []
         self.add(struct, condition)
@@ -88,6 +96,10 @@ class ConditionalChain:
 class If(ConditionContext):
     """If-statement implementation for class definitions.
 
+    .. versionchanged:: 2.4.5
+
+        Python 3.14 is **not** supported.
+
     .. code-block:: python
 
         @struct
@@ -113,6 +125,10 @@ class If(ConditionContext):
 
 class ElseIf(ConditionContext):
     """ElseIf-statement implementation for class definitions.
+
+    .. versionchanged:: 2.4.3
+
+        Python 3.14 is **not** supported.
 
     .. code-block:: python
 

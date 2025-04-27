@@ -2,6 +2,10 @@
 
 #include "caterpillar/caterpillar.h"
 
+#if PY_3_13_PLUS
+#define _Py_IMMORTAL_REFCNT _Py_IMMORTAL_INITIAL_REFCNT
+#endif
+
 static PyObject*
 cp_invaliddefault_new(PyTypeObject* type, PyObject* args, PyObject* kw)
 {

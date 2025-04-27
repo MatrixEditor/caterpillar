@@ -1,4 +1,4 @@
-# Copyright (C) MatrixEditor 2023-2024
+# Copyright (C) MatrixEditor 2023-2025
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,8 +16,9 @@ from typing import Any, Callable
 from caterpillar.abc import _ContextLike
 
 # --- Shared Concepts ---
-# TODO: This section need some docs
+# TODO: This section needs some docs
 
+# additional modifies set in the root context of each operation
 MODE_PACK = 0
 MODE_UNPACK = 1
 
@@ -85,10 +86,10 @@ class Action:
     The action itself is not stored as part of the struct's model; it merely runs
     during struct processing.
 
-    :param run_pack: The callable that will be executed before packing the struct (optional).
-    :type run_pack: Callable[[_ContextLike], None] | None
-    :param run_unpack: The callable that will be executed before unpacking the struct (optional).
-    :type run_unpack: Callable[[_ContextLike], None] | None
+    :param pack: The callable that will be executed before packing the struct (optional).
+    :type pack: Callable[[_ContextLike], None] | None
+    :param unpack: The callable that will be executed before unpacking the struct (optional).
+    :type unpack: Callable[[_ContextLike], None] | None
     """
 
     __slots__ = (ATTR_ACTION_PACK, ATTR_ACTION_UNPACK)
