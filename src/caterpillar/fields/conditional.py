@@ -96,6 +96,10 @@ class ConditionalChain:
 class If(ConditionContext):
     """If-statement implementation for class definitions.
 
+    .. versionchanged:: 2.4.5
+
+        Python 3.14 is **not** supported.
+
     .. code-block:: python
 
         @struct
@@ -121,6 +125,10 @@ class If(ConditionContext):
 
 class ElseIf(ConditionContext):
     """ElseIf-statement implementation for class definitions.
+
+    .. versionchanged:: 2.4.3
+
+        Python 3.14 is **not** supported.
 
     .. code-block:: python
 

@@ -45,6 +45,8 @@ class _DigestValue:
 
 class Algorithm:
     """
+    .. versionadded:: 2.4.0
+
     A class representing a cryptographic or checksum algorithm.
 
     This class allows for the creation, updating, and finalization of values using a
@@ -163,9 +165,14 @@ class Algorithm:
 
 
 class Digest:
-    """
-    A class to handle the creation, updating, and verification of digests
+    """A class to handle the creation, updating, and verification of digests
     using a specified algorithm.
+
+    .. versionadded:: 2.4.0
+
+    .. versionchanged:: 2.4.3
+
+        Python 3.14 is **not** supported.
 
     The `Digest` class allows you to integrate hash or checksum algorithms
     into a struct by installing hooks that manage the digest state during
