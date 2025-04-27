@@ -14,7 +14,7 @@
 
 > [!NOTE]
 > Python 3.14 breaks `with` statements in class definitions since `__annotations__` are added at the end
-> of a class definition. Therefore, `Digest` and contiaitonal statements **ARE NOT SUPPORTED** in Python 3.14+.
+> of a class definition. Therefore, `Digest` and conditional statements **ARE NOT SUPPORTED** in Python 3.14+.
 
 
 
