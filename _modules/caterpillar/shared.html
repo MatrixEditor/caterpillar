@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>caterpillar.exception &#8212; Caterpillar 2.4.3 documentation</title>
+    <title>caterpillar.shared &#8212; Caterpillar 2.4.3 documentation</title>
   
   
   
@@ -45,7 +45,7 @@
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../_static/design-tabs.js?v=f930bc37"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/caterpillar/exception';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/caterpillar/shared';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -358,7 +358,7 @@
     
     <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Module code</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">caterpillar.exception</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">caterpillar.shared</span></li>
   </ul>
 </nav>
 </div>
@@ -375,7 +375,7 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <h1>Source code for caterpillar.exception</h1><div class="highlight"><pre>
+  <h1>Source code for caterpillar.shared</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Copyright (C) MatrixEditor 2023-2025</span>
 <span class="c1">#</span>
 <span class="c1"># This program is free software: you can redistribute it and/or modify</span>
@@ -390,98 +390,140 @@
 <span class="c1">#</span>
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
-
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">_ContextLike</span>
 
+<span class="c1"># --- Shared Concepts ---</span>
+<span class="c1"># TODO: This section needs some docs</span>
 
-<div class="viewcode-block" id="StructException">
-<a class="viewcode-back" href="../../library/exceptions.html#caterpillar.exception.StructException">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">StructException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for all struct-related exceptions&quot;&quot;&quot;</span>
+<span class="c1"># additional modifies set in the root context of each operation</span>
+<span class="n">MODE_PACK</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">MODE_UNPACK</span> <span class="o">=</span> <span class="mi">1</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">context</span>
-        <span class="k">if</span> <span class="n">context</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">add_note</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Context-Path: </span><span class="si">{</span><span class="n">context</span><span class="o">.</span><span class="n">__context_getattr__</span><span class="p">(</span><span class="s1">&#39;_path&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+<span class="c1"># REVISIT: taken from reference</span>
+<span class="c1">#: All models annotated with either @struct or @bitfield are struct</span>
+<span class="c1">#: containers. Thus, they store the additional class attribute `__struct__`.</span>
+<span class="c1">#:</span>
+<span class="c1">#: Internally, any types utilizing this attribute can be employed within a</span>
+<span class="c1">#: struct, bitfield, or sequence definition. The type of the stored value</span>
+<span class="c1">#: must be conforming to the _StructLike protocol.</span>
+<span class="n">ATTR_STRUCT</span> <span class="o">=</span> <span class="s2">&quot;__struct__&quot;</span>
+
+<span class="c1"># TODO: add to reference</span>
+<span class="c1"># NEW CONCEPT: Actions</span>
+<span class="c1"># An annotation that is equipped with an action attribute indicates that</span>
+<span class="c1"># the struct will execute this very action instead of parsing the field.</span>
+<span class="c1">#</span>
+<span class="c1"># PROPOSAL:</span>
+<span class="c1">#   For instance, an action could be used to install an IOHook on the</span>
+<span class="c1">#   current stream (checksum or hash calculation).</span>
+<span class="c1">#</span>
+<span class="c1">#       class MyAction:</span>
+<span class="c1">#           def __action__(self, context: _ContextLike) -&gt; None:</span>
+<span class="c1">#               ...</span>
+<span class="c1">#</span>
+<span class="c1">#       @struct</span>
+<span class="c1">#       class MyStruct:</span>
+<span class="c1">#           any_name: MyAction()</span>
+<span class="c1">#</span>
+<span class="c1">#   The action will be executed before the next field is parsed and won&#39;t</span>
+<span class="c1">#   be stored in the model of the struct.</span>
+<span class="n">ATTR_ACTION_PACK</span> <span class="o">=</span> <span class="s2">&quot;__action_pack__&quot;</span>
+<span class="n">ATTR_ACTION_UNPACK</span> <span class="o">=</span> <span class="s2">&quot;__action_unpack__&quot;</span>
 
 
-
-<div class="viewcode-block" id="DynamicSizeError">
-<a class="viewcode-back" href="../../library/exceptions.html#caterpillar.exception.DynamicSizeError">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">DynamicSizeError</span><span class="p">(</span><span class="n">StructException</span><span class="p">):</span>
+<div class="viewcode-block" id="Action">
+<a class="viewcode-back" href="../../library/model.html#caterpillar.py.Action">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Action</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Exception raised for errors related to dynamic sizes in structs.</span>
+<span class="sd">    A class representing an action to be executed during the parsing or processing</span>
+<span class="sd">    of a struct. This is used for cases where a field requires an operation to be</span>
+<span class="sd">    performed instead of directly storing data.</span>
 
-<span class="sd">    This can be used when there are issues with determining the size of a struct element at runtime.</span>
-<span class="sd">    &quot;&quot;&quot;</span></div>
+<span class="sd">    An action can be used to execute custom logic (such as modifying the IO stream)</span>
+<span class="sd">    before the next field is processed. For example, it could be used to trigger</span>
+<span class="sd">    checksum or hash calculations before reading a struct field.</span>
 
+<span class="sd">    There are two types of actions:</span>
 
+<span class="sd">    1. **Packing actions**: These actions are triggered before packing the data into the struct (i.e., before serializing or encoding).</span>
+<span class="sd">    2. **Unpacking actions**: These actions are triggered before unpacking the data from the struct (i.e., before deserializing or decoding).</span>
 
-<div class="viewcode-block" id="OptionError">
-<a class="viewcode-back" href="../../library/exceptions.html#caterpillar.exception.OptionError">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">OptionError</span><span class="p">(</span><span class="n">StructException</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Exception raised for errors related to options in structs.</span>
+<span class="sd">    Example:</span>
 
-<span class="sd">    This can be used when there are issues with handling options or choices within a struct.</span>
-<span class="sd">    &quot;&quot;&quot;</span></div>
+<span class="sd">    &gt;&gt;&gt; def checksum_action(context: _ContextLike) -&gt; None:</span>
+<span class="sd">    ...     # This action could perform some checksum or logging logic</span>
+<span class="sd">    ...     pass</span>
+<span class="sd">    ...</span>
+<span class="sd">    &gt;&gt;&gt; @struct</span>
+<span class="sd">    ... class MyStruct:</span>
+<span class="sd">    ...     some_field: Bytes(10)</span>
+<span class="sd">    ...     checksum: Action(checksum_action) # runs only when packing</span>
 
+<span class="sd">    In this example, the `checksum` field is an action, and the `checksum_action`</span>
+<span class="sd">    will be invoked before the `some_field` field is parsed.</span>
 
+<span class="sd">    The action itself is not stored as part of the struct&#39;s model; it merely runs</span>
+<span class="sd">    during struct processing.</span>
 
-<div class="viewcode-block" id="ValidationError">
-<a class="viewcode-back" href="../../library/exceptions.html#caterpillar.exception.ValidationError">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">ValidationError</span><span class="p">(</span><span class="n">StructException</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Exception raised for errors related to validation in structs.</span>
+<span class="sd">    :param pack: The callable that will be executed before packing the struct (optional).</span>
+<span class="sd">    :type pack: Callable[[_ContextLike], None] | None</span>
+<span class="sd">    :param unpack: The callable that will be executed before unpacking the struct (optional).</span>
+<span class="sd">    :type unpack: Callable[[_ContextLike], None] | None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
-<span class="sd">    This can be used when there are issues with validating the structure or content of a struct.</span>
-<span class="sd">    &quot;&quot;&quot;</span></div>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="n">ATTR_ACTION_PACK</span><span class="p">,</span> <span class="n">ATTR_ACTION_UNPACK</span><span class="p">)</span>
 
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">pack</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">_ContextLike</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">unpack</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">_ContextLike</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__action_pack__</span> <span class="o">=</span> <span class="n">pack</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__action_unpack__</span> <span class="o">=</span> <span class="n">unpack</span>
 
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a string representation of the action, showing its callable name</span>
+<span class="sd">        and location.</span>
 
-<div class="viewcode-block" id="UnsupportedOperation">
-<a class="viewcode-back" href="../../library/exceptions.html#caterpillar.exception.UnsupportedOperation">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">UnsupportedOperation</span><span class="p">(</span><span class="n">StructException</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Exception raised for unsupported operations in structs.</span>
+<span class="sd">        If only one of the action types is provided (either packing or unpacking),</span>
+<span class="sd">        the corresponding action type (`PackAction` or `UnpackAction`) is displayed.</span>
 
-<span class="sd">    This can be used when attempting an operation that is not supported or allowed in the context of structs.</span>
-<span class="sd">    &quot;&quot;&quot;</span></div>
+<span class="sd">        :return: A string representation of the action.</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Action&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__action_pack__</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__action_unpack__</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;PackAction&quot;</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__action_pack__</span><span class="o">.</span><span class="vm">__qualname__</span><span class="si">}</span><span class="s2">)&quot;</span>
 
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">__action_unpack__</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__action_pack__</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;UnpackAction&quot;</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__action_unpack__</span><span class="o">.</span><span class="vm">__qualname__</span><span class="si">}</span><span class="s2">)&quot;</span>
 
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__action_pack__</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__action_unpack__</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">name</span>
 
-<div class="viewcode-block" id="InvalidValueError">
-<a class="viewcode-back" href="../../library/exceptions.html#caterpillar.exception.InvalidValueError">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">InvalidValueError</span><span class="p">(</span><span class="n">StructException</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    An exception raised for invalid configuration values.</span>
-<span class="sd">    &quot;&quot;&quot;</span></div>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__action_pack__</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">__action_unpack__</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__action_pack__</span><span class="o">.</span><span class="vm">__qualname__</span><span class="si">}</span><span class="s2">)&quot;</span>
 
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__action_pack__</span><span class="o">.</span><span class="vm">__qualname__</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__action_unpack__</span><span class="o">.</span><span class="vm">__qualname__</span><span class="si">}</span><span class="s2">)&quot;</span>
 
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_action</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if the given object is an instance of an `Action` class,</span>
+<span class="sd">        based on the presence of the `__action_pack__` or `__action_unpack__` attributes.</span>
 
-<div class="viewcode-block" id="StreamError">
-<a class="viewcode-back" href="../../library/exceptions.html#caterpillar.exception.StreamError">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">StreamError</span><span class="p">(</span><span class="n">StructException</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    An exception raised for read and write issues.</span>
-<span class="sd">    &quot;&quot;&quot;</span></div>
-
-
-
-<div class="viewcode-block" id="DelegationError">
-<a class="viewcode-back" href="../../library/exceptions.html#caterpillar.exception.DelegationError">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">DelegationError</span><span class="p">(</span><span class="n">StructException</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    An exception used if underlying calls fail.</span>
-<span class="sd">    &quot;&quot;&quot;</span></div>
-
-
-
-<div class="viewcode-block" id="Stop">
-<a class="viewcode-back" href="../../library/exceptions.html#caterpillar.exception.Stop">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">Stop</span><span class="p">(</span><span class="n">StructException</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Stops the current parsing process&quot;&quot;&quot;</span></div>
+<span class="sd">        :param obj: The object to check.</span>
+<span class="sd">        :type obj: Any</span>
+<span class="sd">        :return: True if the object has either a `__action_pack__` or `__action_unpack__` attribute, indicating it is an action.</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span>
+            <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="p">(</span><span class="n">ATTR_ACTION_PACK</span><span class="p">,</span> <span class="n">ATTR_ACTION_UNPACK</span><span class="p">)</span>
+        <span class="p">)</span></div>
 
 </pre></div>
 

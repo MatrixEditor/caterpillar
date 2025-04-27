@@ -30,6 +30,9 @@ effects that are not tied to the direct data of the struct.
 Advanced Usage: Message Digests
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+.. warning::
+    This feature is not supported in Python 3.14+.
+
 Actions can also be used to perform more complex operations, such as calculating
 checksums or cryptographic hash values before or after processing fields. For
 example, you can use an action to automatically wrap a sequence of fields with a

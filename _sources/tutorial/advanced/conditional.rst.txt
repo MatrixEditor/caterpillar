@@ -3,6 +3,9 @@
 Conditional Fields
 ==================
 
+.. warning::
+    This feature is not supported in Python 3.14+.
+
 *Conditional fields* allow you to define fields in a struct that are included
 or excluded based on certain conditions. This feature is especially useful when
 working with versioned formats or optional fields that depend on runtime
