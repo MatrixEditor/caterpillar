@@ -76,6 +76,12 @@ on its powerful features, explore the official [documentation](https://matrixedi
 > As of Caterpillar v2.1.2 it is possible to install the library without the need of
 > compiling the C extension.
 
+### PIP installation (Python-only)
+
+```bash
+pip install caterpillar-py
+```
+
 ### Python-only installation
 
 ```bash
