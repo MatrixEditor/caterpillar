@@ -8,6 +8,14 @@ Installation
 to install it by providing the Git link. This library has no fixed dependencies, so it can run
 out of the box.
 
+.. versionadded:: 2.4.4
+
+    *caterpillar* now has a Python-only installation candidate for PIP:
+
+    .. code-block:: console
+
+        pip install caterpillar-py
+
 There are several installation options you can use to install a desired part of the library.
 *caterpillar* ships with a native C extension and additional tools. As not everyone wants to
 use C extensions, it's default installation candidate does not include the native extension.
