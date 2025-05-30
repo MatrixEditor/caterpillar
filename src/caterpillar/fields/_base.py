@@ -12,7 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-from typing import Self, Union, Set, Any, Dict, Optional, List, Callable
+from typing import Self, Union, Set, Any, Dict, Optional, List
 from io import BytesIO
 from caterpillar.abc import (
     _StructLike,
@@ -42,7 +42,7 @@ from caterpillar.options import (
     Flag,
 )
 from caterpillar.context import CTX_OFFSETS, CTX_STREAM
-from caterpillar.context import CTX_FIELD, CTX_POS
+from caterpillar.context import CTX_FIELD
 from caterpillar.context import CTX_VALUE, CTX_SEQ
 from caterpillar import registry
 
@@ -409,7 +409,7 @@ class Field:
             # The "keep_position" flag is not applicable here. Configure a field to keep the
             # position afterward.
             context[CTX_VALUE] = value
-            return struct.__unpack__(context)
+            value = struct.__unpack__(context)
 
         return value
 

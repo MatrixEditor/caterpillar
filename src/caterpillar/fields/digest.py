@@ -19,7 +19,7 @@ import zlib
 
 from typing import Any, Callable, Optional, Self, Type
 
-from caterpillar.abc import _ContextLike, _StructLike, _ContextLambda
+from caterpillar.abc import _ContextLike, _StructLike, _ContextLambda, _Action
 from caterpillar.context import CTX_OBJECT, CTX_STREAM
 from caterpillar.exception import StructException, ValidationError
 from caterpillar.shared import Action
@@ -30,6 +30,7 @@ from ._base import Field
 from .common import Bytes, uint32
 
 DEFAULT_DIGEST_PATH = "digest"
+
 
 class _DigestValue:
     """
@@ -172,7 +173,7 @@ class Digest:
 
     .. versionchanged:: 2.4.3
 
-        Python 3.14 is **not** supported.
+        Python 3.14 is **not** supported, use :class:`DigestField` instead.
 
     The `Digest` class allows you to integrate hash or checksum algorithms
     into a struct by installing hooks that manage the digest state during
@@ -420,12 +421,170 @@ class Digest:
             raise ValidationError(
                 (
                     f"Failed to verify digest of {self.name!r} using "
-                    f"algorithm {self.algo.name or '<no name>'} \n"
+                    f"algorithm {self.algo.name or '<unnamed>'} \n"
                     f" - Expected: {expected_digest_raw!r} \n"
                     f" - Actual: {digest_raw!r}"
                 ),
                 context,
             )
+
+
+CTX_DIGEST_OBJ = "_digest_obj"
+CTX_DIGEST_HOOK = "_digest_hook"
+CTX_DIGEST_ALGO = "_digest_algo"
+CTX_DIGEST = "_digest"
+
+
+class DigestFieldAction:
+    """
+    .. versionadded:: 2.4.5
+
+    Represents an Action used to initialize a digest computation before struct processing begins.
+
+    This action is intended to be used as a pre-processing step before serializing or parsing
+    struct fields that are to be hashed. It injects a digest hook into the IO stream to intercept
+    and update digest state as data is read or written.
+
+    The following context variables will be populated based on the given target:
+    - ``_digest_obj__<target>``: The current state of the digest computation. (hash object)
+    - ``_digest_hook__<target>``: The IO hook associated with the digest computation.
+    - ``_digest_algo__<target>``: The algorithm used for the digest computation.
+
+    :param target: The unique name identifying this digest field.
+    :type target: str
+    :param algorithm: The digest algorithm implementation (must support create/update/digest).
+    :type algorithm: Algorithm
+    """
+
+    def __init__(self, target: str, algorithm: Algorithm) -> None:
+        self.name = target
+        self.algo = algorithm
+        self._ctx_obj = f"{CTX_DIGEST_OBJ}__{target}"
+        self._ctx_hook = f"{CTX_DIGEST_HOOK}__{target}"
+        self._ctx_algo = f"{CTX_DIGEST_ALGO}__{target}"
+
+    def update(self, data: bytes, context: _ContextLike) -> None:
+        """
+        Updates the digest object with new data.
+
+        This method is registered with an IO hook so it gets triggered
+        automatically during reads/writes to accumulate digest state.
+        """
+        obj = context[self._ctx_obj]
+        new_obj = self.algo.update(obj, data, context)
+        context[self._ctx_obj] = new_obj or obj
+
+    def begin(self, context: _ContextLike) -> None:
+        """
+        Initializes the digest algorithm and attaches an IO hook to track data.
+        """
+        context[self._ctx_obj] = self.algo.create(context)
+        context[self._ctx_algo] = self.algo
+
+        hook = IOHook(io=None, update=self.update)
+        hook.init(context)
+        context[self._ctx_hook] = hook
+
+    # Both packing and unpacking will trigger the same logic
+    __action_pack__ = __action_unpack__ = begin
+
+
+class DigestField:
+    """
+    .. versionadded:: 2.4.5
+
+    Represents a field in a struct that stores or verifies a digest.
+
+    This struct field computes a digest over all preceding fields and then either:
+      - Packs the resulting digest value.
+      - Unpacks a stored digest and optionally verifies it.
+
+    Example Usage:
+
+    .. code-block:: python
+
+        @struct
+        class Format:
+            _hash_begin: DigestField.begin("hash", Sha2_256_Algo)
+            user_data: Bytes(10)
+            hash: Sha2_256_Field("hash", verify=True) = None
+
+
+    :param target: The unique name shared with the corresponding :class:`DigestFieldAction`.
+    :type target: str
+    :param struct:  The struct used to pack/unpack the digest value (e.g., Bytes(32))
+    :type struct: _StructLike
+    :param verify:  Whether to verify the unpacked digest against the computed one.
+    :type verify: bool
+    """
+
+    def __init__(self, target: str, struct: _StructLike, verify: bool = False) -> None:
+        self.name = target
+        self.struct = struct
+        self.verify = verify
+        self._ctx_obj = f"{CTX_DIGEST_OBJ}__{target}"
+        self._ctx_hook = f"{CTX_DIGEST_HOOK}__{target}"
+        self._ctx_digest = f"{CTX_DIGEST}__{target}"
+        self._ctx_algo = f"{CTX_DIGEST_ALGO}__{target}"
+
+    def __type__(self) -> type:
+        """Defines the Python type returned after unpacking (always bytes)."""
+        return bytes
+
+    def __size__(self, context: _ContextLike) -> int:
+        """Returns the size in bytes of the digest field."""
+        return self.struct.__size__(context)
+
+    def __pack__(self, obj: None, context: _ContextLike) -> None:
+        """
+        Called during packing. Computes the digest over all previously packed data,
+        stores it in the context, finalizes the IO hook, and packs the digest itself.
+        """
+        digest = context[self._ctx_algo].digest(context[self._ctx_obj], context)
+        context.__context_setattr__(self.name, digest)
+        context[self._ctx_hook].finish(context)
+        self.struct.__pack__(digest, context)
+
+    def __unpack__(self, context: _ContextLike):
+        """
+        Called during unpacking. Computes the digest over all preceding data, reads
+        the stored digest, optionally verifies it, and returns the unpacked value.
+
+        :raises ValidationError: If verification is enabled and the digest does not match.
+        """
+        expected = context[self._ctx_algo].digest(context[self._ctx_obj], context)
+        context[self._ctx_digest] = expected
+        context[self._ctx_hook].finish(context)
+
+        digest = self.struct.__unpack__(context)
+        if self.verify and digest != expected:
+            digest_raw = digest.hex() if isinstance(digest, bytes) else digest
+            expected_raw = expected.hex() if isinstance(expected, bytes) else expected
+            raise ValidationError(
+                (
+                    f"Failed to verify digest of {self.name!r} using "
+                    f"algorithm {context[self._ctx_algo].name or '<unnamed>'} \n"
+                    f" - Expected: {expected_raw!r} \n"
+                    f" - Actual: {digest_raw!r}"
+                ),
+                context,
+            )
+
+        return digest
+
+    @staticmethod
+    def begin(target: str, algo: Algorithm) -> _Action:
+        """Factory method to create a DigestFieldAction used at the start of a struct
+        to set up hashing for the named digest field.
+
+        :param target: Shared identifier between DigestField and its corresponding action.
+        :type target: str
+        :param algo:  Digest algorithm (e.g., Sha2_256_Algo)
+        :type algo: Algorithm
+        :return: An action to initialize hashing in the struct context.
+        :rtype: _Action
+        """
+        return DigestFieldAction(target, algo)
 
 
 # --- public algorithms ---
@@ -448,6 +607,16 @@ def _hash_digest(algo: Algorithm, struct: _StructLike):
         path: Optional[str] = None,
     ) -> Digest:
         return Digest(algo, struct, name, verify, path)
+
+    return _wrapper
+
+
+def _hash_digest_field(struct: _StructLike):
+    def _wrapper(
+        name: str,
+        verify: bool = False,
+    ) -> DigestField:
+        return DigestField(target=name, struct=struct, verify=verify)
 
     return _wrapper
 
@@ -476,6 +645,7 @@ Crc32_Algo = Algorithm(
     name="crc32",
 )
 Crc32 = _hash_digest(Crc32_Algo, uint32)
+Crc32_Field = _hash_digest_field(uint32)
 
 Adler_Algo = Algorithm(
     create=lambda context: zlib.adler32(b""),
@@ -484,6 +654,7 @@ Adler_Algo = Algorithm(
     name="adler32",
 )
 Adler = _hash_digest(Adler_Algo, uint32)
+Adler_Field = _hash_digest_field(uint32)
 
 try:
     from cryptography.hazmat.primitives import hashes
@@ -593,9 +764,7 @@ except ImportError:
     Sha3_256_Algo = _hashlib_algo(hashlib.sha3_256)
     Sha3_384_Algo = _hashlib_algo(hashlib.sha3_384)
     Sha3_512_Algo = _hashlib_algo(hashlib.sha3_512)
-
     Md5_Algo = _hashlib_algo(hashlib.md5)
-    Sm3_Algo = None
 
     Sha1 = _hash_digest(Sha1_Algo, Bytes(32))
     Sha2_224 = _hash_digest(Sha2_224_Algo, Bytes(28))
@@ -607,7 +776,18 @@ except ImportError:
     Sha3_384 = _hash_digest(Sha3_384_Algo, Bytes(48))
     Sha3_512 = _hash_digest(Sha3_512_Algo, Bytes(64))
     Md5 = _hash_digest(Md5_Algo, Bytes(16))
-    Sm3 = None
 
     HMACAlgorithm = None
     HMAC = None
+
+
+Sha1_Field = _hash_digest_field(Bytes(32))
+Sha2_224_Field = _hash_digest_field(Bytes(28))
+Sha2_256_Field = _hash_digest_field(Bytes(32))
+Sha2_384_Field = _hash_digest_field(Bytes(48))
+Sha2_512_Field = _hash_digest_field(Bytes(64))
+Sha3_224_Field = _hash_digest_field(Bytes(28))
+Sha3_256_Field = _hash_digest_field(Bytes(32))
+Sha3_384_Field = _hash_digest_field(Bytes(48))
+Sha3_512_Field = _hash_digest_field(Bytes(64))
+Md5_Field = _hash_digest_field(Bytes(16))

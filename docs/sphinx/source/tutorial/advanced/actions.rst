@@ -31,21 +31,43 @@ Advanced Usage: Message Digests
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. warning::
-    This feature is not supported in Python 3.14+.
+    This feature has a different syntax in Python 3.14+.
 
 Actions can also be used to perform more complex operations, such as calculating
 checksums or cryptographic hash values before or after processing fields. For
 example, you can use an action to automatically wrap a sequence of fields with a
 specialized message digest like SHA256 (see :class:`~caterpillar.py.Digest`):
 
-.. code-block:: python
+.. tab-set::
 
-    @struct
-    class Format:
-        a: uint8
-        with Sha2_256("hash", verify=True):
-            user_data: Bytes(50)
-        # the 'hash' attribute will be set automatically
+    .. tab-item:: Python <= 3.13
+
+        .. code-block:: python
+
+            @struct
+            class Format:
+                key: b"..."
+                with Sha2_256("hash", verify=True):
+                    user_data: Bytes(50)
+                # the 'hash' attribute will be set automatically
+
+
+    .. tab-item:: Python >= 3.14
+
+        .. code-block:: python
+
+            @struct
+            class Format:
+                key: b"..."
+                _hash_begin: DigestField.begin("hash", Sha2_256_Algo)
+                user_data: Bytes(50)
+                # the 'hash' attribute must be set manually
+                hash: DigestField("hash", Bytes(32), verify=True) = None
+                # or
+                hash: Sha2_256_Field("hash", verify=True) = None
+
+
+
 
 In this example, the :code:`user_data` field is wrapped with the :code:`Sha2_256` digest action.
 When the struct is packed, a SHA256 hash is computed for the :code:`user_data` and stored
@@ -54,17 +76,36 @@ with, the verification step will raise an error.
 
 The resulting struct includes the following fields:
 
-.. code-block:: python
 
-    >>> Format.__struct__.fields
-    [
-        Field('key', struct=<ConstBytes>, ...),
-        (Action(Digest.begin), None),
-        Field('user_data', struct=<Bytes>, ...),
-        (Action(Digest.end_pack, Digest.end_unpack), None),
-        Field('hash', struct=<Bytes>, ...),
-        (UnpackAction(Digest.verfiy), None)
-    ]
+.. tab-set::
+
+    .. tab-item:: Python <= 3.13
+
+        .. code-block:: python
+
+            >>> Format.__struct__.fields
+            [
+                Field('key', struct=<ConstBytes>, ...),
+                (Action(Digest.begin), None),
+                Field('user_data', struct=<Bytes>, ...),
+                (Action(Digest.end_pack, Digest.end_unpack), None),
+                Field('hash', struct=<Bytes>, ...),
+                (UnpackAction(Digest.verfiy), None)
+            ]
+
+
+    .. tab-item:: Python >= 3.14
+
+        .. code-block:: python
+
+            >>> Format.__struct__.fields
+            [
+                Field('key', struct=<ConstBytes>, ...),
+                (<DigestFieldAction>, None),
+                Field('user_data', struct=<Bytes>, ...),
+                <DigestField>,
+            ]
+
 
 Here, you can see that:
 

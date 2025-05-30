@@ -97,7 +97,7 @@ class _SupportsUnpack(Protocol):
     """
 
     @abstractmethod
-    def __unpack__(self, context: _ContextLike):
+    def __unpack__(self, context: _ContextLike) -> Any:
         pass
 
 
@@ -123,7 +123,7 @@ class _StructLike(Protocol):
         pass
 
     @abstractmethod
-    def __unpack__(self, context: _ContextLike):
+    def __unpack__(self, context: _ContextLike) -> Any:
         pass
 
     @abstractmethod
