@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>3.5. Actions &#8212; Caterpillar 2.4.4 documentation</title>
+    <title>3.5. Actions &#8212; Caterpillar 2.4.5 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=b1e24531"></script>
+    <script src="../../_static/documentation_options.js?v=159ac128"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -53,7 +53,7 @@
     <link rel="prev" title="3.4. Conditional Fields" href="conditional.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.4.4" />
+  <meta name="docsearch:version" content="2.4.5" />
   </head>
   
   
@@ -116,7 +116,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.4.4</p>
+    <p class="title logo__title">Caterpillar 2.4.5</p>
   
 </a></div>
     
@@ -458,25 +458,50 @@ effects that are not tied to the direct data of the struct.</p>
 <h2><span class="section-number">3.5.1. </span>Advanced Usage: Message Digests<a class="headerlink" href="#advanced-usage-message-digests" title="Link to this heading">#</a></h2>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>This feature is not supported in Python 3.14+.</p>
+<p>This feature has a different syntax in Python 3.14+.</p>
 </div>
 <p>Actions can also be used to perform more complex operations, such as calculating
 checksums or cryptographic hash values before or after processing fields. For
 example, you can use an action to automatically wrap a sequence of fields with a
 specialized message digest like SHA256 (see <a class="reference internal" href="../../library/fields/crypto.html#caterpillar.py.Digest" title="caterpillar.py.Digest"><code class="xref py py-class docutils literal notranslate"><span class="pre">Digest</span></code></a>):</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-0">
+Python &lt;= 3.13</label><div class="sd-tab-content docutils">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
-    <span class="n">a</span><span class="p">:</span> <span class="n">uint8</span>
+    <span class="n">key</span><span class="p">:</span> <span class="sa">b</span><span class="s2">&quot;...&quot;</span>
     <span class="k">with</span> <span class="n">Sha2_256</span><span class="p">(</span><span class="s2">&quot;hash&quot;</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="n">user_data</span><span class="p">:</span> <span class="n">Bytes</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span>
     <span class="c1"># the &#39;hash&#39; attribute will be set automatically</span>
 </pre></div>
+</div>
+</div>
+<input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-1">
+Python &gt;= 3.14</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
+    <span class="n">key</span><span class="p">:</span> <span class="sa">b</span><span class="s2">&quot;...&quot;</span>
+    <span class="n">_hash_begin</span><span class="p">:</span> <span class="n">DigestField</span><span class="o">.</span><span class="n">begin</span><span class="p">(</span><span class="s2">&quot;hash&quot;</span><span class="p">,</span> <span class="n">Sha2_256_Algo</span><span class="p">)</span>
+    <span class="n">user_data</span><span class="p">:</span> <span class="n">Bytes</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span>
+    <span class="c1"># the &#39;hash&#39; attribute must be set manually</span>
+    <span class="nb">hash</span><span class="p">:</span> <span class="n">DigestField</span><span class="p">(</span><span class="s2">&quot;hash&quot;</span><span class="p">,</span> <span class="n">Bytes</span><span class="p">(</span><span class="mi">32</span><span class="p">),</span> <span class="n">verify</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="c1"># or</span>
+    <span class="nb">hash</span><span class="p">:</span> <span class="n">Sha2_256_Field</span><span class="p">(</span><span class="s2">&quot;hash&quot;</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">=</span> <span class="kc">None</span>
+</pre></div>
+</div>
+</div>
 </div>
 <p>In this example, the <code class="code docutils literal notranslate"><span class="pre">user_data</span></code> field is wrapped with the <code class="code docutils literal notranslate"><span class="pre">Sha2_256</span></code> digest action.
 When the struct is packed, a SHA256 hash is computed for the <code class="code docutils literal notranslate"><span class="pre">user_data</span></code> and stored
 in the <code class="code docutils literal notranslate"><span class="pre">hash</span></code> attribute. If the struct is unpacked and the data has been tampered
 with, the verification step will raise an error.</p>
 <p>The resulting struct includes the following fields:</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-2" name="sd-tab-set-1" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-2">
+Python &lt;= 3.13</label><div class="sd-tab-content docutils">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Format</span><span class="o">.</span><span class="n">__struct__</span><span class="o">.</span><span class="n">fields</span>
 <span class="go">[</span>
 <span class="go">    Field(&#39;key&#39;, struct=&lt;ConstBytes&gt;, ...),</span>
@@ -487,6 +512,21 @@ with, the verification step will raise an error.</p>
 <span class="go">    (UnpackAction(Digest.verfiy), None)</span>
 <span class="go">]</span>
 </pre></div>
+</div>
+</div>
+<input id="sd-tab-item-3" name="sd-tab-set-1" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-3">
+Python &gt;= 3.14</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Format</span><span class="o">.</span><span class="n">__struct__</span><span class="o">.</span><span class="n">fields</span>
+<span class="go">[</span>
+<span class="go">    Field(&#39;key&#39;, struct=&lt;ConstBytes&gt;, ...),</span>
+<span class="go">    (&lt;DigestFieldAction&gt;, None),</span>
+<span class="go">    Field(&#39;user_data&#39;, struct=&lt;Bytes&gt;, ...),</span>
+<span class="go">    &lt;DigestField&gt;,</span>
+<span class="go">]</span>
+</pre></div>
+</div>
+</div>
 </div>
 <p>Here, you can see that:</p>
 <ul class="simple">

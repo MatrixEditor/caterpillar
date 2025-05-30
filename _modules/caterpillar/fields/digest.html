@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>caterpillar.fields.digest &#8212; Caterpillar 2.4.4 documentation</title>
+    <title>caterpillar.fields.digest &#8212; Caterpillar 2.4.5 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=b1e24531"></script>
+    <script src="../../../_static/documentation_options.js?v=159ac128"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -50,7 +50,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.4.4" />
+  <meta name="docsearch:version" content="2.4.5" />
   </head>
   
   
@@ -113,7 +113,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.4.4</p>
+    <p class="title logo__title">Caterpillar 2.4.5</p>
   
 </a></div>
     
@@ -397,7 +397,7 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Self</span><span class="p">,</span> <span class="n">Type</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">_ContextLike</span><span class="p">,</span> <span class="n">_StructLike</span><span class="p">,</span> <span class="n">_ContextLambda</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">_ContextLike</span><span class="p">,</span> <span class="n">_StructLike</span><span class="p">,</span> <span class="n">_ContextLambda</span><span class="p">,</span> <span class="n">_Action</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">CTX_OBJECT</span><span class="p">,</span> <span class="n">CTX_STREAM</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.exception</span><span class="w"> </span><span class="kn">import</span> <span class="n">StructException</span><span class="p">,</span> <span class="n">ValidationError</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.shared</span><span class="w"> </span><span class="kn">import</span> <span class="n">Action</span>
@@ -408,6 +408,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">Bytes</span><span class="p">,</span> <span class="n">uint32</span>
 
 <span class="n">DEFAULT_DIGEST_PATH</span> <span class="o">=</span> <span class="s2">&quot;digest&quot;</span>
+
 
 <span class="k">class</span><span class="w"> </span><span class="nc">_DigestValue</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -555,7 +556,7 @@
 
 <span class="sd">    .. versionchanged:: 2.4.3</span>
 
-<span class="sd">        Python 3.14 is **not** supported.</span>
+<span class="sd">        Python 3.14 is **not** supported, use :class:`DigestField` instead.</span>
 
 <span class="sd">    The `Digest` class allows you to integrate hash or checksum algorithms</span>
 <span class="sd">    into a struct by installing hooks that manage the digest state during</span>
@@ -803,12 +804,176 @@
             <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span>
                 <span class="p">(</span>
                     <span class="sa">f</span><span class="s2">&quot;Failed to verify digest of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> using &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;algorithm </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">algo</span><span class="o">.</span><span class="n">name</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">&#39;&lt;no name&gt;&#39;</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;algorithm </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">algo</span><span class="o">.</span><span class="n">name</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">&#39;&lt;unnamed&gt;&#39;</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span>
                     <span class="sa">f</span><span class="s2">&quot; - Expected: </span><span class="si">{</span><span class="n">expected_digest_raw</span><span class="si">!r}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span>
                     <span class="sa">f</span><span class="s2">&quot; - Actual: </span><span class="si">{</span><span class="n">digest_raw</span><span class="si">!r}</span><span class="s2">&quot;</span>
                 <span class="p">),</span>
                 <span class="n">context</span><span class="p">,</span>
             <span class="p">)</span></div>
+
+
+
+<span class="n">CTX_DIGEST_OBJ</span> <span class="o">=</span> <span class="s2">&quot;_digest_obj&quot;</span>
+<span class="n">CTX_DIGEST_HOOK</span> <span class="o">=</span> <span class="s2">&quot;_digest_hook&quot;</span>
+<span class="n">CTX_DIGEST_ALGO</span> <span class="o">=</span> <span class="s2">&quot;_digest_algo&quot;</span>
+<span class="n">CTX_DIGEST</span> <span class="o">=</span> <span class="s2">&quot;_digest&quot;</span>
+
+
+<div class="viewcode-block" id="DigestFieldAction">
+<a class="viewcode-back" href="../../../library/fields/crypto.html#caterpillar.py.DigestFieldAction">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DigestFieldAction</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    .. versionadded:: 2.4.5</span>
+
+<span class="sd">    Represents an Action used to initialize a digest computation before struct processing begins.</span>
+
+<span class="sd">    This action is intended to be used as a pre-processing step before serializing or parsing</span>
+<span class="sd">    struct fields that are to be hashed. It injects a digest hook into the IO stream to intercept</span>
+<span class="sd">    and update digest state as data is read or written.</span>
+
+<span class="sd">    The following context variables will be populated based on the given target:</span>
+<span class="sd">    - ``_digest_obj__&lt;target&gt;``: The current state of the digest computation. (hash object)</span>
+<span class="sd">    - ``_digest_hook__&lt;target&gt;``: The IO hook associated with the digest computation.</span>
+<span class="sd">    - ``_digest_algo__&lt;target&gt;``: The algorithm used for the digest computation.</span>
+
+<span class="sd">    :param target: The unique name identifying this digest field.</span>
+<span class="sd">    :type target: str</span>
+<span class="sd">    :param algorithm: The digest algorithm implementation (must support create/update/digest).</span>
+<span class="sd">    :type algorithm: Algorithm</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">:</span> <span class="n">Algorithm</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">target</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">algo</span> <span class="o">=</span> <span class="n">algorithm</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ctx_obj</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">CTX_DIGEST_OBJ</span><span class="si">}</span><span class="s2">__</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ctx_hook</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">CTX_DIGEST_HOOK</span><span class="si">}</span><span class="s2">__</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ctx_algo</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">CTX_DIGEST_ALGO</span><span class="si">}</span><span class="s2">__</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Updates the digest object with new data.</span>
+
+<span class="sd">        This method is registered with an IO hook so it gets triggered</span>
+<span class="sd">        automatically during reads/writes to accumulate digest state.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_ctx_obj</span><span class="p">]</span>
+        <span class="n">new_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">algo</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+        <span class="n">context</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_ctx_obj</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_obj</span> <span class="ow">or</span> <span class="n">obj</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">begin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the digest algorithm and attaches an IO hook to track data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">context</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_ctx_obj</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">algo</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+        <span class="n">context</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_ctx_algo</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">algo</span>
+
+        <span class="n">hook</span> <span class="o">=</span> <span class="n">IOHook</span><span class="p">(</span><span class="n">io</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">update</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">)</span>
+        <span class="n">hook</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+        <span class="n">context</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_ctx_hook</span><span class="p">]</span> <span class="o">=</span> <span class="n">hook</span>
+
+    <span class="c1"># Both packing and unpacking will trigger the same logic</span>
+    <span class="n">__action_pack__</span> <span class="o">=</span> <span class="n">__action_unpack__</span> <span class="o">=</span> <span class="n">begin</span></div>
+
+
+
+<div class="viewcode-block" id="DigestField">
+<a class="viewcode-back" href="../../../library/fields/crypto.html#caterpillar.py.DigestField">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DigestField</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    .. versionadded:: 2.4.5</span>
+
+<span class="sd">    Represents a field in a struct that stores or verifies a digest.</span>
+
+<span class="sd">    This struct field computes a digest over all preceding fields and then either:</span>
+<span class="sd">      - Packs the resulting digest value.</span>
+<span class="sd">      - Unpacks a stored digest and optionally verifies it.</span>
+
+<span class="sd">    Example Usage:</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        @struct</span>
+<span class="sd">        class Format:</span>
+<span class="sd">            _hash_begin: DigestField.begin(&quot;hash&quot;, Sha2_256_Algo)</span>
+<span class="sd">            user_data: Bytes(10)</span>
+<span class="sd">            hash: Sha2_256_Field(&quot;hash&quot;, verify=True) = None</span>
+
+
+<span class="sd">    :param target: The unique name shared with the corresponding :class:`DigestFieldAction`.</span>
+<span class="sd">    :type target: str</span>
+<span class="sd">    :param struct:  The struct used to pack/unpack the digest value (e.g., Bytes(32))</span>
+<span class="sd">    :type struct: _StructLike</span>
+<span class="sd">    :param verify:  Whether to verify the unpacked digest against the computed one.</span>
+<span class="sd">    :type verify: bool</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">struct</span><span class="p">:</span> <span class="n">_StructLike</span><span class="p">,</span> <span class="n">verify</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">target</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">struct</span> <span class="o">=</span> <span class="n">struct</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verify</span> <span class="o">=</span> <span class="n">verify</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ctx_obj</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">CTX_DIGEST_OBJ</span><span class="si">}</span><span class="s2">__</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ctx_hook</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">CTX_DIGEST_HOOK</span><span class="si">}</span><span class="s2">__</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ctx_digest</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">CTX_DIGEST</span><span class="si">}</span><span class="s2">__</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ctx_algo</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">CTX_DIGEST_ALGO</span><span class="si">}</span><span class="s2">__</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__type__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Defines the Python type returned after unpacking (always bytes).&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">bytes</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__size__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the size in bytes of the digest field.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">struct</span><span class="o">.</span><span class="n">__size__</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__pack__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Called during packing. Computes the digest over all previously packed data,</span>
+<span class="sd">        stores it in the context, finalizes the IO hook, and packs the digest itself.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">digest</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_ctx_algo</span><span class="p">]</span><span class="o">.</span><span class="n">digest</span><span class="p">(</span><span class="n">context</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_ctx_obj</span><span class="p">],</span> <span class="n">context</span><span class="p">)</span>
+        <span class="n">context</span><span class="o">.</span><span class="n">__context_setattr__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">digest</span><span class="p">)</span>
+        <span class="n">context</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_ctx_hook</span><span class="p">]</span><span class="o">.</span><span class="n">finish</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">struct</span><span class="o">.</span><span class="n">__pack__</span><span class="p">(</span><span class="n">digest</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__unpack__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Called during unpacking. Computes the digest over all preceding data, reads</span>
+<span class="sd">        the stored digest, optionally verifies it, and returns the unpacked value.</span>
+
+<span class="sd">        :raises ValidationError: If verification is enabled and the digest does not match.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">expected</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_ctx_algo</span><span class="p">]</span><span class="o">.</span><span class="n">digest</span><span class="p">(</span><span class="n">context</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_ctx_obj</span><span class="p">],</span> <span class="n">context</span><span class="p">)</span>
+        <span class="n">context</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_ctx_digest</span><span class="p">]</span> <span class="o">=</span> <span class="n">expected</span>
+        <span class="n">context</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_ctx_hook</span><span class="p">]</span><span class="o">.</span><span class="n">finish</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+
+        <span class="n">digest</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">struct</span><span class="o">.</span><span class="n">__unpack__</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verify</span> <span class="ow">and</span> <span class="n">digest</span> <span class="o">!=</span> <span class="n">expected</span><span class="p">:</span>
+            <span class="n">digest_raw</span> <span class="o">=</span> <span class="n">digest</span><span class="o">.</span><span class="n">hex</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">digest</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span> <span class="k">else</span> <span class="n">digest</span>
+            <span class="n">expected_raw</span> <span class="o">=</span> <span class="n">expected</span><span class="o">.</span><span class="n">hex</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">expected</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span> <span class="k">else</span> <span class="n">expected</span>
+            <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span>
+                <span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Failed to verify digest of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> using &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;algorithm </span><span class="si">{</span><span class="n">context</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_ctx_algo</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">&#39;&lt;unnamed&gt;&#39;</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot; - Expected: </span><span class="si">{</span><span class="n">expected_raw</span><span class="si">!r}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot; - Actual: </span><span class="si">{</span><span class="n">digest_raw</span><span class="si">!r}</span><span class="s2">&quot;</span>
+                <span class="p">),</span>
+                <span class="n">context</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">digest</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">begin</span><span class="p">(</span><span class="n">target</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">algo</span><span class="p">:</span> <span class="n">Algorithm</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Action</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Factory method to create a DigestFieldAction used at the start of a struct</span>
+<span class="sd">        to set up hashing for the named digest field.</span>
+
+<span class="sd">        :param target: Shared identifier between DigestField and its corresponding action.</span>
+<span class="sd">        :type target: str</span>
+<span class="sd">        :param algo:  Digest algorithm (e.g., Sha2_256_Algo)</span>
+<span class="sd">        :type algo: Algorithm</span>
+<span class="sd">        :return: An action to initialize hashing in the struct context.</span>
+<span class="sd">        :rtype: _Action</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">DigestFieldAction</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">algo</span><span class="p">)</span></div>
 
 
 
@@ -832,6 +997,16 @@
         <span class="n">path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Digest</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">Digest</span><span class="p">(</span><span class="n">algo</span><span class="p">,</span> <span class="n">struct</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">verify</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">_wrapper</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_hash_digest_field</span><span class="p">(</span><span class="n">struct</span><span class="p">:</span> <span class="n">_StructLike</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_wrapper</span><span class="p">(</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">verify</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DigestField</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">DigestField</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">struct</span><span class="o">=</span><span class="n">struct</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="n">verify</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">_wrapper</span>
 
@@ -860,6 +1035,7 @@
     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;crc32&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">Crc32</span> <span class="o">=</span> <span class="n">_hash_digest</span><span class="p">(</span><span class="n">Crc32_Algo</span><span class="p">,</span> <span class="n">uint32</span><span class="p">)</span>
+<span class="n">Crc32_Field</span> <span class="o">=</span> <span class="n">_hash_digest_field</span><span class="p">(</span><span class="n">uint32</span><span class="p">)</span>
 
 <span class="n">Adler_Algo</span> <span class="o">=</span> <span class="n">Algorithm</span><span class="p">(</span>
     <span class="n">create</span><span class="o">=</span><span class="k">lambda</span> <span class="n">context</span><span class="p">:</span> <span class="n">zlib</span><span class="o">.</span><span class="n">adler32</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;&quot;</span><span class="p">),</span>
@@ -868,6 +1044,7 @@
     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;adler32&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">Adler</span> <span class="o">=</span> <span class="n">_hash_digest</span><span class="p">(</span><span class="n">Adler_Algo</span><span class="p">,</span> <span class="n">uint32</span><span class="p">)</span>
+<span class="n">Adler_Field</span> <span class="o">=</span> <span class="n">_hash_digest_field</span><span class="p">(</span><span class="n">uint32</span><span class="p">)</span>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">cryptography.hazmat.primitives</span><span class="w"> </span><span class="kn">import</span> <span class="n">hashes</span>
@@ -977,9 +1154,7 @@
     <span class="n">Sha3_256_Algo</span> <span class="o">=</span> <span class="n">_hashlib_algo</span><span class="p">(</span><span class="n">hashlib</span><span class="o">.</span><span class="n">sha3_256</span><span class="p">)</span>
     <span class="n">Sha3_384_Algo</span> <span class="o">=</span> <span class="n">_hashlib_algo</span><span class="p">(</span><span class="n">hashlib</span><span class="o">.</span><span class="n">sha3_384</span><span class="p">)</span>
     <span class="n">Sha3_512_Algo</span> <span class="o">=</span> <span class="n">_hashlib_algo</span><span class="p">(</span><span class="n">hashlib</span><span class="o">.</span><span class="n">sha3_512</span><span class="p">)</span>
-
     <span class="n">Md5_Algo</span> <span class="o">=</span> <span class="n">_hashlib_algo</span><span class="p">(</span><span class="n">hashlib</span><span class="o">.</span><span class="n">md5</span><span class="p">)</span>
-    <span class="n">Sm3_Algo</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="n">Sha1</span> <span class="o">=</span> <span class="n">_hash_digest</span><span class="p">(</span><span class="n">Sha1_Algo</span><span class="p">,</span> <span class="n">Bytes</span><span class="p">(</span><span class="mi">32</span><span class="p">))</span>
     <span class="n">Sha2_224</span> <span class="o">=</span> <span class="n">_hash_digest</span><span class="p">(</span><span class="n">Sha2_224_Algo</span><span class="p">,</span> <span class="n">Bytes</span><span class="p">(</span><span class="mi">28</span><span class="p">))</span>
@@ -991,10 +1166,21 @@
     <span class="n">Sha3_384</span> <span class="o">=</span> <span class="n">_hash_digest</span><span class="p">(</span><span class="n">Sha3_384_Algo</span><span class="p">,</span> <span class="n">Bytes</span><span class="p">(</span><span class="mi">48</span><span class="p">))</span>
     <span class="n">Sha3_512</span> <span class="o">=</span> <span class="n">_hash_digest</span><span class="p">(</span><span class="n">Sha3_512_Algo</span><span class="p">,</span> <span class="n">Bytes</span><span class="p">(</span><span class="mi">64</span><span class="p">))</span>
     <span class="n">Md5</span> <span class="o">=</span> <span class="n">_hash_digest</span><span class="p">(</span><span class="n">Md5_Algo</span><span class="p">,</span> <span class="n">Bytes</span><span class="p">(</span><span class="mi">16</span><span class="p">))</span>
-    <span class="n">Sm3</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="n">HMACAlgorithm</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">HMAC</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+<span class="n">Sha1_Field</span> <span class="o">=</span> <span class="n">_hash_digest_field</span><span class="p">(</span><span class="n">Bytes</span><span class="p">(</span><span class="mi">32</span><span class="p">))</span>
+<span class="n">Sha2_224_Field</span> <span class="o">=</span> <span class="n">_hash_digest_field</span><span class="p">(</span><span class="n">Bytes</span><span class="p">(</span><span class="mi">28</span><span class="p">))</span>
+<span class="n">Sha2_256_Field</span> <span class="o">=</span> <span class="n">_hash_digest_field</span><span class="p">(</span><span class="n">Bytes</span><span class="p">(</span><span class="mi">32</span><span class="p">))</span>
+<span class="n">Sha2_384_Field</span> <span class="o">=</span> <span class="n">_hash_digest_field</span><span class="p">(</span><span class="n">Bytes</span><span class="p">(</span><span class="mi">48</span><span class="p">))</span>
+<span class="n">Sha2_512_Field</span> <span class="o">=</span> <span class="n">_hash_digest_field</span><span class="p">(</span><span class="n">Bytes</span><span class="p">(</span><span class="mi">64</span><span class="p">))</span>
+<span class="n">Sha3_224_Field</span> <span class="o">=</span> <span class="n">_hash_digest_field</span><span class="p">(</span><span class="n">Bytes</span><span class="p">(</span><span class="mi">28</span><span class="p">))</span>
+<span class="n">Sha3_256_Field</span> <span class="o">=</span> <span class="n">_hash_digest_field</span><span class="p">(</span><span class="n">Bytes</span><span class="p">(</span><span class="mi">32</span><span class="p">))</span>
+<span class="n">Sha3_384_Field</span> <span class="o">=</span> <span class="n">_hash_digest_field</span><span class="p">(</span><span class="n">Bytes</span><span class="p">(</span><span class="mi">48</span><span class="p">))</span>
+<span class="n">Sha3_512_Field</span> <span class="o">=</span> <span class="n">_hash_digest_field</span><span class="p">(</span><span class="n">Bytes</span><span class="p">(</span><span class="mi">64</span><span class="p">))</span>
+<span class="n">Md5_Field</span> <span class="o">=</span> <span class="n">_hash_digest_field</span><span class="p">(</span><span class="n">Bytes</span><span class="p">(</span><span class="mi">16</span><span class="p">))</span>
 </pre></div>
 
                 </article>

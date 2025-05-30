@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Cryptographic Structs &#8212; Caterpillar 2.4.4 documentation</title>
+    <title>Cryptographic Structs &#8212; Caterpillar 2.4.5 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=b1e24531"></script>
+    <script src="../../_static/documentation_options.js?v=159ac128"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -53,7 +53,7 @@
     <link rel="prev" title="Compression Structs" href="compression.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.4.4" />
+  <meta name="docsearch:version" content="2.4.5" />
   </head>
   
   
@@ -116,7 +116,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.4.4</p>
+    <p class="title logo__title">Caterpillar 2.4.5</p>
   
 </a></div>
     
@@ -465,7 +465,7 @@ using a specified algorithm.</p>
 <p><span class="versionmodified added">Added in version 2.4.0.</span></p>
 </div>
 <div class="versionchanged">
-<p><span class="versionmodified changed">Changed in version 2.4.3: </span>Python 3.14 is <strong>not</strong> supported.</p>
+<p><span class="versionmodified changed">Changed in version 2.4.3: </span>Python 3.14 is <strong>not</strong> supported, use <a class="reference internal" href="#caterpillar.py.DigestField" title="caterpillar.py.DigestField"><code class="xref py py-class docutils literal notranslate"><span class="pre">DigestField</span></code></a> instead.</p>
 </div>
 <p>The <cite>Digest</cite> class allows you to integrate hash or checksum algorithms
 into a struct by installing hooks that manage the digest state during
@@ -522,6 +522,63 @@ and validation. When packing an object, the digest will be updated automatically
 <li><p><strong>name</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – An optional name for the digest field (defaults to ‘sha256’ or another default name).</p></li>
 <li><p><strong>verify</strong> (<em>bool</em>) – Whether to enable verification of the digest upon unpacking. Default is False.</p></li>
 <li><p><strong>path</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – Optional path to the digest field in the context, used for accessing and storing the digest.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="caterpillar.py.DigestField">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.py.</span></span><span class="sig-name descname"><span class="pre">DigestField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">struct</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../abc.html#caterpillar.abc._StructLike" title="caterpillar.abc._StructLike"><span class="pre">_StructLike</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">verify</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/digest.html#DigestField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.py.DigestField" title="Link to this definition">#</a></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.4.5.</span></p>
+</div>
+<p>Represents a field in a struct that stores or verifies a digest.</p>
+<dl class="simple">
+<dt>This struct field computes a digest over all preceding fields and then either:</dt><dd><ul class="simple">
+<li><p>Packs the resulting digest value.</p></li>
+<li><p>Unpacks a stored digest and optionally verifies it.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Example Usage:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
+    <span class="n">_hash_begin</span><span class="p">:</span> <span class="n">DigestField</span><span class="o">.</span><span class="n">begin</span><span class="p">(</span><span class="s2">&quot;hash&quot;</span><span class="p">,</span> <span class="n">Sha2_256_Algo</span><span class="p">)</span>
+    <span class="n">user_data</span><span class="p">:</span> <span class="n">Bytes</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+    <span class="nb">hash</span><span class="p">:</span> <span class="n">Sha2_256_Field</span><span class="p">(</span><span class="s2">&quot;hash&quot;</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">=</span> <span class="kc">None</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>target</strong> (<em>str</em>) – The unique name shared with the corresponding <a class="reference internal" href="#caterpillar.py.DigestFieldAction" title="caterpillar.py.DigestFieldAction"><code class="xref py py-class docutils literal notranslate"><span class="pre">DigestFieldAction</span></code></a>.</p></li>
+<li><p><strong>struct</strong> (<a class="reference internal" href="../abc.html#caterpillar.abc._StructLike" title="caterpillar.abc._StructLike"><em>_StructLike</em></a>) – The struct used to pack/unpack the digest value (e.g., Bytes(32))</p></li>
+<li><p><strong>verify</strong> (<em>bool</em>) – Whether to verify the unpacked digest against the computed one.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="caterpillar.py.DigestFieldAction">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.py.</span></span><span class="sig-name descname"><span class="pre">DigestFieldAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#caterpillar.py.Algorithm" title="caterpillar.fields.digest.Algorithm"><span class="pre">Algorithm</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/digest.html#DigestFieldAction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.py.DigestFieldAction" title="Link to this definition">#</a></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.4.5.</span></p>
+</div>
+<p>Represents an Action used to initialize a digest computation before struct processing begins.</p>
+<p>This action is intended to be used as a pre-processing step before serializing or parsing
+struct fields that are to be hashed. It injects a digest hook into the IO stream to intercept
+and update digest state as data is read or written.</p>
+<p>The following context variables will be populated based on the given target:
+- <code class="docutils literal notranslate"><span class="pre">_digest_obj__&lt;target&gt;</span></code>: The current state of the digest computation. (hash object)
+- <code class="docutils literal notranslate"><span class="pre">_digest_hook__&lt;target&gt;</span></code>: The IO hook associated with the digest computation.
+- <code class="docutils literal notranslate"><span class="pre">_digest_algo__&lt;target&gt;</span></code>: The algorithm used for the digest computation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>target</strong> (<em>str</em>) – The unique name identifying this digest field.</p></li>
+<li><p><strong>algorithm</strong> (<a class="reference internal" href="#caterpillar.py.Algorithm" title="caterpillar.py.Algorithm"><em>Algorithm</em></a>) – The digest algorithm implementation (must support create/update/digest).</p></li>
 </ul>
 </dd>
 </dl>
@@ -711,6 +768,8 @@ and validation. When packing an object, the digest will be updated automatically
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hashes">Hashes</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.py.Algorithm"><code class="docutils literal notranslate"><span class="pre">Algorithm</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.py.Digest"><code class="docutils literal notranslate"><span class="pre">Digest</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.py.DigestField"><code class="docutils literal notranslate"><span class="pre">DigestField</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.py.DigestFieldAction"><code class="docutils literal notranslate"><span class="pre">DigestFieldAction</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ciphers">Ciphers</a><ul class="nav section-nav flex-column">

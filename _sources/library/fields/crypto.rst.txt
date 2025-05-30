@@ -13,6 +13,10 @@ Hashes
 
 .. autoclass:: caterpillar.py.Digest
 
+.. autoclass:: caterpillar.py.DigestField
+
+.. autoclass:: caterpillar.py.DigestFieldAction
+
 
 Ciphers
 -------
