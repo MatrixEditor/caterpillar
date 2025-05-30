@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from typing import Any, Callable
-from caterpillar.abc import _ContextLike
+from caterpillar.abc import _ContextLambda
 
 # --- Shared Concepts ---
 # TODO: This section needs some docs
@@ -87,20 +87,23 @@ class Action:
     during struct processing.
 
     :param pack: The callable that will be executed before packing the struct (optional).
-    :type pack: Callable[[_ContextLike], None] | None
+    :type pack: _ContextLambda | None
     :param unpack: The callable that will be executed before unpacking the struct (optional).
-    :type unpack: Callable[[_ContextLike], None] | None
+    :type unpack: _ContextLambda | None
     """
 
     __slots__ = (ATTR_ACTION_PACK, ATTR_ACTION_UNPACK)
 
     def __init__(
         self,
-        pack: Callable[[_ContextLike], None] | None = None,
-        unpack: Callable[[_ContextLike], None] | None = None,
+        pack: _ContextLambda | None = None,
+        unpack: _ContextLambda | None = None,
+        both: _ContextLambda | None = None,
     ) -> None:
         self.__action_pack__ = pack
         self.__action_unpack__ = unpack
+        if both is not None:
+            self.__action_pack__ = self.__action_unpack__ = both
 
     def __repr__(self) -> str:
         """

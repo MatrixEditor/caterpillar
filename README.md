@@ -14,7 +14,9 @@
 
 > [!NOTE]
 > Python 3.14 breaks `with` statements in class definitions since `__annotations__` are added at the end
-> of a class definition. Therefore, `Digest` and conditional statements **ARE NOT SUPPORTED** in Python 3.14+.
+> of a class definition. Therefore, `Digest` and conditional statements **ARE NOT SUPPORTED** in using the `with` syntax Python 3.14+.
+> As of version `2.4.5` the `Digest` class has a counterpart (`DigestField`), which can be used to manually specify a digest without
+> the need of a `ẁith` statement.
 
 
 
