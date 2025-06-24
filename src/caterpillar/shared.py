@@ -31,6 +31,8 @@ MODE_UNPACK = 1
 #: must be conforming to the _StructLike protocol.
 ATTR_STRUCT = "__struct__"
 
+ATTR_TYPE = "__type__"
+
 # TODO: add to reference
 # NEW CONCEPT: Actions
 # An annotation that is equipped with an action attribute indicates that
@@ -147,3 +149,40 @@ class Action:
         return any(
             getattr(obj, attr, None) for attr in (ATTR_ACTION_PACK, ATTR_ACTION_UNPACK)
         )
+
+
+def hasstruct(obj) -> bool:
+    """
+    Check if the given object has a structure attribute.
+
+    :param obj: The object to check.
+    :return: True if the object has a structure attribute, else False.
+    """
+    cls_dict = getattr(obj.__class__ if not isinstance(obj, type) else obj, "__dict__")
+    return ATTR_STRUCT in cls_dict
+
+
+def getstruct(obj, /, __default=None):
+    """
+    Get the structure attribute of the given object.
+
+    :param obj: The object to get the structure attribute from.
+    :return: The structure attribute of the object.
+    """
+    obj = obj.__class__ if not isinstance(obj, type) else obj
+    cls_dict = getattr(obj, "__dict__", None)
+    if cls_dict is None:
+        return getattr(obj, ATTR_STRUCT, None)
+
+    return cls_dict.get(ATTR_STRUCT, __default)
+
+
+def typeof(struct):
+    if hasstruct(struct):
+        struct = getstruct(struct)
+
+    __type__ = getattr(struct, ATTR_TYPE, None)
+    if not __type__:
+        return Any
+    # this function must return a type
+    return __type__() or Any
