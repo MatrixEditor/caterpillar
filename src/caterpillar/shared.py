@@ -30,7 +30,7 @@ MODE_UNPACK = 1
 #: struct, bitfield, or sequence definition. The type of the stored value
 #: must be conforming to the _StructLike protocol.
 ATTR_STRUCT = "__struct__"
-
+ATTR_BYTEORDER = "__byteorder__"
 ATTR_TYPE = "__type__"
 
 # TODO: add to reference
