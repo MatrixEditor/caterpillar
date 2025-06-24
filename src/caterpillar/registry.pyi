@@ -12,35 +12,21 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-from .byteorder import (
-    AARCH64,
-    AMD,
-    AMD64,
-    ARM,
-    ARM64,
-    BigEndian,
-    LittleEndian,
-    PowerPC,
-    PowerPC64,
-    RISC_V,
-    RISC_V64,
-    x86,
-    x86_64,
-)
-from .context import ContextPath, ctx, parent, this, ContextLength as lenof
-from .model import (
-    bitfield,
-    pack,
-    pack_file,
-    pack_into,
-    struct,
-    union,
-    unpack,
-    unpack_file,
-    sizeof,
-    Sequence as Seq,
-)
-from .shared import typeof, getstruct, hasstruct
-from .registry import to_struct
-from . import options as opt
-from .fields import Field as F
+from caterpillar.abc import _StructLike
+from typing import Any, Callable, Self
+
+class TypeConverter:
+    target: type
+    delegate: Callable[[Any, dict], _StructLike]
+    def __init__(
+        self,
+        target: type | None = None,
+        delegate: Callable[[Any, dict], _StructLike] | None = None,
+    ) -> None: ...
+    def matches(self, annotation: Any) -> bool: ...
+    def convert(self, annotation: Any, kwargs: dict) -> _StructLike: ...
+    def __call__(self, delegate: Callable[[Any, dict], _StructLike]) -> Self: ...
+
+annotation_registry: list[TypeConverter]
+
+def to_struct(obj: Any, **kwargs) -> _StructLike: ...
