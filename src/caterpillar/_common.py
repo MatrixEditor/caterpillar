@@ -14,9 +14,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import itertools
 
-from typing import Collection, List, Any
+from typing import Collection
 
-from caterpillar.abc import _ContextLike, _StreamType, _PrefixedType
+from caterpillar.abc import _PrefixedType
 from caterpillar.context import (
     Context,
     CTX_PATH,
@@ -31,7 +31,7 @@ from caterpillar.options import O_ARRAY_FACTORY
 
 
 class WithoutContextVar:
-    def __init__(self, context: _ContextLike, name, value) -> None:
+    def __init__(self, context, name, value) -> None:
         self.context = context
         self.old_value = context[name]
         self.value = value
@@ -48,7 +48,7 @@ class WithoutContextVar:
         self.context[CTX_FIELD] = self.field
 
 
-def unpack_seq(context: _ContextLike, unpack_one) -> List[Any]:
+def unpack_seq(context, unpack_one) -> Collection:
     """Generic function to unpack sequenced elements.
 
     :param stream: the input stream
@@ -113,7 +113,7 @@ def unpack_seq(context: _ContextLike, unpack_one) -> List[Any]:
     return values
 
 
-def pack_seq(seq: Collection[Any], context: _ContextLike, pack_one) -> None:
+def pack_seq(seq, context, pack_one) -> None:
     """Generic function to pack sequenced elements.
 
     :param seq: the iterable of elements
@@ -164,7 +164,7 @@ def pack_seq(seq: Collection[Any], context: _ContextLike, pack_one) -> None:
             raise StructException(str(exc), seq_context) from exc
 
 
-def iseof(stream: _StreamType) -> bool:
+def iseof(stream) -> bool:
     """
     Check if the stream is at the end of the file.
 
