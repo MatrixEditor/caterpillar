@@ -14,13 +14,16 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import re
 
-from typing import Optional, Self, Tuple
-from typing import List, Dict, Any
-from typing import Set, Iterable, Union
+from typing import Optional, Self, Iterable
 
-
-from caterpillar.abc import _StructLike, _ContextLike, _StreamType, _Action
-from caterpillar.context import Context, CTX_PATH, CTX_OBJECT, CTX_STREAM, CTX_SEQ
+from caterpillar.context import (
+    CTX_FIELD,
+    Context,
+    CTX_PATH,
+    CTX_OBJECT,
+    CTX_STREAM,
+    CTX_SEQ,
+)
 from caterpillar.byteorder import (
     BYTEORDER_FIELD,
     ByteOrder,
@@ -58,13 +61,13 @@ class Sequence(FieldMixin):
     Sequence(fields=['a'])
     """
 
-    model: Any
+    model: type
     """
     Specifies the target class/dictionary used as the base model.
     """
 
     # second value with action in tuple is reserved
-    fields: List[Field | Tuple[_Action, None]]
+    fields: list
     """A list of all fields defined in this struct.
 
     This attribute stores the fields in an *ordered* collection, whereby ordered
@@ -83,12 +86,12 @@ class Sequence(FieldMixin):
     Global architecture definition (will be inferred on all fields)
     """
 
-    options: Set[Flag]
+    options: set
     """
     Additional options specifying what to include in the final class.
     """
 
-    field_options: Set[Flag]
+    field_options: set
     """
     Global field flags that will be applied on all fields.
     """
@@ -106,7 +109,7 @@ class Sequence(FieldMixin):
 
     def __init__(
         self,
-        model: Optional[Dict[str, Field]] = None,
+        model: Optional[dict] = None,
         order: Optional[ByteOrder] = None,
         arch: Optional[Arch] = None,
         options: Iterable[Flag] | None = None,
@@ -119,7 +122,7 @@ class Sequence(FieldMixin):
         self.field_options = set(field_options or [])
 
         # these fields will be set or used while processing the model type
-        self._member_map_: Dict[str, Field] = {}
+        self._member_map_ = {}
         self.fields = []
         self.is_union = S_UNION in self.options
         # Process all fields in the model
@@ -161,7 +164,7 @@ class Sequence(FieldMixin):
         """
         return option in self.options
 
-    def _included(self, name: str, default: Optional[Any], annotation: Any) -> bool:
+    def _included(self, name: str, default, annotation) -> bool:
         """
         Check if a field with the given name should be included.
 
@@ -179,10 +182,10 @@ class Sequence(FieldMixin):
 
         return True
 
-    def _set_default(self, name: str, value: Any) -> None:
+    def _set_default(self, name: str, value) -> None:
         pass
 
-    def _process_default(self, name, annotation: Any, had_default=False) -> Any:
+    def _process_default(self, name, annotation, had_default=False):
         default = getattr(self.model, name, INVALID_DEFAULT)
         # constant values that are not in the form of fields, structs or types should
         # be wrapped into constant values. For more information, see _process_field
@@ -244,17 +247,13 @@ class Sequence(FieldMixin):
         for name in removables:
             self._remove_from_model(name)
 
-    def _prepare_fields(self) -> Dict[str, Any]:
+    def _prepare_fields(self):
         return self.model
 
-    def _process_annotation(
-        self, annotation: Any, default: Optional[Any], order: ByteOrder, arch: Arch
-    ) -> Union[_StructLike, Field]:
+    def _process_annotation(self, annotation, default, order: ByteOrder, arch: Arch):
         return registry.to_struct(annotation, arch=arch, order=order)
 
-    def _process_field(
-        self, name: str, annotation: Any, default: Optional[Any]
-    ) -> Field:
+    def _process_field(self, name: str, annotation, default) -> Field:
         """
         Process a field in the model.
 
@@ -263,8 +262,8 @@ class Sequence(FieldMixin):
         :param default: The default value of the field.
         :return: The processed field.
         """
-        field: Field = None
-        struct: _StructLike = None
+        field = None
+        struct = None
 
         order = getattr(annotation, BYTEORDER_FIELD, self.order or SysNative)
         arch = self.arch or system_arch
@@ -303,7 +302,7 @@ class Sequence(FieldMixin):
         if included:
             self._member_map_[name] = field
 
-    def add_action(self, action: _Action) -> None:
+    def add_action(self, action) -> None:
         self.fields.append((action, None))
 
     def del_field(self, name: str, field: Field) -> None:
@@ -316,10 +315,10 @@ class Sequence(FieldMixin):
         self._member_map_.pop(name, None)
         self.fields.remove(field)
 
-    def get_members(self) -> Dict[str, Field]:
+    def get_members(self):
         return self._member_map_.copy()
 
-    def __size__(self, context: _ContextLike) -> int:
+    def __size__(self, context) -> int:
         """
         Get the size of the struct.
 
@@ -334,15 +333,16 @@ class Sequence(FieldMixin):
 
         return max(sizes) if self.is_union else sum(sizes)
 
-    def unpack_one(self, context: _ContextLike) -> Optional[Any]:
+    def unpack_one(self, context):
         # At first, we define the object context where the parsed values
         # will be stored
-        init_data: Dict[str, Any] = Context()
+        init_data = Context()
         context[CTX_OBJECT] = Context(_parent=context)
 
         base_path = context[CTX_PATH]
         if self.is_union:
-            start = context[CTX_STREAM].tell()
+            stream = context[CTX_STREAM]
+            start = stream.tell()
             max_size = 0
 
         for field in self.fields:
@@ -354,7 +354,7 @@ class Sequence(FieldMixin):
                 continue
 
             if self.is_union:
-                pos = context[CTX_STREAM].tell()
+                pos = stream.tell()
 
             # REVISIT: make this a real attribute
             name = field.__name__
@@ -368,8 +368,8 @@ class Sequence(FieldMixin):
 
             if self.is_union:
                 # This union implementation will cover the max size
-                max_size = max(context[CTX_STREAM], stream.tell() - pos)
-                context[CTX_STREAM].seek(start)
+                max_size = max(max_size, stream.tell() - pos)
+                stream.seek(start)
 
         obj = init_data
         if self.is_union:
@@ -377,7 +377,7 @@ class Sequence(FieldMixin):
             stream.seek(start + max_size)
         return obj
 
-    def __unpack__(self, context: _ContextLike) -> Optional[Any]:
+    def __unpack__(self, context):
         """
         Unpack the struct from the stream.
 
@@ -396,12 +396,12 @@ class Sequence(FieldMixin):
             return unpack_seq(context, self.unpack_one)
         return self.unpack_one(this_context)
 
-    def get_value(self, obj: Any, name: str, field: Field) -> Optional[Any]:
+    def get_value(self, obj, name: str, field: Field):
         return obj.get(name, None)
 
-    def pack_one(self, obj: Dict[str, Any], context: _ContextLike) -> None:
+    def pack_one(self, obj, context) -> None:
         max_size = 0
-        union_field: Optional[_StructLike] = None
+        union_field = None
         base_path: str = context[CTX_PATH]
 
         for field in self.fields:
@@ -442,11 +442,11 @@ class Sequence(FieldMixin):
             value = self.get_value(obj, name, union_field)
             union_field.__pack__(value, context)
 
-    def __pack__(self, obj: Any, context: _ContextLike) -> None:
+    def __pack__(self, obj, context) -> None:
         # As structs can be used in field definitions a field will call this struct
         # and could potentially be a sequence. Therefore, we have to check whether we
         # should unpack multiple objects.
-        field: Optional[Field] = context.get("_field")
+        field: Optional[Field] = context.get(CTX_FIELD)
         if field and context[CTX_SEQ]:
             pack_seq(obj, context, self.pack_one)
         else:
@@ -467,7 +467,7 @@ class Sequence(FieldMixin):
 
 # --- private sequence tyoe converter ---
 @registry.TypeConverter(dict)
-def _type_converter(annotation: Any, kwargs: dict) -> _StructLike:
+def _type_converter(annotation, kwargs: dict):
     arch = kwargs.pop("arch", None)
     order = kwargs.pop("order", None)
     return Sequence(model=annotation, order=order, arch=arch)
