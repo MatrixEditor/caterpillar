@@ -12,7 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-from typing import Any, Callable
+from typing import Any
 from caterpillar.abc import _ContextLambda
 
 # --- Shared Concepts ---
@@ -34,6 +34,7 @@ ATTR_BYTEORDER = "__byteorder__"
 ATTR_TYPE = "__type__"
 ATTR_BITS = "__bits__"
 ATTR_SIGNED = "__signed__"
+ATTR_TEMPLATE = "__template__"
 
 # TODO: add to reference
 # NEW CONCEPT: Actions

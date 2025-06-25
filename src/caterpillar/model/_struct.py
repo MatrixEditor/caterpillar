@@ -17,23 +17,18 @@ import dataclasses as dc
 
 from tempfile import TemporaryFile
 from io import BytesIO, IOBase
-from typing import Optional, Union, Callable
-from typing import Dict, Any, Iterable
 from collections import OrderedDict
 from shutil import copyfileobj
 
 from caterpillar.shared import getstruct, hasstruct, ATTR_STRUCT
-from caterpillar.abc import _StructLike, _StreamType, _SupportsUnpack, _SupportsPack
-from caterpillar.abc import _ContainsStruct, _ContextLike, _SupportsSize
+from caterpillar.abc import _SupportsUnpack, _SupportsSize
 from caterpillar.context import Context, CTX_STREAM
-from caterpillar.byteorder import ByteOrder, Arch
 from caterpillar.exception import InvalidValueError
 from caterpillar.options import (
     S_EVAL_ANNOTATIONS,
     S_UNION,
     S_ADD_BYTES,
     S_SLOTS,
-    Flag,
     GLOBAL_STRUCT_OPTIONS,
     GLOBAL_UNION_OPTIONS,
 )
@@ -455,7 +450,7 @@ def pack_into(
 
     :raises TypeError: If no `struct` is specified and cannot be inferred from the object.
     """
-    offsets: Dict[int, memoryview] = OrderedDict()
+    offsets = OrderedDict()
     context = Context(
         _parent=None, _path="<root>", _pos=0, _offsets=offsets, mode=MODE_PACK, **kwds
     )
@@ -601,7 +596,7 @@ def unpack_file(
         return unpack(struct, fp, as_field=as_field, **kwds)
 
 
-def sizeof(obj: Union[_StructLike, _ContainsStruct, _SupportsSize], **kwds) -> int:
+def sizeof(obj, **kwds) -> int:
     context = Context(_parent=None, _path="<root>", **kwds)
     struct_ = obj
     if hasstruct(struct_):

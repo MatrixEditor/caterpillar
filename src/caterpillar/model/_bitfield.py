@@ -14,22 +14,15 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import struct as libstruct
 
-from typing import Optional, Any, Dict
-from typing import Iterable, Tuple
-from typing import Self, List
 from dataclasses import dataclass, field as dcfield
 
-from caterpillar.abc import _StructLike, _ContextLike, _StreamType
+from caterpillar.abc import _StructLike
 from caterpillar.shared import typeof, ATTR_BITS, ATTR_SIGNED
 from caterpillar.byteorder import (
-    Arch,
-    ByteOrder,
     byteorder,
     system_arch,
-    LittleEndian,
 )
 from caterpillar.options import (
-    Flag,
     GLOBAL_BITFIELD_FLAGS,
     GLOBAL_STRUCT_OPTIONS,
     GLOBAL_UNION_OPTIONS,
@@ -44,7 +37,7 @@ from caterpillar.fields import (
     Pass,
 )
 from caterpillar.exception import ValidationError, DelegationError
-from caterpillar.context import Context, CTX_PATH, CTX_OBJECT, CTX_STREAM
+from caterpillar.context import Context, CTX_OBJECT, CTX_STREAM
 
 from ._struct import Struct
 
@@ -83,8 +76,6 @@ class BitFieldGroup:
 
 
 class BitField(Struct):
-    groups: List[BitFieldGroup]
-
     __slots__ = (
         "groups",
         "_bit_pos",
@@ -256,7 +247,7 @@ class BitField(Struct):
             return False
         return True
 
-    def group(self, bit_index: int) -> Optional[BitFieldGroup]:
+    def group(self, bit_index: int):
         grp = None
         for candidate in self.groups:
             if bit_index > candidate.pos:
@@ -264,14 +255,14 @@ class BitField(Struct):
             grp = candidate
         return grp
 
-    def __size__(self, context: _ContextLike) -> int:
+    def __size__(self, context) -> int:
         # The size of a bitfield is alsways static
         return self.__bits__ // 8
 
-    def unpack_one(self, context: _ContextLike) -> Optional[Any]:
+    def unpack_one(self, context):
         # At first, we define the object context where the parsed values
         # will be stored
-        init_data: Dict[str, Any] = Context()
+        init_data = Context()
         context[CTX_OBJECT] = Context(_parent=context)
         values = libstruct.unpack(
             f"{self.order.ch}{self.__fmt__}",
@@ -303,10 +294,10 @@ class BitField(Struct):
 
         return self.model(**init_data)
 
-    def pack_one(self, obj, context: _ContextLike) -> None:
+    def pack_one(self, obj, context) -> None:
         # REVISIT: this function is very time consuming. should be do something
         # about that?
-        stream: _StreamType = context[CTX_STREAM]
+        stream = context[CTX_STREAM]
         values = []
         for group in self.groups:
             # The same applies here, but we convert all values to int instead of reading
