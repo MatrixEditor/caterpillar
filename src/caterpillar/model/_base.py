@@ -25,7 +25,6 @@ from caterpillar.context import (
     CTX_SEQ,
 )
 from caterpillar.byteorder import (
-    BYTEORDER_FIELD,
     ByteOrder,
     SysNative,
     Arch,
@@ -46,7 +45,7 @@ from caterpillar.fields import (
     Const,
 )
 from caterpillar._common import unpack_seq, pack_seq
-from caterpillar.shared import ATTR_ACTION_PACK, ATTR_ACTION_UNPACK, Action
+from caterpillar.shared import ATTR_ACTION_PACK, ATTR_ACTION_UNPACK, Action, ATTR_BYTEORDER
 from caterpillar import registry
 
 
@@ -265,7 +264,7 @@ class Sequence(FieldMixin):
         field = None
         struct = None
 
-        order = getattr(annotation, BYTEORDER_FIELD, self.order or SysNative)
+        order = getattr(annotation, ATTR_BYTEORDER, self.order or SysNative)
         arch = self.arch or system_arch
         result = self._process_annotation(annotation, default, order, arch)
         if isinstance(result, Field):

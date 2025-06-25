@@ -16,15 +16,14 @@ import struct as PyStruct
 import warnings
 
 from io import BytesIO
-from typing import Sequence, Any, Optional, Union, List, Callable
-from types import EllipsisType, NoneType
+from typing import Any, Union
+from types import NoneType
 from functools import cached_property
 from enum import Enum as _EnumType
 from uuid import UUID
 
 from caterpillar.abc import (
     _StructLike,
-    _ContextLambda,
     _StreamType,
     _ContextLike,
 )
@@ -39,7 +38,6 @@ from caterpillar.byteorder import LittleEndian
 from caterpillar import registry
 from caterpillar._common import WithoutContextVar
 from caterpillar.shared import getstruct
-from caterpillar.model import getbits
 
 from ._base import Field, INVALID_DEFAULT, singleton
 from ._mixin import FieldStruct

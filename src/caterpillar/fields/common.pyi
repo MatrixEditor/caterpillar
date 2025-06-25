@@ -104,7 +104,7 @@ class Const(Transformer[_IT, _IT, _IT, _IT]):
 
 _EnumT = TypeVar("_EnumT")
 
-class Enum(Generic[_EnumT, _IT], Transformer[_EnumT, _IT, _EnumT, _IT]):
+class Enum(Generic[_EnumT, _IT], Transformer[_EnumT, _IT, Union[_EnumT, _IT], _IT]):
     model: Type[_EnumT]
     default: _EnumT
     def __init__(

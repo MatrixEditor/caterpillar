@@ -27,3 +27,26 @@ from ._struct import (
 )
 from ._bitfield import BitField, bitfield, BitFieldGroup, issigned, getbits
 from ._template import istemplate, template, TemplateTypeVar, derive
+
+__all__ = [
+    "Sequence",
+    "Struct",
+    "struct",
+    "UnionHook",
+    "union",
+    "unpack",
+    "unpack_file",
+    "pack",
+    "pack_into",
+    "pack_file",
+    "sizeof",
+    "BitField",
+    "bitfield",
+    "BitFieldGroup",
+    "issigned",
+    "getbits",
+    "istemplate",
+    "template",
+    "TemplateTypeVar",
+    "derive",
+]

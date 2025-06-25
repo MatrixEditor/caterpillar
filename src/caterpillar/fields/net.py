@@ -16,9 +16,6 @@ import ipaddress
 import binascii
 import re
 
-from typing import Union, Any, Optional
-
-
 from .common import Transformer, uint32, UInt, Bytes
 from ._base import singleton
 

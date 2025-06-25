@@ -12,8 +12,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+import ipaddress
+
 from re import Pattern
-from ipaddress import IPv4Address, IPv6Address
 
 from ._base import singleton as singleton
 from .common import (
@@ -24,8 +25,8 @@ from .common import (
 )
 from caterpillar.abc import _ContextLike
 
-IPv4Address = Transformer[IPv4Address, int, IPv4Address, int]
-IPv6Address = Transformer[IPv6Address, int, IPv6Address, int]
+IPv4Address: Transformer[ipaddress.IPv4Address, int, ipaddress.IPv4Address, int]
+IPv6Address: Transformer[ipaddress.IPv6Address, int, ipaddress.IPv6Address, int]
 
 class MACAddress(Transformer[str | bytes, bytes, bytes, bytes]):
     DELIMITERS: Pattern

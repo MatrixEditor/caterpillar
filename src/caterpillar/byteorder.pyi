@@ -15,8 +15,6 @@
 from enum import Enum
 from typing import Optional
 
-BYTEORDER_FIELD: str = ...
-
 class ByteOrder:
     name: str
     ch: str
