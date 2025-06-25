@@ -13,25 +13,16 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-from __future__ import annotations
-
 import sys
 import inspect
 import types
 import dataclasses
 
-from typing import Dict, Any
-from typing import Union, Self
-from typing import Optional
-from typing import Callable, TypeVar
-
-from caterpillar.byteorder import ByteOrder, Arch
-from caterpillar.abc import _GreedyType, _PrefixedType
-from caterpillar.abc import _ContextLambda, _Switch
-from caterpillar.abc import _StructLike
+from caterpillar.abc import _GreedyType
 from caterpillar.fields import Field, INVALID_DEFAULT
 from caterpillar.model import Struct
 from caterpillar.options import S_UNION
+from caterpillar.shared import ATTR_TEMPLATE
 
 
 class TemplateTypeVar:
@@ -55,7 +46,7 @@ class TemplateTypeVar:
     name: str
     """The bound name of this type variable"""
 
-    field_kwds: Dict[str, Any]
+    field_kwds: dict
     """Arguments that will be passed to the created field instance."""
 
     def __init__(self, name: str, **field_kwds) -> None:
@@ -73,31 +64,29 @@ class TemplateTypeVar:
         return f"~{self.name}[{count}]"
 
     # Now we have to implement all special operators defined in FieldMixin
-    def __getitem__(
-        self, amount: Union[int, _GreedyType, _PrefixedType, _ContextLambda]
-    ) -> TemplateTypeVar:
+    def __getitem__(self, amount):
         return TemplateTypeVar(self.name, amount=amount, **self.field_kwds)
 
-    def __rshift__(self, switch: Union[dict, _Switch]) -> Self:
+    def __rshift__(self, switch):
         return TemplateTypeVar(self.name, options=switch, **self.field_kwds)
 
-    def __matmul__(self, offset: Union[int, _ContextLambda]) -> Self:
+    def __matmul__(self, offset):
         return TemplateTypeVar(self.name, offset=offset, **self.field_kwds)
 
-    def __set_byteorder__(self, order: ByteOrder) -> Self:
+    def __set_byteorder__(self, order):
         return TemplateTypeVar(self.name, order=order, **self.field_kwds)
 
-    def __rsub__(self, bits: Union[int, _ContextLambda]) -> Self:
+    def __rsub__(self, bits):
         return TemplateTypeVar(self.name, bits=bits, **self.field_kwds)
 
     # @scheduled_for_removal
-    def __floordiv__(self, condition: Union[_ContextLambda, bool]) -> Self:
+    def __floordiv__(self, condition):
         return TemplateTypeVar(self.name, condition=condition, **self.field_kwds)
 
     def to_field(
         self,
-        struct: Union[_StructLike, _ContextLambda],
-        arch: Optional[Arch] = None,
+        struct,
+        arch,
         default=INVALID_DEFAULT,
     ) -> Field:
         # REVISIT: what about flags?
@@ -122,13 +111,10 @@ def get_caller_module(frame: int = 1) -> str:
         raise ModuleNotFoundError("Could not load module from caller!") from e
 
 
-TEMPLATE_ATTR = "__template__"
-
-
 @dataclasses.dataclass
 class TemplateInfo:
-    required_tys: Dict[str, _StructLike]
-    positional_tys: Dict[str, _StructLike]
+    required_tys: dict
+    positional_tys: dict
 
     def is_defined(self, name: str) -> bool:
         return name in list(self.required_tys) + list(self.positional_tys)
@@ -144,12 +130,12 @@ class TemplateInfo:
         self.positional_tys[name] = default
 
 
-def istemplate(obj: Any) -> bool:
+def istemplate(obj) -> bool:
     """Return true if the object is a template."""
-    return hasattr(obj, TEMPLATE_ATTR)
+    return hasattr(obj, ATTR_TEMPLATE)
 
 
-def template(*args: Union[str, TemplateTypeVar], **kwargs) -> Callable[[type], type]:
+def template(*args, **kwargs):
     """
     Defines required template type variables if necessary and prepares
     template class definition.
@@ -197,13 +183,13 @@ def template(*args: Union[str, TemplateTypeVar], **kwargs) -> Callable[[type], t
         for name in disposable:
             # Only temporary template vars will be removed
             delattr(module, name)
-        setattr(cls, TEMPLATE_ATTR, info)
+        setattr(cls, ATTR_TEMPLATE, info)
         return cls
 
     return create_template_class
 
 
-def get_mangled_name(model_ty: type, annotations: Dict[str, Any]) -> str:
+def get_mangled_name(model_ty: type, annotations: dict) -> str:
     ty_name = model_ty.__name__
     parts = []
     for name, value in annotations.items():
@@ -214,7 +200,7 @@ def get_mangled_name(model_ty: type, annotations: Dict[str, Any]) -> str:
 
 
 def derive(
-    template_ty: type, *tys_args, partial=False, name=None, union=False, **tys_kwargs
+    template_ty, *tys_args, partial=False, name=None, union=False, **tys_kwargs
 ) -> type:
     """Creates a new struct class based on the given template class.
 
@@ -237,7 +223,7 @@ def derive(
     if not istemplate(template_ty):
         raise TypeError(f"{template_ty.__name__} is not a template class!")
 
-    info: TemplateInfo = getattr(template_ty, TEMPLATE_ATTR)
+    info: TemplateInfo = getattr(template_ty, ATTR_TEMPLATE)
     if len(tys_args) > len(info.required_tys):
         raise ValueError(
             f"Expected max. {len(info.required_tys)} positional arguments - got {len(tys_args)}!"
@@ -321,5 +307,5 @@ def derive(
                 new_info.required_tys[name] = replacement
             elif name in info.positional_tys:
                 new_info.positional_tys[name] = replacement
-        setattr(new_ty, TEMPLATE_ATTR, new_info)
+        setattr(new_ty, ATTR_TEMPLATE, new_info)
     return new_ty

@@ -12,41 +12,21 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-from ._base import Sequence
-from ._struct import (
-    Struct,
-    struct,
-    UnionHook,
-    union,
-    unpack,
-    unpack_file,
-    pack,
-    pack_into,
-    pack_file,
-    sizeof,
-)
-from ._bitfield import BitField, bitfield, BitFieldGroup, issigned, getbits
-from ._template import istemplate, template, TemplateTypeVar, derive
+from caterpillar.abc import _StructLike
+from typing import Any, Callable, Self
 
-__all__ = [
-    "Sequence",
-    "Struct",
-    "struct",
-    "UnionHook",
-    "union",
-    "unpack",
-    "unpack_file",
-    "pack",
-    "pack_into",
-    "pack_file",
-    "sizeof",
-    "BitField",
-    "bitfield",
-    "BitFieldGroup",
-    "issigned",
-    "getbits",
-    "istemplate",
-    "template",
-    "TemplateTypeVar",
-    "derive",
-]
+class TypeConverter:
+    target: type
+    delegate: Callable[[Any, dict], _StructLike]
+    def __init__(
+        self,
+        target: type | None = None,
+        delegate: Callable[[Any, dict], _StructLike] | None = None,
+    ) -> None: ...
+    def matches(self, annotation: Any) -> bool: ...
+    def convert(self, annotation: Any, kwargs: dict) -> _StructLike: ...
+    def __call__(self, delegate: Callable[[Any, dict], _StructLike]) -> Self: ...
+
+annotation_registry: list[TypeConverter]
+
+def to_struct(obj: Any, **kwargs) -> _StructLike: ...

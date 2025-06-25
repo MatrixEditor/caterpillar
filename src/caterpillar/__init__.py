@@ -19,7 +19,7 @@ __release__ = None
 __author__ = "MatrixEditor"
 
 
-def native_support():
+def native_support() -> bool:
     """Return True if native support is available."""
     try:
         # pylint: disable-next=import-outside-toplevel
@@ -32,3 +32,5 @@ def native_support():
 
 # Explicitly report deprecation warnings
 warnings.filterwarnings("default", module="caterpillar")
+
+__all__ = ["__version__", "__author__", "native_support"]

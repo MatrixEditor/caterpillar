@@ -17,8 +17,7 @@ from platform import machine
 from dataclasses import dataclass
 from enum import Enum
 
-# constant to identify the byteorder of an object
-BYTEORDER_FIELD = "__byteorder__"
+from caterpillar.shared import ATTR_BYTEORDER
 
 
 @dataclass(frozen=True)
@@ -56,7 +55,7 @@ class ByteOrder:
 
         :param other: The object to which the byte order information should be applied.
         """
-        setattr(other, BYTEORDER_FIELD, self)
+        setattr(other, ATTR_BYTEORDER, self)
 
     def __add__(self, other):
         """
@@ -89,14 +88,14 @@ SysNative = ByteOrder(
 )
 
 
-def byteorder(obj, default: ByteOrder = None) -> ByteOrder:
+def byteorder(obj, default=None) -> ByteOrder:
     """
     Get the byte order of an object, defaulting to SysNative if not explicitly set.
 
     :param obj: The object to retrieve the byte order from.
     :return: The byte order of the object.
     """
-    return getattr(obj, BYTEORDER_FIELD, default or SysNative)
+    return getattr(obj, ATTR_BYTEORDER, default or SysNative)
 
 
 @dataclass(frozen=True)

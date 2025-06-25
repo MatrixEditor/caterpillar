@@ -9,7 +9,6 @@ from caterpillar.fields.digest import (
     Md5,
     Md5_Field,
     Sha2_256,
-    _DigestValue,
     Md5_Algo,
     Sha2_256_Algo,
     Sha2_256_Field,

@@ -12,21 +12,14 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-from typing import Self, Union, Set, Any, Dict, Optional, List
+from typing import Union, Any, List
 from io import BytesIO
 from caterpillar.abc import (
     _StructLike,
-    _ContextLambda,
-    _Switch,
-    _StreamType,
-    _ContextLike,
     _GreedyType,
     _PrefixedType,
-    hasstruct,
-    getstruct,
-    typeof,
 )
-from caterpillar.byteorder import ByteOrder, SysNative, Arch, system_arch
+from caterpillar.byteorder import ByteOrder, SysNative, system_arch
 from caterpillar.exception import (
     DynamicSizeError,
     StructException,
@@ -41,10 +34,9 @@ from caterpillar.options import (
     F_SEQUENTIAL,
     Flag,
 )
-from caterpillar.context import CTX_OFFSETS, CTX_STREAM
-from caterpillar.context import CTX_FIELD
-from caterpillar.context import CTX_VALUE, CTX_SEQ
+from caterpillar.context import CTX_OFFSETS, CTX_STREAM, CTX_FIELD, CTX_VALUE, CTX_SEQ
 from caterpillar import registry
+from caterpillar.shared import hasstruct, getstruct, typeof
 
 
 def singleton(cls):
@@ -57,80 +49,79 @@ INVALID_DEFAULT = object()
 DEFAULT_OPTION = object()
 
 
-# @dataclass(init=False)
 class Field:
     """Represents a field in a data structure."""
 
-    struct: Union[_StructLike, _ContextLambda]
-    """
-    Stores a reference to the actual parsing struct that will be used to parse or
-    build our data. This attribute is never null.
-    """
+    # struct
+    # """
+    # Stores a reference to the actual parsing struct that will be used to parse or
+    # build our data. This attribute is never null.
+    # """
 
-    order: ByteOrder
-    """
-    An automatically inferred or explicitly specified byte order. Note that this
-    attribute may have no impact on the underlying struct. The default byte order
-    is ``SysNative``.
-    """
+    # order: ByteOrder
+    # """
+    # An automatically inferred or explicitly specified byte order. Note that this
+    # attribute may have no impact on the underlying struct. The default byte order
+    # is ``SysNative``.
+    # """
 
-    offset: Union[_ContextLambda, int]
-    """
-    Using the ``@`` operator an offset can be assigned to a field. If set, the
-    stream will be reset and set to the original position.
+    # offset
+    # """
+    # Using the ``@`` operator an offset can be assigned to a field. If set, the
+    # stream will be reset and set to the original position.
 
-    The minus one indicates that no offset has been associated with this field.
-    """
+    # The minus one indicates that no offset has been associated with this field.
+    # """
 
-    flags: Dict[int, Flag]
-    """
-    Additional options that can be enabled using the logical OR operator ``|``.
+    # flags: Dict[int, Flag]
+    # """
+    # Additional options that can be enabled using the logical OR operator ``|``.
 
-    Note that there are default options that will be set automatically:
+    # Note that there are default options that will be set automatically:
 
-    * ``keep_position``:
-        Persists the streams position after parsing data using the underlying
-        struct. In relation to ``offset``, this option will reset the stream to
-        its original position if deactivated.
-    * ``dynamic``:
-        Specifies that this field does not store a constant size.
-    * ``sequential``:
-        An automatic flag that indicates this field stores a sequential struct.
-    """
+    # * ``keep_position``:
+    #     Persists the streams position after parsing data using the underlying
+    #     struct. In relation to ``offset``, this option will reset the stream to
+    #     its original position if deactivated.
+    # * ``dynamic``:
+    #     Specifies that this field does not store a constant size.
+    # * ``sequential``:
+    #     An automatic flag that indicates this field stores a sequential struct.
+    # """
 
-    amount: Union[_ContextLambda, int, _GreedyType, _PrefixedType]
-    """
-    A constant or dynamic value to represent the amount of structs. Zero indicates
-    there are no sequence types associated with this field.
-    """
+    # amount: Union[_ContextLambda, int, _GreedyType, _PrefixedType]
+    # """
+    # A constant or dynamic value to represent the amount of structs. Zero indicates
+    # there are no sequence types associated with this field.
+    # """
 
-    options: Union[_Switch, Dict[Any, _StructLike], None]
-    """
-    An extra attribute that stores additional options that can be translates as a
-    switch statement.
-    """
+    # options
+    # """
+    # An extra attribute that stores additional options that can be translates as a
+    # switch statement.
+    # """
 
-    condition: Union[_ContextLambda, bool]
-    """
-    Given optional execution this attribute should be used to return a boolean value
-    that decides whether the value of this field should be set. Using ``//`` the
-    condition can be set during class declaration.
-    """
+    # condition
+    # """
+    # Given optional execution this attribute should be used to return a boolean value
+    # that decides whether the value of this field should be set. Using ``//`` the
+    # condition can be set during class declaration.
+    # """
 
-    arch: Arch
-    """
-    The field's architecture (inferred or explicitly specified).
-    """
+    # arch
+    # """
+    # The field's architecture (inferred or explicitly specified).
+    # """
 
-    default: Optional[Any]
-    """
-    The configured default value.
-    """
+    # default
+    # """
+    # The configured default value.
+    # """
 
-    bits: Union[_ContextLambda, int, None]
-    """
-    The configured bits.
-    """
+    # bits
+    # """
+    # The configured bits.
+    # """
 
     __slots__ = (
         "struct",
@@ -148,18 +139,17 @@ class Field:
 
     def __init__(
         self,
-        struct: Union[_StructLike, _ContextLambda],
-        order: ByteOrder | None = None,
-        offset: Union[_ContextLambda, int] = -1,
-        flags: Set[Flag] = None,
-        amount: Union[_ContextLambda, int, _PrefixedType] = 0,
-        options: Union[_Switch, Dict[Any, _StructLike], None] = None,
-        condition: Union[_ContextLambda, bool] = True,
-        arch: Arch = None,
-        default: Optional[Any] = INVALID_DEFAULT,
-        bits: Union[_ContextLambda, int, None] = None,
+        struct,
+        order=None,
+        offset=-1,
+        flags=None,
+        amount=0,
+        options=None,
+        condition=True,
+        arch=None,
+        default=INVALID_DEFAULT,
+        bits=None,
     ) -> None:
-        # NOTE: we use a custom init method to automatically set flags
         self.struct = struct
         self.order = order or SysNative
         self.flags = {hash(x): x for x in flags or set([F_KEEP_POSITION])}
@@ -178,9 +168,7 @@ class Field:
         # that None is still usable as default
         self.default = default
 
-    def _verify_context_value(
-        self, value: Union[_ContextLambda, Any], expected: type
-    ) -> None:
+    def _verify_context_value(self, value, expected) -> None:
         # As the offset value or amount may be dynamic, we have to candidate
         # types. There should be an error if none applies.
         if not isinstance(value, expected) and not callable(value):
@@ -188,18 +176,18 @@ class Field:
                 f"Expected a valid value or context lambda, got {type(value)}"
             )
 
-    def __or__(self, flag: Flag) -> Self:  # add flags
+    def __or__(self, flag: Flag):  # add flags
         if not isinstance(flag, Flag):
             raise TypeError(f"Expected a flag, got {type(flag)}")
 
         self.flags[hash(flag)] = flag
         return self
 
-    def __xor__(self, flag: Flag) -> Self:  # remove flags:
+    def __xor__(self, flag: Flag):  # remove flags:
         self.flags.pop(hash(flag), None)
         return self
 
-    def __matmul__(self, offset: Union[_ContextLambda, int]) -> Self:
+    def __matmul__(self, offset):
         self._verify_context_value(offset, int)
         self.offset = offset
         # This operation automatically removes the "keep_position"
@@ -208,7 +196,7 @@ class Field:
             self.flags.pop(F_KEEP_POSITION._hash_, None)
         return self
 
-    def __getitem__(self, dim: Union[_ContextLambda, int, _GreedyType]) -> Self:
+    def __getitem__(self, dim):
         self._verify_context_value(dim, (_GreedyType, int, _PrefixedType))
         self.amount = dim
         if self.amount != 0:
@@ -216,28 +204,28 @@ class Field:
             self.flags[F_SEQUENTIAL._hash_] = F_SEQUENTIAL
         return self
 
-    def __rshift__(self, switch: Union[_Switch, dict]) -> Self:
+    def __rshift__(self, switch):
         if not isinstance(switch, dict) and not callable(switch):
             raise TypeError(f"Expected a valid switch context, got {type(switch)}")
 
         self.options = switch
         return self
 
-    def __floordiv__(self, condition: Union[_ContextLambda, bool]) -> Self:
+    def __floordiv__(self, condition):
         self._verify_context_value(condition, bool)
         self.condition = condition
         return self
 
-    def __rsub__(self, bits: Union[_ContextLambda, int]) -> Self:
+    def __rsub__(self, bits):
         self._verify_context_value(bits, int)
         self.bits = bits
         return self
 
-    def __set_byteorder__(self, order: ByteOrder) -> Self:
+    def __set_byteorder__(self, order: ByteOrder):
         self.order = order
         return self
 
-    def __type__(self) -> type:
+    def __type__(self):
         return self.get_type()
 
     __ixor__ = __xor__
@@ -256,7 +244,7 @@ class Field:
         # pylint: disable-next=protected-access
         return F_SEQUENTIAL._hash_ in self.flags
 
-    def is_enabled(self, context: _ContextLike) -> bool:
+    def is_enabled(self, context) -> bool:
         """Evaluates the condition of this field.
 
         :param context: the context on which to operate
@@ -281,7 +269,7 @@ class Field:
         # pylint: disable-next=protected-access
         return flag._hash_ in self.flags or flag in GLOBAL_FIELD_FLAGS
 
-    def length(self, context: _ContextLike) -> Union[int, _GreedyType, _PrefixedType]:
+    def length(self, context):
         """Calculates the sequence length of this field.
 
         :param context: the context on which to operate
@@ -298,11 +286,11 @@ class Field:
         except Exception as exc:
             raise DynamicSizeError("Dynamic sized field!", context) from exc
 
-    def get_struct(self, value: Any, context: _ContextLike) -> _StructLike:
+    def get_struct(self, value, context):
         """Returns the struct from stored options.
 
         :param value: the unpacked or packed value
-        :type value: Any
+        :type value
         :param context: the current context
         :type context: _ContextLike
         :return: the struct that packs or unpacks the data
@@ -327,11 +315,11 @@ class Field:
             return getstruct(struct)
         return struct
 
-    def get_offset(self, context: _ContextLike) -> int:
+    def get_offset(self, context) -> int:
         """Returns the offset position of this field"""
         return self.offset(context) if callable(self.offset) else self.offset
 
-    def get_type(self) -> type:
+    def get_type(self):
         """Returns the annotation type for this field
 
         :return: the annotation type
@@ -348,24 +336,21 @@ class Field:
         types = [typeof(s) for s in self.options.values()]
         return Union[*types, Any]
 
-    def get_name(self) -> Optional[str]:
+    def get_name(self):
         return getattr(self, "__name__", None)
 
     # IO related stuff
-    def __unpack__(self, context: _ContextLike) -> Optional[Any]:
+    def __unpack__(self, context):
         """Reads packed data from the given stream.
 
         This method returns nothing if this field is disabled and applies switch if
         additional options are configured.
 
-        :param stream: the data stream
-        :type stream: _StreamType
         :param context: the current context
         :type context: _ContextLike
         :return: the parsed data
-        :rtype: Optional[Any]
         """
-        stream: _StreamType = context[CTX_STREAM]
+        stream = context[CTX_STREAM]
         if self.condition is not True and not self.is_enabled(context):
             # Disabled fields or context lambdas won't pack any data
             return
@@ -413,7 +398,7 @@ class Field:
 
         return value
 
-    def __pack__(self, obj: Any, context: _ContextLike) -> None:
+    def __pack__(self, obj, context) -> None:
         """Writes the given object to the provided stream.
 
         There are several options associated with this function. First, disabled
@@ -425,16 +410,14 @@ class Field:
         flag ``KEEP_POSITION`` is not found.
 
         :param obj: the value to write
-        :type obj: Any
-        :param stream: the output stream
-        :type stream: _StreamType
+        :type obj
         :param context: the current context with a qualified path
         :type context: _ContextLike
         :raises TypeError: if the value is not iterable but this field is marked
                            to be sequential
         """
         # TODO: revisit code
-        stream: _StreamType = context[CTX_STREAM]
+        stream = context[CTX_STREAM]
         if self.condition is not True and not self.is_enabled(context):
             # Disabled fields or context lambdas won't pack any data
             return
@@ -481,7 +464,7 @@ class Field:
             context._root[CTX_OFFSETS][offset] = stream.getbuffer()
             context[CTX_STREAM] = base_stream
 
-    def __size__(self, context: _ContextLike) -> int:
+    def __size__(self, context) -> int:
         """Calculates the size of this field.
 
         There are several situations to bear in mind when executing this function:
@@ -548,7 +531,7 @@ class Field:
 
 # --- private type converter ---
 @registry.TypeConverter(_StructLike)
-def _type_converter(annotation: _StructLike, kwargs: dict) -> Field:
+def _type_converter(annotation, kwargs):
     # REVISIT: more options ?
     arch = kwargs.pop("arch", None)
     order = kwargs.pop("order", None)
@@ -559,11 +542,11 @@ registry.annotation_registry.append(_type_converter)
 
 
 class _CallableTypeConverter(registry.TypeConverter):
-    def matches(self, annotation: Any) -> bool:
+    def matches(self, annotation) -> bool:
         # must be a callable but not a type
         return callable(annotation) and not isinstance(annotation, type)
 
-    def convert(self, annotation: Any, kwargs: dict) -> _StructLike:
+    def convert(self, annotation, kwargs):
         arch = kwargs.pop("arch", None)
         order = kwargs.pop("order", None)
         # callables are treates as context lambdas

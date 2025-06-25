@@ -12,41 +12,17 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-from ._base import Sequence
-from ._struct import (
-    Struct,
-    struct,
-    UnionHook,
-    union,
-    unpack,
-    unpack_file,
-    pack,
-    pack_into,
-    pack_file,
-    sizeof,
-)
-from ._bitfield import BitField, bitfield, BitFieldGroup, issigned, getbits
-from ._template import istemplate, template, TemplateTypeVar, derive
+from caterpillar.abc import _ContextLike
 
-__all__ = [
-    "Sequence",
-    "Struct",
-    "struct",
-    "UnionHook",
-    "union",
-    "unpack",
-    "unpack_file",
-    "pack",
-    "pack_into",
-    "pack_file",
-    "sizeof",
-    "BitField",
-    "bitfield",
-    "BitFieldGroup",
-    "issigned",
-    "getbits",
-    "istemplate",
-    "template",
-    "TemplateTypeVar",
-    "derive",
-]
+class StructException(Exception):
+    context: _ContextLike
+    def __init__(self, message: str, context: _ContextLike | None = None) -> None: ...
+
+class DynamicSizeError(StructException): ...
+class OptionError(StructException): ...
+class ValidationError(StructException): ...
+class UnsupportedOperation(StructException): ...
+class InvalidValueError(StructException): ...
+class StreamError(StructException): ...
+class DelegationError(StructException): ...
+class Stop(StructException): ...

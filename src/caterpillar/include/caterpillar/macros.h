@@ -24,6 +24,7 @@
 #include <Python.h>
 
 #define PY_3_13_PLUS (PY_VERSION_HEX >= 0x030d0000)
+#define PY_3_14_PLUS (PY_VERSION_HEX >= 0x030e0000)
 
 #define _Cp_NameStr(x) ("caterpillar._C." x)
 

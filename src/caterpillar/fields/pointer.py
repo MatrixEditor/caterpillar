@@ -15,12 +15,13 @@
 
 from typing import Any, Union, Optional
 
-from caterpillar.abc import _ContextLike, _StructLike, _ContextLambda, getstruct
+from caterpillar.abc import _ContextLike, _StructLike, _ContextLambda
 from caterpillar.byteorder import Arch
 from caterpillar.exception import DelegationError, StructException
 from caterpillar.context import CTX_STREAM, CTX_FIELD, CTX_ARCH, CTX_SEQ
 from caterpillar.options import Flag
 from caterpillar._common import WithoutContextVar
+from caterpillar.shared import getstruct
 
 from ._mixin import FieldStruct
 from .common import uint16, uint24, uint32, uint64, uint8
@@ -38,15 +39,13 @@ class pointer(int):
     :ivar Any obj: The associated object, if any.
     """
 
-    obj: Optional[Any]
-
     def __repr__(self) -> str:
         result = super().__repr__()
         if self.obj is not None:
             result = f"<{type(self.obj).__name__}* {hex(self)}>"
         return result
 
-    def get(self) -> Optional[Any]:
+    def get(self):
         return self.obj
 
 
@@ -58,20 +57,17 @@ class Pointer(FieldStruct):
     :ivar struct: The configured struct to use.
     """
 
-    model: Optional[_StructLike]
-    struct: Union[_StructLike, _ContextLambda]
-
     __slots__ = ("model", "struct")
 
     def __init__(
         self,
-        struct: Union[_StructLike, _ContextLambda],
-        model: Optional[_StructLike] = None,
+        struct,
+        model=None,
     ) -> None:
         self.struct = struct
         self.model = getstruct(model, model) if model is not None else None
 
-    def __mul__(self, model: _StructLike) -> "Pointer":
+    def __mul__(self, model):
         """
         Create a new Pointer with a specified model.
 
@@ -82,7 +78,7 @@ class Pointer(FieldStruct):
 
         return type(self)(self.struct, model)
 
-    def __type__(self) -> type:
+    def __type__(self):
         """
         Get the type associated with the Pointer.
 
@@ -91,7 +87,7 @@ class Pointer(FieldStruct):
         """
         return pointer
 
-    def __size__(self, context: _ContextLike) -> int:
+    def __size__(self, context):
         """
         Get the size of the Pointer struct.
 
@@ -104,7 +100,7 @@ class Pointer(FieldStruct):
             struct = self.struct(context)
         return struct.__size__(context)
 
-    def unpack_single(self, context: _ContextLike) -> Union[int, pointer]:
+    def unpack_single(self, context):
         """
         Unpack a single value using the Pointer struct.
 
@@ -142,7 +138,7 @@ class Pointer(FieldStruct):
                 stream.seek(fallback)
         return self._create(value, start, model_obj, context)
 
-    def pack_single(self, obj: Any, context: _ContextLike) -> None:
+    def pack_single(self, obj, context) -> None:
         """
         Pack a single value using the Pointer struct.
 
@@ -156,7 +152,7 @@ class Pointer(FieldStruct):
         with WithoutContextVar(context, CTX_SEQ, False):
             struct.__pack__(int(obj), context)
 
-    def _to_offset(self, value: Any, start: int, context: _ContextLike) -> int:
+    def _to_offset(self, value, start: int, context) -> int:
         """
         Convert the pointer value to an offset.
 
@@ -168,7 +164,7 @@ class Pointer(FieldStruct):
         """
         return value
 
-    def _clean(self, value: int, context: _ContextLike) -> Any:
+    def _clean(self, value: int, context) -> Any:
         """
         Clean the pointer value.
 
@@ -178,7 +174,7 @@ class Pointer(FieldStruct):
         """
         return value
 
-    def _create(self, value: Any, start: int, model_obj: Any, context: _ContextLike):
+    def _create(self, value, start: int, model_obj, context):
         """
         Create a new pointer object.
 
@@ -197,7 +193,7 @@ UNSIGNED_POINTER_TYS = {x.__bits__: x for x in [uint8, uint16, uint24, uint32, u
 SIGNED_POINTER_TYS = {x.__bits__: x for x in [int8, int16, int24, int32, int64]}
 
 
-def uintptr_fn(context: _ContextLike) -> _StructLike:
+def uintptr_fn(context):
     """
     Generator function to decide which struct to use as the pointer type based
     on the current architecture.
@@ -210,7 +206,7 @@ def uintptr_fn(context: _ContextLike) -> _StructLike:
     return UNSIGNED_POINTER_TYS.get(arch.ptr_size, UInt(arch.ptr_size))
 
 
-def intptr_fn(context: _ContextLike) -> _StructLike:
+def intptr_fn(context):
     """
     Generator function to decide which struct to use as the pointer type based
     on the current architecture.
@@ -254,7 +250,7 @@ class RelativePointer(Pointer):
     A struct that represents a relative pointer to another struct within the stream.
     """
 
-    def __type__(self) -> type:
+    def __type__(self):
         """
         Get the type associated with the RelativePointer.
 
@@ -266,7 +262,7 @@ class RelativePointer(Pointer):
 
         return relative_pointer
 
-    def _to_offset(self, value: Any, start: int, context: _ContextLike) -> int:
+    def _to_offset(self, value, start: int, context) -> int:
         """
         Convert the relative pointer value to an offset.
 
@@ -278,7 +274,7 @@ class RelativePointer(Pointer):
         """
         return start + value
 
-    def _create(self, value: Any, start: int, model_obj: Any, context: _ContextLike):
+    def _create(self, value, start: int, model_obj, context):
         """
         Create a new relative pointer object.
 
