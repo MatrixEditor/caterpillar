@@ -2,7 +2,7 @@
 
 #include "caterpillar/caterpillar.h"
 
-#if PY_3_13_PLUS
+#if PY_3_14_PLUS
 #define _Py_IMMORTAL_REFCNT _Py_IMMORTAL_INITIAL_REFCNT
 #endif
 
