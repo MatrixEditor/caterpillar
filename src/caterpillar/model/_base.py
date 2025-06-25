@@ -286,7 +286,7 @@ class Sequence(FieldMixin):
         field.default = default
         field.order = self.order or field.order
         field.arch = self.arch or field.arch
-        field.flags.update(self.field_options)
+        field.flags.update({hash(x): x for x in self.field_options})
         return field
 
     def add_field(self, name: str, field: Field, included: bool = False) -> None:

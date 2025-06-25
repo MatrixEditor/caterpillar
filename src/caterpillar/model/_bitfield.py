@@ -19,7 +19,8 @@ from typing import Iterable, Tuple
 from typing import Self, List
 from dataclasses import dataclass, field as dcfield
 
-from caterpillar.abc import _StructLike, _ContextLike, _StreamType, typeof
+from caterpillar.abc import _StructLike, _ContextLike, _StreamType
+from caterpillar.shared import typeof, ATTR_BITS, ATTR_SIGNED
 from caterpillar.byteorder import (
     Arch,
     ByteOrder,
@@ -47,25 +48,16 @@ from caterpillar.context import Context, CTX_PATH, CTX_OBJECT, CTX_STREAM
 
 from ._struct import Struct
 
-BitTuple = Tuple[int, int, type]
+BitTuple = tuple
 
 
-BITS_ATTR = "__bits__"
-SIGNED_ATTR = "__signed__"
-
-
-def getbits(obj: Any) -> int:
-    __bits__ = getattr(obj, BITS_ATTR)
+def getbits(obj) -> int:
+    __bits__ = getattr(obj, ATTR_BITS)
     return __bits__() if callable(__bits__) else __bits__
 
 
-def issigned(obj: Any) -> bool:
-    return bool(getattr(obj, SIGNED_ATTR, None))
-
-
-def getformat(obj: Any) -> str:
-    attr = getattr(obj, "__fmt__")
-    return attr() if callable(attr) else attr
+def issigned(obj) -> bool:
+    return bool(getattr(obj, ATTR_SIGNED, None))
 
 
 @dataclass(init=False)
@@ -73,9 +65,9 @@ class BitFieldGroup:
     size: int
     pos: int
     fmt: str
-    fields: Dict[BitTuple, Field] = dcfield(default_factory=dict)
+    fields: dict = dcfield(default_factory=dict)
 
-    def __init__(self, size: int, pos: int, fields: Dict = None) -> None:
+    def __init__(self, size: int, pos: int, fields=None) -> None:
         self.size = size
         self.pos = pos
         self.fields = fields or {}
@@ -104,17 +96,17 @@ class BitField(Struct):
 
     def __init__(
         self,
-        model: type,
-        order: Optional[ByteOrder] = None,
-        arch: Optional[Arch] = None,
-        options: Iterable[Flag] = None,
-        field_options: Iterable[Flag] = None,
+        model,
+        order=None,
+        arch=None,
+        options=None,
+        field_options=None,
     ) -> None:
-        self.groups: List[BitFieldGroup] = []
+        self.groups = []
         # These fields remain private and will be deleted after processing
-        self._bit_pos: int = 0
-        self._abs_bit_pos: int = 0
-        self._current_group: BitFieldGroup = None
+        self._bit_pos = 0
+        self._abs_bit_pos = 0
+        self._current_group = None
 
         super().__init__(
             model=model,
@@ -133,7 +125,7 @@ class BitField(Struct):
         del self._abs_bit_pos
         del self._current_group
 
-    def __add__(self, other: "BitField") -> Self:
+    def __add__(self, other):
         if not isinstance(other, BitField):
             raise ValidationError(
                 f"Attempted to add a non-bitfield struct to a bitfield! (type={type(other)})"
@@ -141,9 +133,7 @@ class BitField(Struct):
         # REVISIT: undefined bahaviour when parsing
         return super(Struct, self).__add__(other)
 
-    def _process_field(
-        self, name: str, annotation: Any, default: Optional[Any]
-    ) -> Field:
+    def _process_field(self, name: str, annotation, default):
         """
         Process a field in the model.
 
@@ -157,11 +147,11 @@ class BitField(Struct):
         #    name : bit_count [ - struct ] [ = default_value ]
         # or
         #    name : struct [ = default_value ]
-        struct: _StructLike = None
-        field: Field = None
+        struct = None
+        field = None
 
         order = byteorder(annotation, self.order)
-        group: BitFieldGroup = self._current_group
+        group = self._current_group
         arch = self.arch or system_arch
 
         width = 0
@@ -232,7 +222,7 @@ class BitField(Struct):
         field.order = self.order or field.order
         field.arch = self.arch or field.arch
         field.bits = field.bits or width
-        field.flags.update(self.field_options)
+        field.flags.update({hash(x): x for x in self.field_options})
 
         # Now, we have to check whether a new byte has to be started
         if group.size - self._bit_pos < width:
@@ -257,7 +247,7 @@ class BitField(Struct):
         self._abs_bit_pos += width
         return field
 
-    def _included(self, name: str, default: Optional[Any], annotation: Any) -> bool:
+    def _included(self, name: str, default, annotation) -> bool:
         if not super()._included(name, default, annotation):
             return False
 
@@ -267,7 +257,7 @@ class BitField(Struct):
         return True
 
     def group(self, bit_index: int) -> Optional[BitFieldGroup]:
-        grp: BitFieldGroup = None
+        grp = None
         for candidate in self.groups:
             if bit_index > candidate.pos:
                 break
@@ -313,7 +303,7 @@ class BitField(Struct):
 
         return self.model(**init_data)
 
-    def pack_one(self, obj: Any, context: _ContextLike) -> None:
+    def pack_one(self, obj, context: _ContextLike) -> None:
         # REVISIT: this function is very time consuming. should be do something
         # about that?
         stream: _StreamType = context[CTX_STREAM]
@@ -351,10 +341,12 @@ class BitField(Struct):
 
 def _make_bitfield(
     cls: type,
-    options: Iterable[Flag],
-    order: Optional[ByteOrder] = None,
-    arch: Optional[Arch] = None,
-    field_options: Iterable[Flag] = None,
+    /,
+    *,
+    options,
+    order=None,
+    arch=None,
+    field_options=None,
 ) -> type:
     _ = BitField(
         cls, order=order, arch=arch, options=options, field_options=field_options
@@ -363,13 +355,13 @@ def _make_bitfield(
 
 
 def bitfield(
-    cls: type = None,
+    cls=None,
     /,
     *,
-    options: Iterable[Flag] = None,
-    order: Optional[ByteOrder] = None,
-    arch: Optional[Arch] = None,
-    field_options: Iterable[Flag] = None,
+    options=None,
+    order=None,
+    arch=None,
+    field_options=None,
 ):
     def wrap(cls):
         return _make_bitfield(

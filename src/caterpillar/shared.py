@@ -32,6 +32,8 @@ MODE_UNPACK = 1
 ATTR_STRUCT = "__struct__"
 ATTR_BYTEORDER = "__byteorder__"
 ATTR_TYPE = "__type__"
+ATTR_BITS = "__bits__"
+ATTR_SIGNED = "__signed__"
 
 # TODO: add to reference
 # NEW CONCEPT: Actions
