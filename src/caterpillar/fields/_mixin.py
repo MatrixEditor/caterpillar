@@ -13,21 +13,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from io import BytesIO
-from types import EllipsisType
-from typing import Any, Collection, List, Union, Iterable, Callable
+from typing import Iterable
 from functools import partial
 
-from caterpillar.abc import (
-    _ContextLike,
-    _StructLike,
-    _ContextLambda,
-    _Switch,
-    getstruct,
-)
 from caterpillar.byteorder import ByteOrder, byteorder
 from caterpillar.options import Flag
 from caterpillar.context import CTX_SEQ, CTX_STREAM
 from caterpillar._common import unpack_seq, pack_seq, WithoutContextVar
+from caterpillar.shared import getstruct
 
 from ._base import Field
 
@@ -35,39 +28,39 @@ from ._base import Field
 class FieldMixin:
     """A simple mixin to support operators used to create :class:`Field` instances."""
 
-    def __or__(self, flag: Flag) -> Field:
+    def __or__(self, flag: Flag):
         """Creates a field *with* the given flag."""
         return Field(self, byteorder(self)) | flag
 
-    def __xor__(self, flag: Flag) -> Field:
+    def __xor__(self, flag: Flag):
         """Creates a field *without* the given flag."""
         return Field(self, byteorder(self)) ^ flag
 
-    def __matmul__(self, offset: Union[_ContextLambda, int]) -> Field:
+    def __matmul__(self, offset):
         """Creates a field that should start at the given offset."""
         return Field(self, byteorder(self)) @ offset
 
-    def __getitem__(self, dim: Union[_ContextLambda, int, EllipsisType]) -> Field:
+    def __getitem__(self, dim):
         """Returns a sequenced field."""
         return Field(self, byteorder(self))[dim]
 
-    def __rshift__(self, switch: Union[_Switch, dict]) -> Field:
+    def __rshift__(self, switch):
         """Inserts switch options into the new field"""
         return Field(self, byteorder(self)) >> switch
 
-    def __floordiv__(self, condition: Union[_ContextLambda, bool]) -> Field:
+    def __floordiv__(self, condition):
         """Returns a field with the given condition"""
         return Field(self, byteorder(self)) // condition
 
-    def __set_byteorder__(self, order: ByteOrder) -> Field:
+    def __set_byteorder__(self, order: ByteOrder):
         """Returns a field with the given byteorder"""
         return Field(self, order=order)
 
-    def __rsub__(self, bits: Union[_ContextLambda, int]) -> Field:
+    def __rsub__(self, bits):
         """Returns a field with the given bit count"""
         return Field(self, byteorder(self), bits=bits)
 
-    def __and__(self, other: _StructLike) -> "Chain":
+    def __and__(self, other):
         """Returns a chain with the next element added at the end"""
         if isinstance(other, Chain):
             return other & self
@@ -93,7 +86,7 @@ class FieldStruct(FieldMixin):
         "__bits__": "TBD",
     }
 
-    def pack_single(self, obj: Any, context: _ContextLike) -> None:
+    def pack_single(self, obj, context) -> None:
         """
         Abstract method to pack a single element.
 
@@ -105,7 +98,7 @@ class FieldStruct(FieldMixin):
         """
         raise NotImplementedError
 
-    def unpack_single(self, context: _ContextLike) -> Any:
+    def unpack_single(self, context):
         """
         Abstract method to unpack a single element.
 
@@ -116,7 +109,7 @@ class FieldStruct(FieldMixin):
         """
         raise NotImplementedError
 
-    def pack_seq(self, seq: Collection, context: _ContextLike) -> None:
+    def pack_seq(self, seq, context) -> None:
         """
         Pack a sequence of elements using the provided context.
 
@@ -127,7 +120,7 @@ class FieldStruct(FieldMixin):
         """
         pack_seq(seq, context, self.pack_single)
 
-    def unpack_seq(self, context: _ContextLike) -> List[Any]:
+    def unpack_seq(self, context):
         """
         Unpack a sequence of elements using the provided context.
 
@@ -137,7 +130,7 @@ class FieldStruct(FieldMixin):
         """
         return unpack_seq(context, self.unpack_single)
 
-    def __pack__(self, obj: Any, context: _ContextLike) -> None:
+    def __pack__(self, obj, context) -> None:
         """
         Pack data based on whether the field is sequential or not.
 
@@ -148,7 +141,7 @@ class FieldStruct(FieldMixin):
         """
         (self.pack_single if not context[CTX_SEQ] else self.pack_seq)(obj, context)
 
-    def __unpack__(self, context: _ContextLike) -> Any:
+    def __unpack__(self, context):
         """
         Unpack data based on whether the field is sequential or not.
 
@@ -186,15 +179,15 @@ class Chain(FieldStruct):
 
     __slots__ = ("_elements",)
 
-    def __init__(self, initial: _StructLike, *structs: _StructLike) -> None:
+    def __init__(self, initial, *structs) -> None:
         # start -> next -> next -> next -> done | unpack
         #                                   Y
         # done <- previous <- previous <- start | pack
         self._elements = [getstruct(initial, initial)]
-        self._elements += list(map(lambda x: getstruct(x, x), structs))
+        self._elements += [x for x in map(lambda x: getstruct(x, x), structs) if x]
 
     @property
-    def head(self) -> _StructLike:
+    def head(self):
         """
         Get the head of the chain, i.e., the first structure.
 
@@ -204,7 +197,7 @@ class Chain(FieldStruct):
         return self._elements[0]
 
     @property
-    def tail(self) -> _StructLike:
+    def tail(self):
         """
         Get the tail of the chain, i.e., the last structure.
 
@@ -214,7 +207,7 @@ class Chain(FieldStruct):
 
         return self._elements[-1]
 
-    def __size__(self, context: _ContextLike) -> int:
+    def __size__(self, context) -> int:
         """
         Calculate the size of the chain in bytes.
 
@@ -235,7 +228,7 @@ class Chain(FieldStruct):
 
         return self.tail.__type__()
 
-    def __and__(self, other: _StructLike) -> "Chain":
+    def __and__(self, other):
         """
         Concatenate another structure to the end of the chain.
 
@@ -247,7 +240,7 @@ class Chain(FieldStruct):
         self._elements.append(getstruct(other, other))
         return self
 
-    def __rand__(self, other: _StructLike) -> "Chain":
+    def __rand__(self, other):
         """
         Concatenate another structure to the beginning of the chain.
 
@@ -258,7 +251,7 @@ class Chain(FieldStruct):
         """
         return self.__and__(other)
 
-    def unpack_single(self, context: _ContextLike) -> memoryview:
+    def unpack_single(self, context):
         """
         Unpack a single data instance from the chain.
 
@@ -278,7 +271,7 @@ class Chain(FieldStruct):
 
         return data
 
-    def pack_single(self, obj: Any, context: _ContextLike) -> None:
+    def pack_single(self, obj, context) -> None:
         """
         Pack a single data instance into the chain.
 
@@ -311,10 +304,10 @@ class Operator:
 
     .. code-block:: python
 
-        from caterpillar.fields import uint16, _infix_
+        from caterpillar.fields import uint16, Operator
         from caterpillar.model import struct
 
-        M = _infix_(lambda a, b: a[b*2])
+        M = Operator(lambda a, b: a[b*2])
 
         @struct
         class Format:
@@ -325,7 +318,7 @@ class Operator:
 
     .. code-block:: python
 
-        @_infix_
+        @Operator
         def M(a, b):
             return a[b*2]
 
@@ -333,21 +326,21 @@ class Operator:
     :type func: Callable[[Any, Any], _StructLike]
     """
 
-    def __init__(self, func: Callable[[Any, Any], _StructLike]) -> None:
+    def __init__(self, func) -> None:
         self.func = func
 
-    def __truediv__(self, arg2) -> _StructLike:
+    def __truediv__(self, arg2):
         return self.func(arg2)
 
-    def __rtruediv__(self, arg1) -> "_infix_":
+    def __rtruediv__(self, arg1):
         return Operator(partial(self.func, arg1))
 
-    def __call__(self, arg1, arg2) -> _StructLike:
+    def __call__(self, arg1, arg2):
         return self.func(arg1, arg2)
 
 
 # utility methods
-def get_args(args: Any, context: _ContextLike) -> List[Any]:
+def get_args(args, context):
     """
     Get arguments for an instance.
 
@@ -365,7 +358,7 @@ def get_args(args: Any, context: _ContextLike) -> List[Any]:
     return args
 
 
-def get_kwargs(kwargs: dict, context: _ContextLike) -> dict:
+def get_kwargs(kwargs: dict, context) -> dict:
     """
     Process a dictionary of keyword arguments, replacing callable values with their
     results.
