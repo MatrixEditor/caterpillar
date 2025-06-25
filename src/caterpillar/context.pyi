@@ -12,17 +12,14 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-from dataclasses import dataclass
 from types import FrameType
 from typing import (
     Any,
     Callable,
     Dict,
     List,
-    NewType,
     Optional,
     Self,
-    Tuple,
     Type,
     Union,
     dataclass_transform,

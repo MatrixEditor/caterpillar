@@ -118,6 +118,9 @@ class _StructLike(Protocol):
     def __pack__(self, obj: Any, context: _ContextLike) -> None:
         pass
 
+
+@runtime_checkable
+class _SupportsType(Protocol):
     def __type__(self) -> Optional[Union[type, str]]:
         pass
 

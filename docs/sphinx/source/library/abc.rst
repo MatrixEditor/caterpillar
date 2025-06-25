@@ -35,21 +35,7 @@ Context
 Other base classes
 ------------------
 
-.. autoclass:: caterpillar.abc._EnumLike
+.. autoclass:: caterpillar.abc._SwitchLike
     :members:
 
-.. autoclass:: caterpillar.abc._Switch
-    :members:
-
-
-Standard interface
-------------------
-
-.. autoattribute:: caterpillar.abc.STRUCT_FIELD
-
-.. autofunction:: caterpillar.abc.hasstruct
-
-.. autofunction:: caterpillar.abc.getstruct
-
-.. autofunction:: caterpillar.abc.typeof
 

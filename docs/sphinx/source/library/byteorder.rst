@@ -10,8 +10,6 @@ Byteorder
 .. autoclass:: caterpillar.byteorder.ByteOrder
     :members:
 
-.. autoattribute:: caterpillar.byteorder.BYTEORDER_FIELD
-
 .. autoattribute:: caterpillar.byteorder.Native
 
 .. autoattribute:: caterpillar.byteorder.BigEndian
