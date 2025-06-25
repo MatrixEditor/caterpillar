@@ -12,18 +12,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-from abc import abstractmethod
-from typing import Protocol, Union, Callable, Optional, runtime_checkable
+from typing import Protocol, runtime_checkable
 
-from caterpillar.abc import (
-    _ContextLike,
-    _StructLike,
-    _ContainsStruct,
-    getstruct,
-    hasstruct,
-)
-from ._mixin import get_kwargs
-from .common import Transformer, Bytes
+from caterpillar.abc import _StructLike
+from caterpillar.shared import getstruct, hasstruct
+from caterpillar.fields._mixin import get_kwargs
+from caterpillar.fields.common import Transformer, Bytes
 
 
 @runtime_checkable
@@ -36,7 +30,6 @@ class _Compressor(Protocol):
     Any class implementing this protocol must define these methods.
     """
 
-    @abstractmethod
     def compress(self, data: bytes, **kwds) -> bytes:
         """
         Compress the provided data.
@@ -47,9 +40,8 @@ class _Compressor(Protocol):
         :return: The compressed data.
         :rtype: bytes
         """
-        pass
+        return b""
 
-    @abstractmethod
     def decompress(self, data: bytes, **kwds) -> bytes:
         """
         Decompress the provided data.
@@ -60,7 +52,7 @@ class _Compressor(Protocol):
         :return: The decompressed data.
         :rtype: bytes
         """
-        pass
+        return b""
 
 
 class Compressed(Transformer):
@@ -83,10 +75,10 @@ class Compressed(Transformer):
 
     def __init__(
         self,
-        compressor: _Compressor,
-        struct: Union[_ContainsStruct, _StructLike],
-        comp_kwargs: Optional[dict] = None,
-        decomp_kwargs: Optional[dict] = None,
+        compressor,
+        struct,
+        comp_kwargs=None,
+        decomp_kwargs=None,
     ) -> None:
         if hasstruct(struct):
             struct = getstruct(struct)
@@ -95,7 +87,7 @@ class Compressed(Transformer):
         self.comp_args = comp_kwargs or {}
         self.decomp_args = decomp_kwargs or {}
 
-    def encode(self, obj: bytes, context: _ContextLike) -> bytes:
+    def encode(self, obj: bytes, context) -> bytes:
         """
         Compress the input data using the provided compressor.
 
@@ -108,7 +100,7 @@ class Compressed(Transformer):
         """
         return self.compressor.compress(obj, **get_kwargs(self.comp_args, context))
 
-    def decode(self, parsed: bytes, context: _ContextLike) -> bytes:
+    def decode(self, parsed: bytes, context) -> bytes:
         """
         Decompress the input data using the provided compressor.
 
@@ -124,81 +116,77 @@ class Compressed(Transformer):
         )
 
 
-_LengthOrStruct = Union[_ContainsStruct, _StructLike, Callable, int]
-
-
 def compressed(
-    lib: _Compressor,
-    obj: _LengthOrStruct,
-    comp_kwargs: Optional[dict] = None,
-    decomp_kwargs: Optional[dict] = None,
+    lib,
+    obj,
+    comp_kwargs=None,
+    decomp_kwargs=None,
 ) -> _StructLike:
     if callable(obj) or isinstance(obj, int) or obj is ...:
         obj = Bytes(obj)
     return Compressed(lib, obj, comp_kwargs, decomp_kwargs)
 
 
-try:
-    import zlib
+def ZLibCompressed(
+    obj,
+    comp_kwargs=None,
+    decomp_kwargs=None,
+):
+    """
+    Create a struct representing zlib compression.
+    """
+    try:
+        import zlib
 
-    def ZLibCompressed(
-        obj: _LengthOrStruct,
-        comp_kwargs: Optional[dict] = None,
-        decomp_kwargs: Optional[dict] = None,
-    ):
-        """
-        Create a struct representing zlib compression.
-        """
         return compressed(zlib, obj, comp_kwargs, decomp_kwargs)
+    except ImportError:
+        raise NotImplementedError("Could not import zlib!")
 
-except ImportError:
-    ZLibCompressed = None
 
-try:
-    import bz2
+def Bz2Compressed(
+    obj,
+    comp_kwargs=None,
+    decomp_kwargs=None,
+):
+    """
+    Create a struct representing bz2 compression.
+    """
+    try:
+        import bz2
 
-    def Bz2Compressed(
-        obj: _LengthOrStruct,
-        comp_kwargs: Optional[dict] = None,
-        decomp_kwargs: Optional[dict] = None,
-    ):
-        """
-        Create a struct representing bz2 compression.
-        """
         return compressed(bz2, obj, comp_kwargs, decomp_kwargs)
+    except ImportError:
+        raise NotImplementedError("Could not import bz2!")
 
-except ImportError:
-    Bz2Compressed = None
 
-try:
-    import lzma
+def LZMACompressed(
+    obj,
+    comp_kwargs=None,
+    decomp_kwargs=None,
+):
+    """
+    Create a struct representing lzma compression.
+    """
+    try:
+        import lzma
 
-    def LZMACompressed(
-        obj: _LengthOrStruct,
-        comp_kwargs: Optional[dict] = None,
-        decomp_kwargs: Optional[dict] = None,
-    ):
-        """
-        Create a struct representing lzma compression.
-        """
         return compressed(lzma, obj, comp_kwargs, decomp_kwargs)
+    except ImportError:
+        raise NotImplementedError("Could not import lzma!")
 
-except ImportError:
-    LZMACompressed = None
 
-try:
-    # install package manuall with pip install lzallright
-    import lzallright
+def LZOCompressed(
+    obj,
+    comp_kwargs=None,
+    decomp_kwargs=None,
+):
+    """
+    Create a struct representing LZO compression.
+    """
+    try:
+        # install package manuall with pip install lzallright
+        import lzallright
 
-    def LZOCompressed(
-        obj: _LengthOrStruct,
-        comp_kwargs: Optional[dict] = None,
-        decomp_kwargs: Optional[dict] = None,
-    ):
-        """
-        Create a struct representing LZO compression.
-        """
         return compressed(lzallright.LZOCompressor(), obj, comp_kwargs, decomp_kwargs)
-
-except ImportError:
-    LZOCompressed = None
+    except ImportError:
+        raise NotImplementedError("Could not import lzallright!")

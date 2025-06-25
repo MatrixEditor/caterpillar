@@ -18,9 +18,10 @@ import warnings
 from typing import Union, Any
 from typing import Optional
 from caterpillar.abc import _ContextLambda, _StructLike
-from caterpillar.abc import _ContextLike, typeof
+from caterpillar.abc import _ContextLike
 from caterpillar.context import ConditionContext
 from caterpillar.exception import ValidationError
+from caterpillar.shared import typeof
 
 from ._base import Field
 
@@ -40,7 +41,7 @@ class ConditionalChain:
 
     __slots__ = "chain", "conditions"
 
-    def __init__(self, struct: _StructLike, condition: _ContextLambda) -> None:
+    def __init__(self, struct, condition) -> None:
         if (sys.version_info.major, sys.version_info.minor) >= (3, 14):
             warnings.warn(
                 "Python3.14 breaks support for Contitional fields. Conditional "
@@ -50,7 +51,7 @@ class ConditionalChain:
         self.conditions = []
         self.add(struct, condition)
 
-    def __type__(self) -> str:
+    def __type__(self):
         return Optional[Union[*map(typeof, self.chain.values())]]
 
     def __repr__(self) -> str:
@@ -66,12 +67,12 @@ class ConditionalChain:
 
         return f"<Chain {', '.join(annotation)}>"
 
-    def add(self, struct: _StructLike, func: _ContextLambda) -> None:
+    def add(self, struct, func) -> None:
         idx = len(self.chain)
         self.chain[idx] = struct
         self.conditions.append(func)
 
-    def get_struct(self, context: _ContextLike) -> Optional[_StructLike]:
+    def get_struct(self, context):
         index = 0
         while index < len(self.chain):
             func = self.conditions[index]
@@ -79,16 +80,16 @@ class ConditionalChain:
                 return self.chain[index]
             index += 1
 
-    def __unpack__(self, context: _ContextLike) -> Any:
+    def __unpack__(self, context) -> Any:
         struct = self.get_struct(context)
         return struct.__unpack__(context) if struct else None
 
-    def __pack__(self, obj: Any, context: _ContextLike) -> None:
+    def __pack__(self, obj: Any, context) -> None:
         struct = self.get_struct(context)
         if struct:
             struct.__pack__(obj, context)
 
-    def __size__(self, context: _ContextLike) -> int:
+    def __size__(self, context) -> int:
         struct = self.get_struct(context)
         return struct.__size__(context) if struct else 0
 
@@ -196,4 +197,4 @@ class ElseIf(ConditionContext):
 # REVISIT: There is one case where 'ELSE' is not applicable and will cause
 # a field to be present at all times. This problem exists if we add fields
 # into an else-branch without a previously defined field.
-Else = ElseIf(lambda _: True)
+Else = ElseIf(lambda context: True)
