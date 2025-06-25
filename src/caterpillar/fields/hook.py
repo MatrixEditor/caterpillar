@@ -13,16 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from io import RawIOBase
-from typing import Callable, Optional
 
-from caterpillar.abc import _ContextLike
 from caterpillar.context import CTX_STREAM
-
-HookInit = Callable[[_ContextLike], None]
-HookUpdate = Callable[[bytes, _ContextLike], Optional[bytes]]
-HookRead = Callable[[bytes, _ContextLike], Optional[bytes]]
-HookWrite = Callable[[bytes, _ContextLike], Optional[bytes]]
-HookFinish = Callable[[_ContextLike], None]
 
 
 class IOHook(RawIOBase):
@@ -49,13 +41,7 @@ class IOHook(RawIOBase):
     """
 
     def __init__(
-        self,
-        io: RawIOBase,
-        init: Optional[HookInit] = None,
-        update: Optional[HookUpdate] = None,
-        read: Optional[HookRead] = None,
-        write: Optional[HookWrite] = None,
-        finish: Optional[HookFinish] = None,
+        self, io, init=None, update=None, read=None, write=None, finish=None
     ) -> None:
         # NOTE: no validation here if _io is valid, because
         # self.init will set it
@@ -76,7 +62,7 @@ class IOHook(RawIOBase):
         if self._context is None:
             raise ValueError("Context is not set")
 
-    def init(self, context: _ContextLike) -> None:
+    def init(self, context) -> None:
         """
         Initialize the I/O hook with the provided context. This triggers the
         `init` hook, if available, and sets up the context for subsequent operations.
@@ -90,7 +76,7 @@ class IOHook(RawIOBase):
         self._io = context[CTX_STREAM]
         self._context[CTX_STREAM] = self
 
-    def finish(self, context: _ContextLike) -> None:
+    def finish(self, context) -> None:
         """
         Finalize the I/O hook by calling the `finish` hook (if provided) and
         restoring the original I/O stream in the context.
@@ -122,7 +108,7 @@ class IOHook(RawIOBase):
         """
         return super().readable()
 
-    def read(self, size: int = -1) -> bytes | None:
+    def read(self, size: int = -1):
         """
         Read data from the stream, applying the optional hooks (if any).
 
@@ -147,7 +133,7 @@ class IOHook(RawIOBase):
 
         return data
 
-    def write(self, b: bytes, /) -> int | None:
+    def write(self, b, /):
         """
         Write data to the stream, applying the optional hooks (if any).
 
