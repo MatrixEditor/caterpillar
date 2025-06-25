@@ -14,9 +14,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from __future__ import annotations
 
-from typing import Any
-
-from caterpillar.abc import _StreamType, _ContextLike
 from caterpillar.exception import InvalidValueError, DynamicSizeError, StreamError
 from caterpillar.byteorder import LittleEndian
 from caterpillar.context import CTX_FIELD, CTX_STREAM
@@ -54,10 +51,10 @@ class VarInt(FieldStruct):
     def __type__(self) -> type:
         return int
 
-    def __size__(self, context: _ContextLike) -> int:
+    def __size__(self, context) -> int:
         raise DynamicSizeError("VarInt has dynamic size!")
 
-    def bit_config(self, context: _ContextLike) -> tuple:
+    def bit_config(self, context) -> tuple:
         high_bit = 1 << 7
         low_bit = 0
         if context[CTX_FIELD].has_flag(VARINT_LSB):
@@ -65,7 +62,7 @@ class VarInt(FieldStruct):
             low_bit = 1 << 7
         return high_bit, low_bit
 
-    def pack_single(self, obj: int, context: _ContextLike) -> None:
+    def pack_single(self, obj: int, context) -> None:
         """
         Pack a single value into the stream.
 
@@ -78,7 +75,7 @@ class VarInt(FieldStruct):
         if obj < 0:
             raise InvalidValueError("Invalid negative value for VarInt encoding!")
 
-        stream: _StreamType = context[CTX_STREAM]
+        stream = context[CTX_STREAM]
         order = context[CTX_FIELD].order
         is_little = order == LittleEndian
 
@@ -101,7 +98,7 @@ class VarInt(FieldStruct):
         # Just write all bytes to the stream
         stream.write(bytes(data))
 
-    def unpack_single(self, context: _ContextLike) -> Any:
+    def unpack_single(self, context):
         """
         Unpack a single value from the stream.
 
@@ -109,7 +106,7 @@ class VarInt(FieldStruct):
         :param context: The current context.
         :return: The unpacked value.
         """
-        stream: _StreamType = context[CTX_STREAM]
+        stream = context[CTX_STREAM]
         data = []
         _, lb = self.bit_config(context)
         shift = 0
