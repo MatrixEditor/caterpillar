@@ -1,4 +1,5 @@
 # type: ignore
+from caterpillar.fields.common import uint8
 from caterpillar.py import bitfield, char, int8, unpack, pack
 
 try:
@@ -16,10 +17,10 @@ class Format:
     _1: 3  # unnamed padding to the rest of the byte
 
 
-print(Format.__struct__)
+print(Format.__struct__.groups)
 obj = unpack(Format, b"\x80\x80")
 print(obj)
-# prints: Format(b1=True, b2='2', b3=0, _1=0)
+# prints: Format(b1=1, b2='2', b3=0, _1=0)
 # real_pos:      0123456701234567
 # bit_pos:       7654321076543210
 #                ---------------- # right to left

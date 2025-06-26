@@ -424,7 +424,7 @@ class Sequence(FieldMixin):
                 if name in self._member_map_:
                     value = self.get_value(obj, name, field)
                 else:
-                    # REVISIT: this line might not be necessary if const fields alredy
+                    # REVISIT: this line might not be necessary if const fields already
                     # use their internal value.
                     value = field.default if field.default != INVALID_DEFAULT else None
                 field.__pack__(value, context)

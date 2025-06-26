@@ -15,7 +15,7 @@
 from types import NoneType
 from typing import Any, Callable, Collection, Generic, Iterable, TypeVar
 
-_VT = TypeVar("_VT")
+_VT = TypeVar("_VT", default=NoneType)
 
 class Flag(Generic[_VT]):
     name: str
@@ -37,15 +37,20 @@ def get_flags(obj: Any, attr: str | None = None) -> set[Flag] | None: ...
 def has_flag(flag: str | Flag, obj: Any, attr: str | None = None) -> bool: ...
 def get_flag(name: str, obj: Any, attr: str | None = None) -> Flag | None: ...
 
-S_DISCARD_UNNAMED: Flag[NoneType]
-S_DISCARD_CONST: Flag[NoneType]
-S_UNION: Flag[NoneType]
-S_REPLACE_TYPES: Flag[NoneType]
-S_EVAL_ANNOTATIONS: Flag[NoneType]
-S_ADD_BYTES: Flag[NoneType]
-S_SLOTS: Flag[NoneType]
-F_KEEP_POSITION: Flag[NoneType]
-F_DYNAMIC: Flag[NoneType]
-F_SEQUENTIAL: Flag[NoneType]
-F_OFFSET_OVERRIDE: Flag[NoneType]
+S_DISCARD_UNNAMED: Flag
+S_DISCARD_CONST: Flag
+S_UNION: Flag
+S_REPLACE_TYPES: Flag
+S_EVAL_ANNOTATIONS: Flag
+S_ADD_BYTES: Flag
+S_SLOTS: Flag
+F_KEEP_POSITION: Flag
+F_DYNAMIC: Flag
+F_SEQUENTIAL: Flag
+F_OFFSET_OVERRIDE: Flag
 O_ARRAY_FACTORY: Flag[Callable[[Iterable], Collection]]
+B_OVERWRITE_ALIGNMENT: Flag
+
+B_GROUP_END: Flag
+B_GROUP_NEW: Flag
+B_GROUP_KEEP: Flag

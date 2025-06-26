@@ -160,3 +160,9 @@ F_OFFSET_OVERRIDE = Flag("offset_override")
 
 # value intentionally left blank
 O_ARRAY_FACTORY = Flag("option.array_factory", value=None)
+
+# bitfield options
+B_OVERWRITE_ALIGNMENT = Flag("bitfield.overwrite_alignment")
+B_GROUP_END = Flag("bitfield.group.end")
+B_GROUP_NEW = Flag("bitfield.group.new")
+B_GROUP_KEEP = Flag("bitfield.group.keep")
