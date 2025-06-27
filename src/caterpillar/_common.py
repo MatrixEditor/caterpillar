@@ -68,6 +68,7 @@ def unpack_seq(context, unpack_one) -> Collection:
     # the new context. The '_pos' attribute will be adjusted automatically.
     values = []  # always list (maybe add factory)
     seq_context = Context(
+        _root=context._root,
         _parent=context,
         _io=stream,
         _length=length,
@@ -142,6 +143,7 @@ def pack_seq(seq, context, pack_one) -> None:
     # Special elements '_index' and '_length' can be referenced within
     # the new context. The '_pos' attribute will be adjusted automatically.
     seq_context = Context(
+        _root=context._root,
         _parent=context,
         _io=stream,
         _length=count,

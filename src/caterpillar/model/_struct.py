@@ -451,8 +451,15 @@ def pack_into(
     :raises TypeError: If no `struct` is specified and cannot be inferred from the object.
     """
     offsets = OrderedDict()
+    # NOTE: we don't have to set _root here because the default root context
+    # will be this instance.
     context = Context(
-        _parent=None, _path="<root>", _pos=0, _offsets=offsets, mode=MODE_PACK, **kwds
+        _parent=None,
+        _path="<root>",
+        _pos=0,
+        _offsets=offsets,
+        mode=MODE_PACK,
+        **kwds,
     )
     if struct is None:
         struct = getstruct(obj)
