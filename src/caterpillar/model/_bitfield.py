@@ -48,7 +48,7 @@ from caterpillar.context import CTX_PATH, Context, CTX_OBJECT, CTX_STREAM
 from ._struct import Struct, sizeof
 
 
-# --- BItfield Concept ---
+# --- Bitfield Concept ---
 # NEW REVISED CONCEPT
 # Each Bitfield instance maintains a sequence of bitfield groups, where each group
 # contains a collection of sized fields. A bitfield group may consist of either multiple
@@ -734,6 +734,8 @@ class Bitfield(Struct):
             if option.name == EndGroup.name:
                 if entry:
                     group.entries.append(entry)
+                    self._bit_pos += entry.width
+                    group.bit_count = max(group.bit_count, self._bit_pos)
                     consumed = True
                 group.align_to(alignment)
 
