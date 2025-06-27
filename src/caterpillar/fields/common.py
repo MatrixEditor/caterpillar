@@ -1242,6 +1242,13 @@ class Int(FieldStruct):
             raise ValueError(f"Invalid int size: {bits!r} - expected int")
         self.size = self.__bits__ // 8
 
+    def __repr__(self) -> str:
+        name = "int"
+        if not self.signed:
+            name = f"u{name}"
+
+        return f"<{name}{self.__bits__}>"
+
     def __type__(self) -> type:
         """
         Return the type associated with this Int field.

@@ -63,12 +63,13 @@ class _ContextLambda(Protocol):
 
 
 @runtime_checkable
-class _ActionLike(Protocol):
-    @abstractmethod
+class _SupportsActionUnpack(Protocol):
     def __action_pack__(self, context: _ContextLike) -> None:
         pass
 
-    @abstractmethod
+
+@runtime_checkable
+class _SupportsActionPack(Protocol):
     def __action_unpack__(self, context: _ContextLike) -> None:
         pass
 

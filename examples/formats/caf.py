@@ -114,7 +114,7 @@ class CAFPacketTable:
     remainder_frames: int32
     # The VarInt configuration doesn't have to be changed, as this file format uses
     # the default implementation.
-    table_data: VarInt[this.num_packets]
+    table_data: vint[this.num_packets]
 
 
 @struct(order=BigEndian)

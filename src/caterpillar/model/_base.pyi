@@ -32,6 +32,7 @@ class Sequence(FieldMixin, Generic[_SeqModelT], _StructLike[_SeqModelT, _SeqMode
     options: set[Flag]
     field_options: set[Flag]
     is_union: bool
+    _member_map_: Dict[str, Field]
     def __init__(
         self,
         model: Optional[dict[str, Field]] = None,

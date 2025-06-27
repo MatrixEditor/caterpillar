@@ -25,7 +25,21 @@ from ._struct import (
     pack_file,
     sizeof,
 )
-from ._bitfield import BitField, bitfield, BitFieldGroup, issigned, getbits
+from ._bitfield import (
+    Bitfield,
+    bitfield,
+    BitfieldEntry,
+    BitfieldGroup,
+    BitfieldValueFactory,
+    issigned,
+    getbits,
+    NewGroup,
+    EndGroup,
+    SetAlignment,
+    EnumFactory,
+    CharFactory,
+    DEFAULT_ALIGNMENT,
+)
 from ._template import istemplate, template, TemplateTypeVar, derive
 
 __all__ = [
@@ -40,13 +54,21 @@ __all__ = [
     "pack_into",
     "pack_file",
     "sizeof",
-    "BitField",
+    "Bitfield",
     "bitfield",
-    "BitFieldGroup",
+    "BitfieldGroup",
     "issigned",
     "getbits",
     "istemplate",
     "template",
     "TemplateTypeVar",
     "derive",
+    "NewGroup",
+    "EndGroup",
+    "SetAlignment",
+    "BitfieldEntry",
+    "BitfieldValueFactory",
+    "EnumFactory",
+    "CharFactory",
+    "DEFAULT_ALIGNMENT",
 ]

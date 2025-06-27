@@ -61,9 +61,16 @@ class _ContainsStruct(Protocol[_IT_contra, _OT]):
     __struct__: _StructLike[_IT_contra, _OT]
 
 @runtime_checkable
-class _ActionLike(Protocol):
-    def __action_pack__(self, context: _ContextLike) -> None: ...
-    def __action_unpack__(self, context: _ContextLike) -> None: ...
+class _SupportsActionUnpack(Protocol):
+    def __action_pack__(self, context: _ContextLike) -> None:
+        pass
+
+@runtime_checkable
+class _SupportsActionPack(Protocol):
+    def __action_unpack__(self, context: _ContextLike) -> None:
+        pass
+
+_ActionLike = Union[_SupportsActionPack, _SupportsActionUnpack]
 
 @runtime_checkable
 class _SupportsPack(Protocol[_IT_contra]):
