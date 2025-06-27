@@ -144,19 +144,19 @@ def get_flag(name: str, obj, attr=None):
 ###############################################################################
 
 # for structs and unions
-S_DISCARD_UNNAMED = Flag("discard_unnamed")
-S_DISCARD_CONST = Flag("discard_const")
-S_UNION = Flag("union")
-S_REPLACE_TYPES = Flag("replace_types")
-S_EVAL_ANNOTATIONS = Flag("eval_annotations")
+S_DISCARD_UNNAMED = Flag("struct.discard_unnamed")
+S_DISCARD_CONST = Flag("struct.discard_const")
+S_UNION = Flag("struct.union")
+S_REPLACE_TYPES = Flag("struct.replace_types")
+S_EVAL_ANNOTATIONS = Flag("struct.eval_annotations")
 S_ADD_BYTES = Flag("struct.bytes_method")
 S_SLOTS = Flag("struct.slots")
 
 # for fields
-F_KEEP_POSITION = Flag("keep_position")
-F_DYNAMIC = Flag("dynamic")
-F_SEQUENTIAL = Flag("sequential")
-F_OFFSET_OVERRIDE = Flag("offset_override")
+F_KEEP_POSITION = Flag("field.keep_position")
+F_DYNAMIC = Flag("field.dynamic")
+F_SEQUENTIAL = Flag("field.sequential")
+F_OFFSET_OVERRIDE = Flag("field.offset_override")
 
 # value intentionally left blank
 O_ARRAY_FACTORY = Flag("option.array_factory", value=None)
@@ -166,3 +166,4 @@ B_OVERWRITE_ALIGNMENT = Flag("bitfield.overwrite_alignment")
 B_GROUP_END = Flag("bitfield.group.end")
 B_GROUP_NEW = Flag("bitfield.group.new")
 B_GROUP_KEEP = Flag("bitfield.group.keep")
+B_NO_AUTO_BOOL = Flag("bitfield.no_auto_bool")

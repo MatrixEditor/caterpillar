@@ -50,7 +50,7 @@ F_SEQUENTIAL: Flag
 F_OFFSET_OVERRIDE: Flag
 O_ARRAY_FACTORY: Flag[Callable[[Iterable], Collection]]
 B_OVERWRITE_ALIGNMENT: Flag
-
 B_GROUP_END: Flag
 B_GROUP_NEW: Flag
 B_GROUP_KEEP: Flag
+B_NO_AUTO_BOOL: Flag

@@ -34,6 +34,7 @@ from caterpillar.options import (
     B_OVERWRITE_ALIGNMENT,
     B_GROUP_END,
     B_GROUP_KEEP,
+    B_NO_AUTO_BOOL,
     Flag,
 )
 from caterpillar.fields import (
@@ -49,10 +50,10 @@ from ._struct import Struct, sizeof
 
 # --- BItfield Concept ---
 # NEW REVISED CONCEPT
-# Each Bitfield stores a sequence of so-called bitfield-groups, whereby each group stores
-# a collection of sized fields. A bitfield-group may be represented by a collection of other
-# fields (_StructLike) or a single _StructLike object. For instance, consider the following
-# bitfield definition:
+# Each Bitfield instance maintains a sequence of bitfield groups, where each group
+# contains a collection of sized fields. A bitfield group may consist of either multiple
+# entries (i.e., any types that can be converted to an integral type) or a single
+# _StructLike object. For example, consider the following bitfield definition:
 #
 #   @bitfield
 #   class Format:
@@ -62,87 +63,115 @@ from ._struct import Struct, sizeof
 #       b1: char
 #       c1: uint32
 #
-# The created Bitfield will store three formal bitfield-groups (marked with characters a to c
-# here). By default, the bitfield uses 8bit alignment, which results in 1 byte for the first
-# group:
+# This Bitfield definition will generate three distinct bitfield groups (labeled here as
+# groups a, b, and c). By default, bitfields use 8-bit alignment, leading to the following
+# layout:
 #
 #       Group      Pos       Bits
 #       a          0x00      8
 #       b          0x01      8
 #       c          0x02      32
 #
-# Internally, only the first group requires special parsing since the other two are structs
-# without a specific bit number. This dynamic grouping model now allows us to use the power
-# of struct class definitions in bitfields.
+# Internally, only the first group requires special bit-level parsing. The remaining groups
+# (b and c) are treated as standard structures since they span full bytes or words without
+# sub-byte alignment. This dynamic grouping mechanism allows leveraging full struct-like
+# class definitions within bitfields.
 #
-# This new approach enables more complect bitfield definitions. Therefore, the syntax will be
-# extended:
+# This new approach enables more complex and expressive bitfield definitions. The annotation
+# syntax is therefore extended as follows:
 #
-#   +---------------------------------------------------+--------------------------------+
-# 1.| <name> : <bits> [ - <field> ]                     | default definition             |
-#   +---------------------------------------------------+--------------------------------+
-# 2.| <name> : 0                                        | start new byte                 |
-#   +---------------------------------------------------+--------------------------------+
-# 3.| <name> : <field>                                  | custom field (no bits used)    |
-#   +---------------------------------------------------+--------------------------------+
-# 4.| <name> : (<field>,<factory>)                      | field with custom type factory |
-#   +---------------------------------------------------+--------------------------------+
-# 5.| <name> : (<bits>,<factory>[,<options>])           | bits with custom type factory  |
-#   |        : (<bits>,[<options>])                     | and options                    |
-#   +---------------------------------------------------+--------------------------------+
+#   +---------------------------------------------------+--------------------------------------+
+# 1.| <name> : <bits> [ - <field> ]                     | Standard field with optional type    |
+#   +---------------------------------------------------+--------------------------------------+
+# 2.| <name> : 0                                        | Aligns to the next byte boundary     |
+#   +---------------------------------------------------+--------------------------------------+
+# 3.| <name> : <field>                                  | Struct-like field (no bits consumed) |
+#   +---------------------------------------------------+--------------------------------------+
+# 4.| <name> : (<field>,<factory>)                      | Field with custom type factory       |
+#   +---------------------------------------------------+--------------------------------------+
+# 5.| <name> : (<bits>,<factory>[,<options>])           | bits with custom type factory        |
+#   |        : (<bits>,[<options>])                     | and options                          |
+#   +---------------------------------------------------+--------------------------------------+
 #
-# The generation process will follow some implications and rules derived from this extended
-# syntax. These rules are as follows:
+# Processing Rules:
 #
-#   For 1.:
-#       - The default alignment is one byte (8bits). If an annotation of rule no. 2 follows,
-#         eight the current byte will be filled.
-#       - When the <field> is given, typeof will be called to retrieve the <factory> and
-#         getbits+sizeof to retrieve the current alignment. The new alignment will be
-#         ignored if a custom alignment has been set in the constructor of the BItfield.
-#         If the <field> stores the B_OVERWRITE_ALIGNMENT option, the current alignment
-#         will be overwritten.
-#       - If the B_GROUP_END option is present, the current group will be finalized and a
-#         new one will be started.
+#   Rule 1.:
+#       - Default alignment is 1 byte (8 bits).
+#       - If followed by a rule 2 declaration, the remaining bits in the current byte are padded.
+#       - If a <field> is provided:
+#           - typeof(<field>) is used to infer the factory.
+#           - etbits() and sizeof() determine the field’s alignment.
+#       - If a custom alignment is configured in the Bitfield constructor, inferred alignment is
+#         ignored unless the field includes the B_OVERWRITE_ALIGNMENT option.
+#       - If the B_GROUP_END option is set, the current group is finalized and a new one is started.
 #
-#   For 2.:
-#       - This field definition will be removed regardless of the given name
-#       - The current configured alignment will be used to fill bits up to the alignment.
-#       - This field definition finalizes the current bitfield-group unless B_GROUP_KEEP
-#         has been configured on the bitfield.
+#   Rule 2.:
+#       - This rule forces alignment to the next byte boundary.
+#       - The field is ignored during final class generation (name is discarded).
+#       - The current group is finalized unless the bitfield is configured with B_GROUP_KEEP
 #
-#   For 3.:
-#       - The same rules as for defining fields in struct classes apply here.
-#       - Additionally, this definition implies a definition of rule no. 2. The current group
-#         will be finalized regardless of whether B_GROUP_KEEP has been set.
+#   Rule 3.:
+#       - Equivalent to struct-like class field definitions.
+#       - Automatically implies a rule 2 alignment.
+#       - Always finalizes the current group regardless of B_GROUP_KEEP.
 #
-#   For 4.:
-#       - Extension of rule no. 1 that explicitly defines the conversion factory, which must be
-#         one of the following types: Type (such as int, bool) that supports the __int__ method,
-#         or a type or instance of a BitfieldValueFactory.
+#   Rule 4.:
+#       - Extension of Rule 1.
+#       - Explicitly defines a conversion factory for the field.
+#       - The factory must be:
+#           - A built-in type (e.g., int, bool) supporting __int__, or
+#           - A type or instance of BitfieldValueFactory.
 #
-#   For 5.:
-#       - Same processing as for rule no. 4 but defined options (either flags or options described
-#         below) can be present either as list or single element. Additional options are:
-#               NewGroup: Aligns the previous group to the current alignment and creates a new one
-#                         while also adding the specified bitfield entry to the new group.
-#               EndGroup: Adds the bitfield entry to the current group and aligns to according to the
-#                         current alignment.
-#               SetAlignment: Updates the current working alignment
-#         The order of specified options matters.
+#   Rule 5.:
+#       - Builds upon Rule 4 with support for options.
+#       - Options can be passed as a list or single element.
+#       - Supported Options:
+#           - NewGroup: Aligns the current group, starts a new one, and adds the entry to it.
+#           - EndGroup: Adds the entry to the current group, then aligns it.
+#           - SetAlignment: Changes the current working alignment.
+#       - Note: Option order affects behavior and must be considered carefully.
 
+#: The default alignment (in bits) used for bitfield group boundaries
 DEFAULT_ALIGNMENT = 8
 
+#: Alias for the `B_GROUP_NEW` flag, used to indicate that a new bitfield group should be started.
 NewGroup = B_GROUP_NEW
+
+#: Alias for the `B_GROUP_END` flag, used to indicate that the current bitfield group
+#: should be finalized.
 EndGroup = B_GROUP_END
 
 
 class SetAlignment:
+    """
+    Instructional flag used to update the current bitfield alignment dynamically during
+    bitfield generation.
+
+    This class allows to explicitly set a new alignment boundary (in bits) for subsequent fields
+    or groups in a bitfield definition. This enables finer control over how bitfield groups are
+    organized and aligned.
+
+    :param new_alignment: The alignment size in bits to be used from this point forward in the bitfield layout.
+    :type new_alignment: int
+    """
+
     def __init__(self, new_alignment: int) -> None:
         self.alignment = new_alignment
 
     @staticmethod
     def flag(new_alignment: int):
+        """Create a :class:`Flag` instance representing a request to set a new alignment.
+
+        This method is intended for use where a generic :class:`Flag` is expected rather than a full
+        :class:`SetAlignment` object, e.g. for setting options for a :class:`Field`.
+
+        >>> field = 5 - uint32 | SetAlignment.flag(32)
+
+        :param new_alignment: The alignment size in bits.
+        :type new_alignment: int
+        :return: A `Flag` object with the key `"bitfield.new_alignment"` and the specified alignment as its value.
+        :rtype: Flag
+        """
         return Flag("bitfield.new_alignment", new_alignment)
 
     def __hash__(self) -> int:
@@ -150,26 +179,94 @@ class SetAlignment:
 
 
 def getbits(obj) -> int:
+    """Retrieve the bit-width of a given object.
+
+    This function checks for a :py:func:`__bits__` attribute on the object. The object must either implement
+    the :class:`_SupportsBits` or :class:`_ContainsBits` protocol.
+
+    >>> class A:
+    ...     __bits__ = 3
+    ...
+    >>> a = A()
+    >>> getbits(a)
+    3
+
+    :param obj: The object for which the bit-width should be determined. It is expected to have an :attr:`ATTR_BITS` attribute.
+    :type obj: Any
+    :return: The number of bits used by the object.
+    :rtype: int
+    :raises AttributeError: If the object does not have an attribute defined by :attr:`ATTR_BITS`.
+    """
     __bits__ = getattr(obj, ATTR_BITS)
     return __bits__() if callable(__bits__) else __bits__
 
 
 def issigned(obj) -> bool:
+    """Determine whether a given object represents a signed field.
+
+    :param obj: The object for which signedness should be determined.
+    :type obj: Any
+    :return: :code:`True` if the field is marked as signed, :code:`False` otherwise.
+    :rtype: bool
+    """
     return bool(getattr(obj, ATTR_SIGNED, None))
 
 
 class BitfieldValueFactory:
+    """
+    A generic factory class responsible for converting values between Python objects and integers
+    for use in bitfield entries.
+
+    By default, the factory converts to and from Python's built-in :code:`int` type, but it can be customized
+    to support any type that accepts an integer in its constructor and implements :code:`__int__`.
+
+    :param target:  The target type to which integer values will be converted., defaults to None
+    :type target: type, optional
+    """
+
     def __init__(self, target=None) -> None:
         self.target = target or int
 
     def to_int(self, obj) -> int:
+        """Convert a Python object to an integer.
+
+        :param obj: The object to convert.
+        :type obj: Any
+        :return: The integer representation of the object.
+        :rtype: int
+        """
         return int(obj)
 
     def from_int(self, value: int):
+        """Convert an integer to the target object type.
+
+        :param value: The integer to convert.
+        :type value: int
+        :return: The value converted to the target type.
+        :rtype: Any
+        """
         return self.target(value)
 
 
 class BitfieldEntry:
+    """
+    Represents a single entry in a bitfield, including its bit position, width, name, and
+    conversion behavior.
+
+    May also represent a special action or directive instead of a field.
+
+    :param bit: The starting bit position within its group.
+    :type bit: int
+    :param width: The number of bits used by this field.
+    :type width: int
+    :param name: The name of the field.
+    :type name: str
+    :param factory: A factory for type conversion. Defaults to BitfieldValueFactory.
+    :type factory: type or BitfieldValueFactory or None
+    :param action: Optional action object for special handling (e.g., alignment or padding).
+    :type action: Any
+    """
+
     def __init__(
         self, bit: int, width: int, name: str, factory=None, action=None
     ) -> None:
@@ -184,16 +281,44 @@ class BitfieldEntry:
 
     @staticmethod
     def new_action(action):
+        """
+        Create a new action-type entry (e.g., padding, control directive).
+
+        :param action: The action object to encapsulate.
+        :type action: Any
+        :return: A BitfieldEntry instance with no bit-width, used for meta instructions.
+        :rtype: BitfieldEntry
+        """
         return BitfieldEntry(0, 0, "<action>", action=action)
 
     def shift(self, value_width: int) -> int:
+        """
+        Calculate how much to shift the field when extracting it from a value.
+
+        :param value_width: The total bit width of the container.
+        :type value_width: int
+        :return: The number of bits to shift.
+        :rtype: int
+        """
         bit_pos = max(0, value_width - self.bit)
         return max(bit_pos - self.width, 0)
 
     def is_action(self) -> bool:
+        """
+        Check whether this entry is an action (i.e., not a data field).
+
+        :return: True if this is an action entry.
+        :rtype: bool
+        """
         return self.action is not None
 
     def __repr__(self) -> str:
+        """
+        Return a human-readable string representation of the bitfield entry.
+
+        :return: String representation.
+        :rtype: str
+        """
         if self.is_action():
             return repr(self.action)
 
@@ -201,37 +326,83 @@ class BitfieldEntry:
         if self.factory:
             type_ = type(self.factory)
             if type_ is BitfieldValueFactory:
-                type_ = int
+                type_ = self.factory.target
 
             r = f"{r}, factory={type_.__name__}"
         return f"{r}>"
 
 
 class BitfieldGroup:
+    """
+    A group of one or more bitfield entries. Groups are used to organize fields within a single
+    alignment unit and may represent either packed fields or standalone fields.
+
+    :param bit_count: The number of bits in the group, or -1 for single field representation.
+    :type bit_count: int
+    """
+
     def __init__(self, bit_count: int) -> None:
         self.bit_count = bit_count
         self.entries = []
 
     def is_field(self) -> bool:
+        """
+        Determine whether the group contains a single non-bitfield field.
+
+        :return: True if the group holds a single struct-like field.
+        :rtype: bool
+        """
         return self.bit_count == -1
 
     def get_field(self):
+        """
+        Get the single field from this group.
+
+        :return: The field object.
+        :rtype: BitfieldEntry
+        """
         return self.entries[0]
 
     def set_field(self, field):
+        """
+        Set the group to hold only the given field and mark it as a standalone field group.
+
+        :param field: The field to store in this group.
+        :type field: BitfieldEntry
+        """
         self.entries = [field]
         self.bit_count = -1
 
     def align_to(self, alignment: int):
+        """
+        Align the bit count of this group to the specified boundary.
+
+        :param alignment: The number of bits to align to.
+        :type alignment: int
+        """
         if not self.is_field():
             pad = self.bit_count % alignment
             if pad > 0:
                 self.bit_count += alignment - pad
 
     def is_empty(self) -> bool:
+        """
+        Check if the group contains any entries.
+
+        :return: True if the group is empty.
+        :rtype: bool
+        """
         return len(self.entries) == 0
 
     def get_size(self, context=None):
+        """
+        Get the size of this group in bytes.
+
+        :param context: Optional context used for size evaluation.
+        :type context: Any
+        :return: The size of the group in bytes.
+        :rtype: int
+        """
         if self.is_field():
             field = self.get_field()
             return field.__size__(context) if context else sizeof(field)
@@ -239,6 +410,14 @@ class BitfieldGroup:
         return self.bit_count // 8
 
     def get_bits(self, context=None):
+        """
+        Get the total number of bits in this group.
+
+        :param context: Optional context used for size evaluation.
+        :type context: Any
+        :return: The number of bits.
+        :rtype: int
+        """
         return self.get_size(context) * 8
 
     def __repr__(self) -> str:
@@ -249,12 +428,39 @@ class BitfieldGroup:
 
 
 class Bitfield(Struct):
+    """
+    A Bitfield represents a packed structure composed of bit-level fields. This
+    class allows for the declarative definition of compact memory representations
+    where each field can occupy an arbitrary number of bits, not necessarily
+    aligned to byte boundaries.
+
+    Core Implementation:
+    - Bitfields are organized into BitfieldGroups, which manage alignment and field aggregation.
+    - Entries can be individual bit widths or wrapped fields with explicit alignment.
+    - Special field options like NewGroup and EndGroup can control group layout.
+    - Supports value factories for type conversion and symbolic runtime actions.
+
+    Available global options:
+    - :code:`B_NO_AUTO_BOOL`: disables automatically converting 1bit fields to boolean
+    - :code:`B_GROUP_KEEP`: disables finalizing groups when using the alignment definition syntax
+
+    :param model: The model for the structure.
+    :type model: Any
+    :param order: Byte order of the structure.
+    :type order: Optional[str]
+    :param arch: Target architecture.
+    :type arch: Optional[str]
+    :param options: Global structure options.
+    :type options: Optional[set]
+    :param field_options: Field-specific options.
+    :type field_options: Optional[set]
+    :param alignment: Bit alignment size.
+    :type alignment: Optional[int]
+    """
+
     __slots__ = (
         "groups",
         "alignment",
-        "_bit_pos",
-        "_current_group",
-        "_current_alignment",
     )
 
     def __init__(
@@ -282,15 +488,25 @@ class Bitfield(Struct):
         # Add additional options based on the struct's type
         self.options.difference_update(GLOBAL_STRUCT_OPTIONS, GLOBAL_UNION_OPTIONS)
         self.options.update(GLOBAL_BITFIELD_FLAGS)
-        # self.__bits__ = sum(map(lambda x: x.bit_count, self.groups))
 
         self.groups = [group for group in self.groups if not group.is_empty()]
+        # REVISIT: should be enable modification after processing?
         del self._bit_pos
         del self._current_alignment
         del self._current_group
 
     def __add__(self, sequence):
+        """
+        Append another Bitfield instance to this one.
+
+        :param sequence: Another Bitfield instance.
+        :type sequence: Bitfield
+        :return: Combined Bitfield.
+        :rtype: Bitfield
+        :raises TypeError: If sequence is not a Bitfield.
+        """
         if not isinstance(sequence, Bitfield):
+            # REVISIT: we could just add each field as a group individually?
             raise TypeError(
                 f"Attempted to add a non-bitfield struct to a bitfield! (type={type(sequence)})"
             )
@@ -299,6 +515,18 @@ class Bitfield(Struct):
         return super(Struct, self).__add__(sequence)
 
     def _process_align(self, options) -> Field:
+        """
+        Process an alignment directive.
+
+        .. code-block:: bnf
+
+            <name> : 0
+
+        :param options: A list of alignment-related options.
+        :type options: Optional[list]
+        :return: A placeholder field.
+        :rtype: Field
+        """
         for option in options or []:
             if self._process_alignment_option(option):
                 continue
@@ -318,8 +546,25 @@ class Bitfield(Struct):
         return Field(Pass)
 
     def _process_bits(self, name: str, bits: int, factory=None, options=None) -> Field:
+        """
+        Process a bitfield entry with a given width.
+
+        :param name: Field name.
+        :type name: str
+        :param bits: Width in bits.
+        :type bits: int
+        :param factory: Optional value factory.
+        :type factory: Optional[BitfieldValueFactory]
+        :param options: Field-specific options.
+        :type options: Optional[list]
+        :return: Resulting Field.
+        :rtype: Field
+        """
         if bits == 0:
             return self._process_align(options)
+
+        if not factory and bits == 1 and not self.has_option(B_NO_AUTO_BOOL):
+            factory = BitfieldValueFactory(bool)
 
         entry = BitfieldEntry(self._bit_pos, bits, name, factory)
         self._bit_pos += bits
@@ -331,7 +576,24 @@ class Bitfield(Struct):
         # this is only symbolic
         return Field(Int(bits))
 
-    def _process_bits_field(self, name: str, field, options=None) -> Field:
+    def _process_bits_field(
+        self, name: str, field, options=None, factory=None
+    ) -> Field:
+        """
+        Process a bitfield that wraps another field instance.
+
+        :param name: Field name.
+        :type name: str
+        :param field: The field instance.
+        :type field: Field
+        :param options: List of options.
+        :type options: Optional[list]
+        :param factory: Optional value factory.
+        :type factory: Optional[BitfieldValueFactory]
+        :return: Resulting Field.
+        :rtype: Field
+        :raises TypeError: If bit width is not an integer.
+        """
         if field.bits is None:
             # we don't need to check for NewGroup and EndGroup options here as no
             # bits are specified and the field gets its own group.
@@ -353,7 +615,7 @@ class Bitfield(Struct):
             )
 
         entry = BitfieldEntry(
-            self._bit_pos, width, name, BitfieldValueFactory(typeof(field))
+            self._bit_pos, width, name, factory or BitfieldValueFactory(typeof(field))
         )
         self._bit_pos += width
         if not self._process_options(options, entry):
@@ -362,7 +624,12 @@ class Bitfield(Struct):
             group.bit_count = max(group.bit_count, self._bit_pos)
 
         if field.has_flag(B_OVERWRITE_ALIGNMENT):
-            self._current_alignment = (sizeof(field) * 8) or DEFAULT_ALIGNMENT
+            try:
+                field_bits = getbits(field.struct)
+            except Exception:
+                field_bits = sizeof(field) * 8
+
+            self._current_alignment = field_bits or DEFAULT_ALIGNMENT
             self._current_group.align_to(self._current_alignment)
 
         return field
@@ -446,10 +713,12 @@ class Bitfield(Struct):
                 (width, factory_or_option, *extra_options) = annotation
                 if isinstance(factory_or_option, BitfieldValueFactory):
                     factory = factory_or_option
-                elif isinstance(factory_or_option, type) and issubclass(
-                    factory_or_option, BitfieldValueFactory
-                ):
-                    factory = factory_or_option()
+                elif isinstance(factory_or_option, type):
+                    # here we enable just specifying types instead of a factory
+                    if not issubclass(factory_or_option, BitfieldValueFactory):
+                        factory = BitfieldValueFactory(factory_or_option)
+                    else:
+                        factory = factory_or_option()
                 else:
                     # treat as option
                     options = [factory_or_option]
@@ -463,7 +732,7 @@ class Bitfield(Struct):
                 if not isinstance(field, Field):
                     field = Field(field, order=order, arch=arch, default=default)
 
-                return self._process_bits_field(name, field, options)
+                return self._process_bits_field(name, field, options, factory)
 
             case _:
                 # rule 1 (with field) or rule 3
@@ -488,10 +757,24 @@ class Bitfield(Struct):
         return True
 
     def __size__(self, context) -> int:
+        """
+        Calculate the total size of the bitfield structure.
+
+        :param context: Packing context.
+        :type context: Any
+        :return: Total size in bytes.
+        :rtype: int
+        """
         # size is different as our model includes correct padding
         return sum(map(lambda g: g.get_size(context), self.groups))
 
     def __bits__(self) -> int:
+        """
+        Compute the total number of bits in the structure.
+
+        :return: Total bit count.
+        :rtype: int
+        """
         return sum(map(lambda g: g.get_bits(), self.groups))
 
     def unpack_one(self, context):
@@ -530,7 +813,6 @@ class Bitfield(Struct):
                             func(context)
                             continue
 
-                    print(bin(raw_value), entry.shift(group.bit_count), bin(entry.low_mask))
                     value = (raw_value >> entry.shift(group.bit_count)) & entry.low_mask
                     if entry.factory:
                         value = entry.factory.from_int(value)
@@ -612,6 +894,44 @@ def bitfield(
     field_options=None,
     alignment=None,
 ):
+    """
+    Decorator that transforms a class definition into a :class:`Bitfield` structure.
+
+    This decorator enables defining bitfields using simple class syntax,
+    with support for custom alignment, ordering, architecture, and field options.
+
+    :param cls: The user-defined class to transform.
+    :type cls: Optional[type]
+    :param options: A set of global or structure-specific options.
+    :type options: Optional[set]
+    :param order: Optional byte order for serialization (e.g., 'little' or 'big').
+    :type order: Optional[str]
+    :param arch: Optional architecture string (e.g., 'x86', 'arm').
+    :type arch: Optional[str]
+    :param field_options: Optional default options for fields.
+    :type field_options: Optional[set]
+    :param alignment: Optional alignment in bits.
+    :type alignment: Optional[int]
+    :return: The decorated class, enhanced as a `Bitfield` structure.
+    :rtype: type
+
+    .. code-block:: python
+
+        from caterpillar.py import bitfield, SetAlignment, uint16
+
+        @bitfield
+        class Packet:
+            version   : 3
+            type      : (5, SetAlignment(16))
+            length    : 10
+            _         : 0  # align to 16bits
+            payload   : uint16
+
+        # You can now pack/unpack Packet instances as compact binary bitfields
+        pkt = Packet(version=1, type=2, length=128, payload=0xABCD)
+        packed = pack(pkt)
+        unpacked = unpack(Packet, packed)
+    """
     def wrap(cls):
         return _make_bitfield(
             cls,

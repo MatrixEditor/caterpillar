@@ -109,6 +109,30 @@ class Bitfield(Struct[_ModelT]):
     def unpack_one(self, context: _ContextLike): ...
     def pack_one(self, obj: _ModelT, context: _ContextLike) -> None: ...
     def add_action(self, action: _ActionLike) -> None: ...
+    def _process_align(
+        self, options: Optional[Iterable[Flag | SetAlignment]]
+    ) -> Field: ...
+    def _process_bits(
+        self,
+        name: str,
+        bits: int,
+        factory: Optional[BitfieldValueFactory | Type] = ...,
+        options: Optional[Iterable[Flag | SetAlignment]] = ...,
+    ) -> Field: ...
+    def _process_bits_field(
+        self,
+        name: str,
+        field: Field,
+        factory: Optional[BitfieldValueFactory | Type] = ...,
+        options: Optional[Iterable[Flag | SetAlignment]] = ...,
+    ) -> Field: ...
+    def _process_options(
+        self,
+        options: Iterable[Flag | SetAlignment],
+        entry: Optional[BitfieldEntry] = ...,
+    ) -> bool: ...
+    def _new_group(self, alignment: int) -> BitfieldGroup: ...
+    def _process_alignment_option(self, option: Flag | SetAlignment) -> bool: ...
 
 @overload
 def bitfield(
