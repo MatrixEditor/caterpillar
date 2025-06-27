@@ -656,11 +656,11 @@ class Bitfield(Struct):
             factory = BitfieldValueFactory(bool)
 
         entry = BitfieldEntry(self._bit_pos, bits, name, factory)
-        self._bit_pos += bits
         if not self._process_options(options, entry):
             group = self._current_group
             group.entries.append(entry)
             # Adjust the size of the goup dynamically
+            self._bit_pos += entry.width
             group.bit_count = max(group.bit_count, self._bit_pos)
         # this is only symbolic
         return Field(Int(bits))
@@ -706,10 +706,10 @@ class Bitfield(Struct):
         entry = BitfieldEntry(
             self._bit_pos, width, name, factory or BitfieldValueFactory(typeof(field))
         )
-        self._bit_pos += width
         if not self._process_options(options, entry):
             group = self._current_group
             group.entries.append(entry)
+            self._bit_pos += width
             group.bit_count = max(group.bit_count, self._bit_pos)
 
         if field.has_flag(B_OVERWRITE_ALIGNMENT):
@@ -737,8 +737,8 @@ class Bitfield(Struct):
                     self._bit_pos += entry.width
                     group.bit_count = max(group.bit_count, self._bit_pos)
                     consumed = True
-                group.align_to(alignment)
 
+                group.align_to(alignment)
                 self._current_group = self._new_group(alignment)
             elif option.name == NewGroup.name:
                 # finalize current group, create a new one and add the entry to the newly
