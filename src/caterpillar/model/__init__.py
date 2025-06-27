@@ -36,6 +36,9 @@ from ._bitfield import (
     NewGroup,
     EndGroup,
     SetAlignment,
+    EnumFactory,
+    CharFactory,
+    DEFAULT_ALIGNMENT,
 )
 from ._template import istemplate, template, TemplateTypeVar, derive
 
@@ -65,4 +68,7 @@ __all__ = [
     "SetAlignment",
     "BitfieldEntry",
     "BitfieldValueFactory",
+    "EnumFactory",
+    "CharFactory",
+    "DEFAULT_ALIGNMENT",
 ]

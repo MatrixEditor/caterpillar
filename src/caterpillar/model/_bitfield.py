@@ -224,6 +224,8 @@ class BitfieldValueFactory:
     :type target: type, optional
     """
 
+    __slots__ = ("target",)
+
     def __init__(self, target=None) -> None:
         self.target = target or int
 
@@ -248,6 +250,89 @@ class BitfieldValueFactory:
         return self.target(value)
 
 
+class EnumFactory(BitfieldValueFactory):
+    """A value factory for enum-like types used in bitfields.
+
+    This factory attempts to convert between integers and enumeration instances,
+    using the provided :code:`model` (which should support :code:`__int__`). It
+    can operate in strict or lenient mode:
+
+    - In strict mode, a :class:`ValueError` is raised if conversion fails.
+    - In lenient mode, the raw integer is returned if the value is not in the enum.
+
+    :param model: The enum model or mapping type to use.
+    :type model: Type
+    :param strict: Whether to raise an error on unknown values.
+    :type strict: bool
+
+    .. code-block:: python
+        :caption: Example
+
+        class Status(enum.IntEnum):
+            OK = 0
+            ERROR = 1
+
+        factory = EnumFactory(Status, strict=True)
+        factory.from_int(0)  # -> Status.OK
+        factory.from_int(2)  # -> ValueError (strict mode)
+    """
+
+    def __init__(self, model, strict=False) -> None:
+        super().__init__(model)
+        self.strict = strict
+
+    def from_int(self, value: int):
+        """
+        Convert an integer into an enum instance or raw int.
+
+        :param value: The integer to convert.
+        :type value: int
+        :return: Enum instance or raw int if not found (in non-strict mode).
+        :rtype: Any
+        :raises ValueError: If strict is enabled and value is not valid.
+        """
+        try:
+            return super().from_int(value)
+        except ValueError:
+            if self.strict:
+                raise
+            return value
+
+
+class CharFactory(BitfieldValueFactory):
+    """
+    A value factory for handling single ASCII/Unicode characters as integers.
+
+    This factory allows treating a character field as a one-byte integer and vice versa,
+    automatically converting during packing and unpacking.
+    """
+
+    def __init__(self) -> None:
+        super().__init__(str)
+
+    def from_int(self, value: int):
+        """
+        Convert an integer to its character representation.
+
+        :param value: Integer ASCII or Unicode code point.
+        :type value: int
+        :return: Corresponding character.
+        :rtype: str
+        """
+        return chr(value)
+
+    def to_int(self, obj) -> int:
+        """
+        Convert a character to its integer (ordinal) representation.
+
+        :param obj: The character to convert.
+        :type obj: str
+        :return: Corresponding integer value.
+        :rtype: int
+        """
+        return ord(obj)
+
+
 class BitfieldEntry:
     """
     Represents a single entry in a bitfield, including its bit position, width, name, and
@@ -266,6 +351,8 @@ class BitfieldEntry:
     :param action: Optional action object for special handling (e.g., alignment or padding).
     :type action: Any
     """
+
+    __slots__ = ("bit", "width", "name", "factory", "action", "low_mask")
 
     def __init__(
         self, bit: int, width: int, name: str, factory=None, action=None
@@ -340,6 +427,8 @@ class BitfieldGroup:
     :param bit_count: The number of bits in the group, or -1 for single field representation.
     :type bit_count: int
     """
+
+    __slots__ = ("entries", "bit_count")
 
     def __init__(self, bit_count: int) -> None:
         self.bit_count = bit_count
@@ -527,6 +616,11 @@ class Bitfield(Struct):
         :return: A placeholder field.
         :rtype: Field
         """
+        # 2.: the current group will be finalized
+        if not self.has_option(B_GROUP_KEEP):
+            self._current_group.align_to(self._current_alignment)
+            self._current_group = self._new_group(self._current_alignment)
+
         for option in options or []:
             if self._process_alignment_option(option):
                 continue
@@ -537,11 +631,6 @@ class Bitfield(Struct):
                 # finalize current group (same effect for alignment statement)
                 group.align_to(alignment)
                 self._current_group = self._new_group(alignment)
-
-        # 2.: the current group will be finalized
-        if not self.has_option(B_GROUP_KEEP):
-            self._current_group.align_to(self._current_alignment)
-            self._current_group = self._new_group(self._current_alignment)
 
         return Field(Pass)
 
@@ -756,6 +845,19 @@ class Bitfield(Struct):
             return width.bits != 0
         return True
 
+    def _replace_type(self, name: str, type_: type) -> None:
+        entry = self.get_entry(name)
+        if entry is not None:
+            if not entry.factory:
+                type_ = int
+            elif isinstance(entry.factory, BitfieldValueFactory):
+                type_ = entry.factory.target or object
+            else:
+                type_ = object
+
+        # else: must be a field with a known type
+        return super()._replace_type(name, type_)
+
     def __size__(self, context) -> int:
         """
         Calculate the total size of the bitfield structure.
@@ -862,6 +964,15 @@ class Bitfield(Struct):
         )
         return super().add_action(action)
 
+    def get_entry(self, name: str):
+        for group in self.groups:
+            if group.is_field():
+                continue
+
+            for entry in group.entries:
+                if entry.name == name:
+                    return entry
+
 
 def _make_bitfield(
     cls: type,
@@ -932,6 +1043,7 @@ def bitfield(
         packed = pack(pkt)
         unpacked = unpack(Packet, packed)
     """
+
     def wrap(cls):
         return _make_bitfield(
             cls,
