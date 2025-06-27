@@ -13,13 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from caterpillar.abc import _ContextLike
-
 
 class StructException(Exception):
     """Base class for all struct-related exceptions"""
 
-    def __init__(self, message: str, context: _ContextLike | None = None) -> None:
+    def __init__(self, message: str, context=None) -> None:
         super().__init__(message)
         self.context = context
         if context:

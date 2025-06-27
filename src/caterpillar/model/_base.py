@@ -45,7 +45,12 @@ from caterpillar.fields import (
     Const,
 )
 from caterpillar._common import unpack_seq, pack_seq
-from caterpillar.shared import ATTR_ACTION_PACK, ATTR_ACTION_UNPACK, Action, ATTR_BYTEORDER
+from caterpillar.shared import (
+    ATTR_ACTION_PACK,
+    ATTR_ACTION_UNPACK,
+    Action,
+    ATTR_BYTEORDER,
+)
 from caterpillar import registry
 
 
@@ -387,7 +392,10 @@ class Sequence(FieldMixin):
         base_path = context[CTX_PATH]
         # REVISIT: the name 'this_context' is misleading here
         this_context = Context(
-            _parent=context, _io=context[CTX_STREAM], _path=base_path
+            _root=context._root,
+            _parent=context,
+            _io=context[CTX_STREAM],
+            _path=base_path,
         )
         # See __pack__ for more information
         field: Optional[Field] = context.get("_field")
@@ -450,6 +458,7 @@ class Sequence(FieldMixin):
             pack_seq(obj, context, self.pack_one)
         else:
             ctx = Context(
+                _root=context._root,
                 _parent=context,
                 _io=context[CTX_STREAM],
                 _path=context[CTX_PATH],

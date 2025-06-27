@@ -37,6 +37,7 @@ CTX_INDEX = "_index"
 CTX_PATH = "_path"
 CTX_SEQ = "_is_seq"
 CTX_ARCH = "_arch"
+CTX_ROOT = "_root"
 
 
 class Context(dict):
@@ -92,14 +93,7 @@ class Context(dict):
 
     @property
     def _root(self):
-        current = self
-        while CTX_PARENT in current:
-            # dict-like access is much faster
-            parent = current[CTX_PARENT]
-            if parent is None:
-                break
-            current = parent
-        return current
+        return self.get("_root", self)
 
 
 class ExprMixin:
