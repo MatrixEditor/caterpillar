@@ -6,6 +6,10 @@ Struct Model
 
 *TODO*
 
+.. toctree::
+    :maxdepth: 2
+
+    model/bitfield.rst
 
 Base classes
 ------------
@@ -18,12 +22,6 @@ Base classes
     :members:
 
 .. autoclass:: caterpillar.model.Struct()
-    :members:
-
-.. autoclass:: caterpillar.model.BitFieldGroup
-    :members:
-
-.. autoclass:: caterpillar.model.BitField
     :members:
 
 .. autoclass:: caterpillar.model.UnionHook
@@ -64,3 +62,5 @@ Templates
 
 
 .. autofunction:: caterpillar.model.derive
+
+

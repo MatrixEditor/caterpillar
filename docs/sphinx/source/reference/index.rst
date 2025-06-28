@@ -14,6 +14,7 @@ documentation.
 
 .. toctree::
    :maxdepth: 2
+   :numbered:
    :caption: Python Reference
 
    introduction.rst
