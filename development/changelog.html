@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Changelog &#8212; Caterpillar 2.5.0 documentation</title>
+    <title>Changelog &#8212; Caterpillar 2.5.1 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=3c4615cf"></script>
+    <script src="../_static/documentation_options.js?v=983e91d6"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -53,7 +53,7 @@
     <link rel="prev" title="Contribution Guidelines" href="contribution.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.5.0" />
+  <meta name="docsearch:version" content="2.5.1" />
   </head>
   
   
@@ -115,7 +115,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.5.0</p>
+    <p class="title logo__title">Caterpillar 2.5.1</p>
   
 </a></div>
     
@@ -396,6 +396,18 @@
   <section id="changelog">
 <span id="id1"></span><h1>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">#</a></h1>
 <p><em>More entries will be added in the future.</em></p>
+<section id="hot-fix-release">
+<span id="changelog-2-5-1"></span><h2>[2.5.1] - Hot-Fix Release<a class="headerlink" href="#hot-fix-release" title="Link to this heading">#</a></h2>
+<section id="fixed">
+<h3>Fixed<a class="headerlink" href="#fixed" title="Link to this heading">#</a></h3>
+<section id="caterpillar-model">
+<h4><em>caterpillar.model</em><a class="headerlink" href="#caterpillar-model" title="Link to this heading">#</a></h4>
+<ul class="simple">
+<li><p>An issue when packing or unpacking a bitfield with unnamed fields AND <code class="xref py py-attr docutils literal notranslate"><span class="pre">S_DISCARD_UNNAMED</span></code> enabled</p></li>
+</ul>
+</section>
+</section>
+</section>
 <section id="minor-release">
 <span id="changelog-2-5-0"></span><h2>[2.5.0] - Minor Release<a class="headerlink" href="#minor-release" title="Link to this heading">#</a></h2>
 <p>This version introduces massive changes due to the addition of stub files. Most of the type hints in the Python
@@ -444,8 +456,8 @@ flexible and dynamic.</p>
 <li><p><strong>Breaking:</strong> <code class="docutils literal notranslate"><span class="pre">_EnumLike</span></code>, <code class="docutils literal notranslate"><span class="pre">_ContextPathStr</span></code></p></li>
 </ul>
 </section>
-<section id="caterpillar-model">
-<h4><em>caterpillar.model</em><a class="headerlink" href="#caterpillar-model" title="Link to this heading">#</a></h4>
+<section id="id3">
+<h4><em>caterpillar.model</em><a class="headerlink" href="#id3" title="Link to this heading">#</a></h4>
 <ul class="simple">
 <li><p>Unused <code class="docutils literal notranslate"><span class="pre">getformat</span></code> function</p></li>
 </ul>
@@ -459,8 +471,8 @@ flexible and dynamic.</p>
 </section>
 <section id="changed">
 <h3>Changed<a class="headerlink" href="#changed" title="Link to this heading">#</a></h3>
-<section id="id3">
-<h4><em>caterpillar.abc</em><a class="headerlink" href="#id3" title="Link to this heading">#</a></h4>
+<section id="id4">
+<h4><em>caterpillar.abc</em><a class="headerlink" href="#id4" title="Link to this heading">#</a></h4>
 <ul class="simple">
 <li><p>Rename <code class="docutils literal notranslate"><span class="pre">_Switch</span></code> protocol to <code class="xref py py-attr docutils literal notranslate"><span class="pre">_SwitchLike</span></code></p></li>
 <li><p>Move the following attributes and methods into <em>caterpillar.shared</em>: rename <code class="docutils literal notranslate"><span class="pre">STRUCT_FIELD</span></code> to <code class="xref py py-attr docutils literal notranslate"><span class="pre">ATTR_STRUCT</span></code>, <code class="xref py py-func docutils literal notranslate"><span class="pre">hasstruct()</span></code>, <code class="xref py py-func docutils literal notranslate"><span class="pre">getstruct()</span></code> and <code class="xref py py-func docutils literal notranslate"><span class="pre">typeof()</span></code></p></li>
@@ -472,8 +484,8 @@ flexible and dynamic.</p>
 <li><p>Move <code class="docutils literal notranslate"><span class="pre">BYTEORDER_FIELD</span></code> to <em>caterpillar.shared</em> as <code class="xref py py-attr docutils literal notranslate"><span class="pre">ATTR_BYTEORDER</span></code></p></li>
 </ul>
 </section>
-<section id="id4">
-<h4><em>caterpillar.model</em><a class="headerlink" href="#id4" title="Link to this heading">#</a></h4>
+<section id="id5">
+<h4><em>caterpillar.model</em><a class="headerlink" href="#id5" title="Link to this heading">#</a></h4>
 <ul class="simple">
 <li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">sizeof()</span></code> now checks if the provided object implements the <a class="reference internal" href="../reference/datamodel/protocols/structlike.html#SupportsSize" title="_SupportsSize"><code class="xref py py-class docutils literal notranslate"><span class="pre">_SupportsSize</span></code></a> protocol</p></li>
 <li><p>New <code class="xref py py-class docutils literal notranslate"><span class="pre">Bitfield</span></code> concept with enhanced syntax</p></li>
@@ -486,10 +498,10 @@ flexible and dynamic.</p>
 </ul>
 <hr></section>
 </section>
-<section id="fixed">
-<h3>Fixed<a class="headerlink" href="#fixed" title="Link to this heading">#</a></h3>
-<section id="id5">
-<h4><em>caterpillar.model</em><a class="headerlink" href="#id5" title="Link to this heading">#</a></h4>
+<section id="id6">
+<h3>Fixed<a class="headerlink" href="#id6" title="Link to this heading">#</a></h3>
+<section id="id7">
+<h4><em>caterpillar.model</em><a class="headerlink" href="#id7" title="Link to this heading">#</a></h4>
 <ul class="simple">
 <li><p>when parsing union objects with an unbound stream object</p></li>
 <li><p>field options defined in Sequences and Structs were not populated when creating fields.</p></li>
@@ -537,6 +549,13 @@ flexible and dynamic.</p>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hot-fix-release">[2.5.1] - Hot-Fix Release</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fixed">Fixed</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar-model"><em>caterpillar.model</em></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#minor-release">[2.5.0] - Minor Release</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#added">Added</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar-abc"><em>caterpillar.abc</em></a></li>
@@ -547,19 +566,19 @@ flexible and dynamic.</p>
 </li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#removed">Removed</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id2"><em>caterpillar.abc</em></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar-model"><em>caterpillar.model</em></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id3"><em>caterpillar.model</em></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar-fields-common"><em>caterpillar.fields.common</em></a></li>
 </ul>
 </li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#changed">Changed</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id3"><em>caterpillar.abc</em></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id4"><em>caterpillar.abc</em></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar-byteorder"><em>caterpillar.byteorder</em></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id4"><em>caterpillar.model</em></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id5"><em>caterpillar.model</em></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#documentation"><em>Documentation</em></a></li>
 </ul>
 </li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fixed">Fixed</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id5"><em>caterpillar.model</em></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">Fixed</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id7"><em>caterpillar.model</em></a></li>
 </ul>
 </li>
 </ul>
