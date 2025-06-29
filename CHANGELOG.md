@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.5.1] - Hot-Fix Release
+
+### Fixed
+
+- **caterpillar.model**
+   - An issue when packing or unpacking a bitfield with unnamed fields AND `S_DISCARD_UNNAMED` enabled
+
+
 ## [2.5.0] - Minor Release
 
 ### Added
