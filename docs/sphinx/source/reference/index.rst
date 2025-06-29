@@ -24,7 +24,6 @@ If you want to switch to the C API instead, please refer to the sections describ
 
 .. toctree::
    :maxdepth: 2
-   :numbered:
    :caption: C API Reference
 
    capi/extension

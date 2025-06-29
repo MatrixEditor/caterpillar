@@ -23,7 +23,6 @@ is an important resource to start from.
 
 .. toctree::
     :caption: Python
-    :numbered:
     :maxdepth: 4
 
     first_steps/index.rst

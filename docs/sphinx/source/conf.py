@@ -29,7 +29,7 @@ extensions = [
     "sphinx_design",
     "breathe",
     "c_annotations",
-    "sphinx_copybutton"
+    "sphinx_copybutton",
 ]
 
 templates_path = ["_templates"]
@@ -63,13 +63,14 @@ pygments_style = "sphinx"
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
 
-refcount_file = '../../../src/capi.dat'
-autodoc_member_order = 'bysource'
+refcount_file = "../../../src/capi.dat"
+autodoc_member_order = "bysource"
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 html_theme = "pydata_sphinx_theme"
 html_static_path = ["_static"]
+html_css_files = ["css/custom.css"]
 html_theme_options = {
     "show_nav_level": 4,
     "navbar_end": ["navbar-icon-links", "theme-switcher"],
@@ -78,10 +79,9 @@ html_theme_options = {
     "logo": {
         "text": f"Caterpillar {version}",
     },
-    "announcement": "https://raw.githubusercontent.com/MatrixEditor/caterpillar/master/docs/sphinx/source/_templates/announcement.html",
 }
 html_sidebars = {
-  "installing/index": [],
+    "installing/index": [],
 }
 
 # -- Options for C++ Docs -----------------------------------------------------

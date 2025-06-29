@@ -8,14 +8,14 @@ Cryptographic Structs
 Hashes
 ------
 
-.. autoclass:: caterpillar.py.Algorithm
+.. autoclass:: caterpillar.fields.Algorithm
 
 
-.. autoclass:: caterpillar.py.Digest
+.. autoclass:: caterpillar.fields.Digest
 
-.. autoclass:: caterpillar.py.DigestField
+.. autoclass:: caterpillar.fields.DigestField
 
-.. autoclass:: caterpillar.py.DigestFieldAction
+.. autoclass:: caterpillar.fields.DigestFieldAction
 
 
 Ciphers
