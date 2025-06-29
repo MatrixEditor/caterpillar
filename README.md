@@ -1,6 +1,7 @@
 # Caterpillar - 🐛
 
-[![python](https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2FMatrixEditor%2Fcaterpillar%2Fmaster%2Fpyproject.toml&logo=python)](https://www.python.org/downloads/)
+[![python](https://img.shields.io/badge/Python-3.12+-blue?logo=python&logoColor=yellow)](https://www.python.org/downloads/)
+![![Latest Version](https://pypi.org/project/caterpillar-py/)](https://img.shields.io/github/v/release/MatrixEditor/caterpillar.svg?logo=github)
 [![Build and Deploy Docs](https://github.com/MatrixEditor/caterpillar/actions/workflows/python-sphinx.yml/badge.svg)](https://github.com/MatrixEditor/caterpillar/actions/workflows/python-sphinx.yml)
 [![Run Tests](https://github.com/MatrixEditor/caterpillar/actions/workflows/python-test.yml/badge.svg)](https://github.com/MatrixEditor/caterpillar/actions/workflows/python-test.yml)
 ![GitHub issues](https://img.shields.io/github/issues/MatrixEditor/caterpillar?logo=github)
