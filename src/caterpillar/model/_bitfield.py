@@ -930,6 +930,9 @@ class Bitfield(Struct):
                             func(context)
                             continue
 
+                    if entry.name not in self._member_map_:
+                        continue
+
                     value = (raw_value >> entry.shift(group.bit_count)) & entry.low_mask
                     if entry.factory:
                         value = entry.factory.from_int(value)
@@ -961,6 +964,9 @@ class Bitfield(Struct):
                         func = getattr(entry.action, ATTR_ACTION_PACK, None)
                         if func:
                             func(context)
+                        continue
+
+                    if entry.name not in self._member_map_:
                         continue
 
                     entry_value = self.get_value(obj, entry.name, None)
