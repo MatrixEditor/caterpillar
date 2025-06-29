@@ -131,4 +131,12 @@ instance directly. All custom attributes are stored in the dictionary representa
     **Internal use only:** This special member is only set in the root context and stores all packed objects that
     should be placed at an offset position.
 
+.. attribute:: CTX_ROOT
+    :value: "_root"
+
+    .. versionadded:: 2.5.0
+
+    Special attribute set to specify the root context. If this attribute is not present, the current ``Context`` instance
+    will be returned.
+
 .. _Ellipsis: https://docs.python.org/3/library/constants.html#Ellipsis

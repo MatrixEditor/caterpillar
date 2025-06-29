@@ -61,14 +61,14 @@ Default Factory Classes
 Default Options
 ---------------
 
-.. py:attr:: EndGroup
+.. py:attribute:: EndGroup
 
     .. versionadded:: 2.5.0
 
     Alias for the :attr:`B_GROUP_NEW` flag, used to indicate that a new bitfield group should be started.
 
 
-.. py:attr:: NewGroup
+.. py:attribute:: NewGroup
 
     Alias for the :attr:`B_GROUP_END` flag, used to indicate that the current bitfield group should be finalized.
 

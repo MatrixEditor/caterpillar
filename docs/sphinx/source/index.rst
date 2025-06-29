@@ -125,6 +125,7 @@ what configuration options can be used. Alternatively you can follow the :ref:`t
 .. toctree::
    :maxdepth: 3
    :hidden:
+   :numbered: 4
    :caption: Contents:
 
    installing/index.rst

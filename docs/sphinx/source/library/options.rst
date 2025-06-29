@@ -1,12 +1,12 @@
 .. _options:
 
-*******
-Options
-*******
+****************
+Options / Flags
+****************
 
 *TODO*
 
-Options by type
+Options by Type
 ---------------
 
 Global options

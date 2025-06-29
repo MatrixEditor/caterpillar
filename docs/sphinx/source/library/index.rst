@@ -1,4 +1,4 @@
-.. _library-index:
+:noindex:
 
 *******
 Library
@@ -7,18 +7,24 @@ Library
 *descriptions are WIP*
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Python API
 
    byteorder.rst
    options.rst
-   abc.rst
    context.rst
    exceptions.rst
    model.rst
    registry
+   shared
    fields/index.rst
 
+
+.. _library-index-capi:
+
+***********
+C Extension
+***********
 
 .. toctree::
    :maxdepth: 2

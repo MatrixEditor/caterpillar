@@ -100,3 +100,5 @@ resolution order of Python:
     Anonymous inner union definitions are tricky and are not officially supported yet. There are
     workarounds to that problem, which are discussed in the API documentation of :class:`~caterpillar.model.Sequence`.
 
+.. _Stringizes: https://docs.python.org/3/howto/annotations.html#manually-un-stringizing-stringized-annotations
+.. _Python Classes: https://docs.python.org/3/reference/compound_stmts.html#class

@@ -259,6 +259,4 @@ Modifying fields
 
 .. _struct: https://docs.python.org/3/library/struct.html
 .. _sphinx-autodoc: https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html
-.. _Stringizes: https://docs.python.org/3/howto/annotations.html#manually-un-stringizing-stringized-annotations
-.. _Python Classes: https://docs.python.org/3/reference/compound_stmts.html#class
 .. _Ellipsis: https://docs.python.org/3/library/constants.html#Ellipsis
