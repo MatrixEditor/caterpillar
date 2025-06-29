@@ -85,7 +85,7 @@ class _SupportsUnpack(Protocol[_OT_co]):
     def __unpack__(self, context: _ContextLike) -> _OT_co: ...
 
 _SwitchLambda = Callable[[Any, _ContextLike], _StructLike[_IT, _OT]]
-_Switch = Union[
+_SwitchLike = Union[
     dict[Any, Union[_ContainsStruct[_IT, _OT], _StructLike[_IT, _OT]]],
     _SwitchLambda[_IT, _OT],
 ]
