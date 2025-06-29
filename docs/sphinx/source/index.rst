@@ -132,7 +132,13 @@ what configuration options can be used. Alternatively you can follow the :ref:`t
    tutorial/index.rst
    reference/index.rst
    library/index.rst
+
+.. toctree::
+   :maxdepth: 3
+   :hidden:
+
    development/index.rst
+
 
 .. seealso::
    * `Github Source <https://github.com/MatrixEditor/caterpillar>`_

@@ -29,8 +29,6 @@ Standard Interface
 
 .. autofunction:: caterpillar.model.struct
 
-.. autofunction:: caterpillar.model.union
-
 .. autofunction:: caterpillar.model.pack
 
 .. autofunction:: caterpillar.model.pack_into
@@ -40,3 +38,9 @@ Standard Interface
 .. autofunction:: caterpillar.model.unpack
 
 .. autofunction:: caterpillar.model.unpack_file
+
+.. autofunction:: caterpillar.model.sizeof
+
+    .. versionchanged:: 2.5.0
+
+        Now checks if the provided object implements the :class:`_SupportsSize` protocol

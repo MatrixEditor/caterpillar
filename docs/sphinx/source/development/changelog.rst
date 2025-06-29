@@ -8,8 +8,8 @@ Changelog
 
 .. _changelog_2.5.0:
 
-2.5.0
-=====
+[2.5.0] - Minor Release
+=======================
 
 This version introduces massive changes due to the addition of stub files. Most of the type hints in the Python
 file are ported into several stub files. Additionally, the bitfield concept was completely renewed to be more
@@ -91,6 +91,12 @@ Changed
 
 - :func:`sizeof` now checks if the provided object implements the :class:`_SupportsSize` protocol
 - New :class:`Bitfield` concept with enhanced syntax
+
+
+*Documentation*
+^^^^^^^^^^^^^^^
+
+- Update reference and library docs as well as section numbering
 
 .. raw:: html
 
