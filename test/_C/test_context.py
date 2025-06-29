@@ -27,7 +27,7 @@ if caterpillar.native_support():
         assert getattr(c, "foo") == 1
         assert getattr(c, "bar") == 2
         # This call will be transferred to the __context_getattr__ function
-        assert getattr(c, "foo.__class__") == int
+        assert getattr(c, "foo.__class__") is int
 
         with pytest.raises(AttributeError):
             # this class is strict when it comes to undefined

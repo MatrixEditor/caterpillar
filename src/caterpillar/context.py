@@ -18,12 +18,11 @@ import operator
 import sys
 import warnings
 
-from typing import Callable, Any, Union, Self
+from typing import Callable, Any, Self
 from types import FrameType
 from dataclasses import dataclass
 
 
-from caterpillar.abc import _ContextLambda, _ContextLike
 from caterpillar.exception import StructException
 from caterpillar.registry import to_struct
 
@@ -38,6 +37,7 @@ CTX_INDEX = "_index"
 CTX_PATH = "_path"
 CTX_SEQ = "_is_seq"
 CTX_ARCH = "_arch"
+CTX_ROOT = "_root"
 
 
 class Context(dict):
@@ -92,15 +92,8 @@ class Context(dict):
             setattr(obj, nodes[1], value)
 
     @property
-    def _root(self) -> _ContextLike:
-        current = self
-        while CTX_PARENT in current:
-            # dict-like access is much faster
-            parent = current[CTX_PARENT]
-            if parent is None:
-                break
-            current = parent
-        return current
+    def _root(self):
+        return self.get("_root", self)
 
 
 class ExprMixin:
@@ -239,12 +232,7 @@ class ConditionContext:
 
     __slots__ = "func", "annotations", "namelist", "depth"
 
-    def __init__(self, condition: Union[_ContextLambda, bool], depth=2):
-        if (sys.version_info.major, sys.version_info.minor) >= (3, 14):
-            warnings.warn(
-                "Python3.14 breaks support for Contitional fields. Conditional "
-                "statements must be defined manually until a fix has been released."
-            )
+    def __init__(self, condition, depth=2):
         self.func = condition
         self.annotations = None
         self.namelist = None
@@ -257,6 +245,11 @@ class ConditionContext:
             raise StructException(msg) from exc
 
     def __enter__(self) -> Self:
+        if (sys.version_info.major, sys.version_info.minor) >= (3, 14):
+            warnings.warn(
+                "Python3.14 breaks support for Contitional fields. Conditional "
+                "statements must be defined manually until a fix has been released."
+            )
         frame = self.getframe(self.depth, "Could not enter condition context!")
         # keep track of all annotations
         try:
@@ -316,8 +309,8 @@ class BinaryExpression(ExprMixin):
     """
 
     operand: Callable[[Any, Any], Any]
-    left: Union[Any, _ContextLambda]
-    right: Union[Any, _ContextLambda]
+    left: Any
+    right: Any
 
     def __call__(self, context: Context, **kwds):
         lhs = self.left(context, **kwds) if callable(self.left) else self.left
@@ -349,9 +342,9 @@ class UnaryExpression:
 
     name: str
     operand: Callable[[Any], Any]
-    value: Union[Any, _ContextLambda]
+    value: Any
 
-    def __call__(self, context: Context, **kwds):
+    def __call__(self, context, **kwds):
         value = self.value(context, **kwds) if callable(self.value) else self.value
         return self.operand(value)
 
@@ -373,7 +366,7 @@ class ContextPath(ExprMixin):
     Represents a lambda function for retrieving a value from a Context based on a specified path.
     """
 
-    def __init__(self, path: str = None) -> None:
+    def __init__(self, path=None) -> None:
         """
         Initializes a ContextPath instance with an optional path.
 
@@ -384,7 +377,7 @@ class ContextPath(ExprMixin):
         self.call_kwargs = None
         self.getitem_args = None
 
-    def __call__(self, context: _ContextLike = None, **kwds):
+    def __call__(self, context=None, **kwds):
         """
         Calls the lambda function to retrieve a value from a Context.
 
@@ -405,7 +398,7 @@ class ContextPath(ExprMixin):
         return self
 
     def __type__(self) -> type:
-        return Any
+        return object
 
     def __getattribute__(self, key: str) -> ContextPath:
         """
@@ -461,7 +454,7 @@ class ContextLength(ExprMixin):
     def __init__(self, path: ContextPath) -> None:
         self.path = path
 
-    def __call__(self, context: Context = None, **kwds):
+    def __call__(self, context=None, **kwds):
         """
         Calls the lambda function to retrieve a value from a Context.
 

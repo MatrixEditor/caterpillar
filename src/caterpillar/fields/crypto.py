@@ -12,36 +12,22 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-from typing import Union, Any, Type, Optional, Protocol, Iterable, runtime_checkable
+from typing import Protocol, runtime_checkable
 
-try:
-    from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-    from cryptography.hazmat.primitives.padding import PaddingContext
-except ImportError:
-    Cipher = algorithms = modes = PaddingContext = Any
-
-
-from caterpillar.abc import _StructLike, _ContextLike
-from caterpillar.abc import _GreedyType, _ContextLambda
 from caterpillar.exception import UnsupportedOperation
 from caterpillar.exception import InvalidValueError
-from caterpillar.context import CTX_STREAM, Context
+from caterpillar.context import CTX_STREAM
 from .common import Memory, Bytes
 from ._mixin import get_args, get_kwargs
 
 
 @runtime_checkable
 class Padding(Protocol):  # pylint: disable=missing-class-docstring
-    def unpadder(self) -> PaddingContext:
+    def unpadder(self):
         """Abstract method to get an unpadder for padding."""
 
-    def padder(self) -> PaddingContext:
+    def padder(self):
         """Abstract method to get a padder for padding."""
-
-
-_ArgType = Union[_ContextLambda, Any]
-
-KwArgs = Context
 
 
 class Encrypted(Memory):
@@ -67,16 +53,18 @@ class Encrypted(Memory):
     # REVISIT: this constructor looks ugly
     def __init__(
         self,
-        length: Union[int, _GreedyType, _ContextLambda],
-        algorithm: Type["algorithms.CipherAlgorithm"],
-        mode: Union[Type["modes.Mode"], "modes.Mode"],
-        padding: Union[Padding, Type[Padding]] = None,
-        algo_args: Optional[Iterable[_ArgType]] = None,
-        mode_args: Optional[Iterable[_ArgType]] = None,
-        padding_args: Optional[Iterable[_ArgType]] = None,
-        post: Optional[_StructLike] = None,
+        length,
+        algorithm,
+        mode,
+        padding=None,
+        algo_args=None,
+        mode_args=None,
+        padding_args=None,
+        post=None,
     ) -> None:
-        if Cipher is None:
+        try:
+            from cryptography.hazmat.primitives.ciphers import Cipher
+        except ImportError:
             raise UnsupportedOperation(
                 (
                     "To use encryption with this framework, the module 'cryptography' "
@@ -94,7 +82,7 @@ class Encrypted(Memory):
         self._padding_args = padding_args
         self.post = post
 
-    def algorithm(self, context: _ContextLike) -> "algorithms.CipherAlgorithm":
+    def algorithm(self, context):
         """
         Get the encryption algorithm instance.
 
@@ -103,11 +91,11 @@ class Encrypted(Memory):
         :return: An instance of the encryption algorithm.
         :rtype: algorithms.CipherAlgorithm
         """
-        return self.get_instance(
-            algorithms.CipherAlgorithm, self._algo, self._algo_args, context
-        )
+        from cryptography.hazmat.primitives.ciphers import CipherAlgorithm
 
-    def mode(self, context: _ContextLike) -> "modes.Mode":
+        return self.get_instance(CipherAlgorithm, self._algo, self._algo_args, context)
+
+    def mode(self, context):
         """
         Get the encryption mode instance.
 
@@ -116,9 +104,11 @@ class Encrypted(Memory):
         :return: An instance of the encryption mode.
         :rtype: modes.Mode
         """
+        from cryptography.hazmat.primitives.ciphers import modes
+
         return self.get_instance(modes.Mode, self._mode, self._mode_args, context)
 
-    def padding(self, context: _ContextLike) -> Padding:
+    def padding(self, context) -> Padding:
         """
         Get the padding scheme instance.
 
@@ -129,9 +119,7 @@ class Encrypted(Memory):
         """
         return self.get_instance(Padding, self._padding, self._padding_args, context)
 
-    def get_instance(
-        self, type_: type, field: Any, args: Any, context: _ContextLambda
-    ) -> Any:
+    def get_instance(self, type_, field, args, context):
         """
         Get an instance of a specified type.
 
@@ -155,7 +143,7 @@ class Encrypted(Memory):
             args, kwargs = get_args(args, context), {}
         return field(*args, **kwargs)
 
-    def pack_single(self, obj: Any, context: _ContextLike) -> None:
+    def pack_single(self, obj, context) -> None:
         """
         Pack a single element.
 
@@ -164,6 +152,8 @@ class Encrypted(Memory):
         :param context: The current operation context.
         :type context: _ContextLike
         """
+        from cryptography.hazmat.primitives.ciphers import Cipher
+
         cipher = Cipher(self.algorithm(context), self.mode(context))
         padding = self.padding(context)
 
@@ -175,7 +165,7 @@ class Encrypted(Memory):
         encryptor = cipher.encryptor()
         super().pack_single(encryptor.update(data) + encryptor.finalize(), context)
 
-    def unpack_single(self, context: _ContextLike) -> memoryview:
+    def unpack_single(self, context):
         """
         Unpack a single element.
 
@@ -184,6 +174,7 @@ class Encrypted(Memory):
         :return: The unpacked element as a memoryview.
         :rtype: memoryview
         """
+        from cryptography.hazmat.primitives.ciphers import Cipher
         value = super().unpack_single(context)
         cipher = Cipher(self.algorithm(context), self.mode(context))
 
@@ -197,29 +188,24 @@ class Encrypted(Memory):
         return memoryview(data)
 
 
-_KeyType = Union[str, bytes, int, _ContextLambda]
-
-
 class KeyCipher(Bytes):
-    key: Union[str, bytes, int]
-    """The key that should be applied.
+    # key: bytes
+    # """The key that should be applied.
 
-    It will be converted automatically to bytes if not given.
-    """
+    # It will be converted automatically to bytes if not given.
+    # """
 
-    key_length: int
-    """Internal attribute to keep track of the key's length"""
+    # key_length: int
+    # """Internal attribute to keep track of the key's length"""
 
     __slots__ = "key", "key_length", "is_lazy"
 
-    def __init__(
-        self, key: _KeyType, length: Union[_ContextLambda, int, None] = None
-    ) -> None:
+    def __init__(self, key, length=None) -> None:
         super().__init__(length or ...)
         self.key = self.is_lazy = self.key_length = None
         self.set_key(key)
 
-    def set_key(self, key: _KeyType, context: _ContextLike = None) -> None:
+    def set_key(self, key, context=None) -> None:
         if callable(key) and context is None:
             # context lambda indicates the key will be computed at runtime
             self.key = key
@@ -242,7 +228,7 @@ class KeyCipher(Bytes):
         self.key_length = len(self.key)
         self.is_lazy = False
 
-    def process(self, obj: bytes, context: _ContextLike) -> bytes:
+    def process(self, obj: bytes, context) -> bytes:
         length = len(obj)
         data = bytearray(length)
         key = self.key
@@ -255,10 +241,10 @@ class KeyCipher(Bytes):
     def _do_process(self, src: bytes, dest: bytearray):
         raise NotImplementedError
 
-    def pack_single(self, obj: bytes, context: _ContextLike) -> None:
+    def pack_single(self, obj: bytes, context) -> None:
         context[CTX_STREAM].write(self.process(obj, context))
 
-    def unpack_single(self, context: _ContextLike) -> bytes:
+    def unpack_single(self, context) -> bytes:
         obj: bytes = super().unpack_single(context)
         return self.process(obj, context)
 

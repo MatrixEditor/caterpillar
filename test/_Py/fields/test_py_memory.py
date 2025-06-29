@@ -18,7 +18,7 @@ def test_memory_length():
     with pytest.raises(ValidationError):
         pack(b"12345678901", memory, as_field=True)
 
-    dyn_memory = Memory(lambda ctx: ctx._root.length)
+    dyn_memory = Memory(lambda context: context._root.length)
     assert len(unpack(dyn_memory, b"123456789011", as_field=True, length=10)) == 10
 
     greedy_memory = Memory(...)

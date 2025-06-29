@@ -16,10 +16,6 @@ import ipaddress
 import binascii
 import re
 
-from typing import Union, Any, Optional
-
-
-from caterpillar.abc import _ContextLike
 from .common import Transformer, uint32, UInt, Bytes
 from ._base import singleton
 
@@ -47,7 +43,7 @@ class IPv4Address(Transformer):
         """
         return ipaddress.IPv4Address
 
-    def encode(self, obj: ipaddress.IPv4Address, context: _ContextLike) -> Any:
+    def encode(self, obj: ipaddress.IPv4Address, context):
         """
         Encode an IPv4Address object.
 
@@ -58,7 +54,7 @@ class IPv4Address(Transformer):
         # pylint: disable-next=protected-access
         return obj._ip
 
-    def decode(self, parsed: int, context: _ContextLike) -> ipaddress.IPv4Address:
+    def decode(self, parsed: int, context) -> ipaddress.IPv4Address:
         """
         Decode an encoded IPv4 address.
 
@@ -92,7 +88,7 @@ class IPv6Address(Transformer):
         """
         return ipaddress.IPv6Address
 
-    def encode(self, obj: ipaddress.IPv6Address, context: _ContextLike) -> Any:
+    def encode(self, obj: ipaddress.IPv6Address, context):
         """
         Encode an IPv6Address object.
 
@@ -103,7 +99,7 @@ class IPv6Address(Transformer):
         # pylint: disable-next=protected-access
         return obj._ip
 
-    def decode(self, parsed: int, context: _ContextLike) -> ipaddress.IPv6Address:
+    def decode(self, parsed: int, context) -> ipaddress.IPv6Address:
         """
         Decode an encoded IPv6 address.
 
@@ -123,7 +119,7 @@ class MACAddress(Transformer):
 
     DELIMITERS = re.compile(rb"[:-]")
 
-    def __init__(self, sep: Optional[str] = None) -> None:
+    def __init__(self, sep=None) -> None:
         """
         Initialize the MACAddress transformer.
 
@@ -132,7 +128,7 @@ class MACAddress(Transformer):
         super().__init__(Bytes(6))
         self.sep = sep or ":"
 
-    def encode(self, obj: Union[str, bytes], context: _ContextLike) -> Any:
+    def encode(self, obj, context):
         """
         Encode a MAC address.
 
@@ -147,7 +143,7 @@ class MACAddress(Transformer):
         mac = re.sub(MACAddress.DELIMITERS, b"", obj)
         return binascii.unhexlify(mac)
 
-    def decode(self, parsed: bytes, context: _ContextLike) -> bytes:
+    def decode(self, parsed: bytes, context) -> bytes:
         """
         Decode an encoded MAC address.
 

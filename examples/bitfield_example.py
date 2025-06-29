@@ -1,5 +1,5 @@
 # type: ignore
-from caterpillar.py import bitfield, char, int8, unpack, pack
+from caterpillar.py import bitfield, CharFactory, int8, unpack, pack
 
 try:
     from rich import print
@@ -11,15 +11,15 @@ except ImportError:
 class Format:
     b1: 1  # inferred uint8 type with a width of one bit
     _: 0  # start new uint8 with 7 unused bits
-    b2: 2 - char  # wraps parsed int to char (string)
+    b2: (2, CharFactory)  # wraps parsed int to char (string)
     b3: 3 - int8 = 1  # default value is applied -> REVISIT: necessary?
     _1: 3  # unnamed padding to the rest of the byte
 
 
-print(Format.__struct__)
+print(Format.__struct__.groups)
 obj = unpack(Format, b"\x80\x80")
 print(obj)
-# prints: Format(b1=True, b2='2', b3=0, _1=0)
+# prints: Format(b1=1, b2='\x02', b3=0, _1=0)
 # real_pos:      0123456701234567
 # bit_pos:       7654321076543210
 #                ---------------- # right to left

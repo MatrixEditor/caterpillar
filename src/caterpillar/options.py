@@ -14,8 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from dataclasses import dataclass
-from typing import Any, Optional, Set, Union
-
+from typing import Any
 
 @dataclass(init=False)
 class Flag:
@@ -24,12 +23,12 @@ class Flag:
     name: str
     """The name of this flag"""
 
-    value: Optional[Any] = None
+    value: Any = None
     """
     Optional configuration value.
     """
 
-    def __init__(self, name: str, value: Optional[Any] = None) -> None:
+    def __init__(self, name: str, value=None) -> None:
         self.name = name
         self.value = value
         self._hash_ = hash(name)
@@ -44,19 +43,19 @@ class Flag:
 
 
 #: Defaults that will be applied to **all** structs.
-GLOBAL_STRUCT_OPTIONS: Set[Flag] = set()
+GLOBAL_STRUCT_OPTIONS = set()
 
 #: Defaults that will be applied on **all** unions.
-GLOBAL_UNION_OPTIONS: Set[Flag] = set()
+GLOBAL_UNION_OPTIONS = set()
 
 #: Default field flags that will be applied on **all** fields.
-GLOBAL_FIELD_FLAGS: Set[Flag] = set()
+GLOBAL_FIELD_FLAGS = set()
 
 #: Default field flags that will be applied on **all** bit-fields.
-GLOBAL_BITFIELD_FLAGS: Set[Flag] = set()
+GLOBAL_BITFIELD_FLAGS = set()
 
 
-def configure(base: Set[Flag], *flags: Flag) -> None:
+def configure(base, *flags: Flag) -> None:
     """
     Update the base set of flags with additional flags.
 
@@ -96,7 +95,7 @@ def set_union_flags(*flags: Flag) -> None:
     configure(GLOBAL_UNION_OPTIONS, *flags)
 
 
-def get_flags(obj: Any, attr: Optional[str] = None) -> Optional[Set[Flag]]:
+def get_flags(obj, attr=None):
     """
     Get the flags associated with an object.
 
@@ -107,7 +106,7 @@ def get_flags(obj: Any, attr: Optional[str] = None) -> Optional[Set[Flag]]:
     return getattr(obj, attr or "flags", None)
 
 
-def has_flag(flag: Union[str, Flag], obj: Any, attr: Optional[str] = None) -> bool:
+def has_flag(flag, obj, attr=None) -> bool:
     """
     Check if an object has a specific flag.
 
@@ -125,7 +124,7 @@ def has_flag(flag: Union[str, Flag], obj: Any, attr: Optional[str] = None) -> bo
     return flag in flags
 
 
-def get_flag(name: str, obj: Any, attr: Optional[str] = None) -> Optional[Flag]:
+def get_flag(name: str, obj, attr=None):
     """
     Get a specific flag associated with an object.
 
@@ -145,19 +144,26 @@ def get_flag(name: str, obj: Any, attr: Optional[str] = None) -> Optional[Flag]:
 ###############################################################################
 
 # for structs and unions
-S_DISCARD_UNNAMED = Flag("discard_unnamed")
-S_DISCARD_CONST = Flag("discard_const")
-S_UNION = Flag("union")
-S_REPLACE_TYPES = Flag("replace_types")
-S_EVAL_ANNOTATIONS = Flag("eval_annotations")
+S_DISCARD_UNNAMED = Flag("struct.discard_unnamed")
+S_DISCARD_CONST = Flag("struct.discard_const")
+S_UNION = Flag("struct.union")
+S_REPLACE_TYPES = Flag("struct.replace_types")
+S_EVAL_ANNOTATIONS = Flag("struct.eval_annotations")
 S_ADD_BYTES = Flag("struct.bytes_method")
 S_SLOTS = Flag("struct.slots")
 
 # for fields
-F_KEEP_POSITION = Flag("keep_position")
-F_DYNAMIC = Flag("dynamic")
-F_SEQUENTIAL = Flag("sequential")
-F_OFFSET_OVERRIDE = Flag("offset_override")
+F_KEEP_POSITION = Flag("field.keep_position")
+F_DYNAMIC = Flag("field.dynamic")
+F_SEQUENTIAL = Flag("field.sequential")
+F_OFFSET_OVERRIDE = Flag("field.offset_override")
 
 # value intentionally left blank
 O_ARRAY_FACTORY = Flag("option.array_factory", value=None)
+
+# bitfield options
+B_OVERWRITE_ALIGNMENT = Flag("bitfield.overwrite_alignment")
+B_GROUP_END = Flag("bitfield.group.end")
+B_GROUP_NEW = Flag("bitfield.group.new")
+B_GROUP_KEEP = Flag("bitfield.group.keep")
+B_NO_AUTO_BOOL = Flag("bitfield.no_auto_bool")

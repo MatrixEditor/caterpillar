@@ -4,24 +4,24 @@
 Field Model
 ***********
 
-.. autoclass:: caterpillar.py.Field()
+.. autoclass:: caterpillar.fields.Field
     :members:
     :private-members:
     :no-undoc-members:
 
-.. autoclass:: caterpillar.py.FieldMixin
+.. autoclass:: caterpillar.fields.FieldMixin
     :special-members:
 
-.. autoclass:: caterpillar.py.FieldStruct
+.. autoclass:: caterpillar.fields.FieldStruct
     :members:
     :special-members:
 
-.. autoclass:: caterpillar.py.Chain
+.. autoclass:: caterpillar.fields.Chain
     :members:
     :special-members:
 
-.. autoclass:: caterpillar.py.If
+.. autoclass:: caterpillar.fields.If
     :members:
 
-.. autoclass:: caterpillar.py.ElseIf
+.. autoclass:: caterpillar.fields.ElseIf
     :members:
