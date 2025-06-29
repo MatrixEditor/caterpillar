@@ -1,0 +1,751 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>3.2.3. Processing-related Types &#8212; Caterpillar 2.5.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=c1cc8b61" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=3c4615cf"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'reference/datamodel/processing_classes';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="3.3. Operators" href="../operators.html" />
+    <link rel="prev" title="3.2.2.6. Byteorder Extensions" href="protocols/byteorder_extensions.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2.5.0" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Caterpillar 2.5.0</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../installing/index.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../tutorial/index.html">
+    Tutorial
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../library/index.html">
+    Library
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../development/index.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/MatrixEditor/caterpillar" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../installing/index.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../tutorial/index.html">
+    Tutorial
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../library/index.html">
+    Library
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../development/index.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/MatrixEditor/caterpillar" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Python Reference</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">3.1. Introduction</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../datamodel.html">3.2. Data Model</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 has-children"><a class="reference internal" href="standard.html">3.2.1. Standard Types</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="sequence.html">3.2.1.1. Sequence</a></li>
+<li class="toctree-l3"><a class="reference internal" href="struct.html">3.2.1.2. Struct</a></li>
+<li class="toctree-l3"><a class="reference internal" href="union.html">3.2.1.3. Union</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bitfield.html">3.2.1.4. Bit-field</a></li>
+<li class="toctree-l3"><a class="reference internal" href="templates.html">3.2.1.5. Templates</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="protocols.html">3.2.2. Caterpillar’s Protocols</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="protocols/actionlike.html">3.2.2.1. Action-like Objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="protocols/contextlike.html">3.2.2.2. Context-like Objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="protocols/contextlambda.html">3.2.2.3. Context Lambdas</a></li>
+<li class="toctree-l3"><a class="reference internal" href="protocols/structlike.html">3.2.2.4. Struct-Like Objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="protocols/bitfield_extensions.html">3.2.2.5. Bit-field Extensions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="protocols/byteorder_extensions.html">3.2.2.6. Byteorder Extensions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">3.2.3. Processing-related Types</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../operators.html">3.3. Operators</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">C API Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../capi/extension.html">3.4. Using the C API</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../capi/abstract.html">3.5. Abstract Objects Layer</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../capi/atom.html">3.5.1. Atom Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../capi/context.html">3.5.2. Context Protocol</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../capi/objects/objimpl.html">3.6. Concrete Objects Layer</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../capi/objects/arch.html">3.6.1. Arch &amp; Endian Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../capi/objects/option.html">3.6.2. Option Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../capi/objects/contextobj.html">3.6.3. Context Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../capi/objects/contextexpr.html">3.6.4. Context Expressions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../capi/objects/contextpath.html">3.6.5. Context Path Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../capi/objects/state.html">3.6.6. State Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../capi/objects/layer.html">3.6.7. Layer Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../capi/objects/struct.html">3.6.8. Struct Objects</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../capi/objects/atoms/index.html">3.6.9. Atom Objects</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../capi/objects/atoms/int.html">3.6.9.1. Integer Atoms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../capi/objects/atoms/char.html">3.6.9.2. Char Atoms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../capi/objects/atoms/float.html">3.6.9.3. Float Atoms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../capi/objects/atoms/bool.html">3.6.9.4. Bool Atoms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../capi/objects/atoms/padding.html">3.6.9.5. Padding Atoms</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../capi/parsing.html">3.7. Packing and Unpacking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../capi/macros.html">3.8. Defined Macros</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../capi/module.html">3.9. Module API</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link"><span class="section-number">3. </span>Reference</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../datamodel.html" class="nav-link"><span class="section-number">3.2. </span>Data Model</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">3.2.3. </span>Processing-related Types</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="processing-related-types">
+<span id="datamodel-processing"></span><h1><span class="section-number">3.2.3. </span>Processing-related Types<a class="headerlink" href="#processing-related-types" title="Link to this heading">#</a></h1>
+<section id="field">
+<h2><span class="section-number">3.2.3.1. </span>Field<a class="headerlink" href="#field" title="Link to this heading">#</a></h2>
+<p>The next core element of this library is the <em>Field</em>. It serves as a context storage to store configuration data
+about a struct. Even sequences and structs can be used as fields. The process is straightforward: each custom operator
+creates an instance of a <a class="reference internal" href="../../library/fields/field_model.html#caterpillar.fields.Field" title="caterpillar.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a> with the applied configuration value. Most of the time, this value can be
+static or a <a class="reference internal" href="protocols/contextlambda.html#context-lambda"><span class="std std-ref">Context Lambdas</span></a>. A field implements basic behavior that should not be duplicated, such as
+conditional execution, exception handling with default values, and support for a built-in switch-case structure.</p>
+<p>As mentioned earlier, some primitive structs depend on being linked to a <a class="reference internal" href="../../library/fields/field_model.html#caterpillar.fields.Field" title="caterpillar.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a>. This is because all
+configuration elements are stored in a <a class="reference internal" href="../../library/fields/field_model.html#caterpillar.fields.Field" title="caterpillar.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a> instance rather than in the target struct instance. More
+information about each supported configuration can be found in <a class="reference internal" href="../operators.html#operators"><span class="std std-ref">Operators</span></a>.</p>
+</section>
+<section id="greedy">
+<span id="id1"></span><h2><span class="section-number">3.2.3.2. </span>Greedy<a class="headerlink" href="#greedy" title="Link to this heading">#</a></h2>
+<p>This library provides direct support for <em>greedy</em> parsing. Leveraging Python’s syntactic features, this special form
+of parsing is enabled using the <a class="reference external" href="https://docs.python.org/3/library/constants.html#Ellipsis">Ellipsis</a> (<code class="code docutils literal notranslate"><span class="pre">...</span></code>). All previously introduced structs implement greedy parsing
+when enabled.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">uint8</span><span class="p">[</span><span class="o">...</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>This special type can be used in places where a length has to be specified. Therefore, it can be applied to all array
+<code class="code docutils literal notranslate"><span class="pre">[]</span></code> declarations and constructors that take the length as an input argument, such as <code class="xref py py-class docutils literal notranslate"><span class="pre">CString</span></code>, for
+example.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">CString</span><span class="p">(</span><span class="o">...</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;abcd</span><span class="se">\x00</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="go">&#39;abcd&#39;</span>
+</pre></div>
+</div>
+</section>
+<section id="prefixed">
+<span id="id2"></span><h2><span class="section-number">3.2.3.3. </span>Prefixed<a class="headerlink" href="#prefixed" title="Link to this heading">#</a></h2>
+<p>In addition to greedy parsing, this library supports prefixed packing and unpacking as well. With <em>prefixed</em>, we refer
+to the length of an array of elements that should be parsed. In this library, the <code class="code docutils literal notranslate"><span class="pre">slice</span></code> class is to achieve a
+prefix option.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">CString</span><span class="p">[</span><span class="n">uint32</span><span class="p">::]</span>
+</pre></div>
+</div>
+</section>
+<section id="context">
+<span id="context-reference"></span><h2><span class="section-number">3.2.3.4. </span>Context<a class="headerlink" href="#context" title="Link to this heading">#</a></h2>
+<p>The context is another core element of this framework, utilized to store all relevant variables needed during the
+process of packing or unpacking objects. The top-level <a class="reference internal" href="../../library/model/struct.html#caterpillar.model.unpack" title="caterpillar.model.unpack"><code class="xref py py-meth docutils literal notranslate"><span class="pre">unpack()</span></code></a> and <a class="reference internal" href="../../library/model/struct.html#caterpillar.model.pack" title="caterpillar.model.pack"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pack()</span></code></a> methods are designed to
+create the context themselves with some pre-defined (internal) fields.</p>
+<div class="admonition-implementation-note admonition">
+<p class="admonition-title">Implementation Note</p>
+<p><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code> objects are essentially <code class="code docutils literal notranslate"><span class="pre">dict</span></code> objects with enhanced capabilities. Therefore, all
+operations supported on dictionaries are applicable.</p>
+</div>
+<p>The context enables special attribute-like access using <code class="code docutils literal notranslate"><span class="pre">getattr</span></code> if the attribute wasn’t defined in the
+instance directly. All custom attributes are stored in the dictionary representation of the instance.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="CTX_PARENT">
+<span class="sig-name descname"><span class="pre">CTX_PARENT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&quot;_parent&quot;</span></em><a class="headerlink" href="#CTX_PARENT" title="Link to this definition">#</a></dt>
+<dd><p>All <code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code> instances <em>SHOULD</em> contain a reference to the parent context. If the returned reference is
+<code class="code docutils literal notranslate"><span class="pre">None</span></code>, it can be assumed that the current context is the root context. If this attribute is set, it
+<em>MUST</em> point to a <code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="CTX_OBJECT">
+<span class="sig-name descname"><span class="pre">CTX_OBJECT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&quot;_obj&quot;</span></em><a class="headerlink" href="#CTX_OBJECT" title="Link to this definition">#</a></dt>
+<dd><p>When packing or unpacking objects, the current object attributes are stored within the <em>object</em> context. This
+is a special context that allows access to previously parsed fields or attributes of the input object. To
+minimize the number of calls using this attribute, a shortcut named <code class="code docutils literal notranslate"><span class="pre">this</span></code> was defined, which
+automatically inserts a path to the object context.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="CTX_STREAM">
+<span class="sig-name descname"><span class="pre">CTX_STREAM</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&quot;_io&quot;</span></em><a class="headerlink" href="#CTX_STREAM" title="Link to this definition">#</a></dt>
+<dd><p>The input or output stream <em>MUST</em> be set in each context instance to prevent access errors on missing stream
+objects.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>Discussion on <a class="reference external" href="https://github.com/MatrixEditor/caterpillar/discussions/1">Github</a> why this attribute has
+to be set in every context instance.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="CTX_PATH">
+<span class="sig-name descname"><span class="pre">CTX_PATH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&quot;_path&quot;</span></em><a class="headerlink" href="#CTX_PATH" title="Link to this definition">#</a></dt>
+<dd><p>Although it is optional to provide the current parsing or building path, it is <em>recommended</em>. All nesting
+structures implement a behavior that automatically adds a sub-path while packing or unpacking. Special
+names are <code class="code docutils literal notranslate"><span class="pre">&quot;&lt;root&gt;&quot;</span></code> for the starting path and <code class="code docutils literal notranslate"><span class="pre">&quot;&lt;NUMBER&gt;&quot;</span></code> for greedy sequence elements.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="CTX_FIELD">
+<span class="sig-name descname"><span class="pre">CTX_FIELD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&quot;_field&quot;</span></em><a class="headerlink" href="#CTX_FIELD" title="Link to this definition">#</a></dt>
+<dd><p>In case a struct is linked to a field, the <a class="reference internal" href="../../library/fields/field_model.html#caterpillar.fields.Field" title="caterpillar.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a> instance will always set this context variable
+to be accessible from within the underlying struct.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="CTX_INDEX">
+<span class="sig-name descname"><span class="pre">CTX_INDEX</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&quot;_index&quot;</span></em><a class="headerlink" href="#CTX_INDEX" title="Link to this definition">#</a></dt>
+<dd><p>When packing or unpacking collections of elements, the current working index is given under this context
+variable. This variable is set only in this specific situation.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="CTX_VALUE">
+<span class="sig-name descname"><span class="pre">CTX_VALUE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&quot;_value&quot;</span></em><a class="headerlink" href="#CTX_VALUE" title="Link to this definition">#</a></dt>
+<dd><p>In case a switch-case statement is activated in a field, the context will receive the parsed value in this
+context variable temporarily.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="CTX_POS">
+<span class="sig-name descname"><span class="pre">CTX_POS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&quot;_pos&quot;</span></em><a class="headerlink" href="#CTX_POS" title="Link to this definition">#</a></dt>
+<dd><p>Currently undefined.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="CTX_OFFSETS">
+<span class="sig-name descname"><span class="pre">CTX_OFFSETS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&quot;_offsets&quot;</span></em><a class="headerlink" href="#CTX_OFFSETS" title="Link to this definition">#</a></dt>
+<dd><p><strong>Internal use only:</strong> This special member is only set in the root context and stores all packed objects that
+should be placed at an offset position.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="CTX_ROOT">
+<span class="sig-name descname"><span class="pre">CTX_ROOT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&quot;_root&quot;</span></em><a class="headerlink" href="#CTX_ROOT" title="Link to this definition">#</a></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.5.0.</span></p>
+</div>
+<p>Special attribute set to specify the root context. If this attribute is not present, the current <code class="docutils literal notranslate"><span class="pre">Context</span></code> instance
+will be returned.</p>
+</dd></dl>
+
+</section>
+<section id="context-path">
+<h2><span class="section-number">3.2.3.5. </span>Context path<a class="headerlink" href="#context-path" title="Link to this heading">#</a></h2>
+<p>The path of a context is a specialized form of a <a class="reference internal" href="protocols/contextlambda.html#context-lambda"><span class="std std-ref">Context Lambdas</span></a> and supports lazy evaluation of most
+operators (conditional ones excluded). Once called, they try to retrieve the requested value from within
+the given <code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code> instance. Below is a list of default paths designed to provide a relatively easy
+way to access the context variables.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ctx">
+<span class="sig-name descname"><span class="pre">ctx</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&quot;&quot;</span></em><a class="headerlink" href="#ctx" title="Link to this definition">#</a></dt>
+<dd><p>This special path acts as a wrapper to access all variables within the top-level <code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code> object.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="this">
+<span class="sig-name descname"><span class="pre">this</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&quot;_obj&quot;</span></em><a class="headerlink" href="#this" title="Link to this definition">#</a></dt>
+<dd><p>As described before, a special <em>object context</em> is created when packing or unpacking structs that store
+more than one field.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="parent">
+<span class="sig-name descname"><span class="pre">parent</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&quot;_parent._obj&quot;</span></em><a class="headerlink" href="#parent" title="Link to this definition">#</a></dt>
+<dd><p>A shortcut to access the object context of the parent context.</p>
+</dd></dl>
+
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="protocols/byteorder_extensions.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title"><span class="section-number">3.2.2.6. </span>Byteorder Extensions</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../operators.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><span class="section-number">3.3. </span>Operators</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#field">3.2.3.1. Field</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#greedy">3.2.3.2. Greedy</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#prefixed">3.2.3.3. Prefixed</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#context">3.2.3.4. Context</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#CTX_PARENT"><code class="docutils literal notranslate"><span class="pre">CTX_PARENT</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#CTX_OBJECT"><code class="docutils literal notranslate"><span class="pre">CTX_OBJECT</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#CTX_STREAM"><code class="docutils literal notranslate"><span class="pre">CTX_STREAM</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#CTX_PATH"><code class="docutils literal notranslate"><span class="pre">CTX_PATH</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#CTX_FIELD"><code class="docutils literal notranslate"><span class="pre">CTX_FIELD</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#CTX_INDEX"><code class="docutils literal notranslate"><span class="pre">CTX_INDEX</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#CTX_VALUE"><code class="docutils literal notranslate"><span class="pre">CTX_VALUE</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#CTX_POS"><code class="docutils literal notranslate"><span class="pre">CTX_POS</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#CTX_OFFSETS"><code class="docutils literal notranslate"><span class="pre">CTX_OFFSETS</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#CTX_ROOT"><code class="docutils literal notranslate"><span class="pre">CTX_ROOT</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#context-path">3.2.3.5. Context path</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ctx"><code class="docutils literal notranslate"><span class="pre">ctx</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#this"><code class="docutils literal notranslate"><span class="pre">this</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#parent"><code class="docutils literal notranslate"><span class="pre">parent</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/reference/datamodel/processing_classes.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, MatrixEditor.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

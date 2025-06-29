@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Byteorder and Architecture &#8212; Caterpillar 2.4.5 documentation</title>
+    <title>4.1. Byteorder and Architecture &#8212; Caterpillar 2.5.0 documentation</title>
   
   
   
@@ -33,6 +33,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=c1cc8b61" />
   
   <!-- So that users can add custom icons -->
   <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -40,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=159ac128"></script>
+    <script src="../_static/documentation_options.js?v=3c4615cf"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,11 +50,11 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'library/byteorder';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Options" href="options.html" />
-    <link rel="prev" title="Library" href="index.html" />
+    <link rel="next" title="4.2. Options / Flags" href="options.html" />
+    <link rel="prev" title="4. Library" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.4.5" />
+  <meta name="docsearch:version" content="2.5.0" />
   </head>
   
   
@@ -90,7 +91,6 @@
 
   <div class="pst-async-banner-revealer d-none">
   <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
-  <aside class="bd-header-announcement d-print-none d-none" aria-label="Announcement" data-pst-announcement-url="https://raw.githubusercontent.com/MatrixEditor/caterpillar/master/docs/sphinx/source/_templates/announcement.html"></aside>
 </div>
 
   
@@ -116,7 +116,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.4.5</p>
+    <p class="title logo__title">Caterpillar 2.5.0</p>
   
 </a></div>
     
@@ -332,24 +332,30 @@
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Python API</span></p>
 <ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Byteorder and Architecture</a></li>
-<li class="toctree-l1"><a class="reference internal" href="options.html">Options</a></li>
-<li class="toctree-l1"><a class="reference internal" href="abc.html">Abstract base classes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="context.html">Context</a></li>
-<li class="toctree-l1"><a class="reference internal" href="exceptions.html">Exceptions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="model.html">Struct Model</a></li>
-<li class="toctree-l1"><a class="reference internal" href="registry.html">Annotation Registry</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="fields/index.html">Fields</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="fields/field_model.html">Field Model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fields/common.html">Common Structs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fields/compression.html">Compression Structs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fields/crypto.html">Cryptographic Structs</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">4.1. Byteorder and Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="options.html">4.2. Options / Flags</a></li>
+<li class="toctree-l1"><a class="reference internal" href="context.html">4.3. Context</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exceptions.html">4.4. Exceptions</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="model.html">4.5. Struct Model</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="model/sequence.html">4.5.1. Sequence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model/struct.html">4.5.2. Struct</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model/bitfield.html">4.5.3. Bitfield</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model/template.html">4.5.4. Templates</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="registry.html">4.6. Annotation Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="shared.html">4.7. Shared Concepts</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="fields/index.html">4.8. Fields</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="fields/field_model.html">4.8.1. Field Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fields/common.html">4.8.2. Common Structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fields/compression.html">4.8.3. Compression Structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fields/crypto.html">4.8.4. Cryptographic Structs</a></li>
 </ul>
 </details></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">C API Python Types</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="ctypes/int.html">Integer Types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ctypes/int.html">5.1. Integer Types</a></li>
 </ul>
 </div>
 </nav></div>
@@ -391,9 +397,9 @@
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Library</a></li>
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link"><span class="section-number">4. </span>Library</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Byteorder and Architecture</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">4.1. </span>Byteorder and Architecture</span></li>
   </ul>
 </nav>
 </div>
@@ -411,9 +417,9 @@
                 <article class="bd-article">
                   
   <section id="byteorder-and-architecture">
-<span id="byteorder"></span><h1>Byteorder and Architecture<a class="headerlink" href="#byteorder-and-architecture" title="Link to this heading">#</a></h1>
+<span id="byteorder"></span><h1><span class="section-number">4.1. </span>Byteorder and Architecture<a class="headerlink" href="#byteorder-and-architecture" title="Link to this heading">#</a></h1>
 <section id="id1">
-<h2>Byteorder<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">4.1.1. </span>Byteorder<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="caterpillar.byteorder.ByteOrder">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.byteorder.</span></span><span class="sig-name descname"><span class="pre">ByteOrder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alignment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#caterpillar.byteorder.ByteOrder.Alignment" title="caterpillar.byteorder.ByteOrder.Alignment"><span class="pre">Alignment</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Alignment.NONE</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#caterpillar.byteorder.ByteOrder.Size" title="caterpillar.byteorder.ByteOrder.Size"><span class="pre">Size</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Size.STANDARD</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caterpillar/byteorder.html#ByteOrder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.byteorder.ByteOrder" title="Link to this definition">#</a></dt>
@@ -454,11 +460,22 @@ is <cite>Alignment.NONE</cite>).</p></li>
 
 </dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="caterpillar.byteorder.BYTEORDER_FIELD">
-<span class="sig-prename descclassname"><span class="pre">byteorder.</span></span><span class="sig-name descname"><span class="pre">BYTEORDER_FIELD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'__byteorder__'</span></em><a class="headerlink" href="#caterpillar.byteorder.BYTEORDER_FIELD" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="caterpillar.byteorder.byteorder">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.byteorder.</span></span><span class="sig-name descname"><span class="pre">byteorder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#caterpillar.byteorder.ByteOrder" title="caterpillar.byteorder.ByteOrder"><span class="pre">ByteOrder</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#caterpillar.byteorder.ByteOrder" title="caterpillar.byteorder.ByteOrder"><span class="pre">ByteOrder</span></a></span></span><a class="reference internal" href="../_modules/caterpillar/byteorder.html#byteorder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.byteorder.byteorder" title="Link to this definition">#</a></dt>
+<dd><p>Get the byte order of an object, defaulting to SysNative if not explicitly set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>obj</strong> – The object to retrieve the byte order from.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The byte order of the object.</p>
+</dd>
+</dl>
+</dd></dl>
 
+<section id="standard-byteorder-instances">
+<h3><span class="section-number">4.1.1.1. </span>Standard Byteorder Instances<a class="headerlink" href="#standard-byteorder-instances" title="Link to this heading">#</a></h3>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caterpillar.byteorder.Native">
 <span class="sig-prename descclassname"><span class="pre">byteorder.</span></span><span class="sig-name descname"><span class="pre">Native</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">ByteOrder(name='Native',</span> <span class="pre">ch='=',</span> <span class="pre">alignment=&lt;Alignment.NONE:</span> <span class="pre">0&gt;,</span> <span class="pre">size=&lt;Size.STANDARD:</span> <span class="pre">0&gt;)</span></em><a class="headerlink" href="#caterpillar.byteorder.Native" title="Link to this definition">#</a></dt>
@@ -484,23 +501,10 @@ is <cite>Alignment.NONE</cite>).</p></li>
 <span class="sig-prename descclassname"><span class="pre">byteorder.</span></span><span class="sig-name descname"><span class="pre">SysNative</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">ByteOrder(name='SysNative',</span> <span class="pre">ch='&#64;',</span> <span class="pre">alignment=&lt;Alignment.NATIVE:</span> <span class="pre">1&gt;,</span> <span class="pre">size=&lt;Size.NATIVE:</span> <span class="pre">1&gt;)</span></em><a class="headerlink" href="#caterpillar.byteorder.SysNative" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
-<dl class="py function">
-<dt class="sig sig-object py" id="caterpillar.byteorder.byteorder">
-<span class="sig-prename descclassname"><span class="pre">caterpillar.byteorder.</span></span><span class="sig-name descname"><span class="pre">byteorder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#caterpillar.byteorder.ByteOrder" title="caterpillar.byteorder.ByteOrder"><span class="pre">ByteOrder</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#caterpillar.byteorder.ByteOrder" title="caterpillar.byteorder.ByteOrder"><span class="pre">ByteOrder</span></a></span></span><a class="reference internal" href="../_modules/caterpillar/byteorder.html#byteorder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.byteorder.byteorder" title="Link to this definition">#</a></dt>
-<dd><p>Get the byte order of an object, defaulting to SysNative if not explicitly set.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>obj</strong> – The object to retrieve the byte order from.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The byte order of the object.</p>
-</dd>
-</dl>
-</dd></dl>
-
+</section>
 </section>
 <section id="architecture">
-<h2>Architecture<a class="headerlink" href="#architecture" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">4.1.2. </span>Architecture<a class="headerlink" href="#architecture" title="Link to this heading">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="caterpillar.byteorder.Arch">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.byteorder.</span></span><span class="sig-name descname"><span class="pre">Arch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ptr_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caterpillar/byteorder.html#Arch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.byteorder.Arch" title="Link to this definition">#</a></dt>
@@ -520,6 +524,84 @@ is <cite>Alignment.NONE</cite>).</p></li>
 <span class="sig-prename descclassname"><span class="pre">byteorder.</span></span><span class="sig-name descname"><span class="pre">system_arch</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#caterpillar.byteorder.Arch" title="caterpillar.byteorder.Arch"><span class="pre">Arch</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Arch(name='x86_64',</span> <span class="pre">ptr_size=64)</span></em><a class="headerlink" href="#caterpillar.byteorder.system_arch" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
+<section id="standard-architectures">
+<h3><span class="section-number">4.1.2.1. </span>Standard Architectures<a class="headerlink" href="#standard-architectures" title="Link to this heading">#</a></h3>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.byteorder.x86">
+<span class="sig-prename descclassname"><span class="pre">byteorder.</span></span><span class="sig-name descname"><span class="pre">x86</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Arch(name='x86',</span> <span class="pre">ptr_size=32)</span></em><a class="headerlink" href="#caterpillar.byteorder.x86" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.byteorder.x86_64">
+<span class="sig-prename descclassname"><span class="pre">byteorder.</span></span><span class="sig-name descname"><span class="pre">x86_64</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Arch(name='x86-64',</span> <span class="pre">ptr_size=64)</span></em><a class="headerlink" href="#caterpillar.byteorder.x86_64" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.byteorder.ARM">
+<span class="sig-prename descclassname"><span class="pre">byteorder.</span></span><span class="sig-name descname"><span class="pre">ARM</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Arch(name='ARM',</span> <span class="pre">ptr_size=32)</span></em><a class="headerlink" href="#caterpillar.byteorder.ARM" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.byteorder.ARM64">
+<span class="sig-prename descclassname"><span class="pre">byteorder.</span></span><span class="sig-name descname"><span class="pre">ARM64</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Arch(name='ARM64',</span> <span class="pre">ptr_size=64)</span></em><a class="headerlink" href="#caterpillar.byteorder.ARM64" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.byteorder.AARCH64">
+<span class="sig-prename descclassname"><span class="pre">byteorder.</span></span><span class="sig-name descname"><span class="pre">AARCH64</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Arch(name='ARM64',</span> <span class="pre">ptr_size=64)</span></em><a class="headerlink" href="#caterpillar.byteorder.AARCH64" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.byteorder.PowerPC">
+<span class="sig-prename descclassname"><span class="pre">byteorder.</span></span><span class="sig-name descname"><span class="pre">PowerPC</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Arch(name='PowerPC',</span> <span class="pre">ptr_size=32)</span></em><a class="headerlink" href="#caterpillar.byteorder.PowerPC" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.byteorder.PowerPC64">
+<span class="sig-prename descclassname"><span class="pre">byteorder.</span></span><span class="sig-name descname"><span class="pre">PowerPC64</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Arch(name='PowerPC64',</span> <span class="pre">ptr_size=64)</span></em><a class="headerlink" href="#caterpillar.byteorder.PowerPC64" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.byteorder.MIPS">
+<span class="sig-prename descclassname"><span class="pre">byteorder.</span></span><span class="sig-name descname"><span class="pre">MIPS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Arch(name='MIPS',</span> <span class="pre">ptr_size=32)</span></em><a class="headerlink" href="#caterpillar.byteorder.MIPS" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.byteorder.MIPS64">
+<span class="sig-prename descclassname"><span class="pre">byteorder.</span></span><span class="sig-name descname"><span class="pre">MIPS64</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Arch(name='MIPS64',</span> <span class="pre">ptr_size=64)</span></em><a class="headerlink" href="#caterpillar.byteorder.MIPS64" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.byteorder.SPARC">
+<span class="sig-prename descclassname"><span class="pre">byteorder.</span></span><span class="sig-name descname"><span class="pre">SPARC</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Arch(name='SPARC',</span> <span class="pre">ptr_size=32)</span></em><a class="headerlink" href="#caterpillar.byteorder.SPARC" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.byteorder.SPARC64">
+<span class="sig-prename descclassname"><span class="pre">byteorder.</span></span><span class="sig-name descname"><span class="pre">SPARC64</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Arch(name='SPARC64',</span> <span class="pre">ptr_size=64)</span></em><a class="headerlink" href="#caterpillar.byteorder.SPARC64" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.byteorder.RISC_V64">
+<span class="sig-prename descclassname"><span class="pre">byteorder.</span></span><span class="sig-name descname"><span class="pre">RISC_V64</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Arch(name='RISK-V64',</span> <span class="pre">ptr_size=64)</span></em><a class="headerlink" href="#caterpillar.byteorder.RISC_V64" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.byteorder.RISC_V">
+<span class="sig-prename descclassname"><span class="pre">byteorder.</span></span><span class="sig-name descname"><span class="pre">RISC_V</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Arch(name='RISK-V',</span> <span class="pre">ptr_size=32)</span></em><a class="headerlink" href="#caterpillar.byteorder.RISC_V" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.byteorder.AMD">
+<span class="sig-prename descclassname"><span class="pre">byteorder.</span></span><span class="sig-name descname"><span class="pre">AMD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Arch(name='AMD',</span> <span class="pre">ptr_size=32)</span></em><a class="headerlink" href="#caterpillar.byteorder.AMD" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.byteorder.AMD64">
+<span class="sig-prename descclassname"><span class="pre">byteorder.</span></span><span class="sig-name descname"><span class="pre">AMD64</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Arch(name='AMD64',</span> <span class="pre">ptr_size=64)</span></em><a class="headerlink" href="#caterpillar.byteorder.AMD64" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</section>
 </section>
 </section>
 
@@ -539,7 +621,7 @@ is <cite>Alignment.NONE</cite>).</p></li>
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Library</p>
+        <p class="prev-next-title"><span class="section-number">4. </span>Library</p>
       </div>
     </a>
     <a class="right-next"
@@ -547,7 +629,7 @@ is <cite>Alignment.NONE</cite>).</p></li>
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Options</p>
+        <p class="prev-next-title"><span class="section-number">4.2. </span>Options / Flags</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -570,25 +652,45 @@ is <cite>Alignment.NONE</cite>).</p></li>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Byteorder</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">4.1.1. Byteorder</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.byteorder.ByteOrder"><code class="docutils literal notranslate"><span class="pre">ByteOrder</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.byteorder.ByteOrder.Alignment"><code class="docutils literal notranslate"><span class="pre">ByteOrder.Alignment</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.byteorder.ByteOrder.Size"><code class="docutils literal notranslate"><span class="pre">ByteOrder.Size</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.byteorder.ByteOrder.apply"><code class="docutils literal notranslate"><span class="pre">ByteOrder.apply()</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.byteorder.BYTEORDER_FIELD"><code class="docutils literal notranslate"><span class="pre">byteorder.BYTEORDER_FIELD</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.byteorder.Native"><code class="docutils literal notranslate"><span class="pre">byteorder.Native</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.byteorder.BigEndian"><code class="docutils literal notranslate"><span class="pre">byteorder.BigEndian</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.byteorder.LittleEndian"><code class="docutils literal notranslate"><span class="pre">byteorder.LittleEndian</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.byteorder.NetEndian"><code class="docutils literal notranslate"><span class="pre">byteorder.NetEndian</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.byteorder.SysNative"><code class="docutils literal notranslate"><span class="pre">byteorder.SysNative</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.byteorder.byteorder"><code class="docutils literal notranslate"><span class="pre">byteorder()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#standard-byteorder-instances">4.1.1.1. Standard Byteorder Instances</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.byteorder.Native"><code class="docutils literal notranslate"><span class="pre">byteorder.Native</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.byteorder.BigEndian"><code class="docutils literal notranslate"><span class="pre">byteorder.BigEndian</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.byteorder.LittleEndian"><code class="docutils literal notranslate"><span class="pre">byteorder.LittleEndian</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.byteorder.NetEndian"><code class="docutils literal notranslate"><span class="pre">byteorder.NetEndian</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.byteorder.SysNative"><code class="docutils literal notranslate"><span class="pre">byteorder.SysNative</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#architecture">Architecture</a><ul class="nav section-nav flex-column">
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#architecture">4.1.2. Architecture</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.byteorder.Arch"><code class="docutils literal notranslate"><span class="pre">Arch</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.byteorder.system_arch"><code class="docutils literal notranslate"><span class="pre">byteorder.system_arch</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#standard-architectures">4.1.2.1. Standard Architectures</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.byteorder.x86"><code class="docutils literal notranslate"><span class="pre">byteorder.x86</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.byteorder.x86_64"><code class="docutils literal notranslate"><span class="pre">byteorder.x86_64</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.byteorder.ARM"><code class="docutils literal notranslate"><span class="pre">byteorder.ARM</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.byteorder.ARM64"><code class="docutils literal notranslate"><span class="pre">byteorder.ARM64</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.byteorder.AARCH64"><code class="docutils literal notranslate"><span class="pre">byteorder.AARCH64</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.byteorder.PowerPC"><code class="docutils literal notranslate"><span class="pre">byteorder.PowerPC</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.byteorder.PowerPC64"><code class="docutils literal notranslate"><span class="pre">byteorder.PowerPC64</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.byteorder.MIPS"><code class="docutils literal notranslate"><span class="pre">byteorder.MIPS</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.byteorder.MIPS64"><code class="docutils literal notranslate"><span class="pre">byteorder.MIPS64</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.byteorder.SPARC"><code class="docutils literal notranslate"><span class="pre">byteorder.SPARC</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.byteorder.SPARC64"><code class="docutils literal notranslate"><span class="pre">byteorder.SPARC64</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.byteorder.RISC_V64"><code class="docutils literal notranslate"><span class="pre">byteorder.RISC_V64</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.byteorder.RISC_V"><code class="docutils literal notranslate"><span class="pre">byteorder.RISC_V</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.byteorder.AMD"><code class="docutils literal notranslate"><span class="pre">byteorder.AMD</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.byteorder.AMD64"><code class="docutils literal notranslate"><span class="pre">byteorder.AMD64</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

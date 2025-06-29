@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>caterpillar.options &#8212; Caterpillar 2.4.5 documentation</title>
+    <title>caterpillar.options &#8212; Caterpillar 2.5.0 documentation</title>
   
   
   
@@ -32,6 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=c1cc8b61" />
   
   <!-- So that users can add custom icons -->
   <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -39,7 +40,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=159ac128"></script>
+    <script src="../../_static/documentation_options.js?v=3c4615cf"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -50,7 +51,7 @@
     <link rel="search" title="Search" href="../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.4.5" />
+  <meta name="docsearch:version" content="2.5.0" />
   </head>
   
   
@@ -87,7 +88,6 @@
 
   <div class="pst-async-banner-revealer d-none">
   <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
-  <aside class="bd-header-announcement d-print-none d-none" aria-label="Announcement" data-pst-announcement-url="https://raw.githubusercontent.com/MatrixEditor/caterpillar/master/docs/sphinx/source/_templates/announcement.html"></aside>
 </div>
 
   
@@ -113,7 +113,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.4.5</p>
+    <p class="title logo__title">Caterpillar 2.5.0</p>
   
 </a></div>
     
@@ -392,8 +392,7 @@
 <span class="c1"># along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Union</span>
-
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
 
 <div class="viewcode-block" id="Flag">
 <a class="viewcode-back" href="../../library/options.html#caterpillar.options.Flag">[docs]</a>
@@ -404,12 +403,12 @@
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The name of this flag&quot;&quot;&quot;</span>
 
-    <span class="n">value</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">value</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Optional configuration value.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_hash_</span> <span class="o">=</span> <span class="nb">hash</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
@@ -425,21 +424,21 @@
 
 
 <span class="c1">#: Defaults that will be applied to **all** structs.</span>
-<span class="n">GLOBAL_STRUCT_OPTIONS</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="n">Flag</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+<span class="n">GLOBAL_STRUCT_OPTIONS</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
 
 <span class="c1">#: Defaults that will be applied on **all** unions.</span>
-<span class="n">GLOBAL_UNION_OPTIONS</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="n">Flag</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+<span class="n">GLOBAL_UNION_OPTIONS</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
 
 <span class="c1">#: Default field flags that will be applied on **all** fields.</span>
-<span class="n">GLOBAL_FIELD_FLAGS</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="n">Flag</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+<span class="n">GLOBAL_FIELD_FLAGS</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
 
 <span class="c1">#: Default field flags that will be applied on **all** bit-fields.</span>
-<span class="n">GLOBAL_BITFIELD_FLAGS</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="n">Flag</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+<span class="n">GLOBAL_BITFIELD_FLAGS</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
 
 
 <div class="viewcode-block" id="configure">
 <a class="viewcode-back" href="../../library/options.html#caterpillar.options.configure">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">configure</span><span class="p">(</span><span class="n">base</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="n">Flag</span><span class="p">],</span> <span class="o">*</span><span class="n">flags</span><span class="p">:</span> <span class="n">Flag</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">configure</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="o">*</span><span class="n">flags</span><span class="p">:</span> <span class="n">Flag</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Update the base set of flags with additional flags.</span>
 
@@ -491,7 +490,7 @@
 
 <div class="viewcode-block" id="get_flags">
 <a class="viewcode-back" href="../../library/options.html#caterpillar.options.get_flags">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">get_flags</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">attr</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Set</span><span class="p">[</span><span class="n">Flag</span><span class="p">]]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_flags</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">attr</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the flags associated with an object.</span>
 
@@ -505,7 +504,7 @@
 
 <div class="viewcode-block" id="has_flag">
 <a class="viewcode-back" href="../../library/options.html#caterpillar.options.has_flag">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">has_flag</span><span class="p">(</span><span class="n">flag</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Flag</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">attr</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">has_flag</span><span class="p">(</span><span class="n">flag</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">attr</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Check if an object has a specific flag.</span>
 
@@ -526,7 +525,7 @@
 
 <div class="viewcode-block" id="get_flag">
 <a class="viewcode-back" href="../../library/options.html#caterpillar.options.get_flag">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">get_flag</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">attr</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Flag</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_flag</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">attr</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get a specific flag associated with an object.</span>
 
@@ -547,22 +546,29 @@
 <span class="c1">###############################################################################</span>
 
 <span class="c1"># for structs and unions</span>
-<span class="n">S_DISCARD_UNNAMED</span> <span class="o">=</span> <span class="n">Flag</span><span class="p">(</span><span class="s2">&quot;discard_unnamed&quot;</span><span class="p">)</span>
-<span class="n">S_DISCARD_CONST</span> <span class="o">=</span> <span class="n">Flag</span><span class="p">(</span><span class="s2">&quot;discard_const&quot;</span><span class="p">)</span>
-<span class="n">S_UNION</span> <span class="o">=</span> <span class="n">Flag</span><span class="p">(</span><span class="s2">&quot;union&quot;</span><span class="p">)</span>
-<span class="n">S_REPLACE_TYPES</span> <span class="o">=</span> <span class="n">Flag</span><span class="p">(</span><span class="s2">&quot;replace_types&quot;</span><span class="p">)</span>
-<span class="n">S_EVAL_ANNOTATIONS</span> <span class="o">=</span> <span class="n">Flag</span><span class="p">(</span><span class="s2">&quot;eval_annotations&quot;</span><span class="p">)</span>
+<span class="n">S_DISCARD_UNNAMED</span> <span class="o">=</span> <span class="n">Flag</span><span class="p">(</span><span class="s2">&quot;struct.discard_unnamed&quot;</span><span class="p">)</span>
+<span class="n">S_DISCARD_CONST</span> <span class="o">=</span> <span class="n">Flag</span><span class="p">(</span><span class="s2">&quot;struct.discard_const&quot;</span><span class="p">)</span>
+<span class="n">S_UNION</span> <span class="o">=</span> <span class="n">Flag</span><span class="p">(</span><span class="s2">&quot;struct.union&quot;</span><span class="p">)</span>
+<span class="n">S_REPLACE_TYPES</span> <span class="o">=</span> <span class="n">Flag</span><span class="p">(</span><span class="s2">&quot;struct.replace_types&quot;</span><span class="p">)</span>
+<span class="n">S_EVAL_ANNOTATIONS</span> <span class="o">=</span> <span class="n">Flag</span><span class="p">(</span><span class="s2">&quot;struct.eval_annotations&quot;</span><span class="p">)</span>
 <span class="n">S_ADD_BYTES</span> <span class="o">=</span> <span class="n">Flag</span><span class="p">(</span><span class="s2">&quot;struct.bytes_method&quot;</span><span class="p">)</span>
 <span class="n">S_SLOTS</span> <span class="o">=</span> <span class="n">Flag</span><span class="p">(</span><span class="s2">&quot;struct.slots&quot;</span><span class="p">)</span>
 
 <span class="c1"># for fields</span>
-<span class="n">F_KEEP_POSITION</span> <span class="o">=</span> <span class="n">Flag</span><span class="p">(</span><span class="s2">&quot;keep_position&quot;</span><span class="p">)</span>
-<span class="n">F_DYNAMIC</span> <span class="o">=</span> <span class="n">Flag</span><span class="p">(</span><span class="s2">&quot;dynamic&quot;</span><span class="p">)</span>
-<span class="n">F_SEQUENTIAL</span> <span class="o">=</span> <span class="n">Flag</span><span class="p">(</span><span class="s2">&quot;sequential&quot;</span><span class="p">)</span>
-<span class="n">F_OFFSET_OVERRIDE</span> <span class="o">=</span> <span class="n">Flag</span><span class="p">(</span><span class="s2">&quot;offset_override&quot;</span><span class="p">)</span>
+<span class="n">F_KEEP_POSITION</span> <span class="o">=</span> <span class="n">Flag</span><span class="p">(</span><span class="s2">&quot;field.keep_position&quot;</span><span class="p">)</span>
+<span class="n">F_DYNAMIC</span> <span class="o">=</span> <span class="n">Flag</span><span class="p">(</span><span class="s2">&quot;field.dynamic&quot;</span><span class="p">)</span>
+<span class="n">F_SEQUENTIAL</span> <span class="o">=</span> <span class="n">Flag</span><span class="p">(</span><span class="s2">&quot;field.sequential&quot;</span><span class="p">)</span>
+<span class="n">F_OFFSET_OVERRIDE</span> <span class="o">=</span> <span class="n">Flag</span><span class="p">(</span><span class="s2">&quot;field.offset_override&quot;</span><span class="p">)</span>
 
 <span class="c1"># value intentionally left blank</span>
 <span class="n">O_ARRAY_FACTORY</span> <span class="o">=</span> <span class="n">Flag</span><span class="p">(</span><span class="s2">&quot;option.array_factory&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+<span class="c1"># bitfield options</span>
+<span class="n">B_OVERWRITE_ALIGNMENT</span> <span class="o">=</span> <span class="n">Flag</span><span class="p">(</span><span class="s2">&quot;bitfield.overwrite_alignment&quot;</span><span class="p">)</span>
+<span class="n">B_GROUP_END</span> <span class="o">=</span> <span class="n">Flag</span><span class="p">(</span><span class="s2">&quot;bitfield.group.end&quot;</span><span class="p">)</span>
+<span class="n">B_GROUP_NEW</span> <span class="o">=</span> <span class="n">Flag</span><span class="p">(</span><span class="s2">&quot;bitfield.group.new&quot;</span><span class="p">)</span>
+<span class="n">B_GROUP_KEEP</span> <span class="o">=</span> <span class="n">Flag</span><span class="p">(</span><span class="s2">&quot;bitfield.group.keep&quot;</span><span class="p">)</span>
+<span class="n">B_NO_AUTO_BOOL</span> <span class="o">=</span> <span class="n">Flag</span><span class="p">(</span><span class="s2">&quot;bitfield.no_auto_bool&quot;</span><span class="p">)</span>
 </pre></div>
 
                 </article>

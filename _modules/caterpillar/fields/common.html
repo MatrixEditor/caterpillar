@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>caterpillar.fields.common &#8212; Caterpillar 2.4.5 documentation</title>
+    <title>caterpillar.fields.common &#8212; Caterpillar 2.5.0 documentation</title>
   
   
   
@@ -32,6 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css?v=c1cc8b61" />
   
   <!-- So that users can add custom icons -->
   <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -39,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=159ac128"></script>
+    <script src="../../../_static/documentation_options.js?v=3c4615cf"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -50,7 +51,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.4.5" />
+  <meta name="docsearch:version" content="2.5.0" />
   </head>
   
   
@@ -87,7 +88,6 @@
 
   <div class="pst-async-banner-revealer d-none">
   <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
-  <aside class="bd-header-announcement d-print-none d-none" aria-label="Announcement" data-pst-announcement-url="https://raw.githubusercontent.com/MatrixEditor/caterpillar/master/docs/sphinx/source/_templates/announcement.html"></aside>
 </div>
 
   
@@ -113,7 +113,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.4.5</p>
+    <p class="title logo__title">Caterpillar 2.5.0</p>
   
 </a></div>
     
@@ -394,17 +394,14 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">io</span><span class="w"> </span><span class="kn">import</span> <span class="n">BytesIO</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Callable</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">types</span><span class="w"> </span><span class="kn">import</span> <span class="n">EllipsisType</span><span class="p">,</span> <span class="n">NoneType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">types</span><span class="w"> </span><span class="kn">import</span> <span class="n">NoneType</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">cached_property</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span> <span class="k">as</span> <span class="n">_EnumType</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">uuid</span><span class="w"> </span><span class="kn">import</span> <span class="n">UUID</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.abc</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">_StructLike</span><span class="p">,</span>
-    <span class="n">_ContextLambda</span><span class="p">,</span>
-    <span class="n">getstruct</span><span class="p">,</span>
-    <span class="n">_EnumLike</span><span class="p">,</span>
     <span class="n">_StreamType</span><span class="p">,</span>
     <span class="n">_ContextLike</span><span class="p">,</span>
 <span class="p">)</span>
@@ -418,6 +415,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.byteorder</span><span class="w"> </span><span class="kn">import</span> <span class="n">LittleEndian</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar</span><span class="w"> </span><span class="kn">import</span> <span class="n">registry</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar._common</span><span class="w"> </span><span class="kn">import</span> <span class="n">WithoutContextVar</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.shared</span><span class="w"> </span><span class="kn">import</span> <span class="n">getstruct</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">._base</span><span class="w"> </span><span class="kn">import</span> <span class="n">Field</span><span class="p">,</span> <span class="n">INVALID_DEFAULT</span><span class="p">,</span> <span class="n">singleton</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">._mixin</span><span class="w"> </span><span class="kn">import</span> <span class="n">FieldStruct</span>
@@ -429,7 +427,7 @@
 
 
 <div class="viewcode-block" id="PyStructFormattedField">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.PyStructFormattedField">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.PyStructFormattedField">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">PyStructFormattedField</span><span class="p">(</span><span class="n">FieldStruct</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A field class representing a binary format using format characters (e.g., &#39;i&#39;, &#39;x&#39;, etc.).</span>
@@ -487,7 +485,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ty</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__size__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__size__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculate the size of the field in bytes.</span>
 
@@ -500,8 +498,8 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__bits__</span> <span class="o">//</span> <span class="mi">8</span>
 
 <div class="viewcode-block" id="PyStructFormattedField.pack_single">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.PyStructFormattedField.pack_single">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">pack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.PyStructFormattedField.pack_single">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Pack a single value into the stream using the defined format character.</span>
 
@@ -524,8 +522,8 @@
 
 
 <div class="viewcode-block" id="PyStructFormattedField.pack_seq">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.PyStructFormattedField.pack_seq">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">pack_seq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seq</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.PyStructFormattedField.pack_seq">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pack_seq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seq</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Pack a sequence of values into the stream.</span>
 
@@ -541,8 +539,8 @@
 
 
 <div class="viewcode-block" id="PyStructFormattedField.unpack_single">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.PyStructFormattedField.unpack_single">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">unpack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.PyStructFormattedField.unpack_single">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">unpack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Unpack a single value from the stream.</span>
 
@@ -559,8 +557,8 @@
 
 
 <div class="viewcode-block" id="PyStructFormattedField.unpack_seq">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.PyStructFormattedField.unpack_seq">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">unpack_seq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.PyStructFormattedField.unpack_seq">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">unpack_seq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Unpack a sequence of values from the stream.</span>
 
@@ -584,8 +582,8 @@
 
 
 <div class="viewcode-block" id="PyStructFormattedField.get_length">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.PyStructFormattedField.get_length">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_length</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.PyStructFormattedField.get_length">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_length</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the length of the field, which may be dynamically determined based on the context.</span>
 
@@ -600,7 +598,7 @@
 
 
 <div class="viewcode-block" id="PyStructFormattedField.is_padding">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.PyStructFormattedField.is_padding">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.PyStructFormattedField.is_padding">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">is_padding</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check if the field represents padding.</span>
@@ -638,11 +636,9 @@
 
 <span class="n">void_ptr</span> <span class="o">=</span> <span class="n">PyStructFormattedField</span><span class="p">(</span><span class="s2">&quot;P&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
 
-<span class="n">_ConstType</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
-
 
 <div class="viewcode-block" id="Transformer">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Transformer">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Transformer">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Transformer</span><span class="p">(</span><span class="n">FieldStruct</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A class that acts as a transformer for encoding and decoding data using a wrapped _StructLike object.</span>
@@ -650,15 +646,11 @@
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;struct&quot;</span><span class="p">,)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">struct</span><span class="p">:</span> <span class="n">_StructLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">struct</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">struct</span> <span class="o">=</span> <span class="n">struct</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__bits__</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">struct</span><span class="p">,</span> <span class="s2">&quot;__bits__&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
-    <span class="c1"># TODO: document this</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">__fmt__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">struct</span><span class="o">.</span><span class="n">__fmt__</span><span class="p">()</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">__type__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__type__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the type of the data encoded/decoded by the transformer.</span>
 
@@ -666,7 +658,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">struct</span><span class="o">.</span><span class="n">__type__</span><span class="p">()</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__size__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__size__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the size of the data encoded/decoded by the transformer.</span>
 
@@ -676,8 +668,8 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">struct</span><span class="o">.</span><span class="n">__size__</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Transformer.encode">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Transformer.encode">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Transformer.encode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Encode data using the wrapped _StructLike object.</span>
 
@@ -689,8 +681,8 @@
 
 
 <div class="viewcode-block" id="Transformer.decode">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Transformer.decode">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Transformer.decode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Decode data using the wrapped _StructLike object.</span>
 
@@ -702,8 +694,8 @@
 
 
 <div class="viewcode-block" id="Transformer.pack_single">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Transformer.pack_single">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">pack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Transformer.pack_single">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Pack a single value into the stream using encoding.</span>
 
@@ -715,8 +707,8 @@
 
 
 <div class="viewcode-block" id="Transformer.unpack_single">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Transformer.unpack_single">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">unpack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Transformer.unpack_single">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">unpack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Unpack a single value from the stream and decode it.</span>
 
@@ -730,7 +722,7 @@
 
 
 <div class="viewcode-block" id="Const">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Const">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Const">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Const</span><span class="p">(</span><span class="n">Transformer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A specialized Transformer that enforces a constant value during</span>
@@ -758,13 +750,13 @@
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">,)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">_ConstType</span><span class="p">,</span> <span class="n">struct</span><span class="p">:</span> <span class="n">_StructLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">struct</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">struct</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
 
 <div class="viewcode-block" id="Const.encode">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Const.encode">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Const.encode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Encode data using the constant value. This method will always return</span>
 <span class="sd">        the constant value, regardless of the input. Therefore, :code:`None`</span>
@@ -784,8 +776,8 @@
 
 
 <div class="viewcode-block" id="Const.decode">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Const.decode">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Const.decode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Decode data and ensure it matches the constant value. If the</span>
 <span class="sd">        parsed value doesn&#39;t match, a `ValidationError` is raised.</span>
@@ -813,7 +805,7 @@
 
 
 <div class="viewcode-block" id="Enum">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Enum">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Enum">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Enum</span><span class="p">(</span><span class="n">Transformer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A specialized Transformer for encoding and decoding enumeration values.</span>
@@ -847,15 +839,15 @@
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">model</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span>
-        <span class="n">struct</span><span class="p">:</span> <span class="n">_StructLike</span><span class="p">,</span>
-        <span class="n">default</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">_EnumLike</span> <span class="o">|</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">INVALID_DEFAULT</span><span class="p">,</span>
+        <span class="n">model</span><span class="p">,</span>
+        <span class="n">struct</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="n">INVALID_DEFAULT</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">struct</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="n">default</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__type__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__type__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Determine the type for this transformation, which is either the enum type</span>
 <span class="sd">        or a union of the enum and struct types, depending on the global field flags.</span>
@@ -869,8 +861,8 @@
         <span class="k">return</span> <span class="n">Union</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">struct</span><span class="o">.</span><span class="n">__type__</span><span class="p">()]</span>
 
 <div class="viewcode-block" id="Enum.encode">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Enum.encode">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Enum.encode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Encode an enumeration value into its corresponding encoded representation.</span>
 
@@ -893,8 +885,8 @@
 
 
 <div class="viewcode-block" id="Enum.decode">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Enum.decode">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Enum.decode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Decode an encoded value (typically an integer) back to its corresponding</span>
 <span class="sd">        enumeration value.</span>
@@ -937,10 +929,10 @@
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">_EnumTypeConverter</span><span class="p">(</span><span class="n">registry</span><span class="o">.</span><span class="n">TypeConverter</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">matches</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">annotation</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">matches</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">annotation</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">annotation</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">annotation</span><span class="p">,</span> <span class="n">_EnumType</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">convert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">annotation</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_StructLike</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">convert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">annotation</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="n">struct_obj</span> <span class="o">=</span> <span class="n">getstruct</span><span class="p">(</span><span class="n">annotation</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">struct_obj</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span>
@@ -954,7 +946,7 @@
 
 
 <div class="viewcode-block" id="Memory">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Memory">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Memory">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Memory</span><span class="p">(</span><span class="n">FieldStruct</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A class representing a memory field that handles packing and unpacking byte-like objects</span>
@@ -994,7 +986,7 @@
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">length</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">_ContextLambda</span><span class="p">,</span> <span class="n">EllipsisType</span><span class="p">],</span>
+        <span class="n">length</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="n">length</span>
 
@@ -1006,7 +998,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">memoryview</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__size__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__size__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculate the size of the memory field based on the `length` parameter.</span>
 
@@ -1019,8 +1011,8 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">(</span><span class="n">context</span><span class="p">)</span> <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">)</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span>
 
 <div class="viewcode-block" id="Memory.pack_single">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Memory.pack_single">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">pack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">memoryview</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">],</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Memory.pack_single">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Pack a single byte object (memoryview or bytes) into the stream.</span>
 
@@ -1057,8 +1049,8 @@
 
 
 <div class="viewcode-block" id="Memory.unpack_single">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Memory.unpack_single">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">unpack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Memory.unpack_single">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">unpack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Unpack a single byte object (memoryview) from the stream.</span>
 
@@ -1080,7 +1072,7 @@
 
 
 <div class="viewcode-block" id="Bytes">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Bytes">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Bytes">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Bytes</span><span class="p">(</span><span class="n">Memory</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Byte sequences.</span>
 
@@ -1098,8 +1090,8 @@
         <span class="k">return</span> <span class="nb">bytes</span>
 
 <div class="viewcode-block" id="Bytes.unpack_single">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Bytes.unpack_single">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">unpack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Bytes.unpack_single">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">unpack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Unpack a single byte sequence (bytes) from the stream.</span>
 
@@ -1115,7 +1107,7 @@
 
 
 <div class="viewcode-block" id="String">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.String">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.String">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">String</span><span class="p">(</span><span class="n">Memory</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;String sequences.</span>
 
@@ -1133,8 +1125,8 @@
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">length</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">_ContextLambda</span><span class="p">,</span> <span class="n">EllipsisType</span><span class="p">],</span>
-        <span class="n">encoding</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">length</span><span class="p">,</span>
+        <span class="n">encoding</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">length</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">encoding</span> <span class="o">=</span> <span class="n">encoding</span> <span class="ow">or</span> <span class="s2">&quot;utf-8&quot;</span>
@@ -1148,15 +1140,15 @@
         <span class="k">return</span> <span class="nb">str</span>
 
 <div class="viewcode-block" id="String.pack_single">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.String.pack_single">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">pack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.String.pack_single">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Packs a single string into the stream.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">pack_single</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">encoding</span><span class="p">),</span> <span class="n">context</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="String.unpack_single">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.String.unpack_single">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">unpack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.String.unpack_single">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">unpack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Unpack a single string from the stream.</span>
 
@@ -1169,7 +1161,7 @@
 
 
 <div class="viewcode-block" id="CString">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.CString">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.CString">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">CString</span><span class="p">(</span><span class="n">FieldStruct</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    C-style strings (null-terminated or padded).</span>
@@ -1207,9 +1199,9 @@
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">length</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">_ContextLambda</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">EllipsisType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">encoding</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">pad</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">length</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">encoding</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">pad</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize the String field with a fixed length or a length determined by a context lambda.</span>
@@ -1242,7 +1234,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">CString</span><span class="p">(</span><span class="o">...</span><span class="p">)[</span><span class="n">dim</span><span class="p">]</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__size__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__size__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the size of the `CString` field.</span>
 
@@ -1260,8 +1252,8 @@
         <span class="k">return</span> <span class="nb">str</span>
 
 <div class="viewcode-block" id="CString.pack_single">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.CString.pack_single">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">pack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.CString.pack_single">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Pack a single string into the stream with padding.</span>
 
@@ -1290,8 +1282,8 @@
 
 
 <div class="viewcode-block" id="CString.unpack_single">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.CString.unpack_single">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">unpack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.CString.unpack_single">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">unpack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Unpack a single C-style string from the stream.</span>
 
@@ -1325,7 +1317,7 @@
 
 
 <div class="viewcode-block" id="ConstString">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.ConstString">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.ConstString">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ConstString</span><span class="p">(</span><span class="n">Const</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A specialized constant field for handling fixed string values.</span>
@@ -1361,7 +1353,7 @@
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">encoding</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;value must be a string&quot;</span><span class="p">)</span>
 
@@ -1381,7 +1373,7 @@
 
 
 <div class="viewcode-block" id="ConstBytes">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.ConstBytes">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.ConstBytes">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ConstBytes</span><span class="p">(</span><span class="n">Const</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A constant field for handling fixed bytes values.</span>
@@ -1418,7 +1410,7 @@
 
 
 <div class="viewcode-block" id="Computed">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Computed">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Computed">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Computed</span><span class="p">(</span><span class="n">FieldStruct</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A specialized field for representing computed or dynamically calculated values.</span>
@@ -1445,11 +1437,11 @@
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">,)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">_ConstType</span><span class="p">,</span> <span class="n">_ContextLambda</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__bits__</span> <span class="o">=</span> <span class="mi">0</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__type__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__type__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return the type of the computed field.</span>
 
@@ -1457,7 +1449,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">Any</span> <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="k">else</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__pack__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__pack__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        No packing is needed for computed fields, as the value is computed dynamically.</span>
 
@@ -1469,7 +1461,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__size__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__size__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return the size of the computed field.</span>
 
@@ -1480,7 +1472,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="mi">0</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__unpack__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__unpack__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Unpack the computed value based on the context.</span>
 
@@ -1493,8 +1485,8 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">context</span><span class="p">)</span> <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span>
 
 <div class="viewcode-block" id="Computed.pack_single">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Computed.pack_single">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">pack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Computed.pack_single">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        No packing is needed for computed fields.</span>
 
@@ -1506,8 +1498,8 @@
 
 
 <div class="viewcode-block" id="Computed.unpack_single">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Computed.unpack_single">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">unpack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Computed.unpack_single">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">unpack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        No unpacking is needed for computed fields.</span>
 
@@ -1569,26 +1561,26 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="kc">None</span><span class="o">.</span><span class="vm">__class__</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__pack__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__pack__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">pass</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__size__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__size__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">return</span> <span class="mi">0</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__unpack__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__unpack__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">None</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">pack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># No need for an implementation</span>
         <span class="k">pass</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">unpack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">unpack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># No need for an implementation</span>
         <span class="k">pass</span>
 
 
 <div class="viewcode-block" id="Prefixed">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Prefixed">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Prefixed">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Prefixed</span><span class="p">(</span><span class="n">FieldStruct</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A specialized field for handling data with a prefix (typically indicating length or size).</span>
@@ -1625,9 +1617,9 @@
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">prefix</span><span class="p">:</span> <span class="n">_StructLike</span><span class="p">,</span>
-        <span class="n">struct</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">_StructLike</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">encoding</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="p">,</span>
+        <span class="n">struct</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">encoding</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">prefix</span> <span class="o">=</span> <span class="n">prefix</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">struct</span> <span class="o">=</span> <span class="n">struct</span>
@@ -1640,7 +1632,7 @@
             <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">encoding</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">struct</span> <span class="o">=</span> <span class="n">struct</span><span class="p">,</span> <span class="kc">None</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__type__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">type</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__type__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return the type associated with this Prefixed field.</span>
 
@@ -1651,7 +1643,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">bytes</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">struct</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">struct</span><span class="o">.</span><span class="n">__type__</span><span class="p">()</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__size__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__size__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Prefixed fields do not have a fixed size.</span>
 
@@ -1663,8 +1655,8 @@
         <span class="k">raise</span> <span class="n">DynamicSizeError</span><span class="p">(</span><span class="s2">&quot;Prefixed does not store a size&quot;</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Prefixed.pack_single">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Prefixed.pack_single">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">pack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Prefixed.pack_single">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Pack a single object into the stream, with the prefix indicating the size.</span>
 
@@ -1673,7 +1665,6 @@
 <span class="sd">        :param obj: The object to pack (should be a byte sequence).</span>
 <span class="sd">        :param context: The current context.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># REVISIT: We can only provide a value with __len__ here</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">struct</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">BytesIO</span><span class="p">()</span>
             <span class="k">with</span> <span class="n">WithoutContextVar</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">CTX_STREAM</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
@@ -1689,8 +1680,8 @@
 
 
 <div class="viewcode-block" id="Prefixed.unpack_single">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Prefixed.unpack_single">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">unpack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Prefixed.unpack_single">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">unpack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Unpack a single object from the stream, using the prefix to determine the size.</span>
 
@@ -1721,7 +1712,7 @@
 
 
 <div class="viewcode-block" id="Int">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Int">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Int">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Int</span><span class="p">(</span><span class="n">FieldStruct</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Generic Integer</span>
 
@@ -1735,12 +1726,19 @@
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;signed&quot;</span><span class="p">,</span> <span class="s2">&quot;size&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bits</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">signed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bits</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">signed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">signed</span> <span class="o">=</span> <span class="n">signed</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__bits__</span> <span class="o">=</span> <span class="n">bits</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bits</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid int size: </span><span class="si">{</span><span class="n">bits</span><span class="si">!r}</span><span class="s2"> - expected int&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__bits__</span> <span class="o">//</span> <span class="mi">8</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;int&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">signed</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;u</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;</span><span class="si">{</span><span class="n">name</span><span class="si">}{</span><span class="bp">self</span><span class="o">.</span><span class="n">__bits__</span><span class="si">}</span><span class="s2">&gt;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__type__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1750,7 +1748,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">int</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__size__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__size__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return the size of the integer in bytes.</span>
 
@@ -1760,8 +1758,8 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span>
 
 <div class="viewcode-block" id="Int.pack_single">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Int.pack_single">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">pack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Int.pack_single">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Pack a single integer value into the stream.</span>
 
@@ -1781,8 +1779,8 @@
 
 
 <div class="viewcode-block" id="Int.unpack_single">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Int.unpack_single">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">unpack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Int.unpack_single">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">unpack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Unpack a single integer value from the stream.</span>
 
@@ -1803,7 +1801,7 @@
 
 
 <div class="viewcode-block" id="UInt">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.UInt">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.UInt">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">UInt</span><span class="p">(</span><span class="n">Int</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Generic unsigned integer.&quot;&quot;&quot;</span>
 
@@ -1819,7 +1817,7 @@
 
 
 <div class="viewcode-block" id="Aligned">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Aligned">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Aligned">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Aligned</span><span class="p">(</span><span class="n">FieldStruct</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Alignment of a struct (before or after)</span>
@@ -1863,11 +1861,11 @@
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">struct</span><span class="p">:</span> <span class="n">_StructLike</span><span class="p">,</span>
-        <span class="n">alignment</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">_ContextLambda</span><span class="p">],</span>
-        <span class="n">after</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">before</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">filler</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">struct</span><span class="p">,</span>
+        <span class="n">alignment</span><span class="p">,</span>
+        <span class="n">after</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">before</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">filler</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">before</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">after</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Must specify either before or after&quot;</span><span class="p">)</span>
@@ -1887,7 +1885,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filler</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Filler must be a single byte - got </span><span class="si">{</span><span class="n">filler</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__type__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">type</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__type__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return the type associated with this aligned field.</span>
 
@@ -1895,7 +1893,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">struct</span><span class="o">.</span><span class="n">__type__</span><span class="p">()</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__size__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__size__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculate the size of the aligned field, accounting for padding based on the alignment.</span>
 
@@ -1912,8 +1910,8 @@
         <span class="k">return</span> <span class="n">struct_size</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">alignment</span> <span class="o">-</span> <span class="p">(</span><span class="n">struct_size</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">alignment</span><span class="p">))</span>
 
 <div class="viewcode-block" id="Aligned.unpack_alignment">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Aligned.unpack_alignment">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">unpack_alignment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">):</span>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Aligned.unpack_alignment">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">unpack_alignment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Unpack padding for the alignment, verifying that the correct amount of padding is present.</span>
 
@@ -1938,8 +1936,8 @@
 
 
 <div class="viewcode-block" id="Aligned.unpack_single">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Aligned.unpack_single">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">unpack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Aligned.unpack_single">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">unpack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Unpack a single aligned field from the stream.</span>
 
@@ -1958,8 +1956,8 @@
 
 
 <div class="viewcode-block" id="Aligned.pack_alignment">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Aligned.pack_alignment">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">pack_alignment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">):</span>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Aligned.pack_alignment">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pack_alignment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Apply padding for the alignment before or after the structure, depending on</span>
 <span class="sd">        the `before` and `after` settings.</span>
@@ -1973,8 +1971,8 @@
 
 
 <div class="viewcode-block" id="Aligned.pack_single">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Aligned.pack_single">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">pack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Aligned.pack_single">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Pack a single aligned field into the stream, applying padding if necessary.</span>
 
@@ -1991,8 +1989,8 @@
 
 
 <div class="viewcode-block" id="align">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.align">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">align</span><span class="p">(</span><span class="n">alignment</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">_ContextLambda</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">_ContextLambda</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.align">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">align</span><span class="p">(</span><span class="n">alignment</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Create a context lambda to calculate the alignment padding required at the current stream position.</span>
 
@@ -2017,7 +2015,7 @@
 <span class="sd">    :return: A context lambda function that returns the number of bytes to align the next structure.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_get_aligned_size</span><span class="p">(</span><span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_aligned_size</span><span class="p">(</span><span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">):</span>
         <span class="n">pos</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_STREAM</span><span class="p">]</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
         <span class="n">value</span> <span class="o">=</span> <span class="n">alignment</span><span class="p">(</span><span class="n">context</span><span class="p">)</span> <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">alignment</span><span class="p">)</span> <span class="k">else</span> <span class="n">alignment</span>
         <span class="k">return</span> <span class="n">value</span> <span class="o">-</span> <span class="p">(</span><span class="n">pos</span> <span class="o">%</span> <span class="n">value</span><span class="p">)</span>
@@ -2027,7 +2025,7 @@
 
 
 <div class="viewcode-block" id="Lazy">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Lazy">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Lazy">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Lazy</span><span class="p">(</span><span class="n">FieldStruct</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A lazy field struct that defers the creation of the underlying struct until it is needed.</span>
@@ -2057,7 +2055,7 @@
 <span class="sd">                   when the field is accessed.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">struct</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">_StructLike</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">struct</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">callable</span><span class="p">(</span><span class="n">struct</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;struct must be a callable - got </span><span class="si">{</span><span class="n">struct</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
 
@@ -2075,7 +2073,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">struct_fn</span><span class="p">()</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__bits__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__bits__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the bit representation of the Lazy struct by delegating to the underlying struct.</span>
 
@@ -2084,7 +2082,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">struct</span><span class="o">.</span><span class="n">__bits__</span><span class="p">()</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__type__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__type__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the type associated with the Lazy struct by delegating to the underlying struct.</span>
 
@@ -2093,7 +2091,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">struct</span><span class="o">.</span><span class="n">__type__</span><span class="p">()</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__size__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__size__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the size of the Lazy struct by delegating to the underlying struct.</span>
 
@@ -2104,8 +2102,8 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">struct</span><span class="o">.</span><span class="n">__size__</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Lazy.pack_single">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Lazy.pack_single">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">pack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Lazy.pack_single">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Pack a single value using the Lazy struct by delegating to the underlying struct.</span>
 
@@ -2116,8 +2114,8 @@
 
 
 <div class="viewcode-block" id="Lazy.unpack_single">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Lazy.unpack_single">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">unpack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Lazy.unpack_single">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">unpack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Unpack a single value using the Lazy struct by delegating to the underlying struct.</span>
 
@@ -2130,7 +2128,7 @@
 
 
 <div class="viewcode-block" id="Uuid">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.py.Uuid">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Uuid">[docs]</a>
 <span class="nd">@singleton</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">Uuid</span><span class="p">(</span><span class="n">FieldStruct</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -2163,7 +2161,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">UUID</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__size__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__size__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the size of the UUID field.</span>
 
@@ -2182,7 +2180,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="mi">128</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__pack__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">UUID</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__pack__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">UUID</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Pack a UUID object into the stream.</span>
 
@@ -2195,7 +2193,7 @@
         <span class="n">is_le</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_FIELD</span><span class="p">]</span><span class="o">.</span><span class="n">order</span> <span class="ow">is</span> <span class="n">LittleEndian</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__pack__</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">bytes_le</span> <span class="k">if</span> <span class="n">is_le</span> <span class="k">else</span> <span class="n">obj</span><span class="o">.</span><span class="n">bytes</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__unpack__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UUID</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__unpack__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UUID</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Unpack a UUID from the stream.</span>
 

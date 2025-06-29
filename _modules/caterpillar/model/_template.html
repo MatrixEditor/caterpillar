@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>caterpillar.model._template &#8212; Caterpillar 2.4.5 documentation</title>
+    <title>caterpillar.model._template &#8212; Caterpillar 2.5.0 documentation</title>
   
   
   
@@ -32,6 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css?v=c1cc8b61" />
   
   <!-- So that users can add custom icons -->
   <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -39,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=159ac128"></script>
+    <script src="../../../_static/documentation_options.js?v=3c4615cf"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -50,7 +51,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.4.5" />
+  <meta name="docsearch:version" content="2.5.0" />
   </head>
   
   
@@ -87,7 +88,6 @@
 
   <div class="pst-async-banner-revealer d-none">
   <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
-  <aside class="bd-header-announcement d-print-none d-none" aria-label="Announcement" data-pst-announcement-url="https://raw.githubusercontent.com/MatrixEditor/caterpillar/master/docs/sphinx/source/_templates/announcement.html"></aside>
 </div>
 
   
@@ -113,7 +113,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.4.5</p>
+    <p class="title logo__title">Caterpillar 2.5.0</p>
   
 </a></div>
     
@@ -391,29 +391,20 @@
 <span class="c1">#</span>
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
-
 <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">types</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">dataclasses</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Self</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">TypeVar</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.byteorder</span><span class="w"> </span><span class="kn">import</span> <span class="n">ByteOrder</span><span class="p">,</span> <span class="n">Arch</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">_GreedyType</span><span class="p">,</span> <span class="n">_PrefixedType</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">_ContextLambda</span><span class="p">,</span> <span class="n">_Switch</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">_StructLike</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">_GreedyType</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.fields</span><span class="w"> </span><span class="kn">import</span> <span class="n">Field</span><span class="p">,</span> <span class="n">INVALID_DEFAULT</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.model</span><span class="w"> </span><span class="kn">import</span> <span class="n">Struct</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.options</span><span class="w"> </span><span class="kn">import</span> <span class="n">S_UNION</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.shared</span><span class="w"> </span><span class="kn">import</span> <span class="n">ATTR_TEMPLATE</span>
 
 
 <div class="viewcode-block" id="TemplateTypeVar">
-<a class="viewcode-back" href="../../../library/model.html#caterpillar.model.TemplateTypeVar">[docs]</a>
+<a class="viewcode-back" href="../../../library/model/template.html#caterpillar.model.TemplateTypeVar">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">TemplateTypeVar</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Template type variable.</span>
 
@@ -435,7 +426,7 @@
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The bound name of this type variable&quot;&quot;&quot;</span>
 
-    <span class="n">field_kwds</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="n">field_kwds</span><span class="p">:</span> <span class="nb">dict</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Arguments that will be passed to the created field instance.&quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">field_kwds</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -453,31 +444,29 @@
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;~</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">[</span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s2">]&quot;</span>
 
     <span class="c1"># Now we have to implement all special operators defined in FieldMixin</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">amount</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">_GreedyType</span><span class="p">,</span> <span class="n">_PrefixedType</span><span class="p">,</span> <span class="n">_ContextLambda</span><span class="p">]</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemplateTypeVar</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">amount</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">TemplateTypeVar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">amount</span><span class="o">=</span><span class="n">amount</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">field_kwds</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__rshift__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">switch</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="n">_Switch</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__rshift__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">switch</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">TemplateTypeVar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">switch</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">field_kwds</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__matmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">offset</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">_ContextLambda</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__matmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">offset</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">TemplateTypeVar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="n">offset</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">field_kwds</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__set_byteorder__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">order</span><span class="p">:</span> <span class="n">ByteOrder</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__set_byteorder__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">TemplateTypeVar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">field_kwds</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__rsub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bits</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">_ContextLambda</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__rsub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bits</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">TemplateTypeVar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">bits</span><span class="o">=</span><span class="n">bits</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">field_kwds</span><span class="p">)</span>
 
     <span class="c1"># @scheduled_for_removal</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__floordiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">condition</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">_ContextLambda</span><span class="p">,</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__floordiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">condition</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">TemplateTypeVar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">condition</span><span class="o">=</span><span class="n">condition</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">field_kwds</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">to_field</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">struct</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">_StructLike</span><span class="p">,</span> <span class="n">_ContextLambda</span><span class="p">],</span>
-        <span class="n">arch</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Arch</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">struct</span><span class="p">,</span>
+        <span class="n">arch</span><span class="p">,</span>
         <span class="n">default</span><span class="o">=</span><span class="n">INVALID_DEFAULT</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Field</span><span class="p">:</span>
         <span class="c1"># REVISIT: what about flags?</span>
@@ -503,13 +492,10 @@
         <span class="k">raise</span> <span class="ne">ModuleNotFoundError</span><span class="p">(</span><span class="s2">&quot;Could not load module from caller!&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
 
 
-<span class="n">TEMPLATE_ATTR</span> <span class="o">=</span> <span class="s2">&quot;__template__&quot;</span>
-
-
 <span class="nd">@dataclasses</span><span class="o">.</span><span class="n">dataclass</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">TemplateInfo</span><span class="p">:</span>
-    <span class="n">required_tys</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">_StructLike</span><span class="p">]</span>
-    <span class="n">positional_tys</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">_StructLike</span><span class="p">]</span>
+    <span class="n">required_tys</span><span class="p">:</span> <span class="nb">dict</span>
+    <span class="n">positional_tys</span><span class="p">:</span> <span class="nb">dict</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">is_defined</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">required_tys</span><span class="p">)</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positional_tys</span><span class="p">)</span>
@@ -526,16 +512,16 @@
 
 
 <div class="viewcode-block" id="istemplate">
-<a class="viewcode-back" href="../../../library/model.html#caterpillar.model.istemplate">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">istemplate</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../library/model/template.html#caterpillar.model.istemplate">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">istemplate</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return true if the object is a template.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">TEMPLATE_ATTR</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">ATTR_TEMPLATE</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="template">
-<a class="viewcode-back" href="../../../library/model.html#caterpillar.model.template">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">template</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">TemplateTypeVar</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">type</span><span class="p">],</span> <span class="nb">type</span><span class="p">]:</span>
+<a class="viewcode-back" href="../../../library/model/template.html#caterpillar.model.template">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">template</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Defines required template type variables if necessary and prepares</span>
 <span class="sd">    template class definition.</span>
@@ -583,14 +569,14 @@
         <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">disposable</span><span class="p">:</span>
             <span class="c1"># Only temporary template vars will be removed</span>
             <span class="nb">delattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
-        <span class="nb">setattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">TEMPLATE_ATTR</span><span class="p">,</span> <span class="n">info</span><span class="p">)</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">ATTR_TEMPLATE</span><span class="p">,</span> <span class="n">info</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">cls</span>
 
     <span class="k">return</span> <span class="n">create_template_class</span></div>
 
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">get_mangled_name</span><span class="p">(</span><span class="n">model_ty</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span> <span class="n">annotations</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_mangled_name</span><span class="p">(</span><span class="n">model_ty</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span> <span class="n">annotations</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="n">ty_name</span> <span class="o">=</span> <span class="n">model_ty</span><span class="o">.</span><span class="vm">__name__</span>
     <span class="n">parts</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">annotations</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -601,9 +587,9 @@
 
 
 <div class="viewcode-block" id="derive">
-<a class="viewcode-back" href="../../../library/model.html#caterpillar.model.derive">[docs]</a>
+<a class="viewcode-back" href="../../../library/model/template.html#caterpillar.model.derive">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">derive</span><span class="p">(</span>
-    <span class="n">template_ty</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span> <span class="o">*</span><span class="n">tys_args</span><span class="p">,</span> <span class="n">partial</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">union</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">tys_kwargs</span>
+    <span class="n">template_ty</span><span class="p">,</span> <span class="o">*</span><span class="n">tys_args</span><span class="p">,</span> <span class="n">partial</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">union</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">tys_kwargs</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates a new struct class based on the given template class.</span>
 
@@ -626,7 +612,7 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="n">istemplate</span><span class="p">(</span><span class="n">template_ty</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">template_ty</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> is not a template class!&quot;</span><span class="p">)</span>
 
-    <span class="n">info</span><span class="p">:</span> <span class="n">TemplateInfo</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">template_ty</span><span class="p">,</span> <span class="n">TEMPLATE_ATTR</span><span class="p">)</span>
+    <span class="n">info</span><span class="p">:</span> <span class="n">TemplateInfo</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">template_ty</span><span class="p">,</span> <span class="n">ATTR_TEMPLATE</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tys_args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">required_tys</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;Expected max. </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">required_tys</span><span class="p">)</span><span class="si">}</span><span class="s2"> positional arguments - got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">tys_args</span><span class="p">)</span><span class="si">}</span><span class="s2">!&quot;</span>
@@ -710,7 +696,7 @@
                 <span class="n">new_info</span><span class="o">.</span><span class="n">required_tys</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">replacement</span>
             <span class="k">elif</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">info</span><span class="o">.</span><span class="n">positional_tys</span><span class="p">:</span>
                 <span class="n">new_info</span><span class="o">.</span><span class="n">positional_tys</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">replacement</span>
-        <span class="nb">setattr</span><span class="p">(</span><span class="n">new_ty</span><span class="p">,</span> <span class="n">TEMPLATE_ATTR</span><span class="p">,</span> <span class="n">new_info</span><span class="p">)</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="n">new_ty</span><span class="p">,</span> <span class="n">ATTR_TEMPLATE</span><span class="p">,</span> <span class="n">new_info</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">new_ty</span></div>
 
 </pre></div>

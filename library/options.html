@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Options &#8212; Caterpillar 2.4.5 documentation</title>
+    <title>4.2. Options / Flags &#8212; Caterpillar 2.5.0 documentation</title>
   
   
   
@@ -33,6 +33,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=c1cc8b61" />
   
   <!-- So that users can add custom icons -->
   <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -40,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=159ac128"></script>
+    <script src="../_static/documentation_options.js?v=3c4615cf"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,11 +50,11 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'library/options';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Abstract base classes" href="abc.html" />
-    <link rel="prev" title="Byteorder and Architecture" href="byteorder.html" />
+    <link rel="next" title="4.3. Context" href="context.html" />
+    <link rel="prev" title="4.1. Byteorder and Architecture" href="byteorder.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.4.5" />
+  <meta name="docsearch:version" content="2.5.0" />
   </head>
   
   
@@ -90,7 +91,6 @@
 
   <div class="pst-async-banner-revealer d-none">
   <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
-  <aside class="bd-header-announcement d-print-none d-none" aria-label="Announcement" data-pst-announcement-url="https://raw.githubusercontent.com/MatrixEditor/caterpillar/master/docs/sphinx/source/_templates/announcement.html"></aside>
 </div>
 
   
@@ -116,7 +116,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.4.5</p>
+    <p class="title logo__title">Caterpillar 2.5.0</p>
   
 </a></div>
     
@@ -332,24 +332,30 @@
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Python API</span></p>
 <ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="byteorder.html">Byteorder and Architecture</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Options</a></li>
-<li class="toctree-l1"><a class="reference internal" href="abc.html">Abstract base classes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="context.html">Context</a></li>
-<li class="toctree-l1"><a class="reference internal" href="exceptions.html">Exceptions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="model.html">Struct Model</a></li>
-<li class="toctree-l1"><a class="reference internal" href="registry.html">Annotation Registry</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="fields/index.html">Fields</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="fields/field_model.html">Field Model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fields/common.html">Common Structs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fields/compression.html">Compression Structs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fields/crypto.html">Cryptographic Structs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="byteorder.html">4.1. Byteorder and Architecture</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">4.2. Options / Flags</a></li>
+<li class="toctree-l1"><a class="reference internal" href="context.html">4.3. Context</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exceptions.html">4.4. Exceptions</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="model.html">4.5. Struct Model</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="model/sequence.html">4.5.1. Sequence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model/struct.html">4.5.2. Struct</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model/bitfield.html">4.5.3. Bitfield</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model/template.html">4.5.4. Templates</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="registry.html">4.6. Annotation Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="shared.html">4.7. Shared Concepts</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="fields/index.html">4.8. Fields</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="fields/field_model.html">4.8.1. Field Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fields/common.html">4.8.2. Common Structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fields/compression.html">4.8.3. Compression Structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fields/crypto.html">4.8.4. Cryptographic Structs</a></li>
 </ul>
 </details></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">C API Python Types</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="ctypes/int.html">Integer Types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ctypes/int.html">5.1. Integer Types</a></li>
 </ul>
 </div>
 </nav></div>
@@ -391,9 +397,9 @@
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Library</a></li>
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link"><span class="section-number">4. </span>Library</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Options</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">4.2. </span>Options / Flags</span></li>
   </ul>
 </nav>
 </div>
@@ -410,30 +416,36 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="options">
-<span id="id1"></span><h1>Options<a class="headerlink" href="#options" title="Link to this heading">#</a></h1>
-<p><em>TODO</em></p>
+  <section id="options-flags">
+<span id="options"></span><h1><span class="section-number">4.2. </span>Options / Flags<a class="headerlink" href="#options-flags" title="Link to this heading">#</a></h1>
+<p>This library provides a flexible system of options and flags to control various aspects
+of data structures, serialization, and deserialization behaviors. Options can be set
+globally or applied to specific types to fine-tune performance, memory usage, and
+structure representation.</p>
 <section id="options-by-type">
-<h2>Options by type<a class="headerlink" href="#options-by-type" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">4.2.1. </span>Options by Type<a class="headerlink" href="#options-by-type" title="Link to this heading">#</a></h2>
+<p>Options are grouped by the type of object they affect.</p>
 <section id="global-options">
-<h3>Global options<a class="headerlink" href="#global-options" title="Link to this heading">#</a></h3>
-<dl class="py data">
+<h3><span class="section-number">4.2.1.1. </span>Global Options<a class="headerlink" href="#global-options" title="Link to this heading">#</a></h3>
+<dl class="py attribute">
 <dt class="sig sig-object py" id="caterpillar.options.O_ARRAY_FACTORY">
 <span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">O_ARRAY_FACTORY</span></span><a class="headerlink" href="#caterpillar.options.O_ARRAY_FACTORY" title="Link to this definition">#</a></dt>
-<dd><p>To control the returned array type, a factory class or method can be set
-in this option using its attached value. For instance, we can incorporate
-the <code class="code docutils literal notranslate"><span class="pre">numpy.ndarray</span></code> into our unpacked objects:</p>
+<dd><p>Specifies a factory function or class for creating array instances. This allows you
+to replace the default array type with a more efficient or specialized implementation.
+For example, you can use <code class="code docutils literal notranslate"><span class="pre">numpy.ndarray</span></code> for large numeric arrays to reduce
+memory usage:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.options</span><span class="w"> </span><span class="kn">import</span> <span class="n">O_ARRAY_FACTORY</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="n">array</span>
 
-<span class="c1"># just set the option&#39;s value</span>
+<span class="c1"># Set the array factory globally</span>
 <span class="n">O_ARRAY_FACTORY</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">array</span>
 </pre></div>
 </div>
-<p>With the new configuration applied, your unpacked objects will occupy less
-memory space. The following table shows the size of unpacked objects in bytes:</p>
-<div class="pst-scrollable-table-container"><table class="table" id="id4">
-<caption><span class="caption-text">Object sizes between different configuration options</span><a class="headerlink" href="#id4" title="Link to this table">#</a></caption>
+<p>With this configuration, unpacked arrays will use the specified factory, potentially
+leading to significant memory savings. The following table demonstrates the memory
+footprint of unpacked objects under different configurations:</p>
+<div class="pst-scrollable-table-container"><table class="table" id="id3">
+<caption><span class="caption-text">Object sizes for different configuration options</span><a class="headerlink" href="#id3" title="Link to this table">#</a></caption>
 <colgroup>
 <col style="width: 25.0%" />
 <col style="width: 37.5%" />
@@ -442,7 +454,7 @@ memory space. The following table shows the size of unpacked objects in bytes:</
 <thead>
 <tr class="row-odd"><th class="head stub"><p>Configuration</p></th>
 <th class="head"><p><code class="code docutils literal notranslate"><span class="pre">formats/nibarchive</span></code></p></th>
-<th class="head"><p><code class="code docutils literal notranslate"><span class="pre">formats/caf</span></code> <a class="footnote-reference brackets" href="#id3" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>*<span class="fn-bracket">]</span></a></p></th>
+<th class="head"><p><code class="code docutils literal notranslate"><span class="pre">formats/caf</span></code> <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>*<span class="fn-bracket">]</span></a></p></th>
 </tr>
 </thead>
 <tbody>
@@ -454,15 +466,15 @@ memory space. The following table shows the size of unpacked objects in bytes:</
 <td><p>14240</p></td>
 <td><p>3848</p></td>
 </tr>
-<tr class="row-even"><th class="stub"><p>Default configuration and <code class="code docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p></th>
+<tr class="row-even"><th class="stub"><p>Default configuration with <code class="code docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p></th>
 <td><p>7520</p></td>
 <td><p>1232</p></td>
 </tr>
-<tr class="row-odd"><th class="stub"><p><code class="code docutils literal notranslate"><span class="pre">__slots__</span></code> classes and <code class="code docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p></th>
+<tr class="row-odd"><th class="stub"><p><code class="code docutils literal notranslate"><span class="pre">__slots__</span></code> classes with <code class="code docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p></th>
 <td><p>6152</p></td>
 <td><p>384</p></td>
 </tr>
-<tr class="row-even"><th class="stub"><p>Original filesize</p></th>
+<tr class="row-even"><th class="stub"><p>Original file size</p></th>
 <td><p><strong>1157</strong></p></td>
 <td><p><strong>5433</strong></p></td>
 </tr>
@@ -472,32 +484,31 @@ memory space. The following table shows the size of unpacked objects in bytes:</
 </dd></dl>
 
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id3" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">*</a><span class="fn-bracket">]</span></span>
-<p>A CAF audio comes with a special chunk type that stores only zeros. By ingoring
-the data in this chunk, we can achieve less bytes in memory than the file originally used.</p>
+<aside class="footnote brackets" id="id2" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">*</a><span class="fn-bracket">]</span></span>
+<p>A CAF audio file may include a chunk that contains only zeroed data. By ignoring
+this chunk during unpacking, the in-memory size can be smaller than the original file.</p>
 </aside>
 </aside>
 </section>
 <section id="sequence-options">
-<h3>Sequence options<a class="headerlink" href="#sequence-options" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">4.2.1.2. </span>Sequence Options<a class="headerlink" href="#sequence-options" title="Link to this heading">#</a></h3>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>All sequence-related configuration options are applied to structs as well.</p>
+<p>All sequence-related options also apply to structs.</p>
 </div>
-<dl class="py data">
+<dl class="py attribute">
 <dt class="sig sig-object py" id="caterpillar.options.S_DISCARD_UNNAMED">
 <span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">S_DISCARD_UNNAMED</span></span><a class="headerlink" href="#caterpillar.options.S_DISCARD_UNNAMED" title="Link to this definition">#</a></dt>
-<dd><p>Using this option, all <em>unnamed</em> fields will be discarded and won’t be
-visible in the final result object. An <em>unnamed</em> field must follow the
-following naming convention:</p>
+<dd><p>When enabled, this option discards all <em>unnamed</em> fields from the final unpacked result.
+An <em>unnamed</em> field must follow the convention:</p>
 <div class="highlight-bnf notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nc">unnamed</span><span class="p">&gt;</span> := &#39;_&#39; [0-9]*
 </pre></div>
 </div>
-<p>Therefore, it is possible to include more than one unnamed field, for
-example:</p>
-<div class="literal-block-wrapper docutils container" id="id5">
-<div class="code-block-caption"><span class="caption-text">Simple sequence with an unnamed field</span><a class="headerlink" href="#id5" title="Link to this code">#</a></div>
+<p>This allows you to include padding or other non-essential fields without polluting
+the output. For example:</p>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">Sequence with an unnamed field</span><a class="headerlink" href="#id4" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span> <span class="o">=</span> <span class="n">Seq</span><span class="p">({</span>
 <span class="gp">... </span>    <span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="n">uint8</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="s2">&quot;_&quot;</span><span class="p">:</span> <span class="n">padding</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span>
@@ -515,17 +526,19 @@ example:</p>
 <dl class="py data">
 <dt class="sig sig-object py" id="caterpillar.options.S_DISCARD_CONST">
 <span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">S_DISCARD_CONST</span></span><a class="headerlink" href="#caterpillar.options.S_DISCARD_CONST" title="Link to this definition">#</a></dt>
-<dd><p>This option will only discard constant fields.</p>
+<dd><p>Discards all constant fields from the final result. This is useful for fields
+that serve only validation or padding purposes.</p>
 </dd></dl>
 
 </section>
 <section id="struct-options">
-<h3>Struct options<a class="headerlink" href="#struct-options" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">4.2.1.3. </span>Struct Options<a class="headerlink" href="#struct-options" title="Link to this heading">#</a></h3>
 <dl class="py data">
 <dt class="sig sig-object py" id="caterpillar.options.S_SLOTS">
 <span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">S_SLOTS</span></span><a class="headerlink" href="#caterpillar.options.S_SLOTS" title="Link to this definition">#</a></dt>
-<dd><p>Feature option that will create a new class with the <code class="code docutils literal notranslate"><span class="pre">__slots__</span></code> attribute
-to lower required space. Take the following two structs into consideration:</p>
+<dd><p>When enabled, this option generates a struct class with a <code class="code docutils literal notranslate"><span class="pre">__slots__</span></code> declaration.
+Using <code class="code docutils literal notranslate"><span class="pre">__slots__</span></code> significantly reduces the per-object memory overhead by preventing
+the creation of an instance <code class="code docutils literal notranslate"><span class="pre">__dict__</span></code>. For example:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">DictClass</span><span class="p">:</span>
     <span class="n">a</span><span class="p">:</span> <span class="n">uint8</span>
@@ -547,11 +560,9 @@ to lower required space. Take the following two structs into consideration:</p>
     <span class="n">g</span><span class="p">:</span> <span class="n">uint8</span>
 </pre></div>
 </div>
-<p>Each struct stores seven fields in total, whereby <code class="code docutils literal notranslate"><span class="pre">Format2</span></code> uses <code class="code docutils literal notranslate"><span class="pre">__slots__</span></code>
-to store each member. We used <a class="reference external" href="https://pympler.readthedocs.io/en/latest/">pympler</a> to
-retrieve the amount of occupied bytes per object:</p>
-<div class="literal-block-wrapper docutils container" id="id6">
-<div class="code-block-caption"><span class="caption-text">Size difference between a <code class="code docutils literal notranslate"><span class="pre">__slots__</span></code> class and a normal Python class</span><a class="headerlink" href="#id6" title="Link to this code">#</a></div>
+<p>Comparing memory usage using <a class="reference external" href="https://pympler.readthedocs.io/en/latest/">pympler</a>:</p>
+<div class="literal-block-wrapper docutils container" id="id5">
+<div class="code-block-caption"><span class="caption-text">Memory usage difference with <code class="code docutils literal notranslate"><span class="pre">__slots__</span></code></span><a class="headerlink" href="#id5" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">o1</span> <span class="o">=</span> <span class="n">DictClass</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="mh">0xFF</span><span class="p">]</span><span class="o">*</span><span class="mi">7</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">asizeof</span><span class="o">.</span><span class="n">asizeof</span><span class="p">(</span><span class="n">o1</span><span class="p">)</span>
 <span class="go">712</span>
@@ -561,8 +572,7 @@ retrieve the amount of occupied bytes per object:</p>
 </pre></div>
 </div>
 </div>
-<p>In addition, the overall used memory will be reduced, because the defined type will
-also occupy less memory:</p>
+<p>The class definition itself also occupies less memory:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">sys</span><span class="w"> </span><span class="kn">import</span> <span class="n">getsizeof</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">getsizeof</span><span class="p">(</span><span class="n">DictClass</span><span class="p">)</span>
 <span class="go">1704</span>
@@ -575,27 +585,25 @@ also occupy less memory:</p>
 <dl class="py data">
 <dt class="sig sig-object py" id="caterpillar.options.S_REPLACE_TYPES">
 <span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">S_REPLACE_TYPES</span></span><a class="headerlink" href="#caterpillar.options.S_REPLACE_TYPES" title="Link to this definition">#</a></dt>
-<dd><p>This option was designed for documentation purposes only and should be
-used in that context only. It will alter the class’ annotations and remove
-all <code class="xref py py-class docutils literal notranslate"><span class="pre">caterpillar.fields.Field</span></code> instances.</p>
-<p>Consider the following struct:</p>
+<dd><p>Replaces field types in the class annotations with their native Python equivalents.
+This option is primarily intended for documentation purposes. It removes all
+<a class="reference internal" href="fields/field_model.html#caterpillar.fields.Field" title="caterpillar.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">caterpillar.fields.Field</span></code></a> instances from annotations. For example:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
     <span class="n">a</span><span class="p">:</span> <span class="n">uint8</span>
     <span class="n">b</span><span class="p">:</span> <span class="n">String</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
-    <span class="n">c</span><span class="p">:</span> <span class="n">uuid</span>
+    <span class="n">c</span><span class="p">:</span> <span class="n">Uuid</span>
 
-<span class="c1"># use the following line to enable type replacement globally</span>
+<span class="c1"># Enable type replacement globally</span>
 <span class="n">opt</span><span class="o">.</span><span class="n">set_struct_flags</span><span class="p">(</span><span class="n">opt</span><span class="o">.</span><span class="n">S_REPLACE_TYPES</span><span class="p">)</span>
-<span class="c1"># otherwise, just add options={opt.S_REPLACE_TYPES} to the</span>
-<span class="c1"># @struct call.</span>
+<span class="c1"># Or apply it directly:</span>
+<span class="nd">@struct</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="n">opt</span><span class="o">.</span><span class="n">S_REPLACE_TYPES</span><span class="p">})</span>
 </pre></div>
 </div>
-<p>You will notice the difference in the following output on disabled
-type replacement (1) and enabled replacement (2):</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Format</span><span class="o">.</span><span class="vm">__annotations__</span> <span class="c1"># (1)</span>
-<span class="go">{&#39;a&#39;: &lt;FormatField(int) &#39;B&#39;&gt;, &#39;b&#39;: &lt;String&gt;, &#39;c&#39;: &lt;uuid&gt;}</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">Format</span><span class="o">.</span><span class="vm">__annotations__</span> <span class="c1"># (2)</span>
+<p>Comparison of annotations:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Format</span><span class="o">.</span><span class="vm">__annotations__</span> <span class="c1"># Without replacement</span>
+<span class="go">{&#39;a&#39;: &lt;FormatField(int) &#39;B&#39;&gt;, &#39;b&#39;: &lt;String&gt;, &#39;c&#39;: &lt;Uuid&gt;}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Format</span><span class="o">.</span><span class="vm">__annotations__</span> <span class="c1"># With replacement</span>
 <span class="go">{&#39;a&#39;: &lt;class &#39;int&#39;&gt;, &#39;b&#39;: &lt;class &#39;str&#39;&gt;, &#39;c&#39;: &lt;class &#39;uuid.UUID&#39;&gt;}</span>
 </pre></div>
 </div>
@@ -604,51 +612,152 @@ type replacement (1) and enabled replacement (2):</p>
 <dl class="py data">
 <dt class="sig sig-object py" id="caterpillar.options.S_EVAL_ANNOTATIONS">
 <span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">S_EVAL_ANNOTATIONS</span></span><a class="headerlink" href="#caterpillar.options.S_EVAL_ANNOTATIONS" title="Link to this definition">#</a></dt>
-<dd><p>If you decide to use <code class="code docutils literal notranslate"><span class="pre">from</span> <span class="pre">__future__</span> <span class="pre">import</span> <span class="pre">annotations</span></code>, you have to set this
-option for each struct in the scope of this import, because it will stringify all
-placed annotations. Therefore, they need to be executed before analyzed.</p>
+<dd><p>Ensures that annotations are evaluated at runtime if you use
+<code class="code docutils literal notranslate"><span class="pre">from</span> <span class="pre">__future__</span> <span class="pre">import</span> <span class="pre">annotations</span></code>. When enabled, stringified annotations
+are evaluated before analysis.</p>
 <div class="admonition caution">
 <p class="admonition-title">Caution</p>
-<p>Use this option with caution! It may result in execution of untrusted code, be aware!</p>
+<p>Use with care! Evaluating annotations can lead to the execution of untrusted code.</p>
 </div>
 </dd></dl>
 
 <dl class="py data">
 <dt class="sig sig-object py" id="caterpillar.options.S_UNION">
 <span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">S_UNION</span></span><a class="headerlink" href="#caterpillar.options.S_UNION" title="Link to this definition">#</a></dt>
-<dd><p>Internal option to add union behaviour to the <code class="code docutils literal notranslate"><span class="pre">caterpillar.model.Struct</span></code> class.</p>
+<dd><p>Internal option that enables union behavior for the <a class="reference internal" href="model/struct.html#caterpillar.model.Struct" title="caterpillar.model.Struct"><code class="xref py py-class docutils literal notranslate"><span class="pre">caterpillar.model.Struct</span></code></a> class.</p>
 </dd></dl>
 
 </section>
 <section id="field-options">
-<h3>Field options<a class="headerlink" href="#field-options" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">4.2.1.4. </span>Field Options<a class="headerlink" href="#field-options" title="Link to this heading">#</a></h3>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caterpillar.options.F_KEEP_POSITION">
 <span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">F_KEEP_POSITION</span></span><a class="headerlink" href="#caterpillar.options.F_KEEP_POSITION" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>When enabled, this option retains the position information of each field in the
+serialized data. This is the default behavior.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caterpillar.options.F_DYNAMIC">
 <span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">F_DYNAMIC</span></span><a class="headerlink" href="#caterpillar.options.F_DYNAMIC" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Marks the field as dynamic, indicating that its size or format is determined at
+runtime rather than being statically defined. This is used internally to support
+advanced features like variable-length fields.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caterpillar.options.F_SEQUENTIAL">
 <span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">F_SEQUENTIAL</span></span><a class="headerlink" href="#caterpillar.options.F_SEQUENTIAL" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Indicates that this field should be processed sequentially relative to other
+fields, ensuring that order-dependent parsing or packing logic is respected.
+This is primarily for internal use in complex layouts.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caterpillar.options.F_OFFSET_OVERRIDE">
 <span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">F_OFFSET_OVERRIDE</span></span><a class="headerlink" href="#caterpillar.options.F_OFFSET_OVERRIDE" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Allows you to override the calculated offset for this field within its parent
+structure. This means, the offset used by the <a class="reference internal" href="../reference/operators.html#struct.__matmul__" title="struct.__matmul__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">struct.__matmul__()</span></code></a>
+operation will be used from here on.</p>
+</dd></dl>
+
+</section>
+<section id="bit-field-options">
+<h3><span class="section-number">4.2.1.5. </span>Bit-field Options<a class="headerlink" href="#bit-field-options" title="Link to this heading">#</a></h3>
+<p>Bit-field options provide fine-grained control over the alignment, grouping,
+and interpretation of individual fields and entire bit-field classes.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.options.B_OVERWRITE_ALIGNMENT">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">B_OVERWRITE_ALIGNMENT</span></span><a class="headerlink" href="#caterpillar.options.B_OVERWRITE_ALIGNMENT" title="Link to this definition">#</a></dt>
+<dd><p>Replaces the current alignment with the alignment explicitly defined by the field.
+This option is applicable only to fields within a bit-field class.</p>
+<p>For example, the following structure overrides the default alignment of 8 bits
+with a 32-bit alignment for the specified field:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@bitfield</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
+    <span class="c1"># Override alignment from 8 bits to 32 bits</span>
+    <span class="n">a</span><span class="p">:</span> <span class="mi">4</span> <span class="o">-</span> <span class="n">uint32</span> <span class="o">|</span> <span class="n">B_OVERWRITE_ALIGNMENT</span>
+</pre></div>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.5.0.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.options.B_GROUP_END">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">B_GROUP_END</span></span><a class="headerlink" href="#caterpillar.options.B_GROUP_END" title="Link to this definition">#</a></dt>
+<dd><p>Adds the annotated field to the current bit-field group and immediately aligns
+the group’s total size according to the active alignment constraints.
+This option is applicable only to fields.</p>
+<p>For example, to avoid automatic alignment to the next multiple of 16 bits:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@bitfield</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
+    <span class="n">a1</span><span class="p">:</span> <span class="mi">4</span>
+    <span class="n">a2</span><span class="p">:</span> <span class="mi">3</span>
+    <span class="c1"># Prevent automatic alignment to 16 bits:</span>
+    <span class="n">a3</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">B_GROUP_END</span><span class="p">)</span>
+    <span class="n">b1</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.5.0.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.options.B_GROUP_NEW">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">B_GROUP_NEW</span></span><a class="headerlink" href="#caterpillar.options.B_GROUP_NEW" title="Link to this definition">#</a></dt>
+<dd><p>Finalizes the current bit-field group by aligning it, then starts a new group
+and adds the annotated field to this new group.
+This option is applicable only to fields.</p>
+<p>Example usage where a new group is started with its own alignment:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@bitfield</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
+    <span class="n">a1</span><span class="p">:</span> <span class="mi">4</span>
+    <span class="n">a2</span><span class="p">:</span> <span class="mi">4</span>
+    <span class="c1"># Finalize current group and start new one with 8-bit alignment:</span>
+    <span class="n">b1</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">B_GROUP_NEW</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.5.0.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.options.B_GROUP_KEEP">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">B_GROUP_KEEP</span></span><a class="headerlink" href="#caterpillar.options.B_GROUP_KEEP" title="Link to this definition">#</a></dt>
+<dd><p><em>Applicable only to classes.</em></p>
+<p>When applied at the class level, this option instructs the bit-field structure
+to preserve existing group alignments throughout parsing and packing.
+It affects how alignment statements are interpreted within the class body.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.5.0.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.options.B_NO_AUTO_BOOL">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">B_NO_AUTO_BOOL</span></span><a class="headerlink" href="#caterpillar.options.B_NO_AUTO_BOOL" title="Link to this definition">#</a></dt>
+<dd><p><em>Applicable only to classes.</em></p>
+<p>Prevents the automatic assignment of a boolean type factory for fields
+that are exactly one bit in size. By default, one-bit fields are treated
+as boolean values; enabling this option disables that behavior, preserving
+the raw integer representation instead.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.5.0.</span></p>
+</div>
+</dd></dl>
 
 </section>
 </section>
 <section id="interface">
-<h2>Interface<a class="headerlink" href="#interface" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">4.2.2. </span>Interface<a class="headerlink" href="#interface" title="Link to this heading">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="caterpillar.options.Flag">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">Flag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caterpillar/options.html#Flag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.options.Flag" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">Flag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caterpillar/options.html#Flag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.options.Flag" title="Link to this definition">#</a></dt>
 <dd><p>Simple customizable user-flag.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caterpillar.options.Flag.name">
@@ -658,7 +767,7 @@ placed annotations. Therefore, they need to be executed before analyzed.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caterpillar.options.Flag.value">
-<span class="sig-name descname"><span class="pre">value</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#caterpillar.options.Flag.value" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">value</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Any</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#caterpillar.options.Flag.value" title="Link to this definition">#</a></dt>
 <dd><p>Optional configuration value.</p>
 </dd></dl>
 
@@ -666,7 +775,7 @@ placed annotations. Therefore, they need to be executed before analyzed.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="caterpillar.options.configure">
-<span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">configure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#caterpillar.options.Flag" title="caterpillar.options.Flag"><span class="pre">Flag</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">flags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#caterpillar.options.Flag" title="caterpillar.options.Flag"><span class="pre">Flag</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/caterpillar/options.html#configure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.options.configure" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">configure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">flags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#caterpillar.options.Flag" title="caterpillar.options.Flag"><span class="pre">Flag</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/caterpillar/options.html#configure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.options.configure" title="Link to this definition">#</a></dt>
 <dd><p>Update the base set of flags with additional flags.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -716,7 +825,7 @@ placed annotations. Therefore, they need to be executed before analyzed.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="caterpillar.options.get_flags">
-<span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">get_flags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#caterpillar.options.Flag" title="caterpillar.options.Flag"><span class="pre">Flag</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/caterpillar/options.html#get_flags"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.options.get_flags" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">get_flags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caterpillar/options.html#get_flags"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.options.get_flags" title="Link to this definition">#</a></dt>
 <dd><p>Get the flags associated with an object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -733,7 +842,7 @@ placed annotations. Therefore, they need to be executed before analyzed.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="caterpillar.options.has_flag">
-<span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">has_flag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#caterpillar.options.Flag" title="caterpillar.options.Flag"><span class="pre">Flag</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/caterpillar/options.html#has_flag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.options.has_flag" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">has_flag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/caterpillar/options.html#has_flag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.options.has_flag" title="Link to this definition">#</a></dt>
 <dd><p>Check if an object has a specific flag.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -751,7 +860,7 @@ placed annotations. Therefore, they need to be executed before analyzed.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="caterpillar.options.get_flag">
-<span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">get_flag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#caterpillar.options.Flag" title="caterpillar.options.Flag"><span class="pre">Flag</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/caterpillar/options.html#get_flag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.options.get_flag" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">get_flag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caterpillar/options.html#get_flag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.options.get_flag" title="Link to this definition">#</a></dt>
 <dd><p>Get a specific flag associated with an object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -786,15 +895,15 @@ placed annotations. Therefore, they need to be executed before analyzed.</p>
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Byteorder and Architecture</p>
+        <p class="prev-next-title"><span class="section-number">4.1. </span>Byteorder and Architecture</p>
       </div>
     </a>
     <a class="right-next"
-       href="abc.html"
+       href="context.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Abstract base classes</p>
+        <p class="prev-next-title"><span class="section-number">4.3. </span>Context</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -817,33 +926,41 @@ placed annotations. Therefore, they need to be executed before analyzed.</p>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#options-by-type">Options by type</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#global-options">Global options</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#options-by-type">4.2.1. Options by Type</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#global-options">4.2.1.1. Global Options</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.options.O_ARRAY_FACTORY"><code class="docutils literal notranslate"><span class="pre">caterpillar.options.O_ARRAY_FACTORY</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sequence-options">Sequence options</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sequence-options">4.2.1.2. Sequence Options</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.options.S_DISCARD_UNNAMED"><code class="docutils literal notranslate"><span class="pre">caterpillar.options.S_DISCARD_UNNAMED</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.options.S_DISCARD_CONST"><code class="docutils literal notranslate"><span class="pre">caterpillar.options.S_DISCARD_CONST</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#struct-options">Struct options</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#struct-options">4.2.1.3. Struct Options</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.options.S_SLOTS"><code class="docutils literal notranslate"><span class="pre">caterpillar.options.S_SLOTS</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.options.S_REPLACE_TYPES"><code class="docutils literal notranslate"><span class="pre">caterpillar.options.S_REPLACE_TYPES</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.options.S_EVAL_ANNOTATIONS"><code class="docutils literal notranslate"><span class="pre">caterpillar.options.S_EVAL_ANNOTATIONS</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.options.S_UNION"><code class="docutils literal notranslate"><span class="pre">caterpillar.options.S_UNION</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#field-options">Field options</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#field-options">4.2.1.4. Field Options</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.options.F_KEEP_POSITION"><code class="docutils literal notranslate"><span class="pre">caterpillar.options.F_KEEP_POSITION</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.options.F_DYNAMIC"><code class="docutils literal notranslate"><span class="pre">caterpillar.options.F_DYNAMIC</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.options.F_SEQUENTIAL"><code class="docutils literal notranslate"><span class="pre">caterpillar.options.F_SEQUENTIAL</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.options.F_OFFSET_OVERRIDE"><code class="docutils literal notranslate"><span class="pre">caterpillar.options.F_OFFSET_OVERRIDE</span></code></a></li>
 </ul>
 </li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bit-field-options">4.2.1.5. Bit-field Options</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.options.B_OVERWRITE_ALIGNMENT"><code class="docutils literal notranslate"><span class="pre">caterpillar.options.B_OVERWRITE_ALIGNMENT</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.options.B_GROUP_END"><code class="docutils literal notranslate"><span class="pre">caterpillar.options.B_GROUP_END</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.options.B_GROUP_NEW"><code class="docutils literal notranslate"><span class="pre">caterpillar.options.B_GROUP_NEW</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.options.B_GROUP_KEEP"><code class="docutils literal notranslate"><span class="pre">caterpillar.options.B_GROUP_KEEP</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.options.B_NO_AUTO_BOOL"><code class="docutils literal notranslate"><span class="pre">caterpillar.options.B_NO_AUTO_BOOL</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#interface">Interface</a><ul class="nav section-nav flex-column">
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#interface">4.2.2. Interface</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.options.Flag"><code class="docutils literal notranslate"><span class="pre">Flag</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.options.Flag.name"><code class="docutils literal notranslate"><span class="pre">Flag.name</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.options.Flag.value"><code class="docutils literal notranslate"><span class="pre">Flag.value</span></code></a></li>

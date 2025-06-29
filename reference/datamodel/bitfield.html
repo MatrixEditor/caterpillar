@@ -1,0 +1,878 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>3.2.1.4. Bit-field &#8212; Caterpillar 2.5.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=c1cc8b61" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=3c4615cf"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'reference/datamodel/bitfield';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="3.2.1.5. Templates" href="templates.html" />
+    <link rel="prev" title="3.2.1.3. Union" href="union.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2.5.0" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Caterpillar 2.5.0</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../installing/index.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../tutorial/index.html">
+    Tutorial
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../library/index.html">
+    Library
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../development/index.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/MatrixEditor/caterpillar" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../installing/index.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../tutorial/index.html">
+    Tutorial
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../library/index.html">
+    Library
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../development/index.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/MatrixEditor/caterpillar" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Python Reference</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">3.1. Introduction</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../datamodel.html">3.2. Data Model</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="standard.html">3.2.1. Standard Types</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="sequence.html">3.2.1.1. Sequence</a></li>
+<li class="toctree-l3"><a class="reference internal" href="struct.html">3.2.1.2. Struct</a></li>
+<li class="toctree-l3"><a class="reference internal" href="union.html">3.2.1.3. Union</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">3.2.1.4. Bit-field</a></li>
+<li class="toctree-l3"><a class="reference internal" href="templates.html">3.2.1.5. Templates</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="protocols.html">3.2.2. Caterpillar’s Protocols</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="protocols/actionlike.html">3.2.2.1. Action-like Objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="protocols/contextlike.html">3.2.2.2. Context-like Objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="protocols/contextlambda.html">3.2.2.3. Context Lambdas</a></li>
+<li class="toctree-l3"><a class="reference internal" href="protocols/structlike.html">3.2.2.4. Struct-Like Objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="protocols/bitfield_extensions.html">3.2.2.5. Bit-field Extensions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="protocols/byteorder_extensions.html">3.2.2.6. Byteorder Extensions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="processing_classes.html">3.2.3. Processing-related Types</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../operators.html">3.3. Operators</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">C API Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../capi/extension.html">3.4. Using the C API</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../capi/abstract.html">3.5. Abstract Objects Layer</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../capi/atom.html">3.5.1. Atom Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../capi/context.html">3.5.2. Context Protocol</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../capi/objects/objimpl.html">3.6. Concrete Objects Layer</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../capi/objects/arch.html">3.6.1. Arch &amp; Endian Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../capi/objects/option.html">3.6.2. Option Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../capi/objects/contextobj.html">3.6.3. Context Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../capi/objects/contextexpr.html">3.6.4. Context Expressions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../capi/objects/contextpath.html">3.6.5. Context Path Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../capi/objects/state.html">3.6.6. State Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../capi/objects/layer.html">3.6.7. Layer Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../capi/objects/struct.html">3.6.8. Struct Objects</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../capi/objects/atoms/index.html">3.6.9. Atom Objects</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../capi/objects/atoms/int.html">3.6.9.1. Integer Atoms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../capi/objects/atoms/char.html">3.6.9.2. Char Atoms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../capi/objects/atoms/float.html">3.6.9.3. Float Atoms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../capi/objects/atoms/bool.html">3.6.9.4. Bool Atoms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../capi/objects/atoms/padding.html">3.6.9.5. Padding Atoms</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../capi/parsing.html">3.7. Packing and Unpacking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../capi/macros.html">3.8. Defined Macros</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../capi/module.html">3.9. Module API</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link"><span class="section-number">3. </span>Reference</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../datamodel.html" class="nav-link"><span class="section-number">3.2. </span>Data Model</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="standard.html" class="nav-link"><span class="section-number">3.2.1. </span>Standard Types</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">3.2.1.4. </span>Bit-field</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="bit-field">
+<span id="datamodel-standard-bitfield"></span><h1><span class="section-number">3.2.1.4. </span>Bit-field<a class="headerlink" href="#bit-field" title="Link to this heading">#</a></h1>
+<p>A <em>Bit-field</em>, despite its name suggesting a field of bits, is a powerful structure designed for
+detailed byte inspection. Similar to other structures, it is a finite collection of named fields. This
+section will introduce potential challenges associated with the implementation of a <a class="reference internal" href="../../library/model/bitfield.html#caterpillar.model.Bitfield" title="caterpillar.model.Bitfield"><code class="xref py py-class docutils literal notranslate"><span class="pre">Bitfield</span></code></a>
+and explains its behavior.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 2.5.0: </span>Completely reworked the internal <code class="xref py py-class docutils literal notranslate"><span class="pre">Bitfield</span></code> behaviour, model and processing.</p>
+</div>
+<section id="concept">
+<h2>Concept<a class="headerlink" href="#concept" title="Link to this heading">#</a></h2>
+<p>Each Bitfield instance maintains a sequence of bitfield groups, where each group
+contains a collection of sized fields. A bitfield group may consist of either multiple
+entries (i.e., any types that can be converted to an integral type) or a single
+<a class="reference internal" href="protocols/structlike.html#StructLike" title="_StructLike"><code class="xref py py-class docutils literal notranslate"><span class="pre">_StructLike</span></code></a> object. For example, consider the following bitfield definition:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@bitfield</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
+    <span class="n">a1</span><span class="p">:</span> <span class="mi">2</span>
+    <span class="n">a2</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">_</span> <span class="p">:</span> <span class="mi">0</span>
+    <span class="n">b1</span><span class="p">:</span> <span class="n">char</span>
+    <span class="n">c1</span><span class="p">:</span> <span class="n">uint32</span>
+</pre></div>
+</div>
+<p>This Bitfield definition will generate three distinct bitfield groups (labeled here as
+groups a, b, and c). By default, bitfields use 8-bit alignment, leading to the following
+layout:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Group</span>      <span class="n">Pos</span>       <span class="n">Bits</span>
+<span class="n">a</span>          <span class="mh">0x00</span>      <span class="mi">8</span>
+<span class="n">b</span>          <span class="mh">0x01</span>      <span class="mi">8</span>
+<span class="n">c</span>          <span class="mh">0x02</span>      <span class="mi">32</span>
+</pre></div>
+</div>
+<p>Internally, only the first group requires special bit-level parsing. The remaining groups
+(b and c) are treated as standard structures since they span full bytes or words without
+sub-byte alignment. This dynamic grouping mechanism allows leveraging full struct-like
+class definitions within bitfields.</p>
+</section>
+<section id="syntax">
+<h2>Syntax<a class="headerlink" href="#syntax" title="Link to this heading">#</a></h2>
+<p>This new approach enables more complex and expressive bitfield definitions. The annotation
+syntax is therefore extended as follows:</p>
+<table class="t-stbl">
+    <tbody>
+        <tr>
+            <td colspan="10" class="t-hr">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <span class="t-decl-id">name</span>
+                <code><b>:</b></code>
+                <span class="t-decl-id">bits</span>
+                <code><b>-</b></code>
+                <span class="t-decl-id">field</span>
+                <span class="t-decl-opt">(optional)</span>
+            </td>
+            <td class="t-no"> (1)
+            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="10" class="t-hr">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <span class="t-decl-id">name</span>
+                <code><b>:</b></code>
+                <code><b>0<b></code>
+            </td>
+            <td class="t-no"> (2)
+            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="10" class="t-hr">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <span class="t-decl-id">name</span>
+                <code><b>:</b></code>
+                <span class="t-decl-id">field-or-action </span>
+            </td>
+            <td class="t-no"> (3)
+            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="10" class="t-hr">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <span class="t-decl-id">name</span>
+                <code><b>:</b></code>
+                <code><b>(</b></code>
+                <span class="t-decl-id">field</span>
+                <code><b>,</b></code>
+                <span class="t-decl-id">factory</span>
+                <code><b>)</b></code>
+            </td>
+            <td class="t-no"> (4)
+            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="10" class="t-hr">
+            </td>
+        </tr>
+            <td>
+                <span class="t-decl-id">name</span>
+                <code><b>:</b></code>
+                <code><b>(</b></code>
+                <span class="t-decl-id">bits</span>
+                <code><b>,</b></code>
+                <span class="t-decl-id">factory</span>
+                <span class="t-decl-opt">(optional)</span>
+                <code><b>,</b></code>
+                <span class="t-decl-id">options</span>
+                <span class="t-decl-opt">(optional)</span>
+                <code><b>)</b></code>
+            </td>
+            <td class="t-no"> (5)
+            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="10" class="t-hr">
+            </td>
+        </tr>
+    </tbody>
+</table><p>Each identifier named above is bound to certain constraints:</p>
+<table class="t-par-begin">
+    <tbody>
+        <tr class="t-par">
+            <td> <span class="t-decl-id"><i>name</i></span>
+            </td>
+            <td> -
+            </td>
+            <td> Any valid Python attribute name.
+            </td>
+        </tr>
+        <tr class="t-par">
+            <td> <span class="t-decl-id"><i>bits</i></span>
+            </td>
+            <td> -
+            </td>
+            <td> Any valid positive integer starting from <code>0</code>.
+            </td>
+        </tr>
+        <tr class="t-par">
+            <td> <span class="t-decl-id"><i>field</i></span>
+            </td>
+            <td> -
+            </td>
+            <td>
+                Any valid field definition for a struct resulting in a
+                <code class="xref py py-class docutils literal notranslate"><span class="pre">_StructLike</span></code>
+                that implements the subtract-operation resulting in a
+                <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code>
+                instance.
+            </td>
+        </tr>
+        <tr class="t-par">
+            <td> <span class="t-decl-id"><i>field-or-action</i></span>
+            </td>
+            <td> -
+            </td>
+            <td>
+                Any valid field definition for a struct resulting or an object implementing the
+                <code class="xref py py-class docutils literal notranslate"><span class="pre">_ActionLike</span></code>
+                protocol.
+            </td>
+        </tr>
+        <tr class="t-par">
+            <td> <span class="t-decl-id"><i>factory</i></span>
+            </td>
+            <td> -
+            </td>
+            <td>
+                Either a target Python type to use as factory or an instance of
+                <a class="reference internal" href="../library/model/bitfield.html#caterpillar.model.BitfieldValueFactory" title="caterpillar.model.BitfieldValueFactory"><code class="xref py py-class docutils literal notranslate"><span class="pre">BitfieldValueFactory</span></code></a>.
+            </td>
+        </tr>
+        <tr class="t-par">
+            <td> <span class="t-decl-id"><i>options</i></span>
+            </td>
+            <td> -
+            </td>
+            <td>
+                One or more options represented either as flags or instances of
+                <a class="reference internal" href="../library/model/bitfield.html#caterpillar.model.SetAlignment" title="caterpillar.model.SetAlignment"><code class="xref py py-class docutils literal notranslate"><span class="pre">SetAlignment</span></code></a>.
+            </td>
+        </tr>
+    </tbody>
+</table><p>What that syntax allows can be seen in the following example:</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">Bit-field definition using all syntax rules</span><a class="headerlink" href="#id1" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@bitfield</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span> <span class="c1">#                                               -.</span>
+    <span class="c1"># Any annotation that can be converted by a TypeConverter  | 1. Group</span>
+    <span class="c1"># into as _StructLike object is allowed.                   | (3 Bytes)</span>
+    <span class="n">magic</span><span class="p">:</span> <span class="sa">b</span><span class="s2">&quot;foo&quot;</span> <span class="c1"># bytes                                     -&#39;</span>
+
+    <span class="c1"># Syntax according to (1) and (2)                         -.</span>
+    <span class="n">version</span> <span class="p">:</span> <span class="mi">4</span> <span class="c1"># int                                          | 2. Group</span>
+    <span class="n">state</span>   <span class="p">:</span> <span class="mi">3</span> <span class="c1"># int                                          | (1 Byte / 8 Bits)</span>
+    <span class="n">_</span>       <span class="p">:</span> <span class="mi">0</span> <span class="c1"># ignored/removed                             -&#39;</span>
+
+    <span class="c1"># Extended Syntax (5)</span>
+    <span class="n">flag1</span> <span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">SetAlignment</span><span class="p">(</span><span class="mi">16</span><span class="p">))</span>     <span class="c1"># bool, new alignment   -.</span>
+    <span class="n">flag2</span> <span class="p">:</span> <span class="mi">1</span>                         <span class="c1"># bool                   | 3. Group</span>
+    <span class="n">name</span>  <span class="p">:</span> <span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="n">CharFactory</span><span class="p">)</span>         <span class="c1"># str                    | (2 Bytes / 16 Bits)</span>
+    <span class="nb">type</span>  <span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">SimpleEnum</span><span class="p">,</span> <span class="n">EndGroup</span><span class="p">)</span> <span class="c1"># SimpleEnum            -&#39;</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="processing-rules">
+<h2>Processing Rules<a class="headerlink" href="#processing-rules" title="Link to this heading">#</a></h2>
+<p>Based on the previously defined syntax, some processing constraints were derived:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>Rule 1.:</dt><dd><ul>
+<li><p>Default alignment is 1 byte (8 bits).</p></li>
+<li><p>Zero (<code class="docutils literal notranslate"><span class="pre">0</span></code>) bits are prohibited.</p></li>
+<li><p>If followed by a (2) declaration, the remaining bits in the current byte are padded.</p></li>
+<li><dl class="simple">
+<dt>If a <code class="docutils literal notranslate"><span class="pre">&lt;field&gt;</span></code> is provided:</dt><dd><ul>
+<li><p>typeof(<code class="docutils literal notranslate"><span class="pre">&lt;field&gt;</span></code>) is used to infer the factory.</p></li>
+<li><p><a class="reference internal" href="../../library/model/bitfield.html#caterpillar.model.getbits" title="caterpillar.model.getbits"><code class="xref py py-func docutils literal notranslate"><span class="pre">getbits()</span></code></a> and <code class="xref py py-func docutils literal notranslate"><span class="pre">sizeof()</span></code> determine the field’s alignment.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>If a custom alignment is configured in the Bitfield constructor, inferred alignment is ignored unless the field includes the <code class="xref py py-attr docutils literal notranslate"><span class="pre">B_OVERWRITE_ALIGNMENT</span></code> option.</p></li>
+<li><p>If the <code class="xref py py-attr docutils literal notranslate"><span class="pre">B_GROUP_END</span></code> option is set, the current group is finalized and a new one is started.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Rule 2.:</dt><dd><ul>
+<li><p>This rule forces alignment to the next byte boundary.</p></li>
+<li><p>The field is ignored during final class generation (name is discarded).</p></li>
+<li><p>The current group is finalized unless the bitfield is configured with <a class="reference internal" href="../../library/options.html#caterpillar.options.B_GROUP_KEEP" title="caterpillar.options.B_GROUP_KEEP"><code class="xref py py-attr docutils literal notranslate"><span class="pre">B_GROUP_KEEP</span></code></a></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Rule 3.:</dt><dd><ul>
+<li><p>Equivalent to struct-like class field definitions.</p></li>
+<li><p>Automatically implies a rule 2 alignment.</p></li>
+<li><p>Always finalizes the current group regardless of <a class="reference internal" href="../../library/options.html#caterpillar.options.B_GROUP_KEEP" title="caterpillar.options.B_GROUP_KEEP"><code class="xref py py-attr docutils literal notranslate"><span class="pre">B_GROUP_KEEP</span></code></a>.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Rule 4.:</dt><dd><ul>
+<li><p>Extension of (1).</p></li>
+<li><p>Explicitly defines a conversion factory for the field.</p></li>
+<li><dl class="simple">
+<dt>The factory must be:</dt><dd><ul>
+<li><p>A built-in type (e.g., int, bool) supporting <code class="docutils literal notranslate"><span class="pre">__int__</span></code>, or</p></li>
+<li><p>A type or instance of <code class="xref py py-class docutils literal notranslate"><span class="pre">BitfieldValueFactory</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Rule 5.:</dt><dd><ul>
+<li><p>Builds upon (4) with support for options.</p></li>
+<li><p>Options can be passed as a list or single element.</p></li>
+<li><dl class="simple">
+<dt>Supported Options:</dt><dd><ul>
+<li><p><a class="reference internal" href="../../library/model/bitfield.html#caterpillar.model.NewGroup" title="caterpillar.model.NewGroup"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NewGroup</span></code></a>: Aligns the current group, starts a new one, and adds the entry to it.</p></li>
+<li><p><a class="reference internal" href="../../library/model/bitfield.html#caterpillar.model.EndGroup" title="caterpillar.model.EndGroup"><code class="xref py py-attr docutils literal notranslate"><span class="pre">EndGroup</span></code></a>: Adds the entry to the current group, then aligns it.</p></li>
+<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">SetAlignment</span></code>: Changes the current working alignment.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Note: Option order affects behavior and must be considered carefully.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="union.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title"><span class="section-number">3.2.1.3. </span>Union</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="templates.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><span class="section-number">3.2.1.5. </span>Templates</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#concept">Concept</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#syntax">Syntax</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#processing-rules">Processing Rules</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/reference/datamodel/bitfield.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, MatrixEditor.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

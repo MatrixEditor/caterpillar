@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>3.2. Option Objects &#8212; Caterpillar 2.4.5 documentation</title>
+    <title>3.6.2. Option Objects &#8212; Caterpillar 2.5.0 documentation</title>
   
   
   
@@ -33,6 +33,7 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css?v=c1cc8b61" />
   
   <!-- So that users can add custom icons -->
   <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -40,7 +41,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=159ac128"></script>
+    <script src="../../../_static/documentation_options.js?v=3c4615cf"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,11 +50,11 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'reference/capi/objects/option';</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="3.3. Context Objects" href="contextobj.html" />
-    <link rel="prev" title="3.1. Arch &amp; Endian Objects" href="arch.html" />
+    <link rel="next" title="3.6.3. Context Objects" href="contextobj.html" />
+    <link rel="prev" title="3.6.1. Arch &amp; Endian Objects" href="arch.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.4.5" />
+  <meta name="docsearch:version" content="2.5.0" />
   </head>
   
   
@@ -90,7 +91,6 @@
 
   <div class="pst-async-banner-revealer d-none">
   <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
-  <aside class="bd-header-announcement d-print-none d-none" aria-label="Announcement" data-pst-announcement-url="https://raw.githubusercontent.com/MatrixEditor/caterpillar/master/docs/sphinx/source/_templates/announcement.html"></aside>
 </div>
 
   
@@ -116,7 +116,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.4.5</p>
+    <p class="title logo__title">Caterpillar 2.5.0</p>
   
 </a></div>
     
@@ -332,40 +332,60 @@
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Python Reference</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../datamodel.html">Data Model</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../operators.html">Operators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">3.1. Introduction</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../datamodel.html">3.2. Data Model</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../datamodel/standard.html">3.2.1. Standard Types</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../datamodel/sequence.html">3.2.1.1. Sequence</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../datamodel/struct.html">3.2.1.2. Struct</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../datamodel/union.html">3.2.1.3. Union</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../datamodel/bitfield.html">3.2.1.4. Bit-field</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../datamodel/templates.html">3.2.1.5. Templates</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../datamodel/protocols.html">3.2.2. Caterpillar’s Protocols</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../datamodel/protocols/actionlike.html">3.2.2.1. Action-like Objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../datamodel/protocols/contextlike.html">3.2.2.2. Context-like Objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../datamodel/protocols/contextlambda.html">3.2.2.3. Context Lambdas</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../datamodel/protocols/structlike.html">3.2.2.4. Struct-Like Objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../datamodel/protocols/bitfield_extensions.html">3.2.2.5. Bit-field Extensions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../datamodel/protocols/byteorder_extensions.html">3.2.2.6. Byteorder Extensions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../datamodel/processing_classes.html">3.2.3. Processing-related Types</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../../operators.html">3.3. Operators</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">C API Reference</span></p>
 <ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../extension.html">1. Using the C API</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../abstract.html">2. Abstract Objects Layer</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="../atom.html">2.1. Atom Protocol</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../context.html">2.2. Context Protocol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../extension.html">3.4. Using the C API</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../abstract.html">3.5. Abstract Objects Layer</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../atom.html">3.5.1. Atom Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../context.html">3.5.2. Context Protocol</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="objimpl.html">3. Concrete Objects Layer</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="arch.html">3.1. Arch &amp; Endian Objects</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">3.2. Option Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="contextobj.html">3.3. Context Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="contextexpr.html">3.4. Context Expressions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="contextpath.html">3.5. Context Path Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="state.html">3.6. State Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="layer.html">3.7. Layer Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="struct.html">3.8. Struct Objects</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="atoms/index.html">3.9. Atom Objects</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="atoms/int.html">3.9.1. Integer Atoms</a></li>
-<li class="toctree-l3"><a class="reference internal" href="atoms/char.html">3.9.2. Char Atoms</a></li>
-<li class="toctree-l3"><a class="reference internal" href="atoms/float.html">3.9.3. Float Atoms</a></li>
-<li class="toctree-l3"><a class="reference internal" href="atoms/bool.html">3.9.4. Bool Atoms</a></li>
-<li class="toctree-l3"><a class="reference internal" href="atoms/padding.html">3.9.5. Padding Atoms</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="objimpl.html">3.6. Concrete Objects Layer</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="arch.html">3.6.1. Arch &amp; Endian Objects</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">3.6.2. Option Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contextobj.html">3.6.3. Context Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contextexpr.html">3.6.4. Context Expressions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contextpath.html">3.6.5. Context Path Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="state.html">3.6.6. State Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="layer.html">3.6.7. Layer Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="struct.html">3.6.8. Struct Objects</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="atoms/index.html">3.6.9. Atom Objects</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="atoms/int.html">3.6.9.1. Integer Atoms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="atoms/char.html">3.6.9.2. Char Atoms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="atoms/float.html">3.6.9.3. Float Atoms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="atoms/bool.html">3.6.9.4. Bool Atoms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="atoms/padding.html">3.6.9.5. Padding Atoms</a></li>
 </ul>
 </details></li>
 </ul>
 </details></li>
-<li class="toctree-l1"><a class="reference internal" href="../parsing.html">4. Packing and Unpacking</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../macros.html">5. Defined Macros</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../module.html">6. Module API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parsing.html">3.7. Packing and Unpacking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../macros.html">3.8. Defined Macros</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../module.html">3.9. Module API</a></li>
 </ul>
 </div>
 </nav></div>
@@ -407,12 +427,12 @@
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Reference</a></li>
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link"><span class="section-number">3. </span>Reference</a></li>
     
     
-    <li class="breadcrumb-item"><a href="objimpl.html" class="nav-link"><span class="section-number">3. </span>Concrete Objects Layer</a></li>
+    <li class="breadcrumb-item"><a href="objimpl.html" class="nav-link"><span class="section-number">3.6. </span>Concrete Objects Layer</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">3.2. </span>Option Objects</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">3.6.2. </span>Option Objects</span></li>
   </ul>
 </nav>
 </div>
@@ -430,7 +450,7 @@
                 <article class="bd-article">
                   
   <section id="option-objects">
-<span id="reference-capi-option"></span><h1><span class="section-number">3.2. </span>Option Objects<a class="headerlink" href="#option-objects" title="Link to this heading">#</a></h1>
+<span id="reference-capi-option"></span><h1><span class="section-number">3.6.2. </span>Option Objects<a class="headerlink" href="#option-objects" title="Link to this heading">#</a></h1>
 <dl class="c var">
 <dt class="sig sig-object c" id="c.CpOption_Type">
 <span class="n"><span class="pre">PyTypeObject</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CpOption_Type</span></span></span><a class="headerlink" href="#c.CpOption_Type" title="Link to this definition">#</a><br /></dt>
@@ -473,7 +493,7 @@
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title"><span class="section-number">3.1. </span>Arch &amp; Endian Objects</p>
+        <p class="prev-next-title"><span class="section-number">3.6.1. </span>Arch &amp; Endian Objects</p>
       </div>
     </a>
     <a class="right-next"
@@ -481,7 +501,7 @@
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">3.3. </span>Context Objects</p>
+        <p class="prev-next-title"><span class="section-number">3.6.3. </span>Context Objects</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

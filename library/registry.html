@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Annotation Registry &#8212; Caterpillar 2.4.5 documentation</title>
+    <title>4.6. Annotation Registry &#8212; Caterpillar 2.5.0 documentation</title>
   
   
   
@@ -33,6 +33,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=c1cc8b61" />
   
   <!-- So that users can add custom icons -->
   <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -40,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=159ac128"></script>
+    <script src="../_static/documentation_options.js?v=3c4615cf"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,11 +50,11 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'library/registry';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Fields" href="fields/index.html" />
-    <link rel="prev" title="Struct Model" href="model.html" />
+    <link rel="next" title="4.7. Shared Concepts" href="shared.html" />
+    <link rel="prev" title="4.5.4. Templates" href="model/template.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.4.5" />
+  <meta name="docsearch:version" content="2.5.0" />
   </head>
   
   
@@ -90,7 +91,6 @@
 
   <div class="pst-async-banner-revealer d-none">
   <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
-  <aside class="bd-header-announcement d-print-none d-none" aria-label="Announcement" data-pst-announcement-url="https://raw.githubusercontent.com/MatrixEditor/caterpillar/master/docs/sphinx/source/_templates/announcement.html"></aside>
 </div>
 
   
@@ -116,7 +116,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.4.5</p>
+    <p class="title logo__title">Caterpillar 2.5.0</p>
   
 </a></div>
     
@@ -332,24 +332,30 @@
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Python API</span></p>
 <ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="byteorder.html">Byteorder and Architecture</a></li>
-<li class="toctree-l1"><a class="reference internal" href="options.html">Options</a></li>
-<li class="toctree-l1"><a class="reference internal" href="abc.html">Abstract base classes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="context.html">Context</a></li>
-<li class="toctree-l1"><a class="reference internal" href="exceptions.html">Exceptions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="model.html">Struct Model</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Annotation Registry</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="fields/index.html">Fields</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="fields/field_model.html">Field Model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fields/common.html">Common Structs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fields/compression.html">Compression Structs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fields/crypto.html">Cryptographic Structs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="byteorder.html">4.1. Byteorder and Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="options.html">4.2. Options / Flags</a></li>
+<li class="toctree-l1"><a class="reference internal" href="context.html">4.3. Context</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exceptions.html">4.4. Exceptions</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="model.html">4.5. Struct Model</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="model/sequence.html">4.5.1. Sequence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model/struct.html">4.5.2. Struct</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model/bitfield.html">4.5.3. Bitfield</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model/template.html">4.5.4. Templates</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">4.6. Annotation Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="shared.html">4.7. Shared Concepts</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="fields/index.html">4.8. Fields</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="fields/field_model.html">4.8.1. Field Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fields/common.html">4.8.2. Common Structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fields/compression.html">4.8.3. Compression Structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fields/crypto.html">4.8.4. Cryptographic Structs</a></li>
 </ul>
 </details></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">C API Python Types</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="ctypes/int.html">Integer Types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ctypes/int.html">5.1. Integer Types</a></li>
 </ul>
 </div>
 </nav></div>
@@ -391,9 +397,9 @@
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Library</a></li>
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link"><span class="section-number">4. </span>Library</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Annotation Registry</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">4.6. </span>Annotation Registry</span></li>
   </ul>
 </nav>
 </div>
@@ -411,7 +417,7 @@
                 <article class="bd-article">
                   
   <section id="annotation-registry">
-<span id="pyapi-registry"></span><h1>Annotation Registry<a class="headerlink" href="#annotation-registry" title="Link to this heading">#</a></h1>
+<span id="pyapi-registry"></span><h1><span class="section-number">4.6. </span>Annotation Registry<a class="headerlink" href="#annotation-registry" title="Link to this heading">#</a></h1>
 <p><em>TODO</em></p>
 <dl class="py class" id="module-caterpillar.registry">
 <dt class="sig sig-object py" id="caterpillar.registry.TypeConverter">
@@ -435,7 +441,7 @@ like this:</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>target</strong> (<em>Type</em><em>, </em><em>optional</em>) – the target type, defaults to None</p></li>
-<li><p><strong>delegate</strong> (<em>Callable</em><em>[</em><em>[</em><em>Any</em><em>, </em><em>dict</em><em>]</em><em>, </em><a class="reference internal" href="abc.html#caterpillar.abc._StructLike" title="caterpillar.abc._StructLike"><em>_StructLike</em></a><em>]</em><em>, </em><em>optional</em>) – optional delegation function, defaults to None</p></li>
+<li><p><strong>delegate</strong> (<em>Callable</em><em>[</em><em>[</em><em>Any</em><em>, </em><em>dict</em><em>]</em><em>, </em><a class="reference internal" href="../reference/datamodel/protocols/structlike.html#StructLike" title="_StructLike"><em>_StructLike</em></a><em>]</em><em>, </em><em>optional</em>) – optional delegation function, defaults to None</p></li>
 </ul>
 </dd>
 </dl>
@@ -458,7 +464,7 @@ like this:</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.registry.TypeConverter.convert">
-<span class="sig-name descname"><span class="pre">convert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">annotation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="abc.html#caterpillar.abc._StructLike" title="caterpillar.abc._StructLike"><span class="pre">_StructLike</span></a></span></span><a class="reference internal" href="../_modules/caterpillar/registry.html#TypeConverter.convert"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.registry.TypeConverter.convert" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">convert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">annotation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">_StructLike</span></span></span><a class="reference internal" href="../_modules/caterpillar/registry.html#TypeConverter.convert"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.registry.TypeConverter.convert" title="Link to this definition">#</a></dt>
 <dd><p>Convert the given annotation (uses the delegate function by default).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -474,7 +480,7 @@ like this:</p>
 <dd class="field-odd"><p>The converted object.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="abc.html#caterpillar.abc._StructLike" title="caterpillar.abc._StructLike">_StructLike</a></p>
+<dd class="field-even"><p><a class="reference internal" href="../reference/datamodel/protocols/structlike.html#StructLike" title="_StructLike">_StructLike</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -483,7 +489,7 @@ like this:</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="caterpillar.registry.to_struct">
-<span class="sig-prename descclassname"><span class="pre">caterpillar.registry.</span></span><span class="sig-name descname"><span class="pre">to_struct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="abc.html#caterpillar.abc._StructLike" title="caterpillar.abc._StructLike"><span class="pre">_StructLike</span></a></span></span><a class="reference internal" href="../_modules/caterpillar/registry.html#to_struct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.registry.to_struct" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">caterpillar.registry.</span></span><span class="sig-name descname"><span class="pre">to_struct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">_StructLike</span></span></span><a class="reference internal" href="../_modules/caterpillar/registry.html#to_struct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.registry.to_struct" title="Link to this definition">#</a></dt>
 <dd><p>Convert an object to a <code class="code docutils literal notranslate"><span class="pre">_StruckLike</span></code> object using registered type converters.</p>
 <p>This function will not convert any objects that are already
 implementing the functions of <code class="code docutils literal notranslate"><span class="pre">_StructLike</span></code>.</p>
@@ -501,7 +507,7 @@ implementing the functions of <code class="code docutils literal notranslate"><s
 <dd class="field-odd"><p>the converted object</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="abc.html#caterpillar.abc._StructLike" title="caterpillar.abc._StructLike">_StructLike</a></p>
+<dd class="field-even"><p><a class="reference internal" href="../reference/datamodel/protocols/structlike.html#StructLike" title="_StructLike">_StructLike</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -519,20 +525,20 @@ implementing the functions of <code class="code docutils literal notranslate"><s
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="model.html"
+       href="model/template.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Struct Model</p>
+        <p class="prev-next-title"><span class="section-number">4.5.4. </span>Templates</p>
       </div>
     </a>
     <a class="right-next"
-       href="fields/index.html"
+       href="shared.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Fields</p>
+        <p class="prev-next-title"><span class="section-number">4.7. </span>Shared Concepts</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

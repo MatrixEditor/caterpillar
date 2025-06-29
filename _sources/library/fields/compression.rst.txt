@@ -7,16 +7,16 @@ Compression Structs
 Basic structs
 -------------
 
-.. autoclass:: caterpillar.py.Compressed
+.. autoclass:: caterpillar.fields.Compressed
     :members:
 
 Supported compression types
 ---------------------------
 
-.. autofunction:: caterpillar.py.ZLibCompressed
+.. autofunction:: caterpillar.fields.ZLibCompressed
 
-.. autofunction:: caterpillar.py.Bz2Compressed
+.. autofunction:: caterpillar.fields.Bz2Compressed
 
-.. autofunction:: caterpillar.py.LZMACompressed
+.. autofunction:: caterpillar.fields.LZMACompressed
 
-.. autofunction:: caterpillar.py.LZOCompressed
+.. autofunction:: caterpillar.fields.LZOCompressed

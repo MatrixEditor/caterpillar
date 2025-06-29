@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Compression Structs &#8212; Caterpillar 2.4.5 documentation</title>
+    <title>4.8.3. Compression Structs &#8212; Caterpillar 2.5.0 documentation</title>
   
   
   
@@ -33,6 +33,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=c1cc8b61" />
   
   <!-- So that users can add custom icons -->
   <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -40,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=159ac128"></script>
+    <script src="../../_static/documentation_options.js?v=3c4615cf"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,11 +50,11 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'library/fields/compression';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Cryptographic Structs" href="crypto.html" />
-    <link rel="prev" title="Common Structs" href="common.html" />
+    <link rel="next" title="4.8.4. Cryptographic Structs" href="crypto.html" />
+    <link rel="prev" title="4.8.2. Common Structs" href="common.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.4.5" />
+  <meta name="docsearch:version" content="2.5.0" />
   </head>
   
   
@@ -90,7 +91,6 @@
 
   <div class="pst-async-banner-revealer d-none">
   <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
-  <aside class="bd-header-announcement d-print-none d-none" aria-label="Announcement" data-pst-announcement-url="https://raw.githubusercontent.com/MatrixEditor/caterpillar/master/docs/sphinx/source/_templates/announcement.html"></aside>
 </div>
 
   
@@ -116,7 +116,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.4.5</p>
+    <p class="title logo__title">Caterpillar 2.5.0</p>
   
 </a></div>
     
@@ -332,24 +332,30 @@
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Python API</span></p>
 <ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../byteorder.html">Byteorder and Architecture</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../options.html">Options</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../abc.html">Abstract base classes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../context.html">Context</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../exceptions.html">Exceptions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../model.html">Struct Model</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../registry.html">Annotation Registry</a></li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Fields</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="field_model.html">Field Model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="common.html">Common Structs</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Compression Structs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="crypto.html">Cryptographic Structs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../byteorder.html">4.1. Byteorder and Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../options.html">4.2. Options / Flags</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../context.html">4.3. Context</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../exceptions.html">4.4. Exceptions</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../model.html">4.5. Struct Model</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../model/sequence.html">4.5.1. Sequence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../model/struct.html">4.5.2. Struct</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../model/bitfield.html">4.5.3. Bitfield</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../model/template.html">4.5.4. Templates</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../registry.html">4.6. Annotation Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../shared.html">4.7. Shared Concepts</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">4.8. Fields</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="field_model.html">4.8.1. Field Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="common.html">4.8.2. Common Structs</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">4.8.3. Compression Structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="crypto.html">4.8.4. Cryptographic Structs</a></li>
 </ul>
 </details></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">C API Python Types</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../ctypes/int.html">Integer Types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ctypes/int.html">5.1. Integer Types</a></li>
 </ul>
 </div>
 </nav></div>
@@ -391,12 +397,12 @@
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Library</a></li>
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link"><span class="section-number">4. </span>Library</a></li>
     
     
-    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Fields</a></li>
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link"><span class="section-number">4.8. </span>Fields</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Compression Structs</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">4.8.3. </span>Compression Structs</span></li>
   </ul>
 </nav>
 </div>
@@ -414,12 +420,12 @@
                 <article class="bd-article">
                   
   <section id="compression-structs">
-<span id="fields-compression"></span><h1>Compression Structs<a class="headerlink" href="#compression-structs" title="Link to this heading">#</a></h1>
+<span id="fields-compression"></span><h1><span class="section-number">4.8.3. </span>Compression Structs<a class="headerlink" href="#compression-structs" title="Link to this heading">#</a></h1>
 <section id="basic-structs">
-<h2>Basic structs<a class="headerlink" href="#basic-structs" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">4.8.3.1. </span>Basic structs<a class="headerlink" href="#basic-structs" title="Link to this heading">#</a></h2>
 <dl class="py class">
-<dt class="sig sig-object py" id="caterpillar.py.Compressed">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.py.</span></span><span class="sig-name descname"><span class="pre">Compressed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">compressor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_Compressor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">struct</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../abc.html#caterpillar.abc._ContainsStruct" title="caterpillar.abc._ContainsStruct"><span class="pre">_ContainsStruct</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../abc.html#caterpillar.abc._StructLike" title="caterpillar.abc._StructLike"><span class="pre">_StructLike</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">comp_kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decomp_kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/compression.html#Compressed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.py.Compressed" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="caterpillar.fields.Compressed">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.fields.</span></span><span class="sig-name descname"><span class="pre">Compressed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">compressor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">struct</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comp_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decomp_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/compression.html#Compressed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Compressed" title="Link to this definition">#</a></dt>
 <dd><p>A transformer class for handling compression and decompression of data.</p>
 <p>This class takes a compression algorithm that implements the <cite>_Compressor</cite> protocol and
 applies it to the data for compression or decompression operations. It allows for
@@ -428,21 +434,21 @@ additional customization through the <cite>comp_kwargs</cite> and <cite>decomp_k
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>compressor</strong> (<em>_Compressor</em>) – The compression algorithm that implements the _Compressor protocol.</p></li>
-<li><p><strong>struct</strong> (<em>Union</em><em>[</em><a class="reference internal" href="../abc.html#caterpillar.abc._ContainsStruct" title="caterpillar.abc._ContainsStruct"><em>_ContainsStruct</em></a><em>, </em><a class="reference internal" href="../abc.html#caterpillar.abc._StructLike" title="caterpillar.abc._StructLike"><em>_StructLike</em></a><em>]</em>) – The struct to be compressed or decompressed, should implement _ContainsStruct or _StructLike.</p></li>
+<li><p><strong>struct</strong> (<em>Union</em><em>[</em><a class="reference internal" href="../../reference/datamodel/protocols/structlike.html#ContainsStruct" title="_ContainsStruct"><em>_ContainsStruct</em></a><em>, </em><a class="reference internal" href="../../reference/datamodel/protocols/structlike.html#StructLike" title="_StructLike"><em>_StructLike</em></a><em>]</em>) – The struct to be compressed or decompressed, should implement _ContainsStruct or _StructLike.</p></li>
 <li><p><strong>comp_kwargs</strong> (<em>Optional</em><em>[</em><em>dict</em><em>]</em>) – Optional keyword arguments for the compression method.</p></li>
 <li><p><strong>decomp_kwargs</strong> (<em>Optional</em><em>[</em><em>dict</em><em>]</em>) – Optional keyword arguments for the decompression method.</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="caterpillar.py.Compressed.encode">
-<span class="sig-name descname"><span class="pre">encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../abc.html#caterpillar.abc._ContextLike" title="caterpillar.abc._ContextLike"><span class="pre">_ContextLike</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/compression.html#Compressed.encode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.py.Compressed.encode" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="caterpillar.fields.Compressed.encode">
+<span class="sig-name descname"><span class="pre">encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/compression.html#Compressed.encode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Compressed.encode" title="Link to this definition">#</a></dt>
 <dd><p>Compress the input data using the provided compressor.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>obj</strong> (<em>bytes</em>) – The data to be compressed.</p></li>
-<li><p><strong>context</strong> (<a class="reference internal" href="../abc.html#caterpillar.abc._ContextLike" title="caterpillar.abc._ContextLike"><em>_ContextLike</em></a>) – Context information for compression (e.g., field-specific metadata).</p></li>
+<li><p><strong>context</strong> (<a class="reference internal" href="../../reference/datamodel/protocols/contextlike.html#ContextLike" title="_ContextLike"><em>_ContextLike</em></a>) – Context information for compression (e.g., field-specific metadata).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -455,14 +461,14 @@ additional customization through the <cite>comp_kwargs</cite> and <cite>decomp_k
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="caterpillar.py.Compressed.decode">
-<span class="sig-name descname"><span class="pre">decode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parsed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../abc.html#caterpillar.abc._ContextLike" title="caterpillar.abc._ContextLike"><span class="pre">_ContextLike</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/compression.html#Compressed.decode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.py.Compressed.decode" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="caterpillar.fields.Compressed.decode">
+<span class="sig-name descname"><span class="pre">decode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parsed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/compression.html#Compressed.decode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Compressed.decode" title="Link to this definition">#</a></dt>
 <dd><p>Decompress the input data using the provided compressor.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>parsed</strong> (<em>bytes</em>) – The compressed data to be decompressed.</p></li>
-<li><p><strong>context</strong> (<a class="reference internal" href="../abc.html#caterpillar.abc._ContextLike" title="caterpillar.abc._ContextLike"><em>_ContextLike</em></a>) – Context information for decompression (e.g., field-specific metadata).</p></li>
+<li><p><strong>context</strong> (<a class="reference internal" href="../../reference/datamodel/protocols/contextlike.html#ContextLike" title="_ContextLike"><em>_ContextLike</em></a>) – Context information for decompression (e.g., field-specific metadata).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -478,28 +484,28 @@ additional customization through the <cite>comp_kwargs</cite> and <cite>decomp_k
 
 </section>
 <section id="supported-compression-types">
-<h2>Supported compression types<a class="headerlink" href="#supported-compression-types" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">4.8.3.2. </span>Supported compression types<a class="headerlink" href="#supported-compression-types" title="Link to this heading">#</a></h2>
 <dl class="py function">
-<dt class="sig sig-object py" id="caterpillar.py.ZLibCompressed">
-<span class="sig-prename descclassname"><span class="pre">caterpillar.py.</span></span><span class="sig-name descname"><span class="pre">ZLibCompressed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../abc.html#caterpillar.abc._ContainsStruct" title="caterpillar.abc._ContainsStruct"><span class="pre">_ContainsStruct</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../abc.html#caterpillar.abc._StructLike" title="caterpillar.abc._StructLike"><span class="pre">_StructLike</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comp_kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decomp_kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/compression.html#ZLibCompressed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.py.ZLibCompressed" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="caterpillar.fields.ZLibCompressed">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.fields.</span></span><span class="sig-name descname"><span class="pre">ZLibCompressed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comp_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decomp_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/compression.html#ZLibCompressed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.ZLibCompressed" title="Link to this definition">#</a></dt>
 <dd><p>Create a struct representing zlib compression.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="caterpillar.py.Bz2Compressed">
-<span class="sig-prename descclassname"><span class="pre">caterpillar.py.</span></span><span class="sig-name descname"><span class="pre">Bz2Compressed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../abc.html#caterpillar.abc._ContainsStruct" title="caterpillar.abc._ContainsStruct"><span class="pre">_ContainsStruct</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../abc.html#caterpillar.abc._StructLike" title="caterpillar.abc._StructLike"><span class="pre">_StructLike</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comp_kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decomp_kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/compression.html#Bz2Compressed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.py.Bz2Compressed" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="caterpillar.fields.Bz2Compressed">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.fields.</span></span><span class="sig-name descname"><span class="pre">Bz2Compressed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comp_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decomp_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/compression.html#Bz2Compressed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Bz2Compressed" title="Link to this definition">#</a></dt>
 <dd><p>Create a struct representing bz2 compression.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="caterpillar.py.LZMACompressed">
-<span class="sig-prename descclassname"><span class="pre">caterpillar.py.</span></span><span class="sig-name descname"><span class="pre">LZMACompressed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../abc.html#caterpillar.abc._ContainsStruct" title="caterpillar.abc._ContainsStruct"><span class="pre">_ContainsStruct</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../abc.html#caterpillar.abc._StructLike" title="caterpillar.abc._StructLike"><span class="pre">_StructLike</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comp_kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decomp_kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/compression.html#LZMACompressed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.py.LZMACompressed" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="caterpillar.fields.LZMACompressed">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.fields.</span></span><span class="sig-name descname"><span class="pre">LZMACompressed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comp_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decomp_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/compression.html#LZMACompressed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.LZMACompressed" title="Link to this definition">#</a></dt>
 <dd><p>Create a struct representing lzma compression.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="caterpillar.py.LZOCompressed">
-<span class="sig-prename descclassname"><span class="pre">caterpillar.py.</span></span><span class="sig-name descname"><span class="pre">LZOCompressed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../abc.html#caterpillar.abc._ContainsStruct" title="caterpillar.abc._ContainsStruct"><span class="pre">_ContainsStruct</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../abc.html#caterpillar.abc._StructLike" title="caterpillar.abc._StructLike"><span class="pre">_StructLike</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comp_kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decomp_kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/compression.html#LZOCompressed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.py.LZOCompressed" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="caterpillar.fields.LZOCompressed">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.fields.</span></span><span class="sig-name descname"><span class="pre">LZOCompressed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comp_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decomp_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/compression.html#LZOCompressed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.LZOCompressed" title="Link to this definition">#</a></dt>
 <dd><p>Create a struct representing LZO compression.</p>
 </dd></dl>
 
@@ -522,7 +528,7 @@ additional customization through the <cite>comp_kwargs</cite> and <cite>decomp_k
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Common Structs</p>
+        <p class="prev-next-title"><span class="section-number">4.8.2. </span>Common Structs</p>
       </div>
     </a>
     <a class="right-next"
@@ -530,7 +536,7 @@ additional customization through the <cite>comp_kwargs</cite> and <cite>decomp_k
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Cryptographic Structs</p>
+        <p class="prev-next-title"><span class="section-number">4.8.4. </span>Cryptographic Structs</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -553,19 +559,19 @@ additional customization through the <cite>comp_kwargs</cite> and <cite>decomp_k
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#basic-structs">Basic structs</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.py.Compressed"><code class="docutils literal notranslate"><span class="pre">Compressed</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.py.Compressed.encode"><code class="docutils literal notranslate"><span class="pre">Compressed.encode()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.py.Compressed.decode"><code class="docutils literal notranslate"><span class="pre">Compressed.decode()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#basic-structs">4.8.3.1. Basic structs</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Compressed"><code class="docutils literal notranslate"><span class="pre">Compressed</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Compressed.encode"><code class="docutils literal notranslate"><span class="pre">Compressed.encode()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Compressed.decode"><code class="docutils literal notranslate"><span class="pre">Compressed.decode()</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#supported-compression-types">Supported compression types</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.py.ZLibCompressed"><code class="docutils literal notranslate"><span class="pre">ZLibCompressed()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.py.Bz2Compressed"><code class="docutils literal notranslate"><span class="pre">Bz2Compressed()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.py.LZMACompressed"><code class="docutils literal notranslate"><span class="pre">LZMACompressed()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.py.LZOCompressed"><code class="docutils literal notranslate"><span class="pre">LZOCompressed()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#supported-compression-types">4.8.3.2. Supported compression types</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.ZLibCompressed"><code class="docutils literal notranslate"><span class="pre">ZLibCompressed()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Bz2Compressed"><code class="docutils literal notranslate"><span class="pre">Bz2Compressed()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.LZMACompressed"><code class="docutils literal notranslate"><span class="pre">LZMACompressed()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.LZOCompressed"><code class="docutils literal notranslate"><span class="pre">LZOCompressed()</span></code></a></li>
 </ul>
 </li>
 </ul>

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>caterpillar.fields.compression &#8212; Caterpillar 2.4.5 documentation</title>
+    <title>caterpillar.fields.compression &#8212; Caterpillar 2.5.0 documentation</title>
   
   
   
@@ -32,6 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css?v=c1cc8b61" />
   
   <!-- So that users can add custom icons -->
   <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -39,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=159ac128"></script>
+    <script src="../../../_static/documentation_options.js?v=3c4615cf"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -50,7 +51,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.4.5" />
+  <meta name="docsearch:version" content="2.5.0" />
   </head>
   
   
@@ -87,7 +88,6 @@
 
   <div class="pst-async-banner-revealer d-none">
   <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
-  <aside class="bd-header-announcement d-print-none d-none" aria-label="Announcement" data-pst-announcement-url="https://raw.githubusercontent.com/MatrixEditor/caterpillar/master/docs/sphinx/source/_templates/announcement.html"></aside>
 </div>
 
   
@@ -113,7 +113,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.4.5</p>
+    <p class="title logo__title">Caterpillar 2.5.0</p>
   
 </a></div>
     
@@ -390,18 +390,12 @@
 <span class="c1">#</span>
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">abstractmethod</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Protocol</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">runtime_checkable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Protocol</span><span class="p">,</span> <span class="n">runtime_checkable</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.abc</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">_ContextLike</span><span class="p">,</span>
-    <span class="n">_StructLike</span><span class="p">,</span>
-    <span class="n">_ContainsStruct</span><span class="p">,</span>
-    <span class="n">getstruct</span><span class="p">,</span>
-    <span class="n">hasstruct</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">._mixin</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_kwargs</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">Transformer</span><span class="p">,</span> <span class="n">Bytes</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">_StructLike</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.shared</span><span class="w"> </span><span class="kn">import</span> <span class="n">getstruct</span><span class="p">,</span> <span class="n">hasstruct</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.fields._mixin</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_kwargs</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.fields.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">Transformer</span><span class="p">,</span> <span class="n">Bytes</span>
 
 
 <span class="nd">@runtime_checkable</span>
@@ -414,7 +408,6 @@
 <span class="sd">    Any class implementing this protocol must define these methods.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="nd">@abstractmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">compress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compress the provided data.</span>
@@ -425,9 +418,8 @@
 <span class="sd">        :return: The compressed data.</span>
 <span class="sd">        :rtype: bytes</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span>
+        <span class="k">return</span> <span class="sa">b</span><span class="s2">&quot;&quot;</span>
 
-    <span class="nd">@abstractmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">decompress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Decompress the provided data.</span>
@@ -438,11 +430,11 @@
 <span class="sd">        :return: The decompressed data.</span>
 <span class="sd">        :rtype: bytes</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span>
+        <span class="k">return</span> <span class="sa">b</span><span class="s2">&quot;&quot;</span>
 
 
 <div class="viewcode-block" id="Compressed">
-<a class="viewcode-back" href="../../../library/fields/compression.html#caterpillar.py.Compressed">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/compression.html#caterpillar.fields.Compressed">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Compressed</span><span class="p">(</span><span class="n">Transformer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A transformer class for handling compression and decompression of data.</span>
@@ -463,10 +455,10 @@
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">compressor</span><span class="p">:</span> <span class="n">_Compressor</span><span class="p">,</span>
-        <span class="n">struct</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">_ContainsStruct</span><span class="p">,</span> <span class="n">_StructLike</span><span class="p">],</span>
-        <span class="n">comp_kwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">decomp_kwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">compressor</span><span class="p">,</span>
+        <span class="n">struct</span><span class="p">,</span>
+        <span class="n">comp_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">decomp_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">hasstruct</span><span class="p">(</span><span class="n">struct</span><span class="p">):</span>
             <span class="n">struct</span> <span class="o">=</span> <span class="n">getstruct</span><span class="p">(</span><span class="n">struct</span><span class="p">)</span>
@@ -476,8 +468,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">decomp_args</span> <span class="o">=</span> <span class="n">decomp_kwargs</span> <span class="ow">or</span> <span class="p">{}</span>
 
 <div class="viewcode-block" id="Compressed.encode">
-<a class="viewcode-back" href="../../../library/fields/compression.html#caterpillar.py.Compressed.encode">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../library/fields/compression.html#caterpillar.fields.Compressed.encode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compress the input data using the provided compressor.</span>
 
@@ -492,8 +484,8 @@
 
 
 <div class="viewcode-block" id="Compressed.decode">
-<a class="viewcode-back" href="../../../library/fields/compression.html#caterpillar.py.Compressed.decode">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../library/fields/compression.html#caterpillar.fields.Compressed.decode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Decompress the input data using the provided compressor.</span>
 
@@ -511,96 +503,92 @@
 
 
 
-<span class="n">_LengthOrStruct</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">_ContainsStruct</span><span class="p">,</span> <span class="n">_StructLike</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
-
-
 <span class="k">def</span><span class="w"> </span><span class="nf">compressed</span><span class="p">(</span>
-    <span class="n">lib</span><span class="p">:</span> <span class="n">_Compressor</span><span class="p">,</span>
-    <span class="n">obj</span><span class="p">:</span> <span class="n">_LengthOrStruct</span><span class="p">,</span>
-    <span class="n">comp_kwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">decomp_kwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">lib</span><span class="p">,</span>
+    <span class="n">obj</span><span class="p">,</span>
+    <span class="n">comp_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">decomp_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_StructLike</span><span class="p">:</span>
     <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="n">obj</span> <span class="ow">is</span> <span class="o">...</span><span class="p">:</span>
         <span class="n">obj</span> <span class="o">=</span> <span class="n">Bytes</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">Compressed</span><span class="p">(</span><span class="n">lib</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">comp_kwargs</span><span class="p">,</span> <span class="n">decomp_kwargs</span><span class="p">)</span>
 
 
-<span class="k">try</span><span class="p">:</span>
-    <span class="kn">import</span><span class="w"> </span><span class="nn">zlib</span>
-
 <div class="viewcode-block" id="ZLibCompressed">
-<a class="viewcode-back" href="../../../library/fields/compression.html#caterpillar.py.ZLibCompressed">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">ZLibCompressed</span><span class="p">(</span>
-        <span class="n">obj</span><span class="p">:</span> <span class="n">_LengthOrStruct</span><span class="p">,</span>
-        <span class="n">comp_kwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">decomp_kwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Create a struct representing zlib compression.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">compressed</span><span class="p">(</span><span class="n">zlib</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">comp_kwargs</span><span class="p">,</span> <span class="n">decomp_kwargs</span><span class="p">)</span></div>
+<a class="viewcode-back" href="../../../library/fields/compression.html#caterpillar.fields.ZLibCompressed">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">ZLibCompressed</span><span class="p">(</span>
+    <span class="n">obj</span><span class="p">,</span>
+    <span class="n">comp_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">decomp_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a struct representing zlib compression.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">zlib</span>
+
+        <span class="k">return</span> <span class="n">compressed</span><span class="p">(</span><span class="n">zlib</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">comp_kwargs</span><span class="p">,</span> <span class="n">decomp_kwargs</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Could not import zlib!&quot;</span><span class="p">)</span></div>
 
 
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="n">ZLibCompressed</span> <span class="o">=</span> <span class="kc">None</span>
-
-<span class="k">try</span><span class="p">:</span>
-    <span class="kn">import</span><span class="w"> </span><span class="nn">bz2</span>
 
 <div class="viewcode-block" id="Bz2Compressed">
-<a class="viewcode-back" href="../../../library/fields/compression.html#caterpillar.py.Bz2Compressed">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">Bz2Compressed</span><span class="p">(</span>
-        <span class="n">obj</span><span class="p">:</span> <span class="n">_LengthOrStruct</span><span class="p">,</span>
-        <span class="n">comp_kwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">decomp_kwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Create a struct representing bz2 compression.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">compressed</span><span class="p">(</span><span class="n">bz2</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">comp_kwargs</span><span class="p">,</span> <span class="n">decomp_kwargs</span><span class="p">)</span></div>
+<a class="viewcode-back" href="../../../library/fields/compression.html#caterpillar.fields.Bz2Compressed">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">Bz2Compressed</span><span class="p">(</span>
+    <span class="n">obj</span><span class="p">,</span>
+    <span class="n">comp_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">decomp_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a struct representing bz2 compression.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">bz2</span>
+
+        <span class="k">return</span> <span class="n">compressed</span><span class="p">(</span><span class="n">bz2</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">comp_kwargs</span><span class="p">,</span> <span class="n">decomp_kwargs</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Could not import bz2!&quot;</span><span class="p">)</span></div>
 
 
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="n">Bz2Compressed</span> <span class="o">=</span> <span class="kc">None</span>
-
-<span class="k">try</span><span class="p">:</span>
-    <span class="kn">import</span><span class="w"> </span><span class="nn">lzma</span>
 
 <div class="viewcode-block" id="LZMACompressed">
-<a class="viewcode-back" href="../../../library/fields/compression.html#caterpillar.py.LZMACompressed">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">LZMACompressed</span><span class="p">(</span>
-        <span class="n">obj</span><span class="p">:</span> <span class="n">_LengthOrStruct</span><span class="p">,</span>
-        <span class="n">comp_kwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">decomp_kwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Create a struct representing lzma compression.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">compressed</span><span class="p">(</span><span class="n">lzma</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">comp_kwargs</span><span class="p">,</span> <span class="n">decomp_kwargs</span><span class="p">)</span></div>
+<a class="viewcode-back" href="../../../library/fields/compression.html#caterpillar.fields.LZMACompressed">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">LZMACompressed</span><span class="p">(</span>
+    <span class="n">obj</span><span class="p">,</span>
+    <span class="n">comp_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">decomp_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a struct representing lzma compression.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">lzma</span>
+
+        <span class="k">return</span> <span class="n">compressed</span><span class="p">(</span><span class="n">lzma</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">comp_kwargs</span><span class="p">,</span> <span class="n">decomp_kwargs</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Could not import lzma!&quot;</span><span class="p">)</span></div>
 
 
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="n">LZMACompressed</span> <span class="o">=</span> <span class="kc">None</span>
-
-<span class="k">try</span><span class="p">:</span>
-    <span class="c1"># install package manuall with pip install lzallright</span>
-    <span class="kn">import</span><span class="w"> </span><span class="nn">lzallright</span>
 
 <div class="viewcode-block" id="LZOCompressed">
-<a class="viewcode-back" href="../../../library/fields/compression.html#caterpillar.py.LZOCompressed">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">LZOCompressed</span><span class="p">(</span>
-        <span class="n">obj</span><span class="p">:</span> <span class="n">_LengthOrStruct</span><span class="p">,</span>
-        <span class="n">comp_kwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">decomp_kwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Create a struct representing LZO compression.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">compressed</span><span class="p">(</span><span class="n">lzallright</span><span class="o">.</span><span class="n">LZOCompressor</span><span class="p">(),</span> <span class="n">obj</span><span class="p">,</span> <span class="n">comp_kwargs</span><span class="p">,</span> <span class="n">decomp_kwargs</span><span class="p">)</span></div>
+<a class="viewcode-back" href="../../../library/fields/compression.html#caterpillar.fields.LZOCompressed">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">LZOCompressed</span><span class="p">(</span>
+    <span class="n">obj</span><span class="p">,</span>
+    <span class="n">comp_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">decomp_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a struct representing LZO compression.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># install package manuall with pip install lzallright</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">lzallright</span>
 
+        <span class="k">return</span> <span class="n">compressed</span><span class="p">(</span><span class="n">lzallright</span><span class="o">.</span><span class="n">LZOCompressor</span><span class="p">(),</span> <span class="n">obj</span><span class="p">,</span> <span class="n">comp_kwargs</span><span class="p">,</span> <span class="n">decomp_kwargs</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Could not import lzallright!&quot;</span><span class="p">)</span></div>
 
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="n">LZOCompressed</span> <span class="o">=</span> <span class="kc">None</span>
 </pre></div>
 
                 </article>

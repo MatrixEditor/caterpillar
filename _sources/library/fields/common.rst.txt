@@ -7,121 +7,124 @@ Common Structs
 Numeric Structs
 ---------------
 
-.. autoclass:: caterpillar.py.PyStructFormattedField
+.. autoclass:: caterpillar.fields.PyStructFormattedField
     :members:
 
     .. versionchanged:: 2.4.0
         :code:`FormatField` renamed to :code:`PyStructFormattedField`
 
-.. autoattribute:: caterpillar.py.uint8
+.. autoattribute:: caterpillar.fields.uint8
 
-.. autoattribute:: caterpillar.py.int8
+.. autoattribute:: caterpillar.fields.int8
 
-.. autoattribute:: caterpillar.py.uint16
+.. autoattribute:: caterpillar.fields.uint16
 
-.. autoattribute:: caterpillar.py.int16
+.. autoattribute:: caterpillar.fields.int16
 
-.. autoattribute:: caterpillar.py.uint32
+.. autoattribute:: caterpillar.fields.uint32
 
-.. autoattribute:: caterpillar.py.int32
+.. autoattribute:: caterpillar.fields.int32
 
-.. autoattribute:: caterpillar.py.uint64
+.. autoattribute:: caterpillar.fields.uint64
 
-.. autoattribute:: caterpillar.py.int64
+.. autoattribute:: caterpillar.fields.int64
 
-.. autoattribute:: caterpillar.py.size_t
+.. autoattribute:: caterpillar.fields.size_t
 
-.. autoattribute:: caterpillar.py.ssize_t
+.. autoattribute:: caterpillar.fields.ssize_t
 
-.. autoattribute:: caterpillar.py.float16
+.. autoattribute:: caterpillar.fields.float16
 
-.. autoattribute:: caterpillar.py.float32
+.. autoattribute:: caterpillar.fields.float32
 
-.. autoattribute:: caterpillar.py.float64
+.. autoattribute:: caterpillar.fields.float64
 
-.. autoattribute:: caterpillar.py.void_ptr
+.. autoattribute:: caterpillar.fields.void_ptr
 
-.. autoattribute:: caterpillar.py.char
+.. autoattribute:: caterpillar.fields.char
 
-.. autoattribute:: caterpillar.py.boolean
+.. autoattribute:: caterpillar.fields.boolean
 
-.. autoattribute:: caterpillar.py.padding
+.. autoattribute:: caterpillar.fields.padding
 
-.. autoclass:: caterpillar.py.Int
+.. autoclass:: caterpillar.fields.Int
     :members:
 
-.. autoclass:: caterpillar.py.UInt
+.. autoclass:: caterpillar.fields.UInt
     :members:
 
-.. autoattribute:: caterpillar.py.vint
+.. autoattribute:: caterpillar.fields.vint
 
-.. autoclass:: caterpillar.py.VarInt
+.. autoclass:: caterpillar.fields.VarInt
     :members:
 
 Bytes, Strings
 --------------
 
-.. autoclass:: caterpillar.py.Memory
+.. autoclass:: caterpillar.fields.Memory
     :members:
 
     .. versionchanged:: 2.4.0
         Removed :code:`encoding` argument
 
-.. autoclass:: caterpillar.py.Bytes
+.. autoclass:: caterpillar.fields.Bytes
     :members:
 
-.. autoclass:: caterpillar.py.String
+.. autoclass:: caterpillar.fields.String
     :members:
 
-.. autoclass:: caterpillar.py.Prefixed
+.. autoclass:: caterpillar.fields.Prefixed
     :members:
 
     .. versionadded:: 2.4.0
         Added support for arbitrary structs. **Warning: the second parameter is now a struct instead of the encoding string.**
 
-.. autoclass:: caterpillar.py.CString
+.. autoclass:: caterpillar.fields.CString
     :members:
 
-.. autoclass:: caterpillar.py.ConstString
+.. autoclass:: caterpillar.fields.ConstString
     :members:
 
-.. autoclass:: caterpillar.py.ConstBytes
+.. autoclass:: caterpillar.fields.ConstBytes
     :members:
 
 
 Special Structs
 ---------------
 
-.. autoattribute:: caterpillar.py.Pass
+.. autoattribute:: caterpillar.fields.Pass
 
     See source code for details
 
 
-.. autoclass:: caterpillar.py.Aligned
+.. autoclass:: caterpillar.fields.Aligned
     :members:
 
     .. versionadded:: 2.4.0
 
-.. autofunction:: caterpillar.py.align
+.. autofunction:: caterpillar.fields.align
 
     .. versionadded:: 2.4.0
 
-.. autoclass:: caterpillar.py.Computed
+.. autoclass:: caterpillar.fields.Computed
     :members:
 
-.. autoclass:: caterpillar.py.Transformer
+.. autoclass:: caterpillar.fields.Transformer
     :members:
 
-.. autoclass:: caterpillar.py.Enum
+    .. versionchanged:: 2.5.0
+        Removed ``__fmt__`` method
+
+.. autoclass:: caterpillar.fields.Enum
     :members:
 
-.. autoclass:: caterpillar.py.Const
+.. autoclass:: caterpillar.fields.Const
     :members:
 
-.. autoclass:: caterpillar.py.Lazy
+.. autoclass:: caterpillar.fields.Lazy
     :members:
 
-.. autoclass:: caterpillar.py.Uuid
+.. autoclass:: caterpillar.fields.Uuid
     :members:
 
     .. versionchanged:: 2.4.0

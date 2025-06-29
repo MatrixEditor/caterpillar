@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>caterpillar.model._struct &#8212; Caterpillar 2.4.5 documentation</title>
+    <title>caterpillar.model._struct &#8212; Caterpillar 2.5.0 documentation</title>
   
   
   
@@ -32,6 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css?v=c1cc8b61" />
   
   <!-- So that users can add custom icons -->
   <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -39,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=159ac128"></script>
+    <script src="../../../_static/documentation_options.js?v=3c4615cf"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -50,7 +51,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.4.5" />
+  <meta name="docsearch:version" content="2.5.0" />
   </head>
   
   
@@ -87,7 +88,6 @@
 
   <div class="pst-async-banner-revealer d-none">
   <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
-  <aside class="bd-header-announcement d-print-none d-none" aria-label="Announcement" data-pst-announcement-url="https://raw.githubusercontent.com/MatrixEditor/caterpillar/master/docs/sphinx/source/_templates/announcement.html"></aside>
 </div>
 
   
@@ -113,7 +113,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.4.5</p>
+    <p class="title logo__title">Caterpillar 2.5.0</p>
   
 </a></div>
     
@@ -395,23 +395,18 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">tempfile</span><span class="w"> </span><span class="kn">import</span> <span class="n">TemporaryFile</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">io</span><span class="w"> </span><span class="kn">import</span> <span class="n">BytesIO</span><span class="p">,</span> <span class="n">IOBase</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Callable</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Iterable</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">OrderedDict</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">shutil</span><span class="w"> </span><span class="kn">import</span> <span class="n">copyfileobj</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">getstruct</span><span class="p">,</span> <span class="n">hasstruct</span><span class="p">,</span> <span class="n">STRUCT_FIELD</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">_StructLike</span><span class="p">,</span> <span class="n">_StreamType</span><span class="p">,</span> <span class="n">_SupportsUnpack</span><span class="p">,</span> <span class="n">_SupportsPack</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">_ContainsStruct</span><span class="p">,</span> <span class="n">_ContextLike</span><span class="p">,</span> <span class="n">_SupportsSize</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.shared</span><span class="w"> </span><span class="kn">import</span> <span class="n">getstruct</span><span class="p">,</span> <span class="n">hasstruct</span><span class="p">,</span> <span class="n">ATTR_STRUCT</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">_SupportsUnpack</span><span class="p">,</span> <span class="n">_SupportsSize</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">Context</span><span class="p">,</span> <span class="n">CTX_STREAM</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.byteorder</span><span class="w"> </span><span class="kn">import</span> <span class="n">ByteOrder</span><span class="p">,</span> <span class="n">Arch</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.exception</span><span class="w"> </span><span class="kn">import</span> <span class="n">InvalidValueError</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.options</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">S_EVAL_ANNOTATIONS</span><span class="p">,</span>
     <span class="n">S_UNION</span><span class="p">,</span>
     <span class="n">S_ADD_BYTES</span><span class="p">,</span>
     <span class="n">S_SLOTS</span><span class="p">,</span>
-    <span class="n">Flag</span><span class="p">,</span>
     <span class="n">GLOBAL_STRUCT_OPTIONS</span><span class="p">,</span>
     <span class="n">GLOBAL_UNION_OPTIONS</span><span class="p">,</span>
 <span class="p">)</span>
@@ -421,12 +416,10 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">._base</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span>
 
-<span class="n">_T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;_T&quot;</span><span class="p">)</span>
-
 
 <span class="c1"># REVISIT: remove dataclasses dependency</span>
 <div class="viewcode-block" id="Struct">
-<a class="viewcode-back" href="../../../library/model.html#caterpillar.model.Struct">[docs]</a>
+<a class="viewcode-back" href="../../../library/model/struct.html#caterpillar.model.Struct">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Struct</span><span class="p">(</span><span class="n">Sequence</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Represents a structured data model for serialization and deserialization.</span>
@@ -437,7 +430,7 @@
 <span class="sd">    :param options: Additional options specifying what to include in the final class.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">_member_map_</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Field</span><span class="p">]</span>
+    <span class="n">_member_map_</span><span class="p">:</span> <span class="nb">dict</span>
     <span class="c1"># An internal field that maps the field names of all class attributes to their</span>
     <span class="c1"># corresponding struct fields.</span>
 
@@ -446,12 +439,12 @@
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">model</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span>
-        <span class="n">order</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ByteOrder</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">arch</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Arch</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">options</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Flag</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">field_options</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Flag</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">kw_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">hook_cls</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">type</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">order</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">arch</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">field_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">kw_only</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">hook_cls</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">kw_only</span> <span class="o">=</span> <span class="n">kw_only</span>
         <span class="n">options</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">options</span> <span class="ow">or</span> <span class="p">[])</span>
@@ -465,7 +458,7 @@
             <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span>
             <span class="n">field_options</span><span class="o">=</span><span class="n">field_options</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">STRUCT_FIELD</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">ATTR_STRUCT</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
         <span class="c1"># Add additional options based on the struct&#39;s type</span>
         <span class="n">slots</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_option</span><span class="p">(</span><span class="n">S_SLOTS</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">dataclass</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">kw_only</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kw_only</span><span class="p">,</span> <span class="n">slots</span><span class="o">=</span><span class="n">slots</span><span class="p">)</span>
@@ -479,10 +472,10 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_option</span><span class="p">(</span><span class="n">S_ADD_BYTES</span><span class="p">):</span>
             <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;__bytes__&quot;</span><span class="p">,</span> <span class="n">_struct_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__type__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__type__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_prepare_fields</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_prepare_fields</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># We will inspect all base classes in reverse order and selectively</span>
         <span class="c1"># utilize classes that store a struct instance. Beginning at position</span>
         <span class="c1"># -1, concluding at 0, and using a step size of -1:</span>
@@ -497,10 +490,10 @@
         <span class="c1"># The why is described in detail here: https://docs.python.org/3/howto/annotations.html</span>
         <span class="k">return</span> <span class="n">inspect</span><span class="o">.</span><span class="n">get_annotations</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">eval_str</span><span class="o">=</span><span class="n">eval_str</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_set_default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_set_default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_process_default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">annotation</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">had_default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_process_default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">annotation</span><span class="p">,</span> <span class="n">had_default</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="n">default</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_process_default</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">annotation</span><span class="p">,</span> <span class="n">had_default</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">default</span> <span class="ow">is</span> <span class="n">INVALID_DEFAULT</span> <span class="ow">and</span> <span class="n">had_default</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">kw_only</span> <span class="o">=</span> <span class="kc">True</span>
@@ -512,10 +505,10 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">_remove_from_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="vm">__annotations__</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">unpack_one</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">unpack_one</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="o">**</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">unpack_one</span><span class="p">(</span><span class="n">context</span><span class="p">))</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">field</span><span class="p">:</span> <span class="n">Field</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">field</span><span class="p">:</span> <span class="n">Field</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
 
 
@@ -526,24 +519,24 @@
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">matches</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">annotation</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">matches</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">annotation</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">annotation</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="n">getstruct</span><span class="p">(</span><span class="n">annotation</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">convert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">annotation</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_StructLike</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">convert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">annotation</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">getstruct</span><span class="p">(</span><span class="n">annotation</span><span class="p">)</span>
 
 
 <span class="n">registry</span><span class="o">.</span><span class="n">annotation_registry</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_StructTypeConverter</span><span class="p">())</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_struct_bytes</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">Struct</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_struct_bytes</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">Struct</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">to_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">pack</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">to_bytes</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_struct_getitem</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">Struct</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Field</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_struct_getitem</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">Struct</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">class_getitem</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
             <span class="n">_</span><span class="p">,</span> <span class="n">dim</span> <span class="o">=</span> <span class="n">args</span>
@@ -559,12 +552,12 @@
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_make_struct</span><span class="p">(</span>
     <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span>
-    <span class="n">options</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Flag</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">order</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ByteOrder</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">arch</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Arch</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">field_options</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Flag</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">kw_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">hook_cls</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">type</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">order</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">arch</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">field_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">kw_only</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">hook_cls</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Helper function to create a Struct class.</span>
@@ -589,8 +582,17 @@
 
 
 <div class="viewcode-block" id="struct">
-<a class="viewcode-back" href="../../../library/model.html#caterpillar.model.struct">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">struct</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">_T</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">/</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">_T</span><span class="p">]:</span>
+<a class="viewcode-back" href="../../../library/model/struct.html#caterpillar.model.struct">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">struct</span><span class="p">(</span>
+    <span class="bp">cls</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="o">/</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">order</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">arch</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">field_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">kw_only</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Decorator to create a Struct class.</span>
 
@@ -603,17 +605,31 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">wrap</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">_make_struct</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_make_struct</span><span class="p">(</span>
+            <span class="bp">cls</span><span class="p">,</span>
+            <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span>
+            <span class="n">arch</span><span class="o">=</span><span class="n">arch</span><span class="p">,</span>
+            <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span>
+            <span class="n">field_options</span><span class="o">=</span><span class="n">field_options</span><span class="p">,</span>
+            <span class="n">kw_only</span><span class="o">=</span><span class="n">kw_only</span><span class="p">,</span>
+        <span class="p">)</span>
 
     <span class="k">if</span> <span class="bp">cls</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">_make_struct</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_make_struct</span><span class="p">(</span>
+            <span class="bp">cls</span><span class="p">,</span>
+            <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span>
+            <span class="n">arch</span><span class="o">=</span><span class="n">arch</span><span class="p">,</span>
+            <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span>
+            <span class="n">field_options</span><span class="o">=</span><span class="n">field_options</span><span class="p">,</span>
+            <span class="n">kw_only</span><span class="o">=</span><span class="n">kw_only</span><span class="p">,</span>
+        <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">wrap</span></div>
 
 
 
 <div class="viewcode-block" id="UnionHook">
-<a class="viewcode-back" href="../../../library/model.html#caterpillar.model.UnionHook">[docs]</a>
+<a class="viewcode-back" href="../../../library/model/struct.html#caterpillar.model.UnionHook">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">UnionHook</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Implementation of a hook to simulate union types.</span>
 
@@ -650,17 +666,17 @@
         <span class="c1"># This variable MUST be reset afterward</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_processing_</span> <span class="o">=</span> <span class="kc">False</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__model_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__model_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># since it is possible now, to specify non-kw_only constructors,</span>
         <span class="c1"># we have to capture both, args and kwargs</span>
         <span class="k">with</span> <span class="bp">self</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model_init_</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__model_setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">new_value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__model_setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">new_value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># The target attribute will alyaws be set</span>
         <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">new_value</span><span class="p">)</span>
 
-        <span class="n">members</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Field</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">struct</span><span class="o">.</span><span class="n">get_members</span><span class="p">()</span>
+        <span class="n">members</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">struct</span><span class="o">.</span><span class="n">get_members</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_processing_</span> <span class="ow">or</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">members</span><span class="p">:</span>
             <span class="c1"># Refresh can&#39;t be done if:</span>
             <span class="c1">#   1) the current instance is alredy being processed</span>
@@ -671,9 +687,7 @@
             <span class="c1"># delegation into method allows for customisation</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">refresh</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">new_value</span><span class="p">,</span> <span class="n">members</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">refresh</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">new_value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">members</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Field</span><span class="p">]</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">refresh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">new_value</span><span class="p">,</span> <span class="n">members</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># DEFAULT: retrieve the current field and temporarily pack its data</span>
         <span class="n">field</span> <span class="o">=</span> <span class="n">members</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">pack</span><span class="p">(</span><span class="n">new_value</span><span class="p">,</span> <span class="n">field</span><span class="p">)</span>
@@ -691,7 +705,7 @@
 
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_union_init</span><span class="p">(</span><span class="n">hook</span><span class="p">:</span> <span class="n">UnionHook</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_union_init</span><span class="p">(</span><span class="n">hook</span><span class="p">):</span>
     <span class="c1"># wrapper function to capture the calling instance</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">hook</span><span class="o">.</span><span class="n">__model_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -699,17 +713,27 @@
     <span class="k">return</span> <span class="n">init</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_union_setattr</span><span class="p">(</span><span class="n">hook</span><span class="p">:</span> <span class="n">UnionHook</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_union_setattr</span><span class="p">(</span><span class="n">hook</span><span class="p">):</span>
     <span class="c1"># wrapper function to capture the calling instance</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">setattribute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setattribute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">hook</span><span class="o">.</span><span class="n">__model_setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">setattribute</span>
 
 
 <div class="viewcode-block" id="union">
-<a class="viewcode-back" href="../../../library/model.html#caterpillar.model.union">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">union</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">/</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Flag</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">):</span>
+<a class="viewcode-back" href="../../../library/model/struct.html#caterpillar.model.union">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">union</span><span class="p">(</span>
+    <span class="bp">cls</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="o">/</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">order</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">arch</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">field_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">kw_only</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">hook_cls</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Decorator to create a Union class.</span>
 
@@ -723,20 +747,40 @@
     <span class="n">options</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">options</span> <span class="ow">or</span> <span class="p">[])</span> <span class="o">+</span> <span class="p">[</span><span class="n">S_UNION</span><span class="p">])</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">wrap</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">_make_struct</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_make_struct</span><span class="p">(</span>
+            <span class="bp">cls</span><span class="p">,</span>
+            <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span>
+            <span class="n">arch</span><span class="o">=</span><span class="n">arch</span><span class="p">,</span>
+            <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span>
+            <span class="n">field_options</span><span class="o">=</span><span class="n">field_options</span><span class="p">,</span>
+            <span class="n">kw_only</span><span class="o">=</span><span class="n">kw_only</span><span class="p">,</span>
+            <span class="n">hook_cls</span><span class="o">=</span><span class="n">hook_cls</span><span class="p">,</span>
+        <span class="p">)</span>
 
     <span class="k">if</span> <span class="bp">cls</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">_make_struct</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_make_struct</span><span class="p">(</span>
+            <span class="bp">cls</span><span class="p">,</span>
+            <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span>
+            <span class="n">arch</span><span class="o">=</span><span class="n">arch</span><span class="p">,</span>
+            <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span>
+            <span class="n">field_options</span><span class="o">=</span><span class="n">field_options</span><span class="p">,</span>
+            <span class="n">kw_only</span><span class="o">=</span><span class="n">kw_only</span><span class="p">,</span>
+            <span class="n">hook_cls</span><span class="o">=</span><span class="n">hook_cls</span><span class="p">,</span>
+        <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">wrap</span></div>
 
 
 
 <div class="viewcode-block" id="pack">
-<a class="viewcode-back" href="../../../library/model.html#caterpillar.model.pack">[docs]</a>
+<a class="viewcode-back" href="../../../library/model/struct.html#caterpillar.model.pack">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">pack</span><span class="p">(</span>
-    <span class="n">obj</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">_ContainsStruct</span><span class="p">],</span>
-    <span class="n">struct</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">_SupportsPack</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">obj</span><span class="p">,</span>
+    <span class="n">struct</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="o">/</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">use_tempfile</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">as_field</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwds</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -749,19 +793,21 @@
 <span class="sd">    :return: The packed bytes.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">buffer</span> <span class="o">=</span> <span class="n">BytesIO</span><span class="p">()</span>
-    <span class="n">pack_into</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">buffer</span><span class="p">,</span> <span class="n">struct</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span>
+    <span class="n">pack_into</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">buffer</span><span class="p">,</span> <span class="n">struct</span><span class="p">,</span> <span class="n">use_tempfile</span><span class="o">=</span><span class="n">use_tempfile</span><span class="p">,</span> <span class="n">as_field</span><span class="o">=</span><span class="n">as_field</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">buffer</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span></div>
 
 
 
 <div class="viewcode-block" id="pack_into">
-<a class="viewcode-back" href="../../../library/model.html#caterpillar.model.pack_into">[docs]</a>
+<a class="viewcode-back" href="../../../library/model/struct.html#caterpillar.model.pack_into">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">pack_into</span><span class="p">(</span>
-    <span class="n">obj</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">_ContainsStruct</span><span class="p">],</span>
-    <span class="n">buffer</span><span class="p">:</span> <span class="n">_StreamType</span><span class="p">,</span>
-    <span class="n">struct</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">_StructLike</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">use_tempfile</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">as_field</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">obj</span><span class="p">,</span>
+    <span class="n">buffer</span><span class="p">,</span>
+    <span class="n">struct</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="o">/</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">use_tempfile</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">as_field</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwds</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -774,6 +820,7 @@
 <span class="sd">    data is written to the `buffer`.</span>
 
 <span class="sd">    Example 1: Packing an object into a bytes buffer</span>
+
 <span class="sd">    &gt;&gt;&gt; buffer = BytesIO()</span>
 <span class="sd">    &gt;&gt;&gt; my_obj = SomeObject()  # Assume SomeObject is a valid object to be packed</span>
 <span class="sd">    &gt;&gt;&gt; pack_into(my_obj, buffer, struct=SomeStruct())  # Using a specific struct</span>
@@ -781,10 +828,12 @@
 <span class="sd">    b&quot;...&quot;</span>
 
 <span class="sd">    Example 2: Packing into a file-like stream (e.g., file)</span>
+
 <span class="sd">    &gt;&gt;&gt; with open(&#39;packed_data.bin&#39;, &#39;wb&#39;) as f:</span>
 <span class="sd">    ...     pack_into(my_obj, f, struct=SomeStruct())  # Pack into a file</span>
 
 <span class="sd">    Example 3: Using `as_field` to wrap the struct in a Field before packing</span>
+
 <span class="sd">    &gt;&gt;&gt; buffer = BytesIO()</span>
 <span class="sd">    &gt;&gt;&gt; pack_into(42, buffer, struct=uint8, as_field=True)</span>
 <span class="sd">    &gt;&gt;&gt; buffer.getvalue()</span>
@@ -799,9 +848,16 @@
 
 <span class="sd">    :raises TypeError: If no `struct` is specified and cannot be inferred from the object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">offsets</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">memoryview</span><span class="p">]</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+    <span class="n">offsets</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+    <span class="c1"># NOTE: we don&#39;t have to set _root here because the default root context</span>
+    <span class="c1"># will be this instance.</span>
     <span class="n">context</span> <span class="o">=</span> <span class="n">Context</span><span class="p">(</span>
-        <span class="n">_parent</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">_path</span><span class="o">=</span><span class="s2">&quot;&lt;root&gt;&quot;</span><span class="p">,</span> <span class="n">_pos</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">_offsets</span><span class="o">=</span><span class="n">offsets</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">MODE_PACK</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span>
+        <span class="n">_parent</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">_path</span><span class="o">=</span><span class="s2">&quot;&lt;root&gt;&quot;</span><span class="p">,</span>
+        <span class="n">_pos</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">_offsets</span><span class="o">=</span><span class="n">offsets</span><span class="p">,</span>
+        <span class="n">mode</span><span class="o">=</span><span class="n">MODE_PACK</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwds</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="n">struct</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">struct</span> <span class="o">=</span> <span class="n">getstruct</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
@@ -848,12 +904,15 @@
 
 
 <div class="viewcode-block" id="pack_file">
-<a class="viewcode-back" href="../../../library/model.html#caterpillar.model.pack_file">[docs]</a>
+<a class="viewcode-back" href="../../../library/model/struct.html#caterpillar.model.pack_file">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">pack_file</span><span class="p">(</span>
-    <span class="n">obj</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">_ContainsStruct</span><span class="p">],</span>
+    <span class="n">obj</span><span class="p">,</span>
     <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">struct</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">_StructLike</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">use_tempfile</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">struct</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="o">/</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">use_tempfile</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">as_field</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwds</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -867,18 +926,20 @@
 <span class="sd">    :return: None</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;w+b&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
-        <span class="n">pack_into</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">fp</span><span class="p">,</span> <span class="n">struct</span><span class="p">,</span> <span class="n">use_tempfile</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span></div>
+        <span class="n">pack_into</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">fp</span><span class="p">,</span> <span class="n">struct</span><span class="p">,</span> <span class="n">use_tempfile</span><span class="o">=</span><span class="n">use_tempfile</span><span class="p">,</span> <span class="n">as_field</span><span class="o">=</span><span class="n">as_field</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="unpack">
-<a class="viewcode-back" href="../../../library/model.html#caterpillar.model.unpack">[docs]</a>
+<a class="viewcode-back" href="../../../library/model/struct.html#caterpillar.model.unpack">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">unpack</span><span class="p">(</span>
-    <span class="n">struct</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">_SupportsUnpack</span><span class="p">,</span> <span class="n">_ContainsStruct</span><span class="p">],</span>
-    <span class="n">buffer</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">_StreamType</span><span class="p">],</span>
-    <span class="n">as_field</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">struct</span><span class="p">,</span>
+    <span class="n">buffer</span><span class="p">,</span>
+    <span class="o">/</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">as_field</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwds</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Unpack an object from a bytes buffer or stream using the specified struct.</span>
 
@@ -889,6 +950,7 @@
 <span class="sd">    context as attributes.</span>
 
 <span class="sd">    Example:</span>
+
 <span class="sd">    &gt;&gt;&gt; buffer = b&#39;\\x00\\x01\\x02\\x03&#39;</span>
 <span class="sd">    &gt;&gt;&gt; struct = SomeStruct()</span>
 <span class="sd">    &gt;&gt;&gt; unpack(struct, buffer)</span>
@@ -927,12 +989,15 @@
 
 
 <div class="viewcode-block" id="unpack_file">
-<a class="viewcode-back" href="../../../library/model.html#caterpillar.model.unpack_file">[docs]</a>
+<a class="viewcode-back" href="../../../library/model/struct.html#caterpillar.model.unpack_file">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">unpack_file</span><span class="p">(</span>
-    <span class="n">struct</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">_StructLike</span><span class="p">,</span> <span class="n">_ContainsStruct</span><span class="p">],</span>
+    <span class="n">struct</span><span class="p">,</span>
     <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="o">/</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">as_field</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwds</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Unpack an object from a file using the specified struct.</span>
 
@@ -943,16 +1008,23 @@
 <span class="sd">    :return: The unpacked object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">unpack</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">fp</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">unpack</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">fp</span><span class="p">,</span> <span class="n">as_field</span><span class="o">=</span><span class="n">as_field</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span></div>
 
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">sizeof</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">_StructLike</span><span class="p">,</span> <span class="n">_ContainsStruct</span><span class="p">,</span> <span class="n">_SupportsSize</span><span class="p">],</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<div class="viewcode-block" id="sizeof">
+<a class="viewcode-back" href="../../../library/model/struct.html#caterpillar.model.sizeof">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">sizeof</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
     <span class="n">context</span> <span class="o">=</span> <span class="n">Context</span><span class="p">(</span><span class="n">_parent</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">_path</span><span class="o">=</span><span class="s2">&quot;&lt;root&gt;&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span>
     <span class="n">struct_</span> <span class="o">=</span> <span class="n">obj</span>
     <span class="k">if</span> <span class="n">hasstruct</span><span class="p">(</span><span class="n">struct_</span><span class="p">):</span>
         <span class="n">struct_</span> <span class="o">=</span> <span class="n">getstruct</span><span class="p">(</span><span class="n">struct_</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">struct_</span><span class="o">.</span><span class="n">__size__</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">struct_</span><span class="p">,</span> <span class="n">_SupportsSize</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">struct_</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> does not support size calculation!&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">struct_</span><span class="o">.</span><span class="n">__size__</span><span class="p">(</span><span class="n">context</span><span class="p">)</span></div>
+
 </pre></div>
 
                 </article>

@@ -10,7 +10,7 @@ Context classes
 ---------------
 
 .. autoclass:: caterpillar.context.Context
-    :members:
+    :members: __context_getattr__, __context_setattr__, _root
 
 .. autoclass:: caterpillar.context.ContextPath
     :members:
@@ -52,6 +52,8 @@ Special Attributes
 .. autoattribute:: caterpillar.context.CTX_PATH
 
 .. autoattribute:: caterpillar.context.CTX_SEQ
+
+.. autoattribute:: caterpillar.context.CTX_ROOT
 
 
 Expressions

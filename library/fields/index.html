@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Fields &#8212; Caterpillar 2.4.5 documentation</title>
+    <title>4.8. Fields &#8212; Caterpillar 2.5.0 documentation</title>
   
   
   
@@ -33,6 +33,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=c1cc8b61" />
   
   <!-- So that users can add custom icons -->
   <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -40,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=159ac128"></script>
+    <script src="../../_static/documentation_options.js?v=3c4615cf"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,11 +50,11 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'library/fields/index';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Field Model" href="field_model.html" />
-    <link rel="prev" title="Annotation Registry" href="../registry.html" />
+    <link rel="next" title="4.8.1. Field Model" href="field_model.html" />
+    <link rel="prev" title="4.7. Shared Concepts" href="../shared.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.4.5" />
+  <meta name="docsearch:version" content="2.5.0" />
   </head>
   
   
@@ -90,7 +91,6 @@
 
   <div class="pst-async-banner-revealer d-none">
   <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
-  <aside class="bd-header-announcement d-print-none d-none" aria-label="Announcement" data-pst-announcement-url="https://raw.githubusercontent.com/MatrixEditor/caterpillar/master/docs/sphinx/source/_templates/announcement.html"></aside>
 </div>
 
   
@@ -116,7 +116,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.4.5</p>
+    <p class="title logo__title">Caterpillar 2.5.0</p>
   
 </a></div>
     
@@ -332,24 +332,30 @@
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Python API</span></p>
 <ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../byteorder.html">Byteorder and Architecture</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../options.html">Options</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../abc.html">Abstract base classes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../context.html">Context</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../exceptions.html">Exceptions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../model.html">Struct Model</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../registry.html">Annotation Registry</a></li>
-<li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">Fields</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="field_model.html">Field Model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="common.html">Common Structs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compression.html">Compression Structs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="crypto.html">Cryptographic Structs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../byteorder.html">4.1. Byteorder and Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../options.html">4.2. Options / Flags</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../context.html">4.3. Context</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../exceptions.html">4.4. Exceptions</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../model.html">4.5. Struct Model</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../model/sequence.html">4.5.1. Sequence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../model/struct.html">4.5.2. Struct</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../model/bitfield.html">4.5.3. Bitfield</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../model/template.html">4.5.4. Templates</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../registry.html">4.6. Annotation Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../shared.html">4.7. Shared Concepts</a></li>
+<li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">4.8. Fields</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="field_model.html">4.8.1. Field Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="common.html">4.8.2. Common Structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compression.html">4.8.3. Compression Structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="crypto.html">4.8.4. Cryptographic Structs</a></li>
 </ul>
 </details></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">C API Python Types</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../ctypes/int.html">Integer Types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ctypes/int.html">5.1. Integer Types</a></li>
 </ul>
 </div>
 </nav></div>
@@ -391,9 +397,9 @@
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Library</a></li>
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link"><span class="section-number">4. </span>Library</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Fields</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">4.8. </span>Fields</span></li>
   </ul>
 </nav>
 </div>
@@ -411,7 +417,7 @@
                 <article class="bd-article">
                   
   <section id="fields">
-<span id="id1"></span><h1>Fields<a class="headerlink" href="#fields" title="Link to this heading">#</a></h1>
+<span id="id1"></span><h1><span class="section-number">4.8. </span>Fields<a class="headerlink" href="#fields" title="Link to this heading">#</a></h1>
 <p><em>Fields</em> serve as the foundation of this library. Everything is done internally
 using fields. More specific information about the internal model of fields are
 given in <a class="reference internal" href="../../reference/index.html#reference-index"><span class="std std-ref">Reference</span></a>. This section will discuss all implemented
@@ -419,30 +425,30 @@ structs that are compatible with a <code class="xref py py-class docutils litera
 <div class="toctree-wrapper compound">
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="field_model.html">Field Model</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="field_model.html#caterpillar.py.Field"><code class="docutils literal notranslate"><span class="pre">Field</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="field_model.html#caterpillar.py.FieldMixin"><code class="docutils literal notranslate"><span class="pre">FieldMixin</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="field_model.html#caterpillar.py.FieldStruct"><code class="docutils literal notranslate"><span class="pre">FieldStruct</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="field_model.html#caterpillar.py.Chain"><code class="docutils literal notranslate"><span class="pre">Chain</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="field_model.html#caterpillar.py.If"><code class="docutils literal notranslate"><span class="pre">If</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="field_model.html#caterpillar.py.ElseIf"><code class="docutils literal notranslate"><span class="pre">ElseIf</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="field_model.html">4.8.1. Field Model</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="field_model.html#caterpillar.fields.Field"><code class="docutils literal notranslate"><span class="pre">Field</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="field_model.html#caterpillar.fields.FieldMixin"><code class="docutils literal notranslate"><span class="pre">FieldMixin</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="field_model.html#caterpillar.fields.FieldStruct"><code class="docutils literal notranslate"><span class="pre">FieldStruct</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="field_model.html#caterpillar.fields.Chain"><code class="docutils literal notranslate"><span class="pre">Chain</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="field_model.html#caterpillar.fields.If"><code class="docutils literal notranslate"><span class="pre">If</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="field_model.html#caterpillar.fields.ElseIf"><code class="docutils literal notranslate"><span class="pre">ElseIf</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="common.html">Common Structs</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="common.html#numeric-structs">Numeric Structs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="common.html#bytes-strings">Bytes, Strings</a></li>
-<li class="toctree-l2"><a class="reference internal" href="common.html#special-structs">Special Structs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="common.html">4.8.2. Common Structs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="common.html#numeric-structs">4.8.2.1. Numeric Structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="common.html#bytes-strings">4.8.2.2. Bytes, Strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="common.html#special-structs">4.8.2.3. Special Structs</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="compression.html">Compression Structs</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="compression.html#basic-structs">Basic structs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compression.html#supported-compression-types">Supported compression types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compression.html">4.8.3. Compression Structs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="compression.html#basic-structs">4.8.3.1. Basic structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compression.html#supported-compression-types">4.8.3.2. Supported compression types</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="crypto.html">Cryptographic Structs</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="crypto.html#hashes">Hashes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="crypto.html#ciphers">Ciphers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="crypto.html#standard-interface">Standard interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="crypto.html">4.8.4. Cryptographic Structs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="crypto.html#hashes">4.8.4.1. Hashes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="crypto.html#ciphers">4.8.4.2. Ciphers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="crypto.html#standard-interface">4.8.4.3. Standard interface</a></li>
 </ul>
 </li>
 </ul>
@@ -460,12 +466,12 @@ structs that are compatible with a <code class="xref py py-class docutils litera
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="../registry.html"
+       href="../shared.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Annotation Registry</p>
+        <p class="prev-next-title"><span class="section-number">4.7. </span>Shared Concepts</p>
       </div>
     </a>
     <a class="right-next"
@@ -473,7 +479,7 @@ structs that are compatible with a <code class="xref py py-class docutils litera
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Field Model</p>
+        <p class="prev-next-title"><span class="section-number">4.8.1. </span>Field Model</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

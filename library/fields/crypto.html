@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Cryptographic Structs &#8212; Caterpillar 2.4.5 documentation</title>
+    <title>4.8.4. Cryptographic Structs &#8212; Caterpillar 2.5.0 documentation</title>
   
   
   
@@ -33,6 +33,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=c1cc8b61" />
   
   <!-- So that users can add custom icons -->
   <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -40,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=159ac128"></script>
+    <script src="../../_static/documentation_options.js?v=3c4615cf"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,11 +50,11 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'library/fields/crypto';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Integer Types" href="../ctypes/int.html" />
-    <link rel="prev" title="Compression Structs" href="compression.html" />
+    <link rel="next" title="5.1. Integer Types" href="../ctypes/int.html" />
+    <link rel="prev" title="4.8.3. Compression Structs" href="compression.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.4.5" />
+  <meta name="docsearch:version" content="2.5.0" />
   </head>
   
   
@@ -90,7 +91,6 @@
 
   <div class="pst-async-banner-revealer d-none">
   <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
-  <aside class="bd-header-announcement d-print-none d-none" aria-label="Announcement" data-pst-announcement-url="https://raw.githubusercontent.com/MatrixEditor/caterpillar/master/docs/sphinx/source/_templates/announcement.html"></aside>
 </div>
 
   
@@ -116,7 +116,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.4.5</p>
+    <p class="title logo__title">Caterpillar 2.5.0</p>
   
 </a></div>
     
@@ -332,24 +332,30 @@
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Python API</span></p>
 <ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../byteorder.html">Byteorder and Architecture</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../options.html">Options</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../abc.html">Abstract base classes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../context.html">Context</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../exceptions.html">Exceptions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../model.html">Struct Model</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../registry.html">Annotation Registry</a></li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Fields</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="field_model.html">Field Model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="common.html">Common Structs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compression.html">Compression Structs</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Cryptographic Structs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../byteorder.html">4.1. Byteorder and Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../options.html">4.2. Options / Flags</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../context.html">4.3. Context</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../exceptions.html">4.4. Exceptions</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../model.html">4.5. Struct Model</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../model/sequence.html">4.5.1. Sequence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../model/struct.html">4.5.2. Struct</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../model/bitfield.html">4.5.3. Bitfield</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../model/template.html">4.5.4. Templates</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../registry.html">4.6. Annotation Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../shared.html">4.7. Shared Concepts</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">4.8. Fields</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="field_model.html">4.8.1. Field Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="common.html">4.8.2. Common Structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compression.html">4.8.3. Compression Structs</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">4.8.4. Cryptographic Structs</a></li>
 </ul>
 </details></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">C API Python Types</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../ctypes/int.html">Integer Types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ctypes/int.html">5.1. Integer Types</a></li>
 </ul>
 </div>
 </nav></div>
@@ -391,12 +397,12 @@
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Library</a></li>
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link"><span class="section-number">4. </span>Library</a></li>
     
     
-    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Fields</a></li>
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link"><span class="section-number">4.8. </span>Fields</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Cryptographic Structs</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">4.8.4. </span>Cryptographic Structs</span></li>
   </ul>
 </nav>
 </div>
@@ -414,12 +420,12 @@
                 <article class="bd-article">
                   
   <section id="cryptographic-structs">
-<span id="fields-cryptography"></span><h1>Cryptographic Structs<a class="headerlink" href="#cryptographic-structs" title="Link to this heading">#</a></h1>
+<span id="fields-cryptography"></span><h1><span class="section-number">4.8.4. </span>Cryptographic Structs<a class="headerlink" href="#cryptographic-structs" title="Link to this heading">#</a></h1>
 <section id="hashes">
-<h2>Hashes<a class="headerlink" href="#hashes" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">4.8.4.1. </span>Hashes<a class="headerlink" href="#hashes" title="Link to this heading">#</a></h2>
 <dl class="py class">
-<dt class="sig sig-object py" id="caterpillar.py.Algorithm">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.py.</span></span><span class="sig-name descname"><span class="pre">Algorithm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">create</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../abc.html#caterpillar.abc._ContextLike" title="caterpillar.abc._ContextLike"><span class="pre">_ContextLike</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bytes</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../abc.html#caterpillar.abc._ContextLike" title="caterpillar.abc._ContextLike"><span class="pre">_ContextLike</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">digest</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../abc.html#caterpillar.abc._ContextLike" title="caterpillar.abc._ContextLike"><span class="pre">_ContextLike</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/digest.html#Algorithm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.py.Algorithm" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="caterpillar.fields.Algorithm">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.fields.</span></span><span class="sig-name descname"><span class="pre">Algorithm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">create</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">digest</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/digest.html#Algorithm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Algorithm" title="Link to this definition">#</a></dt>
 <dd><div class="versionadded">
 <p><span class="versionmodified added">Added in version 2.4.0.</span></p>
 </div>
@@ -447,9 +453,9 @@ hash algorithms or checksums like SHA256 or CRC32.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>create</strong> (<em>Callable</em><em>[</em><em>[</em><a class="reference internal" href="../abc.html#caterpillar.abc._ContextLike" title="caterpillar.abc._ContextLike"><em>_ContextLike</em></a><em>]</em><em>, </em><em>Any</em><em>]</em>) – A callable that creates an instance of the algorithm or checksum.</p></li>
-<li><p><strong>update</strong> (<em>Callable</em><em>[</em><em>[</em><em>Any</em><em>, </em><em>bytes</em><em>, </em><a class="reference internal" href="../abc.html#caterpillar.abc._ContextLike" title="caterpillar.abc._ContextLike"><em>_ContextLike</em></a><em>]</em><em>, </em><em>Any</em><em>]</em>) – A callable that updates the algorithm or checksum with new data.</p></li>
-<li><p><strong>digest</strong> (<em>Callable</em><em>[</em><em>[</em><em>Any</em><em>, </em><a class="reference internal" href="../abc.html#caterpillar.abc._ContextLike" title="caterpillar.abc._ContextLike"><em>_ContextLike</em></a><em>]</em><em>, </em><em>bytes</em><em>]</em>) – A callable that returns the digest or checksum value.</p></li>
+<li><p><strong>create</strong> (<em>Callable</em><em>[</em><em>[</em><a class="reference internal" href="../../reference/datamodel/protocols/contextlike.html#ContextLike" title="_ContextLike"><em>_ContextLike</em></a><em>]</em><em>, </em><em>Any</em><em>]</em>) – A callable that creates an instance of the algorithm or checksum.</p></li>
+<li><p><strong>update</strong> (<em>Callable</em><em>[</em><em>[</em><em>Any</em><em>, </em><em>bytes</em><em>, </em><a class="reference internal" href="../../reference/datamodel/protocols/contextlike.html#ContextLike" title="_ContextLike"><em>_ContextLike</em></a><em>]</em><em>, </em><em>Any</em><em>]</em>) – A callable that updates the algorithm or checksum with new data.</p></li>
+<li><p><strong>digest</strong> (<em>Callable</em><em>[</em><em>[</em><em>Any</em><em>, </em><a class="reference internal" href="../../reference/datamodel/protocols/contextlike.html#ContextLike" title="_ContextLike"><em>_ContextLike</em></a><em>]</em><em>, </em><em>bytes</em><em>]</em>) – A callable that returns the digest or checksum value.</p></li>
 <li><p><strong>name</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – An optional name for the algorithm.</p></li>
 </ul>
 </dd>
@@ -457,15 +463,15 @@ hash algorithms or checksums like SHA256 or CRC32.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="caterpillar.py.Digest">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.py.</span></span><span class="sig-name descname"><span class="pre">Digest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#caterpillar.py.Algorithm" title="caterpillar.fields.digest.Algorithm"><span class="pre">Algorithm</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">struct</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../abc.html#caterpillar.abc._StructLike" title="caterpillar.abc._StructLike"><span class="pre">_StructLike</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verify</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/digest.html#Digest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.py.Digest" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="caterpillar.fields.Digest">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.fields.</span></span><span class="sig-name descname"><span class="pre">Digest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">algorithm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">struct</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verify</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/digest.html#Digest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Digest" title="Link to this definition">#</a></dt>
 <dd><p>A class to handle the creation, updating, and verification of digests
 using a specified algorithm.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">Added in version 2.4.0.</span></p>
 </div>
 <div class="versionchanged">
-<p><span class="versionmodified changed">Changed in version 2.4.3: </span>Python 3.14 is <strong>not</strong> supported, use <a class="reference internal" href="#caterpillar.py.DigestField" title="caterpillar.py.DigestField"><code class="xref py py-class docutils literal notranslate"><span class="pre">DigestField</span></code></a> instead.</p>
+<p><span class="versionmodified changed">Changed in version 2.4.3: </span>Python 3.14 is <strong>not</strong> supported, use <a class="reference internal" href="#caterpillar.fields.DigestField" title="caterpillar.fields.DigestField"><code class="xref py py-class docutils literal notranslate"><span class="pre">DigestField</span></code></a> instead.</p>
 </div>
 <p>The <cite>Digest</cite> class allows you to integrate hash or checksum algorithms
 into a struct by installing hooks that manage the digest state during
@@ -517,8 +523,8 @@ and validation. When packing an object, the digest will be updated automatically
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>algorithm</strong> (<a class="reference internal" href="#caterpillar.py.Algorithm" title="caterpillar.py.Algorithm"><em>Algorithm</em></a>) – The checksum or cryptographic algorithm used to generate the digest.</p></li>
-<li><p><strong>struct</strong> (<a class="reference internal" href="../abc.html#caterpillar.abc._StructLike" title="caterpillar.abc._StructLike"><em>_StructLike</em></a>) – The struct to which the digest will be attached.</p></li>
+<li><p><strong>algorithm</strong> (<a class="reference internal" href="#caterpillar.fields.Algorithm" title="caterpillar.fields.Algorithm"><em>Algorithm</em></a>) – The checksum or cryptographic algorithm used to generate the digest.</p></li>
+<li><p><strong>struct</strong> (<a class="reference internal" href="../../reference/datamodel/protocols/structlike.html#StructLike" title="_StructLike"><em>_StructLike</em></a>) – The struct to which the digest will be attached.</p></li>
 <li><p><strong>name</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – An optional name for the digest field (defaults to ‘sha256’ or another default name).</p></li>
 <li><p><strong>verify</strong> (<em>bool</em>) – Whether to enable verification of the digest upon unpacking. Default is False.</p></li>
 <li><p><strong>path</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – Optional path to the digest field in the context, used for accessing and storing the digest.</p></li>
@@ -528,8 +534,8 @@ and validation. When packing an object, the digest will be updated automatically
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="caterpillar.py.DigestField">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.py.</span></span><span class="sig-name descname"><span class="pre">DigestField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">struct</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../abc.html#caterpillar.abc._StructLike" title="caterpillar.abc._StructLike"><span class="pre">_StructLike</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">verify</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/digest.html#DigestField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.py.DigestField" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="caterpillar.fields.DigestField">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.fields.</span></span><span class="sig-name descname"><span class="pre">DigestField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">struct</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verify</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/digest.html#DigestField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.DigestField" title="Link to this definition">#</a></dt>
 <dd><div class="versionadded">
 <p><span class="versionmodified added">Added in version 2.4.5.</span></p>
 </div>
@@ -552,8 +558,8 @@ and validation. When packing an object, the digest will be updated automatically
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>target</strong> (<em>str</em>) – The unique name shared with the corresponding <a class="reference internal" href="#caterpillar.py.DigestFieldAction" title="caterpillar.py.DigestFieldAction"><code class="xref py py-class docutils literal notranslate"><span class="pre">DigestFieldAction</span></code></a>.</p></li>
-<li><p><strong>struct</strong> (<a class="reference internal" href="../abc.html#caterpillar.abc._StructLike" title="caterpillar.abc._StructLike"><em>_StructLike</em></a>) – The struct used to pack/unpack the digest value (e.g., Bytes(32))</p></li>
+<li><p><strong>target</strong> (<em>str</em>) – The unique name shared with the corresponding <a class="reference internal" href="#caterpillar.fields.DigestFieldAction" title="caterpillar.fields.DigestFieldAction"><code class="xref py py-class docutils literal notranslate"><span class="pre">DigestFieldAction</span></code></a>.</p></li>
+<li><p><strong>struct</strong> (<a class="reference internal" href="../../reference/datamodel/protocols/structlike.html#StructLike" title="_StructLike"><em>_StructLike</em></a>) – The struct used to pack/unpack the digest value (e.g., Bytes(32))</p></li>
 <li><p><strong>verify</strong> (<em>bool</em>) – Whether to verify the unpacked digest against the computed one.</p></li>
 </ul>
 </dd>
@@ -561,8 +567,8 @@ and validation. When packing an object, the digest will be updated automatically
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="caterpillar.py.DigestFieldAction">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.py.</span></span><span class="sig-name descname"><span class="pre">DigestFieldAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#caterpillar.py.Algorithm" title="caterpillar.fields.digest.Algorithm"><span class="pre">Algorithm</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/digest.html#DigestFieldAction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.py.DigestFieldAction" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="caterpillar.fields.DigestFieldAction">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.fields.</span></span><span class="sig-name descname"><span class="pre">DigestFieldAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#caterpillar.fields.Algorithm" title="caterpillar.fields.digest.Algorithm"><span class="pre">Algorithm</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/digest.html#DigestFieldAction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.DigestFieldAction" title="Link to this definition">#</a></dt>
 <dd><div class="versionadded">
 <p><span class="versionmodified added">Added in version 2.4.5.</span></p>
 </div>
@@ -578,7 +584,7 @@ and update digest state as data is read or written.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>target</strong> (<em>str</em>) – The unique name identifying this digest field.</p></li>
-<li><p><strong>algorithm</strong> (<a class="reference internal" href="#caterpillar.py.Algorithm" title="caterpillar.py.Algorithm"><em>Algorithm</em></a>) – The digest algorithm implementation (must support create/update/digest).</p></li>
+<li><p><strong>algorithm</strong> (<a class="reference internal" href="#caterpillar.fields.Algorithm" title="caterpillar.fields.Algorithm"><em>Algorithm</em></a>) – The digest algorithm implementation (must support create/update/digest).</p></li>
 </ul>
 </dd>
 </dl>
@@ -586,15 +592,15 @@ and update digest state as data is read or written.</p>
 
 </section>
 <section id="ciphers">
-<h2>Ciphers<a class="headerlink" href="#ciphers" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">4.8.4.2. </span>Ciphers<a class="headerlink" href="#ciphers" title="Link to this heading">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="caterpillar.fields.Encrypted">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.fields.</span></span><span class="sig-name descname"><span class="pre">Encrypted</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">EllipsisType</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../abc.html#caterpillar.abc._ContextLambda" title="caterpillar.abc._ContextLambda"><span class="pre">_ContextLambda</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><span class="pre">CipherAlgorithm</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><span class="pre">Mode</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Padding</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><span class="pre">Padding</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algo_args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../abc.html#caterpillar.abc._ContextLambda" title="caterpillar.abc._ContextLambda"><span class="pre">_ContextLambda</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode_args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../abc.html#caterpillar.abc._ContextLambda" title="caterpillar.abc._ContextLambda"><span class="pre">_ContextLambda</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding_args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../abc.html#caterpillar.abc._ContextLambda" title="caterpillar.abc._ContextLambda"><span class="pre">_ContextLambda</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../abc.html#caterpillar.abc._StructLike" title="caterpillar.abc._StructLike"><span class="pre">_StructLike</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/crypto.html#Encrypted"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Encrypted" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.fields.</span></span><span class="sig-name descname"><span class="pre">Encrypted</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algo_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/crypto.html#Encrypted"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Encrypted" title="Link to this definition">#</a></dt>
 <dd><p>Struct that is able to encrypt/decrypt blocks of memory.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>length</strong> (<em>Union</em><em>[</em><em>int</em><em>, </em><em>_GreedyType</em><em>, </em><a class="reference internal" href="../abc.html#caterpillar.abc._ContextLambda" title="caterpillar.abc._ContextLambda"><em>_ContextLambda</em></a><em>]</em>) – Length of the encrypted data.</p></li>
+<li><p><strong>length</strong> (<em>Union</em><em>[</em><em>int</em><em>, </em><em>_GreedyType</em><em>, </em><a class="reference internal" href="../../reference/datamodel/protocols/contextlambda.html#ContextLambda" title="_ContextLambda"><em>_ContextLambda</em></a><em>]</em>) – Length of the encrypted data.</p></li>
 <li><p><strong>algorithm</strong> (<em>Type</em><em>[</em><em>algorithms.CipherAlgorithm</em><em>]</em>) – Encryption algorithm.</p></li>
 <li><p><strong>mode</strong> (<em>Union</em><em>[</em><em>Type</em><em>[</em><em>modes.Mode</em><em>]</em><em>, </em><em>modes.Mode</em><em>]</em>) – Encryption mode.</p></li>
 <li><p><strong>padding</strong> (<em>Union</em><em>[</em><em>Padding</em><em>, </em><em>Type</em><em>[</em><em>Padding</em><em>]</em><em>]</em><em>, </em><em>optional</em>) – Padding scheme for encryption.</p></li>
@@ -607,11 +613,11 @@ and update digest state as data is read or written.</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.fields.Encrypted.algorithm">
-<span class="sig-name descname"><span class="pre">algorithm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../abc.html#caterpillar.abc._ContextLike" title="caterpillar.abc._ContextLike"><span class="pre">_ContextLike</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">CipherAlgorithm</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/crypto.html#Encrypted.algorithm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Encrypted.algorithm" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">algorithm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/crypto.html#Encrypted.algorithm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Encrypted.algorithm" title="Link to this definition">#</a></dt>
 <dd><p>Get the encryption algorithm instance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>context</strong> (<a class="reference internal" href="../abc.html#caterpillar.abc._ContextLike" title="caterpillar.abc._ContextLike"><em>_ContextLike</em></a>) – The current operation context.</p>
+<dd class="field-odd"><p><strong>context</strong> (<a class="reference internal" href="../../reference/datamodel/protocols/contextlike.html#ContextLike" title="_ContextLike"><em>_ContextLike</em></a>) – The current operation context.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>An instance of the encryption algorithm.</p>
@@ -624,11 +630,11 @@ and update digest state as data is read or written.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.fields.Encrypted.mode">
-<span class="sig-name descname"><span class="pre">mode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../abc.html#caterpillar.abc._ContextLike" title="caterpillar.abc._ContextLike"><span class="pre">_ContextLike</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Mode</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/crypto.html#Encrypted.mode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Encrypted.mode" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">mode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/crypto.html#Encrypted.mode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Encrypted.mode" title="Link to this definition">#</a></dt>
 <dd><p>Get the encryption mode instance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>context</strong> (<a class="reference internal" href="../abc.html#caterpillar.abc._ContextLike" title="caterpillar.abc._ContextLike"><em>_ContextLike</em></a>) – The current operation context.</p>
+<dd class="field-odd"><p><strong>context</strong> (<a class="reference internal" href="../../reference/datamodel/protocols/contextlike.html#ContextLike" title="_ContextLike"><em>_ContextLike</em></a>) – The current operation context.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>An instance of the encryption mode.</p>
@@ -641,11 +647,11 @@ and update digest state as data is read or written.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.fields.Encrypted.padding">
-<span class="sig-name descname"><span class="pre">padding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../abc.html#caterpillar.abc._ContextLike" title="caterpillar.abc._ContextLike"><span class="pre">_ContextLike</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Padding</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/crypto.html#Encrypted.padding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Encrypted.padding" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">padding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Padding</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/crypto.html#Encrypted.padding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Encrypted.padding" title="Link to this definition">#</a></dt>
 <dd><p>Get the padding scheme instance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>context</strong> (<a class="reference internal" href="../abc.html#caterpillar.abc._ContextLike" title="caterpillar.abc._ContextLike"><em>_ContextLike</em></a>) – The current operation context.</p>
+<dd class="field-odd"><p><strong>context</strong> (<a class="reference internal" href="../../reference/datamodel/protocols/contextlike.html#ContextLike" title="_ContextLike"><em>_ContextLike</em></a>) – The current operation context.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>An instance of the padding scheme.</p>
@@ -658,7 +664,7 @@ and update digest state as data is read or written.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.fields.Encrypted.get_instance">
-<span class="sig-name descname"><span class="pre">get_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type_</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../abc.html#caterpillar.abc._ContextLambda" title="caterpillar.abc._ContextLambda"><span class="pre">_ContextLambda</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/crypto.html#Encrypted.get_instance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Encrypted.get_instance" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">get_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/crypto.html#Encrypted.get_instance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Encrypted.get_instance" title="Link to this definition">#</a></dt>
 <dd><p>Get an instance of a specified type.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -666,7 +672,7 @@ and update digest state as data is read or written.</p>
 <li><p><strong>type</strong> (<em>type</em>) – The desired type of the instance.</p></li>
 <li><p><strong>field</strong> (<em>Any</em>) – The field or instance.</p></li>
 <li><p><strong>args</strong> (<em>Any</em>) – Additional arguments for the instance.</p></li>
-<li><p><strong>context</strong> (<a class="reference internal" href="../abc.html#caterpillar.abc._ContextLambda" title="caterpillar.abc._ContextLambda"><em>_ContextLambda</em></a>) – The current operation context.</p></li>
+<li><p><strong>context</strong> (<a class="reference internal" href="../../reference/datamodel/protocols/contextlambda.html#ContextLambda" title="_ContextLambda"><em>_ContextLambda</em></a>) – The current operation context.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -680,13 +686,13 @@ and update digest state as data is read or written.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.fields.Encrypted.pack_single">
-<span class="sig-name descname"><span class="pre">pack_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../abc.html#caterpillar.abc._ContextLike" title="caterpillar.abc._ContextLike"><span class="pre">_ContextLike</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/crypto.html#Encrypted.pack_single"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Encrypted.pack_single" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">pack_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/crypto.html#Encrypted.pack_single"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Encrypted.pack_single" title="Link to this definition">#</a></dt>
 <dd><p>Pack a single element.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>obj</strong> (<em>Any</em>) – The element to pack.</p></li>
-<li><p><strong>context</strong> (<a class="reference internal" href="../abc.html#caterpillar.abc._ContextLike" title="caterpillar.abc._ContextLike"><em>_ContextLike</em></a>) – The current operation context.</p></li>
+<li><p><strong>context</strong> (<a class="reference internal" href="../../reference/datamodel/protocols/contextlike.html#ContextLike" title="_ContextLike"><em>_ContextLike</em></a>) – The current operation context.</p></li>
 </ul>
 </dd>
 </dl>
@@ -694,11 +700,11 @@ and update digest state as data is read or written.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.fields.Encrypted.unpack_single">
-<span class="sig-name descname"><span class="pre">unpack_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../abc.html#caterpillar.abc._ContextLike" title="caterpillar.abc._ContextLike"><span class="pre">_ContextLike</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">memoryview</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/crypto.html#Encrypted.unpack_single"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Encrypted.unpack_single" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">unpack_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/crypto.html#Encrypted.unpack_single"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Encrypted.unpack_single" title="Link to this definition">#</a></dt>
 <dd><p>Unpack a single element.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>context</strong> (<a class="reference internal" href="../abc.html#caterpillar.abc._ContextLike" title="caterpillar.abc._ContextLike"><em>_ContextLike</em></a>) – The current operation context.</p>
+<dd class="field-odd"><p><strong>context</strong> (<a class="reference internal" href="../../reference/datamodel/protocols/contextlike.html#ContextLike" title="_ContextLike"><em>_ContextLike</em></a>) – The current operation context.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The unpacked element as a memoryview.</p>
@@ -713,7 +719,7 @@ and update digest state as data is read or written.</p>
 
 </section>
 <section id="standard-interface">
-<h2>Standard interface<a class="headerlink" href="#standard-interface" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">4.8.4.3. </span>Standard interface<a class="headerlink" href="#standard-interface" title="Link to this heading">#</a></h2>
 <p><em>TODO</em>  default functions</p>
 </section>
 </section>
@@ -734,7 +740,7 @@ and update digest state as data is read or written.</p>
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Compression Structs</p>
+        <p class="prev-next-title"><span class="section-number">4.8.3. </span>Compression Structs</p>
       </div>
     </a>
     <a class="right-next"
@@ -742,7 +748,7 @@ and update digest state as data is read or written.</p>
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Integer Types</p>
+        <p class="prev-next-title"><span class="section-number">5.1. </span>Integer Types</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -765,14 +771,14 @@ and update digest state as data is read or written.</p>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hashes">Hashes</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.py.Algorithm"><code class="docutils literal notranslate"><span class="pre">Algorithm</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.py.Digest"><code class="docutils literal notranslate"><span class="pre">Digest</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.py.DigestField"><code class="docutils literal notranslate"><span class="pre">DigestField</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.py.DigestFieldAction"><code class="docutils literal notranslate"><span class="pre">DigestFieldAction</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hashes">4.8.4.1. Hashes</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Algorithm"><code class="docutils literal notranslate"><span class="pre">Algorithm</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Digest"><code class="docutils literal notranslate"><span class="pre">Digest</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.DigestField"><code class="docutils literal notranslate"><span class="pre">DigestField</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.DigestFieldAction"><code class="docutils literal notranslate"><span class="pre">DigestFieldAction</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ciphers">Ciphers</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ciphers">4.8.4.2. Ciphers</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Encrypted"><code class="docutils literal notranslate"><span class="pre">Encrypted</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Encrypted.algorithm"><code class="docutils literal notranslate"><span class="pre">Encrypted.algorithm()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Encrypted.mode"><code class="docutils literal notranslate"><span class="pre">Encrypted.mode()</span></code></a></li>
@@ -784,7 +790,7 @@ and update digest state as data is read or written.</p>
 </li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#standard-interface">Standard interface</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#standard-interface">4.8.4.3. Standard interface</a></li>
 </ul>
   </nav></div>
 

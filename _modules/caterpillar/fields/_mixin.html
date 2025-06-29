@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>caterpillar.fields._mixin &#8212; Caterpillar 2.4.5 documentation</title>
+    <title>caterpillar.fields._mixin &#8212; Caterpillar 2.5.0 documentation</title>
   
   
   
@@ -32,6 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css?v=c1cc8b61" />
   
   <!-- So that users can add custom icons -->
   <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -39,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=159ac128"></script>
+    <script src="../../../_static/documentation_options.js?v=3c4615cf"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -50,7 +51,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.4.5" />
+  <meta name="docsearch:version" content="2.5.0" />
   </head>
   
   
@@ -87,7 +88,6 @@
 
   <div class="pst-async-banner-revealer d-none">
   <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
-  <aside class="bd-header-announcement d-print-none d-none" aria-label="Announcement" data-pst-announcement-url="https://raw.githubusercontent.com/MatrixEditor/caterpillar/master/docs/sphinx/source/_templates/announcement.html"></aside>
 </div>
 
   
@@ -113,7 +113,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.4.5</p>
+    <p class="title logo__title">Caterpillar 2.5.0</p>
   
 </a></div>
     
@@ -391,63 +391,56 @@
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">io</span><span class="w"> </span><span class="kn">import</span> <span class="n">BytesIO</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">types</span><span class="w"> </span><span class="kn">import</span> <span class="n">EllipsisType</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Collection</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Callable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterable</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.abc</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">_ContextLike</span><span class="p">,</span>
-    <span class="n">_StructLike</span><span class="p">,</span>
-    <span class="n">_ContextLambda</span><span class="p">,</span>
-    <span class="n">_Switch</span><span class="p">,</span>
-    <span class="n">getstruct</span><span class="p">,</span>
-<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.byteorder</span><span class="w"> </span><span class="kn">import</span> <span class="n">ByteOrder</span><span class="p">,</span> <span class="n">byteorder</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.options</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flag</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">CTX_SEQ</span><span class="p">,</span> <span class="n">CTX_STREAM</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar._common</span><span class="w"> </span><span class="kn">import</span> <span class="n">unpack_seq</span><span class="p">,</span> <span class="n">pack_seq</span><span class="p">,</span> <span class="n">WithoutContextVar</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.shared</span><span class="w"> </span><span class="kn">import</span> <span class="n">getstruct</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">._base</span><span class="w"> </span><span class="kn">import</span> <span class="n">Field</span>
 
 
 <div class="viewcode-block" id="FieldMixin">
-<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.py.FieldMixin">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.FieldMixin">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">FieldMixin</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A simple mixin to support operators used to create :class:`Field` instances.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__or__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flag</span><span class="p">:</span> <span class="n">Flag</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Field</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__or__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flag</span><span class="p">:</span> <span class="n">Flag</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates a field *with* the given flag.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">Field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">byteorder</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span> <span class="o">|</span> <span class="n">flag</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__xor__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flag</span><span class="p">:</span> <span class="n">Flag</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Field</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__xor__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flag</span><span class="p">:</span> <span class="n">Flag</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates a field *without* the given flag.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">Field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">byteorder</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span> <span class="o">^</span> <span class="n">flag</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__matmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">offset</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">_ContextLambda</span><span class="p">,</span> <span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Field</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__matmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">offset</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates a field that should start at the given offset.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">Field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">byteorder</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span> <span class="o">@</span> <span class="n">offset</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">_ContextLambda</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">EllipsisType</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Field</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a sequenced field.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">Field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">byteorder</span><span class="p">(</span><span class="bp">self</span><span class="p">))[</span><span class="n">dim</span><span class="p">]</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__rshift__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">switch</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">_Switch</span><span class="p">,</span> <span class="nb">dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Field</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__rshift__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">switch</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Inserts switch options into the new field&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">Field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">byteorder</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span> <span class="o">&gt;&gt;</span> <span class="n">switch</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__floordiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">condition</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">_ContextLambda</span><span class="p">,</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Field</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__floordiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">condition</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a field with the given condition&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">Field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">byteorder</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span> <span class="o">//</span> <span class="n">condition</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__set_byteorder__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">order</span><span class="p">:</span> <span class="n">ByteOrder</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Field</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__set_byteorder__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">order</span><span class="p">:</span> <span class="n">ByteOrder</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a field with the given byteorder&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">Field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__rsub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bits</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">_ContextLambda</span><span class="p">,</span> <span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Field</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__rsub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bits</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a field with the given bit count&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">Field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">byteorder</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="n">bits</span><span class="o">=</span><span class="n">bits</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__and__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_StructLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Chain&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__and__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a chain with the next element added at the end&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Chain</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">other</span> <span class="o">&amp;</span> <span class="bp">self</span>
@@ -456,7 +449,7 @@
 
 
 <div class="viewcode-block" id="FieldStruct">
-<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.py.FieldStruct">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.FieldStruct">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">FieldStruct</span><span class="p">(</span><span class="n">FieldMixin</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A mix-in class combining the behavior of _StructLike with additional</span>
@@ -477,8 +470,8 @@
     <span class="p">}</span>
 
 <div class="viewcode-block" id="FieldStruct.pack_single">
-<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.py.FieldStruct.pack_single">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">pack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.FieldStruct.pack_single">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Abstract method to pack a single element.</span>
 
@@ -492,8 +485,8 @@
 
 
 <div class="viewcode-block" id="FieldStruct.unpack_single">
-<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.py.FieldStruct.unpack_single">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">unpack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.FieldStruct.unpack_single">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">unpack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Abstract method to unpack a single element.</span>
 
@@ -506,8 +499,8 @@
 
 
 <div class="viewcode-block" id="FieldStruct.pack_seq">
-<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.py.FieldStruct.pack_seq">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">pack_seq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seq</span><span class="p">:</span> <span class="n">Collection</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.FieldStruct.pack_seq">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pack_seq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seq</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Pack a sequence of elements using the provided context.</span>
 
@@ -520,8 +513,8 @@
 
 
 <div class="viewcode-block" id="FieldStruct.unpack_seq">
-<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.py.FieldStruct.unpack_seq">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">unpack_seq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.FieldStruct.unpack_seq">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">unpack_seq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Unpack a sequence of elements using the provided context.</span>
 
@@ -533,8 +526,8 @@
 
 
 <div class="viewcode-block" id="FieldStruct.__pack__">
-<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.py.FieldStruct.__pack__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">__pack__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.FieldStruct.__pack__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__pack__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Pack data based on whether the field is sequential or not.</span>
 
@@ -547,8 +540,8 @@
 
 
 <div class="viewcode-block" id="FieldStruct.__unpack__">
-<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.py.FieldStruct.__unpack__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">__unpack__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.FieldStruct.__unpack__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__unpack__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Unpack data based on whether the field is sequential or not.</span>
 
@@ -562,7 +555,7 @@
 
 
 <div class="viewcode-block" id="FieldStruct.__repr__">
-<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.py.FieldStruct.__repr__">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.FieldStruct.__repr__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        String representation of the FieldStruct instance.</span>
@@ -575,7 +568,7 @@
 
 
 <div class="viewcode-block" id="Chain">
-<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.py.Chain">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.Chain">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Chain</span><span class="p">(</span><span class="n">FieldStruct</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Represents a chain of structures where each structure in the chain is linked</span>
@@ -594,17 +587,17 @@
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;_elements&quot;</span><span class="p">,)</span>
 
 <div class="viewcode-block" id="Chain.__init__">
-<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.py.Chain.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial</span><span class="p">:</span> <span class="n">_StructLike</span><span class="p">,</span> <span class="o">*</span><span class="n">structs</span><span class="p">:</span> <span class="n">_StructLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.Chain.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial</span><span class="p">,</span> <span class="o">*</span><span class="n">structs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># start -&gt; next -&gt; next -&gt; next -&gt; done | unpack</span>
         <span class="c1">#                                   Y</span>
         <span class="c1"># done &lt;- previous &lt;- previous &lt;- start | pack</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_elements</span> <span class="o">=</span> <span class="p">[</span><span class="n">getstruct</span><span class="p">(</span><span class="n">initial</span><span class="p">,</span> <span class="n">initial</span><span class="p">)]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_elements</span> <span class="o">+=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">getstruct</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="n">structs</span><span class="p">))</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_elements</span> <span class="o">+=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">getstruct</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="n">structs</span><span class="p">)</span> <span class="k">if</span> <span class="n">x</span><span class="p">]</span></div>
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">head</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_StructLike</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">head</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the head of the chain, i.e., the first structure.</span>
 
@@ -614,7 +607,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_elements</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">tail</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_StructLike</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tail</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the tail of the chain, i.e., the last structure.</span>
 
@@ -625,8 +618,8 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_elements</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
 <div class="viewcode-block" id="Chain.__size__">
-<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.py.Chain.__size__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">__size__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.Chain.__size__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__size__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculate the size of the chain in bytes.</span>
 
@@ -639,7 +632,7 @@
 
 
 <div class="viewcode-block" id="Chain.__type__">
-<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.py.Chain.__type__">[docs]</a>
+<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.Chain.__type__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">__type__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the type of the tail structure in the chain.</span>
@@ -652,8 +645,8 @@
 
 
 <div class="viewcode-block" id="Chain.__and__">
-<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.py.Chain.__and__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__and__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_StructLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Chain&quot;</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.Chain.__and__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__and__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Concatenate another structure to the end of the chain.</span>
 
@@ -667,8 +660,8 @@
 
 
 <div class="viewcode-block" id="Chain.__rand__">
-<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.py.Chain.__rand__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__rand__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_StructLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Chain&quot;</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.Chain.__rand__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__rand__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Concatenate another structure to the beginning of the chain.</span>
 
@@ -681,8 +674,8 @@
 
 
 <div class="viewcode-block" id="Chain.unpack_single">
-<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.py.Chain.unpack_single">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">unpack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">memoryview</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.Chain.unpack_single">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">unpack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Unpack a single data instance from the chain.</span>
 
@@ -704,8 +697,8 @@
 
 
 <div class="viewcode-block" id="Chain.pack_single">
-<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.py.Chain.pack_single">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">pack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.Chain.pack_single">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Pack a single data instance into the chain.</span>
 
@@ -740,10 +733,10 @@
 
 <span class="sd">    .. code-block:: python</span>
 
-<span class="sd">        from caterpillar.fields import uint16, _infix_</span>
+<span class="sd">        from caterpillar.fields import uint16, Operator</span>
 <span class="sd">        from caterpillar.model import struct</span>
 
-<span class="sd">        M = _infix_(lambda a, b: a[b*2])</span>
+<span class="sd">        M = Operator(lambda a, b: a[b*2])</span>
 
 <span class="sd">        @struct</span>
 <span class="sd">        class Format:</span>
@@ -754,7 +747,7 @@
 
 <span class="sd">    .. code-block:: python</span>
 
-<span class="sd">        @_infix_</span>
+<span class="sd">        @Operator</span>
 <span class="sd">        def M(a, b):</span>
 <span class="sd">            return a[b*2]</span>
 
@@ -762,21 +755,21 @@
 <span class="sd">    :type func: Callable[[Any, Any], _StructLike]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">_StructLike</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="o">=</span> <span class="n">func</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__truediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_StructLike</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__truediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg2</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="n">arg2</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__rtruediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;_infix_&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__rtruediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg1</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">Operator</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">,</span> <span class="n">arg1</span><span class="p">))</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_StructLike</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">)</span>
 
 
 <span class="c1"># utility methods</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">get_args</span><span class="p">(</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_args</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get arguments for an instance.</span>
 
@@ -794,7 +787,7 @@
     <span class="k">return</span> <span class="n">args</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">get_kwargs</span><span class="p">(</span><span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_kwargs</span><span class="p">(</span><span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Process a dictionary of keyword arguments, replacing callable values with their</span>
 <span class="sd">    results.</span>

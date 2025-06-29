@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Operators &#8212; Caterpillar 2.4.5 documentation</title>
+    <title>3.3. Operators &#8212; Caterpillar 2.5.0 documentation</title>
   
   
   
@@ -33,6 +33,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=c1cc8b61" />
   
   <!-- So that users can add custom icons -->
   <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -40,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=159ac128"></script>
+    <script src="../_static/documentation_options.js?v=3c4615cf"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,11 +50,11 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'reference/operators';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="1. Using the C API" href="capi/extension.html" />
-    <link rel="prev" title="Data Model" href="datamodel.html" />
+    <link rel="next" title="3.4. Using the C API" href="capi/extension.html" />
+    <link rel="prev" title="3.2.3. Processing-related Types" href="datamodel/processing_classes.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.4.5" />
+  <meta name="docsearch:version" content="2.5.0" />
   </head>
   
   
@@ -90,7 +91,6 @@
 
   <div class="pst-async-banner-revealer d-none">
   <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
-  <aside class="bd-header-announcement d-print-none d-none" aria-label="Announcement" data-pst-announcement-url="https://raw.githubusercontent.com/MatrixEditor/caterpillar/master/docs/sphinx/source/_templates/announcement.html"></aside>
 </div>
 
   
@@ -116,7 +116,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.4.5</p>
+    <p class="title logo__title">Caterpillar 2.5.0</p>
   
 </a></div>
     
@@ -332,40 +332,60 @@
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Python Reference</span></p>
 <ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="datamodel.html">Data Model</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Operators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">3.1. Introduction</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="datamodel.html">3.2. Data Model</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="datamodel/standard.html">3.2.1. Standard Types</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="datamodel/sequence.html">3.2.1.1. Sequence</a></li>
+<li class="toctree-l3"><a class="reference internal" href="datamodel/struct.html">3.2.1.2. Struct</a></li>
+<li class="toctree-l3"><a class="reference internal" href="datamodel/union.html">3.2.1.3. Union</a></li>
+<li class="toctree-l3"><a class="reference internal" href="datamodel/bitfield.html">3.2.1.4. Bit-field</a></li>
+<li class="toctree-l3"><a class="reference internal" href="datamodel/templates.html">3.2.1.5. Templates</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="datamodel/protocols.html">3.2.2. Caterpillar’s Protocols</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="datamodel/protocols/actionlike.html">3.2.2.1. Action-like Objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="datamodel/protocols/contextlike.html">3.2.2.2. Context-like Objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="datamodel/protocols/contextlambda.html">3.2.2.3. Context Lambdas</a></li>
+<li class="toctree-l3"><a class="reference internal" href="datamodel/protocols/structlike.html">3.2.2.4. Struct-Like Objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="datamodel/protocols/bitfield_extensions.html">3.2.2.5. Bit-field Extensions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="datamodel/protocols/byteorder_extensions.html">3.2.2.6. Byteorder Extensions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="datamodel/processing_classes.html">3.2.3. Processing-related Types</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">3.3. Operators</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">C API Reference</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="capi/extension.html">1. Using the C API</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="capi/abstract.html">2. Abstract Objects Layer</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="capi/atom.html">2.1. Atom Protocol</a></li>
-<li class="toctree-l2"><a class="reference internal" href="capi/context.html">2.2. Context Protocol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="capi/extension.html">3.4. Using the C API</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="capi/abstract.html">3.5. Abstract Objects Layer</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="capi/atom.html">3.5.1. Atom Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="capi/context.html">3.5.2. Context Protocol</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="capi/objects/objimpl.html">3. Concrete Objects Layer</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="capi/objects/arch.html">3.1. Arch &amp; Endian Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="capi/objects/option.html">3.2. Option Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="capi/objects/contextobj.html">3.3. Context Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="capi/objects/contextexpr.html">3.4. Context Expressions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="capi/objects/contextpath.html">3.5. Context Path Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="capi/objects/state.html">3.6. State Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="capi/objects/layer.html">3.7. Layer Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="capi/objects/struct.html">3.8. Struct Objects</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="capi/objects/atoms/index.html">3.9. Atom Objects</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="capi/objects/atoms/int.html">3.9.1. Integer Atoms</a></li>
-<li class="toctree-l3"><a class="reference internal" href="capi/objects/atoms/char.html">3.9.2. Char Atoms</a></li>
-<li class="toctree-l3"><a class="reference internal" href="capi/objects/atoms/float.html">3.9.3. Float Atoms</a></li>
-<li class="toctree-l3"><a class="reference internal" href="capi/objects/atoms/bool.html">3.9.4. Bool Atoms</a></li>
-<li class="toctree-l3"><a class="reference internal" href="capi/objects/atoms/padding.html">3.9.5. Padding Atoms</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="capi/objects/objimpl.html">3.6. Concrete Objects Layer</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="capi/objects/arch.html">3.6.1. Arch &amp; Endian Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="capi/objects/option.html">3.6.2. Option Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="capi/objects/contextobj.html">3.6.3. Context Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="capi/objects/contextexpr.html">3.6.4. Context Expressions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="capi/objects/contextpath.html">3.6.5. Context Path Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="capi/objects/state.html">3.6.6. State Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="capi/objects/layer.html">3.6.7. Layer Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="capi/objects/struct.html">3.6.8. Struct Objects</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="capi/objects/atoms/index.html">3.6.9. Atom Objects</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="capi/objects/atoms/int.html">3.6.9.1. Integer Atoms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="capi/objects/atoms/char.html">3.6.9.2. Char Atoms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="capi/objects/atoms/float.html">3.6.9.3. Float Atoms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="capi/objects/atoms/bool.html">3.6.9.4. Bool Atoms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="capi/objects/atoms/padding.html">3.6.9.5. Padding Atoms</a></li>
 </ul>
 </details></li>
 </ul>
 </details></li>
-<li class="toctree-l1"><a class="reference internal" href="capi/parsing.html">4. Packing and Unpacking</a></li>
-<li class="toctree-l1"><a class="reference internal" href="capi/macros.html">5. Defined Macros</a></li>
-<li class="toctree-l1"><a class="reference internal" href="capi/module.html">6. Module API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="capi/parsing.html">3.7. Packing and Unpacking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="capi/macros.html">3.8. Defined Macros</a></li>
+<li class="toctree-l1"><a class="reference internal" href="capi/module.html">3.9. Module API</a></li>
 </ul>
 </div>
 </nav></div>
@@ -407,9 +427,9 @@
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Reference</a></li>
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link"><span class="section-number">3. </span>Reference</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Operators</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">3.3. </span>Operators</span></li>
   </ul>
 </nav>
 </div>
@@ -427,14 +447,14 @@
                 <article class="bd-article">
                   
   <section id="operators">
-<span id="id1"></span><h1>Operators<a class="headerlink" href="#operators" title="Link to this heading">#</a></h1>
+<span id="id1"></span><h1><span class="section-number">3.3. </span>Operators<a class="headerlink" href="#operators" title="Link to this heading">#</a></h1>
 <p><em>TODO: describe all supported operators</em></p>
-<p><em>Caterpillar</em> supports various operators for <a class="reference internal" href="../library/model.html#caterpillar.model.Sequence" title="caterpillar.model.Sequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>,
-<a class="reference internal" href="../library/model.html#caterpillar.model.Struct" title="caterpillar.model.Struct"><code class="xref py py-class docutils literal notranslate"><span class="pre">Struct</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code>, and custom struct implementations
+<p><em>Caterpillar</em> supports various operators for <a class="reference internal" href="../library/model/sequence.html#caterpillar.model.Sequence" title="caterpillar.model.Sequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>,
+<a class="reference internal" href="../library/model/struct.html#caterpillar.model.Struct" title="caterpillar.model.Struct"><code class="xref py py-class docutils literal notranslate"><span class="pre">Struct</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code>, and custom struct implementations
 <a class="footnote-reference brackets" href="#id3" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. This section provides an overview of the operators that can be used with
 structs, including special context operations.</p>
 <section id="struct-operators">
-<h2>Struct operators<a class="headerlink" href="#struct-operators" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">3.3.1. </span>Struct operators<a class="headerlink" href="#struct-operators" title="Link to this heading">#</a></h2>
 <p>All functions described below return a new <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code> instance if not already
 called on a field object.</p>
 <dl class="py function">
@@ -449,21 +469,21 @@ values are not accepted.</p>
 </pre></div>
 </div>
 </dd>
-<dt>Dynamic (<code class="xref py py-class docutils literal notranslate"><span class="pre">_ContextLambda</span></code>)</dt><dd><p>A callable function may be used to return the length as an integer. If you choose
+<dt>Dynamic (<a class="reference internal" href="datamodel/protocols/contextlambda.html#ContextLambda" title="_ContextLambda"><code class="xref py py-class docutils literal notranslate"><span class="pre">_ContextLambda</span></code></a>)</dt><dd><p>A callable function may be used to return the length as an integer. If you choose
 not to use a context value, the provided callable function must take the <code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code>
 instance as its first argument.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">array</span> <span class="o">=</span> <span class="n">uint8</span><span class="p">[</span><span class="n">this</span><span class="o">.</span><span class="n">length</span><span class="p">]</span> <span class="c1"># where this.length would store 100</span>
 </pre></div>
 </div>
 </dd>
-<dt><a class="reference internal" href="datamodel.html#greedy"><span class="std std-ref">Greedy</span></a> (<code class="xref py py-class docutils literal notranslate"><span class="pre">_GreedyType</span></code>)</dt><dd><p>Used when the amount of elements to be unpacked is unknown. The struct tries to
+<dt><a class="reference internal" href="datamodel/processing_classes.html#greedy"><span class="std std-ref">Greedy</span></a> (<code class="xref py py-class docutils literal notranslate"><span class="pre">_GreedyType</span></code>)</dt><dd><p>Used when the amount of elements to be unpacked is unknown. The struct tries to
 unpack an object of the given type and stops either on EOF or if an exception
 is thrown.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">array</span> <span class="o">=</span> <span class="n">uint8</span><span class="p">[</span><span class="o">...</span><span class="p">]</span>
 </pre></div>
 </div>
 </dd>
-<dt><a class="reference internal" href="datamodel.html#prefixed"><span class="std std-ref">Prefixed</span></a> (<code class="xref py py-class docutils literal notranslate"><span class="pre">_PrefixedType</span></code>, <code class="code docutils literal notranslate"><span class="pre">slice</span></code>)</dt><dd><p>In cases where there are length-prefixed structures and you don’t want to store the
+<dt><a class="reference internal" href="datamodel/processing_classes.html#prefixed"><span class="std std-ref">Prefixed</span></a> (<code class="xref py py-class docutils literal notranslate"><span class="pre">_PrefixedType</span></code>, <code class="code docutils literal notranslate"><span class="pre">slice</span></code>)</dt><dd><p>In cases where there are length-prefixed structures and you don’t want to store the
 length in an extra variable, you can use <code class="xref py py-class docutils literal notranslate"><span class="pre">Prefixed</span></code> to improve packing data.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prefixed_array</span> <span class="o">=</span> <span class="n">CString</span><span class="p">[</span><span class="n">uint8</span><span class="p">::]</span>
 </pre></div>
@@ -483,7 +503,7 @@ length in an extra variable, you can use <code class="xref py py-class docutils 
 <dd><p>Invoked to apply a set of options to a <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code>. This function changes the behavior
 of a struct. It unpacks a value using the field’s underlying struct and passes it directly
 into the given options to retrieve the final struct.</p>
-<p>The described behavior has a limitation: if the underlying struct is not a <code class="xref py py-class docutils literal notranslate"><span class="pre">_ContextLambda</span></code>,
+<p>The described behavior has a limitation: if the underlying struct is not a <a class="reference internal" href="datamodel/protocols/contextlambda.html#ContextLambda" title="_ContextLambda"><code class="xref py py-class docutils literal notranslate"><span class="pre">_ContextLambda</span></code></a>,
 there is no possibility of packing an object back to binary data because the initial value is not
 known.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">foo</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="p">{</span>
@@ -521,7 +541,7 @@ file and copy the final result into the given stream.</p>
 </pre></div>
 </div>
 </dd>
-<dt>Dynamic (<code class="xref py py-class docutils literal notranslate"><span class="pre">_ContextLambda</span></code>)</dt><dd><p>Callables and context lambdas are accepted as well.</p>
+<dt>Dynamic (<a class="reference internal" href="datamodel/protocols/contextlambda.html#ContextLambda" title="_ContextLambda"><code class="xref py py-class docutils literal notranslate"><span class="pre">_ContextLambda</span></code></a>)</dt><dd><p>Callables and context lambdas are accepted as well.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">uint8</span> <span class="o">@</span> <span class="n">this</span><span class="o">.</span><span class="n">offset</span>
 </pre></div>
 </div>
@@ -579,7 +599,7 @@ support more than two elements.</p>
 
 </section>
 <section id="field-specific-operations">
-<h2>Field specific operations<a class="headerlink" href="#field-specific-operations" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">3.3.2. </span>Field specific operations<a class="headerlink" href="#field-specific-operations" title="Link to this heading">#</a></h2>
 <p>The following methods are specifically designed for fields and will only affect those. Even though these
 operations are also supported on sequence objects, only the returning <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code> object will be affected.</p>
 <dl class="py function">
@@ -591,7 +611,7 @@ operations are also supported on sequence objects, only the returning <code clas
 <dt class="sig sig-object py" id="field.__ior__">
 <span class="sig-prename descclassname"><span class="pre">field.</span></span><span class="sig-name descname"><span class="pre">__ior__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flag</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#field.__ior__" title="Link to this definition">#</a></dt>
 <dd><p>With the logical OR operation, a so-called <code class="xref py py-class docutils literal notranslate"><span class="pre">Flag</span></code> can be set. Some flags are defined globally, and
-their meaning is described in <a class="reference internal" href="../library/options.html#options"><span class="std std-ref">Options</span></a>.</p>
+their meaning is described in <a class="reference internal" href="../library/options.html#options"><span class="std std-ref">Options / Flags</span></a>.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">uint8</span> <span class="o">|</span> <span class="n">F_KEEP_POSITION</span>
 </pre></div>
 </div>
@@ -613,9 +633,9 @@ their meaning is described in <a class="reference internal" href="../library/opt
 
 </section>
 <section id="sequence-specific-operators">
-<h2>Sequence specific operators<a class="headerlink" href="#sequence-specific-operators" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">3.3.3. </span>Sequence specific operators<a class="headerlink" href="#sequence-specific-operators" title="Link to this heading">#</a></h2>
 <p>The following functions have been implemented to provide a user-friendly interface for
-extending <a class="reference internal" href="../library/model.html#caterpillar.model.Sequence" title="caterpillar.model.Sequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a> objects. All subclasses inherit this
+extending <a class="reference internal" href="../library/model/sequence.html#caterpillar.model.Sequence" title="caterpillar.model.Sequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a> objects. All subclasses inherit this
 functionality as well.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="sequence.__add__">
@@ -650,7 +670,7 @@ internal model representation.</p>
 
 </section>
 <section id="context-specific-operations">
-<h2>Context specific operations<a class="headerlink" href="#context-specific-operations" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">3.3.4. </span>Context specific operations<a class="headerlink" href="#context-specific-operations" title="Link to this heading">#</a></h2>
 <p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code> implements attribute-like access on top of a dictionary, where the requested
 path is resolved recursively. For instance, the path <code class="code docutils literal notranslate"><span class="pre">&quot;foo.bar.baz&quot;</span></code> will be split into
 three parts and then <code class="code docutils literal notranslate"><span class="pre">getattr</span></code> is called until the final element has been reached or an
@@ -658,7 +678,7 @@ error occurs.</p>
 <p>To enhance the facilities of a <code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code> instance, there are special classes with even more
 special operations.</p>
 <section id="context-path">
-<h3>Context path<a class="headerlink" href="#context-path" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">3.3.4.1. </span>Context path<a class="headerlink" href="#context-path" title="Link to this heading">#</a></h3>
 <p>The context path takes a special place, as it can provide lazy execution of almost all operators
 on definition. Its attribute-access model results in a new <code class="xref py py-class docutils literal notranslate"><span class="pre">ContextPath</span></code> instance.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">ContextPath</span><span class="p">(</span><span class="s2">&quot;foo&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">bar</span><span class="o">.</span><span class="n">baz</span>
@@ -710,12 +730,12 @@ the value from the context.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="datamodel.html"
+       href="datamodel/processing_classes.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Data Model</p>
+        <p class="prev-next-title"><span class="section-number">3.2.3. </span>Processing-related Types</p>
       </div>
     </a>
     <a class="right-next"
@@ -723,7 +743,7 @@ the value from the context.</p>
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">1. </span>Using the C API</p>
+        <p class="prev-next-title"><span class="section-number">3.4. </span>Using the C API</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -746,7 +766,7 @@ the value from the context.</p>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#struct-operators">Struct operators</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#struct-operators">3.3.1. Struct operators</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#struct.__getitem__"><code class="docutils literal notranslate"><span class="pre">struct.__getitem__()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#struct.__rshift__"><code class="docutils literal notranslate"><span class="pre">struct.__rshift__()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#struct.__matmul__"><code class="docutils literal notranslate"><span class="pre">struct.__matmul__()</span></code></a></li>
@@ -755,22 +775,22 @@ the value from the context.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#struct.__and__"><code class="docutils literal notranslate"><span class="pre">struct.__and__()</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#field-specific-operations">Field specific operations</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#field-specific-operations">3.3.2. Field specific operations</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#field.__or__"><code class="docutils literal notranslate"><span class="pre">field.__or__()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#field.__ior__"><code class="docutils literal notranslate"><span class="pre">field.__ior__()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#field.__xor__"><code class="docutils literal notranslate"><span class="pre">field.__xor__()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#field.__ixor__"><code class="docutils literal notranslate"><span class="pre">field.__ixor__()</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sequence-specific-operators">Sequence specific operators</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sequence-specific-operators">3.3.3. Sequence specific operators</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sequence.__add__"><code class="docutils literal notranslate"><span class="pre">sequence.__add__()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sequence.__iadd__"><code class="docutils literal notranslate"><span class="pre">sequence.__iadd__()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sequence.__sub__"><code class="docutils literal notranslate"><span class="pre">sequence.__sub__()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sequence.__isub__"><code class="docutils literal notranslate"><span class="pre">sequence.__isub__()</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#context-specific-operations">Context specific operations</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#context-path">Context path</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#context-specific-operations">3.3.4. Context specific operations</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#context-path">3.3.4.1. Context path</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#path.__call__"><code class="docutils literal notranslate"><span class="pre">path.__call__()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#path.__getitem__"><code class="docutils literal notranslate"><span class="pre">path.__getitem__()</span></code></a></li>
 </ul>
