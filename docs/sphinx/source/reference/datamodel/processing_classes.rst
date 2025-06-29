@@ -139,4 +139,32 @@ instance directly. All custom attributes are stored in the dictionary representa
     Special attribute set to specify the root context. If this attribute is not present, the current ``Context`` instance
     will be returned.
 
+
+Context path
+------------
+
+The path of a context is a specialized form of a :ref:`context_lambda` and supports lazy evaluation of most
+operators (conditional ones excluded). Once called, they try to retrieve the requested value from within
+the given :class:`Context` instance. Below is a list of default paths designed to provide a relatively easy
+way to access the context variables.
+
+.. attribute:: ctx
+    :value: ""
+
+    This special path acts as a wrapper to access all variables within the top-level :class:`Context` object.
+
+.. attribute:: this
+    :value: "_obj"
+
+    As described before, a special *object context* is created when packing or unpacking structs that store
+    more than one field.
+
+.. attribute:: parent
+    :value: "_parent._obj"
+
+    A shortcut to access the object context of the parent context.
+
+
+
+
 .. _Ellipsis: https://docs.python.org/3/library/constants.html#Ellipsis

@@ -1,4 +1,4 @@
-:noindex:
+.. _library-index:
 
 *******
 Library
