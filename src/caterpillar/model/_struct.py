@@ -425,6 +425,7 @@ def pack_into(
     data is written to the `buffer`.
 
     Example 1: Packing an object into a bytes buffer
+
     >>> buffer = BytesIO()
     >>> my_obj = SomeObject()  # Assume SomeObject is a valid object to be packed
     >>> pack_into(my_obj, buffer, struct=SomeStruct())  # Using a specific struct
@@ -432,10 +433,12 @@ def pack_into(
     b"..."
 
     Example 2: Packing into a file-like stream (e.g., file)
+
     >>> with open('packed_data.bin', 'wb') as f:
     ...     pack_into(my_obj, f, struct=SomeStruct())  # Pack into a file
 
     Example 3: Using `as_field` to wrap the struct in a Field before packing
+
     >>> buffer = BytesIO()
     >>> pack_into(42, buffer, struct=uint8, as_field=True)
     >>> buffer.getvalue()
@@ -546,6 +549,7 @@ def unpack(
     context as attributes.
 
     Example:
+
     >>> buffer = b'\\x00\\x01\\x02\\x03'
     >>> struct = SomeStruct()
     >>> unpack(struct, buffer)

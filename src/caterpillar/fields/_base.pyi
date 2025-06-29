@@ -19,7 +19,7 @@ from caterpillar.abc import (
     _GreedyType,
     _PrefixedType,
     _StructLike,
-    _Switch,
+    _SwitchLike,
     _IT,
     _OT,
     _LengthT,
@@ -47,7 +47,7 @@ class Field(_StructLike[_IT, _OT]):
     offset: _ContextLambda | int
     flags: dict[int, Flag]
     amount: _LengthT
-    options: Optional[_Switch[_IT, _OT]]
+    options: Optional[_SwitchLike[_IT, _OT]]
     condition: _ContextLambda | bool
     arch: Arch
     default: _OT | None
@@ -59,7 +59,7 @@ class Field(_StructLike[_IT, _OT]):
         offset: _ContextLambda | int = -1,
         flags: Optional[set[Flag]] = None,
         amount: _ContextLambda | int | _PrefixedType = 0,
-        options: _Switch | dict[Any, _StructLike] | None = None,
+        options: _SwitchLike | dict[Any, _StructLike] | None = None,
         condition: _ContextLambda | bool = True,
         arch: Optional[Arch] = None,
         default: _OT | None = ...,
@@ -69,7 +69,7 @@ class Field(_StructLike[_IT, _OT]):
     def __xor__(self, flag: Flag) -> Self: ...
     def __matmul__(self, offset: _ContextLambda | int) -> Self: ...
     def __getitem__(self, dim: _LengthT) -> Self: ...
-    def __rshift__(self, switch: _Switch[_IT, _OT]) -> Self: ...
+    def __rshift__(self, switch: _SwitchLike[_IT, _OT]) -> Self: ...
     def __floordiv__(self, condition: _ContextLambda | bool) -> Self: ...
     def __rsub__(self, bits: _ContextLambda | int) -> Self: ...
     def __set_byteorder__(self, order: ByteOrder) -> Self: ...

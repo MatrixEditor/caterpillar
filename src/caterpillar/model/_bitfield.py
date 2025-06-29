@@ -12,6 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+from collections.abc import Iterable
 from caterpillar.fields.common import Int
 from caterpillar.shared import (
     ATTR_ACTION_PACK,
@@ -617,9 +618,11 @@ class Bitfield(Struct):
         :rtype: Field
         """
         # 2.: the current group will be finalized
+        self._current_group.align_to(self._current_alignment)
         if not self.has_option(B_GROUP_KEEP):
-            self._current_group.align_to(self._current_alignment)
             self._current_group = self._new_group(self._current_alignment)
+        else:
+            self._bit_pos = self._current_group.bit_count
 
         for option in options or []:
             if self._process_alignment_option(option):
@@ -763,11 +766,13 @@ class Bitfield(Struct):
     def _process_alignment_option(self, option):
         if isinstance(option, SetAlignment):
             # update current working alignment
-            self._current_alignment = option.alignment
+            self._current_alignment = option.alignment or DEFAULT_ALIGNMENT
+            self._current_group.align_to(self._current_alignment)
             return True
         elif isinstance(option, Flag):
             if option.name == "bitfield.new_alignment":
                 self._current_alignment = option.value or DEFAULT_ALIGNMENT
+                self._current_group.align_to(self._current_alignment)
                 return True
 
         return False
@@ -811,9 +816,16 @@ class Bitfield(Struct):
                     else:
                         factory = factory_or_option()
                 else:
-                    # treat as option
-                    options = [factory_or_option]
-                options.extend(extra_options)
+                    # treat as option or as a list of options
+                    options = (
+                        [factory_or_option]
+                        if not isinstance(factory_or_option, Iterable)
+                        else list(factory_or_option)
+                    )
+
+                # extra options may be a list or single element
+                for extra in extra_options:
+                    options.extend(extra if isinstance(extra, Iterable) else [extra])
 
                 if isinstance(width, int):
                     # rule no. 5
