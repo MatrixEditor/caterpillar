@@ -99,12 +99,7 @@ class Action:
 
     __slots__ = (ATTR_ACTION_PACK, ATTR_ACTION_UNPACK)
 
-    def __init__(
-        self,
-        pack: _ContextLambda | None = None,
-        unpack: _ContextLambda | None = None,
-        both: _ContextLambda | None = None,
-    ) -> None:
+    def __init__(self, pack=None, unpack=None, both=None) -> None:
         self.__action_pack__ = pack
         self.__action_unpack__ = unpack
         if both is not None:

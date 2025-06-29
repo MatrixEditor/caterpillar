@@ -233,11 +233,6 @@ class ConditionContext:
     __slots__ = "func", "annotations", "namelist", "depth"
 
     def __init__(self, condition, depth=2):
-        if (sys.version_info.major, sys.version_info.minor) >= (3, 14):
-            warnings.warn(
-                "Python3.14 breaks support for Contitional fields. Conditional "
-                "statements must be defined manually until a fix has been released."
-            )
         self.func = condition
         self.annotations = None
         self.namelist = None
@@ -250,6 +245,11 @@ class ConditionContext:
             raise StructException(msg) from exc
 
     def __enter__(self) -> Self:
+        if (sys.version_info.major, sys.version_info.minor) >= (3, 14):
+            warnings.warn(
+                "Python3.14 breaks support for Contitional fields. Conditional "
+                "statements must be defined manually until a fix has been released."
+            )
         frame = self.getframe(self.depth, "Could not enter condition context!")
         # keep track of all annotations
         try:

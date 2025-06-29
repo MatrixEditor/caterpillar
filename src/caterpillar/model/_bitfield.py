@@ -617,9 +617,11 @@ class Bitfield(Struct):
         :rtype: Field
         """
         # 2.: the current group will be finalized
+        self._current_group.align_to(self._current_alignment)
         if not self.has_option(B_GROUP_KEEP):
-            self._current_group.align_to(self._current_alignment)
             self._current_group = self._new_group(self._current_alignment)
+        else:
+            self._bit_pos = self._current_group.bit_count
 
         for option in options or []:
             if self._process_alignment_option(option):
