@@ -9,6 +9,8 @@ and :func:`unpack` allow so-called *partial* struct-like objects, there won't be
 within struct class definitions. It is always recommended to implement all methods conforming
 to the :code:`_StructLike` protocol.
 
+.. _struct_type:
+
 Special Methods for Struct-Like objects
 ---------------------------------------
 
@@ -59,8 +61,6 @@ Special Methods for Struct-Like objects
     :class:`_ContextLambda`, offering support for dynamically sized structs. Furthermore,
     for the explicit definition of dynamic structs, the option to raise a :class:`DynamicSizeError`
     is provided.
-
-.. _struct_type:
 
 .. method:: object.__type__(self)
 
