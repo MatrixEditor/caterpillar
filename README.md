@@ -1,7 +1,7 @@
 # Caterpillar - 🐛
 
 [![python](https://img.shields.io/badge/Python-3.12+-blue?logo=python&logoColor=yellow)](https://www.python.org/downloads/)
-![![Latest Version](https://pypi.org/project/caterpillar-py/)](https://img.shields.io/github/v/release/MatrixEditor/caterpillar.svg?logo=github)
+![![Latest Version](https://pypi.org/project/caterpillar-py/)](https://img.shields.io/github/v/release/MatrixEditor/caterpillar.svg?logo=github&label=Latest+Version)
 [![Build and Deploy Docs](https://github.com/MatrixEditor/caterpillar/actions/workflows/python-sphinx.yml/badge.svg)](https://github.com/MatrixEditor/caterpillar/actions/workflows/python-sphinx.yml)
 [![Run Tests](https://github.com/MatrixEditor/caterpillar/actions/workflows/python-test.yml/badge.svg)](https://github.com/MatrixEditor/caterpillar/actions/workflows/python-test.yml)
 ![GitHub issues](https://img.shields.io/github/issues/MatrixEditor/caterpillar?logo=github)
@@ -40,35 +40,42 @@ options will be added in the future. Documentation is [here >](https://matrixedi
 ## Give me some code!
 
 ```python
-from caterpillar.py import *
+@bitfield(order=LittleEndian)
+class Header:
+    version : 4                # 4bit integer
+    valid   : 1                # 1bit flag (boolean)
+    ident   : (8, CharFactory) # 8bit char
+    # automatic alignment to 16bits
 
 @struct(order=LittleEndian)
 class Format:
-    magic: b"ITS MAGIC"       # Supports string and byte constants directly
-    a: uint8                  # Primitive data types
-    b: int32
-    length: uint8             # String fields with computed lengths
-    name: String(this.length) #  -> you can also use Prefixed(uint8)
+    magic  : b"ITS MAGIC"        # Supports string and byte constants directly
+    header : Header
+    a      : uint8               # Primitive data types
+    b      : int32
+    length : uint8               # String fields with computed lengths
+    name   : String(this.length) #  -> you can also use Prefixed(uint8)
 
-    # custom actions, e.g. for hashes
-    _hash_begin: DigestField.begin("hash", Md5_Algo)
-
-    # Sequences with prefixed, computed lengths
-    names: CString[uint8::]
-
-    # automatic hash creation and verification + default value
-    hash: Md5_Field("hash", verify=True) = None
+    _hash_begin : DigestField.begin("hash", Md5_Algo)   # custom actions, e.g. for hashes
+    names       : CString[uint8::]                      # Sequences with prefixed, computed lengths
+    hash        : Md5_Field("hash", verify=True) = None # automatic hash creation and verification + default value
 
 # Instantiation (keyword-only arguments, magic is auto-inferred):
-obj = Format(a=1, b=2, length=3, name="foo", names=["a", "b"])
+obj = Format(
+    header=Header(version=2, valid=True, ident="F"),
+    a=1,
+    b=2,
+    length=3,
+    name="foo",
+    names=["a", "b"]
+)
 # Packing the object, reads as 'PACK obj FROM Format'
 # objects of struct classes can be packed right away
 blob = pack(obj, Format)
-# results in: b'ITS MAGIC\x01\x02\x00\x00\x00\x03foo\x02a\x00b\x00\xf55...
+# results in: b'ITS MAGIC0*\x01\x02\x00\x00\x00\x03foo\x02a\x00b\x00)\x9a...'
 
 # Unpacking the binary data, reads as 'UNPACK Format FROM blob'
 obj2 = unpack(Format, blob)
-assert obj2.hash == obj.hash
 ```
 
 This library offers extensive functionality beyond basic struct handling. For further details

@@ -580,6 +580,7 @@ class Bitfield(Struct):
         self.options.update(GLOBAL_BITFIELD_FLAGS)
 
         self.groups = [group for group in self.groups if not group.is_empty()]
+        self.groups[-1].align_to(self._current_alignment)
         # REVISIT: should be enable modification after processing?
         del self._bit_pos
         del self._current_alignment
