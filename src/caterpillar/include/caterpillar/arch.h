@@ -141,6 +141,18 @@ struct _endianobj
 #define CpEndian_CheckExact(op) Py_IS_TYPE((op), &CpEndian_Type)
 
 /**
+ * @brief Determine if an object is an instance of `CpEndianObject` or its
+ * subclasses.
+ *
+ * Checks whether the specified Python object is an instance of `CpEndianObject`
+ * or any of its subclasses. Returns 1 if true, 0 otherwise.
+ *
+ * @param op Python object to check.
+ * @return 1 if the object is an instance of `CpEndianObject`; 0 otherwise.
+ */
+#define CpEndian_Check(op) PyObject_TypeCheck((PyObject*)(op), &CpEndian_Type)
+
+/**
  * @brief Create a new `CpEndianObject` instance.
  *
  * Constructs a new endian object with the specified name and format character.
@@ -149,7 +161,11 @@ struct _endianobj
  * @param id Format character used for struct packing.
  * @return A new `CpEndianObject` instance on success; NULL on failure.
  */
-#define CpEndian_Check(op) PyObject_TypeCheck((PyObject*)(op), &CpEndian_Type)
+static inline PyObject*
+CpEndian_New(const char* name, char id)
+{
+  return CpObject_Create(&CpEndian_Type, "sb", name, id);
+}
 
 /**
  * @brief Retrieve the name of an endianness object.
@@ -158,9 +174,9 @@ struct _endianobj
  * @return New reference to the name attribute.
  */
 static inline PyObject*
-CpEndian_New(const char* name, char id)
+CpEndian_GetName(PyObject* obj)
 {
-  return CpObject_Create(&CpEndian_Type, "sb", name, id);
+  return Py_NewRef(_Cp_CAST(CpEndianObject*, obj)->name);
 }
 
 /**
@@ -169,12 +185,6 @@ CpEndian_New(const char* name, char id)
  * @param obj A valid `CpEndianObject` instance.
  * @return Format character used for struct packing.
  */
-static inline PyObject*
-CpEndian_GetName(PyObject* obj)
-{
-  return Py_NewRef(_Cp_CAST(CpEndianObject*, obj)->name);
-}
-
 static inline char
 CpEndian_GetId(PyObject* obj)
 {
