@@ -1,6 +1,7 @@
 /* CpArch and CpEndian */
 #include "caterpillar/caterpillar.h"
 
+#include "private.h"
 #include <structmember.h>
 
 /* CpArch */
@@ -181,7 +182,7 @@ cp_endian_repr(CpEndianObject* self)
       return PyUnicode_FromFormat("<be>");
     default:
       return PyUnicode_FromFormat(
-        "<ByteOrder: %S ch='%c'>", self->name, self->id);
+        "<Endian: %S ch='%c'>", self->name, self->id);
   }
 }
 

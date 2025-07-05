@@ -31,3 +31,25 @@ if caterpillar.native_support():
 
         custom = c_Endian("Custom", ord("/"))
         assert repr(custom) == "<ByteOrder: Custom ch='/'>"
+
+    def test_set_byteorder():
+        class A:
+            def __set_byteorder__(self, order):
+                return self
+
+        class B:
+            pass
+
+        a = A()
+        b = B()
+
+        # You IDE or whatever type checker you're using should inform you
+        # that you can't add an object of type B to a c_Endian, because it
+        # doesn't conform to the _SupportsSetEndian protocol.
+        e = c_Endian("name", ord("!"))
+        with pytest.raises(AttributeError):
+            e + b
+
+        # But you can add an object of type A to c_Endian
+        d = e + a
+        assert d is a
