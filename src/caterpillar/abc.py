@@ -146,9 +146,11 @@ class _SwitchLike(Protocol):
         pass
 
 
+@runtime_checkable
 class _SupportsBits(Protocol):
     def __bits__(self) -> int: ...
 
 
+@runtime_checkable
 class _ContainsBits(Protocol):
     __bits__: int

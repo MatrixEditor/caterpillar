@@ -1,9 +1,11 @@
 /* CpArch and CpEndian */
 #include "caterpillar/caterpillar.h"
 
+#include "private.h"
 #include <structmember.h>
 
 /* CpArch */
+/* ----------------------------------------------------------------------- */
 static PyObject*
 cp_arch_new(PyTypeObject* type, PyObject* args, PyObject* kw)
 {
@@ -14,7 +16,6 @@ cp_arch_new(PyTypeObject* type, PyObject* args, PyObject* kw)
 
   self->name = PyUnicode_FromString("");
   if (!self->name) {
-    Py_DECREF(self->name);
     return NULL;
   }
   self->pointer_size = 0;
@@ -52,7 +53,7 @@ cp_arch_init(CpArchObject* self, PyObject* args, PyObject* kw)
 static PyObject*
 cp_arch_repr(CpArchObject* self)
 {
-  return PyUnicode_FromFormat("<arch [%d] %R>", self->pointer_size, self->name);
+  return PyUnicode_FromFormat("<Arch %R x%d>", self->name, self->pointer_size);
 }
 
 static PyObject*
@@ -73,7 +74,7 @@ cp_arch_hash(CpArchObject* self)
 /* Doc strings */
 
 PyDoc_STRVAR(cp_arch_doc, "\
-CpArch(name, value)\n\
+cArch(name, value)\n\
 --\n\
 Represents a system architecture with a name and an indication of \
 pointer size.");
@@ -93,7 +94,7 @@ static PyMemberDef CpArch_Members[] = { { "name",
                                         { NULL } /* Sentinel */ };
 
 PyTypeObject CpArch_Type = {
-  PyVarObject_HEAD_INIT(NULL, 0) _Cp_Name(Arch), /* tp_name */
+  PyVarObject_HEAD_INIT(NULL, 0) _Cp_NameStr(CpArch_NAME), /* tp_name */
   .tp_basicsize = sizeof(CpArchObject),
   .tp_dealloc = (destructor)cp_arch_dealloc,
   .tp_repr = (reprfunc)cp_arch_repr,
@@ -107,6 +108,7 @@ PyTypeObject CpArch_Type = {
 };
 
 /* CpEndian */
+/* ------------------------------------------------------------------------- */
 
 /*CpAPI*/
 int
@@ -132,7 +134,6 @@ cp_endian_new(PyTypeObject* type, PyObject* args, PyObject* kw)
 
   self->name = PyUnicode_FromString("");
   if (!self->name) {
-    Py_DECREF(self->name);
     return NULL;
   }
   self->id = 0;
@@ -143,7 +144,7 @@ static void
 cp_endian_dealloc(CpEndianObject* self)
 {
   Py_XDECREF(self->name);
-  self->id = '=';
+  self->id = 0;
   Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
@@ -157,8 +158,8 @@ cp_endian_init(CpEndianObject* self, PyObject* args, PyObject* kw)
     return -1;
 
   if (name) {
+    Py_INCREF(name);
     Py_XSETREF(self->name, name);
-    Py_INCREF(self->name);
   }
   self->id = value;
   if (PyUnicode_GET_LENGTH(self->name) == 0) {
@@ -177,9 +178,11 @@ cp_endian_repr(CpEndianObject* self)
     case '<':
       return PyUnicode_FromFormat("<le>");
     case '>':
+    case '!':
       return PyUnicode_FromFormat("<be>");
     default:
-      return PyUnicode_FromFormat("<endian [%c] %R>", self->id, self->name);
+      return PyUnicode_FromFormat(
+        "<Endian: %S ch='%c'>", self->name, self->id);
   }
 }
 
@@ -213,7 +216,7 @@ cp_endian_as_number_add(CpEndianObject* self, PyObject* atom)
 /* Doc strings */
 
 PyDoc_STRVAR(cp_endian_doc, "\
-CpEndian(name, ch)\n\
+cEndian(name, ch)\n\
 --\n\
 \n\
 Represents common byte order information. The format character is \
@@ -240,7 +243,7 @@ static PyMemberDef CpEndian_Members[] = {
 };
 
 PyTypeObject CpEndian_Type = {
-  PyVarObject_HEAD_INIT(NULL, 0) _Cp_Name(Endian), /* tp_name */
+  PyVarObject_HEAD_INIT(NULL, 0) _Cp_NameStr(CpEndian_NAME), /* tp_name */
   .tp_basicsize = sizeof(CpEndianObject),
   .tp_dealloc = (destructor)cp_endian_dealloc,
   .tp_repr = (reprfunc)cp_endian_repr,

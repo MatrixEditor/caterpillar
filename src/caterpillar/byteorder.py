@@ -88,7 +88,7 @@ SysNative = ByteOrder(
 )
 
 
-def byteorder(obj, default=None) -> ByteOrder:
+def byteorder(obj, default=None):
     """
     Get the byte order of an object, defaulting to SysNative if not explicitly set.
 

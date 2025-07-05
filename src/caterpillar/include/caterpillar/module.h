@@ -26,21 +26,6 @@
  */
 struct _modulestate
 {
-  // global options
-  PyObject* cp_option__dynamic;
-  PyObject* cp_option__sequential;
-  PyObject* cp_option__keep_position;
-  PyObject* cp_option__union;
-  PyObject* cp_option__eval;
-  PyObject* cp_option__discard_unnamed;
-  PyObject* cp_option__discard_const;
-  PyObject* cp_option__replace_types;
-  PyObject* cp_option__slots;
-
-  // global default options
-  PyObject* cp_option__global_field_options;
-  PyObject* cp_option__global_struct_options;
-
   // global arch
   PyObject* cp_arch__host;
 
@@ -48,73 +33,6 @@ struct _modulestate
   PyObject* cp_endian__native;
   PyObject* cp_endian__big;
   PyObject* cp_endian__little;
-
-  // typing constants
-  PyObject* Any_Type;
-  PyObject* List_Type;
-  PyObject* Optional_Type;
-  PyObject* Union_Type;
-  PyObject* BytesIO_Type;
-
-  // string constants
-  // strings
-  PyObject* str_path_delim;
-  PyObject* str_tell;
-  PyObject* str_seek;
-  PyObject* str_write;
-  PyObject* str_read;
-  PyObject* str_close;
-  PyObject* str_strict;
-  PyObject* str___pack__;
-  PyObject* str___pack_many__;
-  PyObject* str___unpack__;
-  PyObject* str___unpack_many__;
-  PyObject* str___size__;
-  PyObject* str___type__;
-  PyObject* str___bits__;
-  PyObject* str___annotations__;
-  PyObject* str___mro__;
-  PyObject* str___struct__;
-  PyObject* str___slots__;
-  PyObject* str___match_args__;
-  PyObject* str___weakref__;
-  PyObject* str___dict__;
-  PyObject* str___qualname__;
-  PyObject* str__member_map_;
-  PyObject* str__value2member_map_;
-
-  PyObject* str_start;
-  PyObject* str_ctx__root;
-  PyObject* str_ctx__getattr;
-  PyObject* str_bytesio_getvalue;
-  PyObject* str_builder_process;
-  PyObject* str_pattern_match;
-  PyObject* str_cstring_default_pad;
-  PyObject* str_utf8;
-
-  // compiled regex for unnamed fields
-  PyObject* cp_regex__unnamed;
-  PyObject* inspect_getannotations;
-
-  // cached objects
-  PyObject* cp_bytes__true;
-  PyObject* cp_bytes__false;
-
-  // type handler map
-  PyObject* cp_typehandler_map;
-
-  // COMPAT: hashes for all compatibility context objects
-  PyObject* str__ctx_parent;
-  PyObject* str__ctx_object;
-  PyObject* str__ctx_offsets;
-  PyObject* str__ctx_stream;
-  PyObject* str__ctx_field;
-  PyObject* str__ctx_value;
-  PyObject* str__ctx_pos;
-  PyObject* str__ctx_index;
-  PyObject* str__ctx_path;
-  PyObject* str__ctx_is_seq;
-  PyObject* str__ctx_arch;
 };
 
 /**

@@ -26,20 +26,7 @@
 #define PY_3_13_PLUS (PY_VERSION_HEX >= 0x030d0000)
 #define PY_3_14_PLUS (PY_VERSION_HEX >= 0x030e0000)
 
-#define _Cp_NameStr(x) ("caterpillar._C." x)
-
-/**
- * @brief Appends the name of the C module to the given name.
- */
-#define _Cp_Name(x) ("caterpillar._C." #x)
-
-/**
- * @brief Sets the given object to the given value.
- */
-#define _Cp_SetObj(varname, value)                                             \
-  if (value) {                                                                 \
-    Py_XSETREF(varname, Py_NewRef(value));                                     \
-  }
+#define _Cp_CAST(type, obj) ((type)(obj))
 
 /**
  * @brief Creates an object of the given type and returns it.
@@ -67,14 +54,5 @@
  */
 #define CpObject_CreateOneArg(type, arg)                                       \
   (PyObject_CallOneArg(((PyObject*)(type)), (arg)))
-
-
-#define _Cp_InitNoArgs(type, args, kw) \
-  if ((args && PyTuple_Size(args)) || (kw && PyDict_Size(kw))) { \
-    PyErr_SetString(PyExc_TypeError, \
-                    (#type " cannot be initialized with arguments")); \
-    return -1; \
-  } \
-  return 0;
 
 #endif
