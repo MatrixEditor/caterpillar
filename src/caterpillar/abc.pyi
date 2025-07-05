@@ -17,7 +17,7 @@ from types import EllipsisType
 from typing import Any, Callable, Optional, Protocol, TypeVar, Union, runtime_checkable
 
 _IT = TypeVar("_IT")
-_IT_co = TypeVar("_IT_co")
+_IT_co = TypeVar("_IT_co", covariant=True)
 _IT_contra = TypeVar("_IT_contra", contravariant=True)
 _OT = TypeVar("_OT")
 _OT_co = TypeVar("_OT_co", covariant=True)
@@ -97,3 +97,21 @@ class _SupportsBits(Protocol):
 @runtime_checkable
 class _ContainsBits(Protocol):
     __bits__: int
+
+@runtime_checkable
+class _ArchLike(Protocol):
+    name: str
+    ptr_size: int
+
+    def __init__(self, name: str, ptr_size: int) -> None: ...
+
+@runtime_checkable
+class _SupportsSetEndian(Protocol[_OT_co]):
+    def __set_byteorder__(self, order: _EndianLike) -> _OT_co: ...
+
+@runtime_checkable
+class _EndianLike(Protocol):
+    name: str
+    ch: str
+
+    def __add__(self, other: _SupportsSetEndian[_OT]) -> _OT: ...
