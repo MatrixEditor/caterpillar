@@ -19,81 +19,188 @@
 
 #include "caterpillarapi.h"
 
+// -----------------------------------------------------------------------------
+// CAPI Architecture and Byte Order Concepts
+//
+// Each *cArch* object uses two attributes that are shared between the
+// Python and C implementations. Likewise, the *cByteOrder* object
+// relies on two attributes defined by the _EndianLike protocol.
+// -----------------------------------------------------------------------------
+
 /**
- * @brief Configuration class that represents an architecture.
+ * @brief Represents an architecture configuration.
  *
- * This class/struct will be used by pointer atoms to represent
- * an architecture with its pointer size.
+ * The `_archobj` struct encapsulates architectural information, such as
+ * its name and pointer size. This object is typically used by pointer
+ * atoms to model architecture-specific characteristics.
  */
 struct _archobj
 {
-  /// The name of the architecture
-  PyObject_HEAD PyObject* name;
-  /// The pointer size of the architecture
+  PyObject_HEAD;
+
+  /// Name of the architecture.
+  PyObject* name;
+
+  /// Size of pointers for this architecture, in bytes.
   int pointer_size;
 };
 
 /**
- * @brief Checks if the given object is an architecture object
+ * @brief Determine if an object is exactly of type `CpArchObject`.
  *
- * This macro will check the exact type of the object and return
- * 1 if it is of type `CpArchObject` and 0 otherwise.
+ * Checks whether the specified Python object is an exact instance of
+ * `CpArchObject`. Returns 1 if true, 0 otherwise.
  *
- * @param op the object to check (must be a Python object pointer)
- * @return 1 if the object is an architecture object, 0 otherwise
+ * @param op Python object to check.
+ * @return 1 if the object is exactly a `CpArchObject`; 0 otherwise.
  */
 #define CpArch_CheckExact(op) Py_IS_TYPE((op), &CpArch_Type)
 
 /**
- * @brief Checks if the given object is an architecture object
+ * @brief Determine if an object is an instance of `CpArchObject` or its
+ * subclasses.
  *
- * This macro will check the type of the object and return
- * 1 if it is an architecture object and 0 otherwise.
+ * Checks whether the specified Python object is an instance of `CpArchObject`
+ * or any of its subclasses. Returns 1 if true, 0 otherwise.
  *
- * @param op the object to check (must be a Python object pointer)
- * @return 1 if the object is an architecture object, 0 otherwise
+ * @param op Python object to check.
+ * @return 1 if the object is an instance of `CpArchObject`; 0 otherwise.
  */
 #define CpArch_Check(op) PyObject_TypeCheck((PyObject*)(op), &CpArch_Type)
 
 /**
- * @brief Configuration class that represents endian configuration.
+ * @brief Create a new `CpArchObject` instance.
+ *
+ * Constructs a new architecture object with the specified name and pointer
+ * size.
+ *
+ * @param name Name of the architecture.
+ * @param ptrSize Pointer size in bytes.
+ * @return A new `CpArchObject` instance on success; NULL on failure.
+ */
+static PyObject*
+CpArch_New(const char* name, int ptrSize)
+{
+  return CpObject_Create(&CpArch_Type, "si", name, ptrSize);
+}
+
+/**
+ * @brief Retrieve the name of an architecture object.
+ *
+ * @param obj A valid `CpArchObject` instance.
+ * @return New reference to the name attribute.
+ */
+static inline PyObject*
+CpArch_GetName(PyObject* obj)
+{
+  return Py_NewRef(_Cp_CAST(CpArchObject*, obj)->name);
+}
+
+/**
+ * @brief Retrieve the pointer size of an architecture object.
+ *
+ * @param obj A valid `CpArchObject` instance.
+ * @return Pointer size in bytes.
+ */
+static inline int
+CpArch_GetPtrSize(PyObject* obj)
+{
+  return _Cp_CAST(CpArchObject*, obj)->pointer_size;
+}
+
+// -----------------------------------------------------------------------------
+// Endian
+// -----------------------------------------------------------------------------
+
+/**
+ * @brief Represents an endianness configuration.
+ *
+ * The `_endianobj` struct defines an endianness type, including its
+ * human-readable name and format character used for data struct packing.
  */
 struct _endianobj
 {
+  PyObject_HEAD;
+
   /// The human readable name of this endian
-  PyObject_HEAD PyObject* name;
+  PyObject* name;
+
   /// struct format character
   char id;
 };
 
 /**
- * @brief Checks if the given object is an endian object
+ * @brief Determine if an object is exactly of type `CpEndianObject`.
  *
- * This macro will check the exact type of the object and return
- * 1 if it is of type `CpEndianObject` and 0 otherwise.
+ * Checks whether the specified Python object is an exact instance of
+ * `CpEndianObject`. Returns 1 if true, 0 otherwise.
  *
- * @param op the object to check (must be a Python object pointer)
- * @return 1 if the object is an endian object, 0 otherwise
+ * @param op Python object to check.
+ * @return 1 if the object is exactly a `CpEndianObject`; 0 otherwise.
  */
 #define CpEndian_CheckExact(op) Py_IS_TYPE((op), &CpEndian_Type)
 
 /**
- * @brief Checks if the given object is an endian object
+ * @brief Determine if an object is an instance of `CpEndianObject` or its
+ * subclasses.
  *
- * This macro will check the type of the object and return
- * 1 if it is an endian object and 0 otherwise.
+ * Checks whether the specified Python object is an instance of `CpEndianObject`
+ * or any of its subclasses. Returns 1 if true, 0 otherwise.
  *
- * @param op the object to check (must be a Python object pointer)
- * @return 1 if the object is an endian object, 0 otherwise
+ * @param op Python object to check.
+ * @return 1 if the object is an instance of `CpEndianObject`; 0 otherwise.
  */
 #define CpEndian_Check(op) PyObject_TypeCheck((PyObject*)(op), &CpEndian_Type)
 
 /**
- * @brief Set the byteorder of the given object
+ * @brief Create a new `CpEndianObject` instance.
  *
- * @param op the object to set
- * @param endian the new byteorder
- * @return 0 on success, -1 on error
+ * Constructs a new endian object with the specified name and format character.
+ *
+ * @param name Human-readable name of the endianness.
+ * @param id Format character used for struct packing.
+ * @return A new `CpEndianObject` instance on success; NULL on failure.
+ */
+static inline PyObject*
+CpEndian_New(const char* name, char id)
+{
+  return CpObject_Create(&CpEndian_Type, "sb", name, id);
+}
+
+/**
+ * @brief Retrieve the name of an endianness object.
+ *
+ * @param obj A valid `CpEndianObject` instance.
+ * @return New reference to the name attribute.
+ */
+static inline PyObject*
+CpEndian_GetName(PyObject* obj)
+{
+  return Py_NewRef(_Cp_CAST(CpEndianObject*, obj)->name);
+}
+
+/**
+ * @brief Retrieve the format character identifier for an endianness object.
+ *
+ * @param obj A valid `CpEndianObject` instance.
+ * @return Format character used for struct packing.
+ */
+static inline char
+CpEndian_GetId(PyObject* obj)
+{
+  return _Cp_CAST(CpEndianObject*, obj)->id;
+}
+
+/**
+ * @brief Set the byte order of the specified object.
+ *
+ * Invokes the `__set_byteorder__` method on the target object to update
+ * its byte order configuration. Returns NULL if the method is not
+ * present.
+ *
+ * @param op Python object that supports the `__set_byteorder__` method.
+ * @param endian New `CpEndianObject` to set as the byte order.
+ * @return New reference to the result on success; NULL on failure.
  */
 static inline PyObject*
 CpEndian_SetEndian(PyObject* op, CpEndianObject* endian)
@@ -109,35 +216,5 @@ CpEndian_SetEndian(PyObject* op, CpEndianObject* endian)
   Py_DECREF(attr);
   return ret;
 }
-
-#define _CpEndian_ImplSetByteorder_MethDef(name, docs)                         \
-  {                                                                            \
-    "__set_byteorder__", (PyCFunction)cp_##name##_set_byteorder,               \
-      METH_VARARGS | METH_KEYWORDS, (docs)                                     \
-  }
-
-#define _CpEndian_KwArgsGetByteorder(ret)                                      \
-  static char* kwlist[] = { "byteorder", NULL };                               \
-  PyObject* byteorder = NULL;                                                  \
-  if (!PyArg_ParseTupleAndKeywords(args, kw, "O", kwlist, &byteorder)) {       \
-    return ret;                                                                \
-  }                                                                            \
-  if (!CpEndian_Check(byteorder)) {                                            \
-    PyErr_SetString(PyExc_TypeError, "byteorder must be an Endian object");    \
-    return ret;                                                                \
-  }
-
-#define _CpEndian_ImplSetByteorder(typename, name, field)                      \
-  static PyObject* cp_##name##_set_byteorder(                                  \
-    typename* self, PyObject* args, PyObject* kw)                              \
-  {                                                                            \
-    _CpEndian_KwArgsGetByteorder(NULL);                                        \
-    PyObject* ret = CpEndian_SetEndian(field, (CpEndianObject*)byteorder);     \
-    if (!ret) {                                                                \
-      return NULL;                                                             \
-    }                                                                          \
-    _Cp_SetObj(field, ret);                                                    \
-    return Py_NewRef((PyObject*)self);                                         \
-  }
 
 #endif
