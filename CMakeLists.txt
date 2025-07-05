@@ -17,42 +17,7 @@ python_add_library(
   MODULE
 
   src/ccaterpillar/arch.c
-  src/ccaterpillar/atomobj.c
-  src/ccaterpillar/context.c
-  src/ccaterpillar/option.c
   src/ccaterpillar/module.c
-  src/ccaterpillar/context.c
-  src/ccaterpillar/state.c
-  src/ccaterpillar/struct.c
-  src/ccaterpillar/layer.c
-  src/ccaterpillar/default.c
-
-  src/ccaterpillar/parsing_typeof.c
-  src/ccaterpillar/parsing_sizeof.c
-  src/ccaterpillar/parsing_pack.c
-  src/ccaterpillar/parsing_unpack.c
-
-  src/ccaterpillar/atomimpl/int.c
-  src/ccaterpillar/atomimpl/float.c
-  src/ccaterpillar/atomimpl/bool.c
-  src/ccaterpillar/atomimpl/char.c
-  src/ccaterpillar/atomimpl/pad.c
-  src/ccaterpillar/atomimpl/string.c
-  src/ccaterpillar/atomimpl/const.c
-  src/ccaterpillar/atomimpl/bytes.c
-  src/ccaterpillar/atomimpl/pstring.c
-  src/ccaterpillar/atomimpl/enum.c
-  src/ccaterpillar/atomimpl/varint.c
-  src/ccaterpillar/atomimpl/computed.c
-  src/ccaterpillar/atomimpl/lazy.c
-  src/ccaterpillar/atomimpl/cstring.c
-
-  src/ccaterpillar/atomimpl/builtins/builtin.c
-  src/ccaterpillar/atomimpl/builtins/repeated.c
-  src/ccaterpillar/atomimpl/builtins/condition.c
-  src/ccaterpillar/atomimpl/builtins/switch.c
-  src/ccaterpillar/atomimpl/builtins/atoffset.c
-  src/ccaterpillar/atomimpl/builtins/primitive.c
 
   WITH_SOABI
 )
