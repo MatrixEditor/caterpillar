@@ -17,6 +17,7 @@ python_add_library(
   MODULE
 
   src/ccaterpillar/arch.c
+  src/ccaterpillar/option.c
   src/ccaterpillar/module.c
 
   WITH_SOABI

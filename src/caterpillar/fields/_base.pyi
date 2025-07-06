@@ -24,13 +24,11 @@ from caterpillar.abc import (
     _OT,
     _LengthT,
     _StructT,
+    _OptionLike,
 )
 from caterpillar.byteorder import (
     Arch,
     ByteOrder,
-)
-from caterpillar.options import (
-    Flag,
 )
 from typing import Any, Optional, Self, Type, TypeVar
 
@@ -45,7 +43,7 @@ class Field(_StructLike[_IT, _OT]):
     struct: _StructT[_IT, _OT]
     order: ByteOrder
     offset: _ContextLambda | int
-    flags: dict[int, Flag]
+    flags: dict[int, _OptionLike]
     amount: _LengthT
     options: Optional[_SwitchLike[_IT, _OT]]
     condition: _ContextLambda | bool
@@ -57,7 +55,7 @@ class Field(_StructLike[_IT, _OT]):
         struct: _StructT[_IT, _OT],
         order: ByteOrder | None = None,
         offset: _ContextLambda | int = -1,
-        flags: Optional[set[Flag]] = None,
+        flags: Optional[set[_OptionLike]] = None,
         amount: _ContextLambda | int | _PrefixedType = 0,
         options: _SwitchLike | dict[Any, _StructLike] | None = None,
         condition: _ContextLambda | bool = True,
@@ -65,8 +63,8 @@ class Field(_StructLike[_IT, _OT]):
         default: _OT | None = ...,
         bits: _ContextLambda | int | None = None,
     ) -> None: ...
-    def __or__(self, flag: Flag) -> Self: ...
-    def __xor__(self, flag: Flag) -> Self: ...
+    def __or__(self, flag: _OptionLike) -> Self: ...
+    def __xor__(self, flag: _OptionLike) -> Self: ...
     def __matmul__(self, offset: _ContextLambda | int) -> Self: ...
     def __getitem__(self, dim: _LengthT) -> Self: ...
     def __rshift__(self, switch: _SwitchLike[_IT, _OT]) -> Self: ...
@@ -87,7 +85,7 @@ class Field(_StructLike[_IT, _OT]):
     def is_seq(self) -> bool: ...
     def is_enabled(self, context: _ContextLike) -> bool: ...
     def has_condition(self) -> bool: ...
-    def has_flag(self, flag: Flag) -> bool: ...
+    def has_flag(self, flag: _OptionLike) -> bool: ...
     def length(self, context: _ContextLike) -> int | _GreedyType | _PrefixedType: ...
     def get_struct(
         self, value: Any, context: _ContextLike

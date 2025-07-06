@@ -36,9 +36,9 @@ from caterpillar.abc import (
     _ContextLike,
     _StructLike,
     _SupportsSize,
+    _OptionLike,
 )
 from caterpillar.byteorder import Arch, ByteOrder
-from caterpillar.options import Flag
 from caterpillar.fields._base import Field
 from caterpillar.model._base import Sequence
 
@@ -50,10 +50,10 @@ class Struct(Sequence[_ModelT]):
     def __init__(
         self,
         model: Type[_ModelT],
-        options: Optional[Iterable[Flag]] = None,
+        options: Optional[Iterable[_OptionLike]] = None,
         order: Optional[ByteOrder] = None,
         arch: Optional[Arch] = None,
-        field_options: Optional[Flag] = None,
+        field_options: Optional[_OptionLike] = None,
         kw_only: bool = False,
         hook_cls: Optional[Type[_UnionHookLike[_ModelT]]] = None,
     ) -> None: ...
@@ -92,10 +92,10 @@ def struct(
     cls: Type[_ModelT],
     /,
     *,
-    options: Optional[Iterable[Flag]] = None,
+    options: Optional[Iterable[_OptionLike]] = None,
     order: Optional[ByteOrder] = None,
     arch: Optional[Arch] = None,
-    field_options: Optional[Flag] = None,
+    field_options: Optional[Iterable[_OptionLike]] = None,
     kw_only: bool = False,
 ) -> Type[_ModelT]: ...
 @overload
@@ -103,10 +103,10 @@ def struct(
     cls: None = None,
     /,
     *,
-    options: Optional[Iterable[Flag]] = None,
+    options: Optional[Iterable[_OptionLike]] = None,
     order: Optional[ByteOrder] = None,
     arch: Optional[Arch] = None,
-    field_options: Optional[Flag] = None,
+    field_options: Optional[Iterable[_OptionLike]] = None,
     kw_only: bool = False,
 ) -> Callable[[_ModelT], _ModelT]: ...
 @overload
@@ -114,10 +114,10 @@ def union(
     cls: Type[_ModelT],
     /,
     *,
-    options: Optional[Iterable[Flag]] = None,
+    options: Optional[Iterable[_OptionLike]] = None,
     order: Optional[ByteOrder] = None,
     arch: Optional[Arch] = None,
-    field_options: Optional[Flag] = None,
+    field_options: Optional[Iterable[_OptionLike]] = None,
     kw_only: bool = False,
     hook_cls: Optional[Type[_UnionHookLike[_ModelT]]] = None,
 ) -> Type[_ModelT]: ...
@@ -126,10 +126,10 @@ def union(
     cls: None = None,
     /,
     *,
-    options: Optional[Iterable[Flag]] = None,
+    options: Optional[Iterable[_OptionLike]] = None,
     order: Optional[ByteOrder] = None,
     arch: Optional[Arch] = None,
-    field_options: Optional[Flag] = None,
+    field_options: Optional[Iterable[_OptionLike]] = None,
     kw_only: bool = False,
     hook_cls: Optional[Type[_UnionHookLike[_ModelT]]] = None,
 ) -> Callable[[_ModelT], _ModelT]: ...

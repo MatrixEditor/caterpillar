@@ -115,3 +115,8 @@ class _EndianLike(Protocol):
     ch: str
 
     def __add__(self, other: _SupportsSetEndian[_OT]) -> _OT: ...
+
+@runtime_checkable
+class _OptionLike(Protocol):
+    name: str
+    value: Any

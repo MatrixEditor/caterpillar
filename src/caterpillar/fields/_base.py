@@ -267,7 +267,7 @@ class Field:
         :rtype: bool
         """
         # pylint: disable-next=protected-access
-        return flag._hash_ in self.flags or flag in GLOBAL_FIELD_FLAGS
+        return hash(flag) in self.flags or flag in GLOBAL_FIELD_FLAGS
 
     def length(self, context):
         """Calculates the sequence length of this field.

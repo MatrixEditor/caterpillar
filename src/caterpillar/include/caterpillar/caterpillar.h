@@ -6,5 +6,6 @@
 
 #include "caterpillar/module.h"
 #include "caterpillar/arch.h"
+#include "caterpillar/option.h"
 
 #endif

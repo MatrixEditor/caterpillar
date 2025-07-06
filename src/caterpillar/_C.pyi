@@ -1,3 +1,4 @@
+from typing import Any
 from caterpillar.abc import (
     _OT,
     _ArchLike,
@@ -36,9 +37,17 @@ class c_Endian(_EndianLike):
     def __ne__(self, other: object) -> bool: ...
     def __radd__(self, other: _SupportsSetEndian[_OT]) -> _OT: ...
 
+class c_Option:
+    name: str
+    value: Any
+    def __init__(self, name: str, value: Any = ...) -> None: ...
+    def __eq__(self, value: object | c_Option, /) -> bool: ...
+    def __hash__(self) -> int: ...
+
 __all__ = [
     "c_Arch",
     "c_Endian",
+    "c_Option",
     "BIG_ENDIAN",
     "HOST_ARCH",
     "LITTLE_ENDIAN",

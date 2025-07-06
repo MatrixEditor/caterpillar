@@ -14,11 +14,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from typing import Any, Dict, Generic, Iterable, Self, Optional, Type, TypeVar, Union
 
-from caterpillar.abc import _StructLike, _ActionLike, _ContextLike, _ContainsStruct
+from caterpillar.abc import _StructLike, _ActionLike, _ContextLike, _ContainsStruct, _OptionLike
 from caterpillar.byteorder import ByteOrder, Arch
 from caterpillar.fields._base import Field
 from caterpillar.fields._mixin import FieldMixin
-from caterpillar.options import Flag
 
 _SeqModelT = TypeVar(
     "_SeqModelT", default=Dict[str, Union[_StructLike, _ContainsStruct, type]]
@@ -29,8 +28,8 @@ class Sequence(FieldMixin, Generic[_SeqModelT], _StructLike[_SeqModelT, _SeqMode
     fields: list[Field | tuple[_ActionLike, None]]
     order: Optional[ByteOrder]
     arch: Optional[Arch]
-    options: set[Flag]
-    field_options: set[Flag]
+    options: set[_OptionLike]
+    field_options: set[_OptionLike]
     is_union: bool
     _member_map_: Dict[str, Field]
     def __init__(
@@ -38,14 +37,14 @@ class Sequence(FieldMixin, Generic[_SeqModelT], _StructLike[_SeqModelT, _SeqMode
         model: Optional[dict[str, Field]] = None,
         order: Optional[ByteOrder] = None,
         arch: Optional[Arch] = None,
-        options: Optional[Iterable[Flag]] = None,
-        field_options: Optional[Iterable[Flag]] = None,
+        options: Optional[Iterable[_OptionLike]] = None,
+        field_options: Optional[Iterable[_OptionLike]] = None,
     ) -> None: ...
     def __add__(self, sequence) -> Self: ...
     def __sub__(self, sequence) -> Self: ...
     __iadd__ = __add__
     __isub__ = __sub__
-    def has_option(self, option: Flag) -> bool: ...
+    def has_option(self, option: _OptionLike) -> bool: ...
     def add_field(self, name: str, field: Field, included: bool = False) -> None: ...
     def add_action(self, action: _ActionLike) -> None: ...
     def del_field(self, name: str, field: Field) -> None: ...
