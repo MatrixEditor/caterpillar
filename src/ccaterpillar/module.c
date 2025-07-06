@@ -59,6 +59,7 @@ PyInit__C(void)
   // type setup
   CpModule_SetupType(&CpArch_Type);
   CpModule_SetupType(&CpEndian_Type);
+  CpModule_SetupType(&CpOption_Type);
 
   m = PyModule_Create(&CpModule);
   if (!m) {
@@ -67,6 +68,7 @@ PyInit__C(void)
 
   CpModule_AddObject(CpArch_NAME, &CpArch_Type);
   CpModule_AddObject(CpEndian_NAME, &CpEndian_Type);
+  CpModule_AddObject(CpOption_NAME, &CpOption_Type);
 
   /* setup custom intatoms */
 #define CpModule_DefAtom(name, ...)                                            \
@@ -90,6 +92,8 @@ PyInit__C(void)
     cp_endian__big, "BIG_ENDIAN", CpEndian_New("big", '>'));
   CpModuleState_AddObject(
     cp_arch__host, "HOST_ARCH", CpArch_New("<host>", sizeof(void*) * 8));
+
+  /* setup options */
 
   /*Export API table*/
   PyObject* c_api = PyCapsule_New((void*)Cp_API, NULL, NULL);

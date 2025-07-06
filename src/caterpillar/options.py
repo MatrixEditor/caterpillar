@@ -16,7 +16,8 @@
 from dataclasses import dataclass
 from typing import Any
 
-@dataclass(init=False)
+
+@dataclass(init=False, eq=False)
 class Flag:
     """Simple customizable user-flag."""
 
@@ -40,6 +41,10 @@ class Flag:
         :return: The hash value.
         """
         return self._hash_
+
+    def __eq__(self, value: object, /) -> bool:
+        # custom check to allow c_Option objects to be used
+        return getattr(value, "name", None) == self.name
 
 
 #: Defaults that will be applied to **all** structs.

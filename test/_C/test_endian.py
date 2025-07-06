@@ -30,7 +30,7 @@ if caterpillar.native_support():
         assert repr(ne) == "<native-endian>"
 
         custom = c_Endian("Custom", ord("/"))
-        assert repr(custom) == "<ByteOrder: Custom ch='/'>"
+        assert repr(custom) == "<Endian: Custom ch='/'>"
 
     def test_set_byteorder():
         class A:
