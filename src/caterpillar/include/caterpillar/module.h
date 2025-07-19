@@ -33,6 +33,11 @@ struct _modulestate
   PyObject* cp_endian__native;
   PyObject* cp_endian__big;
   PyObject* cp_endian__little;
+
+  // intern strings
+  PyObject* str__path_sep;
+  PyObject* str__context_root;
+  PyObject* str__fn_rsplit;
 };
 
 /**
@@ -61,8 +66,8 @@ get_global_module_state(void)
 }
 
 /* utility macros */
-#define CpModule_SetupType(op)                                                 \
+#define CpModule_SetupType(op, ret)                                            \
   if (PyType_Ready(op) < 0)                                                    \
-    return NULL;
+    return (ret);
 
 #endif

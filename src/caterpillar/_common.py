@@ -18,13 +18,13 @@ from typing import Collection
 
 from caterpillar.abc import _PrefixedType
 from caterpillar.context import (
-    Context,
     CTX_PATH,
     CTX_FIELD,
     CTX_INDEX,
     CTX_OBJECT,
     CTX_STREAM,
     CTX_SEQ,
+    O_CONTEXT_FACTORY,
 )
 from caterpillar.exception import Stop, StructException, InvalidValueError
 from caterpillar.options import O_ARRAY_FACTORY
@@ -67,7 +67,7 @@ def unpack_seq(context, unpack_one) -> Collection:
     # Special elements '_index' and '_length' can be referenced within
     # the new context. The '_pos' attribute will be adjusted automatically.
     values = []  # always list (maybe add factory)
-    seq_context = Context(
+    seq_context = O_CONTEXT_FACTORY.value(
         _root=context._root,
         _parent=context,
         _io=stream,
@@ -142,7 +142,7 @@ def pack_seq(seq, context, pack_one) -> None:
 
     # Special elements '_index' and '_length' can be referenced within
     # the new context. The '_pos' attribute will be adjusted automatically.
-    seq_context = Context(
+    seq_context = O_CONTEXT_FACTORY.value(
         _root=context._root,
         _parent=context,
         _io=stream,

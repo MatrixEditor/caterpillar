@@ -24,6 +24,7 @@
 #       function definitions.
 
 src:ccaterpillar/arch.c
+src:ccaterpillar/context.c
 
 # First index is reserved for the global module reference
 obj:0:CpModule:PyModuleDef
@@ -49,3 +50,12 @@ func:-:CpOption_SetValue:int:null
 func:-:CpOption_GetValue:PyObject*:+1
 func:-:CpOption_GetName:PyObject*:+1
 
+# CpContext API
+type:5:_contextobj:CpContextObject:c_Context
+func:6:CpContext_GenericGetAttr:PyObject*:+1
+func:7:CpContext_GenericGetAttrString:PyObject*:+1
+func:8:CpContext_GetRoot:PyObject*:+1
+func:-:CpContext_New:PyObject*:+1
+func:-:CpContext_GetDict:PyObject*:+1
+func:9:CpContext_GenericSetAttr:int:null
+func:10:CpContext_GenericSetAttrString:int:null

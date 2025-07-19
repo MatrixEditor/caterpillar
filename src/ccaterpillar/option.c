@@ -120,3 +120,23 @@ PyTypeObject CpOption_Type = {
   .tp_init = (initproc)cp_option_init,
   .tp_new = cp_option_new,
 };
+
+/* init */
+int
+cp_option__mod_types()
+{
+  CpModule_SetupType(&CpOption_Type, -1);
+  return 0;
+}
+
+void
+cp_option__mod_clear(PyObject* m, _modulestate* state)
+{
+}
+
+int
+cp_option__mod_init(PyObject* m, _modulestate* state)
+{
+  CpModule_AddObject(CpOption_NAME, &CpOption_Type, -1);
+  return 0;
+}

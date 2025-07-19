@@ -19,12 +19,15 @@ from typing import (
     Dict,
     List,
     Optional,
+    Protocol,
     Self,
     Type,
     Union,
     dataclass_transform,
+    TYPE_CHECKING,
 )
 from caterpillar.abc import _ContextLike, _ContextLambda
+from caterpillar.options import Flag
 
 CTX_PARENT: str = ...
 CTX_OBJECT: str = ...
@@ -38,6 +41,12 @@ CTX_PATH: str = ...
 CTX_SEQ: str = ...
 CTX_ARCH: str = ...
 CTX_ROOT: str = ...
+
+if TYPE_CHECKING:
+    class ContextFactory(Protocol):
+        def __call__(self, **kwds) -> _ContextLike: ...
+
+O_CONTEXT_FACTORY: Flag[Type[_ContextLike] | ContextFactory]
 
 class Context(dict, _ContextLike):
     def __setattr__(self, key: str, value: Any) -> None: ...
@@ -87,11 +96,12 @@ class ConditionContext:
     annotations: dict
     namelist: List[str]
     depth: int
-    def __init__(self, condition: _ContextLambda[bool] | bool, depth: int = 2) -> None: ...
+    def __init__(
+        self, condition: _ContextLambda[bool] | bool, depth: int = 2
+    ) -> None: ...
     def getframe(self, num: int, msg: str | None = None) -> FrameType: ...
     def __enter__(self) -> Self: ...
     def __exit__(self, *_) -> None: ...
-
 
 @dataclass_transform()
 class BinaryExpression(ExprMixin, _ContextLambda):
