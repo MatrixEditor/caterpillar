@@ -35,7 +35,7 @@
   }                                                                            \
   return 0;
 
-#define CpModule_AddObject(name, value, ret)                                  \
+#define CpModule_AddObject(name, value, ret)                                   \
   Py_INCREF(value);                                                            \
   if (PyModule_AddObject(m, name, (PyObject*)(value)) < 0) {                   \
     Py_DECREF(value);                                                          \
@@ -102,9 +102,9 @@
 #define _CpDef_ModFn(name)                                                     \
   int name##__mod_init(PyObject* m, _modulestate* state);                      \
   void name##__mod_clear(PyObject* m, _modulestate* state);                    \
-  int name##__mod_types(void);
+  int name##__mod_types(void)
 
-_CpDef_ModFn(cp_context) _CpDef_ModFn(cp_arch) _CpDef_ModFn(cp_option)
+%s
 
 #undef _CpDef_ModFn
 

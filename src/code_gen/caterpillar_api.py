@@ -20,10 +20,10 @@ if not CAPI_PATH.exists():
 # Reserved for future use
 __reserved__ = "__reserved__"
 
-cp_types = {} # struct and typedefs
+cp_types = {}  # struct and typedefs
 cp_type_api = {}
 cp_api_src = []
-cp_func_api = {} # <name>: <index> <<-->> <name>: (rtype, [args])
+cp_func_api = {}  # <name>: <index> <<-->> <name>: (rtype, [args])
 
 for line in CAPI_PATH.read_text("utf-8").splitlines():
     if line.startswith("#"):
@@ -47,23 +47,29 @@ for line in CAPI_PATH.read_text("utf-8").splitlines():
             #   the CAPI_TYPE will be inferred as PyTypeObject if none set
             index, struct_name, typedef_name, c_api_type = parts
             cp_types[struct_name] = typedef_name
-            if index != '-':
+            if index != "-":
                 if typedef_name.endswith("Object"):
                     typedef_name = typedef_name[:-6] + "_Type"
-                cp_type_api[typedef_name] = (int(index), c_api_type if c_api_type != "-" else "PyTypeObject")
+                cp_type_api[typedef_name] = (
+                    int(index),
+                    c_api_type if c_api_type != "-" else "PyTypeObject",
+                )
 
         case "src":
-            # src:FILE
+            # src:FILE:IGNORE
             #   Defines the source file (relative to this file) that contains the
             #   function definitions.
-            cp_api_src.append(parts[0])
+            name, *ignored = parts
+            if not ignored:
+                ignored = False
+            cp_api_src.append((name, ignored))
 
         case "func":
             # func:INDEX:NAME:RETURN_TYPE:REFCOUNT
             #   Defines a C API function. The function must be present within the
             #   source set of this file.
             index, name, *_ = parts
-            if index != '-':
+            if index != "-":
                 cp_func_api[name] = int(index)
 
 
@@ -72,7 +78,7 @@ def cp_api_functions() -> dict[str, tuple]:
 
     func_api = {}
     # REVISIT: dirty parsing algorithm
-    for f in cp_api_src:
+    for f, _ in cp_api_src:
         with open(os.path.join(base_path, "..", f), "r", encoding="utf-8") as c_src:
             while True:
                 line = c_src.readline()

@@ -19,12 +19,15 @@
 #       Defines a C API function. The function must be present within the
 #       source set of this file.
 #
-#   src:FILE
+#   src:FILE:IGNORE
 #       Defines the source file (relative to this file) that contains the
-#       function definitions.
+#       function definitions. IGNORE indicates this file won't be used to
+#       generate the module file.
 
 src:ccaterpillar/arch.c
 src:ccaterpillar/context.c
+src:ccaterpillar/atom.c
+src:ccaterpillar/option.c
 
 # First index is reserved for the global module reference
 obj:0:CpModule:PyModuleDef
@@ -59,3 +62,6 @@ func:-:CpContext_New:PyObject*:+1
 func:-:CpContext_GetDict:PyObject*:+1
 func:9:CpContext_GenericSetAttr:int:null
 func:10:CpContext_GenericSetAttrString:int:null
+
+# CpAtom API
+type:11:_atomobj:CpAtomObject:Atom
