@@ -18,7 +18,6 @@ from typing import Collection
 
 from caterpillar.abc import _PrefixedType
 from caterpillar.context import (
-    Context,
     CTX_PATH,
     CTX_FIELD,
     CTX_INDEX,
