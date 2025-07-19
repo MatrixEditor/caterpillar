@@ -4,6 +4,7 @@ from caterpillar.abc import (
     _ArchLike,
     _EndianLike,
     _SupportsSetEndian,
+    _ContextLike,
 )
 
 BIG_ENDIAN: c_Endian
@@ -43,6 +44,9 @@ class c_Option:
     def __init__(self, name: str, value: Any = ...) -> None: ...
     def __eq__(self, value: object | c_Option, /) -> bool: ...
     def __hash__(self) -> int: ...
+
+class c_Context(dict, _ContextLike):
+    def __init__(self, **kwargs) -> None: ...
 
 __all__ = [
     "c_Arch",

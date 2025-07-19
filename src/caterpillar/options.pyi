@@ -21,9 +21,9 @@ _VT = TypeVar("_VT", default=NoneType)
 
 class Flag(Generic[_VT]):
     name: str
-    value: _VT | None = ...
+    value: _VT = ...
     _hash_: int
-    def __init__(self, name: str, value: _VT | None = None) -> None: ...
+    def __init__(self, name: str, value: _VT = ...) -> None: ...
     def __hash__(self) -> int: ...
 
 GLOBAL_STRUCT_OPTIONS: set[_OptionLike] = ...
@@ -50,7 +50,7 @@ F_KEEP_POSITION: Flag
 F_DYNAMIC: Flag
 F_SEQUENTIAL: Flag
 F_OFFSET_OVERRIDE: Flag
-O_ARRAY_FACTORY: Flag[Callable[[Iterable], Collection]]
+O_ARRAY_FACTORY: Flag[Callable[[Iterable], Collection] | None]
 B_OVERWRITE_ALIGNMENT: Flag
 B_GROUP_END: Flag
 B_GROUP_NEW: Flag

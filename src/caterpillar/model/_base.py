@@ -18,11 +18,11 @@ from typing import Optional, Self, Iterable
 
 from caterpillar.context import (
     CTX_FIELD,
-    Context,
     CTX_PATH,
     CTX_OBJECT,
     CTX_STREAM,
     CTX_SEQ,
+    O_CONTEXT_FACTORY,
 )
 from caterpillar.byteorder import (
     ByteOrder,
@@ -113,7 +113,7 @@ class Sequence(FieldMixin):
 
     def __init__(
         self,
-        model: Optional[dict] = None,
+        model: dict,
         order: Optional[ByteOrder] = None,
         arch: Optional[Arch] = None,
         options: Iterable[Flag] | None = None,
@@ -340,8 +340,8 @@ class Sequence(FieldMixin):
     def unpack_one(self, context):
         # At first, we define the object context where the parsed values
         # will be stored
-        init_data = Context()
-        context[CTX_OBJECT] = Context(_parent=context)
+        init_data = O_CONTEXT_FACTORY.value()
+        context[CTX_OBJECT] = O_CONTEXT_FACTORY.value(_parent=context)
 
         base_path = context[CTX_PATH]
         if self.is_union:
@@ -391,7 +391,7 @@ class Sequence(FieldMixin):
         """
         base_path = context[CTX_PATH]
         # REVISIT: the name 'this_context' is misleading here
-        this_context = Context(
+        this_context = O_CONTEXT_FACTORY.value(
             _root=context._root,
             _parent=context,
             _io=context[CTX_STREAM],
@@ -457,7 +457,7 @@ class Sequence(FieldMixin):
         if field and context[CTX_SEQ]:
             pack_seq(obj, context, self.pack_one)
         else:
-            ctx = Context(
+            ctx = O_CONTEXT_FACTORY.value(
                 _root=context._root,
                 _parent=context,
                 _io=context[CTX_STREAM],

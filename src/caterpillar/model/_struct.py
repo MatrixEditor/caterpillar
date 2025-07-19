@@ -22,7 +22,7 @@ from shutil import copyfileobj
 
 from caterpillar.shared import getstruct, hasstruct, ATTR_STRUCT
 from caterpillar.abc import _SupportsUnpack, _SupportsSize
-from caterpillar.context import Context, CTX_STREAM
+from caterpillar.context import O_CONTEXT_FACTORY, CTX_STREAM
 from caterpillar.exception import InvalidValueError
 from caterpillar.options import (
     S_EVAL_ANNOTATIONS,
@@ -456,7 +456,7 @@ def pack_into(
     offsets = OrderedDict()
     # NOTE: we don't have to set _root here because the default root context
     # will be this instance.
-    context = Context(
+    context = O_CONTEXT_FACTORY.value(
         _parent=None,
         _path="<root>",
         _pos=0,
@@ -566,7 +566,7 @@ def unpack(
     """
     # prepare the data stream
     stream = buffer if isinstance(buffer, IOBase) else BytesIO(buffer)
-    context = Context(
+    context = O_CONTEXT_FACTORY.value(
         _path="<root>",
         _parent=None,
         _io=stream,
@@ -608,7 +608,7 @@ def unpack_file(
 
 
 def sizeof(obj, **kwds) -> int:
-    context = Context(_parent=None, _path="<root>", **kwds)
+    context = O_CONTEXT_FACTORY.value(_parent=None, _path="<root>", **kwds)
     struct_ = obj
     if hasstruct(struct_):
         struct_ = getstruct(struct_)

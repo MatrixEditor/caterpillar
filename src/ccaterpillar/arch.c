@@ -181,8 +181,7 @@ cp_endian_repr(CpEndianObject* self)
     case '!':
       return PyUnicode_FromFormat("<be>");
     default:
-      return PyUnicode_FromFormat(
-        "<Endian: %S ch='%c'>", self->name, self->id);
+      return PyUnicode_FromFormat("<Endian: %S ch='%c'>", self->name, self->id);
   }
 }
 
@@ -256,3 +255,38 @@ PyTypeObject CpEndian_Type = {
   .tp_init = (initproc)cp_endian_init,
   .tp_new = cp_endian_new,
 };
+
+/* init*/
+int
+cp_arch__mod_types()
+{
+  CpModule_SetupType(&CpArch_Type, -1);
+  CpModule_SetupType(&CpEndian_Type, -1);
+  return 0;
+}
+
+void
+cp_arch__mod_clear(PyObject* m, _modulestate* state)
+{
+  Py_CLEAR(state->cp_endian__native);
+  Py_CLEAR(state->cp_endian__little);
+  Py_CLEAR(state->cp_endian__big);
+  Py_CLEAR(state->cp_arch__host);
+}
+
+int
+cp_arch__mod_init(PyObject* m, _modulestate* state)
+{
+  CpModule_AddObject(CpArch_NAME, &CpArch_Type, -1);
+  CpModule_AddObject(CpEndian_NAME, &CpEndian_Type, -1);
+
+  CpModuleState_AddObject(
+    cp_endian__native, "NATIVE_ENDIAN", -1, CpEndian_New("native", '='));
+  CpModuleState_AddObject(
+    cp_endian__little, "LITTLE_ENDIAN", -1, CpEndian_New("little", '<'));
+  CpModuleState_AddObject(
+    cp_endian__big, "BIG_ENDIAN", -1, CpEndian_New("big", '>'));
+  CpModuleState_AddObject(
+    cp_arch__host, "HOST_ARCH", -1, CpArch_New("<host>", sizeof(void*) * 8));
+  return 0;
+}

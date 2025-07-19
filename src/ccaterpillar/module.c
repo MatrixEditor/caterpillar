@@ -16,10 +16,9 @@ cp_module_clear(PyObject* m)
   _modulestate* state = get_module_state(m);
   if (state) {
     /* clear default arch and endian */
-    Py_CLEAR(state->cp_endian__native);
-    Py_CLEAR(state->cp_endian__little);
-    Py_CLEAR(state->cp_endian__big);
-    Py_CLEAR(state->cp_arch__host);
+    cp_arch__mod_clear(m, state);
+    cp_option__mod_clear(m, state);
+    cp_context__mod_clear(m, state);
   }
   return 0;
 }
@@ -57,43 +56,32 @@ PyInit__C(void)
   }
 
   // type setup
-  CpModule_SetupType(&CpArch_Type);
-  CpModule_SetupType(&CpEndian_Type);
-  CpModule_SetupType(&CpOption_Type);
+#define SETUP_TYPES(name)                                                      \
+  if (name##__mod_types() < 0)                                                 \
+  return NULL
+
+#define ADD_OBJECTS(name)                                                      \
+  if (name##__mod_init(m, state) < 0)                                          \
+  return NULL
+
+  SETUP_TYPES(cp_context);
+  SETUP_TYPES(cp_arch);
+  SETUP_TYPES(cp_option);
+
+  if (cp_context__mod_types() < 0)
+    return NULL;
 
   m = PyModule_Create(&CpModule);
   if (!m) {
     return NULL;
   }
 
-  CpModule_AddObject(CpArch_NAME, &CpArch_Type);
-  CpModule_AddObject(CpEndian_NAME, &CpEndian_Type);
-  CpModule_AddObject(CpOption_NAME, &CpOption_Type);
-
-  /* setup custom intatoms */
-#define CpModule_DefAtom(name, ...)                                            \
-  {                                                                            \
-    PyObject* value = (PyObject*)__VA_ARGS__;                                  \
-    if (!value) {                                                              \
-      return NULL;                                                             \
-    }                                                                          \
-    CpModule_AddObject(name, value);                                           \
-  }
-
   /* setup state */
   _modulestate* state = get_module_state(m);
 
-  /* setup arch and endian */
-  CpModuleState_AddObject(
-    cp_endian__native, "NATIVE_ENDIAN", CpEndian_New("native", '='));
-  CpModuleState_AddObject(
-    cp_endian__little, "LITTLE_ENDIAN", CpEndian_New("little", '<'));
-  CpModuleState_AddObject(
-    cp_endian__big, "BIG_ENDIAN", CpEndian_New("big", '>'));
-  CpModuleState_AddObject(
-    cp_arch__host, "HOST_ARCH", CpArch_New("<host>", sizeof(void*) * 8));
-
-  /* setup options */
+  ADD_OBJECTS(cp_context);
+  ADD_OBJECTS(cp_arch);
+  ADD_OBJECTS(cp_option);
 
   /*Export API table*/
   PyObject* c_api = PyCapsule_New((void*)Cp_API, NULL, NULL);
@@ -118,4 +106,7 @@ err:
   }
   Py_DECREF(m);
   return NULL;
+
+#undef SETUP_TYPES
+#undef ADD_OBJECTS
 }

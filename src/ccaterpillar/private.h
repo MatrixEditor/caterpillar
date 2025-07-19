@@ -17,6 +17,8 @@
 #ifndef __CP_PRIVATE_H
 #define __CP_PRIVATE_H
 
+#include "caterpillar/caterpillar.h"
+
 #define _Cp_NameStr(x) ("caterpillar._C." x)
 #define _Cp_Name(x) ("caterpillar._C." #x)
 
@@ -33,23 +35,23 @@
   }                                                                            \
   return 0;
 
-#define CpModule_AddObject(name, value)                                        \
+#define CpModule_AddObject(name, value, ret)                                  \
   Py_INCREF(value);                                                            \
   if (PyModule_AddObject(m, name, (PyObject*)(value)) < 0) {                   \
     Py_DECREF(value);                                                          \
     Py_DECREF(m);                                                              \
     PyErr_SetString(PyExc_RuntimeError, "unable to add '" name "' to module"); \
-    return NULL;                                                               \
+    return (ret);                                                              \
   }
 
-#define CpModuleState_AddObject(varName, objName, ...)                         \
+#define CpModuleState_AddObject(varName, objName, ret, ...)                    \
   state->varName = __VA_ARGS__;                                                \
   if (!state->varName) {                                                       \
     PyErr_SetString(PyExc_RuntimeError,                                        \
                     ("unable to create state object '" objName "'"));          \
-    return NULL;                                                               \
+    return (ret);                                                              \
   }                                                                            \
-  CpModule_AddObject(objName, state->varName);
+  CpModule_AddObject(objName, state->varName, ret);
 
 #define CpModuleState_Set(varName, ...)                                        \
   state->varName = __VA_ARGS__;                                                \
@@ -88,5 +90,22 @@
     _Cp_SetObj(field, ret);                                                    \
     return Py_NewRef((PyObject*)self);                                         \
   }
+
+#define _CACHED_STRING(state, attr, str, ret)                                  \
+  if (((state)->attr = PyUnicode_InternFromString((str))) == NULL)             \
+  return (ret)
+
+#define CACHED_STRING_NULL(state, attr, str)                                   \
+  _CACHED_STRING(state, attr, str, NULL)
+
+// private module initializer and finalizer
+#define _CpDef_ModFn(name)                                                     \
+  int name##__mod_init(PyObject* m, _modulestate* state);                      \
+  void name##__mod_clear(PyObject* m, _modulestate* state);                    \
+  int name##__mod_types(void);
+
+_CpDef_ModFn(cp_context) _CpDef_ModFn(cp_arch) _CpDef_ModFn(cp_option)
+
+#undef _CpDef_ModFn
 
 #endif // __CP_PRIVATE_H
