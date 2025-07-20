@@ -28,6 +28,7 @@ src:ccaterpillar/arch.c
 src:ccaterpillar/context.c
 src:ccaterpillar/atom.c
 src:ccaterpillar/option.c
+src:ccaterpillar/lengthinfo.c
 
 # First index is reserved for the global module reference
 obj:0:CpModule:PyModuleDef
@@ -65,3 +66,13 @@ func:10:CpContext_GenericSetAttrString:int:null
 
 # CpAtom API
 type:11:_atomobj:CpAtomObject:Atom
+
+# Length info
+type:20:_lengthinfoobj:CpLengthInfoObject:LengthInfo
+func:-:CpLengthInfo_New:PyObject*:+1
+func:-:CpLengthInfo_Length:int:null
+func:-:CpLengthInfo_IsGreedy:int:null
+func:-:CpLengthInfo_LengthAsLong:PyObject*:+1
+func:-:CpLengthInfo_SetLengthFromLong:int:null
+func:-:CpLengthInfo_SetLength:int:null
+func:-:CpLengthInfo_SetGreedy:void:null

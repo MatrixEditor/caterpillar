@@ -4,9 +4,11 @@
 // API includes
 #include "caterpillar/caterpillarapi.h"
 
-#include "caterpillar/module.h"
 #include "caterpillar/arch.h"
-#include "caterpillar/option.h"
+#include "caterpillar/atom.h"
 #include "caterpillar/context.h"
+#include "caterpillar/module.h"
+#include "caterpillar/option.h"
+#include "caterpillar/lengthinfo.h"
 
 #endif

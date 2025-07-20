@@ -14,7 +14,16 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from io import IOBase
 from types import EllipsisType
-from typing import Any, Callable, Optional, Protocol, TypeVar, Union, runtime_checkable
+from typing import (
+    Any,
+    Callable,
+    Optional,
+    Protocol,
+    TypeVar,
+    Union,
+    runtime_checkable,
+    type_check_only,
+)
 
 _IT = TypeVar("_IT")
 _IT_co = TypeVar("_IT_co", covariant=True)
@@ -82,6 +91,10 @@ class _SupportsSize(Protocol):
     def __size__(self, context: _ContextLike) -> int: ...
 
 @runtime_checkable
+class _SupportsType(Protocol):
+    def __type__(self) -> type | str | None: ...
+
+@runtime_checkable
 class _SupportsUnpack(Protocol[_OT_co]):
     def __unpack__(self, context: _ContextLike) -> _OT_co: ...
 
@@ -99,25 +112,41 @@ class _SupportsBits(Protocol):
 class _ContainsBits(Protocol):
     __bits__: int
 
-@runtime_checkable
+@type_check_only
 class _ArchLike(Protocol):
     name: str
     ptr_size: int
 
     def __init__(self, name: str, ptr_size: int) -> None: ...
 
-@runtime_checkable
+@type_check_only
 class _SupportsSetEndian(Protocol[_OT_co]):
     def __set_byteorder__(self, order: _EndianLike) -> _OT_co: ...
 
-@runtime_checkable
+@type_check_only
 class _EndianLike(Protocol):
     name: str
     ch: str
 
     def __add__(self, other: _SupportsSetEndian[_OT]) -> _OT: ...
 
-@runtime_checkable
+@type_check_only
 class _OptionLike(Protocol):
     name: str
     value: Any
+
+__all__ = [
+    "_ContextLike",
+    "_ContextLambda",
+    "_SupportsActionUnpack",
+    "_SupportsActionPack",
+    "_SupportsPack",
+    "_SupportsUnpack",
+    "_SupportsSize",
+    "_StructLike",
+    "_SupportsType",
+    "_ContainsStruct",
+    "_SwitchLike",
+    "_SupportsBits",
+    "_ContainsBits",
+]
