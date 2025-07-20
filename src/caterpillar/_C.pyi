@@ -1,6 +1,8 @@
-from typing import Any
+from collections.abc import Iterable
+from typing import Any, Generic
 from caterpillar.abc import (
     _OT,
+    _IT,
     _ArchLike,
     _EndianLike,
     _SupportsSetEndian,
@@ -48,12 +50,38 @@ class c_Option:
 class c_Context(dict, _ContextLike):
     def __init__(self, **kwargs) -> None: ...
 
+class LengthInfo:
+    length: int
+    greedy: bool
+    def __init__(self, length: int = ..., greedy: bool = ...) -> None: ...
+
+class Atom(Generic[_IT, _OT]):
+    def __pack__(self, obj: _IT, context: _ContextLike) -> None: ...
+    def __pack_many__(
+        self,
+        obj: Iterable[_IT],
+        context: _ContextLike,
+        lengthinfo: LengthInfo,
+    ) -> None: ...
+    def __unpack__(self, context: _ContextLike) -> _OT: ...
+    def __unpack_many__(
+        self,
+        context: _ContextLike,
+        lengthinfo: LengthInfo,
+    ) -> Iterable[_OT]: ...
+    def __type__(self) -> type | str | None: ...
+    def __size__(self, context: _ContextLike) -> int: ...
+    def __bits__(self) -> int: ...
+
 __all__ = [
     "c_Arch",
     "c_Endian",
     "c_Option",
+    "c_Context",
     "BIG_ENDIAN",
     "HOST_ARCH",
     "LITTLE_ENDIAN",
     "NATIVE_ENDIAN",
+    "Atom",
+    "LengthInfo",
 ]

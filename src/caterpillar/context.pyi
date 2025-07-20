@@ -24,7 +24,7 @@ from typing import (
     Type,
     Union,
     dataclass_transform,
-    TYPE_CHECKING,
+    type_check_only,
 )
 from caterpillar.abc import _ContextLike, _ContextLambda
 from caterpillar.options import Flag
@@ -42,9 +42,9 @@ CTX_SEQ: str = ...
 CTX_ARCH: str = ...
 CTX_ROOT: str = ...
 
-if TYPE_CHECKING:
-    class ContextFactory(Protocol):
-        def __call__(self, **kwds) -> _ContextLike: ...
+@type_check_only
+class ContextFactory(Protocol):
+    def __call__(self, **kwds) -> _ContextLike: ...
 
 O_CONTEXT_FACTORY: Flag[Type[_ContextLike] | ContextFactory]
 

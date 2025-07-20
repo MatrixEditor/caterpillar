@@ -16,9 +16,7 @@ cp_module_clear(PyObject* m)
   _modulestate* state = get_module_state(m);
   if (state) {
     /* clear default arch and endian */
-    cp_arch__mod_clear(m, state);
-    cp_option__mod_clear(m, state);
-    cp_context__mod_clear(m, state);
+    %s
   }
   return 0;
 }
@@ -30,18 +28,12 @@ cp_module_free(void* m)
 }
 
 /* module def */
-static PyMethodDef _module_methods[] = { { NULL } };
-
 PyModuleDef CpModule = {
-  PyModuleDef_HEAD_INIT, /* m_base */
-  "caterpillar._C",      /* m_name */
-  NULL,                  /* m_doc */
-  sizeof(_modulestate),  /* m_size */
-  _module_methods,       /* m_methods */
-  NULL,                  /* m_slots */
-  NULL,                  /* m_traverse */
-  cp_module_clear,       /* m_clear */
-  cp_module_free         /* m_free */
+  PyModuleDef_HEAD_INIT,          /* m_base */
+  .m_name = "caterpillar._C",     /* m_name */
+  .m_size = sizeof(_modulestate), /* m_size */
+  .m_clear = cp_module_clear,     /* m_clear */
+  .m_free = cp_module_free        /* m_free */
 };
 
 /* module init */
@@ -64,9 +56,7 @@ PyInit__C(void)
   if (name##__mod_init(m, state) < 0)                                          \
   return NULL
 
-  SETUP_TYPES(cp_context);
-  SETUP_TYPES(cp_arch);
-  SETUP_TYPES(cp_option);
+  %s
 
   if (cp_context__mod_types() < 0)
     return NULL;
@@ -79,9 +69,7 @@ PyInit__C(void)
   /* setup state */
   _modulestate* state = get_module_state(m);
 
-  ADD_OBJECTS(cp_context);
-  ADD_OBJECTS(cp_arch);
-  ADD_OBJECTS(cp_option);
+  %s
 
   /*Export API table*/
   PyObject* c_api = PyCapsule_New((void*)Cp_API, NULL, NULL);

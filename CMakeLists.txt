@@ -20,6 +20,8 @@ python_add_library(
   src/ccaterpillar/option.c
   src/ccaterpillar/module.c
   src/ccaterpillar/context.c
+  src/ccaterpillar/atom.c
+  src/ccaterpillar/lengthinfo.c
 
   WITH_SOABI
 )
@@ -32,15 +34,20 @@ message(STATUS "Python ${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}")
 set (CP_GENAPI_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/src/code_gen/genapi.py)
 set (CP_CAPI_HEADER ${CMAKE_CURRENT_SOURCE_DIR}/src/caterpillar/include/caterpillar/caterpillarapi.h.in)
 set (CP_CAPI_CSRC ${CMAKE_CURRENT_SOURCE_DIR}/src/ccaterpillar/caterpillarapi.c.in)
+set (CP_CAPI_MOD_CSRC ${CMAKE_CURRENT_SOURCE_DIR}/src/ccaterpillar/module.c.in)
+set (CP_CAPI_PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/ccaterpillar/private.h.in)
+
 set (CP_CAPI_HEADER_OUT ${CMAKE_CURRENT_SOURCE_DIR}/src/caterpillar/include/caterpillar/caterpillarapi.h)
 set (CP_CAPI_CSRC_OUT ${CMAKE_CURRENT_SOURCE_DIR}/src/ccaterpillar/caterpillarapi.c)
+set (CP_CAPI_MOD_CSRC_OUT ${CMAKE_CURRENT_SOURCE_DIR}/src/ccaterpillar/module.c)
+set (CP_CAPI_PRIVATE_OUT ${CMAKE_CURRENT_SOURCE_DIR}/src/ccaterpillar/private.h)
 
 add_custom_target(
  genapi ALL
  # execute python ./src/code_gen/genapi.py ./src/caterpillar/include/caterpillar/caterpillarapi.h.in ./src/ccaterpillar/caterpillarapi.c.in
  # in the root directory
- COMMAND ${PYTHON_EXECUTABLE} ${CP_GENAPI_SCRIPT} ${CP_CAPI_HEADER} ${CP_CAPI_CSRC}
- BYPRODUCTS ${CP_CAPI_HEADER_OUT} ${CP_CAPI_CSRC_OUT}
+ COMMAND ${PYTHON_EXECUTABLE} ${CP_GENAPI_SCRIPT} ${CP_CAPI_HEADER} ${CP_CAPI_CSRC} ${CP_CAPI_MOD_CSRC} ${CP_CAPI_PRIVATE}
+ BYPRODUCTS ${CP_CAPI_HEADER_OUT} ${CP_CAPI_CSRC_OUT} ${CP_CAPI_MOD_CSRC_OUT} ${CP_CAPI_PRIVATE_OUT}
  COMMENT "Generating Public Caterpillar API"
 )
 

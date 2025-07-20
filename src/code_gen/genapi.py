@@ -5,10 +5,16 @@ Custom script to generate the public Caterpillar API.
 
 """
 
-import sys
-import os
+import pathlib
+import argparse
 
-from caterpillar_api import cp_type_api, cp_func_api, cp_api_functions, cp_types
+from caterpillar_api import (
+    cp_type_api,
+    cp_func_api,
+    cp_api_functions,
+    cp_types,
+    cp_api_src,
+)
 
 
 # Base class for all API objects (functions or types)
@@ -75,9 +81,16 @@ class APIFunc(APIObj):
         return f"#define {self.name} (*({self.type}){self.api_name}[{self.index}])"
 
 
-def genapi(api_h: str, api_c: str) -> None:
-    api_h_out = api_h.replace(".in", "")
-    api_c_out = api_c.replace(".in", "")
+def genapi(
+    api_h: pathlib.Path,
+    api_c: pathlib.Path,
+    mod_c: pathlib.Path,
+    private_h: pathlib.Path,
+) -> None:
+    api_h_out = pathlib.Path(str(api_h).replace(".in", ""))
+    api_c_out = pathlib.Path(str(api_c).replace(".in", ""))
+    mod_c_out = pathlib.Path(str(mod_c).replace(".in", ""))
+    private_h_out = pathlib.Path(str(private_h).replace(".in", ""))
 
     func_api = cp_api_functions()
     max_func_index = max(cp_func_api.values())
@@ -117,28 +130,46 @@ def genapi(api_h: str, api_c: str) -> None:
         typedefs.append(f"struct {struct_name};")
         typedefs.append(f"typedef struct {struct_name} {type_name};")
 
-    with open(api_h, "r", encoding="utf-8") as f:
-        api_h_source = f.read()
+    api_h_source = api_h.read_text(encoding="utf-8")
+    mod_types = []
+    for name, ignored in cp_api_src:
+        if not ignored:
+            target_name = pathlib.Path(name).stem
+            mod_types.append(f"cp_{target_name}")
 
-    with open(api_h_out, "w", encoding="utf-8") as f:
+    with api_h_out.open("w", encoding="utf-8") as f:
         f.write(
             api_h_source
             % ("\n".join(typedefs), "\n".join(internal_def), "\n".join(external_def))
         )
 
-    with open(api_c, "r", encoding="utf-8") as f:
-        api_c_source = f.read()
-
-    with open(api_c_out, "w", encoding="utf-8") as f:
+    api_c_source = api_c.read_text(encoding="utf-8")
+    with api_c_out.open("w", encoding="utf-8") as f:
         f.write(api_c_source % (",\n    ".join(array_def),))
+
+    mod_source = mod_c.read_text(encoding="utf-8")
+    mod_c_out.write_text(
+        mod_source
+        % (
+            "\n    ".join([f"{name}__mod_clear(m, state);" for name in mod_types]),
+            "\n  ".join([f"{name}__mod_types();" for name in mod_types]),
+            "\n  ".join([f"{name}__mod_init(m, state);" for name in mod_types]),
+        ),
+        encoding="utf-8",
+    )
+
+    private_h_source = private_h.read_text(encoding="utf-8")
+    private_h_out.write_text(
+        private_h_source % ("\n".join([f"_CpDef_ModFn({name});" for name in mod_types]))
+    )
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print(f"Usage: {sys.argv[0]} <api.h> <api.c>")
-        sys.exit(1)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("api_header", type=pathlib.Path)
+    parser.add_argument("api_source", type=pathlib.Path)
+    parser.add_argument("mod_source", type=pathlib.Path)
+    parser.add_argument("private_header", type=pathlib.Path)
 
-    api_h = sys.argv[1]
-    api_c = sys.argv[2]
-
-    genapi(api_h, api_c)
+    argv = parser.parse_args()
+    genapi(argv.api_header, argv.api_source, argv.mod_source, argv.private_header)
