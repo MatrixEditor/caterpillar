@@ -38,6 +38,7 @@ from typing import (
     Type,
     TypeVar,
     Union,
+    override,
 )
 from uuid import UUID
 
@@ -259,3 +260,26 @@ class _Uuid(FieldStruct[UUID, UUID]):
     def __unpack__(self, context: _ContextLike) -> UUID: ...
 
 Uuid: _Uuid
+
+class AsLengthRef(_StructLike[NoneType, int]):
+    name: str
+    target: str
+    struct: _StructLike[int, int]
+
+    def __init__(
+        self,
+        name: str,
+        target: str,
+        struct: _StructLike[int, int] | None = ...,
+    ) -> None: ...
+    def __mod__(self, other: _StructLike[int, int]) -> AsLengthRef: ...
+    def __rmod__(self, other: _StructLike[int, int]) -> AsLengthRef: ...
+    @override
+    def __type__(self) -> type[int]: ...
+    @override
+    def __size__(self, context: _ContextLike) -> int: ...
+    @override
+    def __pack__(self, obj: NoneType, context: _ContextLike) -> None: ...
+    @override
+    def __unpack__(self, context: _ContextLike) -> int: ...
+    def __bits__(self) -> int: ...

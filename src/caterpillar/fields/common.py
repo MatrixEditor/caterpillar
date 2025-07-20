@@ -16,7 +16,7 @@ import struct as PyStruct
 import warnings
 
 from io import BytesIO
-from typing import Any, Union
+from typing import Any, Self
 from types import NoneType
 from functools import cached_property
 from enum import Enum as _EnumType
@@ -1677,3 +1677,81 @@ class Uuid(FieldStruct):
         is_le = context[CTX_FIELD].order is LittleEndian
         data = context[CTX_STREAM].read(16)
         return UUID(bytes_le=data) if is_le else UUID(bytes=data)
+
+
+class AsLengthRef:
+    """
+    A special field for automatically determining the length of a field
+    based on a target field.
+
+    This field is used to pack and unpack a length value for a target field.
+    When packing, the length of the target field is determined by getting the
+    length of the target field's value from the context. When unpacking, the
+    unpacked value is used as the length of the target field.
+
+    Example usage:
+
+    >>> @struct
+    ... class MyStruct:
+    ...     length: AsLengthRef("length", "data", uint16) = 0
+    ...     a: uint8
+    ...     data: Bytes(this.length)
+    ...
+    >>> pack(MyStruct(data=b"Hello, world!", a=1))
+    b'\\x00\\x0c\\x01Hello, world!'
+
+    :param target: The target field name to determine the length from.
+    :param struct: The struct definition of the length field.
+    """
+
+    __slots__ = (
+        "struct",
+        "target",
+        "name",
+    )
+
+    def __init__(self, name: str, target: str, struct=None) -> None:
+        self.struct = struct
+        self.name = f"_obj.{name}"
+        self.target = f"_obj.{target}"
+
+    def __mod__(self, other) -> Self:
+        self.struct = other
+
+    def __rmod__(self, other) -> Self:
+        self.struct = other
+
+    def __type__(self) -> type:
+        return int
+
+    def __size__(self, context) -> int:
+        if self.struct is None:
+            return 0
+        return self.struct.__size__(context)
+
+    def __bits__(self) -> int:
+        if self.struct is None:
+            return 0
+        return self.struct.__bits__()
+
+    def __pack__(self, obj, context):
+        # object is optional
+        if self.struct is None:
+            raise ValueError("struct is not defined")
+
+        target_obj = context.__context_getattr__(self.target)
+        length = len(target_obj)
+        context.__context_setattr__(self.name, length)
+        self.struct.__pack__(length, context)
+
+    def __unpack__(self, context):
+        if self.struct is None:
+            raise ValueError("struct is not defined")
+
+        length = self.struct.__unpack__(context)
+        context.__context_setattr__(self.name, length)
+        return length
+
+    def __repr__(self) -> str:
+        name = self.target.removeprefix("_obj.")
+        return f"<LengthRef of .{name}>"
