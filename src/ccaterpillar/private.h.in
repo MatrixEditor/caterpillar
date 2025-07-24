@@ -27,6 +27,11 @@
     Py_XSETREF(varname, Py_NewRef(value));                                     \
   }
 
+#define _Cp_AssignCheck(target, value, err_cond)                               \
+  if ((target = (value), !target)) {                                           \
+    goto err_cond;                                                             \
+  }
+
 #define _Cp_InitNoArgs(type, args, kw)                                         \
   if ((args && PyTuple_Size(args)) || (kw && PyDict_Size(kw))) {               \
     PyErr_SetString(PyExc_TypeError,                                           \
@@ -99,6 +104,9 @@
   _CACHED_STRING(state, attr, str, NULL)
 
 // private module initializer and finalizer
+int shared__mod_init(PyObject* m, _modulestate* state);
+void shared__mod_clear(PyObject* m, _modulestate* state);
+
 #define _CpDef_ModFn(name)                                                     \
   int name##__mod_init(PyObject* m, _modulestate* state);                      \
   void name##__mod_clear(PyObject* m, _modulestate* state);                    \

@@ -152,8 +152,8 @@ def genapi(
         mod_source
         % (
             "\n    ".join([f"{name}__mod_clear(m, state);" for name in mod_types]),
-            "\n  ".join([f"{name}__mod_types();" for name in mod_types]),
-            "\n  ".join([f"{name}__mod_init(m, state);" for name in mod_types]),
+            "\n  ".join([f"SETUP_TYPES({name})" for name in mod_types]),
+            "\n  ".join([f"ADD_OBJECTS({name})" for name in mod_types]),
         ),
         encoding="utf-8",
     )

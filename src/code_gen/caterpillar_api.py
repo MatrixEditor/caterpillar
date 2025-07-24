@@ -25,6 +25,8 @@ cp_type_api = {}
 cp_api_src = []
 cp_func_api = {}  # <name>: <index> <<-->> <name>: (rtype, [args])
 
+global_index = 0
+
 for line in CAPI_PATH.read_text("utf-8").splitlines():
     if line.startswith("#"):
         continue
@@ -39,6 +41,9 @@ for line in CAPI_PATH.read_text("utf-8").splitlines():
             # obj:INDEX:NAME:TYPE
             #   Defines a C API object.
             index, name, type_ = parts
+            if index != "-":
+                index = global_index
+                global_index += 1
             cp_type_api[name] = (int(index), type_ if type_ != "-" else "PyTypeObject")
 
         case "type":
@@ -46,8 +51,11 @@ for line in CAPI_PATH.read_text("utf-8").splitlines():
             #   Defines a C API type for a C structure. The index is optional and
             #   the CAPI_TYPE will be inferred as PyTypeObject if none set
             index, struct_name, typedef_name, c_api_type = parts
+
             cp_types[struct_name] = typedef_name
             if index != "-":
+                index = global_index
+                global_index += 1
                 if typedef_name.endswith("Object"):
                     typedef_name = typedef_name[:-6] + "_Type"
                 cp_type_api[typedef_name] = (
@@ -70,6 +78,8 @@ for line in CAPI_PATH.read_text("utf-8").splitlines():
             #   source set of this file.
             index, name, *_ = parts
             if index != "-":
+                index = global_index
+                global_index += 1
                 cp_func_api[name] = int(index)
 
 
