@@ -1,5 +1,6 @@
-from collections.abc import Iterable
-from typing import Any, Generic
+from collections.abc import Collection, Iterable
+from typing import Any, Generic, Self, overload
+from typing_extensions import override
 from caterpillar.abc import (
     _OT,
     _IT,
@@ -7,6 +8,10 @@ from caterpillar.abc import (
     _EndianLike,
     _SupportsSetEndian,
     _ContextLike,
+    _LengthT,
+    _StructLike,
+    _SwitchLike,
+    _ContextLambda,
 )
 
 BIG_ENDIAN: c_Endian
@@ -44,11 +49,17 @@ class c_Option:
     name: str
     value: Any
     def __init__(self, name: str, value: Any = ...) -> None: ...
+    @override
     def __eq__(self, value: object | c_Option, /) -> bool: ...
+    @override
     def __hash__(self) -> int: ...
 
-class c_Context(dict, _ContextLike):
-    def __init__(self, **kwargs) -> None: ...
+class c_Context(dict[str, Any]):
+    def __init__(self, **kwargs: dict[str, Any]) -> None: ...
+    def __context_getattr__(self, path: str) -> Any: ...
+    def __context_setattr__(self, path: str, value: Any) -> None: ...
+    @property
+    def _root(self) -> _ContextLike: ...
 
 class LengthInfo:
     length: int
@@ -72,6 +83,65 @@ class Atom(Generic[_IT, _OT]):
     def __type__(self) -> type | str | None: ...
     def __size__(self, context: _ContextLike) -> int: ...
     def __bits__(self) -> int: ...
+    def __getitem__(self, dim: _LengthT) -> Repeated[_IT, _OT]: ...
+    def __rshift__(self, cases: _SwitchLike[Any, Any]) -> Switch: ...
+
+class Repeated(Atom[Collection[_IT], Collection[_OT]]):
+    atom: _StructLike[_IT, _OT]
+    length: _LengthT
+
+    def __init__(self, atom: _StructLike[_IT, _OT], length: _LengthT) -> None: ...
+    @override
+    def __pack__(self, obj: Collection[_IT], context: _ContextLike) -> None: ...
+    @override
+    def __unpack__(self, context: _ContextLike) -> Collection[_OT]: ...
+    @override
+    def __size__(self, context: _ContextLike) -> int: ...
+    @override
+    def __bits__(self) -> int: ...
+    @override
+    def __type__(self) -> type[list[_OT]]: ...
+    def __set_byteorder__(self, order: _EndianLike) -> Self: ...
+
+class Switch(Atom[Any, Any]):
+    cases: _SwitchLike[Any, Any]
+    atom: _StructLike[Any, Any] | _ContextLambda[Any]
+
+    def __init__(
+        self,
+        atom: _StructLike[Any, Any] | _ContextLambda[Any],
+        cases: _SwitchLike[Any, Any],
+    ) -> None: ...
+    @override
+    def __pack__(self, obj: Any, context: _ContextLike) -> None: ...
+    @override
+    def __unpack__(self, context: _ContextLike) -> Any: ...
+    @override
+    def __type__(self) -> type | str | None: ...
+    def __set_byteorder__(self, order: _EndianLike) -> Self: ...
+    def eval_with_context(
+        self,
+        value: Any,
+        context: _ContextLike,
+    ) -> _StructLike[Any, Any]: ...
+
+class Conditional(Atom[_IT | None, _OT | None]):
+    atom: _StructLike[_IT, _OT]
+    condition: _ContextLambda[bool] | bool
+
+    def __init__(
+        self,
+        atom: _StructLike[_IT, _OT],
+        condition: _ContextLambda[bool] | bool,
+    ) -> None: ...
+    @override
+    def __pack__(self, obj: _IT | None, context: _ContextLike) -> None: ...
+    @override
+    def __unpack__(self, context: _ContextLike) -> _OT | None: ...
+    @override
+    def __type__(self) -> type | str | None: ...
+    def __set_byteorder__(self, order: _EndianLike) -> Self: ...
+    def is_enabled(self, context: _ContextLike) -> bool: ...
 
 __all__ = [
     "c_Arch",
@@ -84,4 +154,7 @@ __all__ = [
     "NATIVE_ENDIAN",
     "Atom",
     "LengthInfo",
+    "Repeated",
+    "Switch",
+    "Conditional",
 ]
