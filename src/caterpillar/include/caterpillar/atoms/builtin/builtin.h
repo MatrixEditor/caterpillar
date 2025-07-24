@@ -32,7 +32,7 @@ struct _builtinatomobj
 
 #define CpBuiltinAtom_CheckExact(op) Py_IS_TYPE((op), &CpBuiltinAtom_Type)
 #define CpBuiltinAtom_Check(op) PyObject_TypeCheck((op), &CpBuiltinAtom_Type)
-#define CpBuiltinAtom_HEAD CpBuiltinAtomObject ob_base;
+#define CpBuiltinAtom_HEAD CpBuiltinAtomObject ob_base
 #define CpBuiltinAtom_ATOM(self) (self)->ob_base.ob_base
 
 static inline PyObject *

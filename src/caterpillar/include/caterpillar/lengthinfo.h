@@ -24,7 +24,7 @@
 
 struct _lengthinfoobj
 {
-  PyObject_HEAD;
+  PY_OBJECT_HEAD;
 
   Py_ssize_t m_length;
   int m_greedy;

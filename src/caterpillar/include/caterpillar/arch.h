@@ -36,7 +36,7 @@
  */
 struct _archobj
 {
-  PyObject_HEAD;
+  PY_OBJECT_HEAD;
 
   /// Name of the architecture.
   PyObject* name;

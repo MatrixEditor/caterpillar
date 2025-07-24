@@ -155,14 +155,14 @@ typedef PyObject* (*bitsfunc)(PyObject*);
 /**
  * @brief Defines the base type for atom objects to be a CAtom
  */
-#define CpAtom_HEAD CpAtomObject ob_base;
+#define CpAtom_HEAD CpAtomObject ob_base
 
 /**
  * @brief Atom object for C types
  */
 struct _atomobj
 {
-  PyObject_HEAD;
+  PY_OBJECT_HEAD;
 
   // C functions to implement
   sizefunc ob_size;
