@@ -32,7 +32,7 @@ cp_lengthinfo_init(CpLengthInfoObject* self, PyObject* args, PyObject* kw)
   Py_ssize_t length = 0;
   int greedy = 0;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kw, "|np", kwlist, &length, &greedy)) {
+  if (!PyArg_ParseTupleAndKeywords(args, kw, "|ni", kwlist, &length, &greedy)) {
     return -1;
   }
 

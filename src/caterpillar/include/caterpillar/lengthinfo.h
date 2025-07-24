@@ -33,7 +33,7 @@ struct _lengthinfoobj
 static inline PyObject*
 CpLengthInfo_New(Py_ssize_t pLength, int pGreedy)
 {
-  return CpObject_Create(&CpLengthInfo_Type, "np", pLength, pGreedy);
+  return CpObject_Create(&CpLengthInfo_Type, "ni", pLength, pGreedy);
 }
 
 static inline Py_ssize_t
