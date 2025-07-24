@@ -208,7 +208,7 @@ CpContext_GetRoot(PyObject* pObj)
     PyObject_GetItem((PyObject*)&(_Cp_CAST(CpContextObject*, pObj))->m_dict,
                      state->str__context_root);
   if (nRoot)
-    return NULL;
+    return nRoot;
 
   PyErr_Clear();
   return Py_NewRef(pObj);
@@ -298,6 +298,7 @@ success:
   Py_XDECREF(nMaxSplit);
   return error;
 }
+
 /* docs */
 
 PyDoc_STRVAR(cp_context__doc__, "\
@@ -358,6 +359,16 @@ cp_context__mod_init(PyObject* m, _modulestate* state)
   _CACHED_STRING(state, str__path_sep, ".", -1);
   _CACHED_STRING(state, str__context_root, "_root", -1);
   _CACHED_STRING(state, str__fn_rsplit, "rsplit", -1);
+  _CACHED_STRING(state, str__context_parent, "_parent", -1);
+  _CACHED_STRING(state, str__context_io, "_io", -1);
+  _CACHED_STRING(state, str__context_length, "_length", -1);
+  _CACHED_STRING(state, str__context_index, "_index", -1);
+  _CACHED_STRING(state, str__context_path, "_path", -1);
+  _CACHED_STRING(state, str__context_obj, "_obj", -1);
+  _CACHED_STRING(state, str__context_is_seq, "_is_seq", -1);
+  _CACHED_STRING(state, str__context_field, "_field", -1);
+  _CACHED_STRING(state, str__value, "value", -1);
+  _CACHED_STRING(state, str__context_list, "_lst", -1);
 
   CpModule_AddObject(CpContext_NAME, &CpContext_Type, -1);
   return 0;
@@ -369,4 +380,14 @@ cp_context__mod_clear(PyObject* m, _modulestate* state)
   Py_CLEAR(state->str__path_sep);
   Py_CLEAR(state->str__context_root);
   Py_CLEAR(state->str__fn_rsplit);
+  Py_CLEAR(state->str__context_parent);
+  Py_CLEAR(state->str__context_io);
+  Py_CLEAR(state->str__context_length);
+  Py_CLEAR(state->str__context_index);
+  Py_CLEAR(state->str__context_path);
+  Py_CLEAR(state->str__context_obj);
+  Py_CLEAR(state->str__context_is_seq);
+  Py_CLEAR(state->str__context_field);
+  Py_CLEAR(state->str__value);
+  Py_CLEAR(state->str__context_list);
 }

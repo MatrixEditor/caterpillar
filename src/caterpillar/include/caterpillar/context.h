@@ -64,10 +64,29 @@ CpContext_GetDict(PyObject* obj)
   return Py_NewRef(&_Cp_CAST(CpContextObject*, obj)->m_dict);
 }
 
-inline static PyObject*
-CpContext_New()
+#define CpContext_New() Cp_FactoryNew(Cp_ContextFactory)
+
+static inline int
+CpContext_SETITEM(PyObject* self, PyObject* key, PyObject* value)
 {
-  return CpObject_CreateNoArgs(&CpContext_Type);
+  return PyDict_SetItem(
+    (PyObject*)&_Cp_CAST(CpContextObject*, self)->m_dict, key, value);
 }
 
+static inline int
+CpContext_COPYITEM(PyObject* pContext, PyObject* pSrc, PyObject* pKey)
+{
+  PyObject* nValue = PyObject_GetItem(pSrc, pKey);
+  if (!nValue) {
+    return -1;
+  }
+  return CpContext_SETITEM(pContext, pKey, nValue);
+}
+
+static inline PyObject*
+CpContext_ITEM(PyObject* self, PyObject* key)
+{
+  return PyDict_GetItem((PyObject*)&_Cp_CAST(CpContextObject*, self)->m_dict,
+                        key);
+}
 #endif
