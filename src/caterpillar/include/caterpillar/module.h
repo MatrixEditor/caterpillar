@@ -38,6 +38,25 @@ struct _modulestate
   PyObject* str__path_sep;
   PyObject* str__context_root;
   PyObject* str__fn_rsplit;
+  PyObject* str__pack;
+  PyObject* str__pack_many;
+  PyObject* str__unpack;
+  PyObject* str__unpack_many;
+  PyObject* str__type;
+  PyObject* str__size;
+  PyObject* str__bits;
+  PyObject* str__context_parent;
+  PyObject* str__context_io;
+  PyObject* str__context_length;
+  PyObject* str__context_index;
+  PyObject* str__context_path;
+  PyObject* str__context_obj;
+  PyObject* str__context_is_seq;
+  PyObject* str__context_field;
+  PyObject* str__start;
+  PyObject* str__value;
+  PyObject* str__context_list;
+  PyObject* str__struct;
 };
 
 /**

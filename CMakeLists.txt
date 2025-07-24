@@ -22,6 +22,11 @@ python_add_library(
   src/ccaterpillar/context.c
   src/ccaterpillar/atom.c
   src/ccaterpillar/lengthinfo.c
+  src/ccaterpillar/shared.c
+  src/ccaterpillar/atoms/builtin/builtin.c
+  src/ccaterpillar/atoms/builtin/repeated.c
+  src/ccaterpillar/atoms/builtin/switch.c
+  src/ccaterpillar/atoms/builtin/conditional.c
 
   WITH_SOABI
 )
