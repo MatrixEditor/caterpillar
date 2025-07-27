@@ -104,8 +104,10 @@
   _CACHED_STRING(state, attr, str, NULL)
 
 // private module initializer and finalizer
-int shared__mod_init(PyObject* m, _modulestate* state);
-void shared__mod_clear(PyObject* m, _modulestate* state);
+int
+shared__mod_init(PyObject* m, _modulestate* state);
+void
+shared__mod_clear(PyObject* m, _modulestate* state);
 
 #define _CpDef_ModFn(name)                                                     \
   int name##__mod_init(PyObject* m, _modulestate* state);                      \

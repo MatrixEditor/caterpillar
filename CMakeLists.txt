@@ -27,6 +27,7 @@ python_add_library(
   src/ccaterpillar/atoms/builtin/repeated.c
   src/ccaterpillar/atoms/builtin/switch.c
   src/ccaterpillar/atoms/builtin/conditional.c
+  src/ccaterpillar/atoms/builtin/offset.c
 
   WITH_SOABI
 )

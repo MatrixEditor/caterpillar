@@ -15,6 +15,7 @@
 #include "caterpillar/atoms/builtin/repeated.h"
 #include "caterpillar/atoms/builtin/switch.h"
 #include "caterpillar/atoms/builtin/conditional.h"
+#include "caterpillar/atoms/builtin/offset.h"
 
 
 

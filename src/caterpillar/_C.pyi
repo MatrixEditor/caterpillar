@@ -83,10 +83,12 @@ class Atom(Generic[_IT, _OT]):
     def __type__(self) -> type | str | None: ...
     def __size__(self, context: _ContextLike) -> int: ...
     def __bits__(self) -> int: ...
+
+class BuiltinAtom(Atom[_IT, _OT]):
     def __getitem__(self, dim: _LengthT) -> Repeated[_IT, _OT]: ...
     def __rshift__(self, cases: _SwitchLike[Any, Any]) -> Switch: ...
 
-class Repeated(Atom[Collection[_IT], Collection[_OT]]):
+class Repeated(BuiltinAtom[Collection[_IT], Collection[_OT]]):
     atom: _StructLike[_IT, _OT]
     length: _LengthT
 
@@ -103,7 +105,7 @@ class Repeated(Atom[Collection[_IT], Collection[_OT]]):
     def __type__(self) -> type[list[_OT]]: ...
     def __set_byteorder__(self, order: _EndianLike) -> Self: ...
 
-class Switch(Atom[Any, Any]):
+class Switch(BuiltinAtom[Any, Any]):
     cases: _SwitchLike[Any, Any]
     atom: _StructLike[Any, Any] | _ContextLambda[Any]
 
@@ -125,7 +127,7 @@ class Switch(Atom[Any, Any]):
         context: _ContextLike,
     ) -> _StructLike[Any, Any]: ...
 
-class Conditional(Atom[_IT | None, _OT | None]):
+class Conditional(BuiltinAtom[_IT | None, _OT | None]):
     atom: _StructLike[_IT, _OT]
     condition: _ContextLambda[bool] | bool
 
@@ -143,6 +145,29 @@ class Conditional(Atom[_IT | None, _OT | None]):
     def __set_byteorder__(self, order: _EndianLike) -> Self: ...
     def is_enabled(self, context: _ContextLike) -> bool: ...
 
+class AtOffset(BuiltinAtom[_IT, _OT]):
+    atom: _StructLike[_IT, _OT]
+    offset: int | _ContextLambda[int]
+    whence: int
+    keep_pos: bool
+
+    def __init__(
+        self,
+        atom: _StructLike[_IT, _OT],
+        offset: int | _ContextLambda[int],
+        whence: int = ...,
+        keep_pos: bool = ...,
+    ) -> None: ...
+    @override
+    def __pack__(self, obj: _IT, context: _ContextLike) -> None: ...
+    @override
+    def __unpack__(self, context: _ContextLike) -> _OT: ...
+    @override
+    def __type__(self) -> type | str | None: ...
+    def __set_byteorder__(self, order: _EndianLike) -> Self: ...
+    @property
+    def is_number(self) -> bool: ...
+
 __all__ = [
     "c_Arch",
     "c_Endian",
@@ -157,4 +182,6 @@ __all__ = [
     "Repeated",
     "Switch",
     "Conditional",
+    "AtOffset",
+    "BuiltinAtom",
 ]

@@ -8,6 +8,8 @@ PyObject* Cp_ContextFactory = NULL;
 PyObject* Cp_ArrayFactory = NULL;
 PyObject* Cp_DefaultOption = NULL;
 
+PyObject* CpBytesIO_Type = NULL;
+
 // Exceptions
 PyObject* CpExc_Stop = NULL;
 
@@ -94,6 +96,28 @@ Cp_GetStruct(PyObject* pObj)
   return nResult;
 }
 
+/*CpAPI*/
+PyObject*
+Cp_EvalObject(PyObject* pObj, PyObject* pContext)
+{
+  PyObject* nResult = NULL;
+  if (!pObj) {
+    PyErr_SetString(PyExc_ValueError, "Input object cannot be null");
+    goto error;
+  }
+
+  if (PyCallable_Check(pObj) && pContext) {
+    _Cp_AssignCheck(nResult, PyObject_CallOneArg(pObj, pContext), error);
+  } else {
+    nResult = Py_NewRef(pObj);
+  }
+  return nResult;
+
+error:
+  // nResult won't be set when this code is reached
+  return NULL;
+}
+
 /*init*/
 void
 shared__mod_clear(PyObject* m, _modulestate* state)
@@ -130,6 +154,10 @@ shared__mod_init(PyObject* m, _modulestate* state)
   _Cp_AssignCheck(
     nTmpMod, PyImport_ImportModule("caterpillar.fields._base"), err);
   _IMPORT_ATTR(nTmpMod, "DEFAULT_OPTION", Cp_DefaultOption);
+  Py_CLEAR(nTmpMod);
+
+  _Cp_AssignCheck(nTmpMod, PyImport_ImportModule("io"), err);
+  _IMPORT_ATTR(nTmpMod, "BytesIO", CpBytesIO_Type);
   Py_CLEAR(nTmpMod);
 
   return 0;

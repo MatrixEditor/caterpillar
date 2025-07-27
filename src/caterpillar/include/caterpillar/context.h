@@ -17,7 +17,7 @@
 #ifndef CP_CONTEXT_H
 #define CP_CONTEXT_H
 
-/* Caterpillar Context and ContextPath C implementation */
+/* Caterpillar Context C implementation */
 #include "caterpillar/caterpillarapi.h"
 
 /*context*/
@@ -66,27 +66,25 @@ CpContext_GetDict(PyObject* obj)
 
 #define CpContext_New() Cp_FactoryNew(Cp_ContextFactory)
 
-static inline int
-CpContext_SETITEM(PyObject* self, PyObject* key, PyObject* value)
-{
-  return PyDict_SetItem(
-    (PyObject*)&_Cp_CAST(CpContextObject*, self)->m_dict, key, value);
-}
+#define CpContext_SETITEM(context, key, value)                                 \
+  PyObject_SetItem(context, key, value)
+
+#define CpContext_ITEM(context, key) PyObject_GetItem(context, key)
 
 static inline int
 CpContext_COPYITEM(PyObject* pContext, PyObject* pSrc, PyObject* pKey)
 {
-  PyObject* nValue = PyObject_GetItem(pSrc, pKey);
+  PyObject* nValue = CpContext_ITEM(pSrc, pKey);
   if (!nValue) {
     return -1;
   }
   return CpContext_SETITEM(pContext, pKey, nValue);
 }
 
-static inline PyObject*
-CpContext_ITEM(PyObject* self, PyObject* key)
-{
-  return PyDict_GetItem((PyObject*)&_Cp_CAST(CpContextObject*, self)->m_dict,
-                        key);
-}
+#define CpContext_IO(context, state)                                           \
+  CpContext_ITEM(context, state->str__context_io)
+
+#define CpContext_SETIO(context, state, pIO)                                   \
+  CpContext_SETITEM(context, state->str__context_io, pIO)
+
 #endif

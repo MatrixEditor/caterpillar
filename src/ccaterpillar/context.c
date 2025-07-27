@@ -49,7 +49,7 @@ cp_context__getattro__(CpContextObject* self, PyObject* name)
   // try to resolve via __getitem__ call
   result = PyDict_GetItem((PyObject*)&self->m_dict, name);
   if (result)
-    return result;
+    return Py_NewRef(result);
 
   PyErr_Clear();
   return CpContext_GenericGetAttr((PyObject*)self, name);
@@ -66,7 +66,7 @@ cp_context__getattr__(CpContextObject* self, const char* path)
   // try to resolve via __getitem__ call
   result = PyDict_GetItemString((PyObject*)&self->m_dict, path);
   if (result)
-    return result;
+    return Py_NewRef(result);
 
   PyErr_Clear();
   return CpContext_GenericGetAttrString((PyObject*)self, path);
@@ -204,9 +204,7 @@ CpContext_GetRoot(PyObject* pObj)
     return NULL;
   }
 
-  nRoot =
-    PyObject_GetItem((PyObject*)&(_Cp_CAST(CpContextObject*, pObj))->m_dict,
-                     state->str__context_root);
+  nRoot = CpContext_ITEM(pObj, state->str__context_root);
   if (nRoot)
     return nRoot;
 
@@ -299,10 +297,144 @@ success:
   return error;
 }
 
+/*CpAPI*/
+PyObject*
+CpContextIO_Tell(PyObject* pContext)
+{
+  PyObject *nResult = NULL, *nIO = NULL;
+  _modulestate* state = get_global_module_state();
+
+  _Cp_AssignCheck(nIO, CpContext_IO(pContext, state), error);
+  _Cp_AssignCheck(
+    nResult, PyObject_CallMethodNoArgs(nIO, state->str__io_tell), error);
+  goto success;
+
+error:
+  Py_CLEAR(nResult);
+
+success:
+  Py_XDECREF(nIO);
+  return nResult;
+}
+
+/*CpAPI*/
+PyObject*
+CpContextIO_Seek(PyObject* pContext, PyObject* pOffset, PyObject* pWhence)
+{
+  PyObject *nResult = NULL, *nIO = NULL;
+  _modulestate* state = get_global_module_state();
+
+  _Cp_AssignCheck(nIO, CpContext_IO(pContext, state), error);
+  _Cp_AssignCheck(nResult,
+                  PyObject_CallMethodObjArgs(
+                    nIO, state->str__io_seek, pOffset, pWhence, NULL),
+                  error);
+  goto success;
+
+error:
+  Py_CLEAR(nResult);
+
+success:
+  Py_XDECREF(nIO);
+  return nResult;
+}
+
+/*CpAPI*/
+PyObject*
+CpContextIO_Read(PyObject* pContext, PyObject* pSize)
+{
+  PyObject *nResult = NULL, *nIO = NULL;
+  _modulestate* state = get_global_module_state();
+
+  _Cp_AssignCheck(nIO, CpContext_IO(pContext, state), error);
+  _Cp_AssignCheck(
+    nResult,
+    PyObject_CallMethodObjArgs(nIO, state->str__io_read, pSize, NULL),
+    error);
+  goto success;
+
+error:
+  Py_CLEAR(nResult);
+
+success:
+  Py_XDECREF(nIO);
+  return nResult;
+}
+
+/*CpAPI*/
+PyObject*
+CpContextIO_ReadSsize_t(PyObject* pContext, Py_ssize_t pSize)
+{
+  PyObject *nResult = NULL, *nSize = NULL;
+
+  _Cp_AssignCheck(nSize, PyLong_FromSsize_t(pSize), error);
+  _Cp_AssignCheck(nResult, CpContextIO_Read(pContext, nSize), error);
+
+error: // == success:
+  Py_XDECREF(nSize);
+  return nResult;
+}
+
+/*CpAPI*/
+PyObject*
+CpContextIO_ReadFully(PyObject* pContext)
+{
+  PyObject *nResult = NULL, *nIO = NULL;
+  _modulestate* state = get_global_module_state();
+
+  _Cp_AssignCheck(nIO, CpContext_IO(pContext, state), error);
+  _Cp_AssignCheck(
+    nResult, PyObject_CallMethodNoArgs(nIO, state->str__io_read), error);
+  goto success;
+
+error:
+  Py_CLEAR(nResult);
+
+success:
+  Py_XDECREF(nIO);
+  return nResult;
+}
+
+/*CpAPI*/
+PyObject*
+CpContextIO_WriteBytes(PyObject* pContext, PyObject* pData)
+{
+  PyObject *nResult = NULL, *nIO = NULL;
+  _modulestate* state = get_global_module_state();
+
+  _Cp_AssignCheck(nIO, CpContext_IO(pContext, state), error);
+  _Cp_AssignCheck(
+    nResult,
+    PyObject_CallMethodObjArgs(nIO, state->str__io_write, pData, NULL),
+    error);
+  goto success;
+
+error:
+  Py_CLEAR(nResult);
+
+success:
+  Py_XDECREF(nIO);
+  return nResult;
+}
+
+/*CpAPI*/
+PyObject*
+CpContextIO_Write(PyObject* pContext, const char* pData, Py_ssize_t pSize)
+{
+  PyObject *nResult = NULL, *nData = NULL;
+
+  _Cp_AssignCheck(nData, PyUnicode_FromStringAndSize(pData, pSize), error);
+  _Cp_AssignCheck(nResult, CpContextIO_WriteBytes(pContext, nData), error);
+
+error: // == success:
+  Py_XDECREF(nData);
+  return nResult;
+}
+
 /* docs */
 
 PyDoc_STRVAR(cp_context__doc__, "\
-CpContext(**kwargs)\n\
+c_Context(**kwargs)\n\
 --\n\
 Represents a context object with attribute-style access.\n\
 \n\
@@ -369,6 +501,12 @@ cp_context__mod_init(PyObject* m, _modulestate* state)
   _CACHED_STRING(state, str__context_field, "_field", -1);
   _CACHED_STRING(state, str__value, "value", -1);
   _CACHED_STRING(state, str__context_list, "_lst", -1);
+  _CACHED_STRING(state, str__io_read, "read", -1);
+  _CACHED_STRING(state, str__io_write, "write", -1);
+  _CACHED_STRING(state, str__io_seek, "seek", -1);
+  _CACHED_STRING(state, str__io_tell, "tell", -1);
+  _CACHED_STRING(state, str__context_offsets, "_offsets", -1);
+  _CACHED_STRING(state, str__io_getvalue, "getvalue", -1);
 
   CpModule_AddObject(CpContext_NAME, &CpContext_Type, -1);
   return 0;
@@ -390,4 +528,10 @@ cp_context__mod_clear(PyObject* m, _modulestate* state)
   Py_CLEAR(state->str__context_field);
   Py_CLEAR(state->str__value);
   Py_CLEAR(state->str__context_list);
+  Py_CLEAR(state->str__io_read);
+  Py_CLEAR(state->str__io_write);
+  Py_CLEAR(state->str__io_seek);
+  Py_CLEAR(state->str__io_tell);
+  Py_CLEAR(state->str__context_offsets);
+  Py_CLEAR(state->str__io_getvalue);
 }

@@ -53,10 +53,16 @@ struct _modulestate
   PyObject* str__context_obj;
   PyObject* str__context_is_seq;
   PyObject* str__context_field;
+  PyObject* str__context_offsets;
   PyObject* str__start;
   PyObject* str__value;
   PyObject* str__context_list;
   PyObject* str__struct;
+  PyObject* str__io_tell;
+  PyObject* str__io_seek;
+  PyObject* str__io_read;
+  PyObject* str__io_write;
+  PyObject* str__io_getvalue;
 };
 
 /**

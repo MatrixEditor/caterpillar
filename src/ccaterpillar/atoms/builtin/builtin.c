@@ -51,12 +51,26 @@ cp_builtinatom_as_number_rshift(PyObject* self, PyObject* pCases)
   return CpSwitchAtom_New(self, pCases);
 }
 
+static PyObject*
+cp_builtinatom_as_number_floordiv(PyObject* self, PyObject* pCondition)
+{
+  return CpConditionalAtom_New(self, pCondition);
+}
+
+static PyObject*
+cp_builtinatom_as_number_matmul(PyObject* self, PyObject* pOffset)
+{
+  return CpOffsetAtom_New(self, pOffset, PY_SEEK_SET);
+}
+
 PyMappingMethods CpBuiltinAtom_MappingMethods = {
   .mp_subscript = (binaryfunc)cp_builtinatom_getitem,
 };
 
 PyNumberMethods CpBuiltinAtom_NumberMethods = {
   .nb_rshift = (binaryfunc)cp_builtinatom_as_number_rshift,
+  .nb_floor_divide = (binaryfunc)cp_builtinatom_as_number_floordiv,
+  .nb_matrix_multiply = (binaryfunc)cp_builtinatom_as_number_matmul,
 };
 
 PyTypeObject CpBuiltinAtom_Type = {

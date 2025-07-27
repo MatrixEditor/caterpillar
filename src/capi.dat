@@ -37,6 +37,7 @@ src:ccaterpillar/atoms/builtin/builtin.c
 src:ccaterpillar/atoms/builtin/repeated.c
 src:ccaterpillar/atoms/builtin/switch.c
 src:ccaterpillar/atoms/builtin/conditional.c
+src:ccaterpillar/atoms/builtin/offset.c
 
 # First index is reserved for the global module reference
 obj:+:CpModule:PyModuleDef
@@ -44,6 +45,7 @@ obj:+:Cp_ArrayFactory:PyObject*
 obj:+:Cp_ContextFactory:PyObject*
 obj:+:CpExc_Stop:PyObject*
 obj:+:Cp_DefaultOption:PyObject*
+obj:+:CpBytesIO_Type:PyObject*
 
 type:-:_modulestate:_modulestate:-
 type:+:_archobj:CpArchObject:c_Arch
@@ -56,6 +58,7 @@ type:+:_optionobj:CpOptionObject:c_Option
 type:+:_repeatedatomobj:CpRepeatedAtomObject:Repeated
 type:+:_switchatomobj:CpSwitchAtomObject:Switch
 type:+:_conditionalatomobj:CpConditionalAtomObject:Conditional
+type:+:_offsetatomobj:CpOffsetAtomObject:AtOffset
 
 func:+:Cp_HasStruct:int:null
 func:+:Cp_GetStructNoCheck:PyObject*:+1
@@ -77,6 +80,15 @@ func:+:CpContext_GenericGetAttrString:PyObject*:+1
 func:+:CpContext_GenericSetAttr:int:null
 func:+:CpContext_GenericSetAttrString:int:null
 func:+:CpContext_GetRoot:PyObject*:+1
+func:-:CpContext_IO:PyObject*:+1
+func:+:CpContextIO_Tell:PyObject*:+1
+func:+:CpContextIO_Read:PyObject*:+1
+func:+:CpContextIO_ReadFully:PyObject*:+1
+func:+:CpContextIO_ReadSsize_t:PyObject*:+1
+func:+:CpContextIO_Tell:PyObject*:+1
+func:+:CpContextIO_WriteBytes:PyObject*:+1
+func:+:CpContextIO_Write:PyObject*:+1
+func:+:CpContextIO_Seek:PyObject*:+1
 func:-:CpContext_New:PyObject*:+1
 func:-:CpEndian_GetId:char:null
 func:+:CpEndian_IsLittleEndian:int:null
@@ -103,6 +115,7 @@ func:-:CpRepeatedAtom_SetAtom:int:null
 func:-:CpRepeatedAtom_GetAtom:PyObject*:+1
 func:-:CpRepeatedAtom_SetLength:int:null
 func:+:Cp_FactoryNew:PyObject*:+1
+func:+:Cp_EvalObject:PyObject*:+1
 func:-:CpSwitchAtom_SetCases:int:null
 func:-:CpSwitchAtom_SetAtom:int:null
 func:+:CpSwitchAtom_EvalWithContext:PyObject*:+1
@@ -116,3 +129,18 @@ func:-:CpConditionalAtom_New:PyObject*:+1
 func:+:CpConditionalAtom_Enabled:int:null
 func:-:CpConditionalAtom_SetAtom:int:null
 func:-:CpConditionalAtom_SetCondition:int:null
+func:-:CpOffsetAtom_New:PyObject*:+1
+func:-:CpOffsetAtom_GetAtom:PyObject*:+1
+func:-:CpOffsetAtom_GetOffset:PyObject*:+1
+func:-:CpOffsetAtom_Whence:PyObject*:+1
+func:-:CpOffsetAtom_WhenceAsSsize_t:Py_ssize_t:null
+func:-:CpOffsetAtom_SetAtom:int:null
+func:-:CpOffsetAtom_SetOffset:int:null
+func:-:CpOffsetAtom_SetWhence:int:null
+func:+:CpOffsetAtom_Size:PyObject*:+1
+func:+:CpOffsetAtom_Unpack:PyObject:+1
+func:+:CpOffsetAtom_Pack:int:null
+func:+:CpOffsetAtom_TypeOf:PyObject:+1
+func:+:CpOffsetAtom_EvalOffset:PyObject*:+1
+func:-:CpOffsetAtom_IsKeepPosition:int:null
+func:-:CpOffsetAtom_SetKeepPosition:void:null
