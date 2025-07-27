@@ -11,12 +11,12 @@ cp_conditionalatom_new(PyTypeObject* type, PyObject* args, PyObject* kw)
     self, (CpConditionalAtomObject*)type->tp_alloc(type, 0), error);
 
   CpBuiltinAtom_ATOM(self).ob_bits = NULL;
-  CpBuiltinAtom_ATOM(self).ob_pack = NULL;
+  CpBuiltinAtom_ATOM(self).ob_pack = CpConditionalAtom_Pack;
   CpBuiltinAtom_ATOM(self).ob_pack_many = NULL;
-  CpBuiltinAtom_ATOM(self).ob_unpack = NULL;
+  CpBuiltinAtom_ATOM(self).ob_unpack = CpConditionalAtom_Unpack;
   CpBuiltinAtom_ATOM(self).ob_unpack_many = NULL;
-  CpBuiltinAtom_ATOM(self).ob_type = NULL;
-  CpBuiltinAtom_ATOM(self).ob_size = NULL;
+  CpBuiltinAtom_ATOM(self).ob_type = CpConditionalAtom_TypeOf;
+  CpBuiltinAtom_ATOM(self).ob_size = CpConditionalAtom_Size;
   self->m_atom = NULL;
   self->m_condition = NULL;
 
@@ -149,6 +149,7 @@ CpConditionalAtom_TypeOf(PyObject* pAtom)
 
   _Cp_AssignCheck(nAtomType, CpAtom_TypeOf(self->m_atom), error);
   _Cp_AssignCheck(nResult, PyNumber_Or(nAtomType, Py_None), error);
+  goto success;
 
 error:
   Py_CLEAR(nResult);
