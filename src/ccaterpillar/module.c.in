@@ -16,6 +16,7 @@ cp_module_clear(PyObject* m)
   _modulestate* state = get_module_state(m);
   if (state) {
     /* clear default arch and endian */
+    shared__mod_clear(m, state);
     %s
   }
   return 0;
@@ -40,60 +41,61 @@ PyModuleDef CpModule = {
 PyMODINIT_FUNC
 PyInit__C(void)
 {
-  PyObject* m;
+  PyObject *m = NULL, *c_api = NULL, *nDict = NULL;
+  _modulestate* state = NULL;
+
   m = PyState_FindModule(&CpModule);
   if (m) {
-    Py_INCREF(m);
-    return m;
+    return Py_NewRef(m);
   }
 
   // type setup
 #define SETUP_TYPES(name)                                                      \
   if (name##__mod_types() < 0)                                                 \
-  return NULL
+    goto err;
 
 #define ADD_OBJECTS(name)                                                      \
   if (name##__mod_init(m, state) < 0)                                          \
-  return NULL
+    goto err;
 
   %s
-
-  if (cp_context__mod_types() < 0)
-    return NULL;
 
   m = PyModule_Create(&CpModule);
   if (!m) {
-    return NULL;
+    goto err;
   }
 
   /* setup state */
-  _modulestate* state = get_module_state(m);
+  state = get_module_state(m);
 
+  ADD_OBJECTS(shared);
   %s
 
   /*Export API table*/
-  PyObject* c_api = PyCapsule_New((void*)Cp_API, NULL, NULL);
+  c_api = PyCapsule_New((void*)Cp_API, NULL, NULL);
   if (c_api == NULL) {
     goto err;
   }
 
-  PyObject* d = PyModule_GetDict(m);
-  if (d == NULL) {
+  if ((nDict = PyDict_New(), !nDict)) {
     goto err;
   }
 
-  if (PyDict_SetItemString(d, "_C_API", c_api) < 0) {
+  if (PyDict_SetItemString(nDict, "_C_API", c_api) < 0) {
     goto err;
   }
-  Py_DECREF(c_api);
-  return m;
+  goto success;
 
 err:
   if (!PyErr_Occurred()) {
     PyErr_SetString(PyExc_RuntimeError, "cannot load caterpillar._C module.");
   }
-  Py_DECREF(m);
-  return NULL;
+  Py_XSETREF(m, NULL);
+
+success:
+  Py_XDECREF(nDict);
+  Py_XDECREF(c_api);
+  return m;
 
 #undef SETUP_TYPES
 #undef ADD_OBJECTS

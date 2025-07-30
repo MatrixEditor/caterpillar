@@ -461,6 +461,7 @@ def pack_into(
         _path="<root>",
         _pos=0,
         _offsets=offsets,
+        _is_seq=False,
         mode=MODE_PACK,
         **kwds,
     )

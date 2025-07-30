@@ -1,31 +1,29 @@
 """
 Custom script to generate the public Caterpillar API.
 =====================================================
-
-
 """
 
 import pathlib
 import argparse
+import dataclasses
+import typing as t
 
 from caterpillar_api import (
-    cp_type_api,
-    cp_func_api,
+    CP_FUNC_API,
+    CP_TYPE_API,
     cp_api_functions,
-    cp_types,
-    cp_api_src,
+    CP_SRC,
+    CP_TYPES,
 )
 
 
 # Base class for all API objects (functions or types)
+@dataclasses.dataclass
 class APIObj:
-    def __init__(
-        self, name: str = None, index: int = 0, api_name: str = None, type_: str = None
-    ) -> None:
-        self.name = name
-        self.index = index
-        self.api_name = api_name
-        self.type = type_
+    name: str
+    index: int
+    api_name: str
+    type: str
 
     def cp_api_table(self) -> str:
         if not self.name:
@@ -41,9 +39,12 @@ class APIObj:
 
 
 class APIType(APIObj):
-    def __init__(self, name: str, index: int, api_name: str, type_: str = None) -> None:
+    def __insit__(
+        self, name: str, index: int, api_name: str, type_: str | None = None
+    ) -> None:
         super().__init__(name, index, api_name, type_ or "PyTypeObject")
 
+    @t.override
     def cp_internal_def(self) -> str:
         # REVISIT: what about struct definitions?
         if self.type.startswith("Py"):
@@ -52,6 +53,7 @@ class APIType(APIObj):
         extra_def = f"#define {self.name.replace('_Type', '')}_NAME \"{self.type}\""
         return f"extern PyTypeObject {self.name};\n{extra_def}"
 
+    @t.override
     def cp_external_def(self):
         """Return the external definition for this API object
 
@@ -66,6 +68,9 @@ class APIType(APIObj):
 
 
 class APIFunc(APIObj):
+    rtype: str
+    args: list[str]
+
     def __init__(
         self, name: str, index: int, api_name: str, rtype: str, args: list[str]
     ) -> None:
@@ -74,9 +79,11 @@ class APIFunc(APIObj):
         type_ = "(%s (*)(%s))" % (rtype, ", ".join(args))
         super().__init__(name, index, api_name, type_)
 
+    @t.override
     def cp_internal_def(self) -> str:
         return f"{self.rtype} {self.name}({', '.join(self.args)});"
 
+    @t.override
     def cp_external_def(self) -> str:
         return f"#define {self.name} (*({self.type}){self.api_name}[{self.index}])"
 
@@ -93,11 +100,11 @@ def genapi(
     private_h_out = pathlib.Path(str(private_h).replace(".in", ""))
 
     func_api = cp_api_functions()
-    max_func_index = max(cp_func_api.values())
-    max_type_index = max(map(lambda x: x[0], cp_type_api.values()))
+    max_func_index = max(CP_FUNC_API.values())
+    max_type_index = max(map(lambda x: x[0], CP_TYPE_API.values()))
 
     api_objects = [None] * (max(max_func_index, max_type_index) + 1)
-    for name, args in cp_type_api.items():
+    for name, args in CP_TYPE_API.items():
         if name == "__reserved__":
             continue
         index = args[0]
@@ -107,7 +114,7 @@ def genapi(
         type_ = None if len(args) == 1 else args[1]
         api_objects[index] = APIType(name, index, "Cp_API", type_)
 
-    for name, index in cp_func_api.items():
+    for name, index in CP_FUNC_API.items():
         if api_objects[index] is not None:
             raise ValueError(f"Duplicate API object: {name} at index {index}")
 
@@ -126,13 +133,13 @@ def genapi(
             internal_def.append(obj.cp_internal_def())
 
     typedefs = []
-    for struct_name, type_name in cp_types.items():
+    for struct_name, type_name in CP_TYPES.items():
         typedefs.append(f"struct {struct_name};")
         typedefs.append(f"typedef struct {struct_name} {type_name};")
 
     api_h_source = api_h.read_text(encoding="utf-8")
     mod_types = []
-    for name, ignored in cp_api_src:
+    for name, ignored in CP_SRC:
         if not ignored:
             target_name = pathlib.Path(name).stem
             mod_types.append(f"cp_{target_name}")
@@ -152,8 +159,8 @@ def genapi(
         mod_source
         % (
             "\n    ".join([f"{name}__mod_clear(m, state);" for name in mod_types]),
-            "\n  ".join([f"{name}__mod_types();" for name in mod_types]),
-            "\n  ".join([f"{name}__mod_init(m, state);" for name in mod_types]),
+            "\n  ".join([f"SETUP_TYPES({name})" for name in mod_types]),
+            "\n  ".join([f"ADD_OBJECTS({name})" for name in mod_types]),
         ),
         encoding="utf-8",
     )

@@ -29,7 +29,7 @@
 struct _optionobj
 {
 
-  PyObject_HEAD;
+  PY_OBJECT_HEAD;
 
   /// Name of the option
   PyObject* name;
