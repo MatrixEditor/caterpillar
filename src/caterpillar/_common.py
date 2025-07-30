@@ -14,8 +14,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import itertools
 
-from typing import Collection
-
 from caterpillar.abc import _PrefixedType
 from caterpillar.context import (
     CTX_PATH,
@@ -48,7 +46,7 @@ class WithoutContextVar:
         self.context[CTX_FIELD] = self.field
 
 
-def unpack_seq(context, unpack_one) -> Collection:
+def unpack_seq(context, unpack_one):
     """Generic function to unpack sequenced elements.
 
     :param stream: the input stream

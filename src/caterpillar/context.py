@@ -474,3 +474,4 @@ class ContextLength(ExprMixin):
 this = ContextPath(CTX_OBJECT)
 ctx = ContextPath()
 parent = ContextPath(".".join([CTX_PARENT, CTX_OBJECT]))
+root = ContextPath(CTX_ROOT)

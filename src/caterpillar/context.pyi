@@ -141,3 +141,4 @@ class ContextLength(ExprMixin, _ContextLambda):
 this: ContextPath
 ctx: ContextPath
 parent: ContextPath
+root: ContextPath

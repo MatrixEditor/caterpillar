@@ -18,6 +18,7 @@ from caterpillar.abc import (
     _StructLike,
     _GreedyType,
     _PrefixedType,
+    _ContextLambda,
 )
 from caterpillar.byteorder import ByteOrder, SysNative, system_arch
 from caterpillar.exception import (
@@ -52,91 +53,6 @@ DEFAULT_OPTION = object()
 class Field:
     """Represents a field in a data structure."""
 
-    # struct
-    # """
-    # Stores a reference to the actual parsing struct that will be used to parse or
-    # build our data. This attribute is never null.
-    # """
-
-    # order: ByteOrder
-    # """
-    # An automatically inferred or explicitly specified byte order. Note that this
-    # attribute may have no impact on the underlying struct. The default byte order
-    # is ``SysNative``.
-    # """
-
-    # offset
-    # """
-    # Using the ``@`` operator an offset can be assigned to a field. If set, the
-    # stream will be reset and set to the original position.
-
-    # The minus one indicates that no offset has been associated with this field.
-    # """
-
-    # flags: Dict[int, Flag]
-    # """
-    # Additional options that can be enabled using the logical OR operator ``|``.
-
-    # Note that there are default options that will be set automatically:
-
-    # * ``keep_position``:
-    #     Persists the streams position after parsing data using the underlying
-    #     struct. In relation to ``offset``, this option will reset the stream to
-    #     its original position if deactivated.
-    # * ``dynamic``:
-    #     Specifies that this field does not store a constant size.
-    # * ``sequential``:
-    #     An automatic flag that indicates this field stores a sequential struct.
-    # """
-
-    # amount: Union[_ContextLambda, int, _GreedyType, _PrefixedType]
-    # """
-    # A constant or dynamic value to represent the amount of structs. Zero indicates
-    # there are no sequence types associated with this field.
-    # """
-
-    # options
-    # """
-    # An extra attribute that stores additional options that can be translates as a
-    # switch statement.
-    # """
-
-    # condition
-    # """
-    # Given optional execution this attribute should be used to return a boolean value
-    # that decides whether the value of this field should be set. Using ``//`` the
-    # condition can be set during class declaration.
-    # """
-
-    # arch
-    # """
-    # The field's architecture (inferred or explicitly specified).
-    # """
-
-    # default
-    # """
-    # The configured default value.
-    # """
-
-    # bits
-    # """
-    # The configured bits.
-    # """
-
-    __slots__ = (
-        "struct",
-        "order",
-        "flags",
-        "bits",
-        "arch",
-        "amount",
-        "options",
-        "condition",
-        "default",
-        "offset",
-        "__name__",
-    )
-
     def __init__(
         self,
         struct,
@@ -150,64 +66,159 @@ class Field:
         default=INVALID_DEFAULT,
         bits=None,
     ) -> None:
+        # pre-computed states to reduce computing time overhead when
+        # packing or unpacking.
+        self._is_lambda = False
+        self._has_cond = False
+        self._cond_is_lambda = False
+        self._is_seq = False
+        self._keep_pos = True
+        self._has_offset = False
+        self._offset_is_lambda = False
+        self._amount_is_lambda = False
+        self._switch_is_lambda = False
+        self._switch_has_default = False
+
+        # private variable initialization
+        self.__struct = None
+        self.__condition = None
+        self.__flags = None
+        self.__offset = None
+        self.__amount = None
+        self.__options = None  # named for historical reasons, should be SWITCH
+
+        # initialization via property setters
         self.struct = struct
+        self.condition = condition
         self.order = order or SysNative
         self.flags = {hash(x): x for x in flags or set([F_KEEP_POSITION])}
         self.bits = bits
-
         self.arch = arch or system_arch
-        # this will unset KEEP_POSITION if configured
-        self.__matmul__(offset)
-        if amount:
-            self.__getitem__(amount)
-        else:
-            self.amount = 1
+        self.offset = offset
+        self.amount = amount or 1
         self.options = options
-        self.condition = condition
+
         # NOTE: we use INVALID_DEFAULT as disabled default value indicator, so
         # that None is still usable as default
         self.default = default
 
+    # These getsetters won't validate the input!!
+    @property
+    def struct(self):
+        return self.__struct
+
+    @struct.setter
+    def struct(self, value):
+        self.__struct = value
+        # pre-computed state of this field
+        self._is_lambda = isinstance(value, _ContextLambda)
+
+    @property
+    def condition(self):
+        return self.__condition
+
+    @condition.setter
+    def condition(self, value):
+        self.__condition = value
+        self._has_cond = value not in (True, None)
+        self._cond_is_lambda = isinstance(value, _ContextLambda)
+
+    @property
+    def flags(self):
+        return self.__flags
+
+    @flags.setter
+    def flags(self, value):
+        self.__flags = value
+        self._update_flags()
+
+    def _update_flags(self):
+        # These two states are not affected by the global field flags
+        self._is_seq = F_SEQUENTIAL._hash_ in self.flags
+        self._keep_pos = F_KEEP_POSITION._hash_ in self.flags
+
+    def add_flag(self, flag) -> None:
+        self.flags[hash(flag)] = flag
+        self._update_flags()
+
+    def has_flag(self, flag: Flag) -> bool:
+        """Checks whether this field stores the given flag.
+
+        :param flag: the flag to lookup
+        :type flag: Flag
+        :return: true if this flag has been found
+        :rtype: bool
+        """
+        return hash(flag) in self.flags or flag in GLOBAL_FIELD_FLAGS
+
+    def remove_flag(self, flag: Flag) -> None:
+        self.flags.pop(hash(flag), None)
+        self._update_flags()
+
+    @property
+    def offset(self):
+        return self.__offset
+
+    @offset.setter
+    def offset(self, value):
+        self.__offset = value
+        self._has_offset = value != -1
+        self._offset_is_lambda = isinstance(value, _ContextLambda)
+        # This operation automatically removes the "keep_position"
+        # flag. It has to be set manually.
+        if self.offset != -1:
+            self.remove_flag(F_KEEP_POSITION)
+
+    @property
+    def amount(self):
+        return self.__amount
+
+    @amount.setter
+    def amount(self, value):
+        self.__amount = value
+        self._amount_is_lambda = isinstance(value, _ContextLambda)
+        self._is_seq = value > 0
+
+    @property
+    def options(self):
+        return self.__options
+
+    @options.setter
+    def options(self, value):
+        self.__options = value
+        self._switch_is_lambda = isinstance(value, _ContextLambda)
+        self._switch_has_default = (
+            value and not self._switch_is_lambda and DEFAULT_OPTION in value
+        )
+
     def _verify_context_value(self, value, expected) -> None:
         # As the offset value or amount may be dynamic, we have to candidate
         # types. There should be an error if none applies.
-        if not isinstance(value, expected) and not callable(value):
+        if not isinstance(value, expected) and not isinstance(value, _ContextLambda):
             raise TypeError(
                 f"Expected a valid value or context lambda, got {type(value)}"
             )
 
-    def __or__(self, flag: Flag):  # add flags
-        if not isinstance(flag, Flag):
-            raise TypeError(f"Expected a flag, got {type(flag)}")
-
-        self.flags[hash(flag)] = flag
+    def __or__(self, flag):  # add flags
+        self.add_flag(flag)
         return self
 
-    def __xor__(self, flag: Flag):  # remove flags:
-        self.flags.pop(hash(flag), None)
+    def __xor__(self, flag):  # remove flags:
+        self.remove_flag(flag)
         return self
 
     def __matmul__(self, offset):
         self._verify_context_value(offset, int)
         self.offset = offset
-        # This operation automatically removes the "keep_position"
-        # flag. It has to be set manually.
-        if self.offset != -1:
-            self.flags.pop(F_KEEP_POSITION._hash_, None)
         return self
 
     def __getitem__(self, dim):
         self._verify_context_value(dim, (_GreedyType, int, _PrefixedType))
         self.amount = dim
-        if self.amount != 0:
-            # pylint: disable-next=protected-access
-            self.flags[F_SEQUENTIAL._hash_] = F_SEQUENTIAL
         return self
 
     def __rshift__(self, switch):
-        if not isinstance(switch, dict) and not callable(switch):
-            raise TypeError(f"Expected a valid switch context, got {type(switch)}")
-
+        self._verify_context_value(switch, dict)
         self.options = switch
         return self
 
@@ -241,8 +252,7 @@ class Field:
         :return: whether this field is sequental
         :rtype: bool
         """
-        # pylint: disable-next=protected-access
-        return F_SEQUENTIAL._hash_ in self.flags
+        return self._is_seq
 
     def is_enabled(self, context) -> bool:
         """Evaluates the condition of this field.
@@ -252,22 +262,14 @@ class Field:
         :return: ``True``, if this field is enabled
         :rtype: bool
         """
-        return self.condition(context) if callable(self.condition) else self.condition
+        if not self._has_cond:
+            return True
+
+        return self.condition(context) if self._cond_is_lambda else self.condition
 
     def has_condition(self) -> bool:
         """Returns whether this field is linked to a condition"""
-        return self.condition is not True
-
-    def has_flag(self, flag: Flag) -> bool:
-        """Checks whether this field stores the given flag.
-
-        :param flag: the flag to lookup
-        :type flag: Flag
-        :return: true if this flag has been found
-        :rtype: bool
-        """
-        # pylint: disable-next=protected-access
-        return hash(flag) in self.flags or flag in GLOBAL_FIELD_FLAGS
+        return self._has_cond
 
     def length(self, context):
         """Calculates the sequence length of this field.
@@ -279,10 +281,7 @@ class Field:
         :rtype: Union[int, _GreedyType]
         """
         try:
-            if isinstance(self.amount, (int, _GreedyType, _PrefixedType)):
-                return self.amount
-
-            return self.amount(context)
+            return self.amount(context) if self._amount_is_lambda else self.amount
         except Exception as exc:
             raise DynamicSizeError("Dynamic sized field!", context) from exc
 
@@ -297,13 +296,13 @@ class Field:
         :rtype: _StructLike
         """
         # treat 'value' as the key of specified options
-        if isinstance(self.options, dict):
-            if value not in self.options and DEFAULT_OPTION not in self.options:
-                raise OptionError(f"Option {str(value)!r} not found!", context)
+        if self._switch_is_lambda:
+            struct = self.options(value, context)
+        else:
+            if value not in self.options and not self._switch_has_default:
+                raise OptionError(f"Option {value!r} not found!", context)
 
             struct = self.options.get(value, None) or self.options.get(DEFAULT_OPTION)
-        else:
-            struct = self.options(value, context)
 
         if struct is None:
             # The struct must be non-null
@@ -311,13 +310,11 @@ class Field:
                 f"Could not find switch value for: {value!r}", context
             )
 
-        if hasstruct(struct):
-            return getstruct(struct)
-        return struct
+        return getstruct(struct, struct)
 
     def get_offset(self, context) -> int:
         """Returns the offset position of this field"""
-        return self.offset(context) if callable(self.offset) else self.offset
+        return self.offset(context) if self._offset_is_lambda else self.offset
 
     def get_type(self):
         """Returns the annotation type for this field
@@ -327,14 +324,17 @@ class Field:
         """
         if not self.options:
             type_ = typeof(self.struct)
-            return type_ if not self.is_seq() else List[type_]
+            return type_ if not self.is_seq() else list[type_]
 
         # We construct a Union type hint as an alternative:
-        if callable(self.options):
+        if self._switch_is_lambda:
             return Any
 
-        types = [typeof(s) for s in self.options.values()]
-        return Union[*types, Any]
+        return_type = Any
+        for switch_type in self.options.values():
+            return_type = return_type | typeof(switch_type)
+
+        return return_type
 
     def get_name(self):
         return getattr(self, "__name__", None)
@@ -351,22 +351,21 @@ class Field:
         :return: the parsed data
         """
         stream = context[CTX_STREAM]
-        if self.condition is not True and not self.is_enabled(context):
+        if self._has_cond and not self.is_enabled(context):
             # Disabled fields or context lambdas won't pack any data
             return
 
         # Using this inlined version of self.is_seq(), qe reduce the amount of
         # calls made to the method and save A LOT of time.
         # pylint: disable-next=protected-access
-        context[CTX_SEQ] = F_SEQUENTIAL._hash_ in self.flags
+        context[CTX_SEQ] = self._is_seq
         # pylint: disable-next=protected-access
-        keep_pos = F_KEEP_POSITION._hash_ in self.flags
-        if not callable(self.struct):  # REVISIT: maybe hardcode this
+        keep_pos = self._keep_pos
+        if not self._is_lambda:  # REVISIT: maybe hardcode this
             if not keep_pos:
                 fallback = stream.tell()
 
-            # as above: we save A LOT of time inlining self.get_offset
-            offset = self.offset(context) if callable(self.offset) else self.offset
+            offset = self.offset(context) if self._offset_is_lambda else self.offset
             if offset >= 0:
                 stream.seek(offset)
 
@@ -382,14 +381,14 @@ class Field:
                     exc = StructException(str(exc), context)
                 # Any exception leads to a default value if configured
                 value = self.default
-                if value == INVALID_DEFAULT or isinstance(exc, ValidationError):
+                if value is INVALID_DEFAULT or isinstance(exc, ValidationError):
                     raise exc
         else:
             # Context functions should be executed with top priority
             value = self.struct(context)
 
         # unpack using switch
-        if self.options is not None:
+        if self.options:
             struct: _StructLike = self.get_struct(value, context)
             # The "keep_position" flag is not applicable here. Configure a field to keep the
             # position afterward.
@@ -417,19 +416,18 @@ class Field:
                            to be sequential
         """
         # TODO: revisit code
-        stream = context[CTX_STREAM]
-        if self.condition is not True and not self.is_enabled(context):
+        if self._has_cond and not self.is_enabled(context):
             # Disabled fields or context lambdas won't pack any data
             return
 
-        # as above: we save A LOT of time inlining self.get_offset
-        offset = self.offset(context) if callable(self.offset) else self.offset
+        stream = context[CTX_STREAM]
+        offset = self.offset(context) if self._offset_is_lambda else self.offset
         # pylint: disable-next=protected-access
-        keep_pos = F_KEEP_POSITION._hash_ in self.flags
+        keep_pos = self._keep_pos
 
         context[CTX_FIELD] = self
         # pylint: disable-next=protected-access
-        context[CTX_SEQ] = F_SEQUENTIAL._hash_ in self.flags
+        context[CTX_SEQ] = self._is_seq
         has_offset = offset >= 0
         if not keep_pos or has_offset:
             fallback = stream.tell()
@@ -442,11 +440,10 @@ class Field:
             stream = BytesIO()
             context[CTX_STREAM] = stream
 
-        is_lambda = callable(self.struct)
-        if self.options is None and not is_lambda:
+        if not self.options and not self._is_lambda:
             self.struct.__pack__(obj, context)
         else:
-            if not is_lambda:
+            if not self._is_lambda:
                 raise StructException(
                     "Attepmt was made to use switch without context lambda!", context
                 )
@@ -488,7 +485,7 @@ class Field:
             raise DynamicSizeError("Dynamic sized field!", context)
 
         context[CTX_FIELD] = self
-        context[CTX_SEQ] = self.is_seq()
+        context[CTX_SEQ] = self._is_seq
 
         # 3. We should gather the element count if this field stores
         # a sequential element
@@ -518,7 +515,7 @@ class Field:
     # representation, maybe revisit
     def __str__(self) -> str:
         name = self.get_name() or "<unnamed>"
-        offset = f", offset={self.offset}" if self.offset != -1 else ""
+        offset = f", offset={self.offset}" if self._has_offset else ""
         return (
             f"Field({name!r}, arch={self.arch.name!r}, order={self.order.name!r}, "
             f"seq={self.is_seq()}, struct={self.struct!r}, cond={self.condition is not True}, "
