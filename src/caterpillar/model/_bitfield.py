@@ -908,7 +908,7 @@ class Bitfield(Struct):
                 context[CTX_PATH] = f"{base_path}.{name}"
                 value = field.__unpack__(context)
                 context[CTX_OBJECT][name] = value
-                if name in self._member_map_:
+                if name in self._members:
                     init_data[name] = value
 
             else:
@@ -930,7 +930,7 @@ class Bitfield(Struct):
                             func(context)
                             continue
 
-                    if entry.name not in self._member_map_:
+                    if entry.name not in self._members:
                         continue
 
                     value = (raw_value >> entry.shift(group.bit_count)) & entry.low_mask
@@ -950,7 +950,7 @@ class Bitfield(Struct):
                 field = group.get_field()
                 name = field.__name__
                 context[CTX_PATH] = f"{base_path}.{name}"
-                if name in self._member_map_:
+                if name in self._members:
                     value = self.get_value(obj, name, field)
                 else:
                     value = field.default if field.default != INVALID_DEFAULT else None
@@ -966,7 +966,7 @@ class Bitfield(Struct):
                             func(context)
                         continue
 
-                    if entry.name not in self._member_map_:
+                    if entry.name not in self._members:
                         continue
 
                     entry_value = self.get_value(obj, entry.name, None)

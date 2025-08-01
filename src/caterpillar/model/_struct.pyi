@@ -46,25 +46,25 @@ _ModelT = TypeVar("_ModelT")
 
 class Struct(Sequence[_ModelT]):
     kw_only: bool
-    model: Type[_ModelT]
+    model: type[_ModelT]
     def __init__(
         self,
-        model: Type[_ModelT],
-        options: Optional[Iterable[_OptionLike]] = None,
-        order: Optional[ByteOrder] = None,
-        arch: Optional[Arch] = None,
-        field_options: Optional[_OptionLike] = None,
+        model: type[_ModelT],
+        options: Iterable[_OptionLike] | None = None,
+        order: ByteOrder | None = None,
+        arch: Arch | None = None,
+        field_options: _OptionLike | None = None,
         kw_only: bool = False,
-        hook_cls: Optional[Type[_UnionHookLike[_ModelT]]] = None,
+        hook_cls: type[_UnionHookLike[_ModelT]] | None = None,
     ) -> None: ...
-    def __type__(self) -> Type[_ModelT]: ...
+    def __type__(self) -> type[_ModelT]: ...
     def unpack_one(self, context: _ContextLike) -> _ModelT: ...
     def get_value(self, obj: Any, name: str, field: Field) -> Any | None: ...
 
 class _StructTypeConverter(registry.TypeConverter):
     def __init__(self) -> None: ...
     def matches(self, annotation: Any) -> bool: ...
-    def convert(self, annotation: Any, kwargs: dict) -> Struct: ...
+    def convert(self, annotation: Any, kwargs: dict[str, Any]) -> Struct[Any]: ...
 
 class _UnionHookLike(Generic[_ModelT]):
     def __model_init__(self, obj: _ModelT, *args, **kwargs) -> None: ...
@@ -89,7 +89,7 @@ class UnionHook(Generic[_ModelT]):
 
 @overload
 def struct(
-    cls: Type[_ModelT],
+    cls: type[_ModelT],
     /,
     *,
     options: Optional[Iterable[_OptionLike]] = None,
@@ -97,7 +97,7 @@ def struct(
     arch: Optional[Arch] = None,
     field_options: Optional[Iterable[_OptionLike]] = None,
     kw_only: bool = False,
-) -> Type[_ModelT]: ...
+) -> type[_ModelT]: ...
 @overload
 def struct(
     cls: None = None,
@@ -111,7 +111,7 @@ def struct(
 ) -> Callable[[_ModelT], _ModelT]: ...
 @overload
 def union(
-    cls: Type[_ModelT],
+    cls: type[_ModelT],
     /,
     *,
     options: Optional[Iterable[_OptionLike]] = None,
@@ -119,8 +119,8 @@ def union(
     arch: Optional[Arch] = None,
     field_options: Optional[Iterable[_OptionLike]] = None,
     kw_only: bool = False,
-    hook_cls: Optional[Type[_UnionHookLike[_ModelT]]] = None,
-) -> Type[_ModelT]: ...
+    hook_cls: Optional[type[_UnionHookLike[_ModelT]]] = None,
+) -> type[_ModelT]: ...
 @overload
 def union(
     cls: None = None,
@@ -131,7 +131,7 @@ def union(
     arch: Optional[Arch] = None,
     field_options: Optional[Iterable[_OptionLike]] = None,
     kw_only: bool = False,
-    hook_cls: Optional[Type[_UnionHookLike[_ModelT]]] = None,
+    hook_cls: Optional[type[_UnionHookLike[_ModelT]]] = None,
 ) -> Callable[[_ModelT], _ModelT]: ...
 @overload
 def pack(
@@ -208,7 +208,7 @@ def unpack(
 ) -> _OT: ...
 @overload
 def unpack(
-    struct: Type[_ModelT],
+    struct: type[_ModelT],
     buffer: bytes | _StreamType,
     /,
     *,

@@ -86,7 +86,7 @@ class TemplateTypeVar:
     def to_field(
         self,
         struct,
-        arch,
+        arch=None,
         default=INVALID_DEFAULT,
     ) -> Field:
         # REVISIT: what about flags?
@@ -292,7 +292,8 @@ def derive(
                 continue
 
             annotations[name] = value.to_field(
-                replacement, default=getattr(template_ty, name, INVALID_DEFAULT)
+                replacement,
+                default=getattr(template_ty, name, INVALID_DEFAULT),
             )
             replaced[value.name] = replacement
 

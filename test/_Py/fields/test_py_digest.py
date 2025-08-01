@@ -47,7 +47,7 @@ else:
 def test_digest_init():
     # must be an action
     # actions are stored in tuples
-    assert hasattr(FormatMd5.__struct__.fields[0][0], ATTR_ACTION_PACK)
+    assert hasattr(FormatMd5.__struct__.fields[0].field, ATTR_ACTION_PACK)
 
     _ = FormatMd5(user_data=b"1234567890")
     # assert obj.hash.__class__ is _DigestValue

@@ -398,7 +398,7 @@ CpRepeatedAtom_Pack(PyObject* pAtom, PyObject* pObj, PyObject* pContext)
 
   // _field
   if (CpContext_COPYITEM(nSeqContext, pContext, state->str__context_field) < 0)
-    goto error;
+    PyErr_Clear();
 
   // _is_seq
   CpContext_SETITEM(nSeqContext, state->str__context_is_seq, Py_False);

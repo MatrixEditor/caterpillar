@@ -17,33 +17,29 @@ if caterpillar.native_support():
 
         # The Repeated atom implements the sequence packing and
         # unpacking without needing a Field instance. However, types
-        # that are not field agnosti, will throw an exception here.
+        # that are not field agnostic will throw an exception here.
+        # Default integer types are designed to support both field-agnostic
+        # and field-specific length.
         atom = Repeated(uint8, 3)
-        with pytest.raises(KeyError):
-            _ = pack(py_data, atom)
-
-        # To temporarily support non-field agnostic types, use the
-        # as_field argument. NOTE: this MAY lead to unintended side
-        # effects.
-        assert pack(py_data, atom, as_field=True) == raw_data
+        assert pack(py_data, atom) == raw_data
 
         atom = Repeated(Bytes(2), 3)
         py_data = [b"ab", b"cd", b"ef"]
         raw_data = b"".join(py_data)
         # default struct-like objects should work without any problems
-        assert pack(py_data, atom, as_field=True) == raw_data
+        assert pack(py_data, atom) == raw_data
 
         # Prefixed length is supported too
         atom = Repeated(uint8, slice(uint8, None, 2))
         py_data = [1, 2, 3]
         raw_data = b"\x03\x01\x02\x03"
-        assert pack(py_data, atom, as_field=True) == raw_data
+        assert pack(py_data, atom) == raw_data
 
         # Context Lambda should work too
         atom = Repeated(uint8, lambda context: context._root.length)
         py_data = [1, 2, 3]
         raw_data = b"\x01\x02\x03"
-        assert pack(py_data, atom, as_field=True, length=3) == raw_data
+        assert pack(py_data, atom, length=3) == raw_data
 
     def testc_repeated_unpack():
         py_data = [b"ab", b"cd", b"ef"]
@@ -58,7 +54,7 @@ if caterpillar.native_support():
         # as_field argument. NOTE: this MAY lead to unintended side
         # effects.
         atom = Repeated(Bytes(2), slice(uint8, None, 2))
-        assert unpack(atom, b"\x03" + raw_data, as_field=True) == py_data
+        assert unpack(atom, b"\x03" + raw_data) == py_data
 
         # Context Lambda should work too
         atom = Repeated(Bytes(2), lambda context: context._root.length)
