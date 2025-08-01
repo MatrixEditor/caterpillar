@@ -25,11 +25,11 @@ from typing import (
     type_check_only,
 )
 
-_IT = TypeVar("_IT")
-_IT_co = TypeVar("_IT_co", covariant=True)
-_IT_contra = TypeVar("_IT_contra", contravariant=True)
-_OT = TypeVar("_OT")
-_OT_co = TypeVar("_OT_co", covariant=True)
+_IT = TypeVar("_IT", default=Any)
+_IT_co = TypeVar("_IT_co", covariant=True, default=Any)
+_IT_contra = TypeVar("_IT_contra", contravariant=True, default=Any)
+_OT = TypeVar("_OT", default=Any)
+_OT_co = TypeVar("_OT_co", covariant=True, default=Any)
 
 _StreamType = IOBase
 _StreamFactory = Callable[[], _StreamType]
@@ -48,6 +48,7 @@ class _ContextLike(Protocol):
     def __context_setattr__(self, path: str, value: Any) -> None: ...
     def __getitem__(self, key, /) -> Any: ...
     def __setitem__(self, key, value: Any, /) -> None: ...
+    def get(self, key: str, default: Any | None = None, /) -> Any: ...
 
 _ContextLambdaReturnT_co = TypeVar(
     "_ContextLambdaReturnT_co", covariant=True, default=Any

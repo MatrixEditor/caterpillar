@@ -36,18 +36,20 @@ class _ContextLike(Protocol):
     def __context_getattr__(self, path: str) -> Any:
         pass
 
-    # TODO
     def __context_setattr__(self, path: str, value: Any) -> None:
         pass
 
     @property
-    def _root(self) -> Optional["_ContextLike"]:
+    def _root(self):
         pass
 
     def __getitem__(self, key: str) -> Any:
         pass
 
     def __setitem__(self, key: str, value: Any) -> None:
+        pass
+
+    def get(self, key: str, default: Any | None = None) -> Any:
         pass
 
 
