@@ -30,4 +30,4 @@ class Format:
 data = b"\x00\x00\x00\x04Hello, World!\x00"
 obj = unpack(Format, data, _arch=x86)
 print(obj)
-print(obj.address[0].get())
+print(obj.address.get())

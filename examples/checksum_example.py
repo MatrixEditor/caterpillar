@@ -19,5 +19,6 @@ print(Format(user_data=b"hello world"))
 print(Format.__struct__.fields)
 data = pack(Format(user_data=b"hello world"))
 print(data)
-print("unpacking..")
+
+print("Unpacking invalid data:")
 print(unpack(Format, data[:-1] + b"\x00"))
