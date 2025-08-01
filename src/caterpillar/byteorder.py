@@ -78,14 +78,18 @@ class ByteOrder:
         return other
 
 
+LITTLE_ENDIAN_FMT = "<"
+
 # Instances representing commonly used byte orders
 Native = ByteOrder("Native", "=")
 BigEndian = ByteOrder("Big Endian", ">")
-LittleEndian = ByteOrder("Little Endian", "<")
+LittleEndian = ByteOrder("Little Endian", LITTLE_ENDIAN_FMT)
 NetEndian = ByteOrder("Network", "!")
 SysNative = ByteOrder(
     "SysNative", "@", ByteOrder.Alignment.NATIVE, ByteOrder.Size.NATIVE
 )
+
+
 
 
 def byteorder(obj, default=None):

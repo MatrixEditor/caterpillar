@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from enum import Enum
-from typing import Optional
 
 from caterpillar.abc import _EndianLike, _ArchLike, _SupportsSetEndian, _OT
 
@@ -40,17 +39,18 @@ class ByteOrder(_EndianLike):
         self,
         name: str,
         ch: str,
-        alignment: Optional[Alignment] = ...,
-        size: Optional[Size] = ...,
+        alignment: Alignment | None = ...,
+        size: Size | None = ...,
     ) -> None: ...
 
+LITTLE_ENDIAN_FMT: str
 Native: ByteOrder = ...
 BigEndian: ByteOrder = ...
 LittleEndian: ByteOrder = ...
 NetEndian: ByteOrder = ...
 SysNative: ByteOrder = ...
 
-def byteorder(obj, default: Optional[_EndianLike] = None) -> _EndianLike: ...
+def byteorder(obj, default: _EndianLike | None = None) -> _EndianLike: ...
 
 class Arch(_ArchLike):
     name: str

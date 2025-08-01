@@ -15,7 +15,7 @@
 from __future__ import annotations
 
 from caterpillar.exception import InvalidValueError, DynamicSizeError, StreamError
-from caterpillar.byteorder import LittleEndian
+from caterpillar.byteorder import LittleEndian, LITTLE_ENDIAN_FMT
 from caterpillar.context import CTX_FIELD, CTX_STREAM
 from caterpillar.options import Flag
 
@@ -46,7 +46,10 @@ class VarInt(FieldStruct):
     b'\\x00\\x88'
     """
 
-    __slots__ = ()
+    __slots__ = ("__byteorder__",)
+
+    def __init__(self):
+        self.__byteorder__ = LittleEndian
 
     def __type__(self) -> type:
         return int
@@ -57,12 +60,13 @@ class VarInt(FieldStruct):
     def bit_config(self, context) -> tuple:
         high_bit = 1 << 7
         low_bit = 0
-        if context[CTX_FIELD].has_flag(VARINT_LSB):
-            high_bit = 0
-            low_bit = 1 << 7
+        if field := context.get(CTX_FIELD):
+            if field.has_flag(VARINT_LSB):
+                high_bit = 0
+                low_bit = 1 << 7
         return high_bit, low_bit
 
-    def pack_single(self, obj: int, context) -> None:
+    def pack_single(self, obj, context) -> None:
         """
         Pack a single value into the stream.
 
@@ -76,8 +80,9 @@ class VarInt(FieldStruct):
             raise InvalidValueError("Invalid negative value for VarInt encoding!")
 
         stream = context[CTX_STREAM]
-        order = context[CTX_FIELD].order
-        is_little = order == LittleEndian
+        field = context.get(CTX_FIELD)
+        order = field.order if field else self.__byteorder__
+        is_little = order.ch == LITTLE_ENDIAN_FMT
 
         hb, lb = self.bit_config(context)
         # This implementation is using LittleEndian. Later we can use reverse to
