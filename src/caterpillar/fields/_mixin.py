@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from io import BytesIO
-from typing import Iterable
+from collections.abc import Iterable
 from functools import partial
 
 from caterpillar.byteorder import ByteOrder, byteorder
@@ -149,9 +149,7 @@ class FieldStruct(FieldMixin):
         :type context: _ContextLike
         :return: The unpacked data.
         """
-        if context[CTX_SEQ]:
-            return self.unpack_seq(context)
-        return self.unpack_single(context)
+        return (self.unpack_seq if context[CTX_SEQ] else self.unpack_single)(context)
 
     def __repr__(self) -> str:
         """

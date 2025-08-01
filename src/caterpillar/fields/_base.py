@@ -12,13 +12,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-from typing import Union, Any, List
+from typing import Any
 from io import BytesIO
 from caterpillar.abc import (
     _StructLike,
     _GreedyType,
     _PrefixedType,
-    _ContextLambda,
 )
 from caterpillar.byteorder import ByteOrder, SysNative, system_arch
 from caterpillar.exception import (
@@ -31,13 +30,11 @@ from caterpillar.exception import (
 from caterpillar.options import (
     GLOBAL_FIELD_FLAGS,
     F_DYNAMIC,
-    F_KEEP_POSITION,
-    F_SEQUENTIAL,
     Flag,
 )
 from caterpillar.context import CTX_OFFSETS, CTX_STREAM, CTX_FIELD, CTX_VALUE, CTX_SEQ
 from caterpillar import registry
-from caterpillar.shared import hasstruct, getstruct, typeof
+from caterpillar.shared import getstruct, typeof
 
 
 def singleton(cls):
@@ -91,7 +88,7 @@ class Field:
         self.struct = struct
         self.condition = condition
         self.order = order or SysNative
-        self.flags = {hash(x): x for x in flags or set([F_KEEP_POSITION])}
+        self.flags = set(flags or [])
         self.bits = bits
         self.arch = arch or system_arch
         self.offset = offset
@@ -109,9 +106,9 @@ class Field:
 
     @struct.setter
     def struct(self, value):
-        self.__struct = value
+        self.__struct = getstruct(value, value)
         # pre-computed state of this field
-        self._is_lambda = isinstance(value, _ContextLambda)
+        self._is_lambda = callable(self.__struct)
 
     @property
     def condition(self):
@@ -121,7 +118,7 @@ class Field:
     def condition(self, value):
         self.__condition = value
         self._has_cond = value not in (True, None)
-        self._cond_is_lambda = isinstance(value, _ContextLambda)
+        self._cond_is_lambda = callable(value)
 
     @property
     def flags(self):
@@ -130,16 +127,9 @@ class Field:
     @flags.setter
     def flags(self, value):
         self.__flags = value
-        self._update_flags()
-
-    def _update_flags(self):
-        # These two states are not affected by the global field flags
-        self._is_seq = F_SEQUENTIAL._hash_ in self.flags
-        self._keep_pos = F_KEEP_POSITION._hash_ in self.flags
 
     def add_flag(self, flag) -> None:
-        self.flags[hash(flag)] = flag
-        self._update_flags()
+        self.flags.add(flag)
 
     def has_flag(self, flag: Flag) -> bool:
         """Checks whether this field stores the given flag.
@@ -149,11 +139,10 @@ class Field:
         :return: true if this flag has been found
         :rtype: bool
         """
-        return hash(flag) in self.flags or flag in GLOBAL_FIELD_FLAGS
+        return flag in self.flags or flag in GLOBAL_FIELD_FLAGS
 
     def remove_flag(self, flag: Flag) -> None:
-        self.flags.pop(hash(flag), None)
-        self._update_flags()
+        self.flags.discard(flag)
 
     @property
     def offset(self):
@@ -162,12 +151,11 @@ class Field:
     @offset.setter
     def offset(self, value):
         self.__offset = value
-        self._has_offset = value != -1
-        self._offset_is_lambda = isinstance(value, _ContextLambda)
+        self._has_offset = value not in (-1, None)
+        self._offset_is_lambda = callable(value)
         # This operation automatically removes the "keep_position"
         # flag. It has to be set manually.
-        if self.offset != -1:
-            self.remove_flag(F_KEEP_POSITION)
+        self._keep_pos = value in (-1, None)
 
     @property
     def amount(self):
@@ -176,8 +164,8 @@ class Field:
     @amount.setter
     def amount(self, value):
         self.__amount = value
-        self._amount_is_lambda = isinstance(value, _ContextLambda)
-        self._is_seq = value > 0
+        self._amount_is_lambda = callable(value)
+        self._is_seq = (value not in (0, 1, None)) or self._amount_is_lambda
 
     @property
     def options(self):
@@ -186,7 +174,7 @@ class Field:
     @options.setter
     def options(self, value):
         self.__options = value
-        self._switch_is_lambda = isinstance(value, _ContextLambda)
+        self._switch_is_lambda = callable(value)
         self._switch_has_default = (
             value and not self._switch_is_lambda and DEFAULT_OPTION in value
         )
@@ -194,7 +182,7 @@ class Field:
     def _verify_context_value(self, value, expected) -> None:
         # As the offset value or amount may be dynamic, we have to candidate
         # types. There should be an error if none applies.
-        if not isinstance(value, expected) and not isinstance(value, _ContextLambda):
+        if not isinstance(value, expected) and not callable(value):
             raise TypeError(
                 f"Expected a valid value or context lambda, got {type(value)}"
             )
@@ -355,7 +343,7 @@ class Field:
             # Disabled fields or context lambdas won't pack any data
             return
 
-        # Using this inlined version of self.is_seq(), qe reduce the amount of
+        # Using this inlined version of self.is_seq(), we reduce the amount of
         # calls made to the method and save A LOT of time.
         # pylint: disable-next=protected-access
         context[CTX_SEQ] = self._is_seq
@@ -365,8 +353,8 @@ class Field:
             if not keep_pos:
                 fallback = stream.tell()
 
-            offset = self.offset(context) if self._offset_is_lambda else self.offset
-            if offset >= 0:
+            if self._has_offset:
+                offset = self.offset(context) if self._offset_is_lambda else self.offset
                 stream.seek(offset)
 
             context[CTX_FIELD] = self
@@ -389,7 +377,7 @@ class Field:
 
         # unpack using switch
         if self.options:
-            struct: _StructLike = self.get_struct(value, context)
+            struct = self.get_struct(value, context)
             # The "keep_position" flag is not applicable here. Configure a field to keep the
             # position afterward.
             context[CTX_VALUE] = value
@@ -421,14 +409,11 @@ class Field:
             return
 
         stream = context[CTX_STREAM]
-        offset = self.offset(context) if self._offset_is_lambda else self.offset
-        # pylint: disable-next=protected-access
         keep_pos = self._keep_pos
-
+        has_offset = self._has_offset
         context[CTX_FIELD] = self
         # pylint: disable-next=protected-access
         context[CTX_SEQ] = self._is_seq
-        has_offset = offset >= 0
         if not keep_pos or has_offset:
             fallback = stream.tell()
 
@@ -436,20 +421,25 @@ class Field:
             # TODO: implement F_OFFSET_OVERRIDE
             # We write the current field into a temporary memory buffer
             # and add it after all processing hasbeen finished.
+            offset = self.offset(context) if self._offset_is_lambda else self.offset
             base_stream = stream
             stream = BytesIO()
             context[CTX_STREAM] = stream
 
-        if not self.options and not self._is_lambda:
-            self.struct.__pack__(obj, context)
+        if not self.options:
+            _ = (
+                self.struct.__pack__(obj, context)
+                if not self._is_lambda
+                else self.struct(context)
+            )
         else:
+            # Just hand over the input value if the struct is not a lambda
+            value = self.struct(obj, context) if self._is_lambda else obj
             if not self._is_lambda:
-                raise StructException(
-                    "Attepmt was made to use switch without context lambda!", context
-                )
-            value = self.struct(context)
+                # support for non-context lambdas with switch statements
+                self.struct.__pack__(value, context)
             if self.options is not None:
-                struct: _StructLike = self.get_struct(value, context)
+                struct = self.get_struct(value, context)
                 struct.__pack__(obj, context)
 
         if not has_offset and not keep_pos:
