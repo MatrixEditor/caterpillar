@@ -16,34 +16,17 @@ efficient.
 structs that adjust their size based on the current context. This framework enables you
 to write complex structures in a compact and readable manner.
 
-.. tab-set::
 
-   .. tab-item:: Python
+.. code-block::
+   :caption: Simple example of a custom struct
 
-      .. code-block::
-         :caption: Simple example of a custom struct
+   @struct
+   class Format:
+      magic: b"Foo"                       # constant values
+      name: CString(...)                  # \x00-terminated String without a fixed length
+      value: le + uint16                  # little endian encoding
+      entries: be + CString[uint32::]     # arrays with big-endian prefixed length
 
-         @struct
-         class Format:
-            magic: b"Foo"                       # constant values
-            name: CString(...)                  # C-String without a fixed length
-            value: le + uint16                  # little endian encoding
-            entries: be + CString[uint32::]     # arrays with big-endian prefixed length
-
-   .. tab-item:: Caterpillar C
-
-      .. code-block:: python
-         :caption: Simple example of a custom struct
-
-         from caterpillar.c import BIG_ENDIAN as be
-
-         @struct
-         class Format:
-            magic: b"Foo"                         # constant values
-            name: cstring(...)                    # C-String without a fixed length
-            value: u16                            # little endian encoding
-            entries: cstring(...)[be + u32::]     # arrays with big-endian prefixed length
-            value2: bool                          # python type mapping configurable
 
 .. admonition:: Hold up, wait a minute!
 
@@ -60,22 +43,11 @@ Format(magic=b'Foo', name='Hello, World!', value=10, entries=['Bar', 'Baz'])
 
 Packing and unpacking have never been easier:
 
+>>> pack(obj)
+b'FooHello, World!\x00\n\x00\x00\x00\x00\x02Bar\x00Baz\x00'
+>>> unpack(Format, _)
+Format(magic=b'Foo', name='Hello, World!', value=10, entries=['Bar', 'Baz'])
 
-.. tab-set::
-
-   .. tab-item:: Python
-
-      >>> pack(obj)
-      b'FooHello, World!\x00\n\x00\x00\x00\x00\x02Bar\x00Baz\x00'
-      >>> unpack(Format, _)
-      Format(magic=b'Foo', name='Hello, World!', value=10, entries=['Bar', 'Baz'])
-
-   .. tab-item:: Caterpillar C
-
-      >>> pack(obj, Format)
-      b'FooHello, World!\x00\n\x00\x00\x00\x00\x02Bar\x00Baz\x00\x01'
-      >>> unpack(_, Format)
-      <Format object at 0x...>
 
 - What about documentation?
   There are specialized options created only for documentation purposes, so you don't

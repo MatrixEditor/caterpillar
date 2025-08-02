@@ -29,7 +29,7 @@ on how pointers are represented in memory for that platform.
     >>> data = b"\x00\x00\x00\x04Hello, World!\x00"
     >>> o = unpack(Format, data, _arch=x86)
     Format(name=<str* 0x4>)
-    >>> _.name.obj
+    >>> o.name.obj
     'Hello, World!'
 
 The pointer behavior is facilitated by the :code:`pointer` class in *Caterpillar*. This
