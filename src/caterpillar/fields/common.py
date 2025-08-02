@@ -12,7 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-from os import fsdecode
 import struct as PyStruct
 import warnings
 
@@ -30,7 +29,7 @@ from caterpillar.exception import (
     DynamicSizeError,
 )
 from caterpillar.context import CTX_FIELD, CTX_STREAM, CTX_SEQ
-from caterpillar.options import O_ARRAY_FACTORY, Flag, GLOBAL_FIELD_FLAGS
+from caterpillar.options import Flag, GLOBAL_FIELD_FLAGS
 from caterpillar.byteorder import LITTLE_ENDIAN_FMT, LittleEndian, SysNative
 from caterpillar import registry
 from caterpillar._common import WithoutContextVar
@@ -57,7 +56,7 @@ class PyStructFormattedField(FieldStruct):
 
     >>> field = PyStructFormattedField('i', int)
     >>> field.__repr__()
-    "<PyStructFormattedField(int) 'i' 32>"
+    "<int32>"
 
     :param ch: The format character (e.g., 'i', 'x', 'f') that defines how the field is packed and unpacked.
     :param type_: The Python type that corresponds to the format character.
