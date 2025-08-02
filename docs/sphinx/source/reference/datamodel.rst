@@ -37,6 +37,7 @@ objects. There are three possible types of structs:
 
 .. toctree::
     :caption: Caterpillar-specific Protocols
+    :maxdepth: 2
 
     datamodel/protocols.rst
 

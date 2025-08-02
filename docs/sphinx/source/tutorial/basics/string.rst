@@ -52,30 +52,27 @@ extends beyond simple C-style strings. Here's how you might define a structure u
 
         This solution serves as an example and isn't the only way to approach it!
 
-            .. code-block:: python
-                :linenos:
+        .. code-block:: python
+            :linenos:
 
-                @struct
-                class ITXTChunk:
-                    keyword: CString(encoding="utf-8")
-                    compression_flag: uint8
-                    # we actually don't need an Enum here
-                    compression_method: uint8
-                    language_tag: CString(encoding="ASCII")
-                    translated_keyword: CString(encoding="utf-8")
-                    # length is calculated with parent.length - len(keyword)+len(b"\x00") - ...
-                    text: CString(
-                        encoding="utf-8",
-                        length=parent.length - lenof(this.translated_keyword) - lenof(this.keyword) - 5,
-                    )
+            @struct
+            class ITXTChunk:
+                keyword: CString(encoding="utf-8")
+                compression_flag: uint8
+                # we actually don't need an Enum here
+                compression_method: uint8
+                language_tag: CString(encoding="ASCII")
+                translated_keyword: CString(encoding="utf-8")
+                # length is calculated with parent.length - len(keyword)+len(b"\x00") - ...
+                text: CString(
+                    encoding="utf-8",
+                    length=parent.length - lenof(this.translated_keyword) - lenof(this.keyword) - 5,
+                )
 
 
 You can also customize the string's termination character if needed:
 
-.. tab-item:: Python
-
-    >>> struct = CString(pad="\x0A")
-
+>>> struct = CString(pad="\x0A")
 
 
 Pascal Strings
@@ -85,11 +82,9 @@ The :class:`~caterpillar.py.Prefixed` class implements Pascal strings, where the
 length of the string is prefixed to the actual data. This is useful when dealing
 with raw bytes or strings with a length indicator.
 
-.. tab-item:: Python
-
-    >>> s = Prefixed(uint8, encoding="utf-8")
-    >>> pack("Hello, World!", s, as_field=True)
-    b'\rHello, World!'
-    >>> unpack(s, _, as_field=True)
-    'Hello, World!'
+>>> s = Prefixed(uint8, encoding="utf-8")
+>>> pack("Hello, World!", s, as_field=True)
+b'\rHello, World!'
+>>> unpack(s, _, as_field=True)
+'Hello, World!'
 
