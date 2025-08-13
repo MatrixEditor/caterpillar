@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>2.1.2. Working with Structs &#8212; Caterpillar 2.5.1 documentation</title>
+    <title>2.1.2. Working with Structs &#8212; Caterpillar 2.6.0 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=983e91d6"></script>
+    <script src="../../_static/documentation_options.js?v=ae39cb24"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -54,7 +54,7 @@
     <link rel="prev" title="2.1.1. Defining Structs" href="structdef.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.5.1" />
+  <meta name="docsearch:version" content="2.6.0" />
   </head>
   
   
@@ -116,7 +116,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.5.1</p>
+    <p class="title logo__title">Caterpillar 2.6.0</p>
   
 </a></div>
     
@@ -444,54 +444,26 @@ override them.</p>
 <p>Packing is the process of converting your structured data into a binary format.
 This is similar to Python’s <a class="reference external" href="https://docs.python.org/3/library/struct.html">struct</a>
 module, but with the added benefit of working directly with Python classes and attributes.</p>
-<div class="sd-tab-set docutils">
-<input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
-<label class="sd-tab-label" for="sd-tab-item-0">
-Python</label><div class="sd-tab-content docutils">
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span> <span class="o">=</span> <span class="n">RGB</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="c1"># equivalent to pack(obj, RGB), reads as &#39;pack obj from RGB&#39;</span>
 <span class="go">b&#39;\x01\x02\x03&#39;</span>
 </pre></div>
-</div>
-</div>
-<input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
-<label class="sd-tab-label" for="sd-tab-item-1">
-Caterpillar C</label><div class="sd-tab-content docutils">
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span> <span class="o">=</span> <span class="n">RGB</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">RGB</span><span class="p">)</span> <span class="c1"># required as of version 2.2.0</span>
-<span class="go">b&#39;\x01\x02\x03&#39;</span>
-</pre></div>
-</div>
-</div>
 </div>
 <p>Notice that in the Python version, you don’t need to explicitly provide the struct (i.e., <code class="code docutils literal notranslate"><span class="pre">RGB</span></code>)
 because <em>Caterpillar</em> handles it automatically.</p>
 </section>
 <section id="unpacking-data">
 <h2><span class="section-number">2.1.2.2. </span>Unpacking data<a class="headerlink" href="#unpacking-data" title="Link to this heading">#</a></h2>
-<p>Recreating data from binary streams is as easy as serializing objects. You just need to specify
-the struct that corresponds to the binary data you’re working with.</p>
-<div class="sd-tab-set docutils">
-<input checked="checked" id="sd-tab-item-2" name="sd-tab-set-1" type="radio">
-<label class="sd-tab-label" for="sd-tab-item-2">
-Python</label><div class="sd-tab-content docutils">
+<p>Recreating data from binary streams is as easy as serializing objects. You just
+need to specify the struct that corresponds to the binary data you’re working
+with.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">RGB</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x01\x02\x03</span><span class="s2">&quot;</span><span class="p">)</span> <span class="c1"># reads as &#39;unpack RGB from data&#39;</span>
 <span class="go">RGB(r=1, g=2, b=3)</span>
 </pre></div>
 </div>
-</div>
-<input id="sd-tab-item-3" name="sd-tab-set-1" type="radio">
-<label class="sd-tab-label" for="sd-tab-item-3">
-Caterpillar C</label><div class="sd-tab-content docutils">
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x01\x02\x03</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">RGB</span><span class="p">)</span> <span class="c1"># reads as &#39;unpack data as RGB&#39;</span>
-<span class="go">RGB(r=1, g=2, b=3)</span>
-</pre></div>
-</div>
-</div>
-</div>
 <p>Now that you’ve seen how to define, pack, and unpack data with structs in <em>Caterpillar</em>, you’re
-almost ready to start working with more complex data structures.</p>
-<p>And remember, we’ve just scratched the surface—there’s a lot more to explore!</p>
+almost ready to start working with more complex data structures. And remember,
+we’ve just scratched the surface—there’s a lot more to explore!</p>
 </section>
 </section>
 
@@ -581,7 +553,7 @@ almost ready to start working with more complex data structures.</p>
 
   <p class="copyright">
     
-      © Copyright 2024, MatrixEditor.
+      © Copyright 2025, MatrixEditor.
       <br/>
     
   </p>

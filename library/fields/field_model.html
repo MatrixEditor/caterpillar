@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>4.8.1. Field Model &#8212; Caterpillar 2.5.1 documentation</title>
+    <title>4.8.1. Field Model &#8212; Caterpillar 2.6.0 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=983e91d6"></script>
+    <script src="../../_static/documentation_options.js?v=ae39cb24"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -54,7 +54,7 @@
     <link rel="prev" title="4.8. Fields" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.5.1" />
+  <meta name="docsearch:version" content="2.6.0" />
   </head>
   
   
@@ -116,7 +116,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.5.1</p>
+    <p class="title logo__title">Caterpillar 2.6.0</p>
   
 </a></div>
     
@@ -353,10 +353,6 @@
 </ul>
 </details></li>
 </ul>
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">C API Python Types</span></p>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../ctypes/int.html">5.1. Integer Types</a></li>
-</ul>
 </div>
 </nav></div>
     </div>
@@ -425,6 +421,121 @@
 <dt class="sig sig-object py" id="caterpillar.fields.Field">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.fields.</span></span><span class="sig-name descname"><span class="pre">Field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">struct</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset=-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flags=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amount=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">condition=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arch=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default=&lt;object</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bits=None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/_base.html#Field"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Field" title="Link to this definition">#</a></dt>
 <dd><p>Represents a field in a data structure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>struct</strong> – The structure or callable used to define the field’s type.</p></li>
+<li><p><strong>order</strong> – Byte order for the field (default: SysNative).</p></li>
+<li><p><strong>offset</strong> – Field offset or callable (default: -1, meaning no explicit offset).</p></li>
+<li><p><strong>flags</strong> – Optional set of flags associated with the field.</p></li>
+<li><p><strong>amount</strong> – The number of elements if this field is a sequence (default: 0).</p></li>
+<li><p><strong>options</strong> – A dictionary representing a switch-case mapping.</p></li>
+<li><p><strong>condition</strong> – A boolean or callable determining whether the field is active.</p></li>
+<li><p><strong>arch</strong> – Architecture specification (default: system_arch).</p></li>
+<li><p><strong>default</strong> – The default value (default: INVALID_DEFAULT).</p></li>
+<li><p><strong>bits</strong> – Bit size if the field is bit-packed.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="caterpillar.fields.Field.struct">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">struct</span></span><a class="headerlink" href="#caterpillar.fields.Field.struct" title="Link to this definition">#</a></dt>
+<dd><p>The internal structure for this field.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="caterpillar.fields.Field.condition">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">condition</span></span><a class="headerlink" href="#caterpillar.fields.Field.condition" title="Link to this definition">#</a></dt>
+<dd><p>The field’s condition expression or value.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="caterpillar.fields.Field.flags">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">flags</span></span><a class="headerlink" href="#caterpillar.fields.Field.flags" title="Link to this definition">#</a></dt>
+<dd><p>The set of flags associated with this field.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caterpillar.fields.Field.add_flag">
+<span class="sig-name descname"><span class="pre">add_flag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flag</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_base.html#Field.add_flag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Field.add_flag" title="Link to this definition">#</a></dt>
+<dd><p>Adds a flag to this field.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>flag</strong> – The flag to add.</p>
+</dd>
+</dl>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.6.0.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caterpillar.fields.Field.has_flag">
+<span class="sig-name descname"><span class="pre">has_flag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../options.html#caterpillar.options.Flag" title="caterpillar.options.Flag"><span class="pre">Flag</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_base.html#Field.has_flag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Field.has_flag" title="Link to this definition">#</a></dt>
+<dd><p>Checks whether this field stores the given flag.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>flag</strong> (<a class="reference internal" href="../options.html#caterpillar.options.Flag" title="caterpillar.options.Flag"><em>Flag</em></a>) – the flag to lookup</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>true if this flag has been found</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caterpillar.fields.Field.remove_flag">
+<span class="sig-name descname"><span class="pre">remove_flag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../options.html#caterpillar.options.Flag" title="caterpillar.options.Flag"><span class="pre">Flag</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_base.html#Field.remove_flag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Field.remove_flag" title="Link to this definition">#</a></dt>
+<dd><p>Removes a flag from this field.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>flag</strong> – The flag to remove.</p>
+</dd>
+</dl>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.6.0.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="caterpillar.fields.Field.offset">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">offset</span></span><a class="headerlink" href="#caterpillar.fields.Field.offset" title="Link to this definition">#</a></dt>
+<dd><p>The field’s offset.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="caterpillar.fields.Field.amount">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">amount</span></span><a class="headerlink" href="#caterpillar.fields.Field.amount" title="Link to this definition">#</a></dt>
+<dd><p>The repetition count for this field.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="caterpillar.fields.Field.options">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">options</span></span><a class="headerlink" href="#caterpillar.fields.Field.options" title="Link to this definition">#</a></dt>
+<dd><p>The switch-case options dictionary.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caterpillar.fields.Field._verify_context_value">
+<span class="sig-name descname"><span class="pre">_verify_context_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_base.html#Field._verify_context_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Field._verify_context_value" title="Link to this definition">#</a></dt>
+<dd><p>Verifies that a value is either of the expected type(s) or is a callable.
+Used to validate inputs for context-aware fields.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>value</strong> – The value to validate.</p></li>
+<li><p><strong>expected</strong> – A type or tuple of valid types.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>TypeError</strong> – If validation fails.</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.fields.Field.is_seq">
 <span class="sig-name descname"><span class="pre">is_seq</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_base.html#Field.is_seq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Field.is_seq" title="Link to this definition">#</a></dt>
@@ -460,23 +571,6 @@
 <dt class="sig sig-object py" id="caterpillar.fields.Field.has_condition">
 <span class="sig-name descname"><span class="pre">has_condition</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_base.html#Field.has_condition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Field.has_condition" title="Link to this definition">#</a></dt>
 <dd><p>Returns whether this field is linked to a condition</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="caterpillar.fields.Field.has_flag">
-<span class="sig-name descname"><span class="pre">has_flag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../options.html#caterpillar.options.Flag" title="caterpillar.options.Flag"><span class="pre">Flag</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_base.html#Field.has_flag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Field.has_flag" title="Link to this definition">#</a></dt>
-<dd><p>Checks whether this field stores the given flag.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>flag</strong> (<a class="reference internal" href="../options.html#caterpillar.options.Flag" title="caterpillar.options.Flag"><em>Flag</em></a>) – the flag to lookup</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>true if this flag has been found</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>bool</p>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -534,6 +628,11 @@
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caterpillar.fields.Field.get_name">
+<span class="sig-name descname"><span class="pre">get_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/_base.html#Field.get_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Field.get_name" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -912,14 +1011,24 @@ to display the condition as well.</p>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field"><code class="docutils literal notranslate"><span class="pre">Field</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.struct"><code class="docutils literal notranslate"><span class="pre">Field.struct</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.condition"><code class="docutils literal notranslate"><span class="pre">Field.condition</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.flags"><code class="docutils literal notranslate"><span class="pre">Field.flags</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.add_flag"><code class="docutils literal notranslate"><span class="pre">Field.add_flag()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.has_flag"><code class="docutils literal notranslate"><span class="pre">Field.has_flag()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.remove_flag"><code class="docutils literal notranslate"><span class="pre">Field.remove_flag()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.offset"><code class="docutils literal notranslate"><span class="pre">Field.offset</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.amount"><code class="docutils literal notranslate"><span class="pre">Field.amount</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.options"><code class="docutils literal notranslate"><span class="pre">Field.options</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field._verify_context_value"><code class="docutils literal notranslate"><span class="pre">Field._verify_context_value()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.is_seq"><code class="docutils literal notranslate"><span class="pre">Field.is_seq()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.is_enabled"><code class="docutils literal notranslate"><span class="pre">Field.is_enabled()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.has_condition"><code class="docutils literal notranslate"><span class="pre">Field.has_condition()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.has_flag"><code class="docutils literal notranslate"><span class="pre">Field.has_flag()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.length"><code class="docutils literal notranslate"><span class="pre">Field.length()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.get_struct"><code class="docutils literal notranslate"><span class="pre">Field.get_struct()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.get_offset"><code class="docutils literal notranslate"><span class="pre">Field.get_offset()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.get_type"><code class="docutils literal notranslate"><span class="pre">Field.get_type()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.get_name"><code class="docutils literal notranslate"><span class="pre">Field.get_name()</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.FieldMixin"><code class="docutils literal notranslate"><span class="pre">FieldMixin</span></code></a></li>
@@ -986,7 +1095,7 @@ to display the condition as well.</p>
 
   <p class="copyright">
     
-      © Copyright 2024, MatrixEditor.
+      © Copyright 2025, MatrixEditor.
       <br/>
     
   </p>

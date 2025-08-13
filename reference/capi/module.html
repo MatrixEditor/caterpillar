@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>3.9. Module API &#8212; Caterpillar 2.5.1 documentation</title>
+    <title>3.9. Module API &#8212; Caterpillar 2.6.0 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=983e91d6"></script>
+    <script src="../../_static/documentation_options.js?v=ae39cb24"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -54,7 +54,7 @@
     <link rel="prev" title="3.8. Defined Macros" href="macros.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.5.1" />
+  <meta name="docsearch:version" content="2.6.0" />
   </head>
   
   
@@ -116,7 +116,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.5.1</p>
+    <p class="title logo__title">Caterpillar 2.6.0</p>
   
 </a></div>
     
@@ -368,19 +368,6 @@
 <li class="toctree-l2"><a class="reference internal" href="objects/arch.html">3.6.1. Arch &amp; Endian Objects</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objects/option.html">3.6.2. Option Objects</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objects/contextobj.html">3.6.3. Context Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="objects/contextexpr.html">3.6.4. Context Expressions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="objects/contextpath.html">3.6.5. Context Path Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="objects/state.html">3.6.6. State Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="objects/layer.html">3.6.7. Layer Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="objects/struct.html">3.6.8. Struct Objects</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="objects/atoms/index.html">3.6.9. Atom Objects</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="objects/atoms/int.html">3.6.9.1. Integer Atoms</a></li>
-<li class="toctree-l3"><a class="reference internal" href="objects/atoms/char.html">3.6.9.2. Char Atoms</a></li>
-<li class="toctree-l3"><a class="reference internal" href="objects/atoms/float.html">3.6.9.3. Float Atoms</a></li>
-<li class="toctree-l3"><a class="reference internal" href="objects/atoms/bool.html">3.6.9.4. Bool Atoms</a></li>
-<li class="toctree-l3"><a class="reference internal" href="objects/atoms/padding.html">3.6.9.5. Padding Atoms</a></li>
-</ul>
-</details></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="parsing.html">3.7. Packing and Unpacking</a></li>
@@ -471,118 +458,7 @@
 <span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">_modulestate</span></span></span><a class="headerlink" href="#c._modulestate" title="Link to this definition">#</a><br /></dt>
 <dd><p>The internal state for this module. It will store all necessary information
 about the core module.</p>
-<p>Global options:</p>
-<dl class="c member">
-<dt class="sig sig-object c" id="c._modulestate.cp_option__dynamic">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">cp_option__dynamic</span></span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.cp_option__dynamic" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c._modulestate.cp_option__sequential">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">cp_option__sequential</span></span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.cp_option__sequential" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c._modulestate.cp_option__keep_position">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">cp_option__keep_position</span></span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.cp_option__keep_position" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c._modulestate.cp_option__union">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">cp_option__union</span></span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.cp_option__union" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c._modulestate.cp_option__eval">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">cp_option__eval</span></span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.cp_option__eval" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c._modulestate.cp_option__discard_unnamed">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">cp_option__discard_unnamed</span></span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.cp_option__discard_unnamed" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c._modulestate.cp_option__discard_const">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">cp_option__discard_const</span></span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.cp_option__discard_const" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c._modulestate.cp_option__replace_types">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">cp_option__replace_types</span></span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.cp_option__replace_types" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c._modulestate.cp_option__slots">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">cp_option__slots</span></span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.cp_option__slots" title="Link to this definition">#</a><br /></dt>
-<dd></dd></dl>
-
-<p>Global default options:</p>
-<dl class="c member">
-<dt class="sig sig-object c" id="c._modulestate.cp_option__global_field_options">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">cp_option__global_field_options</span></span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.cp_option__global_field_options" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c._modulestate.cp_option__global_struct_options">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">cp_option__global_struct_options</span></span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.cp_option__global_struct_options" title="Link to this definition">#</a><br /></dt>
-<dd></dd></dl>
-
-<p>Global arch and endian:</p>
-<dl class="c member">
-<dt class="sig sig-object c" id="c._modulestate.cp_arch__host">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">cp_arch__host</span></span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.cp_arch__host" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c._modulestate.cp_endian__native">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">cp_endian__native</span></span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.cp_endian__native" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c._modulestate.cp_endian__big">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">cp_endian__big</span></span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.cp_endian__big" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c._modulestate.cp_endian__little">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">cp_endian__little</span></span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.cp_endian__little" title="Link to this definition">#</a><br /></dt>
-<dd></dd></dl>
-
-<p>Typing constants:</p>
-<dl class="c member">
-<dt class="sig sig-object c" id="c._modulestate.Any_Type">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">Any_Type</span></span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.Any_Type" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c._modulestate.List_Type">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">List_Type</span></span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.List_Type" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c._modulestate.Union_Type">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">Union_Type</span></span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.Union_Type" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c._modulestate.BytesIO_Type">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">BytesIO_Type</span></span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.BytesIO_Type" title="Link to this definition">#</a><br /></dt>
-<dd></dd></dl>
-
-<p>String constants:</p>
-<dl class="c member">
-<dt class="sig sig-object c" id="c._modulestate.str_path_delim">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str_path_delim</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;.&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str_path_delim" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c._modulestate.str_tell">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str_tell</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;tell&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str_tell" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c._modulestate.str_seek">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str_seek</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;seek&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str_seek" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c._modulestate.str_write">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str_write</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;write&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str_write" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c._modulestate.str_read">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str_read</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;read&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str_read" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c._modulestate.str_close">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str_close</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;close&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str_close" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c._modulestate.str_strict">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str_strict</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;strict&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str_strict" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c._modulestate.str___pack__">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str___pack__</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;__pack__&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str___pack__" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c._modulestate.str___pack_many__">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str___pack_many__</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;__pack_many__&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str___pack_many__" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c._modulestate.str___unpack__">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str___unpack__</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;__unpack__&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str___unpack__" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c._modulestate.str___unpack_many__">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str___unpack_many__</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;__unpack_many__&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str___unpack_many__" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c._modulestate.str___size__">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str___size__</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;__size__&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str___size__" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c._modulestate.str___type__">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str___type__</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;__type__&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str___type__" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c._modulestate.str___annotations__">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str___annotations__</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;__annotations__&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str___annotations__" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c._modulestate.str___mro__">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str___mro__</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;__mro__&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str___mro__" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c._modulestate.str___struct__">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str___struct__</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;__struct__&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str___struct__" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c._modulestate.str___slots__">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str___slots__</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;__slots__&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str___slots__" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c._modulestate.str___match_args__">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str___match_args__</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;__match_args__&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str___match_args__" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c._modulestate.str___weakref__">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str___weakref__</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;__weakref__&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str___weakref__" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c._modulestate.str___dict__">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str___dict__</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;__dict__&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str___dict__" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c._modulestate.str___qualname__">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str___qualname__</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;__qualname__&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str___qualname__" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c._modulestate.str_start">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str_start</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;start&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str_start" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c._modulestate.str_ctx__root">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str_ctx__root</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&lt;root&gt;&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str_ctx__root" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c._modulestate.str_ctx__getattr">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str_ctx__getattr</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;__context_getattr__&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str_ctx__getattr" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c._modulestate.str_bytesio_getvalue">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str_bytesio_getvalue</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;getvalue&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str_bytesio_getvalue" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c._modulestate.str_builder_process">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str_builder_process</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;process&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str_builder_process" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c._modulestate.str_pattern_match">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">str_pattern_match</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;match&quot;</span></span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c._modulestate.str_pattern_match" title="Link to this definition">#</a><br /></dt>
-<dd></dd></dl>
-
+<p><em>TODO</em></p>
 </dd></dl>
 
 <dl class="c macro">
@@ -670,7 +546,7 @@ about the core module.</p>
 
   <p class="copyright">
     
-      © Copyright 2024, MatrixEditor.
+      © Copyright 2025, MatrixEditor.
       <br/>
     
   </p>

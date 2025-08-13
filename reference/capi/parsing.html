@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>3.7. Packing and Unpacking &#8212; Caterpillar 2.5.1 documentation</title>
+    <title>3.7. Packing and Unpacking &#8212; Caterpillar 2.6.0 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=983e91d6"></script>
+    <script src="../../_static/documentation_options.js?v=ae39cb24"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -51,10 +51,10 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="3.8. Defined Macros" href="macros.html" />
-    <link rel="prev" title="3.6.9.5. Padding Atoms" href="objects/atoms/padding.html" />
+    <link rel="prev" title="3.6.3. Context Objects" href="objects/contextobj.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.5.1" />
+  <meta name="docsearch:version" content="2.6.0" />
   </head>
   
   
@@ -116,7 +116,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.5.1</p>
+    <p class="title logo__title">Caterpillar 2.6.0</p>
   
 </a></div>
     
@@ -368,19 +368,6 @@
 <li class="toctree-l2"><a class="reference internal" href="objects/arch.html">3.6.1. Arch &amp; Endian Objects</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objects/option.html">3.6.2. Option Objects</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objects/contextobj.html">3.6.3. Context Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="objects/contextexpr.html">3.6.4. Context Expressions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="objects/contextpath.html">3.6.5. Context Path Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="objects/state.html">3.6.6. State Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="objects/layer.html">3.6.7. Layer Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="objects/struct.html">3.6.8. Struct Objects</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="objects/atoms/index.html">3.6.9. Atom Objects</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="objects/atoms/int.html">3.6.9.1. Integer Atoms</a></li>
-<li class="toctree-l3"><a class="reference internal" href="objects/atoms/char.html">3.6.9.2. Char Atoms</a></li>
-<li class="toctree-l3"><a class="reference internal" href="objects/atoms/float.html">3.6.9.3. Float Atoms</a></li>
-<li class="toctree-l3"><a class="reference internal" href="objects/atoms/bool.html">3.6.9.4. Bool Atoms</a></li>
-<li class="toctree-l3"><a class="reference internal" href="objects/atoms/padding.html">3.6.9.5. Padding Atoms</a></li>
-</ul>
-</details></li>
 </ul>
 </details></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">3.7. Packing and Unpacking</a></li>
@@ -449,58 +436,41 @@
   <section id="packing-and-unpacking">
 <span id="reference-capi-parsing"></span><h1><span class="section-number">3.7. </span>Packing and Unpacking<a class="headerlink" href="#packing-and-unpacking" title="Link to this heading">#</a></h1>
 <dl class="c function">
-<dt class="sig sig-object c" id="c.CpTypeOf">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">CpTypeOf</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">value</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpTypeOf" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c.CpTypeOf_Field">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">CpTypeOf_Field</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">CpFieldObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">field</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpTypeOf_Field" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c.CpTypeOf_Common">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">CpTypeOf_Common</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">op</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpTypeOf_Common" title="Link to this definition">#</a><br /></dt>
+<dt class="sig sig-object c" id="c.CpAtom_TypeOf">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">CpAtom_TypeOf</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">value</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpAtom_TypeOf" title="Link to this definition">#</a><br /></dt>
 <dd><em class="refcount text-info">Return value: New reference.</em><p>Returns the type of the given atom object.</p>
 </dd></dl>
 
 <dl class="c function">
-<dt class="sig sig-object c" id="c.CpSizeOf">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">CpSizeOf</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">atom</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">globals</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpSizeOf" title="Link to this definition">#</a><br /></dt>
-<dd><em class="refcount text-info">Return value: New reference.</em><p>Returns the size of the given atom object.</p>
+<dt class="sig sig-object c" id="c.CpAtom_Pack">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CpAtom_Pack</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">pAtom</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">pObj</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">pContext</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpAtom_Pack" title="Link to this definition">#</a><br /></dt>
+<dd><p>Packs the object <code class="code docutils literal notranslate"><span class="pre">o</span></code> using the provided context and returns <code class="docutils literal notranslate"><span class="pre">-1</span></code> on
+error. The  Proper use would be:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">PyObject</span><span class="w"> </span><span class="o">*</span><span class="n">nAtom</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...,</span><span class="w"> </span><span class="o">*</span><span class="n">nContext</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...,</span><span class="w"> </span><span class="o">*</span><span class="n">nValue</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...;</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">CpAtom_Pack</span><span class="p">(</span><span class="n">nAtom</span><span class="p">,</span><span class="w"> </span><span class="n">nValue</span><span class="p">,</span><span class="w"> </span><span class="n">nContext</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+<span class="w">    </span><span class="k">goto</span><span class="w"> </span><span class="n">error</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>The provided context object must support the <em>Context Protocol</em>, which is
+not validated in this method.This function may raise <em>NotImplementedError</em>
+to indicate that this class does not support packing.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.6.0.</span></p>
+</div>
 </dd></dl>
 
 <dl class="c function">
-<dt class="sig sig-object c" id="c.CpPack">
-<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CpPack</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">op</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">atom</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">io</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">globals</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpPack" title="Link to this definition">#</a><br /></dt>
-<dd><p>Packs the given value using the given atom object and returns :code::<cite>0</cite> if
-successful. Returns <code class="code docutils literal notranslate"><span class="pre">-1</span></code> if an error occurs. The <em>globals</em> parameter may
-be <em>NULL</em>.</p>
+<dt class="sig sig-object c" id="c.CpAtom_Size">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">CpAtom_Size</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">pAtom</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">pContext</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpAtom_Size" title="Link to this definition">#</a><br /></dt>
+<dd><em class="refcount text-info">Return value: New reference.</em><p>Calculates the size of the object <code class="code docutils literal notranslate"><span class="pre">pAtom</span></code> using context
+<code class="code docutils literal notranslate"><span class="pre">pContext</span></code> and returns the result. This method will return <em>NULL</em> if
+an error occurs while calling the target function.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.6.0.</span></p>
+</div>
 </dd></dl>
 
-<dl class="c function">
-<dt class="sig sig-object c" id="c._CpPack_EvalLength">
-<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">_CpPack_EvalLength</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="objects/layer.html#c.CpLayerObject" title="CpLayerObject"><span class="n"><span class="pre">CpLayerObject</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">layer</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">length</span></span>, <span class="n"><span class="pre">Py_ssize_t</span></span><span class="w"> </span><span class="n"><span class="pre">size</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">seq_greedy</span></span>, <span class="n"><span class="pre">Py_ssize_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">seq_length</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c._CpPack_EvalLength" title="Link to this definition">#</a><br /></dt>
-<dd><p>Evaluates the length of the sequence to pack.</p>
-<p>This funtion can be utilized to evaluate the length of the sequence to
-pack. It uses the <code class="code docutils literal notranslate"><span class="pre">size</span></code> parameter to validate the input sequence.
-Although, the <code class="code docutils literal notranslate"><span class="pre">size</span></code> parameter is not mandatory, it is recommended
-- a value of <code class="code docutils literal notranslate"><span class="pre">-1</span></code> will disable the check mentioned before.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>layer</strong> – the current layer that is marked as sequential</p></li>
-<li><p><strong>size</strong> – the size of the input sequence to pack (might be -1, see above)</p></li>
-<li><p><strong>seq_greedy</strong> – destination pointer to store the result whether the sequence should be parsed greedily</p></li>
-<li><p><strong>seq_length</strong> – destination pointer to store the length of the sequence</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><code class="code docutils literal notranslate"><span class="pre">0</span></code> if successful, <code class="code docutils literal notranslate"><span class="pre">-1</span></code> if an error occurs</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="c function">
-<dt class="sig sig-object c" id="c.CpUnpack">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">CpUnpack</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">atom</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">io</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">globals</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpUnpack" title="Link to this definition">#</a><br /></dt>
-<dd><em class="refcount text-info">Return value: New reference.</em><p><em>TODO</em></p>
-</dd></dl>
-
+<p><em>TODO</em></p>
 </section>
 
 
@@ -514,12 +484,12 @@ Although, the <code class="code docutils literal notranslate"><span class="pre">
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="objects/atoms/padding.html"
+       href="objects/contextobj.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title"><span class="section-number">3.6.9.5. </span>Padding Atoms</p>
+        <p class="prev-next-title"><span class="section-number">3.6.3. </span>Context Objects</p>
       </div>
     </a>
     <a class="right-next"
@@ -576,7 +546,7 @@ Although, the <code class="code docutils literal notranslate"><span class="pre">
 
   <p class="copyright">
     
-      © Copyright 2024, MatrixEditor.
+      © Copyright 2025, MatrixEditor.
       <br/>
     
   </p>

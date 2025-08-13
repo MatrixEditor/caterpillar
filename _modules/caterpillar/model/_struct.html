@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>caterpillar.model._struct &#8212; Caterpillar 2.5.1 documentation</title>
+    <title>caterpillar.model._struct &#8212; Caterpillar 2.6.0 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=983e91d6"></script>
+    <script src="../../../_static/documentation_options.js?v=ae39cb24"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -51,7 +51,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.5.1" />
+  <meta name="docsearch:version" content="2.6.0" />
   </head>
   
   
@@ -113,7 +113,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.5.1</p>
+    <p class="title logo__title">Caterpillar 2.6.0</p>
   
 </a></div>
     
@@ -400,7 +400,7 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.shared</span><span class="w"> </span><span class="kn">import</span> <span class="n">getstruct</span><span class="p">,</span> <span class="n">hasstruct</span><span class="p">,</span> <span class="n">ATTR_STRUCT</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">_SupportsUnpack</span><span class="p">,</span> <span class="n">_SupportsSize</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">Context</span><span class="p">,</span> <span class="n">CTX_STREAM</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">O_CONTEXT_FACTORY</span><span class="p">,</span> <span class="n">CTX_STREAM</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.exception</span><span class="w"> </span><span class="kn">import</span> <span class="n">InvalidValueError</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.options</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">S_EVAL_ANNOTATIONS</span><span class="p">,</span>
@@ -851,11 +851,12 @@
     <span class="n">offsets</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
     <span class="c1"># NOTE: we don&#39;t have to set _root here because the default root context</span>
     <span class="c1"># will be this instance.</span>
-    <span class="n">context</span> <span class="o">=</span> <span class="n">Context</span><span class="p">(</span>
+    <span class="n">context</span> <span class="o">=</span> <span class="n">O_CONTEXT_FACTORY</span><span class="o">.</span><span class="n">value</span><span class="p">(</span>
         <span class="n">_parent</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">_path</span><span class="o">=</span><span class="s2">&quot;&lt;root&gt;&quot;</span><span class="p">,</span>
         <span class="n">_pos</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
         <span class="n">_offsets</span><span class="o">=</span><span class="n">offsets</span><span class="p">,</span>
+        <span class="n">_is_seq</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">mode</span><span class="o">=</span><span class="n">MODE_PACK</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwds</span><span class="p">,</span>
     <span class="p">)</span>
@@ -967,7 +968,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># prepare the data stream</span>
     <span class="n">stream</span> <span class="o">=</span> <span class="n">buffer</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="n">IOBase</span><span class="p">)</span> <span class="k">else</span> <span class="n">BytesIO</span><span class="p">(</span><span class="n">buffer</span><span class="p">)</span>
-    <span class="n">context</span> <span class="o">=</span> <span class="n">Context</span><span class="p">(</span>
+    <span class="n">context</span> <span class="o">=</span> <span class="n">O_CONTEXT_FACTORY</span><span class="o">.</span><span class="n">value</span><span class="p">(</span>
         <span class="n">_path</span><span class="o">=</span><span class="s2">&quot;&lt;root&gt;&quot;</span><span class="p">,</span>
         <span class="n">_parent</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">_io</span><span class="o">=</span><span class="n">stream</span><span class="p">,</span>
@@ -1015,7 +1016,7 @@
 <div class="viewcode-block" id="sizeof">
 <a class="viewcode-back" href="../../../library/model/struct.html#caterpillar.model.sizeof">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">sizeof</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-    <span class="n">context</span> <span class="o">=</span> <span class="n">Context</span><span class="p">(</span><span class="n">_parent</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">_path</span><span class="o">=</span><span class="s2">&quot;&lt;root&gt;&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span>
+    <span class="n">context</span> <span class="o">=</span> <span class="n">O_CONTEXT_FACTORY</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">_parent</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">_path</span><span class="o">=</span><span class="s2">&quot;&lt;root&gt;&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span>
     <span class="n">struct_</span> <span class="o">=</span> <span class="n">obj</span>
     <span class="k">if</span> <span class="n">hasstruct</span><span class="p">(</span><span class="n">struct_</span><span class="p">):</span>
         <span class="n">struct_</span> <span class="o">=</span> <span class="n">getstruct</span><span class="p">(</span><span class="n">struct_</span><span class="p">)</span>
@@ -1066,7 +1067,7 @@
 
   <p class="copyright">
     
-      © Copyright 2024, MatrixEditor.
+      © Copyright 2025, MatrixEditor.
       <br/>
     
   </p>

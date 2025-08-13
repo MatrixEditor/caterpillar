@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>4.8.2. Common Structs &#8212; Caterpillar 2.5.1 documentation</title>
+    <title>4.8.2. Common Structs &#8212; Caterpillar 2.6.0 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=983e91d6"></script>
+    <script src="../../_static/documentation_options.js?v=ae39cb24"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -54,7 +54,7 @@
     <link rel="prev" title="4.8.1. Field Model" href="field_model.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.5.1" />
+  <meta name="docsearch:version" content="2.6.0" />
   </head>
   
   
@@ -116,7 +116,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.5.1</p>
+    <p class="title logo__title">Caterpillar 2.6.0</p>
   
 </a></div>
     
@@ -353,10 +353,6 @@
 </ul>
 </details></li>
 </ul>
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">C API Python Types</span></p>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../ctypes/int.html">5.1. Integer Types</a></li>
-</ul>
 </div>
 </nav></div>
     </div>
@@ -433,7 +429,7 @@ which are often used in Python’s <cite>struct</cite> module. Each field is ass
 <p>Example usage:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">PyStructFormattedField</span><span class="p">(</span><span class="s1">&#39;i&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">field</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span>
-<span class="go">&quot;&lt;PyStructFormattedField(int) &#39;i&#39; 32&gt;&quot;</span>
+<span class="go">&quot;&lt;int32&gt;&quot;</span>
 </pre></div>
 </div>
 <dl class="field-list simple">
@@ -517,23 +513,6 @@ which are often used in Python’s <cite>struct</cite> module. Each field is ass
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="caterpillar.fields.PyStructFormattedField.get_length">
-<span class="sig-name descname"><span class="pre">get_length</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/common.html#PyStructFormattedField.get_length"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.PyStructFormattedField.get_length" title="Link to this definition">#</a></dt>
-<dd><p>Get the length of the field, which may be dynamically determined based on the context.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>context</strong> – The context providing the length information.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The length of the field (1 if no length is specified).</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.fields.PyStructFormattedField.is_padding">
 <span class="sig-name descname"><span class="pre">is_padding</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/common.html#PyStructFormattedField.is_padding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.PyStructFormattedField.is_padding" title="Link to this definition">#</a></dt>
 <dd><p>Check if the field represents padding.</p>
@@ -551,87 +530,87 @@ which are often used in Python’s <cite>struct</cite> module. Each field is ass
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caterpillar.fields.uint8">
-<span class="sig-prename descclassname"><span class="pre">fields.</span></span><span class="sig-name descname"><span class="pre">uint8</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;PyStructFormattedField(int)</span> <span class="pre">'B'</span> <span class="pre">8&gt;</span></em><a class="headerlink" href="#caterpillar.fields.uint8" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">fields.</span></span><span class="sig-name descname"><span class="pre">uint8</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;int8&gt;</span></em><a class="headerlink" href="#caterpillar.fields.uint8" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caterpillar.fields.int8">
-<span class="sig-prename descclassname"><span class="pre">fields.</span></span><span class="sig-name descname"><span class="pre">int8</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;PyStructFormattedField(int)</span> <span class="pre">'b'</span> <span class="pre">8&gt;</span></em><a class="headerlink" href="#caterpillar.fields.int8" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">fields.</span></span><span class="sig-name descname"><span class="pre">int8</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;int8&gt;</span></em><a class="headerlink" href="#caterpillar.fields.int8" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caterpillar.fields.uint16">
-<span class="sig-prename descclassname"><span class="pre">fields.</span></span><span class="sig-name descname"><span class="pre">uint16</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;PyStructFormattedField(int)</span> <span class="pre">'H'</span> <span class="pre">16&gt;</span></em><a class="headerlink" href="#caterpillar.fields.uint16" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">fields.</span></span><span class="sig-name descname"><span class="pre">uint16</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;int16&gt;</span></em><a class="headerlink" href="#caterpillar.fields.uint16" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caterpillar.fields.int16">
-<span class="sig-prename descclassname"><span class="pre">fields.</span></span><span class="sig-name descname"><span class="pre">int16</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;PyStructFormattedField(int)</span> <span class="pre">'h'</span> <span class="pre">16&gt;</span></em><a class="headerlink" href="#caterpillar.fields.int16" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">fields.</span></span><span class="sig-name descname"><span class="pre">int16</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;int16&gt;</span></em><a class="headerlink" href="#caterpillar.fields.int16" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caterpillar.fields.uint32">
-<span class="sig-prename descclassname"><span class="pre">fields.</span></span><span class="sig-name descname"><span class="pre">uint32</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;PyStructFormattedField(int)</span> <span class="pre">'I'</span> <span class="pre">32&gt;</span></em><a class="headerlink" href="#caterpillar.fields.uint32" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">fields.</span></span><span class="sig-name descname"><span class="pre">uint32</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;int32&gt;</span></em><a class="headerlink" href="#caterpillar.fields.uint32" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caterpillar.fields.int32">
-<span class="sig-prename descclassname"><span class="pre">fields.</span></span><span class="sig-name descname"><span class="pre">int32</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;PyStructFormattedField(int)</span> <span class="pre">'i'</span> <span class="pre">32&gt;</span></em><a class="headerlink" href="#caterpillar.fields.int32" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">fields.</span></span><span class="sig-name descname"><span class="pre">int32</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;int32&gt;</span></em><a class="headerlink" href="#caterpillar.fields.int32" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caterpillar.fields.uint64">
-<span class="sig-prename descclassname"><span class="pre">fields.</span></span><span class="sig-name descname"><span class="pre">uint64</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;PyStructFormattedField(int)</span> <span class="pre">'Q'</span> <span class="pre">64&gt;</span></em><a class="headerlink" href="#caterpillar.fields.uint64" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">fields.</span></span><span class="sig-name descname"><span class="pre">uint64</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;int64&gt;</span></em><a class="headerlink" href="#caterpillar.fields.uint64" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caterpillar.fields.int64">
-<span class="sig-prename descclassname"><span class="pre">fields.</span></span><span class="sig-name descname"><span class="pre">int64</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;PyStructFormattedField(int)</span> <span class="pre">'q'</span> <span class="pre">64&gt;</span></em><a class="headerlink" href="#caterpillar.fields.int64" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">fields.</span></span><span class="sig-name descname"><span class="pre">int64</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;int64&gt;</span></em><a class="headerlink" href="#caterpillar.fields.int64" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caterpillar.fields.size_t">
-<span class="sig-prename descclassname"><span class="pre">fields.</span></span><span class="sig-name descname"><span class="pre">size_t</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;PyStructFormattedField(int)</span> <span class="pre">'N'</span> <span class="pre">64&gt;</span></em><a class="headerlink" href="#caterpillar.fields.size_t" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">fields.</span></span><span class="sig-name descname"><span class="pre">size_t</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;int64&gt;</span></em><a class="headerlink" href="#caterpillar.fields.size_t" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caterpillar.fields.ssize_t">
-<span class="sig-prename descclassname"><span class="pre">fields.</span></span><span class="sig-name descname"><span class="pre">ssize_t</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;PyStructFormattedField(int)</span> <span class="pre">'n'</span> <span class="pre">64&gt;</span></em><a class="headerlink" href="#caterpillar.fields.ssize_t" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">fields.</span></span><span class="sig-name descname"><span class="pre">ssize_t</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;int64&gt;</span></em><a class="headerlink" href="#caterpillar.fields.ssize_t" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caterpillar.fields.float16">
-<span class="sig-prename descclassname"><span class="pre">fields.</span></span><span class="sig-name descname"><span class="pre">float16</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;PyStructFormattedField(float)</span> <span class="pre">'e'</span> <span class="pre">16&gt;</span></em><a class="headerlink" href="#caterpillar.fields.float16" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">fields.</span></span><span class="sig-name descname"><span class="pre">float16</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;float16&gt;</span></em><a class="headerlink" href="#caterpillar.fields.float16" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caterpillar.fields.float32">
-<span class="sig-prename descclassname"><span class="pre">fields.</span></span><span class="sig-name descname"><span class="pre">float32</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;PyStructFormattedField(float)</span> <span class="pre">'f'</span> <span class="pre">32&gt;</span></em><a class="headerlink" href="#caterpillar.fields.float32" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">fields.</span></span><span class="sig-name descname"><span class="pre">float32</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;float32&gt;</span></em><a class="headerlink" href="#caterpillar.fields.float32" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caterpillar.fields.float64">
-<span class="sig-prename descclassname"><span class="pre">fields.</span></span><span class="sig-name descname"><span class="pre">float64</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;PyStructFormattedField(float)</span> <span class="pre">'d'</span> <span class="pre">64&gt;</span></em><a class="headerlink" href="#caterpillar.fields.float64" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">fields.</span></span><span class="sig-name descname"><span class="pre">float64</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;float64&gt;</span></em><a class="headerlink" href="#caterpillar.fields.float64" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caterpillar.fields.void_ptr">
-<span class="sig-prename descclassname"><span class="pre">fields.</span></span><span class="sig-name descname"><span class="pre">void_ptr</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;PyStructFormattedField(int)</span> <span class="pre">'P'</span> <span class="pre">64&gt;</span></em><a class="headerlink" href="#caterpillar.fields.void_ptr" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">fields.</span></span><span class="sig-name descname"><span class="pre">void_ptr</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;int64&gt;</span></em><a class="headerlink" href="#caterpillar.fields.void_ptr" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caterpillar.fields.char">
-<span class="sig-prename descclassname"><span class="pre">fields.</span></span><span class="sig-name descname"><span class="pre">char</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;PyStructFormattedField(str)</span> <span class="pre">'c'</span> <span class="pre">8&gt;</span></em><a class="headerlink" href="#caterpillar.fields.char" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">fields.</span></span><span class="sig-name descname"><span class="pre">char</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;str8&gt;</span></em><a class="headerlink" href="#caterpillar.fields.char" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caterpillar.fields.boolean">
-<span class="sig-prename descclassname"><span class="pre">fields.</span></span><span class="sig-name descname"><span class="pre">boolean</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;PyStructFormattedField(bool)</span> <span class="pre">'?'</span> <span class="pre">8&gt;</span></em><a class="headerlink" href="#caterpillar.fields.boolean" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">fields.</span></span><span class="sig-name descname"><span class="pre">boolean</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;bool8&gt;</span></em><a class="headerlink" href="#caterpillar.fields.boolean" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caterpillar.fields.padding">
-<span class="sig-prename descclassname"><span class="pre">fields.</span></span><span class="sig-name descname"><span class="pre">padding</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;PyStructFormattedField(padding)</span> <span class="pre">'x'</span> <span class="pre">8&gt;</span></em><a class="headerlink" href="#caterpillar.fields.padding" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">fields.</span></span><span class="sig-name descname"><span class="pre">padding</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;padding&gt;</span></em><a class="headerlink" href="#caterpillar.fields.padding" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py class">
@@ -723,7 +702,7 @@ default setting). The following configurations are therefore possible:</p>
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.fields.VarInt.pack_single">
-<span class="sig-name descname"><span class="pre">pack_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/varint.html#VarInt.pack_single"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.VarInt.pack_single" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">pack_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/varint.html#VarInt.pack_single"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.VarInt.pack_single" title="Link to this definition">#</a></dt>
 <dd><p>Pack a single value into the stream.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1695,7 +1674,6 @@ when the field is accessed.</p>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.PyStructFormattedField.pack_seq"><code class="docutils literal notranslate"><span class="pre">PyStructFormattedField.pack_seq()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.PyStructFormattedField.unpack_single"><code class="docutils literal notranslate"><span class="pre">PyStructFormattedField.unpack_single()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.PyStructFormattedField.unpack_seq"><code class="docutils literal notranslate"><span class="pre">PyStructFormattedField.unpack_seq()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.PyStructFormattedField.get_length"><code class="docutils literal notranslate"><span class="pre">PyStructFormattedField.get_length()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.PyStructFormattedField.is_padding"><code class="docutils literal notranslate"><span class="pre">PyStructFormattedField.is_padding()</span></code></a></li>
 </ul>
 </li>
@@ -1837,7 +1815,7 @@ when the field is accessed.</p>
 
   <p class="copyright">
     
-      © Copyright 2024, MatrixEditor.
+      © Copyright 2025, MatrixEditor.
       <br/>
     
   </p>

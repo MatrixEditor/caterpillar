@@ -14,26 +14,13 @@ To enable the documentation feature globally, you simply need to set the appropr
 flags. Below are the steps to enable it in both environments:
 
 
-.. tab-set::
+.. code-block:: python
+    :caption: Enable documentation feature
 
-    .. tab-item:: Python
+    from caterpillar.py import set_struct_flags, S_REPLACE_TYPES
 
-        .. code-block:: python
-            :caption: Enable documentation feature
+    set_struct_flags(S_REPLACE_TYPES)
 
-            from caterpillar.py import set_struct_flags, S_REPLACE_TYPES
-
-            set_struct_flags(S_REPLACE_TYPES)
-
-
-    .. tab-item:: Caterpillar C
-
-        .. code-block:: python
-            :caption: Enable documentation feature
-
-            from caterpillar.c import STRUCT_OPTIONS, S_REPLACE_TYPES
-
-            STRUCT_OPTIONS.add(S_REPLACE_TYPES)
 
 Once this flag is set, *Caterpillar* will automatically replace the types of fields in
 structs with their respective descriptions. For example, the following reST code will

@@ -10,9 +10,3 @@ Concrete Objects Layer
     arch
     option
     contextobj
-    contextexpr
-    contextpath
-    state
-    layer
-    struct
-    atoms/index.rst

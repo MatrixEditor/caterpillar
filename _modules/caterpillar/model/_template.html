@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>caterpillar.model._template &#8212; Caterpillar 2.5.1 documentation</title>
+    <title>caterpillar.model._template &#8212; Caterpillar 2.6.0 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=983e91d6"></script>
+    <script src="../../../_static/documentation_options.js?v=ae39cb24"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -51,7 +51,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.5.1" />
+  <meta name="docsearch:version" content="2.6.0" />
   </head>
   
   
@@ -113,7 +113,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.5.1</p>
+    <p class="title logo__title">Caterpillar 2.6.0</p>
   
 </a></div>
     
@@ -466,7 +466,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">to_field</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">struct</span><span class="p">,</span>
-        <span class="n">arch</span><span class="p">,</span>
+        <span class="n">arch</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">default</span><span class="o">=</span><span class="n">INVALID_DEFAULT</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Field</span><span class="p">:</span>
         <span class="c1"># REVISIT: what about flags?</span>
@@ -681,7 +681,8 @@
                 <span class="k">continue</span>
 
             <span class="n">annotations</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">to_field</span><span class="p">(</span>
-                <span class="n">replacement</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">template_ty</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">INVALID_DEFAULT</span><span class="p">)</span>
+                <span class="n">replacement</span><span class="p">,</span>
+                <span class="n">default</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">template_ty</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">INVALID_DEFAULT</span><span class="p">),</span>
             <span class="p">)</span>
             <span class="n">replaced</span><span class="p">[</span><span class="n">value</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">replacement</span>
 
@@ -740,7 +741,7 @@
 
   <p class="copyright">
     
-      © Copyright 2024, MatrixEditor.
+      © Copyright 2025, MatrixEditor.
       <br/>
     
   </p>

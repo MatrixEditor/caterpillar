@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>2.1.1. Defining Structs &#8212; Caterpillar 2.5.1 documentation</title>
+    <title>2.1.1. Defining Structs &#8212; Caterpillar 2.6.0 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=983e91d6"></script>
+    <script src="../../_static/documentation_options.js?v=ae39cb24"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -54,7 +54,7 @@
     <link rel="prev" title="2.1. First Steps" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.5.1" />
+  <meta name="docsearch:version" content="2.6.0" />
   </head>
   
   
@@ -116,7 +116,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.5.1</p>
+    <p class="title logo__title">Caterpillar 2.6.0</p>
   
 </a></div>
     
@@ -438,10 +438,6 @@
 is key to leveraging the full power of <em>Caterpillar</em>. In this section, we’ll begin by
 defining a simple struct for the  <a class="reference external" href="https://www.w3.org/TR/png/#11PLTE">PLTE</a> chunk of
 a PNG file, which consists of three-byte entries.</p>
-<div class="sd-tab-set docutils">
-<input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
-<label class="sd-tab-label" for="sd-tab-item-0">
-Python</label><div class="sd-tab-content docutils">
 <div class="literal-block-wrapper docutils container" id="id1">
 <div class="code-block-caption"><span class="caption-text">RGB struct for the PLTE chunk</span><a class="headerlink" href="#id1" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.py</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span> <span class="c1"># &lt;-- just import everything</span>
@@ -452,24 +448,6 @@ Python</label><div class="sd-tab-content docutils">
     <span class="n">g</span><span class="p">:</span> <span class="n">uint8</span>
     <span class="n">b</span><span class="p">:</span> <span class="n">uint8</span>
 </pre></div>
-</div>
-</div>
-</div>
-<input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
-<label class="sd-tab-label" for="sd-tab-item-1">
-Caterpillar C</label><div class="sd-tab-content docutils">
-<div class="literal-block-wrapper docutils container" id="id2">
-<div class="code-block-caption"><span class="caption-text">RGB struct for the PLTE chunk (using Caterpillar C)</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.c</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span> <span class="c1"># &lt;-- just import everything</span>
-
-<span class="nd">@struct</span>         <span class="c1"># &lt;-- just decorate the class with the struct() function</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">RGB</span><span class="p">:</span>
-    <span class="n">r</span><span class="p">:</span> <span class="n">u8</span>       <span class="c1"># &lt;-- a field can be defined just like this</span>
-    <span class="n">g</span><span class="p">:</span> <span class="n">u8</span>
-    <span class="n">b</span><span class="p">:</span> <span class="n">u8</span>
-</pre></div>
-</div>
-</div>
 </div>
 </div>
 <p>By using the <code class="code docutils literal notranslate"><span class="pre">&#64;struct</span></code> decorator, we’ve defined the <code class="code docutils literal notranslate"><span class="pre">RGB</span></code> class as
@@ -564,7 +542,7 @@ on how to enable this option, refer to the documentation on <a class="reference 
 
   <p class="copyright">
     
-      © Copyright 2024, MatrixEditor.
+      © Copyright 2025, MatrixEditor.
       <br/>
     
   </p>

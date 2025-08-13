@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>2.3.1.3. Custom Operators &#8212; Caterpillar 2.5.1 documentation</title>
+    <title>2.3.1.3. Custom Operators &#8212; Caterpillar 2.6.0 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=983e91d6"></script>
+    <script src="../../_static/documentation_options.js?v=ae39cb24"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -54,7 +54,7 @@
     <link rel="prev" title="2.3.1.2. Offsets" href="op-offset.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.5.1" />
+  <meta name="docsearch:version" content="2.6.0" />
   </head>
   
   
@@ -116,7 +116,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.5.1</p>
+    <p class="title logo__title">Caterpillar 2.6.0</p>
   
 </a></div>
     
@@ -444,13 +444,13 @@ when defining structs and fields. For example, you can create an operator
 that automatically generates an array of a fixed length, making your code
 cleaner and more intuitive.</p>
 <p>To define a custom operator, <em>Caterpillar</em> provides a mechanism using the
-<code class="code docutils literal notranslate"><span class="pre">_infix_</span></code> function, which allows you to wrap a lambda or function as an
+<code class="code docutils literal notranslate"><span class="pre">Operator</span></code> class, which allows you to wrap a lambda or function as an
 operator. This custom operator can then be applied to fields in a struct,
 just like any other operator.</p>
 <p>Here’s an example that demonstrates how to define and use a custom operator:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.fields</span><span class="w"> </span><span class="kn">import</span> <span class="n">_infix_</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.fields</span><span class="w"> </span><span class="kn">import</span> <span class="n">Operator</span>
 
-<span class="n">M</span> <span class="o">=</span> <span class="n">_infix_</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">,</span> <span class="n">count</span><span class="p">:</span> <span class="n">s</span><span class="p">[</span><span class="n">count</span> <span class="o">*</span> <span class="mi">2</span><span class="p">])</span>
+<span class="n">M</span> <span class="o">=</span> <span class="n">Operator</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">,</span> <span class="n">count</span><span class="p">:</span> <span class="n">s</span><span class="p">[</span><span class="n">count</span> <span class="o">*</span> <span class="mi">2</span><span class="p">])</span>
 
 <span class="nd">@struct</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
@@ -562,7 +562,7 @@ fields or structs are defined before they are processed by the rest of the frame
 
   <p class="copyright">
     
-      © Copyright 2024, MatrixEditor.
+      © Copyright 2025, MatrixEditor.
       <br/>
     
   </p>

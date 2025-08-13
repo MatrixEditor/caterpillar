@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>3.5.1. Atom Protocol &#8212; Caterpillar 2.5.1 documentation</title>
+    <title>3.5.1. Atom Protocol &#8212; Caterpillar 2.6.0 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=983e91d6"></script>
+    <script src="../../_static/documentation_options.js?v=ae39cb24"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -54,7 +54,7 @@
     <link rel="prev" title="3.5. Abstract Objects Layer" href="abstract.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.5.1" />
+  <meta name="docsearch:version" content="2.6.0" />
   </head>
   
   
@@ -116,7 +116,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.5.1</p>
+    <p class="title logo__title">Caterpillar 2.6.0</p>
   
 </a></div>
     
@@ -368,19 +368,6 @@
 <li class="toctree-l2"><a class="reference internal" href="objects/arch.html">3.6.1. Arch &amp; Endian Objects</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objects/option.html">3.6.2. Option Objects</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objects/contextobj.html">3.6.3. Context Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="objects/contextexpr.html">3.6.4. Context Expressions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="objects/contextpath.html">3.6.5. Context Path Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="objects/state.html">3.6.6. State Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="objects/layer.html">3.6.7. Layer Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="objects/struct.html">3.6.8. Struct Objects</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="objects/atoms/index.html">3.6.9. Atom Objects</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="objects/atoms/int.html">3.6.9.1. Integer Atoms</a></li>
-<li class="toctree-l3"><a class="reference internal" href="objects/atoms/char.html">3.6.9.2. Char Atoms</a></li>
-<li class="toctree-l3"><a class="reference internal" href="objects/atoms/float.html">3.6.9.3. Float Atoms</a></li>
-<li class="toctree-l3"><a class="reference internal" href="objects/atoms/bool.html">3.6.9.4. Bool Atoms</a></li>
-<li class="toctree-l3"><a class="reference internal" href="objects/atoms/padding.html">3.6.9.5. Padding Atoms</a></li>
-</ul>
-</details></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="parsing.html">3.7. Packing and Unpacking</a></li>
@@ -454,6 +441,9 @@
 <p>Caterpillar provides a special protocol for working with atoms. It is
 designed to incorporate packing and unpacking of data streams as well
 as calculating its size and measuring its type.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 2.6.0: </span>Reworked the CAPI and its components.</p>
+</div>
 <dl class="c type">
 <dt class="sig sig-object c" id="c.CpAtomObject">
 <span class="k"><span class="pre">type</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CpAtomObject</span></span></span><a class="headerlink" href="#c.CpAtomObject" title="Link to this definition">#</a><br /></dt>
@@ -469,43 +459,10 @@ an abstract base class.</p>
 <dd><p>The type object of the <code class="xref c c-type docutils literal notranslate"><span class="pre">CpAtom</span></code> class.</p>
 </dd></dl>
 
-<p><em>The following functions are subject to change in the next release.</em></p>
+<p><em>TODO: describe missing functions</em></p>
 <dl class="c function">
-<dt class="sig sig-object c" id="c.CpAtom_CallPack">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">CpAtom_CallPack</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">self</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">name</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">o</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">ctx</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpAtom_CallPack" title="Link to this definition">#</a><br /></dt>
-<dd><p>Packs the object <code class="code docutils literal notranslate"><span class="pre">o</span></code> using context <code class="code docutils literal notranslate"><span class="pre">ctx</span></code> and returns the result. The
-<code class="code docutils literal notranslate"><span class="pre">name</span></code> describes the target method name to be called on the object <code class="code docutils literal notranslate"><span class="pre">self</span></code>.
-This method will return <em>NULL</em> if an error occurs while calling the target method. Proper
-use would be together with the global module state:</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">_coremodulestate</span><span class="o">*</span><span class="w"> </span><span class="n">state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="cm">/*...*/</span><span class="p">;</span>
-<span class="n">PyObject</span><span class="w"> </span><span class="o">*</span><span class="n">o</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...,</span><span class="w"> </span><span class="o">*</span><span class="n">ctx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...;</span>
-
-<span class="c1">// invoke __pack__ manually</span>
-<span class="n">PyObject</span><span class="o">*</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CpAtom_CallPack</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">state</span><span class="o">-&gt;</span><span class="n">str___pack__</span><span class="p">,</span><span class="w"> </span><span class="n">o</span><span class="p">,</span><span class="w"> </span><span class="n">ctx</span><span class="p">);</span>
-<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">result</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nb">NULL</span><span class="p">;</span>
-<span class="p">}</span>
-<span class="c1">// do something with result</span>
-</pre></div>
-</div>
-<p>The provided context object must support the <em>Context Protocol</em>, which is not validated in
-this method. Furthermore, it must be an instance of the <code class="xref c c-type docutils literal notranslate"><span class="pre">CpState</span></code> structure if the
-native <em>pack</em> function is called. This function may return <em>NotImplemented</em> to indicate
-that this class does not support packing.</p>
-</dd></dl>
-
-<dl class="c function">
-<dt class="sig sig-object c" id="c.CpAtom_CallSize">
-<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">CpAtom_CallSize</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">self</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">name</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">ctx</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpAtom_CallSize" title="Link to this definition">#</a><br /></dt>
-<dd><p>Calculates the size of the object <code class="code docutils literal notranslate"><span class="pre">self</span></code> using context <code class="code docutils literal notranslate"><span class="pre">ctx</span></code> and returns the
-result. The <code class="code docutils literal notranslate"><span class="pre">name</span></code> describes the target method name to be called on the object
-<code class="code docutils literal notranslate"><span class="pre">self</span></code>. This method will return <em>NULL</em> if an error occurs while calling the target
-function.</p>
-</dd></dl>
-
-<dl class="c function">
-<dt class="sig sig-object c" id="c.CpAtom_CanPack">
-<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CpAtom_CanPack</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">o</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpAtom_CanPack" title="Link to this definition">#</a><br /></dt>
+<dt class="sig sig-object c" id="c.CpAtom_HasPack">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CpAtom_HasPack</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">o</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpAtom_HasPack" title="Link to this definition">#</a><br /></dt>
 <dt class="sig sig-object c" id="c.CpAtom_FastCanPack">
 <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CpAtom_FastCanPack</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">o</span></span>, <span class="n"><span class="pre">_coremodulestate</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">state</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpAtom_FastCanPack" title="Link to this definition">#</a><br /></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">1</span></code> if the object provides an interface of packing other
@@ -515,10 +472,8 @@ be packed can not be determined by introspection.</p>
 </dd></dl>
 
 <dl class="c function">
-<dt class="sig sig-object c" id="c.CpAtom_CanUnpack">
-<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CpAtom_CanUnpack</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">o</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpAtom_CanUnpack" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c.CpAtom_FastCanUnpack">
-<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CpAtom_FastCanUnpack</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">o</span></span>, <span class="n"><span class="pre">_coremodulestate</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">state</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpAtom_FastCanUnpack" title="Link to this definition">#</a><br /></dt>
+<dt class="sig sig-object c" id="c.CpAtom_HasUnpack">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CpAtom_HasUnpack</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">o</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpAtom_HasUnpack" title="Link to this definition">#</a><br /></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">1</span></code> if the object provides an interface of unpacking other
 objects and <code class="docutils literal notranslate"><span class="pre">0</span></code> otherwise. Note that it returns <code class="docutils literal notranslate"><span class="pre">1</span></code> for classes
 with a <a class="reference internal" href="../datamodel/protocols/structlike.html#object.__unpack__" title="object.__unpack__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__unpack__()</span></code></a> method, since the type of objects
@@ -528,8 +483,6 @@ to be unpacked can not be determined by introspection.</p>
 <dl class="c function">
 <dt class="sig sig-object c" id="c.CpAtom_HasType">
 <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CpAtom_HasType</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">o</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpAtom_HasType" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c.CpAtom_FastHasType">
-<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CpAtom_FastHasType</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">o</span></span>, <span class="n"><span class="pre">_coremodulestate</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">state</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpAtom_FastHasType" title="Link to this definition">#</a><br /></dt>
 <dd><p>Returns <code class="docutils literal notranslate"><span class="pre">1</span></code> if the object provides a method of determining the type
 this object (usually an atom) represents and <code class="docutils literal notranslate"><span class="pre">0</span></code> otherwise. As all
 other functions, this one will simply check for the presence of the
@@ -539,19 +492,10 @@ other functions, this one will simply check for the presence of the
 <dl class="c function">
 <dt class="sig sig-object c" id="c.CpAtom_HasSize">
 <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CpAtom_HasSize</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">o</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpAtom_HasSize" title="Link to this definition">#</a><br /></dt>
-<dt class="sig sig-object c" id="c.CpAtom_FastHasSize">
-<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CpAtom_FastHasSize</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">o</span></span>, <span class="n"><span class="pre">_coremodulestate</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">state</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpAtom_FastHasSize" title="Link to this definition">#</a><br /></dt>
 <dd><p>Searches for <a class="reference internal" href="../datamodel/protocols/structlike.html#object.__size__" title="object.__size__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__size__()</span></code></a>, returns <code class="docutils literal notranslate"><span class="pre">1</span></code> if it is
 present and <code class="docutils literal notranslate"><span class="pre">0</span></code> otherwise.</p>
 </dd></dl>
 
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>For each function introduced above, there is an alternative (faster)
-implementation that won’t create a Python unicode object before calling
-<code class="code docutils literal notranslate"><span class="pre">getattr</span></code>. So, if a reference <code class="xref c c-type docutils literal notranslate"><span class="pre">_codemodulestate</span></code> is owned,
-it’s string cache will be used.</p>
-</div>
 </section>
 
 
@@ -627,7 +571,7 @@ it’s string cache will be used.</p>
 
   <p class="copyright">
     
-      © Copyright 2024, MatrixEditor.
+      © Copyright 2025, MatrixEditor.
       <br/>
     
   </p>

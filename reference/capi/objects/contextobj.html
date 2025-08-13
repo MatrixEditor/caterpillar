@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>3.6.3. Context Objects &#8212; Caterpillar 2.5.1 documentation</title>
+    <title>3.6.3. Context Objects &#8212; Caterpillar 2.6.0 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=983e91d6"></script>
+    <script src="../../../_static/documentation_options.js?v=ae39cb24"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -50,11 +50,11 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'reference/capi/objects/contextobj';</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="3.6.4. Context Expressions" href="contextexpr.html" />
+    <link rel="next" title="3.7. Packing and Unpacking" href="../parsing.html" />
     <link rel="prev" title="3.6.2. Option Objects" href="option.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.5.1" />
+  <meta name="docsearch:version" content="2.6.0" />
   </head>
   
   
@@ -116,7 +116,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.5.1</p>
+    <p class="title logo__title">Caterpillar 2.6.0</p>
   
 </a></div>
     
@@ -368,19 +368,6 @@
 <li class="toctree-l2"><a class="reference internal" href="arch.html">3.6.1. Arch &amp; Endian Objects</a></li>
 <li class="toctree-l2"><a class="reference internal" href="option.html">3.6.2. Option Objects</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">3.6.3. Context Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="contextexpr.html">3.6.4. Context Expressions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="contextpath.html">3.6.5. Context Path Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="state.html">3.6.6. State Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="layer.html">3.6.7. Layer Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="struct.html">3.6.8. Struct Objects</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="atoms/index.html">3.6.9. Atom Objects</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="atoms/int.html">3.6.9.1. Integer Atoms</a></li>
-<li class="toctree-l3"><a class="reference internal" href="atoms/char.html">3.6.9.2. Char Atoms</a></li>
-<li class="toctree-l3"><a class="reference internal" href="atoms/float.html">3.6.9.3. Float Atoms</a></li>
-<li class="toctree-l3"><a class="reference internal" href="atoms/bool.html">3.6.9.4. Bool Atoms</a></li>
-<li class="toctree-l3"><a class="reference internal" href="atoms/padding.html">3.6.9.5. Padding Atoms</a></li>
-</ul>
-</details></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="../parsing.html">3.7. Packing and Unpacking</a></li>
@@ -478,8 +465,44 @@ with attribute-style access, which also conforms to the context protocol.</p>
 
 <dl class="c function">
 <dt class="sig sig-object c" id="c.CpContext_New">
-<a class="reference internal" href="#c.CpContextObject" title="CpContextObject"><span class="n"><span class="pre">CpContextObject</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">CpContext_New</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpContext_New" title="Link to this definition">#</a><br /></dt>
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">CpContext_New</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpContext_New" title="Link to this definition">#</a><br /></dt>
 <dd><em class="refcount text-info">Return value: New reference.</em><p>Creates a new context and returns it. Returns <em>NULL</em> if an error occurs.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.CpContext_GetDict">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">CpContext_GetDict</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">context</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpContext_GetDict" title="Link to this definition">#</a><br /></dt>
+<dd><em class="refcount text-info">Return value: New reference.</em><p><em>TBD</em></p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.CpContext_GetRoot">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">CpContext_GetRoot</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">context</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpContext_GetRoot" title="Link to this definition">#</a><br /></dt>
+<dd><em class="refcount text-info">Return value: New reference.</em><p><em>TBD</em></p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.CpContext_GenericGetAttr">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">CpContext_GenericGetAttr</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">context</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">path</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpContext_GenericGetAttr" title="Link to this definition">#</a><br /></dt>
+<dd><em class="refcount text-info">Return value: New reference.</em><p><em>TBD</em></p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.CpContext_GenericGetAttrString">
+<span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">CpContext_GenericGetAttrString</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">context</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">path</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpContext_GenericGetAttrString" title="Link to this definition">#</a><br /></dt>
+<dd><em class="refcount text-info">Return value: New reference.</em><p><em>TBD</em></p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.CpContext_GenericSetAttr">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CpContext_GenericSetAttr</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">context</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">path</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">value</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpContext_GenericSetAttr" title="Link to this definition">#</a><br /></dt>
+<dd><p><em>TBD</em></p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.CpContext_GenericSetAttrString">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CpContext_GenericSetAttrString</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">context</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">path</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">value</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CpContext_GenericSetAttrString" title="Link to this definition">#</a><br /></dt>
+<dd><p><em>TBD</em></p>
 </dd></dl>
 
 </section>
@@ -504,11 +527,11 @@ with attribute-style access, which also conforms to the context protocol.</p>
       </div>
     </a>
     <a class="right-next"
-       href="contextexpr.html"
+       href="../parsing.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">3.6.4. </span>Context Expressions</p>
+        <p class="prev-next-title"><span class="section-number">3.7. </span>Packing and Unpacking</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -557,7 +580,7 @@ with attribute-style access, which also conforms to the context protocol.</p>
 
   <p class="copyright">
     
-      © Copyright 2024, MatrixEditor.
+      © Copyright 2025, MatrixEditor.
       <br/>
     
   </p>

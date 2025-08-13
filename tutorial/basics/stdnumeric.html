@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>2.2.1.1. Numeric Types &#8212; Caterpillar 2.5.1 documentation</title>
+    <title>2.2.1.1. Numeric Types &#8212; Caterpillar 2.6.0 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=983e91d6"></script>
+    <script src="../../_static/documentation_options.js?v=ae39cb24"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -54,7 +54,7 @@
     <link rel="prev" title="2.2.1. Standard Types" href="stdtypes.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.5.1" />
+  <meta name="docsearch:version" content="2.6.0" />
   </head>
   
   
@@ -116,7 +116,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.5.1</p>
+    <p class="title logo__title">Caterpillar 2.6.0</p>
   
 </a></div>
     
@@ -488,54 +488,15 @@ used in binary data manipulation:</p>
 <li><p><cite>void_ptr</cite>: A void pointer, typically used in scenarios involving memory addresses or raw data pointers</p></li>
 </ul>
 </section>
-<section id="python-vs-caterpillar-c-syntax">
-<h2>Python vs. Caterpillar C Syntax<a class="headerlink" href="#python-vs-caterpillar-c-syntax" title="Link to this heading">#</a></h2>
-<p>The type names in <em>caterpillar</em> differ slightly depending on the platform you’re working with. Below
-is a comparison between the Python and Caterpillar C variants:</p>
-<div class="pst-scrollable-table-container"><table class="table">
-<thead>
-<tr class="row-odd"><th class="head"><p><strong>Python</strong></p></th>
-<th class="head"><p><strong>Caterpillar C</strong></p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><cite>int8</cite>, <cite>uint8</cite>, <cite>int16</cite>, <cite>uint16</cite>, etc.</p></td>
-<td><p><cite>i8</cite>, <cite>u8</cite>, <cite>i16</cite>, <cite>u16</cite>, etc.</p></td>
-</tr>
-<tr class="row-odd"><td><p><cite>float16</cite>, <cite>float32</cite>, <cite>float64</cite></p></td>
-<td><p><cite>f16</cite>, <cite>f32</cite>, <cite>f64</cite></p></td>
-</tr>
-<tr class="row-even"><td><p><cite>boolean</cite>, <cite>char</cite>, <cite>void_ptr</cite></p></td>
-<td><p><cite>boolean</cite>, <cite>char</cite></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<p>For more details, see <a class="reference internal" href="../../library/ctypes/int.html#api-ctypes-int"><span class="std std-ref">Integer Types</span></a></p>
-</section>
 <section id="custom-sized-integers">
 <h2>Custom-sized Integers<a class="headerlink" href="#custom-sized-integers" title="Link to this heading">#</a></h2>
 <p>In <em>Caterpillar</em>, you can define integers with custom sizes in bits, allowing you to work with non-standard
 bit lengths. When defining these integers, you specify the bit count, and <em>Caterpillar</em> internally ensures
 that only the necessary number of bytes are used.</p>
 <p>For example, you can define a 24-bit signed integer or a 40-bit unsigned integer:</p>
-<div class="sd-tab-set docutils">
-<input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
-<label class="sd-tab-label" for="sd-tab-item-0">
-Python</label><div class="sd-tab-content docutils">
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">uint24</span> <span class="o">=</span> <span class="n">Int</span><span class="p">(</span><span class="mi">24</span><span class="p">)</span>      <span class="c1"># three-byte signed integer</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">uint40</span> <span class="o">=</span> <span class="n">UInt</span><span class="p">(</span><span class="mi">40</span><span class="p">)</span>     <span class="c1"># five-byte unsigned integer</span>
 </pre></div>
-</div>
-</div>
-<input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
-<label class="sd-tab-label" for="sd-tab-item-1">
-Caterpillar C</label><div class="sd-tab-content docutils">
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">i48</span> <span class="o">=</span> <span class="n">Int</span><span class="p">(</span><span class="mi">48</span><span class="p">)</span>               <span class="c1"># six-byte signed integer</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">u40</span> <span class="o">=</span> <span class="n">Int</span><span class="p">(</span><span class="mi">40</span><span class="p">,</span> <span class="n">signed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="c1"># five-byte unsigned integer</span>
-</pre></div>
-</div>
-</div>
 </div>
 </section>
 <section id="variable-sized-integer">
@@ -543,23 +504,11 @@ Caterpillar C</label><div class="sd-tab-content docutils">
 <p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">py.VarInt</span></code>/<code class="xref py py-class docutils literal notranslate"><span class="pre">c.VarInt</span></code> type in both <em>Python</em> and <em>Caterpillar C</em> allows you to handle
 integers with variable lengths, which is useful when the size of the integer can change depending on the
 data being packed or unpacked. This type automatically adjusts the number of bytes required based on the value.</p>
-<div class="sd-tab-set docutils">
-<input checked="checked" id="sd-tab-item-2" name="sd-tab-set-1" type="radio">
-<label class="sd-tab-label" for="sd-tab-item-2">
-Python</label><div class="sd-tab-content docutils">
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">F</span><span class="p">(</span><span class="n">vint</span><span class="p">)</span> <span class="c1"># or F(VarInt())</span>
 </pre></div>
 </div>
-</div>
-<input id="sd-tab-item-3" name="sd-tab-set-1" type="radio">
-<label class="sd-tab-label" for="sd-tab-item-3">
-Caterpillar C</label><div class="sd-tab-content docutils">
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># use &#39;varint&#39; directly or use VarInt()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">be_varint</span> <span class="o">=</span> <span class="n">BIG_ENDIAN</span> <span class="o">+</span> <span class="n">varint</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">le_varint</span> <span class="o">=</span> <span class="n">VarInt</span><span class="p">(</span><span class="n">little_endian</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 2.6.0: </span><code class="docutils literal notranslate"><span class="pre">vint</span></code> is now usable without a <code class="docutils literal notranslate"><span class="pre">Field</span></code> wrapper.</p>
 </div>
 </section>
 </section>
@@ -614,7 +563,6 @@ Caterpillar C</label><div class="sd-tab-content docutils">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#integer-types">Integer Types</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#floating-point-types">Floating Point Types</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#special-primitives">Special Primitives</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#python-vs-caterpillar-c-syntax">Python vs. Caterpillar C Syntax</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#custom-sized-integers">Custom-sized Integers</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#variable-sized-integer">Variable-sized Integer</a></li>
 </ul>
@@ -654,7 +602,7 @@ Caterpillar C</label><div class="sd-tab-content docutils">
 
   <p class="copyright">
     
-      © Copyright 2024, MatrixEditor.
+      © Copyright 2025, MatrixEditor.
       <br/>
     
   </p>

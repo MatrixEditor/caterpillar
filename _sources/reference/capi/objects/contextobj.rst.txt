@@ -26,8 +26,36 @@ Context Objects
     Checks if the given object is instance of an :c:type:`CpContextObject`.
 
 
-.. c:function:: CpContextObject *CpContext_New(void)
+.. c:function:: PyObject *CpContext_New(void)
 
     Creates a new context and returns it. Returns *NULL* if an error occurs.
 
 
+.. c:function:: PyObject *CpContext_GetDict(PyObject *context)
+
+    *TBD*
+
+
+.. c:function:: PyObject *CpContext_GetRoot(PyObject *context)
+
+    *TBD*
+
+
+.. c:function:: PyObject *CpContext_GenericGetAttr(PyObject *context, PyObject *path)
+
+    *TBD*
+
+
+.. c:function:: PyObject *CpContext_GenericGetAttrString(PyObject *context, const char *path)
+
+    *TBD*
+
+
+.. c:function:: int CpContext_GenericSetAttr(PyObject *context, PyObject *path, PyObject *value)
+
+    *TBD*
+
+
+.. c:function:: int CpContext_GenericSetAttrString(PyObject *context, const char *path, PyObject *value)
+
+    *TBD*

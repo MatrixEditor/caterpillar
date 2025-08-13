@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>2.2.5. Context &#8212; Caterpillar 2.5.1 documentation</title>
+    <title>2.2.5. Context &#8212; Caterpillar 2.6.0 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=983e91d6"></script>
+    <script src="../../_static/documentation_options.js?v=ae39cb24"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -54,7 +54,7 @@
     <link rel="prev" title="2.2.4. Padding" href="padding.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.5.1" />
+  <meta name="docsearch:version" content="2.6.0" />
   </head>
   
   
@@ -116,7 +116,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.5.1</p>
+    <p class="title logo__title">Caterpillar 2.6.0</p>
   
 </a></div>
     
@@ -441,10 +441,6 @@ access to the parent object, if applicable, through the variable <code class="co
 <p>The context is useful when defining structs that depend on other fields’ values.
 For example, you can reference the length of a string field and use it to define
 the length of another field dynamically.</p>
-<div class="sd-tab-set docutils">
-<input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
-<label class="sd-tab-label" for="sd-tab-item-0">
-Python</label><div class="sd-tab-content docutils">
 <div class="literal-block-wrapper docutils container" id="id1">
 <div class="code-block-caption"><span class="caption-text">Understanding the <em>context</em></span><a class="headerlink" href="#id1" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
@@ -452,23 +448,6 @@ Python</label><div class="sd-tab-content docutils">
     <span class="n">length</span><span class="p">:</span> <span class="n">uint8</span>
     <span class="n">foo</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">length</span><span class="p">)</span>   <span class="c1"># &lt;-- just reference the length field</span>
 </pre></div>
-</div>
-</div>
-</div>
-<input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
-<label class="sd-tab-label" for="sd-tab-item-1">
-Caterpillar C</label><div class="sd-tab-content docutils">
-<div class="literal-block-wrapper docutils container" id="id2">
-<div class="code-block-caption"><span class="caption-text">Understanding the <em>context</em></span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">this</span> <span class="o">=</span> <span class="n">ContextPath</span><span class="p">(</span><span class="s2">&quot;obj&quot;</span><span class="p">)</span>
-
-<span class="nd">@struct</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
-    <span class="n">length</span><span class="p">:</span> <span class="n">u8</span>
-    <span class="n">foo</span><span class="p">:</span> <span class="n">cstring</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">length</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
 </div>
 </div>
 <section id="runtime-length-of-objects">
@@ -484,8 +463,21 @@ and returns the length.</p>
 example, if you have a field <code class="code docutils literal notranslate"><span class="pre">foobar</span></code> that is a sequence, you can access its
 elements like this:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">this</span><span class="o">.</span><span class="n">foobar</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># Access elements of a sequence within the current context</span>
+<span class="go">Path(&#39;_obj.foobar&#39;, getitem(0))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">path</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
 <span class="gp">...</span>
+</pre></div>
+</div>
+</section>
+<section id="custom-context-implementation">
+<h2><span class="section-number">2.2.5.3. </span>Custom Context Implementation<a class="headerlink" href="#custom-context-implementation" title="Link to this heading">#</a></h2>
+<p>To apply a custom context class that conforms to the current
+<a class="reference internal" href="../../reference/datamodel/protocols/contextlike.html#ContextLike" title="_ContextLike"><code class="xref py py-class docutils literal notranslate"><span class="pre">_ContextLike</span></code></a> protocol definition. For instance, packing
+and unpacking can be faster if the C-extension implemetation of
+the <code class="code docutils literal notranslate"><span class="pre">Context</span></code> class is used.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">O_CONTEXT_FACTORY</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.c</span><span class="w"> </span><span class="kn">import</span> <span class="n">c_Context</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">O_CONTEXT_FACTORY</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">c_Context</span>
 </pre></div>
 </div>
 </section>
@@ -540,6 +532,7 @@ elements like this:</p>
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#runtime-length-of-objects">2.2.5.1. Runtime Length of Objects</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#context-paths">2.2.5.2. Context Paths</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#custom-context-implementation">2.2.5.3. Custom Context Implementation</a></li>
 </ul>
   </nav></div>
 
@@ -577,7 +570,7 @@ elements like this:</p>
 
   <p class="copyright">
     
-      © Copyright 2024, MatrixEditor.
+      © Copyright 2025, MatrixEditor.
       <br/>
     
   </p>

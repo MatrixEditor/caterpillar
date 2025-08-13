@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>caterpillar.byteorder &#8212; Caterpillar 2.5.1 documentation</title>
+    <title>caterpillar.byteorder &#8212; Caterpillar 2.6.0 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=983e91d6"></script>
+    <script src="../../_static/documentation_options.js?v=ae39cb24"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -51,7 +51,7 @@
     <link rel="search" title="Search" href="../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.5.1" />
+  <meta name="docsearch:version" content="2.6.0" />
   </head>
   
   
@@ -113,7 +113,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.5.1</p>
+    <p class="title logo__title">Caterpillar 2.6.0</p>
   
 </a></div>
     
@@ -468,19 +468,23 @@
 
 
 
+<span class="n">LITTLE_ENDIAN_FMT</span> <span class="o">=</span> <span class="s2">&quot;&lt;&quot;</span>
+
 <span class="c1"># Instances representing commonly used byte orders</span>
 <span class="n">Native</span> <span class="o">=</span> <span class="n">ByteOrder</span><span class="p">(</span><span class="s2">&quot;Native&quot;</span><span class="p">,</span> <span class="s2">&quot;=&quot;</span><span class="p">)</span>
 <span class="n">BigEndian</span> <span class="o">=</span> <span class="n">ByteOrder</span><span class="p">(</span><span class="s2">&quot;Big Endian&quot;</span><span class="p">,</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">)</span>
-<span class="n">LittleEndian</span> <span class="o">=</span> <span class="n">ByteOrder</span><span class="p">(</span><span class="s2">&quot;Little Endian&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;&quot;</span><span class="p">)</span>
+<span class="n">LittleEndian</span> <span class="o">=</span> <span class="n">ByteOrder</span><span class="p">(</span><span class="s2">&quot;Little Endian&quot;</span><span class="p">,</span> <span class="n">LITTLE_ENDIAN_FMT</span><span class="p">)</span>
 <span class="n">NetEndian</span> <span class="o">=</span> <span class="n">ByteOrder</span><span class="p">(</span><span class="s2">&quot;Network&quot;</span><span class="p">,</span> <span class="s2">&quot;!&quot;</span><span class="p">)</span>
 <span class="n">SysNative</span> <span class="o">=</span> <span class="n">ByteOrder</span><span class="p">(</span>
     <span class="s2">&quot;SysNative&quot;</span><span class="p">,</span> <span class="s2">&quot;@&quot;</span><span class="p">,</span> <span class="n">ByteOrder</span><span class="o">.</span><span class="n">Alignment</span><span class="o">.</span><span class="n">NATIVE</span><span class="p">,</span> <span class="n">ByteOrder</span><span class="o">.</span><span class="n">Size</span><span class="o">.</span><span class="n">NATIVE</span>
 <span class="p">)</span>
 
 
+
+
 <div class="viewcode-block" id="byteorder">
 <a class="viewcode-back" href="../../library/byteorder.html#caterpillar.byteorder.byteorder">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">byteorder</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ByteOrder</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">byteorder</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the byte order of an object, defaulting to SysNative if not explicitly set.</span>
 
@@ -566,7 +570,7 @@
 
   <p class="copyright">
     
-      © Copyright 2024, MatrixEditor.
+      © Copyright 2025, MatrixEditor.
       <br/>
     
   </p>

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Welcome to Caterpillar’s documentation! &#8212; Caterpillar 2.5.1 documentation</title>
+    <title>Welcome to Caterpillar’s documentation! &#8212; Caterpillar 2.6.0 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="_static/documentation_options.js?v=983e91d6"></script>
+    <script src="_static/documentation_options.js?v=ae39cb24"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -53,7 +53,7 @@
     <link rel="next" title="1. Installation" href="installing/index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.5.1" />
+  <meta name="docsearch:version" content="2.6.0" />
   </head>
   
   
@@ -115,7 +115,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.5.1</p>
+    <p class="title logo__title">Caterpillar 2.6.0</p>
   
 </a></div>
     
@@ -367,39 +367,15 @@ efficient.</p>
 <p>🐛 lets you define standard structs with a fixed size while also supporting dynamic
 structs that adjust their size based on the current context. This framework enables you
 to write complex structures in a compact and readable manner.</p>
-<div class="sd-tab-set docutils">
-<input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
-<label class="sd-tab-label" for="sd-tab-item-0">
-Python</label><div class="sd-tab-content docutils">
 <div class="literal-block-wrapper docutils container" id="id1">
 <div class="code-block-caption"><span class="caption-text">Simple example of a custom struct</span><a class="headerlink" href="#id1" title="Link to this code">#</a></div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
    <span class="n">magic</span><span class="p">:</span> <span class="sa">b</span><span class="s2">&quot;Foo&quot;</span>                       <span class="c1"># constant values</span>
-   <span class="n">name</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>                  <span class="c1"># C-String without a fixed length</span>
+   <span class="n">name</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>                  <span class="c1"># \x00-terminated String without a fixed length</span>
    <span class="n">value</span><span class="p">:</span> <span class="n">le</span> <span class="o">+</span> <span class="n">uint16</span>                  <span class="c1"># little endian encoding</span>
    <span class="n">entries</span><span class="p">:</span> <span class="n">be</span> <span class="o">+</span> <span class="n">CString</span><span class="p">[</span><span class="n">uint32</span><span class="p">::]</span>     <span class="c1"># arrays with big-endian prefixed length</span>
 </pre></div>
-</div>
-</div>
-</div>
-<input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
-<label class="sd-tab-label" for="sd-tab-item-1">
-Caterpillar C</label><div class="sd-tab-content docutils">
-<div class="literal-block-wrapper docutils container" id="id2">
-<div class="code-block-caption"><span class="caption-text">Simple example of a custom struct</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.c</span><span class="w"> </span><span class="kn">import</span> <span class="n">BIG_ENDIAN</span> <span class="k">as</span> <span class="n">be</span>
-
-<span class="nd">@struct</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
-   <span class="n">magic</span><span class="p">:</span> <span class="sa">b</span><span class="s2">&quot;Foo&quot;</span>                         <span class="c1"># constant values</span>
-   <span class="n">name</span><span class="p">:</span> <span class="n">cstring</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>                    <span class="c1"># C-String without a fixed length</span>
-   <span class="n">value</span><span class="p">:</span> <span class="n">u16</span>                            <span class="c1"># little endian encoding</span>
-   <span class="n">entries</span><span class="p">:</span> <span class="n">cstring</span><span class="p">(</span><span class="o">...</span><span class="p">)[</span><span class="n">be</span> <span class="o">+</span> <span class="n">u32</span><span class="p">::]</span>     <span class="c1"># arrays with big-endian prefixed length</span>
-   <span class="n">value2</span><span class="p">:</span> <span class="nb">bool</span>                          <span class="c1"># python type mapping configurable</span>
-</pre></div>
-</div>
-</div>
 </div>
 </div>
 <div class="admonition-hold-up-wait-a-minute admonition">
@@ -415,27 +391,11 @@ constant values are created automatically!</em></p>
 </pre></div>
 </div>
 <p>Packing and unpacking have never been easier:</p>
-<div class="sd-tab-set docutils">
-<input checked="checked" id="sd-tab-item-2" name="sd-tab-set-1" type="radio">
-<label class="sd-tab-label" for="sd-tab-item-2">
-Python</label><div class="sd-tab-content docutils">
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
 <span class="go">b&#39;FooHello, World!\x00\n\x00\x00\x00\x00\x02Bar\x00Baz\x00&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">Format</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span>
 <span class="go">Format(magic=b&#39;Foo&#39;, name=&#39;Hello, World!&#39;, value=10, entries=[&#39;Bar&#39;, &#39;Baz&#39;])</span>
 </pre></div>
-</div>
-</div>
-<input id="sd-tab-item-3" name="sd-tab-set-1" type="radio">
-<label class="sd-tab-label" for="sd-tab-item-3">
-Caterpillar C</label><div class="sd-tab-content docutils">
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">Format</span><span class="p">)</span>
-<span class="go">b&#39;FooHello, World!\x00\n\x00\x00\x00\x00\x02Bar\x00Baz\x00\x01&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">Format</span><span class="p">)</span>
-<span class="go">&lt;Format object at 0x...&gt;</span>
-</pre></div>
-</div>
-</div>
 </div>
 <ul class="simple">
 <li><p>What about documentation?
@@ -607,7 +567,7 @@ C Reference</div>
 
   <p class="copyright">
     
-      © Copyright 2024, MatrixEditor.
+      © Copyright 2025, MatrixEditor.
       <br/>
     
   </p>

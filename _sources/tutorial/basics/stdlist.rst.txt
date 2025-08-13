@@ -13,19 +13,14 @@ For example, let's consider the `PLTE <https://www.w3.org/TR/png/#11PLTE>`_ chun
 from the PNG format, which stores a sequence of three-byte RGB objects. To define
 an array of RGB objects, you can use the following syntax:
 
-.. tab-set::
+>>> PLTEChunk = RGB[this.length / 3]
 
-    .. tab-item:: Python
+To use the faster :class:`Repeated` class provided by the C-extension:
 
-        >>> PLTEChunk = RGB[this.length / 3]
+>>> from caterpillar.c import Repeated
+>>> from caterpillar.shared import getstruct
+>>> PLTEChunk = Repeated(getstruct(RGB), this.length / 3)
 
-    .. tab-item:: Caterpillar C
-
-        >>> PLTEChunk = RGB.__struct__[ContextPath("obj.length") / 3]
-
-        .. versionadded:: 2.2.0
-            The syntax will be changed once `__class_getitem__` is implemented by
-            any :class:`.c.Struct` instance.
 
 .. important::
 

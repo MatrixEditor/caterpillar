@@ -13,29 +13,14 @@ The context is useful when defining structs that depend on other fields' values.
 For example, you can reference the length of a string field and use it to define
 the length of another field dynamically.
 
-.. tab-set::
+.. code-block:: python
+    :caption: Understanding the *context*
 
-    .. tab-item:: Python
+    @struct
+    class Format:
+        length: uint8
+        foo: CString(this.length)   # <-- just reference the length field
 
-        .. code-block:: python
-            :caption: Understanding the *context*
-
-            @struct
-            class Format:
-                length: uint8
-                foo: CString(this.length)   # <-- just reference the length field
-
-    .. tab-item:: Caterpillar C
-
-        .. code-block:: python
-            :caption: Understanding the *context*
-
-            this = ContextPath("obj")
-
-            @struct
-            class Format:
-                length: u8
-                foo: cstring(this.length)
 
 
 Runtime Length of Objects
@@ -54,5 +39,19 @@ example, if you have a field :code:`foobar` that is a sequence, you can access i
 elements like this:
 
 >>> path = this.foobar[0]  # Access elements of a sequence within the current context
+Path('_obj.foobar', getitem(0))
 >>> path(context)
 ...
+
+
+Custom Context Implementation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To apply a custom context class that conforms to the current
+:class:`_ContextLike` protocol definition. For instance, packing
+and unpacking can be faster if the C-extension implemetation of
+the :code:`Context` class is used.
+
+>>> from caterpillar.context import O_CONTEXT_FACTORY
+>>> from caterpillar.c import c_Context
+>>> O_CONTEXT_FACTORY.value = c_Context
