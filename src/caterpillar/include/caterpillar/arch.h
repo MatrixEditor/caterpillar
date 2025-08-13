@@ -120,7 +120,7 @@ CpArch_GetPtrSize(PyObject* obj)
  */
 struct _endianobj
 {
-  PyObject_HEAD;
+  PY_OBJECT_HEAD;
 
   /// The human readable name of this endian
   PyObject* name;

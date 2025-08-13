@@ -94,7 +94,8 @@ static PyMemberDef CpArch_Members[] = { { "name",
                                         { NULL } /* Sentinel */ };
 
 PyTypeObject CpArch_Type = {
-  PyVarObject_HEAD_INIT(NULL, 0) _Cp_NameStr(CpArch_NAME), /* tp_name */
+  PyVarObject_HEAD_INIT(NULL, 0)
+  .tp_name = _Cp_NameStr(CpArch_NAME), /* tp_name */
   .tp_basicsize = sizeof(CpArchObject),
   .tp_dealloc = (destructor)cp_arch_dealloc,
   .tp_repr = (reprfunc)cp_arch_repr,
