@@ -156,7 +156,7 @@ class PyStructFormattedField(FieldStruct):
                 context[CTX_SEQ] = False
                 length.start.__pack__(len(seq), context)
                 context[CTX_SEQ] = True
-            else:  # ellipsis will be handled elsewhere (_common.py)
+            elif length is not Ellipsis:
                 if length != target_length:
                     raise ValueError(
                         f"Length mismatch: expected {length}, but only "
