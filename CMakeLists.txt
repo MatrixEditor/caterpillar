@@ -17,42 +17,17 @@ python_add_library(
   MODULE
 
   src/ccaterpillar/arch.c
-  src/ccaterpillar/atomobj.c
-  src/ccaterpillar/context.c
   src/ccaterpillar/option.c
   src/ccaterpillar/module.c
   src/ccaterpillar/context.c
-  src/ccaterpillar/state.c
-  src/ccaterpillar/struct.c
-  src/ccaterpillar/layer.c
-  src/ccaterpillar/default.c
-
-  src/ccaterpillar/parsing_typeof.c
-  src/ccaterpillar/parsing_sizeof.c
-  src/ccaterpillar/parsing_pack.c
-  src/ccaterpillar/parsing_unpack.c
-
-  src/ccaterpillar/atomimpl/int.c
-  src/ccaterpillar/atomimpl/float.c
-  src/ccaterpillar/atomimpl/bool.c
-  src/ccaterpillar/atomimpl/char.c
-  src/ccaterpillar/atomimpl/pad.c
-  src/ccaterpillar/atomimpl/string.c
-  src/ccaterpillar/atomimpl/const.c
-  src/ccaterpillar/atomimpl/bytes.c
-  src/ccaterpillar/atomimpl/pstring.c
-  src/ccaterpillar/atomimpl/enum.c
-  src/ccaterpillar/atomimpl/varint.c
-  src/ccaterpillar/atomimpl/computed.c
-  src/ccaterpillar/atomimpl/lazy.c
-  src/ccaterpillar/atomimpl/cstring.c
-
-  src/ccaterpillar/atomimpl/builtins/builtin.c
-  src/ccaterpillar/atomimpl/builtins/repeated.c
-  src/ccaterpillar/atomimpl/builtins/condition.c
-  src/ccaterpillar/atomimpl/builtins/switch.c
-  src/ccaterpillar/atomimpl/builtins/atoffset.c
-  src/ccaterpillar/atomimpl/builtins/primitive.c
+  src/ccaterpillar/atom.c
+  src/ccaterpillar/lengthinfo.c
+  src/ccaterpillar/shared.c
+  src/ccaterpillar/atoms/builtin/builtin.c
+  src/ccaterpillar/atoms/builtin/repeated.c
+  src/ccaterpillar/atoms/builtin/switch.c
+  src/ccaterpillar/atoms/builtin/conditional.c
+  src/ccaterpillar/atoms/builtin/offset.c
 
   WITH_SOABI
 )
@@ -65,15 +40,20 @@ message(STATUS "Python ${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}")
 set (CP_GENAPI_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/src/code_gen/genapi.py)
 set (CP_CAPI_HEADER ${CMAKE_CURRENT_SOURCE_DIR}/src/caterpillar/include/caterpillar/caterpillarapi.h.in)
 set (CP_CAPI_CSRC ${CMAKE_CURRENT_SOURCE_DIR}/src/ccaterpillar/caterpillarapi.c.in)
+set (CP_CAPI_MOD_CSRC ${CMAKE_CURRENT_SOURCE_DIR}/src/ccaterpillar/module.c.in)
+set (CP_CAPI_PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/ccaterpillar/private.h.in)
+
 set (CP_CAPI_HEADER_OUT ${CMAKE_CURRENT_SOURCE_DIR}/src/caterpillar/include/caterpillar/caterpillarapi.h)
 set (CP_CAPI_CSRC_OUT ${CMAKE_CURRENT_SOURCE_DIR}/src/ccaterpillar/caterpillarapi.c)
+set (CP_CAPI_MOD_CSRC_OUT ${CMAKE_CURRENT_SOURCE_DIR}/src/ccaterpillar/module.c)
+set (CP_CAPI_PRIVATE_OUT ${CMAKE_CURRENT_SOURCE_DIR}/src/ccaterpillar/private.h)
 
 add_custom_target(
  genapi ALL
  # execute python ./src/code_gen/genapi.py ./src/caterpillar/include/caterpillar/caterpillarapi.h.in ./src/ccaterpillar/caterpillarapi.c.in
  # in the root directory
- COMMAND ${PYTHON_EXECUTABLE} ${CP_GENAPI_SCRIPT} ${CP_CAPI_HEADER} ${CP_CAPI_CSRC}
- BYPRODUCTS ${CP_CAPI_HEADER_OUT} ${CP_CAPI_CSRC_OUT}
+ COMMAND ${PYTHON_EXECUTABLE} ${CP_GENAPI_SCRIPT} ${CP_CAPI_HEADER} ${CP_CAPI_CSRC} ${CP_CAPI_MOD_CSRC} ${CP_CAPI_PRIVATE}
+ BYPRODUCTS ${CP_CAPI_HEADER_OUT} ${CP_CAPI_CSRC_OUT} ${CP_CAPI_MOD_CSRC_OUT} ${CP_CAPI_PRIVATE_OUT}
  COMMENT "Generating Public Caterpillar API"
 )
 

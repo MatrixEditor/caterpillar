@@ -36,18 +36,20 @@ class _ContextLike(Protocol):
     def __context_getattr__(self, path: str) -> Any:
         pass
 
-    # TODO
     def __context_setattr__(self, path: str, value: Any) -> None:
         pass
 
     @property
-    def _root(self) -> Optional["_ContextLike"]:
+    def _root(self):
         pass
 
     def __getitem__(self, key: str) -> Any:
         pass
 
     def __setitem__(self, key: str, value: Any) -> None:
+        pass
+
+    def get(self, key: str, default: Any | None = None) -> Any:
         pass
 
 
@@ -146,9 +148,28 @@ class _SwitchLike(Protocol):
         pass
 
 
+@runtime_checkable
 class _SupportsBits(Protocol):
     def __bits__(self) -> int: ...
 
 
+@runtime_checkable
 class _ContainsBits(Protocol):
     __bits__: int
+
+
+__all__ = [
+    "_ContextLike",
+    "_ContextLambda",
+    "_SupportsActionUnpack",
+    "_SupportsActionPack",
+    "_SupportsPack",
+    "_SupportsUnpack",
+    "_SupportsSize",
+    "_StructLike",
+    "_SupportsType",
+    "_ContainsStruct",
+    "_SwitchLike",
+    "_SupportsBits",
+    "_ContainsBits",
+]

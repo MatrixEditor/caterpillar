@@ -1,5 +1,59 @@
 # Changelog
 
+## [2.6.0] - Minor Release
+
+### Added
+- **caterpillar.fields._base**
+  - Add support for non-context lambda switch fields.
+
+- **caterpillar.fields.common**
+  - Add compatibility support for CAPI atoms in `Int`, `UInt` and `PyStructFormattedField`.
+
+- **caterpillar.options**
+  - Add custom `Flag.__eq__` implementation to support equality check with `c_Option` objects.
+
+- **caterpillar.abc**
+  - Add new typing-only `_OptionLike` protocol.
+  - Add missing `_SupportsType` protocol to the stubs file.
+  - Add new method `get` to the `_ContextLike` protocol.
+
+- **caterpillar.context**
+  - Add new option `O_CONTEXT_FACTORY` that controls the global context type.
+    Value must be a method or another type implementing the `_ContextLike` protocol.
+  - Add new global context path: `root` (exported as `G` in shortcuts).
+
+- **caterpillar.shortcuts**
+  - Add new shortcuts `C` for `ctx`, `P` for `parent` and `G` for the `root` context as `ContextPath` objects.
+
+- **CAPI**
+  - New index assignment system when generating CAPI code — a running number is now applied instead of a hard-coded index.
+  - Add complete Context implementation in C (`c_Context`) that conforms to the `_ContextLike` protocol.
+  - Add `Atom` for C-based struct-like classes (previously known as `catom`).
+  - Add native support for `__bits__` in `Atom`.
+  - Add special class `LengthInfo` for packing or unpacking multiple objects.
+  - New builtin atoms (CAPI): `Repeated`, `Conditional` and `Switch`.
+  - Add new shared objects and exception types to the native implementation (`Cp_ContextFactory`, `Cp_ArrayFactory`, `CpExc_Stop` and `Cp_DefaultOption`).
+
+---
+
+### Changed
+- **caterpillar.fields._base**
+  - Rework `Field` implementation to reduce overhead when packing and unpacking elements.
+  - Use pre-computed states instead of calculating everything on the fly; states will be adjusted automatically when setting new values (via `@property` attributes).
+
+---
+
+### Fixed
+- **caterpillar.fields.common**
+  - Fix issue in `Prefixed` that occurred when the internal struct packs a sequence of elements.
+
+---
+
+### Removed
+- **CAPI**
+  - Remove old CAPI and completely revamp the CAPI concept to make it compatible with the Python equivalent.
+
+
 ## [2.5.1] - Hot-Fix Release
 
 ### Fixed

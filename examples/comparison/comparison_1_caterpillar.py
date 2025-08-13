@@ -1,10 +1,16 @@
 from caterpillar.shortcuts import struct, LittleEndian, bitfield, unpack, pack
 from caterpillar.fields import uint8, uint24, CString, Prefixed, uint32
 
+
 # The __slots__ options does not affect the packing or
 # unpacking process.
 # opt.set_struct_flags(opt.S_SLOTS, opt.S_REPLACE_TYPES)
 
+# The following lines will reduce the time around 10% for
+# packing and unpacking. (C-Extension required)
+# from caterpillar.context import O_CONTEXT_FACTORY
+# from caterpillar.c import c_Context
+# O_CONTEXT_FACTORY.value = c_Context
 
 @bitfield(order=LittleEndian)
 class Flags:

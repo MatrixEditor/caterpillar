@@ -38,4 +38,4 @@ Here's an example to clarify the concept:
     TypeError: unsupported operand type(s) for @: 'type' and 'int'
     >>> field = Field(Format) @ 0x1234  # ok
 
-*TODO* axplain internal mechanism of storing an offset map
+*TODO* explain internal mechanism of storing an offset map

@@ -13,43 +13,24 @@ For example, in the case of the  `pHYS <https://www.w3.org/TR/png/#11pHYs>`_ chu
 from the PNG format, you can use an enum for the :code:`unit` field, which represents
 the unit of measurement (like "meter"). Here's how you would define it:
 
-.. tab-set::
 
-    .. tab-item:: Python
+.. code-block:: python
+    :caption: Simple enumeration in a struct definition
 
-        .. code-block:: python
-            :caption: Simple enumeration in a struct definition
+    import enum
 
-            import enum
+    class PHYSUnit(enum.IntEnum): # <-- the enum value doesn't have to be int
+        __struct__ = uint8        # <-- to make the code even more compact, use this
+        UNKNOWN = 0
+        METRE = 1
 
-            class PHYSUnit(enum.IntEnum): # <-- the enum value doesn't have to be int
-                __struct__ = uint8        # <-- to make the code even more compact, use this
-                UNKNOWN = 0
-                METRE = 1
-
-            @struct(order=BigEndian)         # <-- same as before
-            class PHYSChunk:
-                pixels_per_unit_x: uint32
-                pixels_per_unit_y: uint32
-                unit: PHYSUnit               # <-- now we have an auto-enumeration
+    @struct(order=BigEndian)         # <-- same as before
+    class PHYSChunk:
+        pixels_per_unit_x: uint32
+        pixels_per_unit_y: uint32
+        unit: PHYSUnit               # <-- now we have an auto-enumeration
 
 
-    .. tab-item:: Caterpillar C
-
-        .. code-block:: python
-            :caption: Simple enumeration in a struct definition
-
-            import enum
-
-            class PHYSUnit(enum.IntEnum):       # <-- the enum value doesn't have to be int
-                UNKNOWN = 0
-                METRE = 1
-
-            @struct(endian=BIG_ENDIAN)          # <-- same as before
-            class PHYSChunk:
-                pixels_per_unit_x: u32
-                pixels_per_unit_y: u32
-                unit: enumeration(u8, PHYSUnit) # <-- atom is required here
 
 .. important::
 

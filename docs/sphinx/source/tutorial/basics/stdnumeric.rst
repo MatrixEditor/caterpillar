@@ -47,28 +47,6 @@ used in binary data manipulation:
 
 
 
-Python vs. Caterpillar C Syntax
--------------------------------
-
-The type names in *caterpillar* differ slightly depending on the platform you're working with. Below
-is a comparison between the Python and Caterpillar C variants:
-
-.. list-table::
-    :widths: auto
-    :header-rows: 1
-
-    * - **Python**
-      - **Caterpillar C**
-    * - `int8`, `uint8`, `int16`, `uint16`, etc.
-      - `i8`, `u8`, `i16`, `u16`, etc.
-    * - `float16`, `float32`, `float64`
-      - `f16`, `f32`, `f64`
-    * - `boolean`, `char`, `void_ptr`
-      - `boolean`, `char`
-
-For more details, see :ref:`api-ctypes_int`
-
-
 Custom-sized Integers
 ---------------------
 
@@ -78,18 +56,9 @@ that only the necessary number of bytes are used.
 
 For example, you can define a 24-bit signed integer or a 40-bit unsigned integer:
 
-.. tab-set::
+>>> uint24 = Int(24)      # three-byte signed integer
+>>> uint40 = UInt(40)     # five-byte unsigned integer
 
-    .. tab-item:: Python
-
-        >>> uint24 = Int(24)      # three-byte signed integer
-        >>> uint40 = UInt(40)     # five-byte unsigned integer
-
-
-    .. tab-item:: Caterpillar C
-
-        >>> i48 = Int(48)               # six-byte signed integer
-        >>> u40 = Int(40, signed=False) # five-byte unsigned integer
 
 Variable-sized Integer
 ----------------------
@@ -98,15 +67,8 @@ The :class:`.py.VarInt`/:class:`.c.VarInt` type in both *Python* and *Caterpilla
 integers with variable lengths, which is useful when the size of the integer can change depending on the
 data being packed or unpacked. This type automatically adjusts the number of bytes required based on the value.
 
-.. tab-set::
+>>> field = F(vint) # or F(VarInt())
 
-    .. tab-item:: Python
-
-        >>> field = F(vint) # or F(VarInt())
-
-    .. tab-item:: Caterpillar C
-
-        >>> # use 'varint' directly or use VarInt()
-        >>> be_varint = BIG_ENDIAN + varint
-        >>> le_varint = VarInt(little_endian=True)
+.. versionchanged:: 2.6.0
+    ``vint`` is now usable without a ``Field`` wrapper.
 

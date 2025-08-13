@@ -6,6 +6,105 @@ Changelog
 
 *More entries will be added in the future.*
 
+.. _changelog_2.6.0:
+
+[2.6.0] - Minor Release
+=======================
+
+Added
+-----
+
+*caterpillar.fields._base*
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+- Add support for non-context lambda switch fields
+
+
+*caterpillar.fields.common*
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+- Add compatibility support for CAPI atoms in ``Int``, ``UInt`` and ``PyStructFormattedField``
+
+*caterpillar.options*
+^^^^^^^^^^^^^^^^^^^^^
+
+- Add custom ``Flag.__eq__`` implementation to support equality check with ``c_Option`` objects
+
+
+*caterpillar.abc*
+^^^^^^^^^^^^^^^^^
+
+- Add new typing-only `_OptionLike` protocol
+- Add missing `_SupportsType` protocol to the stubs file
+- Add new method `get` to the `_ContextLike` protocol
+
+
+*caterpillar.context*
+^^^^^^^^^^^^^^^^^^^^^
+
+- Add new option :py:attr:`~caterpillar.context.O_CONTEXT_FACTORY` that controls
+  the global context type. Value must be a method or another type implementing
+  the :class:`_ContextLike` protocol
+- Add new global context path: :py:attr:`~caterpillar.context.root` (exported as ``G`` in shortcuts)
+
+*caterpillar.shortcuts*
+^^^^^^^^^^^^^^^^^^^^^^^
+
+- Add new shortcuts ``C`` for :py:attr:`~caterpillar.context.ctx`, ``P`` for
+  :py:attr:`~caterpillar.context.parent` and ``G`` for the
+  :py:attr:`~caterpillar.context.root` context as
+  :class:`~caterpillar.context.ContextPath` objects
+
+
+*CAPI*
+^^^^^^
+
+- New index assignment system when generating CAPI code. A running number is now
+  applied instead of a hard coded index.
+- Add *complete* Context implementation in C (:class:`c_Context`) that conforms
+  to the :class:`_ContextLike` protocol.
+- Add :class:`Atom` for C-based struct-like classes. This class was previously
+  known as :class:`catom`
+- Add native support for `__bits__` in :class:`Atom`
+- Add special class :class:`LengthInfo` for packing or unpacking multiple objects
+- New builtin atoms (CAPI): :class:`Repeated`, :class:`Conditional` and :class:`Switch`
+- Add new shared objects and exception types to the native implementation
+  (:c:var:`Cp_ContextFactory`, :c:var:`Cp_ArrayFactory`, :c:var:`CpExc_Stop` and
+  :c:var:`Cp_DefaultOption`)
+
+
+Changed
+-------
+
+*caterpillar.fields._base*
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+- Rework :class:`~caterpillar.fields._base.Field` implementation to reduce
+  overhead when packing and unpacking elements
+- Use pre-computed states instead of calculating everything on-the-fly. States
+  will be adjusted when setting new values (automatically updated through
+  :code:`@property` attributes)
+
+
+Fixed
+-----
+
+*caterpillar.fields.common*
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
++ Fix issue in Prefixed that occurred when the internal struct packs a sequence
+  of elements
+
+Removed
+-------
+
+*CAPI*
+^^^^^^
+
+- Remove old CAPI and completely revamp the CAPI concept to make it compatible
+  to the Python equivalent.
+
+
 .. _changelog_2.5.1:
 
 [2.5.1] - Hot-Fix Release

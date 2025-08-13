@@ -8,34 +8,17 @@ is key to leveraging the full power of *Caterpillar*. In this section, we'll beg
 defining a simple struct for the  `PLTE <https://www.w3.org/TR/png/#11PLTE>`_ chunk of
 a PNG file, which consists of three-byte entries.
 
-.. tab-set::
+.. code-block:: python
+    :caption: RGB struct for the PLTE chunk
 
-    .. tab-item:: Python
+    from caterpillar.py import * # <-- just import everything
 
-        .. code-block:: python
-            :caption: RGB struct for the PLTE chunk
+    @struct         # <-- just decorate the class with the struct() function
+    class RGB:
+        r: uint8    # <-- a field can be defined just like this
+        g: uint8
+        b: uint8
 
-            from caterpillar.py import * # <-- just import everything
-
-            @struct         # <-- just decorate the class with the struct() function
-            class RGB:
-                r: uint8    # <-- a field can be defined just like this
-                g: uint8
-                b: uint8
-
-
-    .. tab-item:: Caterpillar C
-
-        .. code-block:: python
-            :caption: RGB struct for the PLTE chunk (using Caterpillar C)
-
-            from caterpillar.c import * # <-- just import everything
-
-            @struct         # <-- just decorate the class with the struct() function
-            class RGB:
-                r: u8       # <-- a field can be defined just like this
-                g: u8
-                b: u8
 
 By using the :code:`@struct` decorator, we've defined the :code:`RGB` class as
 a struct. This simple annotation turns the class into a structured representation

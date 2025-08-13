@@ -19,215 +19,132 @@
 #       Defines a C API function. The function must be present within the
 #       source set of this file.
 #
-#   src:FILE
+#   src:FILE:IGNORE
 #       Defines the source file (relative to this file) that contains the
-#       function definitions.
+#       function definitions. IGNORE indicates this file won't be used to
+#       generate the module file.
+#
+# The INDEX will be represented by a '+' for add using current running
+# number or '-' to exclude this element from the shared CAPI.
 
-src:ccaterpillar/context.c
 src:ccaterpillar/arch.c
-src:ccaterpillar/atomobj.c
+src:ccaterpillar/context.c
+src:ccaterpillar/atom.c
 src:ccaterpillar/option.c
-src:ccaterpillar/struct.c
-src:ccaterpillar/state.c
-src:ccaterpillar/layer.c
-src:ccaterpillar/parsing_pack.c
-src:ccaterpillar/parsing_unpack.c
-src:ccaterpillar/parsing_typeof.c
-src:ccaterpillar/parsing_sizeof.c
-src:ccaterpillar/atomimpl/bool.c
-src:ccaterpillar/atomimpl/float.c
-src:ccaterpillar/atomimpl/char.c
-src:ccaterpillar/atomimpl/int.c
-src:ccaterpillar/atomimpl/pad.c
-src:ccaterpillar/atomimpl/string.c
-src:ccaterpillar/atomimpl/const.c
-src:ccaterpillar/atomimpl/bytes.c
-src:ccaterpillar/atomimpl/pstring.c
-src:ccaterpillar/atomimpl/enum.c
-src:ccaterpillar/atomimpl/varint.c
-src:ccaterpillar/atomimpl/computed.c
-src:ccaterpillar/atomimpl/lazy.c
-src:ccaterpillar/atomimpl/cstring.c
-src:ccaterpillar/atomimpl/builtins/builtin.c
-src:ccaterpillar/atomimpl/builtins/repeated.c
-src:ccaterpillar/atomimpl/builtins/condition.c
-src:ccaterpillar/atomimpl/builtins/switch.c
-src:ccaterpillar/atomimpl/builtins/atoffset.c
-src:ccaterpillar/atomimpl/builtins/primitive.c
+src:ccaterpillar/lengthinfo.c
+src:ccaterpillar/shared.c:IGNORE
+src:ccaterpillar/atoms/builtin/builtin.c
+src:ccaterpillar/atoms/builtin/repeated.c
+src:ccaterpillar/atoms/builtin/switch.c
+src:ccaterpillar/atoms/builtin/conditional.c
+src:ccaterpillar/atoms/builtin/offset.c
 
 # First index is reserved for the global module reference
-obj:0:CpModule:PyModuleDef
+obj:+:CpModule:PyModuleDef
+obj:+:Cp_ArrayFactory:PyObject*
+obj:+:Cp_ContextFactory:PyObject*
+obj:+:CpExc_Stop:PyObject*
+obj:+:Cp_DefaultOption:PyObject*
+obj:+:CpBytesIO_Type:PyObject*
 
 type:-:_modulestate:_modulestate:-
+type:+:_archobj:CpArchObject:c_Arch
+type:+:_atomobj:CpAtomObject:Atom
+type:+:_builtinatomobj:CpBuiltinAtomObject:BuiltinAtom
+type:+:_contextobj:CpContextObject:c_Context
+type:+:_endianobj:CpEndianObject:c_Endian
+type:+:_lengthinfoobj:CpLengthInfoObject:LengthInfo
+type:+:_optionobj:CpOptionObject:c_Option
+type:+:_repeatedatomobj:CpRepeatedAtomObject:Repeated
+type:+:_switchatomobj:CpSwitchAtomObject:Switch
+type:+:_conditionalatomobj:CpConditionalAtomObject:Conditional
+type:+:_offsetatomobj:CpOffsetAtomObject:AtOffset
 
-type:1:_atomobj:CpAtomObject:atom
-type:2:_catomobj:CpCAtomObject:catom
-type:3:_archobj:CpArchObject:Arch
-type:4:_endianobj:CpEndianObject:Endian
-type:5:_contextobj:CpContextObject:Context
-type:6:_unaryexpr:CpUnaryExprObject:unaryexpr
-type:7:_binaryexpr:CpBinaryExprObject:binaryexpr
-type:8:_contextpath:CpContextPathObject:ContextPath
-# type:9:_fieldobj:CpFieldObject:Field
-# type:10:_fieldatomobj:CpFieldAtomObject:fieldatom
-# type:11:_fieldcatomobj:CpFieldCAtomObject:fieldcatom
-
-obj:12:CpInvalidDefault_Type:-
-obj:13:CpDefaultOption_Type:-
-obj:14:_CpInvalidDefault_Object:PyObject
-obj:15:_CpDefaultOption_Object:PyObject
-
-type:16:_option:CpOptionObject:Option
-type:17:_stateobj:CpStateObject:State
-type:18:_layerobj:CpLayerObject:layer
-
-# REVISIT: maybe rename to _structfieldinfo
-type:19:_fieldinfoobj:CpStructFieldInfoObject:fieldinfo
-type:20:_structobj:CpStructObject:Struct
-type:21:_floatatomobj:CpFloatAtomObject:Float
-type:22:_intatomobj:CpIntAtomObject:Int
-type:23:_boolatomobj:CpBoolAtomObject:Bool
-type:24:_charatomobj:CpCharAtomObject:Char
-type:25:_paddingatomobj:CpPaddingAtomObject:Padding
-type:26:_stringatomobj:CpStringAtomObject:string
-type:27:_constatomobj:CpConstAtomObject:const
-type:28:_builtinatomobj:CpBuiltinAtomObject:builtinatom
-type:29:_repeatedatomobj:CpRepeatedAtomObject:repeated
-type:30:_seqlayerobj:CpSeqLayerObject:seqlayer
-type:31:_objlayerobj:CpObjLayerObject:objlayer
-type:32:_conditionatomobj:CpConditionAtomObject:condition
-type:33:_switchatomobj:CpSwitchAtomObject:switch
-type:34:_offsetatomobj:CpOffsetAtomObject:atoffset
-type:35:_primitiveatomobj:CpPrimitiveAtomObject:patom
-type:36:_lengthinfoobj:CpLengthInfoObject:lengthinfo
-type:37:_bytesatomobj:CpBytesAtomObject:octetstring
-type:38:_pstringatomobj:CpPStringAtomObject:pstring
-type:39:_enumatomobj:CpEnumAtomObject:enumeration
-type:40:_varintatomobj:CpVarIntAtomObject:VarInt
-type:41:_computedatomobj:CpComputedAtomObject:computed
-type:42:_lazyatomobj:CpLazyAtomObject:lazy
-type:43:_cstringatomobj:CpCStringAtomObject:cstring
-
-func:50:CpEndian_IsLittleEndian:int:null
-func:53:CpContext_New:CpContextObject*:+1
-func:54:CpUnaryExpr_New:CpUnaryExprObject*:+1
-func:55:CpBinaryExpr_New:CpBinaryExprObject*:+1
-func:56:CpContextPath_New:CpContextPathObject*:+1
-func:57:CpContextPath_FromString:CpContextPathObject*:+1
-func:58:CpTypeMap_Lookup:PyObject*:+1
-func:59:CpTypeMap_Register:int:null
-# func:58:CpField_New:CpFieldObject*:null
-# func:59:CpField_HasCondition:int:null
-# func:60:CpField_IsEnabled:int:null
-# func:61:CpField_GetOffset:Py_ssize_t:null
-# func:62:CpField_EvalSwitch:PyObject*:+1
-# func:63:CpField_GetLength:PyObject*:+1
-func:64:CpTypeOf:PyObject*:+1
-# func:65:CpTypeOf_Field:PyObject*:+1
-func:66:CpTypeOf_Common:PyObject*:+1
-func:67:CpPack:int:null
-# func:68:CpPack_Field:int:null
-# func:69:CpPack_Common:int:null
-# func:70:CpPack_Struct:int:null
-func:72:_CpPack_EvalLength:int:null
-func:73:CpSizeOf:PyObject*:+1
-# func:74:CpSizeOf_Field:PyObject*:+1
-func:75:CpSizeOf_Struct:PyObject*:+1
-func:76:CpSizeOf_Common:PyObject*:+1
-func:77:_Cp_SizeOf:PyObject*:+1
-func:78:CpUnpack:PyObject*:+1
-# func:79:CpUnpack_Field:PyObject*:+1
-# func:80:CpUnpack_Common:PyObject*:+1
-# func:81:CpUnpack_Struct:PyObject*:+1
-func:83:_CpUnpack_EvalLength:int:null
-func:84:CpUnpack_CAtom:PyObject*:+1
-func:85:CpPack_CAtom:int:null
-func:86:CpSizeOf_CAtom:PyObject*:+1
-func:87:CpTypeOf_CAtom:PyObject*:+1
-func:88:CpState_New:CpStateObject*:null
-func:89:CpState_Tell:PyObject*:+1
-func:90:CpState_Seek:PyObject*:+1
-func:91:CpState_Read:PyObject*:+1
-func:92:CpState_ReadSsize_t:PyObject*:+1
-func:93:CpState_ReadFully:PyObject*:+1
-func:94:CpState_Write:PyObject*:+1
-func:95:CpState_SetGlobals:int:null
-func:96:CpLayer_New:CpLayerObject*:+1
-func:98:CpLayer_Invalidate:int:null
-func:99:CpStructFieldInfo_New:CpStructFieldInfoObject*:+1
-func:100:CpStruct_AddFieldInfo:int:null
-# func:101:CpStruct_AddField:int:null
-func:102:CpStruct_New:CpStructObject*:+1
-func:103:CpStruct_GetAnnotations:PyObject*:+1
-func:104:CpStruct_ReplaceType:int:null
-func:105:CpStruct_HasOption:int:null
-func:106:CpStruct_Pack:int:null
-func:107:CpStruct_Unpack:PyObject*:+1
-func:108:CpStruct_SizeOf:PyObject*:+1
-func:109:CpStructModel_Check:int:null
-func:110:CpStructModel_GetStruct:PyObject*:+1
-func:111:CpSeqLayer_New:CpSeqLayerObject*:+1
-func:112:CpSeqLayer_SetSequence:int:null
-func:113:CpObjLayer_New:CpObjLayerObject*:+1
-
-# atom api
-func:120:CpIntAtom_Pack:int:null
-func:121:CpIntAtom_Unpack:PyObject*:+1
-func:122:CpFloatAtom_Pack:int:null
-func:123:CpFloatAtom_Unpack:PyObject*:+1
-func:124:CpBoolAtom_Pack:int:null
-func:125:CpBoolAtom_Unpack:PyObject*:+1
-func:126:CpCharAtom_Pack:int:null
-func:127:CpCharAtom_Unpack:PyObject*:+1
-func:128:CpPaddingAtom_Pack:int:null
-func:129:CpPaddingAtom_PackMany:int:null
-func:130:CpPaddingAtom_Unpack:PyObject*:+1
-func:131:CpPaddingAtom_UnpackMany:PyObject*:+1
-func:132:CpStringAtom_Pack:int:null
-func:133:CpStringAtom_Unpack:PyObject*:+1
-func:134:CpConstAtom_Pack:int:null
-func:135:CpConstAtom_Unpack:PyObject*:+1
-func:-:CpRepeatedAtom_New:CpRepeatedAtomObject*:+1
-func:136:CpRepeatedAtom_Pack:int:null
-func:137:CpRepeatedAtom_Unpack:PyObject*:+1
-func:138:CpRepeatedAtom_GetLength:PyObject*:+1
-func:-:CpConditionAtom_New:CpConditionAtomObject*:+1
-func:139:CpConditionAtom_Pack:int:null
-func:140:CpConditionAtom_Unpack:PyObject*:+1
-func:141:CpConditionAtom_IsEnabled:int:null
-func:-:CpSwitchAtom_New:CpSwitchAtomObject*:+1
-func:142:CpSwitchAtom_GetNext:PyObject*:+1
-func:143:CpSwitchAtom_Pack:int:null
-func:144:CpSwitchAtom_Unpack:PyObject*:+1
-func:-:CpOffsetAtom_FromSsize_t:CpOffsetAtomObject*:+1
-func:-:CpOffsetAtom_New:CpOffsetAtomObject*:+1
-func:145:CpOffsetAtom_Pack:int:null
-func:146:CpOffsetAtom_Unpack:PyObject*:+1
-func:147:CpOffsetAtom_GetOffset:PyObject*:+1
-func:-:CpBytesAtom_New:CpBytesAtomObject*:+1
-func:148:CpBytesAtom_GetLength:PyObject*:+1
-func:149:CpBytesAtom_Pack:int:null
-func:150:CpBytesAtom_Unpack:PyObject*:+1
-func:-:CpPStringAtom_New:CpPStringAtomObject*:+1
-func:152:CpPStringAtom_Pack:int:null
-func:153:CpPStringAtom_Unpack:PyObject*:+1
-func:-:CpEnumAtom_New:CpEnumAtomObject*:+1
-func:154:CpEnumAtom_Pack:int:null
-func:155:CpEnumAtom_Unpack:PyObject*:+1
-func:-:CpVarIntAtom_New:CpVarIntAtomObject*:+1
-func:156:CpVarIntAtom_Pack:int:null
-func:157:CpVarIntAtom_Unpack:PyObject*:+1
-func:158:CpVarIntAtom_BSwap:PyObject*:+1
-func:159:CpVarIntAtom_BSwapUnsignedLongLong:ulonglong:null
-func:160:CpVarIntAtom_BSwapLongLong:longlong:null
-func:161:CpVarIntAtom_BSwapSsize_t:Py_ssize_t:null
-func:-:CpComputedAtom_New:CpComputedAtomObject*:+1
-func:162:CpComputedAtom_Pack:int:null
-func:163:CpComputedAtom_Unpack:PyObject*:+1
-func:-:CpComputedAtom_Value:PyObject*:+1
-func:-:CpLazyAtom_New:CpLazyAtomObject*:+1
-func:164:CpLazyAtom_Pack:int:null
-func:165:CpLazyAtom_Unpack:PyObject*:+1
-func:-:CpLazyAtom_Atom:PyObject*:+1
-func:166:CpCStringAtom_Pack:int:null
-func:167:CpCStringAtom_Unpack:PyObject*:+1
+func:+:Cp_HasStruct:int:null
+func:+:Cp_GetStructNoCheck:PyObject*:+1
+func:+:Cp_GetStruct:PyObject*:+1
+func:-:CpArch_GetName:PyObject*:+1
+func:-:CpArch_GetPtrSize:int:null
+func:-:CpArch_New:PyObject*:+1
+func:+:CpAtom_Pack:int:null
+func:+:CpAtom_PackMany:int:null
+func:+:CpAtom_Size:PyObject*:+1
+func:+:CpAtom_Unpack:PyObject*:+1
+func:+:CpAtom_UnpackMany:PyObject*:+1
+func:+:CpAtom_BitsOf:PyObject*:+1
+func:+:CpAtom_TypeOf:PyObject*:+1
+func:-:CpBuiltinAtom_New:PyObject*:+1
+func:-:CpContext_GetDict:PyObject*:+1
+func:+:CpContext_GenericGetAttr:PyObject*:+1
+func:+:CpContext_GenericGetAttrString:PyObject*:+1
+func:+:CpContext_GenericSetAttr:int:null
+func:+:CpContext_GenericSetAttrString:int:null
+func:+:CpContext_GetRoot:PyObject*:+1
+func:-:CpContext_IO:PyObject*:+1
+func:+:CpContextIO_Tell:PyObject*:+1
+func:+:CpContextIO_Read:PyObject*:+1
+func:+:CpContextIO_ReadFully:PyObject*:+1
+func:+:CpContextIO_ReadSsize_t:PyObject*:+1
+func:+:CpContextIO_Tell:PyObject*:+1
+func:+:CpContextIO_WriteBytes:PyObject*:+1
+func:+:CpContextIO_Write:PyObject*:+1
+func:+:CpContextIO_Seek:PyObject*:+1
+func:-:CpContext_New:PyObject*:+1
+func:-:CpEndian_GetId:char:null
+func:+:CpEndian_IsLittleEndian:int:null
+func:-:CpEndian_GetName:PyObject*:+1
+func:-:CpLengthInfo_IsGreedy:int:null
+func:-:CpLengthInfo_Length:int:null
+func:-:CpLengthInfo_LengthAsLong:PyObject*:+1
+func:-:CpLengthInfo_New:PyObject*:+1
+func:-:CpLengthInfo_SetGreedy:void:null
+func:-:CpLengthInfo_SetLength:int:null
+func:-:CpLengthInfo_SetLengthFromLong:int:null
+func:-:CpOption_GetName:PyObject*:+1
+func:-:CpOption_GetValue:PyObject*:+1
+func:-:CpOption_New:PyObject*:+1
+func:-:CpOption_SetValue:int:null
+func:-:CpRepeatedAtom_GetLength:PyObject*:+1
+func:-:CpRepeatedAtom_New:PyObject*:+1
+func:+:CpRepeatedAtom_Pack:int:null
+func:+:CpRepeatedAtom_Size:PyObject*:+1
+func:+:CpRepeatedAtom_TypeOf:PyObject*:+1
+func:+:CpRepeatedAtom_Unpack:PyObject*:+1
+func:+:CpRepeatedAtom_Bits:PyObject*:+1
+func:-:CpRepeatedAtom_SetAtom:int:null
+func:-:CpRepeatedAtom_GetAtom:PyObject*:+1
+func:-:CpRepeatedAtom_SetLength:int:null
+func:+:Cp_FactoryNew:PyObject*:+1
+func:+:Cp_EvalObject:PyObject*:+1
+func:-:CpSwitchAtom_SetCases:int:null
+func:-:CpSwitchAtom_SetAtom:int:null
+func:+:CpSwitchAtom_EvalWithContext:PyObject*:+1
+func:+:CpSwitchAtom_Unpack:PyObject*:+1
+func:-:CpSwitchAtom_New:PyObject*:+1
+func:+:CpSwitchAtom_TypeOf:PyObject*:+1
+func:+:CpSwitchAtom_Pack:PyObject*:+1
+func:-:CpConditionalAtom_GetAtom:PyObject*:+1
+func:-:CpConditionalAtom_GetCondition:PyObject*:+1
+func:-:CpConditionalAtom_New:PyObject*:+1
+func:+:CpConditionalAtom_Enabled:int:null
+func:-:CpConditionalAtom_SetAtom:int:null
+func:-:CpConditionalAtom_SetCondition:int:null
+func:+:CpConditionalAtom_Pack:PyObject*:+1
+func:+:CpConditionalAtom_Unpack:PyObject*:+1
+func:+:CpConditionalAtom_TypeOf:PyObject*:+1
+func:+:CpConditionalAtom_Size:PyObject*:+1
+func:-:CpOffsetAtom_New:PyObject*:+1
+func:-:CpOffsetAtom_GetAtom:PyObject*:+1
+func:-:CpOffsetAtom_GetOffset:PyObject*:+1
+func:-:CpOffsetAtom_Whence:PyObject*:+1
+func:-:CpOffsetAtom_WhenceAsSsize_t:Py_ssize_t:null
+func:-:CpOffsetAtom_SetAtom:int:null
+func:-:CpOffsetAtom_SetOffset:int:null
+func:-:CpOffsetAtom_SetWhence:int:null
+func:+:CpOffsetAtom_Size:PyObject*:+1
+func:+:CpOffsetAtom_Unpack:PyObject:+1
+func:+:CpOffsetAtom_Pack:int:null
+func:+:CpOffsetAtom_TypeOf:PyObject:+1
+func:+:CpOffsetAtom_EvalOffset:PyObject*:+1
+func:-:CpOffsetAtom_IsKeepPosition:int:null
+func:-:CpOffsetAtom_SetKeepPosition:void:null

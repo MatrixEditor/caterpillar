@@ -22,9 +22,9 @@ from typing import Callable, Any, Self
 from types import FrameType
 from dataclasses import dataclass
 
-
 from caterpillar.exception import StructException
 from caterpillar.registry import to_struct
+from caterpillar.options import Flag
 
 CTX_PARENT = "_parent"
 CTX_OBJECT = "_obj"
@@ -94,6 +94,9 @@ class Context(dict):
     @property
     def _root(self):
         return self.get("_root", self)
+
+
+O_CONTEXT_FACTORY = Flag("option.context_factory", value=Context)
 
 
 class ExprMixin:
@@ -471,3 +474,4 @@ class ContextLength(ExprMixin):
 this = ContextPath(CTX_OBJECT)
 ctx = ContextPath()
 parent = ContextPath(".".join([CTX_PARENT, CTX_OBJECT]))
+root = ContextPath(CTX_ROOT)

@@ -16,17 +16,13 @@ import struct as PyStruct
 import warnings
 
 from io import BytesIO
-from typing import Any, Union
+from typing import Any, Self
 from types import NoneType
 from functools import cached_property
 from enum import Enum as _EnumType
 from uuid import UUID
 
-from caterpillar.abc import (
-    _StructLike,
-    _StreamType,
-    _ContextLike,
-)
+from caterpillar.abc import _StructLike, _StreamType, _ContextLike, _PrefixedType
 from caterpillar.exception import (
     ValidationError,
     InvalidValueError,
@@ -34,7 +30,7 @@ from caterpillar.exception import (
 )
 from caterpillar.context import CTX_FIELD, CTX_STREAM, CTX_SEQ
 from caterpillar.options import Flag, GLOBAL_FIELD_FLAGS
-from caterpillar.byteorder import LittleEndian
+from caterpillar.byteorder import LITTLE_ENDIAN_FMT, LittleEndian, SysNative
 from caterpillar import registry
 from caterpillar._common import WithoutContextVar
 from caterpillar.shared import getstruct
@@ -60,7 +56,7 @@ class PyStructFormattedField(FieldStruct):
 
     >>> field = PyStructFormattedField('i', int)
     >>> field.__repr__()
-    "<PyStructFormattedField(int) 'i' 32>"
+    "<int32>"
 
     :param ch: The format character (e.g., 'i', 'x', 'f') that defines how the field is packed and unpacked.
     :param type_: The Python type that corresponds to the format character.
@@ -69,14 +65,15 @@ class PyStructFormattedField(FieldStruct):
     __slots__ = {
         "text": """The format char (e.g. 'x', 'i', ...)""",
         "ty": """The returned Python type""",
-        "_padding_": """Internal field that indicates this struct is padding""",
+        "_is_padding": """Internal field that indicates this struct is padding""",
     }
 
     def __init__(self, ch: str, type_: type) -> None:
         self.text = ch
         self.ty = type_
         self.__bits__ = PyStruct.calcsize(self.text) * 8
-        self._padding_ = self.text == "x"
+        self._is_padding = self.text == "x"
+        self.__byteorder__ = SysNative
 
     def __fmt__(self) -> str:
         """
@@ -93,8 +90,10 @@ class PyStructFormattedField(FieldStruct):
 
         :return: A string representation.
         """
-        type_repr = self.ty.__name__ if not self._padding_ else "padding"
-        return f"<{self.__class__.__name__}({type_repr}) {self.text!r} {self.__bits__}>"
+        if self._is_padding:
+            return "<padding>"
+
+        return f"<{self.ty.__name__}{self.__bits__}>"
 
     def __type__(self) -> type:
         """
@@ -124,18 +123,13 @@ class PyStructFormattedField(FieldStruct):
         :param obj: The value to pack (can be of the type defined by the format character).
         :param context: The context that provides the stream and field-specific information.
         """
-        if obj is None and not self._padding_:
+        if obj is None and not self._is_padding:
             return  # Skip packing if the value is None and the field is not padding
 
-        len_ = self.get_length(context)
-        fmt = f"{context[CTX_FIELD].order.ch}{len_}{self.text}"
-        if self._padding_:
-            data = PyStruct.pack(fmt)
-        elif len_ > 1:
-            # Unfortunately, we have to use the *unpack operation here
-            data = PyStruct.pack(fmt, *obj)
-        else:
-            data = PyStruct.pack(fmt, obj)
+        field = context.get(CTX_FIELD)
+        order_ch = field.order.ch if field else self.__byteorder__.ch
+        fmt = f"{order_ch}{self.text}"
+        data = PyStruct.pack(fmt) if self._is_padding else PyStruct.pack(fmt, obj)
         context[CTX_STREAM].write(data)
 
     def pack_seq(self, seq, context) -> None:
@@ -147,10 +141,31 @@ class PyStructFormattedField(FieldStruct):
         :param seq: The sequence of values to pack.
         :param context: The context providing packing information.
         """
-        if context[CTX_FIELD].amount is not Ellipsis:
-            self.pack_single(seq, context)
+        field = context.get(CTX_FIELD)
+        target_length = len(seq)
+        if target_length == 0:
+            return  # nothing to do
+
+        if not field:
+            # just pack directly
+            # WE LOSE SIZE CHECKING HERE!
+            fmt = f"{self.__byteorder__.ch}{target_length}{self.text}"
         else:
-            super().pack_seq(seq, context)
+            length = field.length(context)
+            if type(length) is _PrefixedType:
+                context[CTX_SEQ] = False
+                length.start.__pack__(len(seq), context)
+                context[CTX_SEQ] = True
+            elif length is not Ellipsis:
+                if length != target_length:
+                    raise ValueError(
+                        f"Length mismatch: expected {length}, but only "
+                        + f"{target_length} elements were provided!"
+                    )
+
+            fmt = f"{field.order.ch}{target_length}{self.text}"
+
+        context[CTX_STREAM].write(PyStruct.pack(fmt, *seq))
 
     def unpack_single(self, context):
         """
@@ -159,13 +174,12 @@ class PyStructFormattedField(FieldStruct):
         :param context: The context that provides the stream and field-specific information.
         :return: The unpacked value, converted to the field's corresponding Python type.
         """
-        len_ = self.get_length(context)
-        size = (self.__bits__ // 8) * len_
-        value = PyStruct.unpack(
-            f"{context[CTX_FIELD].order.ch}{len_}{self.text}",
-            context[CTX_STREAM].read(size),
-        )
-        return value[0] if value else None
+        field = context.get(CTX_FIELD)
+        order_ch = field.order.ch if field else self.__byteorder__.ch
+        fmt = f"{order_ch}{self.text}"
+        size = self.__bits__ // 8
+        (value,) = PyStruct.unpack(fmt, context[CTX_STREAM].read(size))
+        return value
 
     def unpack_seq(self, context):
         """
@@ -174,8 +188,7 @@ class PyStructFormattedField(FieldStruct):
         :param context: The context that provides the stream and field-specific information.
         :return: A list of unpacked values.
         """
-        # We don't want to call .length() here as it would
-        # consume extra time
+        # only possible when a Field has been configured
         field = context[CTX_FIELD]
         length = field.length(context)
         if length == 0:
@@ -184,23 +197,9 @@ class PyStructFormattedField(FieldStruct):
         if length is Ellipsis:
             return super().unpack_seq(context)
 
-        # REVISIT:
         fmt = f"{field.order.ch}{length}{self.text}"
         size = (self.__bits__ // 8) * length
         return list(PyStruct.unpack(fmt, context[CTX_STREAM].read(size)))
-
-    def get_length(self, context) -> int:
-        """
-        Get the length of the field, which may be dynamically determined based on the context.
-
-        :param context: The context providing the length information.
-        :return: The length of the field (1 if no length is specified).
-        :rtype: int
-        """
-        dim = context[CTX_FIELD].length(context)
-        if dim is Ellipsis or not context[CTX_SEQ]:
-            dim = 1
-        return dim
 
     def is_padding(self) -> bool:
         """
@@ -209,7 +208,7 @@ class PyStructFormattedField(FieldStruct):
         :return: True if the field is padding (i.e., 'x' format character), False otherwise.
         :rtype: bool
         """
-        return self._padding_
+        return self._is_padding
 
 
 # Instances of FormatField with specific format specifiers
@@ -430,10 +429,10 @@ class Enum(Transformer):
         :return: The type (either the enum model or a union of enum and struct types).
         """
         # pylint: disable-next=protected-access
-        if ENUM_STRICT._hash_ in GLOBAL_FIELD_FLAGS:
+        if ENUM_STRICT in GLOBAL_FIELD_FLAGS:
             return self.model
 
-        return Union[self.model, self.struct.__type__()]
+        return self.model | self.struct.__type__()
 
     def encode(self, obj, context):
         """
@@ -449,9 +448,11 @@ class Enum(Transformer):
         2 # (the integer value of Color.GREEN)
         """
         if not isinstance(obj, _EnumType):
-            # pylint: disable-next=protected-access
-            if ENUM_STRICT._hash_ in context[CTX_FIELD].flags:
-                raise ValidationError(f"Expected enum type, got {type(obj)}", context)
+            if field := context.get(CTX_FIELD):
+                if field.has_flag(ENUM_STRICT):
+                    raise ValidationError(
+                        f"Expected enum type, got {type(obj)}", context
+                    )
             return obj
 
         return obj.value
@@ -483,12 +484,12 @@ class Enum(Transformer):
             return by_value
 
         default = self.default
-        if default == INVALID_DEFAULT:
-            default = context[CTX_FIELD].default
+        field = context.get(CTX_FIELD)
+        if default is INVALID_DEFAULT and field:
+            default = field.default
 
-        if default == INVALID_DEFAULT:
-            # pylint: disable-next=protected-access
-            if ENUM_STRICT._hash_ in context[CTX_FIELD].flags:
+        if default is INVALID_DEFAULT:
+            if field and field.has_flag(ENUM_STRICT):
                 raise InvalidValueError(
                     f"Could not find enum for value {parsed!r}", context
                 )
@@ -1186,6 +1187,7 @@ class Prefixed(FieldStruct):
             with WithoutContextVar(context, CTX_STREAM, data):
                 self.struct.__pack__(obj, context)
 
+            context[CTX_SEQ] = False
             obj = data.getvalue()
 
         elif self.encoding:
@@ -1241,6 +1243,7 @@ class Int(FieldStruct):
         if not isinstance(bits, int):
             raise ValueError(f"Invalid int size: {bits!r} - expected int")
         self.size = self.__bits__ // 8
+        self.__byteorder__ = SysNative
 
     def __repr__(self) -> str:
         name = "int"
@@ -1278,10 +1281,16 @@ class Int(FieldStruct):
         :param context: The current context, which provides the byte order (little-endian or big-endian).
         :raises ValueError: If the integer is too large or small for the given bit width.
         """
-        order = context[CTX_FIELD].order
-        byteorder = "little" if order is LittleEndian else "big"
+        field = context.get(CTX_FIELD)
+        is_little = (
+            field.order.ch if field else self.__byteorder__.ch
+        ) == LITTLE_ENDIAN_FMT
         context[CTX_STREAM].write(
-            obj.to_bytes(self.size, byteorder, signed=self.signed)
+            obj.to_bytes(
+                self.size,
+                "little" if is_little else "big",
+                signed=self.signed,
+            )
         )
 
     def unpack_single(self, context) -> int:
@@ -1295,10 +1304,15 @@ class Int(FieldStruct):
         :return: The unpacked integer value.
         :raises ValueError: If the data cannot be unpacked as an integer of the specified size.
         """
-        order = context[CTX_FIELD].order
-        byteorder = "little" if order is LittleEndian else "big"
+        field = context.get(CTX_FIELD)
+        is_little = (
+            field.order.ch if field else self.__byteorder__.ch
+        ) == LITTLE_ENDIAN_FMT
+
         return int.from_bytes(
-            context[CTX_STREAM].read(self.size), byteorder, signed=self.signed
+            context[CTX_STREAM].read(self.size),
+            "little" if is_little else "big",
+            signed=self.signed,
         )
 
 
@@ -1677,3 +1691,81 @@ class Uuid(FieldStruct):
         is_le = context[CTX_FIELD].order is LittleEndian
         data = context[CTX_STREAM].read(16)
         return UUID(bytes_le=data) if is_le else UUID(bytes=data)
+
+
+class AsLengthRef:
+    """
+    A special field for automatically determining the length of a field
+    based on a target field.
+
+    This field is used to pack and unpack a length value for a target field.
+    When packing, the length of the target field is determined by getting the
+    length of the target field's value from the context. When unpacking, the
+    unpacked value is used as the length of the target field.
+
+    Example usage:
+
+    >>> @struct
+    ... class MyStruct:
+    ...     length: AsLengthRef("length", "data", uint16) = 0
+    ...     a: uint8
+    ...     data: Bytes(this.length)
+    ...
+    >>> pack(MyStruct(data=b"Hello, world!", a=1))
+    b'\\x00\\x0c\\x01Hello, world!'
+
+    :param target: The target field name to determine the length from.
+    :param struct: The struct definition of the length field.
+    """
+
+    __slots__ = (
+        "struct",
+        "target",
+        "name",
+    )
+
+    def __init__(self, name: str, target: str, struct=None) -> None:
+        self.struct = struct
+        self.name = f"_obj.{name}"
+        self.target = f"_obj.{target}"
+
+    def __mod__(self, other) -> Self:
+        self.struct = other
+
+    def __rmod__(self, other) -> Self:
+        self.struct = other
+
+    def __type__(self) -> type:
+        return int
+
+    def __size__(self, context) -> int:
+        if self.struct is None:
+            return 0
+        return self.struct.__size__(context)
+
+    def __bits__(self) -> int:
+        if self.struct is None:
+            return 0
+        return self.struct.__bits__()
+
+    def __pack__(self, obj, context):
+        # object is optional
+        if self.struct is None:
+            raise ValueError("struct is not defined")
+
+        target_obj = context.__context_getattr__(self.target)
+        length = len(target_obj)
+        context.__context_setattr__(self.name, length)
+        self.struct.__pack__(length, context)
+
+    def __unpack__(self, context):
+        if self.struct is None:
+            raise ValueError("struct is not defined")
+
+        length = self.struct.__unpack__(context)
+        context.__context_setattr__(self.name, length)
+        return length
+
+    def __repr__(self) -> str:
+        name = self.target.removeprefix("_obj.")
+        return f"<LengthRef of .{name}>"

@@ -1,41 +1,36 @@
-# pylint: disable=unused-import,no-name-in-module,import-error
+# pylint: disable=unused-import, no-name-in-module
 import pytest
 import caterpillar
 
 if caterpillar.native_support():
+    from caterpillar._C import Atom, LengthInfo
 
-    from caterpillar._C import atom, catom
+    def testc_atom_init():
+        # instantiation will work but is useless
+        atom = Atom()
 
+        with pytest.raises(TypeError):
+            _ = Atom(a=1)
 
-    def test_atom_init():
-        # Just verify that we can instantiate an atom
-        atom()
-
-
-    def test_catom_init():
-        # Although, we can't do anything with this class, we can create
-        # objects of  it, so let's test that.
-        catom()
-
-
-    def test_atom_inheritance():
-        # Verify that we can inherit from atom and that catom
-        # is a subclass of atom
-        class Foo(atom):
-            pass
-
-        assert issubclass(Foo, atom)
-        assert issubclass(catom, atom)
-
-
-    def test_atom_methods():
-        # Each method should throw a NotImplementedError
-        a = atom()
-        with pytest.raises(NotImplementedError):
-            a.__pack__(None, None)
+    def testc_atom_protocol():
+        # each method will raise NotImplementedError or
+        # return NotImplemented
+        atom = Atom()
 
         with pytest.raises(NotImplementedError):
-            a.__unpack__(None)
+            atom.__unpack__(None)
 
-        # or return NotImplemented if not overridden
-        assert a.__type__() == NotImplemented
+        with pytest.raises(NotImplementedError):
+            atom.__pack__(None, None)
+
+        with pytest.raises(NotImplementedError):
+            atom.__unpack_many__(None, None)
+
+        with pytest.raises(NotImplementedError):
+            atom.__pack_many__(None, None, None)
+
+        with pytest.raises(NotImplementedError):
+            atom.__size__(None)
+
+        assert atom.__type__() is NotImplemented
+        assert atom.__bits__() is NotImplemented

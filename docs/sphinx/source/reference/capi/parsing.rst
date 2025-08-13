@@ -5,42 +5,36 @@ Packing and Unpacking
 **********************
 
 
-.. c:function:: PyObject *CpTypeOf(PyObject *value)
-                PyObject *CpTypeOf_Field(CpFieldObject *field)
-                PyObject *CpTypeOf_Common(PyObject *op)
+.. c:function:: PyObject *CpAtom_TypeOf(PyObject *value)
 
     Returns the type of the given atom object.
 
 
-.. c:function:: PyObject *CpSizeOf(PyObject *atom, PyObject *globals)
+.. c:function:: int CpAtom_Pack(PyObject* pAtom, PyObject* pObj, PyObject *pContext)
 
-    Returns the size of the given atom object.
+    Packs the object :code:`o` using the provided context and returns ``-1`` on
+    error. The  Proper use would be:
 
+    .. code-block:: c
 
-.. c:function:: int CpPack(PyObject *op, PyObject *atom, PyObject *io, PyObject *globals)
+        PyObject *nAtom = ..., *nContext = ..., *nValue = ...;
+        if (CpAtom_Pack(nAtom, nValue, nContext) < 0)
+            goto error;
 
-    Packs the given value using the given atom object and returns :code::`0` if
-    successful. Returns :code:`-1` if an error occurs. The *globals* parameter may
-    be *NULL*.
+    The provided context object must support the *Context Protocol*, which is
+    not validated in this method.This function may raise *NotImplementedError*
+    to indicate that this class does not support packing.
 
-
-.. c:function:: int _CpPack_EvalLength(CpLayerObject* layer, PyObject* length, Py_ssize_t size, bool* seq_greedy, Py_ssize_t* seq_length)
-
-        Evaluates the length of the sequence to pack.
-
-        This funtion can be utilized to evaluate the length of the sequence to
-        pack. It uses the :code:`size` parameter to validate the input sequence.
-        Although, the :code:`size` parameter is not mandatory, it is recommended
-        - a value of :code:`-1` will disable the check mentioned before.
-
-        :param layer: the current layer that is marked as sequential
-        :param size: the size of the input sequence to pack (might be -1, see above)
-        :param seq_greedy: destination pointer to store the result whether the sequence should be parsed greedily
-        :param seq_length: destination pointer to store the length of the sequence
-        :return: :code:`0` if successful, :code:`-1` if an error occurs
+    .. versionadded:: 2.6.0
 
 
-.. c:function:: PyObject *CpUnpack(PyObject *atom, PyObject *io, PyObject *globals)
+.. c:function:: PyObject *CpAtom_Size(PyObject* pAtom, PyObject* pContext)
 
-    *TODO*
+    Calculates the size of the object :code:`pAtom` using context
+    :code:`pContext` and returns the result. This method will return *NULL* if
+    an error occurs while calling the target function.
 
+    .. versionadded:: 2.6.0
+
+
+*TODO*

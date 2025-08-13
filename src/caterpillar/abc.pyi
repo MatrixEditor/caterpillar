@@ -14,13 +14,22 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from io import IOBase
 from types import EllipsisType
-from typing import Any, Callable, Optional, Protocol, TypeVar, Union, runtime_checkable
+from typing import (
+    Any,
+    Callable,
+    Optional,
+    Protocol,
+    TypeVar,
+    Union,
+    runtime_checkable,
+    type_check_only,
+)
 
-_IT = TypeVar("_IT")
-_IT_co = TypeVar("_IT_co")
-_IT_contra = TypeVar("_IT_contra", contravariant=True)
-_OT = TypeVar("_OT")
-_OT_co = TypeVar("_OT_co", covariant=True)
+_IT = TypeVar("_IT", default=Any)
+_IT_co = TypeVar("_IT_co", covariant=True, default=Any)
+_IT_contra = TypeVar("_IT_contra", contravariant=True, default=Any)
+_OT = TypeVar("_OT", default=Any)
+_OT_co = TypeVar("_OT_co", covariant=True, default=Any)
 
 _StreamType = IOBase
 _StreamFactory = Callable[[], _StreamType]
@@ -32,12 +41,14 @@ _LengthT = Union[int, _PrefixedType, _GreedyType, _ContextLambda]
 
 @runtime_checkable
 class _ContextLike(Protocol):
+    def __init__(self, **kwargs) -> None: ...
     @property
     def _root(self) -> Optional[_ContextLike]: ...
     def __context_getattr__(self, path: str) -> Any: ...
     def __context_setattr__(self, path: str, value: Any) -> None: ...
     def __getitem__(self, key, /) -> Any: ...
     def __setitem__(self, key, value: Any, /) -> None: ...
+    def get(self, key: str, default: Any | None = None, /) -> Any: ...
 
 _ContextLambdaReturnT_co = TypeVar(
     "_ContextLambdaReturnT_co", covariant=True, default=Any
@@ -81,6 +92,10 @@ class _SupportsSize(Protocol):
     def __size__(self, context: _ContextLike) -> int: ...
 
 @runtime_checkable
+class _SupportsType(Protocol):
+    def __type__(self) -> type | str | None: ...
+
+@runtime_checkable
 class _SupportsUnpack(Protocol[_OT_co]):
     def __unpack__(self, context: _ContextLike) -> _OT_co: ...
 
@@ -97,3 +112,42 @@ class _SupportsBits(Protocol):
 @runtime_checkable
 class _ContainsBits(Protocol):
     __bits__: int
+
+@type_check_only
+class _ArchLike(Protocol):
+    name: str
+    ptr_size: int
+
+    def __init__(self, name: str, ptr_size: int) -> None: ...
+
+@type_check_only
+class _SupportsSetEndian(Protocol[_OT_co]):
+    def __set_byteorder__(self, order: _EndianLike) -> _OT_co: ...
+
+@type_check_only
+class _EndianLike(Protocol):
+    name: str
+    ch: str
+
+    def __add__(self, other: _SupportsSetEndian[_OT]) -> _OT: ...
+
+@type_check_only
+class _OptionLike(Protocol):
+    name: str
+    value: Any
+
+__all__ = [
+    "_ContextLike",
+    "_ContextLambda",
+    "_SupportsActionUnpack",
+    "_SupportsActionPack",
+    "_SupportsPack",
+    "_SupportsUnpack",
+    "_SupportsSize",
+    "_StructLike",
+    "_SupportsType",
+    "_ContainsStruct",
+    "_SwitchLike",
+    "_SupportsBits",
+    "_ContainsBits",
+]

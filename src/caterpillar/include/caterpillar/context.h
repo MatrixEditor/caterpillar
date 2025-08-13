@@ -1,5 +1,5 @@
 /**
- * Copyright (C) MatrixEditor 2024
+ * Copyright (C) MatrixEditor 2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,9 +17,8 @@
 #ifndef CP_CONTEXT_H
 #define CP_CONTEXT_H
 
-/* Caterpillar Context and ContextPath C implementation */
+/* Caterpillar Context C implementation */
 #include "caterpillar/caterpillarapi.h"
-#include "caterpillar/module.h"
 
 /*context*/
 
@@ -59,106 +58,33 @@ struct _contextobj
  */
 #define CpContext_Check(op) PyObject_TypeCheck((op), &CpContext_Type)
 
-// -----------------------------------------------------------------------------
-// unary expression
-enum
+inline static PyObject*
+CpContext_GetDict(PyObject* obj)
 {
-  CpUnaryExpr_OpNeg = 1,
-  CpUnaryExpr_OpNot = 2,
-  CpUnaryExpr_OpPos = 3
-};
+  return Py_NewRef(&_Cp_CAST(CpContextObject*, obj)->m_dict);
+}
 
-/**
- * @brief A simple unary expression (from Python)
- *
- * This is a helper class to support lazy evaluation of unary expressions
- * while parsing data.
- */
-struct _unaryexpr
+#define CpContext_New() Cp_FactoryNew(Cp_ContextFactory)
+
+#define CpContext_SETITEM(context, key, value)                                 \
+  PyObject_SetItem(context, key, value)
+
+#define CpContext_ITEM(context, key) PyObject_GetItem(context, key)
+
+static inline int
+CpContext_COPYITEM(PyObject* pContext, PyObject* pSrc, PyObject* pKey)
 {
-  /// the operation to perform
-  PyObject_HEAD int m_expr;
-  /// the value to apply the operation to
-  PyObject* m_value;
-};
+  PyObject* nValue = CpContext_ITEM(pSrc, pKey);
+  if (!nValue) {
+    return -1;
+  }
+  return CpContext_SETITEM(pContext, pKey, nValue);
+}
 
-// -----------------------------------------------------------------------------
-// binary expression
-enum
-{
-  // The first six operations store the same value as defined by Python,
-  // minimizing the effort to translate *_richcmp calls into this enum.
-  CpBinaryExpr_Op_LT = 0,
-  CpBinaryExpr_Op_LE,
-  CpBinaryExpr_Op_EQ,
-  CpBinaryExpr_Op_NE,
-  CpBinaryExpr_Op_GT,
-  CpBinaryExpr_Op_GE,
-  CpBinaryExpr_OpAdd,
-  CpBinaryExpr_OpSub,
-  CpBinaryExpr_OpMul,
-  CpBinaryExpr_OpFloorDiv,
-  CpBinaryExpr_OpTrueDiv,
-  CpBinaryExpr_OpMod,
-  CpBinaryExpr_OpPow,
-  CpBinaryExpr_OpMatMul,
-  CpBinaryExpr_OpAnd,
-  CpBinaryExpr_OpOr,
-  CpBinaryExpr_OpBitXor,
-  CpBinaryExpr_OpBitAnd,
-  CpBinaryExpr_OpBitOr,
-  CpBinaryExpr_OpLShift,
-  CpBinaryExpr_OpRShift,
-};
+#define CpContext_IO(context, state)                                           \
+  CpContext_ITEM(context, state->str__context_io)
 
-/**
- * @brief A simple binary expression (from Python)
- *
- * This is a helper class to support lazy evaluation of binary expressions
- * while parsing data. The operations are defined in the enum above.
- */
-struct _binaryexpr
-{
-  /// the operation to perform
-  PyObject_HEAD int m_expr;
-  /// the left and right values
-  PyObject* m_left;
-  PyObject* m_right;
-};
-
-// -----------------------------------------------------------------------------
-// context path
-
-/**
- * @brief A simple context path
- *
- * Represents a lambda function for retrieving a value from a Context based on
- * a specified path.
- */
-struct _contextpath
-{
-  /// the path object
-  PyObject_HEAD PyObject* m_path;
-
-  // internal variable to minimize the amount of calls to get the
-  // global module state.
-  _modulestate* m_state;
-};
-
-/**
- * @brief Checks if the given object is a context path
- *
- * @param op the object to check
- * @return 1 if the object is a context path, 0 otherwise
- */
-#define CpContextPath_CheckExact(op) Py_IS_TYPE((op), &CpContextPath_Type)
-
-/**
- * @brief Checks if the given object is a context path
- *
- * @param op the object to check
- * @return 1 if the object is a context path, 0 otherwise
- */
-#define CpContextPath_Check(op) PyObject_TypeCheck((op), &CpContextPath_Type)
+#define CpContext_SETIO(context, state, pIO)                                   \
+  CpContext_SETITEM(context, state->str__context_io, pIO)
 
 #endif

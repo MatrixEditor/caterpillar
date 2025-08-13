@@ -156,8 +156,7 @@ def hasstruct(obj) -> bool:
     :param obj: The object to check.
     :return: True if the object has a structure attribute, else False.
     """
-    cls_dict = getattr(obj.__class__ if not isinstance(obj, type) else obj, "__dict__")
-    return ATTR_STRUCT in cls_dict
+    return hasattr(obj.__class__ if not isinstance(obj, type) else obj, ATTR_STRUCT)
 
 
 def getstruct(obj, /, __default=None):
@@ -168,11 +167,7 @@ def getstruct(obj, /, __default=None):
     :return: The structure attribute of the object.
     """
     obj = obj.__class__ if not isinstance(obj, type) else obj
-    cls_dict = getattr(obj, "__dict__", None)
-    if cls_dict is None:
-        return getattr(obj, ATTR_STRUCT, None)
-
-    return cls_dict.get(ATTR_STRUCT, __default)
+    return getattr(obj, ATTR_STRUCT, __default)
 
 
 def typeof(struct):

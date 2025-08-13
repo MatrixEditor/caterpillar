@@ -9,6 +9,9 @@ with binary file formats. These concepts lay the foundation for understanding mo
 topics covered in the next chapter.
 
 .. note::
+
+    **Applies for** :code:`caterpillar<2.6.0`.
+
     To simplify field definitions in your structs, we can use shortcuts. For instance, instead
     of manually specifying field types, we can leverage the :code:`F` function from the
     :code:`caterpillar.shortcuts` module to create fields. However, if your don't want to
@@ -21,6 +24,8 @@ topics covered in the next chapter.
     or wrap the struct directly
 
     >>> pack(0xFF, uint8, as_field=True)
+
+
 
 
 .. toctree::

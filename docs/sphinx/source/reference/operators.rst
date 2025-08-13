@@ -153,7 +153,7 @@ The following methods are specifically designed for fields and will only affect 
 operations are also supported on sequence objects, only the returning :class:`Field` object will be affected.
 
 .. function:: field.__or__(self, flag)
-.. function:: field.__ior__(self, flag)
+              field.__ior__(self, flag)
 
     With the logical OR operation, a so-called :class:`Flag` can be set. Some flags are defined globally, and
     their meaning is described in :ref:`options`.
@@ -161,7 +161,7 @@ operations are also supported on sequence objects, only the returning :class:`Fi
     >>> field = uint8 | F_KEEP_POSITION
 
 .. function:: field.__xor__(self, flag)
-.. function:: field.__ixor__(self, flag)
+              field.__ixor__(self, flag)
 
     The logical XOR operation is designed to remove a flag/option from the specified field.
 
@@ -176,7 +176,7 @@ extending :class:`~caterpillar.model.Sequence` objects. All subclasses inherit t
 functionality as well.
 
 .. function:: sequence.__add__(self, sequence)
-.. function:: sequence.__iadd__(self, sequence)
+              sequence.__iadd__(self, sequence)
 
     Called to *import* all fields from the given sequence into this instance. Note that the
     fields will be added to the *end* of the current field list.
@@ -184,7 +184,7 @@ functionality as well.
     >>> seq = Sequence({"a": uint8}) + Sequence({"b": uint8})
 
 .. function:: sequence.__sub__(self, sequence)
-.. function:: sequence.__isub__(self, sequence)
+              sequence.__isub__(self, sequence)
 
     Invoked to remove all fields in this sequence that are also stored in the given
     sequence. This operation does not alter the used model but only affects the

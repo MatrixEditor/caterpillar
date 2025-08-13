@@ -14,21 +14,19 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import re
 
-from typing import Optional, Self, Iterable
+from typing import Self, override
 
 from caterpillar.context import (
     CTX_FIELD,
-    Context,
     CTX_PATH,
     CTX_OBJECT,
     CTX_STREAM,
     CTX_SEQ,
+    O_CONTEXT_FACTORY,
 )
 from caterpillar.byteorder import (
     ByteOrder,
-    SysNative,
     Arch,
-    system_arch,
 )
 from caterpillar.exception import StructException, ValidationError
 from caterpillar.options import (
@@ -54,6 +52,26 @@ from caterpillar.shared import (
 from caterpillar import registry
 
 
+class _Member:
+    def __init__(self, name, field, include=False, is_action=False):
+        self.name = name
+        self.field = field
+        self.include = include
+        self.is_action = is_action
+        self.action_unpack = getattr(field, ATTR_ACTION_UNPACK, None)
+        self.action_pack = getattr(field, ATTR_ACTION_PACK, None)
+
+    def __repr__(self):
+        if self.is_action:
+            return f"Action({self.field})"
+
+        return f"Member(name={self.name}, field={self.field}, include={self.include})"
+
+    @override
+    def __eq__(self, value: object, /) -> bool:
+        return self.field == value or value == self.name
+
+
 class Sequence(FieldMixin):
     """Default implementation for a sequence of fields.
 
@@ -65,41 +83,6 @@ class Sequence(FieldMixin):
     Sequence(fields=['a'])
     """
 
-    model: type
-    """
-    Specifies the target class/dictionary used as the base model.
-    """
-
-    # second value with action in tuple is reserved
-    fields: list
-    """A list of all fields defined in this struct.
-
-    This attribute stores the fields in an *ordered* collection, whereby ordered
-    means, relative to their initial class declaration position. These fields can
-    be modified using ``add_field``, ``del_field`` or the operators ``+`` and
-    ``-``.
-    """
-
-    order: Optional[ByteOrder]
-    """
-    Optional configuration value for the byte order of a field.__annotations__
-    """
-
-    arch: Optional[Arch]
-    """
-    Global architecture definition (will be inferred on all fields)
-    """
-
-    options: set
-    """
-    Additional options specifying what to include in the final class.
-    """
-
-    field_options: set
-    """
-    Global field flags that will be applied on all fields.
-    """
-
     __slots__ = (
         "model",
         "fields",
@@ -107,26 +90,26 @@ class Sequence(FieldMixin):
         "arch",
         "options",
         "field_options",
-        "_member_map_",
+        "_members",
         "is_union",
     )
 
     def __init__(
         self,
-        model: Optional[dict] = None,
-        order: Optional[ByteOrder] = None,
-        arch: Optional[Arch] = None,
-        options: Iterable[Flag] | None = None,
-        field_options: Iterable[Flag] | None = None,
+        model,
+        order=None,
+        arch=None,
+        options=None,
+        field_options=None,
     ) -> None:
         self.model = model
         self.arch = arch
-        self.order = order or SysNative
+        self.order = order
         self.options = set(options or [])
         self.field_options = set(field_options or [])
 
         # these fields will be set or used while processing the model type
-        self._member_map_ = {}
+        self._members = {}
         self.fields = []
         self.is_union = S_UNION in self.options
         # Process all fields in the model
@@ -134,23 +117,22 @@ class Sequence(FieldMixin):
 
     def __add__(self, sequence: "Sequence") -> Self:
         # We will try to import all fields from the given sequence
-        for field in sequence.fields:
-            if Action.is_action(field):
-                self.add_action(field)
-            else:
-                name = field.__name__
-                if name not in self._member_map_:
-                    is_included = name and name in sequence._member_map_
-                    self.add_field(name, field, is_included)
+        for member in sequence.fields:
+            # Ignore duplicates here:
+            if member.name in self.fields:
+                continue
+
+            self.fields.append(member)
+            if member.include and not member.is_action:
+                self._members[member.name] = member.field
         return self
 
     def __sub__(self, sequence: "Sequence") -> Self:
         # By default, we are only removing existing fields.
-        for field in sequence.fields:
-            if isinstance(field, Field):
-                name = field.__name__
-                if field in self.fields or (name and name in self._member_map_):
-                    self.del_field(name, field)
+        for member in sequence.fields:
+            self._members.pop(member.name, None)
+            if member.name in self.fields:
+                self.fields.remove(member)
         return self
 
     __iadd__ = __add__
@@ -269,8 +251,10 @@ class Sequence(FieldMixin):
         field = None
         struct = None
 
-        order = getattr(annotation, ATTR_BYTEORDER, self.order or SysNative)
-        arch = self.arch or system_arch
+        # The order and arch of the field can be overridden by the annotation
+        # and should not get applied if this seq does not define it.
+        order = getattr(annotation, ATTR_BYTEORDER, self.order)
+        arch = self.arch
         result = self._process_annotation(annotation, default, order, arch)
         if isinstance(result, Field):
             field = result
@@ -290,7 +274,8 @@ class Sequence(FieldMixin):
         field.default = default
         field.order = self.order or field.order
         field.arch = self.arch or field.arch
-        field.flags.update({hash(x): x for x in self.field_options})
+        field.flags.update(self.field_options)
+        # field.flags.update({hash(x): x for x in self.field_options})
         return field
 
     def add_field(self, name: str, field: Field, included: bool = False) -> None:
@@ -301,26 +286,31 @@ class Sequence(FieldMixin):
         :param field: The field to add.
         :param included: True if the field should be included, else False.
         """
-        self.fields.append(field)
+        self.fields.append(_Member(name, field, include=included))
         setattr(field, "__name__", name)
         if included:
-            self._member_map_[name] = field
+            self._members[name] = field
 
     def add_action(self, action) -> None:
-        self.fields.append((action, None))
+        """
+        Add an action to the struct.
 
-    def del_field(self, name: str, field: Field) -> None:
+        :param action: The action to add.
+        """
+        self.fields.append(_Member(None, action, is_action=True))
+
+    def del_field(self, name: str, field) -> None:
         """
         Remomves a field from this struct.
 
         :param name: The name of the field.
         :param field: The field to remove.
         """
-        self._member_map_.pop(name, None)
+        self._members.pop(name, None)
         self.fields.remove(field)
 
     def get_members(self):
-        return self._member_map_.copy()
+        return self._members.copy()
 
     def __size__(self, context) -> int:
         """
@@ -331,8 +321,11 @@ class Sequence(FieldMixin):
         """
         sizes = []
         base_path = context[CTX_PATH]
-        for field in self.fields:
-            context[CTX_PATH] = f"{base_path}.{field.__name__}"
+        for member in self.fields:
+            if member.is_action:
+                continue
+            field = member.field
+            context[CTX_PATH] = f"{base_path}.{member.name}"
             sizes.append(field.__size__(context))
 
         return max(sizes) if self.is_union else sum(sizes)
@@ -340,8 +333,8 @@ class Sequence(FieldMixin):
     def unpack_one(self, context):
         # At first, we define the object context where the parsed values
         # will be stored
-        init_data = Context()
-        context[CTX_OBJECT] = Context(_parent=context)
+        init_data = O_CONTEXT_FACTORY.value()
+        context[CTX_OBJECT] = O_CONTEXT_FACTORY.value(_parent=context)
 
         base_path = context[CTX_PATH]
         if self.is_union:
@@ -349,25 +342,23 @@ class Sequence(FieldMixin):
             start = stream.tell()
             max_size = 0
 
-        for field in self.fields:
-            if field.__class__ is tuple:
-                action, _ = field
-                action = getattr(action, ATTR_ACTION_UNPACK, None)
-                if action:
-                    action(context)
+        for member in self.fields:
+            if member.is_action:
+                if member.action_unpack:
+                    member.action_unpack(context)
                 continue
 
             if self.is_union:
                 pos = stream.tell()
 
             # REVISIT: make this a real attribute
-            name = field.__name__
+            name = member.name
             # The context path has to be changed accordingly
             context[CTX_PATH] = f"{base_path}.{name}"
-            result = field.__unpack__(context)
+            result = member.field.__unpack__(context)
             # the object's data shouldn't include removed fields
             context[CTX_OBJECT][name] = result
-            if name in self._member_map_:
+            if member.include:
                 init_data[name] = result
 
             if self.is_union:
@@ -391,14 +382,14 @@ class Sequence(FieldMixin):
         """
         base_path = context[CTX_PATH]
         # REVISIT: the name 'this_context' is misleading here
-        this_context = Context(
+        this_context = O_CONTEXT_FACTORY.value(
             _root=context._root,
             _parent=context,
             _io=context[CTX_STREAM],
             _path=base_path,
         )
         # See __pack__ for more information
-        field: Optional[Field] = context.get("_field")
+        field = context.get("_field")
         if field and context[CTX_SEQ]:
             return unpack_seq(context, self.unpack_one)
         return self.unpack_one(this_context)
@@ -411,15 +402,15 @@ class Sequence(FieldMixin):
         union_field = None
         base_path: str = context[CTX_PATH]
 
-        for field in self.fields:
-            if field.__class__ is tuple:
-                action, _ = field
-                action = getattr(action, ATTR_ACTION_PACK, None)
-                if action:
-                    action(context)
+        for member in self.fields:
+            if member.is_action:
+                if member.action_pack:
+                    member.action_pack(context)
                 continue
+
             # The name has to be set (important for current context)
-            name = field.__name__
+            name = member.name
+            field = member.field
             if self.is_union:
                 # Union is only applicable for non-dynamic structs
                 size: int = field.__size__(context)
@@ -429,7 +420,7 @@ class Sequence(FieldMixin):
             else:
                 # Default behaviour: let the field write its content to the stream.
                 context[CTX_PATH] = f"{base_path}.{name}"
-                if name in self._member_map_:
+                if member.include:
                     value = self.get_value(obj, name, field)
                 else:
                     # REVISIT: this line might not be necessary if const fields already
@@ -453,11 +444,11 @@ class Sequence(FieldMixin):
         # As structs can be used in field definitions a field will call this struct
         # and could potentially be a sequence. Therefore, we have to check whether we
         # should unpack multiple objects.
-        field: Optional[Field] = context.get(CTX_FIELD)
+        field = context.get(CTX_FIELD)
         if field and context[CTX_SEQ]:
             pack_seq(obj, context, self.pack_one)
         else:
-            ctx = Context(
+            ctx = O_CONTEXT_FACTORY.value(
                 _root=context._root,
                 _parent=context,
                 _io=context[CTX_STREAM],
@@ -467,7 +458,7 @@ class Sequence(FieldMixin):
             self.pack_one(obj, ctx)
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__qualname__}(fields={list(self._member_map_)})"
+        return f"{self.__class__.__qualname__}(fields={list(self._members)})"
 
     def __str__(self) -> str:
         return self.__repr__()

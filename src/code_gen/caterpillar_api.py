@@ -18,19 +18,18 @@ if not CAPI_PATH.exists():
     raise FileNotFoundError(f"File not found: {CAPI_PATH}")
 
 # Reserved for future use
-__reserved__ = "__reserved__"
+RESERVED_STR = "__reserved__"
 
-cp_types = {} # struct and typedefs
-cp_type_api = {}
-cp_api_src = []
-cp_func_api = {} # <name>: <index> <<-->> <name>: (rtype, [args])
+CP_TYPES: dict[str, str] = {}
+CP_TYPE_API: dict[str, tuple[int, str]] = {}
+CP_SRC: list[tuple[str, bool]] = []
+CP_FUNC_API: dict[str, int] = {}
+
+global_index = 0
 
 for line in CAPI_PATH.read_text("utf-8").splitlines():
-    if line.startswith("#"):
-        continue
-
     line = line.strip()
-    if not line:
+    if line.startswith("#") or not line:
         continue
 
     def_type, *parts = line.split(":")
@@ -39,40 +38,57 @@ for line in CAPI_PATH.read_text("utf-8").splitlines():
             # obj:INDEX:NAME:TYPE
             #   Defines a C API object.
             index, name, type_ = parts
-            cp_type_api[name] = (int(index), type_ if type_ != "-" else "PyTypeObject")
+            if index != "-":
+                index = global_index
+                global_index += 1
+            CP_TYPE_API[name] = (int(index), type_ if type_ != "-" else "PyTypeObject")
 
         case "type":
             # type:INDEX:STRUCT_NAME:TYPEDEF_NAME:CAPI_TYPE
             #   Defines a C API type for a C structure. The index is optional and
             #   the CAPI_TYPE will be inferred as PyTypeObject if none set
             index, struct_name, typedef_name, c_api_type = parts
-            cp_types[struct_name] = typedef_name
-            if index != '-':
+
+            CP_TYPES[struct_name] = typedef_name
+            if index != "-":
+                index = global_index
+                global_index += 1
                 if typedef_name.endswith("Object"):
                     typedef_name = typedef_name[:-6] + "_Type"
-                cp_type_api[typedef_name] = (int(index), c_api_type if c_api_type != "-" else "PyTypeObject")
+                CP_TYPE_API[typedef_name] = (
+                    int(index),
+                    c_api_type if c_api_type != "-" else "PyTypeObject",
+                )
 
         case "src":
-            # src:FILE
+            # src:FILE:IGNORE
             #   Defines the source file (relative to this file) that contains the
             #   function definitions.
-            cp_api_src.append(parts[0])
+            name, *ignored = parts
+            if not ignored:
+                ignored = False
+            CP_SRC.append((name, ignored))
 
         case "func":
             # func:INDEX:NAME:RETURN_TYPE:REFCOUNT
             #   Defines a C API function. The function must be present within the
             #   source set of this file.
             index, name, *_ = parts
-            if index != '-':
-                cp_func_api[name] = int(index)
+            if index != "-":
+                index = global_index
+                global_index += 1
+                CP_FUNC_API[name] = int(index)
+
+        case _:
+            pass
 
 
-def cp_api_functions() -> dict[str, tuple]:
+def cp_api_functions() -> dict[str, tuple[str, list[str]]]:
     base_path = os.path.dirname(__file__)
 
     func_api = {}
     # REVISIT: dirty parsing algorithm
-    for f in cp_api_src:
+    for f, _ in CP_SRC:
         with open(os.path.join(base_path, "..", f), "r", encoding="utf-8") as c_src:
             while True:
                 line = c_src.readline()

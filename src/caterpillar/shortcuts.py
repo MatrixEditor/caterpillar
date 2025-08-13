@@ -28,6 +28,7 @@ from .byteorder import (
     x86_64,
 )
 from .context import ContextPath, ctx, parent, this, ContextLength as lenof
+from .context import ctx as C, parent as P, root as G
 from .model import (
     bitfield,
     pack,
@@ -80,4 +81,7 @@ __all__ = [
     "to_struct",
     "F",
     "opt",
+    "C",
+    "P",
+    "G",
 ]

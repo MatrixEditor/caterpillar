@@ -1,79 +1,19 @@
 /* context and context path implementation */
-#include "caterpillar/context.h"
+#include "caterpillar/caterpillar.h"
+#include "private.h"
 #include "structmember.h"
 
 /* impl */
 static int
 cp_context_init(CpContextObject* self, PyObject* args, PyObject* kw)
 {
-  return PyDict_Type.tp_init((PyObject*)self, args, kw) < 0;
+  return PyDict_Type.tp_init((PyObject*)&self->m_dict, args, kw) < 0;
 }
 
 static int
 cp_context__setattr__(CpContextObject* self, char* name, PyObject* value)
 {
   return PyDict_SetItemString((PyObject*)&self->m_dict, name, value);
-}
-
-static inline PyObject*
-_cp_context__context_getattr__(CpContextObject* self, PyObject* name)
-{
-  _modulestate* state = get_global_module_state();
-  PyObject *tmp = NULL, *lineValue = name, *lastKey = NULL, *key = NULL,
-           *obj = NULL;
-
-  PyObject* values = PyUnicode_Split(lineValue, state->str_path_delim, -1);
-  if (!values) {
-    return NULL;
-  }
-
-  size_t length = PyList_Size(values);
-  if (length == 0) {
-    Py_XDECREF(values);
-    PyErr_SetString(PyExc_ValueError, "Empty path");
-    return NULL;
-  }
-
-  key = PyList_GetItem(values, 0);
-  if (!key) {
-    Py_XDECREF(values);
-    return NULL;
-  }
-
-  tmp = Py_XNewRef(PyDict_GetItem((PyObject*)&self->m_dict, key));
-  if (!tmp) {
-    PyErr_Clear();
-    PyErr_Format(
-      PyExc_AttributeError, "Context has no attribute '%s'", Py_XNewRef(key));
-    Py_XDECREF(values);
-    return NULL;
-  }
-
-  obj = tmp;
-  Py_XSETREF(lastKey, Py_XNewRef(key));
-  for (size_t i = 1; i < length; i++) {
-    key = PyList_GetItem(values, i);
-    if (!key) {
-      Py_XDECREF(values);
-      return NULL;
-    }
-
-    tmp = PyObject_GetAttr(obj, key);
-    if (!tmp) {
-      PyErr_Clear();
-      PyErr_Format(PyExc_AttributeError,
-                   "'%s' has no attribute '%s'",
-                   lastKey,
-                   Py_XNewRef(key));
-      Py_XDECREF(values);
-      return NULL;
-    }
-
-    Py_XSETREF(obj, tmp);
-    Py_XSETREF(lastKey, Py_XNewRef(key));
-  }
-  Py_XDECREF(values);
-  return obj;
 }
 
 static PyObject*
@@ -83,34 +23,418 @@ cp_context__context_getattr__(CpContextObject* self, PyObject* args)
   if (!PyArg_ParseTuple(args, "O", &name)) {
     return NULL;
   }
-  return _cp_context__context_getattr__(self, name);
+  return CpContext_GenericGetAttr((PyObject*)self, name);
+}
+
+static PyObject*
+cp_context__context_setattr__(CpContextObject* self, PyObject* args)
+{
+  PyObject *name = NULL, *value = NULL;
+  if (!PyArg_ParseTuple(args, "OO", &name, &value)) {
+    return NULL;
+  }
+  return CpContext_GenericSetAttr((PyObject*)self, name, value) < 0
+           ? NULL
+           : Py_NewRef(Py_None);
 }
 
 static PyObject*
 cp_context__getattro__(CpContextObject* self, PyObject* name)
 {
   PyObject* result = PyObject_GenericGetAttr((PyObject*)&self->m_dict, name);
-  if (result) {
+  if (result)
     return result;
-  }
+  PyErr_Clear();
+
+  // try to resolve via __getitem__ call
+  result = PyDict_GetItem((PyObject*)&self->m_dict, name);
+  if (result)
+    return Py_NewRef(result);
 
   PyErr_Clear();
-  return _cp_context__context_getattr__(self, name);
+  return CpContext_GenericGetAttr((PyObject*)self, name);
+}
+
+static PyObject*
+cp_context__getattr__(CpContextObject* self, const char* path)
+{
+  PyObject* result = PyObject_GetAttrString((PyObject*)&self->m_dict, path);
+  if (result)
+    return result;
+
+  PyErr_Clear();
+  // try to resolve via __getitem__ call
+  result = PyDict_GetItemString((PyObject*)&self->m_dict, path);
+  if (result)
+    return Py_NewRef(result);
+
+  PyErr_Clear();
+  return CpContext_GenericGetAttrString((PyObject*)self, path);
+}
+
+static PyObject*
+cp_context_get_root(CpContextObject* self, void* closure)
+{
+  return CpContext_GetRoot((PyObject*)self);
 }
 
 /* public API */
 
 /*CpAPI*/
-CpContextObject*
-CpContext_New(void)
+PyObject*
+CpContext_GenericGetAttrString(PyObject* context, const char* path)
 {
-  return (CpContextObject*)CpObject_CreateNoArgs(&CpContext_Type);
+  PyObject *pathObj = NULL, *result = NULL;
+  if (!path) {
+    PyErr_SetString(PyExc_ValueError, "Path must not be NULL!");
+    goto finish;
+  }
+
+  pathObj = PyUnicode_FromString(path);
+  if (!pathObj) {
+    goto finish;
+  }
+
+  result = CpContext_GenericGetAttr(context, pathObj);
+finish:
+  Py_XDECREF(pathObj);
+  return result;
+}
+
+/*CpAPI*/
+PyObject*
+CpContext_GenericGetAttr(PyObject* context, PyObject* path)
+{
+  _modulestate* state = get_global_module_state();
+  PyObject* str = PyObject_Repr(path);
+  // Names starting with 'n' contain a NEW reference to a
+  // Python object, whereas variables starting with 'b'
+  // store a borrowed reference.
+  PyObject *nObj = NULL, *nValues = NULL, *nTmp = NULL, *nLastKey = NULL;
+  PyObject* bKey = NULL;
+  size_t length = 0;
+
+  // We should not assert that context and path are NOT NULL,
+  // due to the nature of this method. (exported API)
+  if (!context) {
+    PyErr_SetString(PyExc_ValueError, "Context must not be NULL!");
+    goto error;
+  }
+
+  if (!path) {
+    PyErr_SetString(PyExc_ValueError, "Path must not be NULL!");
+    goto error;
+  }
+
+  // At first, we will split up the path into several elements
+  nValues = PyUnicode_Split(path, state->str__path_sep, -1);
+  if (!nValues) {
+    goto error;
+  }
+
+  length = PyList_Size(nValues);
+  if (length == 0) {
+    PyErr_SetString(PyExc_ValueError, "Empty or invalid path!");
+    goto error;
+  }
+
+  bKey = PyList_GetItem(nValues, 0);
+  if (!bKey) {
+    goto error;
+  }
+
+  // go through each element and use object.__getattr__ for each of them
+  nTmp = PyObject_GetItem(context, bKey);
+  if (!nTmp) {
+    // not even present on the top layer -> invalid path
+    PyErr_Clear();
+    nTmp = PyObject_GenericGetAttr(context, bKey);
+    if (!nTmp) {
+      goto error;
+    }
+  }
+
+  Py_XSETREF(nObj, Py_XNewRef(nTmp));
+  Py_XSETREF(nLastKey, Py_XNewRef(bKey));
+  for (size_t depth = 1; depth < length; ++depth) {
+    // Fetch each path element and use getattr(nObj, bKey)
+    // for each of them.
+    bKey = PyList_GetItem(nValues, depth);
+    if (!bKey) {
+      goto error;
+    }
+
+    Py_XSETREF(nTmp, PyObject_GetAttr(nObj, bKey));
+    if (!nTmp) {
+      PyErr_Clear();
+      PyErr_Format(PyExc_ValueError,
+                   "%R has no attribute %R in path %R",
+                   nLastKey,
+                   bKey,
+                   path);
+      goto error;
+    }
+
+    Py_SETREF(nObj, Py_NewRef(nTmp));
+    Py_SETREF(nLastKey, Py_NewRef(bKey));
+  }
+  goto success;
+
+error:
+  Py_XSETREF(nObj, NULL);
+
+success:
+  Py_XDECREF(nValues);
+  Py_XDECREF(nTmp);
+  Py_XDECREF(nLastKey);
+
+  // already a new reference, we don't have to use Py_NewRef here.
+  return nObj;
+}
+
+/*CpAPI*/
+PyObject*
+CpContext_GetRoot(PyObject* pObj)
+{
+  // TODO: NULL check
+  _modulestate* state = get_global_module_state();
+  PyObject* nRoot = NULL;
+  if (!pObj) {
+    PyErr_SetString(PyExc_ValueError, "Context must not be NULL!");
+    return NULL;
+  }
+
+  nRoot = CpContext_ITEM(pObj, state->str__context_root);
+  if (nRoot)
+    return nRoot;
+
+  PyErr_Clear();
+  return Py_NewRef(pObj);
+}
+
+/*CpAPI*/
+int
+CpContext_GenericSetAttrString(PyObject* pContext,
+                               const char* pPath,
+                               PyObject* pValue)
+{
+  PyObject* nPathObj = NULL;
+  int vResult = 0;
+  if (!pPath) {
+    PyErr_SetString(PyExc_ValueError, "Path must not be NULL!");
+    goto finish;
+  }
+
+  nPathObj = PyUnicode_FromString(pPath);
+  if (!nPathObj) {
+    goto finish;
+  }
+
+  vResult = CpContext_GenericSetAttr(pContext, nPathObj, pValue);
+finish:
+  Py_XDECREF(nPathObj);
+  return vResult;
+}
+
+/*CpAPI*/
+int
+CpContext_GenericSetAttr(PyObject* pContext, PyObject* pPath, PyObject* pValue)
+{
+  _modulestate* state = get_global_module_state();
+  PyObject *nElemets = NULL, *nMaxSplit = PyLong_FromLong(1), *nObj = NULL,
+           *bNewPath = NULL, *bTarget = NULL;
+  int error = 0;
+  if (!nMaxSplit)
+    goto error;
+
+  if (!pContext) {
+    PyErr_SetString(PyExc_ValueError, "Context object must not be NULL!");
+    goto error;
+  }
+  if (!pPath) {
+    PyErr_SetString(PyExc_ValueError, "Target path must not be NULL!");
+    goto error;
+  }
+
+  // [0] - path to the object storing the target attribute
+  // [1] - target attribute
+  nElemets = PyObject_CallMethodObjArgs(
+    pPath, state->str__fn_rsplit, state->str__path_sep, nMaxSplit, NULL);
+  if (!nElemets)
+    goto error;
+
+  // if length is one, set the attribute directly
+  if (PyList_Size(nElemets) == 1) {
+    if (PyObject_SetItem(
+          pContext, pPath, pValue ? pValue : Py_NewRef(Py_None)) < 0)
+      goto error;
+  } else {
+    bNewPath = PyList_GetItem(nElemets, 0);
+    if (!bNewPath)
+      goto error;
+
+    nObj = CpContext_GenericGetAttr(pContext, bNewPath);
+    if (!nObj)
+      goto error;
+
+    bTarget = PyList_GetItem(nElemets, 1);
+    if (!bTarget)
+      goto error;
+
+    if (PyObject_SetAttr(nObj, bTarget, pValue ? pValue : Py_NewRef(Py_None)) <
+        0)
+      goto error;
+  }
+  goto success;
+
+error:
+  error = -1;
+
+success:
+  Py_XDECREF(nObj);
+  Py_XDECREF(nElemets);
+  Py_XDECREF(nMaxSplit);
+  return error;
+}
+
+/*CpAPI*/
+PyObject*
+CpContextIO_Tell(PyObject* pContext)
+{
+  PyObject *nResult = NULL, *nIO = NULL;
+  _modulestate* state = get_global_module_state();
+
+  _Cp_AssignCheck(nIO, CpContext_IO(pContext, state), error);
+  _Cp_AssignCheck(
+    nResult, PyObject_CallMethodNoArgs(nIO, state->str__io_tell), error);
+  goto success;
+
+error:
+  Py_CLEAR(nResult);
+
+success:
+  Py_XDECREF(nIO);
+  return nResult;
+}
+
+/*CpAPI*/
+PyObject*
+CpContextIO_Seek(PyObject* pContext, PyObject* pOffset, PyObject* pWhence)
+{
+  PyObject *nResult = NULL, *nIO = NULL;
+  _modulestate* state = get_global_module_state();
+
+  _Cp_AssignCheck(nIO, CpContext_IO(pContext, state), error);
+  _Cp_AssignCheck(nResult,
+                  PyObject_CallMethodObjArgs(
+                    nIO, state->str__io_seek, pOffset, pWhence, NULL),
+                  error);
+  goto success;
+
+error:
+  Py_CLEAR(nResult);
+
+success:
+  Py_XDECREF(nIO);
+  return nResult;
+}
+
+/*CpAPI*/
+PyObject*
+CpContextIO_Read(PyObject* pContext, PyObject* pSize)
+{
+  PyObject *nResult = NULL, *nIO = NULL;
+  _modulestate* state = get_global_module_state();
+
+  _Cp_AssignCheck(nIO, CpContext_IO(pContext, state), error);
+  _Cp_AssignCheck(
+    nResult,
+    PyObject_CallMethodObjArgs(nIO, state->str__io_read, pSize, NULL),
+    error);
+  goto success;
+
+error:
+  Py_CLEAR(nResult);
+
+success:
+  Py_XDECREF(nIO);
+  return nResult;
+}
+
+/*CpAPI*/
+PyObject*
+CpContextIO_ReadSsize_t(PyObject* pContext, Py_ssize_t pSize)
+{
+  PyObject *nResult = NULL, *nSize = NULL;
+
+  _Cp_AssignCheck(nSize, PyLong_FromSsize_t(pSize), error);
+  _Cp_AssignCheck(nResult, CpContextIO_Read(pContext, nSize), error);
+
+error: // == success:
+  Py_XDECREF(nSize);
+  return nResult;
+}
+
+/*CpAPI*/
+PyObject*
+CpContextIO_ReadFully(PyObject* pContext)
+{
+  PyObject *nResult = NULL, *nIO = NULL;
+  _modulestate* state = get_global_module_state();
+
+  _Cp_AssignCheck(nIO, CpContext_IO(pContext, state), error);
+  _Cp_AssignCheck(
+    nResult, PyObject_CallMethodNoArgs(nIO, state->str__io_read), error);
+  goto success;
+
+error:
+  Py_CLEAR(nResult);
+
+success:
+  Py_XDECREF(nIO);
+  return nResult;
+}
+
+/*CpAPI*/
+PyObject*
+CpContextIO_WriteBytes(PyObject* pContext, PyObject* pData)
+{
+  PyObject *nResult = NULL, *nIO = NULL;
+  _modulestate* state = get_global_module_state();
+
+  _Cp_AssignCheck(nIO, CpContext_IO(pContext, state), error);
+  _Cp_AssignCheck(
+    nResult,
+    PyObject_CallMethodObjArgs(nIO, state->str__io_write, pData, NULL),
+    error);
+  goto success;
+
+error:
+  Py_CLEAR(nResult);
+
+success:
+  Py_XDECREF(nIO);
+  return nResult;
+}
+
+/*CpAPI*/
+PyObject*
+CpContextIO_Write(PyObject* pContext, const char* pData, Py_ssize_t pSize)
+{
+  PyObject *nResult = NULL, *nData = NULL;
+
+  _Cp_AssignCheck(nData, PyUnicode_FromStringAndSize(pData, pSize), error);
+  _Cp_AssignCheck(nResult, CpContextIO_WriteBytes(pContext, nData), error);
+
+error: // == success:
+  Py_XDECREF(nData);
+  return nResult;
 }
 
 /* docs */
 
 PyDoc_STRVAR(cp_context__doc__, "\
-CpContext(**kwargs)\n\
+c_Context(**kwargs)\n\
 --\n\
 Represents a context object with attribute-style access.\n\
 \n\
@@ -125,836 +449,89 @@ static PyMethodDef CpContext_Methods[] = {
     (PyCFunction)cp_context__context_getattr__,
     METH_VARARGS,
     "Gets an attribute from the context" },
+  { "__context_setattr__",
+    (PyCFunction)cp_context__context_setattr__,
+    METH_VARARGS,
+    NULL },
   { NULL } /* Sentinel */
 };
 
+static PyGetSetDef CpContext_GetSets[] = {
+  { "_root", (getter)cp_context_get_root, NULL, NULL, NULL },
+  { NULL },
+};
+
 PyTypeObject CpContext_Type = {
-  PyVarObject_HEAD_INIT(NULL, 0) _Cp_Name(Context),
+  PyVarObject_HEAD_INIT(NULL, 0) _Cp_NameStr(CpContext_NAME),
   .tp_basicsize = sizeof(CpContextObject),
   .tp_setattr = (setattrfunc)cp_context__setattr__,
+  .tp_getattr = (getattrfunc)cp_context__getattr__,
   .tp_getattro = (getattrofunc)cp_context__getattro__,
+  .tp_getset = CpContext_GetSets,
   .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
   .tp_doc = cp_context__doc__,
   .tp_methods = CpContext_Methods,
   .tp_init = (initproc)cp_context_init,
 };
 
-//------------------------------------------------------------------------------
-// unary expression
-static PyObject*
-cp_unaryexpr_new(PyTypeObject* type, PyObject* args, PyObject* kw)
+/* init */
+int
+cp_context__mod_types()
 {
-  CpUnaryExprObject* self;
-  self = (CpUnaryExprObject*)type->tp_alloc(type, 0);
-  if (self == NULL)
-    return NULL;
-
-  Py_INCREF(Py_None);
-  self->m_value = Py_None;
-  self->m_expr = -1;
-  return (PyObject*)self;
-}
-
-static void
-cp_unaryexpr_dealloc(CpUnaryExprObject* self)
-{
-  Py_XDECREF(self->m_value);
-  Py_TYPE(self)->tp_free((PyObject*)self);
-}
-
-static int
-cp_unaryexpr_init(CpUnaryExprObject* self, PyObject* args, PyObject* kw)
-{
-  static char* kwlist[] = { "expr", "value", NULL };
-  PyObject* value = NULL;
-  int expr = -1;
-  if (!PyArg_ParseTupleAndKeywords(args, kw, "iO", kwlist, &expr, &value))
-    return -1;
-
-  if (value) {
-    Py_XSETREF(self->m_value, value);
-    Py_INCREF(self->m_value);
-  }
-
-  self->m_expr = expr;
-  if (self->m_expr < 0 || self->m_expr > 3) {
-    PyErr_SetString(PyExc_ValueError, "invalid expression type");
-    return -1;
-  }
+  CpContext_Type.tp_base = &PyDict_Type;
+  CpModule_SetupType(&CpContext_Type, -1);
   return 0;
 }
 
-static PyObject*
-cp_unaryexpr_repr(CpUnaryExprObject* self)
+int
+cp_context__mod_init(PyObject* m, _modulestate* state)
 {
-  char ch;
-  switch (self->m_expr) {
-    case CpUnaryExpr_OpNeg:
-      ch = '-';
-      break;
-    case CpUnaryExpr_OpNot:
-      ch = '!';
-      break;
-    case CpUnaryExpr_OpPos:
-      ch = '+';
-      break;
-    default:
-      ch = '?';
-  }
-  return PyUnicode_FromFormat("%c(%R)", ch, self->m_value);
-}
+  // constant path separator to eliminate creating the string
+  // every time.
+  _CACHED_STRING(state, str__path_sep, ".", -1);
+  _CACHED_STRING(state, str__context_root, "_root", -1);
+  _CACHED_STRING(state, str__fn_rsplit, "rsplit", -1);
+  _CACHED_STRING(state, str__context_parent, "_parent", -1);
+  _CACHED_STRING(state, str__context_io, "_io", -1);
+  _CACHED_STRING(state, str__context_length, "_length", -1);
+  _CACHED_STRING(state, str__context_index, "_index", -1);
+  _CACHED_STRING(state, str__context_path, "_path", -1);
+  _CACHED_STRING(state, str__context_obj, "_obj", -1);
+  _CACHED_STRING(state, str__context_is_seq, "_is_seq", -1);
+  _CACHED_STRING(state, str__context_field, "_field", -1);
+  _CACHED_STRING(state, str__value, "value", -1);
+  _CACHED_STRING(state, str__context_list, "_lst", -1);
+  _CACHED_STRING(state, str__io_read, "read", -1);
+  _CACHED_STRING(state, str__io_write, "write", -1);
+  _CACHED_STRING(state, str__io_seek, "seek", -1);
+  _CACHED_STRING(state, str__io_tell, "tell", -1);
+  _CACHED_STRING(state, str__context_offsets, "_offsets", -1);
+  _CACHED_STRING(state, str__io_getvalue, "getvalue", -1);
 
-static Py_hash_t
-cp_unaryexpr_hash(CpUnaryExprObject* self)
-{
-  PyObject* expr = PyLong_FromSize_t(self->m_expr);
-  Py_hash_t hash = PyObject_Hash(expr);
-  Py_XDECREF(expr);
-  return hash;
-}
-
-static PyObject*
-cp_unaryexpr__call__(CpUnaryExprObject* self, PyObject* args, PyObject* kw)
-{
-  PyObject* value = self->m_value;
-  if (PyCallable_Check(value)) {
-    value = PyObject_Call(value, args, kw);
-    if (!value) {
-      if (!PyErr_Occurred()) {
-        PyErr_SetString(PyExc_TypeError, "value must be callable");
-      }
-      Py_XDECREF(value);
-      return NULL;
-    }
-  } else {
-    Py_XINCREF(value);
-  }
-
-  if (!PyNumber_Check(value)) {
-    PyErr_Format(PyExc_TypeError, "value must be a number, got %R", value);
-    Py_XDECREF(value);
-    return NULL;
-  }
-
-  PyObject* result;
-  switch (self->m_expr) {
-    case CpUnaryExpr_OpNeg:
-      result = PyNumber_Negative(value);
-      break;
-    case CpUnaryExpr_OpNot:
-      result = PyNumber_Invert(value);
-      break;
-    case CpUnaryExpr_OpPos:
-      result = PyNumber_Positive(value);
-      break;
-    default:
-      result = NULL;
-      break;
-  }
-
-  Py_XDECREF(value);
-  if (!result) {
-    if (!PyErr_Occurred()) {
-      PyErr_SetString(PyExc_TypeError, "invalid expression type");
-    }
-    return NULL;
-  }
-  return result;
-}
-
-static PyObject*
-cp_unaryexpr_as_number_neg(PyObject* self)
-{
-  return (PyObject*)CpUnaryExpr_New(CpUnaryExpr_OpNeg, self);
-}
-
-static PyObject*
-cp_unaryexpr_as_number_pos(PyObject* self)
-{
-  return (PyObject*)CpUnaryExpr_New(CpUnaryExpr_OpPos, self);
-}
-
-static PyObject*
-cp_unaryexpr_as_number_not(PyObject* self)
-{
-  return (PyObject*)CpUnaryExpr_New(CpUnaryExpr_OpNot, self);
-}
-
-/* operations */
-#define _CpUnaryExpr_BinaryNumberMethod(name, op)                             \
-  static PyObject* cp_unaryexpr_as_number_##name(PyObject* self,              \
-                                                  PyObject* other)             \
-  {                                                                            \
-    return (PyObject*)CpBinaryExpr_New(op, self, other);                       \
-  }
-
-_CpUnaryExpr_BinaryNumberMethod(add, CpBinaryExpr_OpAdd);
-_CpUnaryExpr_BinaryNumberMethod(sub, CpBinaryExpr_OpSub);
-_CpUnaryExpr_BinaryNumberMethod(mul, CpBinaryExpr_OpMul);
-_CpUnaryExpr_BinaryNumberMethod(div, CpBinaryExpr_OpTrueDiv);
-_CpUnaryExpr_BinaryNumberMethod(truediv, CpBinaryExpr_OpTrueDiv);
-_CpUnaryExpr_BinaryNumberMethod(floordiv, CpBinaryExpr_OpFloorDiv);
-_CpUnaryExpr_BinaryNumberMethod(mod, CpBinaryExpr_OpMod);
-_CpUnaryExpr_BinaryNumberMethod(lshift, CpBinaryExpr_OpLShift);
-_CpUnaryExpr_BinaryNumberMethod(rshift, CpBinaryExpr_OpRShift);
-_CpUnaryExpr_BinaryNumberMethod(and, CpBinaryExpr_OpBitAnd);
-_CpUnaryExpr_BinaryNumberMethod(xor, CpBinaryExpr_OpBitXor);
-_CpUnaryExpr_BinaryNumberMethod(or, CpBinaryExpr_OpBitOr);
-_CpUnaryExpr_BinaryNumberMethod(pow, CpBinaryExpr_OpPow);
-_CpUnaryExpr_BinaryNumberMethod(matmul, CpBinaryExpr_OpMatMul);
-
-#undef _CpUnaryExpr_BinaryNumberMethod
-
-/*CpAPI*/
-CpUnaryExprObject*
-CpUnaryExpr_New(int op, PyObject* value)
-{
-  return (CpUnaryExprObject*)CpObject_Create(
-    &CpUnaryExpr_Type, "iO", op, value);
-}
-
-/* docs */
-
-PyDoc_STRVAR(cp_unaryexpr_doc, "UnaryExpr(expr, value)");
-
-/* type setup */
-static PyMemberDef CpUnaryExpr_Members[] = {
-  { "expr",
-    T_INT,
-    offsetof(CpUnaryExprObject, m_expr),
-    READONLY,
-    "The expression type." },
-  { "value", T_OBJECT, offsetof(CpUnaryExprObject, m_value), 0, "The value." },
-  { NULL } /* Sentinel */
-};
-
-static PyNumberMethods CpBinaryExpr_NumberMethods = {
-  // unary
-  .nb_negative = (unaryfunc)cp_unaryexpr_as_number_neg,
-  .nb_positive = (unaryfunc)cp_unaryexpr_as_number_pos,
-  .nb_invert = (unaryfunc)cp_unaryexpr_as_number_not,
-  // binary
-  .nb_add = (binaryfunc)cp_unaryexpr_as_number_add,
-  .nb_subtract = (binaryfunc)cp_unaryexpr_as_number_sub,
-  .nb_multiply = (binaryfunc)cp_unaryexpr_as_number_mul,
-  .nb_true_divide = (binaryfunc)cp_unaryexpr_as_number_truediv,
-  .nb_floor_divide = (binaryfunc)cp_unaryexpr_as_number_floordiv,
-  .nb_remainder = (binaryfunc)cp_unaryexpr_as_number_mod,
-  .nb_power = (ternaryfunc)cp_unaryexpr_as_number_pow,
-  .nb_lshift = (binaryfunc)cp_unaryexpr_as_number_lshift,
-  .nb_rshift = (binaryfunc)cp_unaryexpr_as_number_rshift,
-  .nb_and = (binaryfunc)cp_unaryexpr_as_number_and,
-  .nb_xor = (binaryfunc)cp_unaryexpr_as_number_xor,
-  .nb_or = (binaryfunc)cp_unaryexpr_as_number_or,
-  .nb_matrix_multiply = (binaryfunc)cp_unaryexpr_as_number_matmul,
-};
-
-PyTypeObject CpUnaryExpr_Type = {
-  PyVarObject_HEAD_INIT(NULL, 0) _Cp_Name(UnaryExpr),
-  .tp_basicsize = sizeof(CpUnaryExprObject),
-  .tp_dealloc = (destructor)cp_unaryexpr_dealloc,
-  .tp_repr = (reprfunc)cp_unaryexpr_repr,
-  .tp_hash = (hashfunc)cp_unaryexpr_hash,
-  .tp_call = (ternaryfunc)cp_unaryexpr__call__,
-  .tp_flags = Py_TPFLAGS_DEFAULT,
-  .tp_doc = cp_unaryexpr_doc,
-  .tp_members = CpUnaryExpr_Members,
-  .tp_init = (initproc)cp_unaryexpr_init,
-  .tp_new = (newfunc)cp_unaryexpr_new,
-  .tp_as_number = &CpBinaryExpr_NumberMethods,
-};
-
-//------------------------------------------------------------------------------
-// binary expression
-static PyObject*
-cp_binaryexpr_new(PyTypeObject* type, PyObject* args, PyObject* kw)
-{
-  CpBinaryExprObject* self;
-  self = (CpBinaryExprObject*)type->tp_alloc(type, 0);
-  if (self == NULL)
-    return NULL;
-
-  Py_INCREF(Py_None);
-  self->m_right = Py_None;
-  Py_INCREF(Py_None);
-  self->m_left = Py_None;
-  self->m_expr = -1;
-  return (PyObject*)self;
-}
-
-static void
-cp_binaryexpr_dealloc(CpBinaryExprObject* self)
-{
-  Py_XDECREF(self->m_left);
-  Py_XDECREF(self->m_right);
-  Py_TYPE(self)->tp_free((PyObject*)self);
-}
-
-static int
-cp_binaryexpr_init(CpBinaryExprObject* self, PyObject* args, PyObject* kw)
-{
-  static char* kwlist[] = { "expr", "left", "right", NULL };
-  PyObject *left = NULL, *right = NULL;
-  int expr = -1;
-  if (!PyArg_ParseTupleAndKeywords(
-        args, kw, "iOO", kwlist, &expr, &left, &right)) {
-    return -1;
-  }
-
-  if (left) {
-    Py_XSETREF(self->m_left, left);
-    Py_XINCREF(self->m_left);
-  }
-
-  if (right) {
-    Py_XSETREF(self->m_right, right);
-    Py_XINCREF(self->m_right);
-  }
-
-  self->m_expr = expr;
-  if (self->m_expr < CpBinaryExpr_Op_LT ||
-      self->m_expr > CpBinaryExpr_OpRShift) {
-    PyErr_SetString(PyExc_ValueError, "invalid expression type");
-    return -1;
-  }
+  CpModule_AddObject(CpContext_NAME, &CpContext_Type, -1);
   return 0;
 }
 
-static PyObject*
-cp_binaryexpr_repr(CpBinaryExprObject* self)
+void
+cp_context__mod_clear(PyObject* m, _modulestate* state)
 {
-  char* s;
-  switch (self->m_expr) {
-    case CpBinaryExpr_OpAdd:
-      s = "+";
-      break;
-    case CpBinaryExpr_OpSub:
-      s = "-";
-      break;
-    case CpBinaryExpr_OpMul:
-      s = "*";
-      break;
-    case CpBinaryExpr_OpFloorDiv:
-      s = "//";
-      break;
-    case CpBinaryExpr_OpTrueDiv:
-      s = "/";
-      break;
-    case CpBinaryExpr_OpMod:
-      s = "%";
-      break;
-    case CpBinaryExpr_OpPow:
-      s = "**";
-      break;
-    case CpBinaryExpr_OpBitXor:
-      s = "^";
-      break;
-    case CpBinaryExpr_OpBitAnd:
-      s = "&";
-      break;
-    case CpBinaryExpr_OpBitOr:
-      s = "|";
-      break;
-    case CpBinaryExpr_OpLShift:
-      s = "<<";
-      break;
-    case CpBinaryExpr_OpRShift:
-      s = ">>";
-      break;
-    case CpBinaryExpr_Op_GT:
-      s = ">";
-      break;
-    case CpBinaryExpr_Op_GE:
-      s = ">=";
-      break;
-    case CpBinaryExpr_Op_LT:
-      s = "<";
-      break;
-    case CpBinaryExpr_Op_LE:
-      s = "<=";
-      break;
-    case CpBinaryExpr_Op_EQ:
-      s = "==";
-      break;
-    case CpBinaryExpr_Op_NE:
-      s = "!=";
-      break;
-    case CpBinaryExpr_OpAnd:
-      s = "and";
-      break;
-    case CpBinaryExpr_OpOr:
-      s = "or";
-      break;
-    case CpBinaryExpr_OpMatMul:
-      s = "@";
-      break;
-    default:
-      PyErr_SetString(PyExc_ValueError, "invalid expression type");
-      return NULL;
-  }
-  return PyUnicode_FromFormat("(%R) %s (%R)", self->m_left, s, self->m_right);
+  Py_CLEAR(state->str__path_sep);
+  Py_CLEAR(state->str__context_root);
+  Py_CLEAR(state->str__fn_rsplit);
+  Py_CLEAR(state->str__context_parent);
+  Py_CLEAR(state->str__context_io);
+  Py_CLEAR(state->str__context_length);
+  Py_CLEAR(state->str__context_index);
+  Py_CLEAR(state->str__context_path);
+  Py_CLEAR(state->str__context_obj);
+  Py_CLEAR(state->str__context_is_seq);
+  Py_CLEAR(state->str__context_field);
+  Py_CLEAR(state->str__value);
+  Py_CLEAR(state->str__context_list);
+  Py_CLEAR(state->str__io_read);
+  Py_CLEAR(state->str__io_write);
+  Py_CLEAR(state->str__io_seek);
+  Py_CLEAR(state->str__io_tell);
+  Py_CLEAR(state->str__context_offsets);
+  Py_CLEAR(state->str__io_getvalue);
 }
-
-static PyObject*
-cp_binaryexpr__call__(CpBinaryExprObject* self, PyObject* args, PyObject* kw)
-{
-  PyObject* left = self->m_left;
-  if (PyCallable_Check(left)) {
-    left = PyObject_Call(left, args, kw);
-    if (!left) {
-      if (!PyErr_Occurred()) {
-        PyErr_SetString(PyExc_RuntimeError, "Error during lhs evaluation");
-      }
-      Py_XDECREF(left);
-      return NULL;
-    }
-  } else {
-    Py_XINCREF(left);
-  }
-
-  PyObject* right = self->m_right;
-  if (PyCallable_Check(right)) {
-    right = PyObject_Call(right, args, kw);
-    if (!right) {
-      if (!PyErr_Occurred()) {
-        PyErr_SetString(PyExc_RuntimeError, "Error during rhs evaluation");
-      }
-      Py_XDECREF(right);
-      return NULL;
-    }
-  } else {
-    Py_XINCREF(right);
-  }
-
-  PyObject* result;
-  switch (self->m_expr) {
-    case CpBinaryExpr_OpAdd:
-      result = PyNumber_Add(left, right);
-      break;
-    case CpBinaryExpr_OpSub:
-      result = PyNumber_Subtract(left, right);
-      break;
-    case CpBinaryExpr_OpMul:
-      result = PyNumber_Multiply(left, right);
-      break;
-    case CpBinaryExpr_OpFloorDiv:
-      result = PyNumber_FloorDivide(left, right);
-      break;
-    case CpBinaryExpr_OpTrueDiv:
-      result = PyNumber_TrueDivide(left, right);
-      break;
-    case CpBinaryExpr_OpMod:
-      result = PyNumber_Remainder(left, right);
-      break;
-    case CpBinaryExpr_OpPow:
-      result = PyNumber_Power(left, right, Py_None);
-      break;
-    case CpBinaryExpr_OpBitXor:
-      result = PyNumber_Xor(left, right);
-      break;
-    case CpBinaryExpr_OpBitAnd:
-      result = PyNumber_And(left, right);
-      break;
-    case CpBinaryExpr_OpBitOr:
-      result = PyNumber_Or(left, right);
-      break;
-    case CpBinaryExpr_OpLShift:
-      result = PyNumber_Lshift(left, right);
-      break;
-    case CpBinaryExpr_OpRShift:
-      result = PyNumber_Rshift(left, right);
-      break;
-    case CpBinaryExpr_Op_GT:
-      result = PyObject_RichCompare(left, right, Py_GT);
-      break;
-    case CpBinaryExpr_Op_GE:
-      result = PyObject_RichCompare(left, right, Py_GE);
-      break;
-    case CpBinaryExpr_Op_LT:
-      result = PyObject_RichCompare(left, right, Py_LT);
-      break;
-    case CpBinaryExpr_Op_LE:
-      result = PyObject_RichCompare(left, right, Py_LE);
-      break;
-    case CpBinaryExpr_Op_EQ:
-      result = PyObject_RichCompare(left, right, Py_EQ);
-      break;
-    case CpBinaryExpr_Op_NE:
-      result = PyObject_RichCompare(left, right, Py_NE);
-      break;
-    case CpBinaryExpr_OpAnd:
-      result = PyNumber_And(left, right);
-      break;
-    case CpBinaryExpr_OpOr:
-      result = PyNumber_Or(left, right);
-      break;
-    case CpBinaryExpr_OpMatMul:
-      result = PyNumber_MatrixMultiply(left, right);
-      break;
-    default:
-      result = NULL;
-      break;
-  }
-
-  Py_XDECREF(left);
-  Py_XDECREF(right);
-  if (!result) {
-    if (!PyErr_Occurred()) {
-      PyErr_SetString(PyExc_TypeError, "invalid expression type");
-    }
-    return NULL;
-  }
-  return result;
-}
-
-static PyObject*
-cp_binaryexpr_as_number_neg(PyObject* self)
-{
-  return (PyObject*)CpUnaryExpr_New(CpUnaryExpr_OpNeg, self);
-}
-
-static PyObject*
-cp_binaryexpr_as_number_pos(PyObject* self)
-{
-  return (PyObject*)CpUnaryExpr_New(CpUnaryExpr_OpPos, self);
-}
-
-static PyObject*
-cp_binaryexpr_as_number_not(PyObject* self)
-{
-  return (PyObject*)CpUnaryExpr_New(CpUnaryExpr_OpNot, self);
-}
-
-/* operations */
-#define _CpUnaryExpr_BinaryNumberMethod(name, op)                             \
-  static PyObject* cp_binaryexpr_as_number_##name(PyObject* self,              \
-                                                  PyObject* other)             \
-  {                                                                            \
-    return (PyObject*)CpBinaryExpr_New(op, self, other);                       \
-  }
-
-_CpUnaryExpr_BinaryNumberMethod(add, CpBinaryExpr_OpAdd);
-_CpUnaryExpr_BinaryNumberMethod(sub, CpBinaryExpr_OpSub);
-_CpUnaryExpr_BinaryNumberMethod(mul, CpBinaryExpr_OpMul);
-_CpUnaryExpr_BinaryNumberMethod(div, CpBinaryExpr_OpTrueDiv);
-_CpUnaryExpr_BinaryNumberMethod(truediv, CpBinaryExpr_OpTrueDiv);
-_CpUnaryExpr_BinaryNumberMethod(floordiv, CpBinaryExpr_OpFloorDiv);
-_CpUnaryExpr_BinaryNumberMethod(mod, CpBinaryExpr_OpMod);
-_CpUnaryExpr_BinaryNumberMethod(lshift, CpBinaryExpr_OpLShift);
-_CpUnaryExpr_BinaryNumberMethod(rshift, CpBinaryExpr_OpRShift);
-_CpUnaryExpr_BinaryNumberMethod(and, CpBinaryExpr_OpBitAnd);
-_CpUnaryExpr_BinaryNumberMethod(xor, CpBinaryExpr_OpBitXor);
-_CpUnaryExpr_BinaryNumberMethod(or, CpBinaryExpr_OpBitOr);
-_CpUnaryExpr_BinaryNumberMethod(pow, CpBinaryExpr_OpPow);
-_CpUnaryExpr_BinaryNumberMethod(matmul, CpBinaryExpr_OpMatMul);
-
-#undef _CpUnaryExpr_BinaryNumberMethod
-
-/*CpAPI*/
-CpBinaryExprObject*
-CpBinaryExpr_New(int op, PyObject* left, PyObject* right)
-{
-  return (CpBinaryExprObject*)CpObject_Create(
-    &CpBinaryExpr_Type, "iOO", op, left, right);
-}
-
-/* docs */
-PyDoc_STRVAR(cp_binaryexpr_doc, "CpBinaryExpr(expr, left, right)");
-
-/* type setup */
-static PyMemberDef CpBinaryExpr_Members[] = {
-  { "expr",
-    T_INT,
-    offsetof(CpBinaryExprObject, m_expr),
-    READONLY,
-    "expression type" },
-  { "lhs",
-    T_OBJECT,
-    offsetof(CpBinaryExprObject, m_left),
-    0,
-    "left hand side" },
-  { "rhs",
-    T_OBJECT,
-    offsetof(CpBinaryExprObject, m_left),
-    0,
-    "right hand side" },
-  { NULL } /* Sentinel */
-};
-
-static PyNumberMethods CpUnaryExpr_NumberMethods = {
-  // unary
-  .nb_negative = (unaryfunc)cp_binaryexpr_as_number_neg,
-  .nb_positive = (unaryfunc)cp_binaryexpr_as_number_pos,
-  .nb_invert = (unaryfunc)cp_binaryexpr_as_number_not,
-  // binary
-  .nb_add = (binaryfunc)cp_binaryexpr_as_number_add,
-  .nb_subtract = (binaryfunc)cp_binaryexpr_as_number_sub,
-  .nb_multiply = (binaryfunc)cp_binaryexpr_as_number_mul,
-  .nb_true_divide = (binaryfunc)cp_binaryexpr_as_number_truediv,
-  .nb_floor_divide = (binaryfunc)cp_binaryexpr_as_number_floordiv,
-  .nb_remainder = (binaryfunc)cp_binaryexpr_as_number_mod,
-  .nb_power = (ternaryfunc)cp_binaryexpr_as_number_pow,
-  .nb_lshift = (binaryfunc)cp_binaryexpr_as_number_lshift,
-  .nb_rshift = (binaryfunc)cp_binaryexpr_as_number_rshift,
-  .nb_and = (binaryfunc)cp_binaryexpr_as_number_and,
-  .nb_xor = (binaryfunc)cp_binaryexpr_as_number_xor,
-  .nb_or = (binaryfunc)cp_binaryexpr_as_number_or,
-  .nb_matrix_multiply = (binaryfunc)cp_binaryexpr_as_number_matmul,
-};
-
-PyTypeObject CpBinaryExpr_Type = {
-  PyVarObject_HEAD_INIT(NULL, 0) _Cp_Name(BinaryExpr),
-  .tp_basicsize = sizeof(CpBinaryExprObject),
-  .tp_dealloc = (destructor)cp_binaryexpr_dealloc,
-  .tp_repr = (reprfunc)cp_binaryexpr_repr,
-  .tp_call = (ternaryfunc)cp_binaryexpr__call__,
-  .tp_flags = Py_TPFLAGS_DEFAULT,
-  .tp_doc = cp_unaryexpr_doc,
-  .tp_members = CpBinaryExpr_Members,
-  .tp_init = (initproc)cp_binaryexpr_init,
-  .tp_new = (newfunc)cp_binaryexpr_new,
-  .tp_as_number = &CpUnaryExpr_NumberMethods,
-};
-
-//------------------------------------------------------------------------------
-// context path
-static PyObject*
-cp_contextpath_new(PyTypeObject* type, PyObject* args, PyObject* kw)
-{
-  CpContextPathObject* self;
-  self = (CpContextPathObject*)type->tp_alloc(type, 0);
-  if (self == NULL)
-    return NULL;
-
-  self->m_path = PyUnicode_FromString("");
-  if (!self->m_path) {
-    Py_DECREF(self->m_path);
-    return NULL;
-  }
-  self->m_state = get_global_module_state();
-  return (PyObject*)self;
-}
-
-static void
-cp_contextpath_dealloc(CpContextPathObject* self)
-{
-  Py_XDECREF(self->m_path);
-  Py_TYPE(self)->tp_free((PyObject*)self);
-}
-
-static int
-cp_contextpath_init(CpContextPathObject* self, PyObject* args, PyObject* kw)
-{
-  static char* kwlist[] = { "path", NULL };
-  PyObject* path = NULL;
-  if (!PyArg_ParseTupleAndKeywords(args, kw, "|U", kwlist, &path))
-    return -1;
-
-  if (path) {
-    Py_XSETREF(self->m_path, path);
-    Py_INCREF(self->m_path);
-  }
-  return 0;
-}
-
-static PyObject*
-cp_contextpath_repr(CpContextPathObject* self)
-{
-  return PyUnicode_FromFormat("<path %R>", self->m_path);
-}
-
-static PyObject*
-cp_contextpath_str(CpContextPathObject* self)
-{
-  return Py_XNewRef(self->m_path);
-}
-
-static Py_hash_t
-cp_contextpath_hash(CpContextPathObject* self)
-{
-  return PyObject_Hash(self->m_path);
-}
-
-static PyObject*
-cp_contextpath__type__(CpContextPathObject* self)
-{
-  PyObject* type = get_global_module_state()->Any_Type;
-  Py_INCREF(type);
-  return type;
-}
-
-static PyObject*
-cp_contextpath__size__(CpContextPathObject* self, PyObject* args)
-{
-  return PyLong_FromSize_t(0);
-}
-
-static PyObject*
-cp_contextpath__getattr__(CpContextPathObject* self, char* name)
-{
-  PyObject* key = PyUnicode_FromString(name);
-  PyObject* result = PyObject_GenericGetAttr((PyObject*)&self->ob_base, key);
-  Py_XDECREF(key);
-  if (result) {
-    return result;
-  }
-
-  PyErr_Clear();
-
-  if (!self->m_path || PyUnicode_GET_LENGTH(self->m_path) == 0) {
-    result = PyObject_CallFunction((PyObject*)&CpContextPath_Type, "s", name);
-  } else {
-    PyObject* path =
-      PyUnicode_FromFormat("%s.%s", PyUnicode_AsUTF8(self->m_path), name);
-    result = PyObject_CallFunction((PyObject*)&CpContextPath_Type, "O", path);
-    Py_XDECREF(path);
-  }
-
-  Py_XINCREF(result);
-  return result;
-}
-
-static PyObject*
-cp_contextpath__call__(CpContextPathObject* self,
-                       PyObject* args,
-                       PyObject* kwargs)
-{
-  static char* kwlist[] = { "context", NULL };
-  PyObject* context = NULL;
-  if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O", kwlist, &context))
-    return NULL;
-
-  if (!context || context == Py_None) {
-    PyErr_SetString(PyExc_ValueError, "context cannot be None");
-    return NULL;
-  }
-
-  return PyObject_CallMethodOneArg(
-    context, self->m_state->str_ctx__getattr, self->m_path);
-}
-
-static PyObject*
-cp_contextpath_as_number_neg(PyObject* self)
-{
-  return (PyObject*)CpUnaryExpr_New(CpUnaryExpr_OpNeg, self);
-}
-
-static PyObject*
-cp_contextpath_as_number_pos(PyObject* self)
-{
-  return (PyObject*)CpUnaryExpr_New(CpUnaryExpr_OpPos, self);
-}
-
-static PyObject*
-cp_contextpath_as_number_not(PyObject* self)
-{
-  return (PyObject*)CpUnaryExpr_New(CpUnaryExpr_OpNot, self);
-}
-
-#define _CpContextPath_BinaryNumberMethod(name, op)                            \
-  static PyObject* cp_contextpath_as_number_##name(PyObject* self,             \
-                                                   PyObject* other)            \
-  {                                                                            \
-    return (PyObject*)CpBinaryExpr_New(op, self, other);                       \
-  }
-
-_CpContextPath_BinaryNumberMethod(add, CpBinaryExpr_OpAdd);
-_CpContextPath_BinaryNumberMethod(sub, CpBinaryExpr_OpSub);
-_CpContextPath_BinaryNumberMethod(mul, CpBinaryExpr_OpMul);
-_CpContextPath_BinaryNumberMethod(div, CpBinaryExpr_OpTrueDiv);
-_CpContextPath_BinaryNumberMethod(truediv, CpBinaryExpr_OpTrueDiv);
-_CpContextPath_BinaryNumberMethod(floordiv, CpBinaryExpr_OpFloorDiv);
-_CpContextPath_BinaryNumberMethod(mod, CpBinaryExpr_OpMod);
-_CpContextPath_BinaryNumberMethod(lshift, CpBinaryExpr_OpLShift);
-_CpContextPath_BinaryNumberMethod(rshift, CpBinaryExpr_OpRShift);
-_CpContextPath_BinaryNumberMethod(and, CpBinaryExpr_OpBitAnd);
-_CpContextPath_BinaryNumberMethod(xor, CpBinaryExpr_OpBitXor);
-_CpContextPath_BinaryNumberMethod(or, CpBinaryExpr_OpBitOr);
-_CpContextPath_BinaryNumberMethod(pow, CpBinaryExpr_OpPow);
-_CpContextPath_BinaryNumberMethod(matmul, CpBinaryExpr_OpMatMul);
-
-#undef _CpContextPath_BinaryNumberMethod
-
-static PyObject*
-cp_contextpath_richcmp(PyObject* self, PyObject* other, int op)
-{
-  return (PyObject*)CpBinaryExpr_New(op, self, other);
-}
-
-/*CpAPI*/
-CpContextPathObject*
-CpContextPath_New(PyObject* path)
-{
-  return (CpContextPathObject*)CpObject_Create(&CpContextPath_Type, "O", path);
-}
-
-/*CpAPI*/
-CpContextPathObject*
-CpContextPath_FromString(const char* path)
-{
-  return (CpContextPathObject*)CpObject_Create(&CpContextPath_Type, "s", path);
-}
-
-/* docs */
-PyDoc_STRVAR(cp_contextpath__doc__, "\
-ContextPath(path)\n\
---\n\
-Represents a lambda function for retrieving a value from a Context \
-based on a specified path.\n\
-");
-
-/* members */
-static PyMemberDef CpContextPath_Members[] = { { "path",
-                                                 T_OBJECT,
-                                                 offsetof(CpContextPathObject,
-                                                          m_path),
-                                                 READONLY,
-                                                 "the path" },
-                                               { NULL } };
-
-static PyMethodDef CpContextPath_Methods[] = {
-  { "__type__", (PyCFunction)cp_contextpath__type__, METH_NOARGS },
-  { "__size__", (PyCFunction)cp_contextpath__size__, METH_VARARGS },
-  { NULL, NULL }
-};
-
-static PyNumberMethods CpContextPath_NumberMethods = {
-  // unary
-  .nb_negative = (unaryfunc)cp_contextpath_as_number_neg,
-  .nb_positive = (unaryfunc)cp_contextpath_as_number_pos,
-  .nb_invert = (unaryfunc)cp_contextpath_as_number_not,
-  // binary
-  .nb_add = (binaryfunc)cp_contextpath_as_number_add,
-  .nb_subtract = (binaryfunc)cp_contextpath_as_number_sub,
-  .nb_multiply = (binaryfunc)cp_contextpath_as_number_mul,
-  .nb_true_divide = (binaryfunc)cp_contextpath_as_number_truediv,
-  .nb_floor_divide = (binaryfunc)cp_contextpath_as_number_floordiv,
-  .nb_remainder = (binaryfunc)cp_contextpath_as_number_mod,
-  .nb_power = (ternaryfunc)cp_contextpath_as_number_pow,
-  .nb_lshift = (binaryfunc)cp_contextpath_as_number_lshift,
-  .nb_rshift = (binaryfunc)cp_contextpath_as_number_rshift,
-  .nb_and = (binaryfunc)cp_contextpath_as_number_and,
-  .nb_xor = (binaryfunc)cp_contextpath_as_number_xor,
-  .nb_or = (binaryfunc)cp_contextpath_as_number_or,
-  .nb_matrix_multiply = (binaryfunc)cp_contextpath_as_number_matmul,
-};
-
-/* type */
-PyTypeObject CpContextPath_Type = {
-  PyVarObject_HEAD_INIT(NULL, 0) _Cp_Name(ContextPath),
-  .tp_basicsize = sizeof(CpContextPathObject),
-  .tp_dealloc = (destructor)cp_contextpath_dealloc,
-  .tp_getattr = (getattrfunc)cp_contextpath__getattr__,
-  .tp_repr = (reprfunc)cp_contextpath_repr,
-  .tp_as_number = &CpContextPath_NumberMethods,
-  .tp_hash = (hashfunc)cp_contextpath_hash,
-  .tp_call = (ternaryfunc)cp_contextpath__call__,
-  .tp_flags = Py_TPFLAGS_DEFAULT,
-  .tp_doc = cp_contextpath__doc__,
-  .tp_richcompare = (richcmpfunc)cp_contextpath_richcmp,
-  .tp_methods = CpContextPath_Methods,
-  .tp_members = CpContextPath_Members,
-  .tp_init = (initproc)cp_contextpath_init,
-  .tp_new = (newfunc)cp_contextpath_new,
-  .tp_str = (reprfunc)cp_contextpath_str,
-};

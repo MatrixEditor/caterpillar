@@ -1,0 +1,102 @@
+/* module implementation */
+#ifndef _CPMODULE
+#define _CPMODULE
+#endif
+
+#include "caterpillar/caterpillar.h"
+
+#include "caterpillarapi.c"
+#include "private.h"
+
+// ------------------------------------------------------------------------------
+// module
+static int
+cp_module_clear(PyObject* m)
+{
+  _modulestate* state = get_module_state(m);
+  if (state) {
+    /* clear default arch and endian */
+    shared__mod_clear(m, state);
+    %s
+  }
+  return 0;
+}
+
+static void
+cp_module_free(void* m)
+{
+  cp_module_clear((PyObject*)m);
+}
+
+/* module def */
+PyModuleDef CpModule = {
+  PyModuleDef_HEAD_INIT,          /* m_base */
+  .m_name = "caterpillar._C",     /* m_name */
+  .m_size = sizeof(_modulestate), /* m_size */
+  .m_clear = cp_module_clear,     /* m_clear */
+  .m_free = cp_module_free        /* m_free */
+};
+
+/* module init */
+PyMODINIT_FUNC
+PyInit__C(void)
+{
+  PyObject *m = NULL, *c_api = NULL, *nDict = NULL;
+  _modulestate* state = NULL;
+
+  m = PyState_FindModule(&CpModule);
+  if (m) {
+    return Py_NewRef(m);
+  }
+
+  // type setup
+#define SETUP_TYPES(name)                                                      \
+  if (name##__mod_types() < 0)                                                 \
+    goto err;
+
+#define ADD_OBJECTS(name)                                                      \
+  if (name##__mod_init(m, state) < 0)                                          \
+    goto err;
+
+  %s
+
+  m = PyModule_Create(&CpModule);
+  if (!m) {
+    goto err;
+  }
+
+  /* setup state */
+  state = get_module_state(m);
+
+  ADD_OBJECTS(shared);
+  %s
+
+  /*Export API table*/
+  c_api = PyCapsule_New((void*)Cp_API, NULL, NULL);
+  if (c_api == NULL) {
+    goto err;
+  }
+
+  if ((nDict = PyDict_New(), !nDict)) {
+    goto err;
+  }
+
+  if (PyDict_SetItemString(nDict, "_C_API", c_api) < 0) {
+    goto err;
+  }
+  goto success;
+
+err:
+  if (!PyErr_Occurred()) {
+    PyErr_SetString(PyExc_RuntimeError, "cannot load caterpillar._C module.");
+  }
+  Py_XSETREF(m, NULL);
+
+success:
+  Py_XDECREF(nDict);
+  Py_XDECREF(c_api);
+  return m;
+
+#undef SETUP_TYPES
+#undef ADD_OBJECTS
+}

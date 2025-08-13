@@ -44,7 +44,7 @@ from caterpillar.fields import (
     INVALID_DEFAULT,
 )
 from caterpillar.exception import StructException
-from caterpillar.context import CTX_PATH, Context, CTX_OBJECT, CTX_STREAM
+from caterpillar.context import CTX_PATH, O_CONTEXT_FACTORY, CTX_OBJECT, CTX_STREAM
 
 from ._struct import Struct, sizeof
 
@@ -895,8 +895,8 @@ class Bitfield(Struct):
         return sum(map(lambda g: g.get_bits(), self.groups))
 
     def unpack_one(self, context):
-        init_data = Context()
-        context[CTX_OBJECT] = Context(_parent=context)
+        init_data = O_CONTEXT_FACTORY.value()
+        context[CTX_OBJECT] = O_CONTEXT_FACTORY.value(_parent=context)
         base_path = context[CTX_PATH]
         # REVISIT
         endian = "little" if self.order == LittleEndian else "big"
@@ -908,7 +908,7 @@ class Bitfield(Struct):
                 context[CTX_PATH] = f"{base_path}.{name}"
                 value = field.__unpack__(context)
                 context[CTX_OBJECT][name] = value
-                if name in self._member_map_:
+                if name in self._members:
                     init_data[name] = value
 
             else:
@@ -930,7 +930,7 @@ class Bitfield(Struct):
                             func(context)
                             continue
 
-                    if entry.name not in self._member_map_:
+                    if entry.name not in self._members:
                         continue
 
                     value = (raw_value >> entry.shift(group.bit_count)) & entry.low_mask
@@ -950,7 +950,7 @@ class Bitfield(Struct):
                 field = group.get_field()
                 name = field.__name__
                 context[CTX_PATH] = f"{base_path}.{name}"
-                if name in self._member_map_:
+                if name in self._members:
                     value = self.get_value(obj, name, field)
                 else:
                     value = field.default if field.default != INVALID_DEFAULT else None
@@ -966,7 +966,7 @@ class Bitfield(Struct):
                             func(context)
                         continue
 
-                    if entry.name not in self._member_map_:
+                    if entry.name not in self._members:
                         continue
 
                     entry_value = self.get_value(obj, entry.name, None)

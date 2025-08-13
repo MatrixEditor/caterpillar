@@ -1,51 +1,31 @@
-# pylint: disable=no-name-in-module,unused-import
 import pytest
 import caterpillar
 
 if caterpillar.native_support():
+    from caterpillar.c import c_Option
+    from caterpillar.py import Flag, Field
 
-    from caterpillar._C import Option
-    from caterpillar._C import (
-        F_DYNAMIC,
-        F_SEQUENTIAL,
-        S_DISCARD_UNNAMED,
-        S_REPLACE_TYPES,
-        S_SLOTS,
-        S_UNION,
-        S_EVAL_ANNOTATIONS,
-    )
-    from caterpillar._C import FIELD_OPTIONS, STRUCT_OPTIONS
+    def testc_option_init():
+        option = c_Option("name")
+        assert option.name == "name"
 
+        option2 = c_Option("name", value=3)
+        assert option2.name == "name"
+        assert option2.value == 3
+        # The equality check will be based on the name attribute
+        assert option2 == option
 
-    @pytest.mark.parametrize(
-        "option",
-        [
-            S_DISCARD_UNNAMED,
-            S_REPLACE_TYPES,
-            S_SLOTS,
-            S_UNION,
-            S_EVAL_ANNOTATIONS,
-        ],
-    )
-    def test_option(option: Option):
-        """Simply cosistency check."""
-        assert option.name.startswith("struct:")
+        with pytest.raises(ValueError):
+            # The name MUST NOT be empty
+            c_Option("")
 
-        STRUCT_OPTIONS.add(option)
-        assert option in STRUCT_OPTIONS
-        STRUCT_OPTIONS.remove(option) # necessary for other tests
+    def testc_option_compat():
+        flag = Flag("name")
+        option = c_Option("name")
 
+        # All flags and options will be treated the same way
+        assert flag == option
 
-    @pytest.mark.parametrize(
-        "option",
-        [
-            F_DYNAMIC,
-            F_SEQUENTIAL,
-        ],
-    )
-    def test_field_option(option: Option):
-        """Simply cosistency check."""
-        assert option.name.startswith("field:")
-
-        FIELD_OPTIONS.add(option)
-        assert option in FIELD_OPTIONS
+    def testc_option_field_compat():
+        f = Field(lambda context: 1, flags={c_Option("name")})
+        assert f.has_flag(c_Option("name"))
