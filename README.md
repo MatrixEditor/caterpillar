@@ -8,12 +8,6 @@
 ![GitHub License](https://img.shields.io/github/license/MatrixEditor/caterpillar?logo=github)
 
 
-
-> [!WARNING]
-> This project is still in beta/testing phase. Expect bugs, naming changes and errors while using this
-> library. C API Reference is WIP, C extensions are supported since v2.1.0. The latest stable release
-> is available at PyPI.
-
 Caterpillar is a Python 3.12+ library to pack and unpack structurized binary data. It
 enhances the capabilities of [Python Struct](https://docs.python.org/3/library/struct.html)
 by enabling direct class declaration. More information about the different configuration
@@ -100,7 +94,7 @@ pip install caterpillar-py
 pip install "caterpillar[all]@git+https://github.com/MatrixEditor/caterpillar"
 ```
 
-### C-extension installation
+### Installation + C-extension
 
 ```bash
 pip install "caterpillar[all]@git+https://github.com/MatrixEditor/caterpillar/#subdirectory=src/ccaterpillar"
