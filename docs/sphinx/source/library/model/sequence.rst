@@ -8,3 +8,7 @@ Sequence
 
 .. autoclass:: Sequence
     :members:
+
+    .. versionchanged:: 2.6.0
+        The :code:`Sequence` class now internally uses another class (``_Member``)
+        to store the fields and actions.

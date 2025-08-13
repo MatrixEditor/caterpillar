@@ -7,7 +7,7 @@ Field Model
 .. autoclass:: caterpillar.fields.Field
     :members:
     :private-members:
-    :no-undoc-members:
+    :undoc-members:
 
 .. autoclass:: caterpillar.fields.FieldMixin
     :special-members:

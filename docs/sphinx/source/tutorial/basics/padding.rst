@@ -4,10 +4,6 @@
 Padding
 *******
 
-.. attention::
-    This section is subject to change if :code:`Padding` is implemented.
-
-
 In binary file formats, padding is often used to align data to certain byte
 boundaries. *Caterpillar* provides a way to handle padding within structs.
 However, it is important to note that *caterpillar* doesn't store any data

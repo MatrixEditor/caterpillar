@@ -11,7 +11,7 @@ that automatically generates an array of a fixed length, making your code
 cleaner and more intuitive.
 
 To define a custom operator, *Caterpillar* provides a mechanism using the
-:code:`_infix_` function, which allows you to wrap a lambda or function as an
+:code:`Operator` class, which allows you to wrap a lambda or function as an
 operator. This custom operator can then be applied to fields in a struct,
 just like any other operator.
 
@@ -19,9 +19,9 @@ Here's an example that demonstrates how to define and use a custom operator:
 
 .. code-block:: python
 
-    from caterpillar.fields import _infix_
+    from caterpillar.fields import Operator
 
-    M = _infix_(lambda s, count: s[count * 2])
+    M = Operator(lambda s, count: s[count * 2])
 
     @struct
     class Format:

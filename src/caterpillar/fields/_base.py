@@ -48,7 +48,19 @@ DEFAULT_OPTION = object()
 
 
 class Field:
-    """Represents a field in a data structure."""
+    """Represents a field in a data structure.
+
+    :param struct: The structure or callable used to define the field's type.
+    :param order: Byte order for the field (default: SysNative).
+    :param offset: Field offset or callable (default: -1, meaning no explicit offset).
+    :param flags: Optional set of flags associated with the field.
+    :param amount: The number of elements if this field is a sequence (default: 0).
+    :param options: A dictionary representing a switch-case mapping.
+    :param condition: A boolean or callable determining whether the field is active.
+    :param arch: Architecture specification (default: system_arch).
+    :param default: The default value (default: INVALID_DEFAULT).
+    :param bits: Bit size if the field is bit-packed.
+    """
 
     def __init__(
         self,
@@ -63,8 +75,7 @@ class Field:
         default=INVALID_DEFAULT,
         bits=None,
     ) -> None:
-        # pre-computed states to reduce computing time overhead when
-        # packing or unpacking.
+        # Cached flags to optimize packing/unpacking performance
         self._is_lambda = False
         self._has_cond = False
         self._cond_is_lambda = False
@@ -82,7 +93,7 @@ class Field:
         self.__flags = None
         self.__offset = None
         self.__amount = None
-        self.__options = None  # named for historical reasons, should be SWITCH
+        self.__options = None  # Historically named; represents switch mappings
 
         # initialization via property setters
         self.struct = struct
@@ -95,13 +106,17 @@ class Field:
         self.amount = amount or 1
         self.options = options
 
-        # NOTE: we use INVALID_DEFAULT as disabled default value indicator, so
-        # that None is still usable as default
+        # INVALID_DEFAULT indicates that no default was explicitly set;
+        # allows None to be used as a valid default
         self.default = default
 
-    # These getsetters won't validate the input!!
+    # -- Property Definitions (Input validation not enforced) --
+
     @property
     def struct(self):
+        """
+        The internal structure for this field.
+        """
         return self.__struct
 
     @struct.setter
@@ -112,6 +127,9 @@ class Field:
 
     @property
     def condition(self):
+        """
+        The field's condition expression or value.
+        """
         return self.__condition
 
     @condition.setter
@@ -122,6 +140,7 @@ class Field:
 
     @property
     def flags(self):
+        """The set of flags associated with this field."""
         return self.__flags
 
     @flags.setter
@@ -129,6 +148,13 @@ class Field:
         self.__flags = value
 
     def add_flag(self, flag) -> None:
+        """
+        Adds a flag to this field.
+
+        :param flag: The flag to add.
+
+        .. versionadded:: 2.6.0
+        """
         self.flags.add(flag)
 
     def has_flag(self, flag: Flag) -> bool:
@@ -142,10 +168,18 @@ class Field:
         return flag in self.flags or flag in GLOBAL_FIELD_FLAGS
 
     def remove_flag(self, flag: Flag) -> None:
+        """
+        Removes a flag from this field.
+
+        :param flag: The flag to remove.
+
+        .. versionadded:: 2.6.0
+        """
         self.flags.discard(flag)
 
     @property
     def offset(self):
+        """The field's offset."""
         return self.__offset
 
     @offset.setter
@@ -153,12 +187,11 @@ class Field:
         self.__offset = value
         self._has_offset = value not in (-1, None)
         self._offset_is_lambda = callable(value)
-        # This operation automatically removes the "keep_position"
-        # flag. It has to be set manually.
         self._keep_pos = value in (-1, None)
 
     @property
     def amount(self):
+        """The repetition count for this field."""
         return self.__amount
 
     @amount.setter
@@ -169,6 +202,7 @@ class Field:
 
     @property
     def options(self):
+        """The switch-case options dictionary."""
         return self.__options
 
     @options.setter
@@ -180,6 +214,14 @@ class Field:
         )
 
     def _verify_context_value(self, value, expected) -> None:
+        """
+        Verifies that a value is either of the expected type(s) or is a callable.
+        Used to validate inputs for context-aware fields.
+
+        :param value: The value to validate.
+        :param expected: A type or tuple of valid types.
+        :raises TypeError: If validation fails.
+        """
         # As the offset value or amount may be dynamic, we have to candidate
         # types. There should be an error if none applies.
         if not isinstance(value, expected) and not callable(value):
@@ -187,44 +229,101 @@ class Field:
                 f"Expected a valid value or context lambda, got {type(value)}"
             )
 
+    # --- Operator Overloads ---
+
     def __or__(self, flag):  # add flags
+        """
+        Adds a flag using the '|' operator.
+
+        :param flag: The flag to add.
+        :return: The updated Field instance.
+        """
         self.add_flag(flag)
         return self
 
     def __xor__(self, flag):  # remove flags:
+        """
+        Removes a flag using the '^' operator.
+
+        :param flag: The flag to remove.
+        :return: The updated Field instance.
+        """
         self.remove_flag(flag)
         return self
 
     def __matmul__(self, offset):
+        """
+        Sets the field's offset using the '@' operator.
+
+        :param offset: The offset value (int or callable).
+        :return: The updated Field instance.
+        """
         self._verify_context_value(offset, int)
         self.offset = offset
         return self
 
     def __getitem__(self, dim):
+        """
+        Sets the number of elements using the indexing operator (e.g.,
+        field[3]).
+
+        :param dim: Repetition count or dynamic type.
+        :return: The updated Field instance.
+        """
         self._verify_context_value(dim, (_GreedyType, int, _PrefixedType))
         self.amount = dim
         return self
 
     def __rshift__(self, switch):
+        """
+        Defines switch-case mappings using the '>>' operator.
+
+        :param switch: A dictionary of options.
+        :return: The updated Field instance.
+        """
         self._verify_context_value(switch, dict)
         self.options = switch
         return self
 
     def __floordiv__(self, condition):
+        """
+        Sets the field's condition using the '//' operator.
+
+        :param condition: A boolean or callable.
+        :return: The updated Field instance.
+        """
         self._verify_context_value(condition, bool)
         self.condition = condition
         return self
 
     def __rsub__(self, bits):
+        """
+        Sets the number of bits for bit-packed fields using the reverse '-'
+        operator.
+
+        :param bits: Bit width (int or callable).
+        :return: The updated Field instance.
+        """
         self._verify_context_value(bits, int)
         self.bits = bits
         return self
 
     def __set_byteorder__(self, order: ByteOrder):
+        """
+        Explicitly sets the byte order for this field.
+
+        :param order: A ByteOrder instance.
+        :return: The updated Field instance.
+        """
         self.order = order
         return self
 
     def __type__(self):
+        """
+        Returns the resolved type of the field, typically from the struct.
+
+        :return: The field type.
+        """
         return self.get_type()
 
     __ixor__ = __xor__
