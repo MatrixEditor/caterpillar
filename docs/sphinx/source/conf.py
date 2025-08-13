@@ -15,7 +15,7 @@ import caterpillar
 
 project = "Caterpillar"
 author = caterpillar.__author__
-copyright = f"2024, {author}"
+copyright = f"2025, {author}"
 release = version = caterpillar.__version__
 
 # -- General configuration ---------------------------------------------------
