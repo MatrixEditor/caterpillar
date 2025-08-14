@@ -1731,9 +1731,11 @@ class AsLengthRef:
 
     def __mod__(self, other) -> Self:
         self.struct = other
+        return self
 
     def __rmod__(self, other) -> Self:
         self.struct = other
+        return self
 
     def __type__(self) -> type:
         return int

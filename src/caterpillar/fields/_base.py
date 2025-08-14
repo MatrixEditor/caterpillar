@@ -533,7 +533,7 @@ class Field:
             )
         else:
             # Just hand over the input value if the struct is not a lambda
-            value = self.struct(obj, context) if self._is_lambda else obj
+            value = self.struct(context) if self._is_lambda else obj
             if not self._is_lambda:
                 # support for non-context lambdas with switch statements
                 self.struct.__pack__(value, context)
