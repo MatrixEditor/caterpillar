@@ -6,6 +6,25 @@ Changelog
 
 *More entries will be added in the future.*
 
+.. _changelog_2.6.1:
+
+[2.6.1] - Hot-Fix
+=================
+
+Fixed
+-----
+
+*caterpillar.fields._base*
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+- Fix switch functionality within the `Field` class for `ContextPath` objects
+
+*caterpillar.fields.common*
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+- fix ``%`` operator for the :class:`~caterpillar.fields.common.AsLengthRef` class.
+
+
 .. _changelog_2.6.0:
 
 [2.6.0] - Minor Release
@@ -23,7 +42,9 @@ Added
 *caterpillar.fields.common*
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-- Add compatibility support for CAPI atoms in ``Int``, ``UInt`` and ``PyStructFormattedField``
+- Add compatibility support for CAPI atoms in ``Int``, ``UInt`` and
+  ``PyStructFormattedField``
+- Add new :class:`~caterpillar.fields.common.AsLengthRef` class
 
 *caterpillar.options*
 ^^^^^^^^^^^^^^^^^^^^^

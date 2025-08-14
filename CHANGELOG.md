@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.6.1] - Hot-Fix Release
+
+### Fixed
+
+- **caterpillar.fields._base**
+  - Fix switch functionality within the `Field` class for `ContextPath` objects
+
+- **caterpillar.fields.common**
+  - fix ``%`` operator for the `AsLengthRef` class.
+
 ## [2.6.0] - Minor Release
 
 ### Added
