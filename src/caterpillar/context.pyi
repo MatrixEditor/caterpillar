@@ -16,12 +16,9 @@ from types import FrameType
 from typing import (
     Any,
     Callable,
-    Dict,
-    List,
-    Optional,
+    Final,
     Protocol,
     Self,
-    Type,
     Union,
     dataclass_transform,
     override,
@@ -30,18 +27,18 @@ from typing import (
 from caterpillar.abc import _ContextLike, _ContextLambda
 from caterpillar.options import Flag
 
-CTX_PARENT: str = ...
-CTX_OBJECT: str = ...
-CTX_OFFSETS: str = ...
-CTX_STREAM: str = ...
-CTX_FIELD: str = ...
-CTX_VALUE: str = ...
-CTX_POS: str = ...
-CTX_INDEX: str = ...
-CTX_PATH: str = ...
-CTX_SEQ: str = ...
-CTX_ARCH: str = ...
-CTX_ROOT: str = ...
+CTX_PARENT: str
+CTX_OBJECT: str
+CTX_OFFSETS: str
+CTX_STREAM: str
+CTX_FIELD: str
+CTX_VALUE: str
+CTX_POS: str
+CTX_INDEX: str
+CTX_PATH: str
+CTX_SEQ: str
+CTX_ARCH: str
+CTX_ROOT: str
 
 @type_check_only
 class ContextFactory(Protocol):
@@ -56,7 +53,6 @@ class Context(dict[str, Any]):
     def __getattribute__(self, key: str) -> Any: ...
     def __context_getattr__(self, path: str) -> Any: ...
     def __context_setattr__(self, path: str, value: Any) -> None: ...
-
 
 class ExprMixin:
     def __add__(self, other: Any) -> BinaryExpression: ...
@@ -98,7 +94,7 @@ class ExprMixin:
 class ConditionContext:
     func: Union[_ContextLambda[bool], bool]
     annotations: dict
-    namelist: List[str]
+    namelist: list[str]
     depth: int
     def __init__(
         self, condition: _ContextLambda[bool] | bool, depth: int = 2
@@ -127,12 +123,12 @@ class UnaryExpression(_ContextLambda):
 
 class ContextPath(ExprMixin, _ContextLambda):
     path: str
-    call_kwargs: Dict[str, Any]
-    getitem_args: List[Any]
-    def __init__(self, path: Optional[str] = None) -> None: ...
-    def __call__(self, context: Optional[_ContextLike] = None, **kwds): ...
+    call_kwargs: dict[str, Any]
+    getitem_args: list[Any]
+    def __init__(self, path: str | None = None) -> None: ...
+    def __call__(self, context: _ContextLike | None = None, **kwds): ...
     def __getitem__(self, key) -> Self: ...
-    def __type__(self) -> Type[Any]: ...
+    def __type__(self) -> type[Any]: ...
     def __getattribute__(self, key: str) -> ContextPath: ...
     @property
     def parent(self) -> ContextPath: ...
@@ -140,9 +136,9 @@ class ContextPath(ExprMixin, _ContextLambda):
 class ContextLength(ExprMixin, _ContextLambda):
     path: str
     def __init__(self, path: ContextPath) -> None: ...
-    def __call__(self, context: Optional[_ContextLike] = None, **kwds) -> Any: ...
+    def __call__(self, context: _ContextLike | None = None, **kwds) -> Any: ...
 
-this: ContextPath
-ctx: ContextPath
-parent: ContextPath
-root: ContextPath
+this: Final[ContextPath]
+ctx: Final[ContextPath]
+parent: Final[ContextPath]
+root: Final[ContextPath]

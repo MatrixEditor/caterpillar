@@ -32,6 +32,7 @@ from typing import (
     Any,
     Callable,
     Collection,
+    Final,
     Generic,
     List,
     Optional,
@@ -39,6 +40,7 @@ from typing import (
     TypeVar,
     Union,
     override,
+    type_check_only,
 )
 from uuid import UUID
 
@@ -58,27 +60,27 @@ class PyStructFormattedField(FieldStruct[_IT, _IT]):
     def get_length(self, context: _ContextLike) -> int: ...
     def is_padding(self) -> bool: ...
 
-padding: PyStructFormattedField[NoneType] = ...
-char: PyStructFormattedField[str] = ...
-boolean: PyStructFormattedField[bool] = ...
-int8: PyStructFormattedField[int] = ...
-uint8: PyStructFormattedField[int] = ...
-int16: PyStructFormattedField[int] = ...
-uint16: PyStructFormattedField[int] = ...
-int32: PyStructFormattedField[int] = ...
-uint32: PyStructFormattedField[int] = ...
-int64: PyStructFormattedField[int] = ...
-uint64: PyStructFormattedField[int] = ...
-ssize_t: PyStructFormattedField[int] = ...
-size_t: PyStructFormattedField[int] = ...
-float16: PyStructFormattedField[float] = ...
-float32: PyStructFormattedField[float] = ...
-float64: PyStructFormattedField[float] = ...
-double: PyStructFormattedField[float] = ...
-void_ptr: PyStructFormattedField[int] = ...
+padding: Final[PyStructFormattedField[NoneType]]
+char: Final[PyStructFormattedField[str]]
+boolean: Final[PyStructFormattedField[bool]]
+int8: Final[PyStructFormattedField[int]]
+uint8: Final[PyStructFormattedField[int]]
+int16: Final[PyStructFormattedField[int]]
+uint16: Final[PyStructFormattedField[int]]
+int32: Final[PyStructFormattedField[int]]
+uint32: Final[PyStructFormattedField[int]]
+int64: Final[PyStructFormattedField[int]]
+uint64: Final[PyStructFormattedField[int]]
+ssize_t: Final[PyStructFormattedField[int]]
+size_t: Final[PyStructFormattedField[int]]
+float16: Final[PyStructFormattedField[float]]
+float32: Final[PyStructFormattedField[float]]
+float64: Final[PyStructFormattedField[float]]
+double: Final[PyStructFormattedField[float]]
+void_ptr: Final[PyStructFormattedField[int]]
 
-_IT_transformed = TypeVar("_IT_transformed")
-_OT_transformed = TypeVar("_OT_transformed")
+_IT_transformed = TypeVar("_IT_transformed", default=Any)
+_OT_transformed = TypeVar("_OT_transformed", default=Any)
 
 class Transformer(
     Generic[_IT, _IT_transformed, _OT, _OT_transformed],
@@ -186,7 +188,7 @@ class _Pass(FieldStruct[None, None]):
     def pack_single(self, obj: None, context: _ContextLike) -> None: ...
     def unpack_single(self, context: _ContextLike) -> None: ...
 
-Pass: _Pass
+Pass: Final[_Pass]
 
 _PrefixIOT = TypeVar("_PrefixIOT", bound=SupportsLenAndGetItem, default=bytes)
 
@@ -218,8 +220,8 @@ class Int(FieldStruct[int, int]):
 class UInt(Int):
     def __init__(self, bits: int) -> None: ...
 
-int24: Int
-uint24: UInt
+int24: Final[Int]
+uint24: Final[UInt]
 
 class Aligned(FieldStruct[_IT, _OT]):
     struct: _StructLike[_IT, _OT]
@@ -252,6 +254,7 @@ class Lazy(FieldStruct[_IT, _OT]):
     def pack_single(self, obj: _IT, context: _ContextLike) -> None: ...
     def unpack_single(self, context: _ContextLike) -> _OT: ...
 
+@type_check_only
 class _Uuid(FieldStruct[UUID, UUID]):
     def __type__(self) -> Type[UUID]: ...
     def __size__(self, context: _ContextLike) -> int: ...
@@ -259,7 +262,7 @@ class _Uuid(FieldStruct[UUID, UUID]):
     def __pack__(self, obj: UUID, context: _ContextLike) -> None: ...
     def __unpack__(self, context: _ContextLike) -> UUID: ...
 
-Uuid: _Uuid
+Uuid: Final[_Uuid]
 
 class AsLengthRef(_StructLike[NoneType, int]):
     name: str
