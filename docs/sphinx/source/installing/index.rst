@@ -57,4 +57,5 @@ where :code:`$NAME` refers to
 
 .. tip::
     If you wish to contribute to this project, make sure you follow the :ref:`contribution`. This
-    library is especially designed for Python 3.12 and prior versions are still subject to approval.
+    library is especially designed for Python 3.12 and prior versions might introduce unintended
+    side-effects.

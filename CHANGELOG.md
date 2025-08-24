@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.6.2] - Patch Release
+
+### Fixed
+
+**caterpillar.field._base**
+  - Fix 1-length sized array fields
+
+**caterpillar**
+  - Add compatibility with at least Python 3.10 by using `typing_extensions`
+
 ## [2.6.1] - Hot-Fix Release
 
 ### Fixed
