@@ -21,10 +21,7 @@ set_struct_flags(S_REPLACE_TYPES)
 
 @struct(kw_only=False, order=BigEndian)
 class Format:
-    # Okay, this looks ugly, but it is only for demonstration purposes
-    address: (uintptr * CString(...))[1]
-    # the better way would be
-    # address: Pointer(uintptr_fn, CString(...))[1]
+    address: uintptr * CString(...)
 
 
 data = b"\x00\x00\x00\x04Hello, World!\x00"

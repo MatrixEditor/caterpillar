@@ -23,7 +23,8 @@ from caterpillar.exception import (
 from caterpillar.fields.hook import IOHook as IOHook
 from caterpillar.shared import Action as Action
 from cryptography.hazmat.primitives import hashes
-from typing import Callable, Generic, Optional, Protocol, Self, Type, TypeVar
+from typing import Callable, Generic, Optional, Protocol, Type, TypeVar
+from typing_extensions import Self
 
 DEFAULT_DIGEST_PATH: str
 

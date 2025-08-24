@@ -103,7 +103,7 @@ class Field:
         self.bits = bits
         self.arch = arch or system_arch
         self.offset = offset
-        self.amount = amount or 1
+        self.amount = amount or None
         self.options = options
 
         # INVALID_DEFAULT indicates that no default was explicitly set;
@@ -198,7 +198,7 @@ class Field:
     def amount(self, value):
         self.__amount = value
         self._amount_is_lambda = callable(value)
-        self._is_seq = (value not in (0, 1, None)) or self._amount_is_lambda
+        self._is_seq = (value not in (0, None)) or self._amount_is_lambda
 
     @property
     def options(self):

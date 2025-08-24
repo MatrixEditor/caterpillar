@@ -13,7 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from caterpillar.abc import _StructLike
-from typing import Any, Callable, Self
+from typing import Any, Callable
+from typing_extensions import Self
 
 class TypeConverter:
     target: type

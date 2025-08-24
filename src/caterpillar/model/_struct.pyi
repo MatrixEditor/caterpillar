@@ -20,7 +20,6 @@ from typing import (
     Optional,
     TypeVar,
     Union,
-    Type,
     Generic,
     overload,
 )

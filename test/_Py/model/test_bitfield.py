@@ -155,7 +155,8 @@ def test_bitfield__unpack():
         _: 0
         b1: Bytes(6)  # b1: bytes
 
-    data = 0b00110100.to_bytes() + b"12" * 3
+    # 0b00110100.to_bytes()
+    data = b"4" + b"12" * 3
     obj = unpack(FormatA, data)
     assert obj.a1 == "\x03"
     assert obj.a2 == SimpleEnum.B
@@ -172,4 +173,5 @@ def test_bitfield__pack():
         b1: uint16
 
     obj = FormatA(a1=True, a2=3, a3=5, b1=0xFF00)
-    assert pack(obj) == 0b1_11_101_00.to_bytes() + b"\x00\xff"
+    # 0b1_11_101_00.to_bytes()
+    assert pack(obj) == b"\xf4" + b"\x00\xff"

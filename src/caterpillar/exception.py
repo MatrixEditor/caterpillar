@@ -12,7 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
+import sys
 
 class StructException(Exception):
     """Base class for all struct-related exceptions"""
@@ -20,7 +20,7 @@ class StructException(Exception):
     def __init__(self, message: str, context=None) -> None:
         super().__init__(message)
         self.context = context
-        if context:
+        if context and sys.version_info >= (3, 12):
             self.add_note(f"Context-Path: {context.__context_getattr__('_path')}")
 
 

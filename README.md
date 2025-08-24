@@ -8,8 +8,8 @@
 ![GitHub License](https://img.shields.io/github/license/MatrixEditor/caterpillar?logo=github)
 
 
-Caterpillar is a Python 3.12+ library to pack and unpack structurized binary data. It
-enhances the capabilities of [Python Struct](https://docs.python.org/3/library/struct.html)
+Caterpillar is a Python 3.12+ library to pack and unpack structurized binary
+data (with support for 3.10+). It enhances the capabilities of [Python Struct](https://docs.python.org/3/library/struct.html)
 by enabling direct class declaration. More information about the different configuration
 options will be added in the future. Documentation is [here >](https://matrixeditor.github.io/caterpillar/).
 

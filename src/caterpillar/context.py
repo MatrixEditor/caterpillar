@@ -18,7 +18,8 @@ import operator
 import sys
 import warnings
 
-from typing import Callable, Any, Self
+from typing import Callable, Any
+from typing_extensions import Self
 from types import FrameType
 from dataclasses import dataclass
 

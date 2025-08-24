@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from caterpillar.abc import _ContextLambda, _StructLike, _ContainsStruct
-from typing import Any, Optional, Union
+from typing import Any
 
 MODE_PACK: int
 MODE_UNPACK: int
