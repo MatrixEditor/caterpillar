@@ -31,7 +31,8 @@ from caterpillar.byteorder import (
     Arch,
     ByteOrder,
 )
-from typing import Any, Optional, Self, Type, TypeVar
+from typing import Any, TypeVar
+from typing_extensions import Self
 
 _T = TypeVar("_T")
 

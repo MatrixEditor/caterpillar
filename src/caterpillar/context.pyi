@@ -18,12 +18,11 @@ from typing import (
     Callable,
     Final,
     Protocol,
-    Self,
     Union,
     dataclass_transform,
-    override,
     type_check_only,
 )
+from typing_extensions import Self, override
 from caterpillar.abc import _ContextLike, _ContextLambda
 from caterpillar.options import Flag
 

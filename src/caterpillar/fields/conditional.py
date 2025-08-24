@@ -12,8 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-from typing import Union, Any
-from typing import Optional
+from typing import Any
 from caterpillar.context import ConditionContext
 from caterpillar.exception import ValidationError
 from caterpillar.shared import typeof
@@ -42,7 +41,11 @@ class ConditionalChain:
         self.add(struct, condition)
 
     def __type__(self):
-        return Optional[Union[*map(typeof, self.chain.values())]]
+        target_type = None
+        for struct_ty in self.chain.values():
+            target_type = target_type | typeof(struct_ty)
+
+        return target_type
 
     def __repr__(self) -> str:
         annotation = []

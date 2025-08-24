@@ -6,7 +6,7 @@ Custom script to generate the public Caterpillar API.
 import pathlib
 import argparse
 import dataclasses
-import typing as t
+from typing_extensions import override
 
 from caterpillar_api import (
     CP_FUNC_API,
@@ -44,7 +44,7 @@ class APIType(APIObj):
     ) -> None:
         super().__init__(name, index, api_name, type_ or "PyTypeObject")
 
-    @t.override
+    @override
     def cp_internal_def(self) -> str:
         # REVISIT: what about struct definitions?
         if self.type.startswith("Py"):
@@ -53,7 +53,7 @@ class APIType(APIObj):
         extra_def = f"#define {self.name.replace('_Type', '')}_NAME \"{self.type}\""
         return f"extern PyTypeObject {self.name};\n{extra_def}"
 
-    @t.override
+    @override
     def cp_external_def(self):
         """Return the external definition for this API object
 
@@ -79,11 +79,11 @@ class APIFunc(APIObj):
         type_ = "(%s (*)(%s))" % (rtype, ", ".join(args))
         super().__init__(name, index, api_name, type_)
 
-    @t.override
+    @override
     def cp_internal_def(self) -> str:
         return f"{self.rtype} {self.name}({', '.join(self.args)});"
 
-    @t.override
+    @override
     def cp_external_def(self) -> str:
         return f"#define {self.name} (*({self.type}){self.api_name}[{self.index}])"
 

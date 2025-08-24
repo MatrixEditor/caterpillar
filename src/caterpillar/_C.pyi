@@ -1,6 +1,6 @@
 from collections.abc import Collection, Iterable
-from typing import Any, Generic, Self, overload
-from typing_extensions import override
+from typing import Any, Generic
+from typing_extensions import override, Self
 from caterpillar.abc import (
     _OT,
     _IT,

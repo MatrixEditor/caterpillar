@@ -13,9 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from typing import Any, Union, Optional
+from typing import Any
 
-from caterpillar.abc import _ContextLike, _StructLike, _ContextLambda
 from caterpillar.byteorder import Arch
 from caterpillar.exception import DelegationError, StructException
 from caterpillar.context import CTX_STREAM, CTX_FIELD, CTX_ARCH, CTX_SEQ

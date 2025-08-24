@@ -14,21 +14,15 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from typing import (
     Any,
-    Generic,
     Iterable,
-    Self,
-    Optional,
-    Type,
     TypeVar,
-    Union,
-    override,
 )
+from typing_extensions import Self, override
 
 from caterpillar.abc import (
     _StructLike,
     _ActionLike,
     _ContextLike,
-    _ContainsStruct,
     _OptionLike,
     _ContextLambda,
     _EndianLike,

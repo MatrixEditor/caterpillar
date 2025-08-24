@@ -16,7 +16,8 @@ import struct as PyStruct
 import warnings
 
 from io import BytesIO
-from typing import Any, Self
+from typing import Any
+from typing_extensions import Self
 from types import NoneType
 from functools import cached_property
 from enum import Enum as _EnumType
@@ -766,7 +767,7 @@ class CString(FieldStruct):
             raise ValueError(
                 f"Invalid padding {pad!r}. Padding must be a an integer or a single character."
             )
-        self._raw_pad = self.pad.to_bytes(1)
+        self._raw_pad = self.pad.to_bytes(1, byteorder="big")
 
     def __class_getitem__(cls, dim) -> Field:
         """
@@ -1287,8 +1288,8 @@ class Int(FieldStruct):
         ) == LITTLE_ENDIAN_FMT
         context[CTX_STREAM].write(
             obj.to_bytes(
-                self.size,
-                "little" if is_little else "big",
+                length=self.size,
+                byteorder="little" if is_little else "big",
                 signed=self.signed,
             )
         )
