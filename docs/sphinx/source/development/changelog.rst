@@ -6,6 +6,20 @@ Changelog
 
 *More entries will be added in the future.*
 
+.. _changelog_2.6.3:
+
+[2.6.3] - Patch
+===============
+
+Fixed
+-----
+
+*caterpillar*
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+- Fix various stub files and decorator annotations
+
+
 .. _changelog_2.6.2:
 
 [2.6.2] - Patch
@@ -17,12 +31,12 @@ Fixed
 *caterpillar.field._base*
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  - Fix 1-length sized array fields
+- Fix 1-length sized array fields
 
 *caterpillar*
 ^^^^^^^^^^^^^
 
-  - Add compatibility with at least Python 3.10 by using ``typing_extensions``
+- Add compatibility with at least Python 3.10 by using ``typing_extensions``
 
 
 .. _changelog_2.6.1:
