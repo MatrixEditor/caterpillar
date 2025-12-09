@@ -9,6 +9,7 @@ from caterpillar.model import (
     EndGroup,
     SetAlignment,
     sizeof,
+    struct,
     unpack,
     CharFactory,
     pack,
@@ -23,7 +24,6 @@ from caterpillar.options import (
 )
 from caterpillar.fields import uint16, uint24, uint32, Bytes, uint8
 from caterpillar.shared import getstruct
-
 
 def test_bitfield_syntax__standard():
     # Syntax no. 1

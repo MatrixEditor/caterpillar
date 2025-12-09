@@ -15,7 +15,7 @@
 from types import NoneType
 from typing import Any, Callable, Collection, Generic, Iterable, TypeVar
 
-from caterpillar.abc import _OptionLike
+from caterpillar.abc import _OptionLike, _ArrayFactoryLike
 
 _VT = TypeVar("_VT", default=NoneType)
 
@@ -50,7 +50,7 @@ F_KEEP_POSITION: Flag
 F_DYNAMIC: Flag
 F_SEQUENTIAL: Flag
 F_OFFSET_OVERRIDE: Flag
-O_ARRAY_FACTORY: Flag[Callable[[Iterable], Collection] | None]
+O_ARRAY_FACTORY: Flag[_ArrayFactoryLike[Any] | None]
 B_OVERWRITE_ALIGNMENT: Flag
 B_GROUP_END: Flag
 B_GROUP_NEW: Flag

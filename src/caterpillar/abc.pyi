@@ -12,6 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+from collections.abc import Collection, Iterable
 from io import IOBase
 from types import EllipsisType
 from typing import (
@@ -136,6 +137,10 @@ class _OptionLike(Protocol):
     name: str
     value: Any
 
+@type_check_only
+class _ArrayFactoryLike(Protocol[_IT]):
+    def __call__(self, __value: Iterable[_IT]) -> Collection[_IT]: ...
+
 __all__ = [
     "_ContextLike",
     "_ContextLambda",
@@ -150,4 +155,5 @@ __all__ = [
     "_SwitchLike",
     "_SupportsBits",
     "_ContainsBits",
+    "_ArrayFactoryLike",
 ]

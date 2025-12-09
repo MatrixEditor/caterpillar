@@ -24,6 +24,7 @@ from typing import (
     TypeVar,
     overload,
 )
+from typing_extensions import Final, dataclass_transform
 
 from caterpillar.abc import _ContextLike, _ActionLike
 from caterpillar.byteorder import Arch, ByteOrder
@@ -45,8 +46,8 @@ class SetAlignment:
     def flag(new_alignment: int) -> Flag[int]: ...
     def __hash__(self) -> int: ...
 
-NewGroup = B_GROUP_NEW
-EndGroup = B_GROUP_END
+NewGroup: Final[Flag[None]] = B_GROUP_NEW
+EndGroup: Final[Flag[None]] = B_GROUP_END
 
 _VT = TypeVar("_VT", default=int)
 
@@ -78,7 +79,7 @@ class BitfieldEntry:
         bit: int,
         width: int,
         name: str,
-        factory: BitfieldValueFactory | Type | None = ...,
+        factory: BitfieldValueFactory | type | None = ...,
         action: _ActionLike | None = ...,
     ) -> None: ...
     @staticmethod
@@ -124,14 +125,14 @@ class Bitfield(Struct[_ModelT]):
         self,
         name: str,
         bits: int,
-        factory: Optional[BitfieldValueFactory | Type] = ...,
+        factory: Optional[BitfieldValueFactory | type] = ...,
         options: Optional[Iterable[Flag | SetAlignment]] = ...,
     ) -> Field: ...
     def _process_bits_field(
         self,
         name: str,
         field: Field,
-        factory: Optional[BitfieldValueFactory | Type] = ...,
+        factory: Optional[BitfieldValueFactory | type] = ...,
         options: Optional[Iterable[Flag | SetAlignment]] = ...,
     ) -> Field: ...
     def _process_options(
@@ -143,6 +144,7 @@ class Bitfield(Struct[_ModelT]):
     def _process_alignment_option(self, option: Flag | SetAlignment) -> bool: ...
 
 @overload
+@dataclass_transform()
 def bitfield(
     cls: None = None,
     /,
@@ -151,14 +153,15 @@ def bitfield(
     order: ByteOrder | None = ...,
     arch: Arch | None = ...,
     field_options: Iterable[Flag] | None = ...,
-) -> Callable[[Type[_ModelT]], Type[_ModelT]]: ...
+) -> Callable[[type[_ModelT]], type[_ModelT]]: ...
 @overload
+@dataclass_transform()
 def bitfield(
-    cls: Type[_ModelT],
+    cls: type[_ModelT],
     /,
     *,
     options: Iterable[Flag] | None = ...,
     order: ByteOrder | None = ...,
     arch: Arch | None = ...,
     field_options: Iterable[Flag] | None = ...,
-) -> Type[_ModelT]: ...
+) -> type[_ModelT]: ...

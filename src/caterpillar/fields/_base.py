@@ -308,7 +308,7 @@ class Field:
         self.bits = bits
         return self
 
-    def __set_byteorder__(self, order: ByteOrder):
+    def __set_byteorder__(self, order):
         """
         Explicitly sets the byte order for this field.
 
@@ -376,7 +376,7 @@ class Field:
         """Returns the struct from stored options.
 
         :param value: the unpacked or packed value
-        :type value
+        :type value: Any
         :param context: the current context
         :type context: _ContextLike
         :return: the struct that packs or unpacks the data
@@ -641,3 +641,4 @@ class _CallableTypeConverter(registry.TypeConverter):
 
 
 registry.annotation_registry.append(_CallableTypeConverter())
+

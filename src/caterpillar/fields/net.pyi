@@ -15,6 +15,7 @@
 import ipaddress
 
 from re import Pattern
+from typing_extensions import Final
 
 from ._base import singleton as singleton
 from .common import (
@@ -25,11 +26,11 @@ from .common import (
 )
 from caterpillar.abc import _ContextLike
 
-IPv4Address: Transformer[ipaddress.IPv4Address, int, ipaddress.IPv4Address, int]
-IPv6Address: Transformer[ipaddress.IPv6Address, int, ipaddress.IPv6Address, int]
+IPv4Address: Final[Transformer[ipaddress.IPv4Address, int, ipaddress.IPv4Address, int]]
+IPv6Address: Final[Transformer[ipaddress.IPv6Address, int, ipaddress.IPv6Address, int]]
 
 class MACAddress(Transformer[str | bytes, bytes, bytes, bytes]):
-    DELIMITERS: Pattern
+    DELIMITERS: Pattern[str]
     sep: str
     def __init__(self, sep: str | None = None) -> None: ...
     def encode(self, obj: str | bytes, context: _ContextLike) -> bytes: ...

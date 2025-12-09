@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from ._base import Field as Field
 from .common import Bytes as Bytes, uint32 as uint32
-from caterpillar.abc import _ContextLambda, _ContextLike, _StructLike, _ActionLike
+from caterpillar.abc import _ContextLambda, _ContextLike, _StructLike
 from caterpillar.context import CTX_OBJECT as CTX_OBJECT, CTX_STREAM as CTX_STREAM
 from caterpillar.exception import (
     StructException as StructException,
@@ -24,7 +24,7 @@ from caterpillar.fields.hook import IOHook as IOHook
 from caterpillar.shared import Action as Action
 from cryptography.hazmat.primitives import hashes
 from typing import Callable, Generic, Optional, Protocol, Type, TypeVar
-from typing_extensions import Self
+from typing_extensions import Final, Self
 
 DEFAULT_DIGEST_PATH: str
 
@@ -109,22 +109,22 @@ class _DigestFactory(Protocol[_AlgoReturnT]):
         self, name: Optional[str] = ..., verify: bool = ..., path: Optional[str] = ...
     ) -> Digest[_AlgoReturnT]: ...
 
-Crc32_Algo: Algorithm[int, int]
+Crc32_Algo: Final[Algorithm[int, int]]
 Crc32: _DigestFactory[int]
-Crc32_Field: DigestField[int]
-Adler_Algo: Algorithm[int]
+Crc32_Field: _DigestFieldFactory[int]
+Adler_Algo: Final[Algorithm[int]]
 Adler: _DigestFactory[int]
-Adler_Field: DigestField[int]
-Sha1_Algo: Algorithm[hashes.Hash]
-Sha2_224_Algo: Algorithm[hashes.Hash]
-Sha2_256_Algo: Algorithm[hashes.Hash]
-Sha2_384_Algo: Algorithm[hashes.Hash]
-Sha2_512_Algo: Algorithm[hashes.Hash]
-Sha3_224_Algo: Algorithm[hashes.Hash]
-Sha3_256_Algo: Algorithm[hashes.Hash]
-Sha3_384_Algo: Algorithm[hashes.Hash]
-Sha3_512_Algo: Algorithm[hashes.Hash]
-Md5_Algo: Algorithm[hashes.Hash]
+Adler_Field: _DigestFieldFactory[int]
+Sha1_Algo: Final[Algorithm[hashes.Hash]]
+Sha2_224_Algo: Final[Algorithm[hashes.Hash]]
+Sha2_256_Algo: Final[Algorithm[hashes.Hash]]
+Sha2_384_Algo: Final[Algorithm[hashes.Hash]]
+Sha2_512_Algo: Final[Algorithm[hashes.Hash]]
+Sha3_224_Algo: Final[Algorithm[hashes.Hash]]
+Sha3_256_Algo: Final[Algorithm[hashes.Hash]]
+Sha3_384_Algo: Final[Algorithm[hashes.Hash]]
+Sha3_512_Algo: Final[Algorithm[hashes.Hash]]
+Md5_Algo: Final[Algorithm[hashes.Hash]]
 Sha1: _DigestFactory[bytes]
 Sha2_224: _DigestFactory[bytes]
 Sha2_256: _DigestFactory[bytes]
@@ -156,13 +156,16 @@ class HMAC(Digest[bytes]):
         path: str | None = None,
     ) -> None: ...
 
-Sha1_Field: DigestField[bytes]
-Sha2_224_Field: DigestField[bytes]
-Sha2_256_Field: DigestField[bytes]
-Sha2_384_Field: DigestField[bytes]
-Sha2_512_Field: DigestField[bytes]
-Sha3_224_Field: DigestField[bytes]
-Sha3_256_Field: DigestField[bytes]
-Sha3_384_Field: DigestField[bytes]
-Sha3_512_Field: DigestField[bytes]
-Md5_Field: DigestField[bytes]
+class _DigestFieldFactory(Protocol[_AlgoReturnT]):
+    def __call__(self, name: str, verify: bool = ...) -> DigestField[_AlgoReturnT]: ...
+
+Sha1_Field: _DigestFieldFactory[bytes]
+Sha2_224_Field: _DigestFieldFactory[bytes]
+Sha2_256_Field: _DigestFieldFactory[bytes]
+Sha2_384_Field: _DigestFieldFactory[bytes]
+Sha2_512_Field: _DigestFieldFactory[bytes]
+Sha3_224_Field: _DigestFieldFactory[bytes]
+Sha3_256_Field: _DigestFieldFactory[bytes]
+Sha3_384_Field: _DigestFieldFactory[bytes]
+Sha3_512_Field: _DigestFieldFactory[bytes]
+Md5_Field: _DigestFieldFactory[bytes]

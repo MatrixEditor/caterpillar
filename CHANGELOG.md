@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.6.3] - Patch Release
+
+### Fixed
+
+**caterpillar**
+  - Various stub files and decorator annotations
+
 ## [2.6.2] - Patch Release
 
 ### Fixed
