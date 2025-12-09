@@ -376,7 +376,7 @@ class Field:
         """Returns the struct from stored options.
 
         :param value: the unpacked or packed value
-        :type value
+        :type value: Any
         :param context: the current context
         :type context: _ContextLike
         :return: the struct that packs or unpacks the data
