@@ -46,7 +46,7 @@ have to install the corresponding extra. It can be done using pip again:
 
 .. code-block:: bash
 
-    pip install "caterpillar[$NAME]@git+https://github.com/MatrixEditor/caterpillar.git"
+    pip install "caterpillar-py[$NAME]@git+https://github.com/MatrixEditor/caterpillar.git"
 
 where :code:`$NAME` refers to
 
