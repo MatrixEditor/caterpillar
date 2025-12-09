@@ -15,14 +15,14 @@
 from ._mixin import FieldStruct
 from caterpillar.abc import _ContextLambda, _ContextLike, _StructLike
 from caterpillar.options import Flag
-from typing import Dict, Generic, Optional, Type, TypeVar
+from typing import Generic, Type, TypeVar
 
 PTR_STRICT: Flag[None]
 
 _PtrValueT = TypeVar("_PtrValueT")
 
 class pointer(Generic[_PtrValueT], int):
-    obj: Optional[_PtrValueT]
+    obj: _PtrValueT | None
     def get(self) -> _PtrValueT | None: ...
 
 class Pointer(FieldStruct[int, pointer[_PtrValueT]]):
@@ -41,8 +41,8 @@ class Pointer(FieldStruct[int, pointer[_PtrValueT]]):
     def unpack_single(self, context: _ContextLike) -> pointer[_PtrValueT]: ...
     def pack_single(self, obj: int, context: _ContextLike) -> None: ...
 
-UNSIGNED_POINTER_TYS: Dict
-SIGNED_POINTER_TYS: Dict
+UNSIGNED_POINTER_TYS: dict[int, _StructLike[int, int]]
+SIGNED_POINTER_TYS: dict[int, _StructLike[int, int]]
 
 def uintptr_fn(context: _ContextLike) -> _StructLike[int, int]: ...
 def intptr_fn(context: _ContextLike) -> _StructLike[int, int]: ...

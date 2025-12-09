@@ -1,3 +1,4 @@
+from typing_extensions import Final
 from ._mixin import FieldStruct
 from caterpillar.abc import _ContextLike
 from caterpillar.options import Flag
@@ -12,4 +13,4 @@ class VarInt(FieldStruct[int, int]):
     def pack_single(self, obj: int, context: _ContextLike) -> None: ...
     def unpack_single(self, context: _ContextLike) -> int: ...
 
-vint: VarInt
+vint: Final[VarInt]

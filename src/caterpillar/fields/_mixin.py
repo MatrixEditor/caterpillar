@@ -16,7 +16,7 @@ from io import BytesIO
 from collections.abc import Iterable
 from functools import partial
 
-from caterpillar.byteorder import ByteOrder, byteorder
+from caterpillar.byteorder import byteorder
 from caterpillar.options import Flag
 from caterpillar.context import CTX_SEQ, CTX_STREAM
 from caterpillar._common import unpack_seq, pack_seq, WithoutContextVar
@@ -52,7 +52,7 @@ class FieldMixin:
         """Returns a field with the given condition"""
         return Field(self, byteorder(self)) // condition
 
-    def __set_byteorder__(self, order: ByteOrder):
+    def __set_byteorder__(self, order):
         """Returns a field with the given byteorder"""
         return Field(self, order=order)
 

@@ -23,6 +23,7 @@ from typing import (
     Generic,
     overload,
 )
+from typing_extensions import dataclass_transform
 
 from caterpillar import registry
 from caterpillar.abc import (
@@ -36,6 +37,8 @@ from caterpillar.abc import (
     _StructLike,
     _SupportsSize,
     _OptionLike,
+    _EndianLike,
+    _ArchLike,
 )
 from caterpillar.byteorder import Arch, ByteOrder
 from caterpillar.fields._base import Field
@@ -80,57 +83,61 @@ class UnionHook(Generic[_ModelT]):
         exc_value: BaseException | None,
         traceback: types.TracebackType | None,
     ) -> None: ...
-    def __model_init__(self, obj: Any, *args, **kwargs) -> None: ...
-    def __model_setattr__(self, obj: Any, key: str, new_value: Any) -> None: ...
+    def __model_init__(self, obj: _ModelT, *args, **kwargs) -> None: ...
+    def __model_setattr__(self, obj: _ModelT, key: str, new_value: Any) -> None: ...
     def refresh(
-        self, obj: Any, key: str, new_value: Any, members: dict[str, Field]
+        self, obj: _ModelT, key: str, new_value: Any, members: dict[str, Field]
     ) -> None: ...
 
 @overload
+@dataclass_transform()
 def struct(
     cls: type[_ModelT],
     /,
     *,
-    options: Optional[Iterable[_OptionLike]] = None,
-    order: Optional[ByteOrder] = None,
-    arch: Optional[Arch] = None,
-    field_options: Optional[Iterable[_OptionLike]] = None,
+    options: Iterable[_OptionLike] | None = None,
+    order: _EndianLike | None = None,
+    arch: _ArchLike | None = None,
+    field_options: Iterable[_OptionLike] | None = None,
     kw_only: bool = False,
 ) -> type[_ModelT]: ...
 @overload
+@dataclass_transform()
 def struct(
     cls: None = None,
     /,
     *,
-    options: Optional[Iterable[_OptionLike]] = None,
-    order: Optional[ByteOrder] = None,
-    arch: Optional[Arch] = None,
-    field_options: Optional[Iterable[_OptionLike]] = None,
+    options: Iterable[_OptionLike] | None = None,
+    order: _EndianLike | None = None,
+    arch: _ArchLike | None = None,
+    field_options: Iterable[_OptionLike] | None = None,
     kw_only: bool = False,
 ) -> Callable[[_ModelT], _ModelT]: ...
 @overload
+@dataclass_transform()
 def union(
     cls: type[_ModelT],
     /,
     *,
-    options: Optional[Iterable[_OptionLike]] = None,
-    order: Optional[ByteOrder] = None,
-    arch: Optional[Arch] = None,
-    field_options: Optional[Iterable[_OptionLike]] = None,
+    options: Iterable[_OptionLike] | None = None,
+    order: _EndianLike | None = None,
+    arch: _ArchLike | None = None,
+    field_options: Iterable[_OptionLike] | None = None,
     kw_only: bool = False,
-    hook_cls: Optional[type[_UnionHookLike[_ModelT]]] = None,
+    hook_cls: type[_UnionHookLike[_ModelT]] | None = None,
 ) -> type[_ModelT]: ...
 @overload
+@dataclass_transform()
 def union(
     cls: None = None,
     /,
     *,
-    options: Optional[Iterable[_OptionLike]] = None,
-    order: Optional[ByteOrder] = None,
-    arch: Optional[Arch] = None,
-    field_options: Optional[Iterable[_OptionLike]] = None,
+    options: Iterable[_OptionLike] | None = None,
+    order: _EndianLike | None = None,
+    arch: _ArchLike | None = None,
+    field_options: Iterable[_OptionLike] | None = None,
     kw_only: bool = False,
-    hook_cls: Optional[type[_UnionHookLike[_ModelT]]] = None,
+    hook_cls: type[_UnionHookLike[_ModelT]] | None = None,
 ) -> Callable[[_ModelT], _ModelT]: ...
 @overload
 def pack(
@@ -140,17 +147,17 @@ def pack(
     *,
     use_tempfile: bool = ...,
     as_field: bool = ...,
-    **kwds,
+    **kwds: Any,
 ) -> bytes: ...
 @overload
 def pack(
     obj: _IT,
-    struct: Union[_ModelT, _ContainsStruct[_IT, _OT], _SupportsPack[_IT]] = None,
+    struct: type | _ContainsStruct[_IT, _OT] | _SupportsPack[_IT] | None = None,
     /,
     *,
     use_tempfile: bool = ...,
     as_field: bool = ...,
-    **kwds,
+    **kwds: Any,
 ) -> bytes: ...
 @overload
 def pack_into(
@@ -161,13 +168,13 @@ def pack_into(
     *,
     use_tempfile: bool = ...,
     as_field: bool = ...,
-    **kwds,
+    **kwds: Any,
 ) -> bytes: ...
 @overload
 def pack_into(
     obj: _IT,
     buffer: _StreamType,
-    struct: Union[_SupportsPack[_IT], _ContainsStruct[_IT, _OT]],
+    struct: _SupportsPack[_IT] | _ContainsStruct[_IT, _OT] | type,
     /,
     *,
     use_tempfile: bool = ...,
@@ -183,27 +190,27 @@ def pack_file(
     *,
     use_tempfile: bool = ...,
     as_field: bool = ...,
-    **kwds,
+    **kwds: Any,
 ) -> bytes: ...
 @overload
 def pack_file(
     obj: _IT,
     filename: str,
-    struct: Union[_SupportsPack[_IT], _ContainsStruct[_IT, _OT]],
+    struct: _SupportsPack[_IT] | _ContainsStruct[_IT, _OT] | type,
     /,
     *,
     use_tempfile: bool = ...,
     as_field: bool = ...,
-    **kwds,
+    **kwds: Any,
 ) -> bytes: ...
 @overload
 def unpack(
-    struct: Union[_SupportsUnpack[_OT], _ContainsStruct[_IT, _OT]],
+    struct: _SupportsPack[_IT] | _ContainsStruct[_IT, _OT],
     buffer: bytes | _StreamType,
     /,
     *,
     as_field: bool = ...,
-    **kwds,
+    **kwds: Any,
 ) -> _OT: ...
 @overload
 def unpack(
@@ -215,14 +222,14 @@ def unpack(
     **kwds,
 ) -> _ModelT: ...
 def unpack_file(
-    struct: Union[_SupportsUnpack[_OT], _ContainsStruct[_IT, _OT]],
+    struct: _SupportsPack[_IT] | _ContainsStruct[_IT, _OT] | type,
     filename: str,
     /,
     *,
     as_field: bool = ...,
-    **kwds,
+    **kwds: Any,
 ) -> _OT: ...
 def sizeof(
-    obj: Union[_SupportsSize, _ContainsStruct[Any, Any], _StructLike[Any, Any], type],
-    **kwds,
+    obj: _SupportsSize | _ContainsStruct[Any, Any] | _StructLike[Any, Any] | type,
+    **kwds: Any,
 ) -> int: ...

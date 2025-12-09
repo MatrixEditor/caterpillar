@@ -308,7 +308,7 @@ class Field:
         self.bits = bits
         return self
 
-    def __set_byteorder__(self, order: ByteOrder):
+    def __set_byteorder__(self, order):
         """
         Explicitly sets the byte order for this field.
 
@@ -641,3 +641,4 @@ class _CallableTypeConverter(registry.TypeConverter):
 
 
 registry.annotation_registry.append(_CallableTypeConverter())
+

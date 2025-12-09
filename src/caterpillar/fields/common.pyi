@@ -14,7 +14,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from ._base import Field
 from ._mixin import FieldStruct
-from _typeshed import SupportsLenAndGetItem
 
 from caterpillar import registry
 from caterpillar.abc import (
@@ -190,7 +189,7 @@ class _Pass(FieldStruct[None, None]):
 
 Pass: Final[_Pass]
 
-_PrefixIOT = TypeVar("_PrefixIOT", bound=SupportsLenAndGetItem, default=bytes)
+_PrefixIOT = TypeVar("_PrefixIOT", default=bytes)
 
 class Prefixed(Generic[_PrefixIOT], FieldStruct[_PrefixIOT, _PrefixIOT]):
     prefix: _StructLike[int, int]
