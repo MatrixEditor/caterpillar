@@ -91,13 +91,13 @@ pip install caterpillar-py
 ### Python-only installation
 
 ```bash
-pip install "caterpillar-py[all]@git+https://github.com/MatrixEditor/caterpillar"
+pip install "caterpillar[all]@git+https://github.com/MatrixEditor/caterpillar"
 ```
 
 ### Installation + C-extension
 
 ```bash
-pip install "caterpillar-py[all]@git+https://github.com/MatrixEditor/caterpillar/#subdirectory=src/ccaterpillar"
+pip install "caterpillar[all]@git+https://github.com/MatrixEditor/caterpillar/#subdirectory=src/ccaterpillar"
 ```
 
 
