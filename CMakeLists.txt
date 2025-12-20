@@ -1,16 +1,16 @@
 cmake_minimum_required(VERSION 3.15...3.26)
 project(${SKBUILD_PROJECT_NAME} LANGUAGES C)
 
+# TODO: document this change
+if (DEFINED ENV{CP_ENABLE_NATIVE} OR DEFINED CP_ENABLE_NATIVE)
+message(STATUS "Building Caterpillar C extension")
+
 find_package(
   Python
   COMPONENTS Interpreter Development.Module
   REQUIRED)
 
 add_compile_definitions(_CPMODULE)
-
-# TODO: document this change
-if (DEFINED ENV{CP_ENABLE_NATIVE} OR DEFINED CP_ENABLE_NATIVE)
-message(STATUS "Building Caterpillar C extension")
 
 python_add_library(
   _C
