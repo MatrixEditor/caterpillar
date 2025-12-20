@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>4.1. Byteorder and Architecture &#8212; Caterpillar 2.6.3 documentation</title>
+    <title>4.1. Byteorder and Architecture &#8212; Caterpillar 2.7.0 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=99c1414e"></script>
+    <script src="../_static/documentation_options.js?v=dfec817d"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -54,7 +54,7 @@
     <link rel="prev" title="4. Library" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.6.3" />
+  <meta name="docsearch:version" content="2.7.0" />
   </head>
   
   
@@ -116,7 +116,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.6.3</p>
+    <p class="title logo__title">Caterpillar 2.7.0</p>
   
 </a></div>
     
@@ -456,6 +456,98 @@ is <cite>Alignment.NONE</cite>).</p></li>
 
 </dd></dl>
 
+<dl class="py class">
+<dt class="sig sig-object py" id="caterpillar.byteorder.DynByteOrder">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.byteorder.</span></span><span class="sig-name descname"><span class="pre">DynByteOrder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_ch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caterpillar/byteorder.html#DynByteOrder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.byteorder.DynByteOrder" title="Link to this definition">#</a></dt>
+<dd><p>Represents a dynamic byte order resolved at runtime.</p>
+<p>A dynamic byte order defers endian resolution until pack or unpack
+execution. Resolution may depend on the active context, a field
+value, or a user-provided callable.</p>
+<p>Supported concepts:</p>
+<ul class="simple">
+<li><p>Root context resolution using CTX_ORDER</p></li>
+<li><p>Context key lookup using a string or callable</p></li>
+<li><p>Runtime resolution using a function</p></li>
+<li><p>Per-field byte order overrides using addition syntax</p></li>
+</ul>
+<p>Using the root context byte order:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">Dynamic</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
+    <span class="n">a</span><span class="p">:</span> <span class="n">uint16</span>
+    <span class="n">b</span><span class="p">:</span> <span class="n">uint32</span>
+
+<span class="n">pack</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span><span class="n">CTX_ORDER</span><span class="p">:</span> <span class="n">BigEndian</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>Using a context key:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">Dynamic</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">spec</span><span class="p">))</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
+    <span class="n">spec</span><span class="p">:</span> <span class="n">uint8</span>
+    <span class="n">a</span><span class="p">:</span> <span class="n">uint16</span>
+</pre></div>
+</div>
+<p>Using a function:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">func</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">BigEndian</span>
+
+<span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">DynByteOrder</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">func</span><span class="p">))</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
+    <span class="n">a</span><span class="p">:</span> <span class="n">uint16</span>
+</pre></div>
+</div>
+<p>Using a per-field dynamic byte order:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">a</span><span class="p">:</span> <span class="n">Dynamic</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">spec</span><span class="p">)</span> <span class="o">+</span> <span class="n">uint16</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em><em>, </em><em>optional</em>) – Human readable name for the byte order, defaults to None</p></li>
+<li><p><strong>key</strong> (<em>str</em><em> or </em><em>callable</em><em>, </em><em>optional</em>) – Context key or callable used to resolve byte order,
+defaults to None</p></li>
+<li><p><strong>func</strong> (<em>callable</em><em>, </em><em>optional</em>) – Callable returning an object with a ch attribute,
+defaults to None</p></li>
+<li><p><strong>init_ch</strong> (<em>str</em><em>, </em><em>optional</em>) – Initial format character, defaults to None</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="caterpillar.byteorder.DynByteOrder.getch">
+<span class="sig-name descname"><span class="pre">getch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/caterpillar/byteorder.html#DynByteOrder.getch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.byteorder.DynByteOrder.getch" title="Link to this definition">#</a></dt>
+<dd><p>Resolve the byte order format character from a context.</p>
+<p>Resolution order:</p>
+<ol class="arabic simple">
+<li><p>Function result, with or without context</p></li>
+<li><p>Context key lookup</p></li>
+<li><p>Root context CTX_ORDER value</p></li>
+<li><p>Boolean or string fallback</p></li>
+</ol>
+<p>Resolution prioritizes a callable, then a context key, and finally
+a root context fallback with default behavior.
+:param context: Context providing byte order information
+:type context: object
+:return: Struct format character representing byte order
+:rtype: str</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="caterpillar.byteorder.DynByteOrder.ch">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ch</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#caterpillar.byteorder.DynByteOrder.ch" title="Link to this definition">#</a></dt>
+<dd><p>Return the active byte order character.</p>
+<p>The value may change dynamically by inspecting the caller frame
+and extracting a local variable named context.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Struct format character for byte order</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="caterpillar.byteorder.byteorder">
 <span class="sig-prename descclassname"><span class="pre">caterpillar.byteorder.</span></span><span class="sig-name descname"><span class="pre">byteorder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#caterpillar.byteorder.ByteOrder" title="caterpillar.byteorder.ByteOrder"><span class="pre">ByteOrder</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#caterpillar.byteorder.ByteOrder" title="caterpillar.byteorder.ByteOrder"><span class="pre">ByteOrder</span></a></span></span><a class="reference internal" href="../_modules/caterpillar/byteorder.html#byteorder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.byteorder.byteorder" title="Link to this definition">#</a></dt>
@@ -468,6 +560,12 @@ is <cite>Alignment.NONE</cite>).</p></li>
 <dd class="field-even"><p>The byte order of the object.</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="caterpillar.byteorder.byteorder_is_little">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.byteorder.</span></span><span class="sig-name descname"><span class="pre">byteorder_is_little</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/caterpillar/byteorder.html#byteorder_is_little"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.byteorder.byteorder_is_little" title="Link to this definition">#</a></dt>
+<dd><p>Check if the byte order of an object is little-endian.</p>
 </dd></dl>
 
 <section id="standard-byteorder-instances">
@@ -495,6 +593,11 @@ is <cite>Alignment.NONE</cite>).</p></li>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caterpillar.byteorder.SysNative">
 <span class="sig-prename descclassname"><span class="pre">byteorder.</span></span><span class="sig-name descname"><span class="pre">SysNative</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">ByteOrder(name='SysNative',</span> <span class="pre">ch='&#64;',</span> <span class="pre">alignment=&lt;Alignment.NATIVE:</span> <span class="pre">1&gt;,</span> <span class="pre">size=&lt;Size.NATIVE:</span> <span class="pre">1&gt;)</span></em><a class="headerlink" href="#caterpillar.byteorder.SysNative" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.byteorder.Dynamic">
+<span class="sig-prename descclassname"><span class="pre">byteorder.</span></span><span class="sig-name descname"><span class="pre">Dynamic</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;DynByteOrder</span> <span class="pre">little=True&gt;</span></em><a class="headerlink" href="#caterpillar.byteorder.Dynamic" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 </section>
@@ -655,13 +758,20 @@ is <cite>Alignment.NONE</cite>).</p></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.byteorder.ByteOrder.apply"><code class="docutils literal notranslate"><span class="pre">ByteOrder.apply()</span></code></a></li>
 </ul>
 </li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.byteorder.DynByteOrder"><code class="docutils literal notranslate"><span class="pre">DynByteOrder</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.byteorder.DynByteOrder.getch"><code class="docutils literal notranslate"><span class="pre">DynByteOrder.getch()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.byteorder.DynByteOrder.ch"><code class="docutils literal notranslate"><span class="pre">DynByteOrder.ch</span></code></a></li>
+</ul>
+</li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.byteorder.byteorder"><code class="docutils literal notranslate"><span class="pre">byteorder()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.byteorder.byteorder_is_little"><code class="docutils literal notranslate"><span class="pre">byteorder_is_little()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#standard-byteorder-instances">4.1.1.1. Standard Byteorder Instances</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.byteorder.Native"><code class="docutils literal notranslate"><span class="pre">byteorder.Native</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.byteorder.BigEndian"><code class="docutils literal notranslate"><span class="pre">byteorder.BigEndian</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.byteorder.LittleEndian"><code class="docutils literal notranslate"><span class="pre">byteorder.LittleEndian</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.byteorder.NetEndian"><code class="docutils literal notranslate"><span class="pre">byteorder.NetEndian</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.byteorder.SysNative"><code class="docutils literal notranslate"><span class="pre">byteorder.SysNative</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.byteorder.Dynamic"><code class="docutils literal notranslate"><span class="pre">byteorder.Dynamic</span></code></a></li>
 </ul>
 </li>
 </ul>

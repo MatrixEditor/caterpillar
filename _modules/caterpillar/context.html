@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>caterpillar.context &#8212; Caterpillar 2.6.3 documentation</title>
+    <title>caterpillar.context &#8212; Caterpillar 2.7.0 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=99c1414e"></script>
+    <script src="../../_static/documentation_options.js?v=dfec817d"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -51,7 +51,7 @@
     <link rel="search" title="Search" href="../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.6.3" />
+  <meta name="docsearch:version" content="2.7.0" />
   </head>
   
   
@@ -113,7 +113,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.6.3</p>
+    <p class="title logo__title">Caterpillar 2.7.0</p>
   
 </a></div>
     
@@ -417,6 +417,7 @@
 <span class="n">CTX_SEQ</span> <span class="o">=</span> <span class="s2">&quot;_is_seq&quot;</span>
 <span class="n">CTX_ARCH</span> <span class="o">=</span> <span class="s2">&quot;_arch&quot;</span>
 <span class="n">CTX_ROOT</span> <span class="o">=</span> <span class="s2">&quot;_root&quot;</span>
+<span class="n">CTX_ORDER</span> <span class="o">=</span> <span class="s2">&quot;_order&quot;</span>
 
 
 <div class="viewcode-block" id="Context">
@@ -482,6 +483,49 @@
 
 
 <span class="n">O_CONTEXT_FACTORY</span> <span class="o">=</span> <span class="n">Flag</span><span class="p">(</span><span class="s2">&quot;option.context_factory&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">Context</span><span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">SetContextVar</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Defines an action that sets a context variable during pack or unpack.</span>
+
+<span class="sd">    The value assigned to the context key is computed dynamically using</span>
+<span class="sd">    a user-provided callable evaluated at runtime.</span>
+
+<span class="sd">    :param key: Name of the context variable to set</span>
+<span class="sd">    :type key: str</span>
+<span class="sd">    :param func: Callable used to compute the context value</span>
+<span class="sd">    :type func: callable</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">func</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="o">=</span> <span class="n">func</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__action_pack__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply the context variable assignment during packing.</span>
+
+<span class="sd">        The callable is evaluated and its result is stored in the</span>
+<span class="sd">        context under the configured key.</span>
+
+<span class="sd">        :param context: Active packing context</span>
+<span class="sd">        :type context: object</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        :rtype: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">context</span><span class="o">.</span><span class="n">__context_setattr__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="n">context</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__action_unpack__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply the context variable assignment during unpacking.</span>
+
+<span class="sd">        The callable is evaluated and its result is stored in the</span>
+<span class="sd">        context under the configured key.</span>
+
+<span class="sd">        :param context: Active unpacking context</span>
+<span class="sd">        :type context: object</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        :rtype: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">context</span><span class="o">.</span><span class="n">__context_setattr__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="n">context</span><span class="p">))</span>
 
 
 <div class="viewcode-block" id="ExprMixin">

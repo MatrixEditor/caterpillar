@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>2.3.4. Conditional Fields &#8212; Caterpillar 2.6.3 documentation</title>
+    <title>2.3.5. Conditional Fields &#8212; Caterpillar 2.7.0 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=99c1414e"></script>
+    <script src="../../_static/documentation_options.js?v=dfec817d"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -50,11 +50,11 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'tutorial/advanced/conditional';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="2.3.5. Actions" href="actions.html" />
-    <link rel="prev" title="2.3.3. Chaining" href="chaining.html" />
+    <link rel="next" title="2.3.6. Actions" href="actions.html" />
+    <link rel="prev" title="2.3.4. Chaining" href="chaining.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.6.3" />
+  <meta name="docsearch:version" content="2.7.0" />
   </head>
   
   
@@ -116,7 +116,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.6.3</p>
+    <p class="title logo__title">Caterpillar 2.7.0</p>
   
 </a></div>
     
@@ -360,13 +360,14 @@
 <li class="toctree-l3"><a class="reference internal" href="op-custom.html">2.3.1.3. Custom Operators</a></li>
 </ul>
 </details></li>
-<li class="toctree-l2"><a class="reference internal" href="pointers.html">2.3.2. Pointers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="chaining.html">2.3.3. Chaining</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">2.3.4. Conditional Fields</a></li>
-<li class="toctree-l2"><a class="reference internal" href="actions.html">2.3.5. Actions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bitfield.html">2.3.6. Bitfields</a></li>
-<li class="toctree-l2"><a class="reference internal" href="union.html">2.3.7. Unions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="templates.html">2.3.8. Templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="byteorder.html">2.3.2. Dynamic Byte Order</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pointers.html">2.3.3. Pointers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chaining.html">2.3.4. Chaining</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">2.3.5. Conditional Fields</a></li>
+<li class="toctree-l2"><a class="reference internal" href="actions.html">2.3.6. Actions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bitfield.html">2.3.7. Bitfields</a></li>
+<li class="toctree-l2"><a class="reference internal" href="union.html">2.3.8. Unions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="templates.html">2.3.9. Templates</a></li>
 </ul>
 </details></li>
 </ul>
@@ -415,7 +416,7 @@
     
     <li class="breadcrumb-item"><a href="index.html" class="nav-link"><span class="section-number">2.3. </span>Advanced Concepts</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">2.3.4. </span>Conditional Fields</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">2.3.5. </span>Conditional Fields</span></li>
   </ul>
 </nav>
 </div>
@@ -433,7 +434,7 @@
                 <article class="bd-article">
                   
   <section id="conditional-fields">
-<span id="tutorial-advanced-conditionals"></span><h1><span class="section-number">2.3.4. </span>Conditional Fields<a class="headerlink" href="#conditional-fields" title="Link to this heading">#</a></h1>
+<span id="tutorial-advanced-conditionals"></span><h1><span class="section-number">2.3.5. </span>Conditional Fields<a class="headerlink" href="#conditional-fields" title="Link to this heading">#</a></h1>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>This feature is not supported in Python 3.14+.</p>
@@ -444,7 +445,7 @@ working with versioned formats or optional fields that depend on runtime
 conditions. You can easily achieve this using context-based lambdas, which are
 built into the library.</p>
 <section id="how-it-works">
-<h2><span class="section-number">2.3.4.1. </span>How it works<a class="headerlink" href="#how-it-works" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">2.3.5.1. </span>How it works<a class="headerlink" href="#how-it-works" title="Link to this heading">#</a></h2>
 <p>By using the <cite>with</cite> keyword in combination with conditional expressions, you can
 bind certain fields to a specific condition. This allows you to include or exclude
 fields dynamically, depending on the value of other fields or context.</p>
@@ -462,7 +463,7 @@ fields dynamically, depending on the value of other fields or context.</p>
 </div>
 </section>
 <section id="key-concepts">
-<h2><span class="section-number">2.3.4.2. </span>Key Concepts<a class="headerlink" href="#key-concepts" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">2.3.5.2. </span>Key Concepts<a class="headerlink" href="#key-concepts" title="Link to this heading">#</a></h2>
 <ol class="arabic simple">
 <li><p><strong>`with` and Conditionals</strong>:
 The <code class="code docutils literal notranslate"><span class="pre">with</span></code> keyword is used to define a block of fields that should only be
@@ -501,7 +502,7 @@ factors. For example:</p>
 </section>
 </section>
 <section id="best-practices">
-<h2><span class="section-number">2.3.4.3. </span>Best Practices<a class="headerlink" href="#best-practices" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">2.3.5.3. </span>Best Practices<a class="headerlink" href="#best-practices" title="Link to this heading">#</a></h2>
 <ul class="simple">
 <li><p><strong>Avoid Using `Else`</strong>:
 It is <strong>strongly recommended</strong> to <strong>avoid</strong> using <code class="code docutils literal notranslate"><span class="pre">Else</span></code> for conditional field
@@ -534,7 +535,7 @@ makes it possible to define complex, version-dependent data structures.</p>
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title"><span class="section-number">2.3.3. </span>Chaining</p>
+        <p class="prev-next-title"><span class="section-number">2.3.4. </span>Chaining</p>
       </div>
     </a>
     <a class="right-next"
@@ -542,7 +543,7 @@ makes it possible to define complex, version-dependent data structures.</p>
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">2.3.5. </span>Actions</p>
+        <p class="prev-next-title"><span class="section-number">2.3.6. </span>Actions</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -565,12 +566,12 @@ makes it possible to define complex, version-dependent data structures.</p>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-it-works">2.3.4.1. How it works</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-concepts">2.3.4.2. Key Concepts</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-it-works">2.3.5.1. How it works</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-concepts">2.3.5.2. Key Concepts</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#example-versioned-struct">Example: Versioned Struct</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#best-practices">2.3.4.3. Best Practices</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#best-practices">2.3.5.3. Best Practices</a></li>
 </ul>
   </nav></div>
 

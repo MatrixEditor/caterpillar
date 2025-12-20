@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>2.3. Advanced Concepts &#8212; Caterpillar 2.6.3 documentation</title>
+    <title>2.3. Advanced Concepts &#8212; Caterpillar 2.7.0 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=99c1414e"></script>
+    <script src="../../_static/documentation_options.js?v=dfec817d"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -54,7 +54,7 @@
     <link rel="prev" title="2.2.6. Common Structures" href="../basics/other.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.6.3" />
+  <meta name="docsearch:version" content="2.7.0" />
   </head>
   
   
@@ -116,7 +116,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.6.3</p>
+    <p class="title logo__title">Caterpillar 2.7.0</p>
   
 </a></div>
     
@@ -360,13 +360,14 @@
 <li class="toctree-l3"><a class="reference internal" href="op-custom.html">2.3.1.3. Custom Operators</a></li>
 </ul>
 </details></li>
-<li class="toctree-l2"><a class="reference internal" href="pointers.html">2.3.2. Pointers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="chaining.html">2.3.3. Chaining</a></li>
-<li class="toctree-l2"><a class="reference internal" href="conditional.html">2.3.4. Conditional Fields</a></li>
-<li class="toctree-l2"><a class="reference internal" href="actions.html">2.3.5. Actions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bitfield.html">2.3.6. Bitfields</a></li>
-<li class="toctree-l2"><a class="reference internal" href="union.html">2.3.7. Unions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="templates.html">2.3.8. Templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="byteorder.html">2.3.2. Dynamic Byte Order</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pointers.html">2.3.3. Pointers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chaining.html">2.3.4. Chaining</a></li>
+<li class="toctree-l2"><a class="reference internal" href="conditional.html">2.3.5. Conditional Fields</a></li>
+<li class="toctree-l2"><a class="reference internal" href="actions.html">2.3.6. Actions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bitfield.html">2.3.7. Bitfields</a></li>
+<li class="toctree-l2"><a class="reference internal" href="union.html">2.3.8. Unions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="templates.html">2.3.9. Templates</a></li>
 </ul>
 </details></li>
 </ul>
@@ -451,35 +452,41 @@ might expect.</p>
 <li class="toctree-l2"><a class="reference internal" href="op-custom.html">2.3.1.3. Custom Operators</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="pointers.html">2.3.2. Pointers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="chaining.html">2.3.3. Chaining</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="chaining.html#how-it-works">2.3.3.1. How it works</a></li>
+<li class="toctree-l1"><a class="reference internal" href="byteorder.html">2.3.2. Dynamic Byte Order</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="byteorder.html#example-struct-wide-dynamic-byte-order">2.3.2.1. Example: struct-wide dynamic byte order</a></li>
+<li class="toctree-l2"><a class="reference internal" href="byteorder.html#example-field-level-dynamic-byte-order">2.3.2.2. Example: field-level dynamic byte order</a></li>
+<li class="toctree-l2"><a class="reference internal" href="byteorder.html#example-context-key-reference">2.3.2.3. Example: context key reference</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="conditional.html">2.3.4. Conditional Fields</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="conditional.html#how-it-works">2.3.4.1. How it works</a></li>
-<li class="toctree-l2"><a class="reference internal" href="conditional.html#key-concepts">2.3.4.2. Key Concepts</a></li>
-<li class="toctree-l2"><a class="reference internal" href="conditional.html#best-practices">2.3.4.3. Best Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pointers.html">2.3.3. Pointers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chaining.html">2.3.4. Chaining</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="chaining.html#how-it-works">2.3.4.1. How it works</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="actions.html">2.3.5. Actions</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="actions.html#advanced-usage-message-digests">2.3.5.1. Advanced Usage: Message Digests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="conditional.html">2.3.5. Conditional Fields</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="conditional.html#how-it-works">2.3.5.1. How it works</a></li>
+<li class="toctree-l2"><a class="reference internal" href="conditional.html#key-concepts">2.3.5.2. Key Concepts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="conditional.html#best-practices">2.3.5.3. Best Practices</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="bitfield.html">2.3.6. Bitfields</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="bitfield.html#core-concepts">2.3.6.1. Core Concepts</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bitfield.html#the-syntax">2.3.6.2. The Syntax</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bitfield.html#practical-example">2.3.6.3. Practical Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="actions.html">2.3.6. Actions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="actions.html#advanced-usage-message-digests">2.3.6.1. Advanced Usage: Message Digests</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="union.html">2.3.7. Unions</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="union.html#how-this-can-work">2.3.7.1. How this can work</a></li>
-<li class="toctree-l2"><a class="reference internal" href="union.html#customazation">2.3.7.2. Customazation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bitfield.html">2.3.7. Bitfields</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="bitfield.html#core-concepts">2.3.7.1. Core Concepts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bitfield.html#the-syntax">2.3.7.2. The Syntax</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bitfield.html#practical-example">2.3.7.3. Practical Example</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="templates.html">2.3.8. Templates</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="templates.html#defining-a-template">2.3.8.1. Defining a Template</a></li>
-<li class="toctree-l2"><a class="reference internal" href="templates.html#deriving-a-template">2.3.8.2. Deriving a Template</a></li>
+<li class="toctree-l1"><a class="reference internal" href="union.html">2.3.8. Unions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="union.html#how-this-can-work">2.3.8.1. How this can work</a></li>
+<li class="toctree-l2"><a class="reference internal" href="union.html#customazation">2.3.8.2. Customazation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="templates.html">2.3.9. Templates</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="templates.html#defining-a-template">2.3.9.1. Defining a Template</a></li>
+<li class="toctree-l2"><a class="reference internal" href="templates.html#deriving-a-template">2.3.9.2. Deriving a Template</a></li>
 </ul>
 </li>
 </ul>

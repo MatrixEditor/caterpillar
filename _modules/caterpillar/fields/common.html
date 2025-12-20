@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>caterpillar.fields.common &#8212; Caterpillar 2.6.3 documentation</title>
+    <title>caterpillar.fields.common &#8212; Caterpillar 2.7.0 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=99c1414e"></script>
+    <script src="../../../_static/documentation_options.js?v=dfec817d"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -51,7 +51,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.6.3" />
+  <meta name="docsearch:version" content="2.7.0" />
   </head>
   
   
@@ -113,7 +113,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.6.3</p>
+    <p class="title logo__title">Caterpillar 2.7.0</p>
   
 </a></div>
     
@@ -2202,7 +2202,7 @@
 <span class="sd">        :param obj: The `UUID` object to pack.</span>
 <span class="sd">        :param context: The current context, which includes the stream and byte order.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">is_le</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_FIELD</span><span class="p">]</span><span class="o">.</span><span class="n">order</span> <span class="ow">is</span> <span class="n">LittleEndian</span>
+        <span class="n">is_le</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_FIELD</span><span class="p">]</span><span class="o">.</span><span class="n">order</span><span class="o">.</span><span class="n">ch</span> <span class="o">==</span> <span class="n">LITTLE_ENDIAN_FMT</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__pack__</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">bytes_le</span> <span class="k">if</span> <span class="n">is_le</span> <span class="k">else</span> <span class="n">obj</span><span class="o">.</span><span class="n">bytes</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__unpack__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UUID</span><span class="p">:</span>
@@ -2216,7 +2216,7 @@
 <span class="sd">        :return: The unpacked `UUID` object.</span>
 <span class="sd">        :rtype: UUID</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">is_le</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_FIELD</span><span class="p">]</span><span class="o">.</span><span class="n">order</span> <span class="ow">is</span> <span class="n">LittleEndian</span>
+        <span class="n">is_le</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_FIELD</span><span class="p">]</span><span class="o">.</span><span class="n">order</span><span class="o">.</span><span class="n">ch</span> <span class="o">==</span> <span class="n">LITTLE_ENDIAN_FMT</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_STREAM</span><span class="p">]</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">UUID</span><span class="p">(</span><span class="n">bytes_le</span><span class="o">=</span><span class="n">data</span><span class="p">)</span> <span class="k">if</span> <span class="n">is_le</span> <span class="k">else</span> <span class="n">UUID</span><span class="p">(</span><span class="nb">bytes</span><span class="o">=</span><span class="n">data</span><span class="p">)</span></div>
 

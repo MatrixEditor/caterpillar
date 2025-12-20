@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>2.3.7. Unions &#8212; Caterpillar 2.6.3 documentation</title>
+    <title>2.3.8. Unions &#8212; Caterpillar 2.7.0 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=99c1414e"></script>
+    <script src="../../_static/documentation_options.js?v=dfec817d"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -50,11 +50,11 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'tutorial/advanced/union';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="2.3.8. Templates" href="templates.html" />
-    <link rel="prev" title="2.3.6. Bitfields" href="bitfield.html" />
+    <link rel="next" title="2.3.9. Templates" href="templates.html" />
+    <link rel="prev" title="2.3.7. Bitfields" href="bitfield.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.6.3" />
+  <meta name="docsearch:version" content="2.7.0" />
   </head>
   
   
@@ -116,7 +116,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.6.3</p>
+    <p class="title logo__title">Caterpillar 2.7.0</p>
   
 </a></div>
     
@@ -360,13 +360,14 @@
 <li class="toctree-l3"><a class="reference internal" href="op-custom.html">2.3.1.3. Custom Operators</a></li>
 </ul>
 </details></li>
-<li class="toctree-l2"><a class="reference internal" href="pointers.html">2.3.2. Pointers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="chaining.html">2.3.3. Chaining</a></li>
-<li class="toctree-l2"><a class="reference internal" href="conditional.html">2.3.4. Conditional Fields</a></li>
-<li class="toctree-l2"><a class="reference internal" href="actions.html">2.3.5. Actions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bitfield.html">2.3.6. Bitfields</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">2.3.7. Unions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="templates.html">2.3.8. Templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="byteorder.html">2.3.2. Dynamic Byte Order</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pointers.html">2.3.3. Pointers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chaining.html">2.3.4. Chaining</a></li>
+<li class="toctree-l2"><a class="reference internal" href="conditional.html">2.3.5. Conditional Fields</a></li>
+<li class="toctree-l2"><a class="reference internal" href="actions.html">2.3.6. Actions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bitfield.html">2.3.7. Bitfields</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">2.3.8. Unions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="templates.html">2.3.9. Templates</a></li>
 </ul>
 </details></li>
 </ul>
@@ -415,7 +416,7 @@
     
     <li class="breadcrumb-item"><a href="index.html" class="nav-link"><span class="section-number">2.3. </span>Advanced Concepts</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">2.3.7. </span>Unions</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">2.3.8. </span>Unions</span></li>
   </ul>
 </nav>
 </div>
@@ -433,7 +434,7 @@
                 <article class="bd-article">
                   
   <section id="unions">
-<span id="tutorial-union"></span><h1><span class="section-number">2.3.7. </span>Unions<a class="headerlink" href="#unions" title="Link to this heading">#</a></h1>
+<span id="tutorial-union"></span><h1><span class="section-number">2.3.8. </span>Unions<a class="headerlink" href="#unions" title="Link to this heading">#</a></h1>
 <p>A <strong>Union</strong> is a special type of structure that mimics the behavior of a C-style union. In a C
 union, multiple fields share the same memory space, meaning only one field can store a value
 at any given time. The value of the most recently assigned field overwrites the previous one.
@@ -472,7 +473,7 @@ modification made to one field automatically updates the corresponding field.</p
 </pre></div>
 </div>
 <section id="how-this-can-work">
-<h2><span class="section-number">2.3.7.1. </span>How this can work<a class="headerlink" href="#how-this-can-work" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">2.3.8.1. </span>How this can work<a class="headerlink" href="#how-this-can-work" title="Link to this heading">#</a></h2>
 <p>When a union object is first created, the fields do not synchronize immediately.
 You can set values for fields independently during the construction of the object.
 After the object is constructed, any change to one of the union’s fields automatically
@@ -481,7 +482,7 @@ field is consistent across the union.</p>
 <p>For more information, see <a class="reference internal" href="../../reference/datamodel/union.html#union-reference"><span class="std std-ref">Union</span></a> reference.</p>
 </section>
 <section id="customazation">
-<h2><span class="section-number">2.3.7.2. </span>Customazation<a class="headerlink" href="#customazation" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">2.3.8.2. </span>Customazation<a class="headerlink" href="#customazation" title="Link to this heading">#</a></h2>
 <p>You can further customize the behavior of unions by implementing a custom <a class="reference internal" href="../../library/model/struct.html#caterpillar.model.UnionHook" title="caterpillar.model.UnionHook"><code class="xref py py-class docutils literal notranslate"><span class="pre">UnionHook</span></code></a>.
 This allows you to define additional actions or modifications when fields in a union
 are accessed or changed.</p>
@@ -516,7 +517,7 @@ the union’s fields.</p>
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title"><span class="section-number">2.3.6. </span>Bitfields</p>
+        <p class="prev-next-title"><span class="section-number">2.3.7. </span>Bitfields</p>
       </div>
     </a>
     <a class="right-next"
@@ -524,7 +525,7 @@ the union’s fields.</p>
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">2.3.8. </span>Templates</p>
+        <p class="prev-next-title"><span class="section-number">2.3.9. </span>Templates</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -547,8 +548,8 @@ the union’s fields.</p>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-this-can-work">2.3.7.1. How this can work</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#customazation">2.3.7.2. Customazation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-this-can-work">2.3.8.1. How this can work</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#customazation">2.3.8.2. Customazation</a></li>
 </ul>
   </nav></div>
 

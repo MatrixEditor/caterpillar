@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>2.3.3. Chaining &#8212; Caterpillar 2.6.3 documentation</title>
+    <title>2.3.4. Chaining &#8212; Caterpillar 2.7.0 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=99c1414e"></script>
+    <script src="../../_static/documentation_options.js?v=dfec817d"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -50,11 +50,11 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'tutorial/advanced/chaining';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="2.3.4. Conditional Fields" href="conditional.html" />
-    <link rel="prev" title="2.3.2. Pointers" href="pointers.html" />
+    <link rel="next" title="2.3.5. Conditional Fields" href="conditional.html" />
+    <link rel="prev" title="2.3.3. Pointers" href="pointers.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.6.3" />
+  <meta name="docsearch:version" content="2.7.0" />
   </head>
   
   
@@ -116,7 +116,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.6.3</p>
+    <p class="title logo__title">Caterpillar 2.7.0</p>
   
 </a></div>
     
@@ -360,13 +360,14 @@
 <li class="toctree-l3"><a class="reference internal" href="op-custom.html">2.3.1.3. Custom Operators</a></li>
 </ul>
 </details></li>
-<li class="toctree-l2"><a class="reference internal" href="pointers.html">2.3.2. Pointers</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">2.3.3. Chaining</a></li>
-<li class="toctree-l2"><a class="reference internal" href="conditional.html">2.3.4. Conditional Fields</a></li>
-<li class="toctree-l2"><a class="reference internal" href="actions.html">2.3.5. Actions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bitfield.html">2.3.6. Bitfields</a></li>
-<li class="toctree-l2"><a class="reference internal" href="union.html">2.3.7. Unions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="templates.html">2.3.8. Templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="byteorder.html">2.3.2. Dynamic Byte Order</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pointers.html">2.3.3. Pointers</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">2.3.4. Chaining</a></li>
+<li class="toctree-l2"><a class="reference internal" href="conditional.html">2.3.5. Conditional Fields</a></li>
+<li class="toctree-l2"><a class="reference internal" href="actions.html">2.3.6. Actions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bitfield.html">2.3.7. Bitfields</a></li>
+<li class="toctree-l2"><a class="reference internal" href="union.html">2.3.8. Unions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="templates.html">2.3.9. Templates</a></li>
 </ul>
 </details></li>
 </ul>
@@ -415,7 +416,7 @@
     
     <li class="breadcrumb-item"><a href="index.html" class="nav-link"><span class="section-number">2.3. </span>Advanced Concepts</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">2.3.3. </span>Chaining</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">2.3.4. </span>Chaining</span></li>
   </ul>
 </nav>
 </div>
@@ -433,7 +434,7 @@
                 <article class="bd-article">
                   
   <section id="chaining">
-<span id="tutorial-chaining"></span><h1><span class="section-number">2.3.3. </span>Chaining<a class="headerlink" href="#chaining" title="Link to this heading">#</a></h1>
+<span id="tutorial-chaining"></span><h1><span class="section-number">2.3.4. </span>Chaining<a class="headerlink" href="#chaining" title="Link to this heading">#</a></h1>
 <p>It is also possible to create a chain of structs, where one struct’s
 output becomes the input for another. This allows for flexible data
 processing pipelines, where you can perform multiple operations on
@@ -441,7 +442,7 @@ the data sequentially. However, this feature is generally not recommended
 for most use cases, as it can introduce complexity and impact performance
 in some scenarios.</p>
 <section id="how-it-works">
-<h2><span class="section-number">2.3.3.1. </span>How it works<a class="headerlink" href="#how-it-works" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">2.3.4.1. </span>How it works<a class="headerlink" href="#how-it-works" title="Link to this heading">#</a></h2>
 <p>When you chain structs together, the resulting data is processed in a
 pipeline fashion: unpacking flows from head to tail, while packing moves
 from tail to head. This means that when unpacking, each struct in the
@@ -479,7 +480,7 @@ the data sequentially. (see <code class="xref py py-class docutils literal notra
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title"><span class="section-number">2.3.2. </span>Pointers</p>
+        <p class="prev-next-title"><span class="section-number">2.3.3. </span>Pointers</p>
       </div>
     </a>
     <a class="right-next"
@@ -487,7 +488,7 @@ the data sequentially. (see <code class="xref py py-class docutils literal notra
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">2.3.4. </span>Conditional Fields</p>
+        <p class="prev-next-title"><span class="section-number">2.3.5. </span>Conditional Fields</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -510,7 +511,7 @@ the data sequentially. (see <code class="xref py py-class docutils literal notra
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-it-works">2.3.3.1. How it works</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-it-works">2.3.4.1. How it works</a></li>
 </ul>
   </nav></div>
 

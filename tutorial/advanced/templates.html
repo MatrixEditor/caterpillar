@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>2.3.8. Templates &#8212; Caterpillar 2.6.3 documentation</title>
+    <title>2.3.9. Templates &#8212; Caterpillar 2.7.0 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=99c1414e"></script>
+    <script src="../../_static/documentation_options.js?v=dfec817d"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -51,10 +51,10 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="3. Reference" href="../../reference/index.html" />
-    <link rel="prev" title="2.3.7. Unions" href="union.html" />
+    <link rel="prev" title="2.3.8. Unions" href="union.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.6.3" />
+  <meta name="docsearch:version" content="2.7.0" />
   </head>
   
   
@@ -116,7 +116,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.6.3</p>
+    <p class="title logo__title">Caterpillar 2.7.0</p>
   
 </a></div>
     
@@ -360,13 +360,14 @@
 <li class="toctree-l3"><a class="reference internal" href="op-custom.html">2.3.1.3. Custom Operators</a></li>
 </ul>
 </details></li>
-<li class="toctree-l2"><a class="reference internal" href="pointers.html">2.3.2. Pointers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="chaining.html">2.3.3. Chaining</a></li>
-<li class="toctree-l2"><a class="reference internal" href="conditional.html">2.3.4. Conditional Fields</a></li>
-<li class="toctree-l2"><a class="reference internal" href="actions.html">2.3.5. Actions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bitfield.html">2.3.6. Bitfields</a></li>
-<li class="toctree-l2"><a class="reference internal" href="union.html">2.3.7. Unions</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">2.3.8. Templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="byteorder.html">2.3.2. Dynamic Byte Order</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pointers.html">2.3.3. Pointers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chaining.html">2.3.4. Chaining</a></li>
+<li class="toctree-l2"><a class="reference internal" href="conditional.html">2.3.5. Conditional Fields</a></li>
+<li class="toctree-l2"><a class="reference internal" href="actions.html">2.3.6. Actions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bitfield.html">2.3.7. Bitfields</a></li>
+<li class="toctree-l2"><a class="reference internal" href="union.html">2.3.8. Unions</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">2.3.9. Templates</a></li>
 </ul>
 </details></li>
 </ul>
@@ -415,7 +416,7 @@
     
     <li class="breadcrumb-item"><a href="index.html" class="nav-link"><span class="section-number">2.3. </span>Advanced Concepts</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">2.3.8. </span>Templates</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">2.3.9. </span>Templates</span></li>
   </ul>
 </nav>
 </div>
@@ -433,14 +434,14 @@
                 <article class="bd-article">
                   
   <section id="templates">
-<span id="tutorial-templates"></span><h1><span class="section-number">2.3.8. </span>Templates<a class="headerlink" href="#templates" title="Link to this heading">#</a></h1>
+<span id="tutorial-templates"></span><h1><span class="section-number">2.3.9. </span>Templates<a class="headerlink" href="#templates" title="Link to this heading">#</a></h1>
 <p>Yes, you read that correctly: <em>Caterpillar</em> supports class templates, similar
 to the concept in C++. Templates allow you to create generic structures that
 can be tailored with specific types when they are derived.</p>
 <p>If you’d like more details about the design decisions and limitations regarding
 templates, refer to the <a class="reference internal" href="../../reference/datamodel/templates.html#ref-templates"><span class="std std-ref">Templates</span></a> section in the data model description.</p>
 <section id="defining-a-template">
-<h2><span class="section-number">2.3.8.1. </span>Defining a Template<a class="headerlink" href="#defining-a-template" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">2.3.9.1. </span>Defining a Template<a class="headerlink" href="#defining-a-template" title="Link to this heading">#</a></h2>
 <p>You can define templates using a special syntax. First, you create <strong>template type variables</strong>,
 and then you use them within your class definition. These templates can be instantiated
 later with specific types or values.</p>
@@ -464,7 +465,7 @@ later with specific types or values.</p>
 </ul>
 </section>
 <section id="deriving-a-template">
-<h2><span class="section-number">2.3.8.2. </span>Deriving a Template<a class="headerlink" href="#deriving-a-template" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">2.3.9.2. </span>Deriving a Template<a class="headerlink" href="#deriving-a-template" title="Link to this heading">#</a></h2>
 <p>Once you have defined a template, you can create specific classes (known as
 <strong>derivations</strong>) by providing the template with concrete types. This allows
 you to reuse the logic from the template with different type combinations,
@@ -516,7 +517,7 @@ for this feature will be part of future enhancements in this project.</p>
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title"><span class="section-number">2.3.7. </span>Unions</p>
+        <p class="prev-next-title"><span class="section-number">2.3.8. </span>Unions</p>
       </div>
     </a>
     <a class="right-next"
@@ -547,8 +548,8 @@ for this feature will be part of future enhancements in this project.</p>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#defining-a-template">2.3.8.1. Defining a Template</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#deriving-a-template">2.3.8.2. Deriving a Template</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#defining-a-template">2.3.9.1. Defining a Template</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#deriving-a-template">2.3.9.2. Deriving a Template</a></li>
 </ul>
   </nav></div>
 

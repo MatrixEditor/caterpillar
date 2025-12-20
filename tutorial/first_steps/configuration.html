@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>2.1.3. Configuring structs &#8212; Caterpillar 2.6.3 documentation</title>
+    <title>2.1.3. Configuring structs &#8212; Caterpillar 2.7.0 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=99c1414e"></script>
+    <script src="../../_static/documentation_options.js?v=dfec817d"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -54,7 +54,7 @@
     <link rel="prev" title="2.1.2. Working with Structs" href="parsing.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.6.3" />
+  <meta name="docsearch:version" content="2.7.0" />
   </head>
   
   
@@ -116,7 +116,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.6.3</p>
+    <p class="title logo__title">Caterpillar 2.7.0</p>
   
 </a></div>
     
@@ -360,13 +360,14 @@
 <li class="toctree-l3"><a class="reference internal" href="../advanced/op-custom.html">2.3.1.3. Custom Operators</a></li>
 </ul>
 </details></li>
-<li class="toctree-l2"><a class="reference internal" href="../advanced/pointers.html">2.3.2. Pointers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../advanced/chaining.html">2.3.3. Chaining</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../advanced/conditional.html">2.3.4. Conditional Fields</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../advanced/actions.html">2.3.5. Actions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../advanced/bitfield.html">2.3.6. Bitfields</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../advanced/union.html">2.3.7. Unions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../advanced/templates.html">2.3.8. Templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advanced/byteorder.html">2.3.2. Dynamic Byte Order</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advanced/pointers.html">2.3.3. Pointers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advanced/chaining.html">2.3.4. Chaining</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advanced/conditional.html">2.3.5. Conditional Fields</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advanced/actions.html">2.3.6. Actions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advanced/bitfield.html">2.3.7. Bitfields</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advanced/union.html">2.3.8. Unions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advanced/templates.html">2.3.9. Templates</a></li>
 </ul>
 </details></li>
 </ul>
@@ -460,6 +461,13 @@ for integers, we need to configure the struct to handle this correctly.</p>
 <p>In both cases, the <code class="code docutils literal notranslate"><span class="pre">pixels_per_unit_x</span></code> and <code class="code docutils literal notranslate"><span class="pre">pixels_per_unit_y</span></code> fields are 4 bytes long,
 so they will be interpreted using big-endian encoding. The <code class="code docutils literal notranslate"><span class="pre">unit</span></code> field is only 1 byte, so
 endianess doesn’t affect it.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>It is also possible to mixup various byte orders within the same struct by applying the
+endianess directly to the field types. Additionally, there is a special byte order type
+that allows dynamic selection of the endian during runtime. See the
+<a class="reference internal" href="../advanced/byteorder.html#tutorial-dyn-byteorder"><span class="std std-ref">advanced configuration</span></a> section for more details.</p>
+</div>
 <p>In addition to configuring the endianess, you can also specify the <strong>architecture</strong> associated
 with the struct using the <a class="reference internal" href="../../library/byteorder.html#caterpillar.byteorder.Arch" title="caterpillar.byteorder.Arch"><code class="xref py py-class docutils literal notranslate"><span class="pre">Arch</span></code></a> class with the <code class="code docutils literal notranslate"><span class="pre">arch</span></code> keyword.</p>
 <div class="admonition-challenge admonition">
