@@ -13,9 +13,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from enum import Enum
+from typing import Callable
 from typing_extensions import Final
 
-from caterpillar.abc import _EndianLike, _ArchLike, _SupportsSetEndian, _OT
+from caterpillar.abc import (
+    _EndianLike,
+    _ArchLike,
+    _SupportsSetEndian,
+    _OT,
+    _ContextLambda,
+    _ContextLike,
+)
 
 class ByteOrder(_EndianLike):
     name: str
@@ -44,14 +52,37 @@ class ByteOrder(_EndianLike):
         size: Size | None = ...,
     ) -> None: ...
 
+class DynByteOrder:
+    name: str
+    ch: str
+    key: str | _ContextLambda[str | _EndianLike | bool] | None
+    func: Callable[[], str | _EndianLike] | _ContextLambda[str | _EndianLike] | None
+
+    def __init__(
+        self,
+        name: str | None = None,
+        key: str | _ContextLambda[str | _EndianLike] | None = None,
+        func: (
+            Callable[[], str | _EndianLike] | _ContextLambda[str | _EndianLike] | None
+        ) = None,
+        init_ch: str | None = None,
+    ) -> None: ...
+    def __call__(
+        self, key: str | _ContextLambda[str | _EndianLike | bool]
+    ) -> DynByteOrder: ...
+    def __add__(self, other: _SupportsSetEndian[_OT]) -> _OT: ...
+    def getch(self, context: _ContextLike) -> str: ...
+
 LITTLE_ENDIAN_FMT: str
 Native: Final[ByteOrder]
 BigEndian: Final[ByteOrder]
 LittleEndian: Final[ByteOrder]
 NetEndian: Final[ByteOrder]
 SysNative: Final[ByteOrder]
+Dynamic: Final[DynByteOrder]
 
 def byteorder(obj, default: _EndianLike | None = None) -> _EndianLike: ...
+def byteorder_is_little(endian: _EndianLike) -> bool: ...
 
 class Arch(_ArchLike):
     name: str

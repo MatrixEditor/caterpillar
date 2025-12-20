@@ -39,6 +39,7 @@ CTX_PATH = "_path"
 CTX_SEQ = "_is_seq"
 CTX_ARCH = "_arch"
 CTX_ROOT = "_root"
+CTX_ORDER = "_order"
 
 
 class Context(dict):
@@ -98,6 +99,49 @@ class Context(dict):
 
 
 O_CONTEXT_FACTORY = Flag("option.context_factory", value=Context)
+
+
+class SetContextVar:
+    """Defines an action that sets a context variable during pack or unpack.
+
+    The value assigned to the context key is computed dynamically using
+    a user-provided callable evaluated at runtime.
+
+    :param key: Name of the context variable to set
+    :type key: str
+    :param func: Callable used to compute the context value
+    :type func: callable
+    """
+
+    def __init__(self, key: str, func) -> None:
+        self.key = key
+        self.func = func
+
+    def __action_pack__(self, context) -> None:
+        """Apply the context variable assignment during packing.
+
+        The callable is evaluated and its result is stored in the
+        context under the configured key.
+
+        :param context: Active packing context
+        :type context: object
+        :return: None
+        :rtype: None
+        """
+        context.__context_setattr__(self.key, self.func(context))
+
+    def __action_unpack__(self, context) -> None:
+        """Apply the context variable assignment during unpacking.
+
+        The callable is evaluated and its result is stored in the
+        context under the configured key.
+
+        :param context: Active unpacking context
+        :type context: object
+        :return: None
+        :rtype: None
+        """
+        context.__context_setattr__(self.key, self.func(context))
 
 
 class ExprMixin:
