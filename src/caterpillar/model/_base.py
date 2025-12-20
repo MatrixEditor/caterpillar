@@ -27,6 +27,7 @@ from caterpillar.context import (
 from caterpillar.byteorder import (
     ByteOrder,
     Arch,
+    LittleEndian,
     SysNative,
     system_arch,
 )
@@ -106,7 +107,7 @@ class Sequence(FieldMixin):
     ) -> None:
         self.model = model
         self.arch = arch
-        self.order = order
+        self.order = order or LittleEndian
         self.options = set(options or [])
         self.field_options = set(field_options or [])
 

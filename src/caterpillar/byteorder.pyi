@@ -56,15 +56,13 @@ class DynByteOrder:
     name: str
     ch: str
     key: str | _ContextLambda[str | _EndianLike | bool] | None
-    func: Callable[[], str | _EndianLike] | _ContextLambda[str | _EndianLike] | None
+    func: Callable[[], _EndianLike] | _ContextLambda[_EndianLike] | None
 
     def __init__(
         self,
         name: str | None = None,
-        key: str | _ContextLambda[str | _EndianLike] | None = None,
-        func: (
-            Callable[[], str | _EndianLike] | _ContextLambda[str | _EndianLike] | None
-        ) = None,
+        key: str | _ContextLambda[str | _EndianLike | bool] | None = None,
+        func: Callable[[], _EndianLike] | _ContextLambda[_EndianLike] | None = None,
         init_ch: str | None = None,
     ) -> None: ...
     def __call__(

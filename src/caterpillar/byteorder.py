@@ -18,6 +18,7 @@ from sys import maxsize
 from platform import machine
 from dataclasses import dataclass
 from enum import Enum
+from typing_extensions import override
 
 from caterpillar.shared import ATTR_BYTEORDER
 from caterpillar.context import CTX_ORDER
@@ -190,20 +191,16 @@ class DynByteOrder:
 
         if self.key is not None:
             if self.__key_str:
-                byte_order = context.get(self.key, SysNative)
+                byte_order = context.__context_getattr__(self.key)
             else:
                 byte_order = self.key(context)
         else:
             root_context = context._root
             byte_order = (root_context or {}).get(CTX_ORDER, SysNative)
 
-        ch = getattr(byte_order, "ch", None)
-        if not ch:
-            match byte_order:
-                case str():
-                    ch = byte_order
-                case _:
-                    ch = LITTLE_ENDIAN_FMT if bool(byte_order) else BigEndian.ch
+        ch = getattr(byte_order, "ch", byte_order)
+        if not isinstance(ch, str):
+            ch = LITTLE_ENDIAN_FMT if bool(byte_order) else BigEndian.ch
 
         return ch
 
@@ -248,6 +245,10 @@ class DynByteOrder:
         """
         return other.__set_byteorder__(self)
 
+    @override
+    def __repr__(self) -> str:
+        return f"<DynByteOrder little={self.ch == LITTLE_ENDIAN_FMT}>"
+
 
 LITTLE_ENDIAN_FMT = "<"
 
@@ -276,7 +277,7 @@ def byteorder_is_little(obj) -> bool:
     """
     Check if the byte order of an object is little-endian.
     """
-    return obj.ch == LITTLE_ENDIAN_FMT
+    return getattr(obj, "ch", LITTLE_ENDIAN_FMT) == LITTLE_ENDIAN_FMT
 
 
 @dataclass(frozen=True)

@@ -22,7 +22,7 @@ def test_dyn_byteorder_pack():
     # 1. Pack with BigEndian
     data_be = pack(obj, **config)
 
-    # 2. Unpack with LittleEndian
+    # 2. Pack with LittleEndian
     config[CTX_ORDER] = LittleEndian
     data_le = pack(obj, **config)
 

@@ -20,6 +20,7 @@ from .byteorder import (
     ARM64,
     BigEndian,
     LittleEndian,
+    Dynamic,
     PowerPC,
     PowerPC64,
     RISC_V,
@@ -84,4 +85,5 @@ __all__ = [
     "C",
     "P",
     "G",
+    "Dynamic",
 ]
