@@ -119,7 +119,7 @@ class MACAddress(Transformer):
 
     DELIMITERS = re.compile(rb"[:-]")
 
-    def __init__(self, sep=None) -> None:
+    def __init__(self, sep=None, encoding: str | None = None) -> None:
         """
         Initialize the MACAddress transformer.
 
@@ -127,6 +127,7 @@ class MACAddress(Transformer):
         """
         super().__init__(Bytes(6))
         self.sep = sep or ":"
+        self.encoding = encoding or "utf-8"
 
     def encode(self, obj, context):
         """
@@ -137,7 +138,7 @@ class MACAddress(Transformer):
         :return: The encoded value.
         """
         if isinstance(obj, str):
-            obj = obj.encode(self.struct.encoding or "utf-8")
+            obj = obj.encode(self.encoding)
 
         # replace unnecessary characters
         mac = re.sub(MACAddress.DELIMITERS, b"", obj)

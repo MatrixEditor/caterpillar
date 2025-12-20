@@ -17,13 +17,14 @@ from typing import (
     Any,
     Callable,
     Final,
+    Generic,
     Protocol,
     Union,
     dataclass_transform,
     type_check_only,
 )
 from typing_extensions import Self, override
-from caterpillar.abc import _ContextLike, _ContextLambda
+from caterpillar.abc import _ContextLike, _ContextLambda, _IT
 from caterpillar.options import Flag
 
 CTX_PARENT: str
@@ -38,6 +39,7 @@ CTX_PATH: str
 CTX_SEQ: str
 CTX_ARCH: str
 CTX_ROOT: str
+CTX_ORDER: str
 
 @type_check_only
 class ContextFactory(Protocol):
@@ -52,6 +54,13 @@ class Context(dict[str, Any]):
     def __getattribute__(self, key: str) -> Any: ...
     def __context_getattr__(self, path: str) -> Any: ...
     def __context_setattr__(self, path: str, value: Any) -> None: ...
+
+class SetContextVar(Generic[_IT]):
+    key: str
+    func: _ContextLambda[_IT]
+    def __init__(self, key: str, func: _ContextLambda[_IT]) -> None: ...
+    def __action_pack__(self, context: _ContextLike) -> None: ...
+    def __action_unpack__(self, context: _ContextLike) -> None: ...
 
 class ExprMixin:
     def __add__(self, other: Any) -> BinaryExpression: ...

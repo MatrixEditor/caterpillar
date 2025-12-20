@@ -22,6 +22,7 @@ options will be added in the future. Documentation is [here >](https://matrixedi
 * allowing you to place conditional statements into class definitions,
 * insert proper types into the class definition to support documentation and
 * it helps you to create cleaner and more compact code.
+* There is also a feature that lets you dynamically change the endian within a struct!
 * You can even extend Caterpillar and write your parsing logic in C or C++!!
 
 > [!NOTE]
@@ -34,6 +35,8 @@ options will be added in the future. Documentation is [here >](https://matrixedi
 ## Give me some code!
 
 ```python
+from caterpillar.py import *
+
 @bitfield(order=LittleEndian)
 class Header:
     version : 4                # 4bit integer
@@ -46,7 +49,7 @@ class Format:
     magic  : b"ITS MAGIC"        # Supports string and byte constants directly
     header : Header
     a      : uint8               # Primitive data types
-    b      : int32
+    b      : Dynamic + int32     # dynamic endian based on global config
     length : uint8               # String fields with computed lengths
     name   : String(this.length) #  -> you can also use Prefixed(uint8)
 
@@ -70,6 +73,9 @@ blob = pack(obj, Format)
 
 # Unpacking the binary data, reads as 'UNPACK Format FROM blob'
 obj2 = unpack(Format, blob)
+
+# to pack with a different endian for field 'b', use _order
+data = pack(obj, Format, _order=BigEndian)
 ```
 
 This library offers extensive functionality beyond basic struct handling. For further details

@@ -18,6 +18,8 @@ from .registry import TypeConverter, annotation_registry, to_struct
 from .byteorder import (
     ByteOrder,
     SysNative,
+    Dynamic,
+    DynByteOrder,
     Arch,
     system_arch,
     Native,
@@ -133,6 +135,8 @@ __all__ = model_all + fields_all + [
     "Arch",
     "BigEndian",
     "ByteOrder",
+    "Dynamic",
+    "DynByteOrder",
     "LittleEndian",
     "MIPS",
     "MIPS64",

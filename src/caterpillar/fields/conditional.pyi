@@ -12,13 +12,14 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+from typing_extensions import Final
 from caterpillar.abc import _ContextLambda, _ContextLike, _StructLike
 from caterpillar.context import ConditionContext
-from typing import Any, Dict, List
+from typing import Any
 
 class ConditionalChain:
-    chain: Dict[int, _StructLike]
-    conditions: List[_ContextLambda[bool]]
+    chain: dict[int, _StructLike]
+    conditions: list[_ContextLambda[bool]]
     def __init__(self, struct: _StructLike, condition: _ContextLambda[int]) -> None: ...
     def __type__(self) -> type: ...
     def add(self, struct: _StructLike, func: _ContextLambda[bool]) -> None: ...
@@ -33,4 +34,4 @@ class ElseIf(ConditionContext):
     def __enter__(self): ...
     def __exit__(self, *_) -> None: ...
 
-Else: ElseIf
+Else: Final[ElseIf]

@@ -23,7 +23,7 @@ from caterpillar.shared import (
     ATTR_SIGNED,
 )
 from caterpillar.byteorder import (
-    LittleEndian,
+    LITTLE_ENDIAN_FMT,
     SysNative,
     system_arch,
 )
@@ -899,7 +899,7 @@ class Bitfield(Struct):
         context[CTX_OBJECT] = O_CONTEXT_FACTORY.value(_parent=context)
         base_path = context[CTX_PATH]
         # REVISIT
-        endian = "little" if self.order == LittleEndian else "big"
+        endian = "little" if self.order.ch == LITTLE_ENDIAN_FMT else "big"
         for group in self.groups:
             if group.is_field():
                 # unpack using field instance
@@ -944,7 +944,7 @@ class Bitfield(Struct):
     def pack_one(self, obj, context) -> None:
         base_path = context[CTX_PATH]
         # REVISIT
-        endian = "little" if self.order == LittleEndian else "big"
+        endian = "little" if self.order.ch == LITTLE_ENDIAN_FMT else "big"
         for group in self.groups:
             if group.is_field():
                 field = group.get_field()

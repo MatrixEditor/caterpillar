@@ -6,6 +6,26 @@ Changelog
 
 *More entries will be added in the future.*
 
+.. _changelog_2.7.0:
+
+[2.7.0] - Dynamic Byteorder
+===========================
+
+Added
+-----
+
+- New concept: *dynamic* byte order (explained in :ref:`tutorial-dyn_byteorder`)
+
+Fixed
+-----
+
+*caterpillar.field.net*
+^^^^^^^^^^^^^^^^^^^^^^^
+
+- Fixed parsing of :class:`~caterpillar.fields.net.MACAddress`
+- Fixed mixed endian in a struct, sequence or bit-field
+
+
 .. _changelog_2.6.3:
 
 [2.6.3] - Patch
@@ -60,8 +80,8 @@ Fixed
 
 .. _changelog_2.6.0:
 
-[2.6.0] - Minor Release
-=======================
+[2.6.0] - CAPI Compatibility
+============================
 
 Added
 -----
@@ -175,8 +195,8 @@ Fixed
 
 .. _changelog_2.5.0:
 
-[2.5.0] - Minor Release
-=======================
+[2.5.0] - Stub Files
+====================
 
 This version introduces massive changes due to the addition of stub files. Most of the type hints in the Python
 file are ported into several stub files. Additionally, the bitfield concept was completely renewed to be more

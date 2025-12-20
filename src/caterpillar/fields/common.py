@@ -1675,7 +1675,7 @@ class Uuid(FieldStruct):
         :param obj: The `UUID` object to pack.
         :param context: The current context, which includes the stream and byte order.
         """
-        is_le = context[CTX_FIELD].order is LittleEndian
+        is_le = context[CTX_FIELD].order.ch == LITTLE_ENDIAN_FMT
         super().__pack__(obj.bytes_le if is_le else obj.bytes, context)
 
     def __unpack__(self, context) -> UUID:
@@ -1689,7 +1689,7 @@ class Uuid(FieldStruct):
         :return: The unpacked `UUID` object.
         :rtype: UUID
         """
-        is_le = context[CTX_FIELD].order is LittleEndian
+        is_le = context[CTX_FIELD].order.ch == LITTLE_ENDIAN_FMT
         data = context[CTX_STREAM].read(16)
         return UUID(bytes_le=data) if is_le else UUID(bytes=data)
 
