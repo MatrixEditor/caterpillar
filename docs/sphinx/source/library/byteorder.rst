@@ -12,7 +12,11 @@ Byteorder
 .. autoclass:: ByteOrder
     :members:
 
+.. autoclass:: DynByteOrder
+    :members:
+
 .. autofunction:: byteorder(obj, default: Optional[ByteOrder] = None) -> ByteOrder
+.. autofunction:: byteorder_is_little
 
 Standard Byteorder Instances
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -27,6 +31,7 @@ Standard Byteorder Instances
 
 .. autoattribute:: caterpillar.byteorder.SysNative
 
+.. autoattribute:: caterpillar.byteorder.Dynamic
 
 
 

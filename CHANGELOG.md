@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.7.0] - Dynamic Byteorder
+
+###  Added
+
+- New concept: *dynamic* byte order (explained in documentation "Dynamic Byte Order")
+
+### Fixed
+
+**caterpillar.field.net**
+
+- Fixed parsing of :class:`~caterpillar.fields.net.MACAddress`
+- Fixed mixed endian in a struct, sequence or bit-field
+
+
+
 ## [2.6.3] - Patch Release
 
 ### Fixed

@@ -4,6 +4,7 @@ from caterpillar.fields import uint8, uint24, CString, Prefixed, uint32
 
 # The __slots__ options does not affect the packing or
 # unpacking process.
+# from caterpillar import options as opt
 # opt.set_struct_flags(opt.S_SLOTS, opt.S_REPLACE_TYPES)
 
 # The following lines will reduce the time around 10% for

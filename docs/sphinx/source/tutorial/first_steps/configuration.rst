@@ -32,6 +32,12 @@ In both cases, the :code:`pixels_per_unit_x` and :code:`pixels_per_unit_y` field
 so they will be interpreted using big-endian encoding. The :code:`unit` field is only 1 byte, so
 endianess doesn't affect it.
 
+.. tip::
+    It is also possible to mixup various byte orders within the same struct by applying the
+    endianess directly to the field types. Additionally, there is a special byte order type
+    that allows dynamic selection of the endian during runtime. See the
+    :ref:`advanced configuration <tutorial-dyn_byteorder>` section for more details.
+
 In addition to configuring the endianess, you can also specify the **architecture** associated
 with the struct using the :class:`~caterpillar.byteorder.Arch` class with the :code:`arch` keyword.
 

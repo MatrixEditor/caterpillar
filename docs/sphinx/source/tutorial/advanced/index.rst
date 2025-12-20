@@ -21,6 +21,7 @@ create and manipulate your own custom struct classes in Python.
     :maxdepth: 2
 
     operators
+    byteorder
     pointers
     chaining
     conditional
