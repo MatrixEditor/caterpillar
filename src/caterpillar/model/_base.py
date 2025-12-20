@@ -27,6 +27,8 @@ from caterpillar.context import (
 from caterpillar.byteorder import (
     ByteOrder,
     Arch,
+    SysNative,
+    system_arch,
 )
 from caterpillar.exception import StructException, ValidationError
 from caterpillar.options import (
@@ -272,8 +274,10 @@ class Sequence(FieldMixin):
             )
             raise ValidationError(msg)
         field.default = default
-        field.order = self.order or field.order
-        field.arch = self.arch or field.arch
+        if field.order is SysNative:
+            field.order = self.order or field.order
+        if field.arch is system_arch:
+            field.arch = self.arch or field.arch
         field.flags.update(self.field_options)
         # field.flags.update({hash(x): x for x in self.field_options})
         return field
