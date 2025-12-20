@@ -115,7 +115,7 @@ class VarInt(FieldStruct):
         data = []
         _, lb = self.bit_config(context)
         shift = 0
-        is_little = context[CTX_FIELD].order == LittleEndian
+        is_little = context[CTX_FIELD].order.ch == LITTLE_ENDIAN_FMT
 
         while True:
             # Note tha unpack operation here to retrieve one byte only
