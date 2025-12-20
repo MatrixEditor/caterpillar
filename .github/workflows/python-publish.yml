@@ -31,9 +31,15 @@ jobs:
           pip install build
 
       - name: Build Package
+        # This is a small hach since the 'caterpillar' project is already
+        # published on PyPi and we can't use that name.
         run: |
-          python -m build .
+          python3 -m build pypi || true
+          sed -i 's/\.\.\/src/\.\/src/g' pypi/pyproject.toml
+          python3 -m build pypi
 
       - name: Publish package to Prod PyPi
-        # if: github.event_name == 'release' && startsWith(github.ref, 'refs/tags') && !github.event.release.prerelease
+        if: github.event_name == 'release' && startsWith(github.ref, 'refs/tags') && !github.event.release.prerelease
         uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          package-dir: pypi/dist
