@@ -38,7 +38,6 @@ _StreamType = IOBase
 _StreamFactory = Callable[[], _StreamType]
 
 _GreedyType = EllipsisType
-_PrefixedType = "slice[_StructLike[int, int], NoneType, NoneType]"
 
 
 @runtime_checkable
@@ -54,9 +53,9 @@ class _ContextLike(Protocol):
 
     _root: "_ContextLike | None"
 
-    def __getitem__(self, key: str) -> Any: ...  # pyright: ignore[reportAny]
-    def __setitem__(self, key: str, value: Any) -> None: ...
-    def get(self, key: str, default: Any | None = None) -> Any: ...
+    def __getitem__(self, key: str, /) -> Any: ...  # pyright: ignore[reportAny]
+    def __setitem__(self, key: str, value: Any, /) -> None: ...
+    def get(self, key: str, default: Any | None = None, /) -> Any: ...
 
 
 @runtime_checkable
@@ -67,9 +66,6 @@ class _ContextLambda(Protocol[_ContextLambdaReturnT_co]):
     """
 
     def __call__(self, context: _ContextLike) -> _ContextLambdaReturnT_co: ...
-
-
-_LengthT = int | _PrefixedType | _GreedyType | _ContextLambda[int]
 
 
 @runtime_checkable
@@ -119,6 +115,10 @@ class _StructLike(Protocol[_IT_contra, _OT_co]):
     def __unpack__(self, context: _ContextLike) -> _OT_co: ...
     def __pack__(self, obj: _IT_contra, context: _ContextLike) -> None: ...
     def __type__(self) -> type | str | None: ...
+
+
+_PrefixedType = slice # [_StructLike[int, int], NoneType, NoneType]
+_LengthT = int | _PrefixedType | _GreedyType | _ContextLambda[int]
 
 
 @runtime_checkable
