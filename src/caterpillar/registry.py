@@ -12,8 +12,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-from typing import Any
+# pyright: reportPrivateUsage=false, reportExplicitAny=false
+from typing import Any, Callable
+from typing_extensions import override
 
 from caterpillar.abc import _StructLike
 from caterpillar.exception import ValidationError
@@ -43,11 +44,20 @@ class TypeConverter:
     :type delegate: Callable[[Any, dict], _StructLike], optional
     """
 
-    def __init__(self, target=None, delegate=None) -> None:
-        self.target = target
+    delegate: Callable[[Any, dict[str, Any]], _StructLike[Any, Any]] | None
+    """
+    optional delegation function
+    """
+
+    def __init__(
+        self,
+        target: type | None = None,
+        delegate: Callable[[Any, dict[str, Any]], _StructLike] | None = None,
+    ) -> None:
+        self.target: type | None = target
         self.delegate = delegate
 
-    def matches(self, annotation: Any) -> bool:
+    def matches(self, annotation: object) -> bool:
         """Check if this converter matches the given annotation type.
 
         :param annotation: he type or object to match against the target.
@@ -57,7 +67,7 @@ class TypeConverter:
         """
         return False if self.target is None else isinstance(annotation, self.target)
 
-    def convert(self, annotation: Any, kwargs: dict) -> _StructLike:
+    def convert(self, annotation: object, kwargs: dict[str, Any]) -> _StructLike:
         """Convert the given annotation (uses the delegate function by default).
 
         :param annotation: The object to be converted.
@@ -73,11 +83,14 @@ class TypeConverter:
 
         return self.delegate(annotation, kwargs)
 
-    def __call__(self, delegate) -> Any:
+    def __call__(
+        self, delegate: Callable[[Any, dict[str, Any]], _StructLike]
+    ) -> "TypeConverter":
         """Sets the delegate function for this converter and return the instance."""
         self.delegate = delegate
         return self
 
+    @override
     def __repr__(self) -> str:
         """Returns a string representation of the TypeConverter instance."""
         if not self.target:
@@ -90,7 +103,7 @@ class TypeConverter:
 annotation_registry: list[TypeConverter] = []
 
 
-def to_struct(obj: Any, **kwargs) -> _StructLike:
+def to_struct(obj: object, **kwargs: dict[str, Any]) -> _StructLike:
     """Convert an object to a :code:`_StruckLike` object using registered type converters.
 
     This function will not convert any objects that are already
