@@ -12,7 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-from abc import abstractmethod
 from collections.abc import Iterable, Collection
 from io import IOBase
 from types import EllipsisType, NoneType
@@ -47,7 +46,9 @@ class _ContextLike(Protocol):
 
     It allows direct attribute access and modification.
     """
+
     _root: "_ContextLike"
+
     def __context_getattr__(self, path: str) -> Any: ...
     def __context_setattr__(self, path: str, value: Any) -> None: ...
     def __getitem__(self, key: str, /) -> Any: ...  # pyright: ignore[reportAny]
@@ -138,9 +139,7 @@ class _SwitchLambda(Protocol):
     based on a value and context.
     """
 
-    def __call__(
-        self, value: Any, context: _ContextLike, **kwargs: dict[str, Any]
-    ) -> _StructLike: ...
+    def __call__(self, value: Any, context: _ContextLike) -> _StructLike: ...
 
 
 @runtime_checkable
