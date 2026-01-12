@@ -449,7 +449,7 @@ class Field(Generic[_IT, _OT]):
         return getattr(self, "__name__", None)
 
     # IO related stuff
-    def __unpack__(self, context: _ContextLike) -> _OT | None:
+    def __unpack__(self, context: _ContextLike) -> _OT:
         """Reads packed data from the given stream.
 
         This method returns nothing if this field is disabled and applies switch if
