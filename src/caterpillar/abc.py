@@ -47,12 +47,9 @@ class _ContextLike(Protocol):
 
     It allows direct attribute access and modification.
     """
-
+    _root: "_ContextLike"
     def __context_getattr__(self, path: str) -> Any: ...
     def __context_setattr__(self, path: str, value: Any) -> None: ...
-
-    _root: "_ContextLike | None"
-
     def __getitem__(self, key: str, /) -> Any: ...  # pyright: ignore[reportAny]
     def __setitem__(self, key: str, value: Any, /) -> None: ...
     def get(self, key: str, default: Any | None = None, /) -> Any: ...
@@ -117,7 +114,7 @@ class _StructLike(Protocol[_IT_contra, _OT_co]):
     def __type__(self) -> type | str | None: ...
 
 
-_PrefixedType = slice # [_StructLike[int, int], NoneType, NoneType]
+_PrefixedType = slice  # [_StructLike[int, int], NoneType, NoneType]
 _LengthT = int | _PrefixedType | _GreedyType | _ContextLambda[int]
 
 
@@ -141,8 +138,9 @@ class _SwitchLambda(Protocol):
     based on a value and context.
     """
 
-    @abstractmethod
-    def __call__(self, value: Any, context: _ContextLike, **kwds) -> _StructLike: ...
+    def __call__(
+        self, value: Any, context: _ContextLike, **kwargs: dict[str, Any]
+    ) -> _StructLike: ...
 
 
 @runtime_checkable
@@ -186,6 +184,10 @@ class _ArrayFactoryLike(Protocol[_IT]):
     def __call__(self, __value: Iterable[_IT]) -> Collection[_IT]: ...
 
 
+class _ContextFactoryLike(Protocol):
+    def __call__(self, **kwargs: Any) -> _ContextLike: ...
+
+
 __all__ = [
     "_ContextLike",
     "_ContextLambda",
@@ -203,4 +205,5 @@ __all__ = [
     "_ArrayFactoryLike",
     "_OptionLike",
     "_ArchLike",
+    "_ContextFactoryLike",
 ]
