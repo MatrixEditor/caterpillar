@@ -12,28 +12,32 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
+# pyright: reportPrivateUsage=false
 from dataclasses import dataclass
-from typing import Any
+from typing import Generic
+from typing_extensions import Final, override
+
+from caterpillar.abc import _OptionLike, _VT, _ArrayFactoryLike
 
 
 @dataclass(init=False, eq=False)
-class Flag:
+class Flag(Generic[_VT]):
     """Simple customizable user-flag."""
 
     name: str
     """The name of this flag"""
 
-    value: Any = None
+    value: _VT | None = None
     """
     Optional configuration value.
     """
 
-    def __init__(self, name: str, value=None) -> None:
+    def __init__(self, name: str, value: _VT | None = None) -> None:
         self.name = name
         self.value = value
-        self._hash_ = hash(name)
+        self._hash_: int = hash(name)
 
+    @override
     def __hash__(self) -> int:
         """
         Custom hash method based on the flag's name.
@@ -42,25 +46,26 @@ class Flag:
         """
         return self._hash_
 
+    @override
     def __eq__(self, value: object, /) -> bool:
         # custom check to allow c_Option objects to be used
-        return getattr(value, "name", None) == self.name
+        return getattr(value, "name", None) == self.name  # pyright: ignore[reportAny]
 
 
 #: Defaults that will be applied to **all** structs.
-GLOBAL_STRUCT_OPTIONS = set()
+GLOBAL_STRUCT_OPTIONS: set[_OptionLike] = set()
 
 #: Defaults that will be applied on **all** unions.
-GLOBAL_UNION_OPTIONS = set()
+GLOBAL_UNION_OPTIONS: set[_OptionLike] = set()
 
 #: Default field flags that will be applied on **all** fields.
-GLOBAL_FIELD_FLAGS = set()
+GLOBAL_FIELD_FLAGS: set[_OptionLike] = set()
 
 #: Default field flags that will be applied on **all** bit-fields.
-GLOBAL_BITFIELD_FLAGS = set()
+GLOBAL_BITFIELD_FLAGS: set[_OptionLike] = set()
 
 
-def configure(base, *flags: Flag) -> None:
+def configure(base: set[_OptionLike], *flags: _OptionLike) -> None:
     """
     Update the base set of flags with additional flags.
 
@@ -70,7 +75,7 @@ def configure(base, *flags: Flag) -> None:
     base.update(flags)
 
 
-def set_struct_flags(*flags: Flag, with_union: bool = False) -> None:
+def set_struct_flags(*flags: _OptionLike, with_union: bool = False) -> None:
     """
     Set default flags for structs.
 
@@ -82,7 +87,7 @@ def set_struct_flags(*flags: Flag, with_union: bool = False) -> None:
         configure(GLOBAL_UNION_OPTIONS, *flags)
 
 
-def set_field_flags(*flags: Flag) -> None:
+def set_field_flags(*flags: _OptionLike) -> None:
     """
     Set default flags for fields.
 
@@ -91,7 +96,7 @@ def set_field_flags(*flags: Flag) -> None:
     configure(GLOBAL_FIELD_FLAGS, *flags)
 
 
-def set_union_flags(*flags: Flag) -> None:
+def set_union_flags(*flags: _OptionLike) -> None:
     """
     Set default flags for unions.
 
@@ -100,7 +105,7 @@ def set_union_flags(*flags: Flag) -> None:
     configure(GLOBAL_UNION_OPTIONS, *flags)
 
 
-def get_flags(obj, attr=None):
+def get_flags(obj: object, attr: str | None = None) -> list[_OptionLike] | None:
     """
     Get the flags associated with an object.
 
@@ -111,7 +116,7 @@ def get_flags(obj, attr=None):
     return getattr(obj, attr or "flags", None)
 
 
-def has_flag(flag, obj, attr=None) -> bool:
+def has_flag(flag: _OptionLike[_VT], obj: object, attr: str | None = None) -> bool:
     """
     Check if an object has a specific flag.
 
@@ -129,7 +134,9 @@ def has_flag(flag, obj, attr=None) -> bool:
     return flag in flags
 
 
-def get_flag(name: str, obj, attr=None):
+def get_flag(
+    name: str, obj: object, attr: str | None = None
+) -> _OptionLike[_VT] | None:
     """
     Get a specific flag associated with an object.
 
@@ -141,7 +148,7 @@ def get_flag(name: str, obj, attr=None):
     flags = get_flags(obj, attr)
     for flag in flags or []:
         if flag.name == name:
-            return flag
+            return flag  # pyright: ignore[reportReturnType]
 
 
 ###############################################################################
@@ -149,26 +156,26 @@ def get_flag(name: str, obj, attr=None):
 ###############################################################################
 
 # for structs and unions
-S_DISCARD_UNNAMED = Flag("struct.discard_unnamed")
-S_DISCARD_CONST = Flag("struct.discard_const")
-S_UNION = Flag("struct.union")
-S_REPLACE_TYPES = Flag("struct.replace_types")
-S_EVAL_ANNOTATIONS = Flag("struct.eval_annotations")
-S_ADD_BYTES = Flag("struct.bytes_method")
-S_SLOTS = Flag("struct.slots")
+S_DISCARD_UNNAMED: Final[Flag] = Flag("struct.discard_unnamed")
+S_DISCARD_CONST: Final[Flag] = Flag("struct.discard_const")
+S_UNION: Final[Flag] = Flag("struct.union")
+S_REPLACE_TYPES: Final[Flag] = Flag("struct.replace_types")
+S_EVAL_ANNOTATIONS: Final[Flag] = Flag("struct.eval_annotations")
+S_ADD_BYTES: Final[Flag] = Flag("struct.bytes_method")
+S_SLOTS: Final[Flag] = Flag("struct.slots")
 
 # for fields
-F_KEEP_POSITION = Flag("field.keep_position")
-F_DYNAMIC = Flag("field.dynamic")
-F_SEQUENTIAL = Flag("field.sequential")
-F_OFFSET_OVERRIDE = Flag("field.offset_override")
+F_KEEP_POSITION: Final[Flag] = Flag("field.keep_position")
+F_DYNAMIC: Final[Flag] = Flag("field.dynamic")
+F_SEQUENTIAL: Final[Flag] = Flag("field.sequential")
+F_OFFSET_OVERRIDE: Final[Flag] = Flag("field.offset_override")
 
 # value intentionally left blank
-O_ARRAY_FACTORY = Flag("option.array_factory", value=None)
+O_ARRAY_FACTORY: Flag[_ArrayFactoryLike] = Flag("option.array_factory", value=None)
 
 # bitfield options
-B_OVERWRITE_ALIGNMENT = Flag("bitfield.overwrite_alignment")
-B_GROUP_END = Flag("bitfield.group.end")
-B_GROUP_NEW = Flag("bitfield.group.new")
-B_GROUP_KEEP = Flag("bitfield.group.keep")
-B_NO_AUTO_BOOL = Flag("bitfield.no_auto_bool")
+B_OVERWRITE_ALIGNMENT: Final[Flag] = Flag("bitfield.overwrite_alignment")
+B_GROUP_END: Final[Flag] = Flag("bitfield.group.end")
+B_GROUP_NEW: Final[Flag] = Flag("bitfield.group.new")
+B_GROUP_KEEP: Final[Flag] = Flag("bitfield.group.keep")
+B_NO_AUTO_BOOL: Final[Flag] = Flag("bitfield.no_auto_bool")
