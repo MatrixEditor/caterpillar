@@ -12,18 +12,31 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# pyright: reportPrivateUsage=false, reportAny=false
+from collections.abc import Collection
 import struct as PyStruct
 import warnings
 
 from io import BytesIO
-from typing import Any
-from typing_extensions import Self
+from typing import Any, Callable, Generic, TypeVar
+from typing_extensions import Final, Self, override
 from types import NoneType
 from functools import cached_property
 from enum import Enum as _EnumType
 from uuid import UUID
 
-from caterpillar.abc import _StructLike, _StreamType, _ContextLike, _PrefixedType
+from caterpillar.abc import (
+    _StructLike,
+    _StreamType,
+    _ContextLike,
+    _PrefixedType,
+    _ContextLambda,
+    _IT,
+    _OT,
+    _LengthT,
+    _EndianLike,
+    _GreedyType,
+)
 from caterpillar.exception import (
     ValidationError,
     InvalidValueError,
@@ -31,21 +44,21 @@ from caterpillar.exception import (
 )
 from caterpillar.context import CTX_FIELD, CTX_STREAM, CTX_SEQ
 from caterpillar.options import Flag, GLOBAL_FIELD_FLAGS
-from caterpillar.byteorder import LITTLE_ENDIAN_FMT, LittleEndian, SysNative
+from caterpillar.byteorder import LITTLE_ENDIAN_FMT, SysNative
 from caterpillar import registry
 from caterpillar._common import WithoutContextVar
 from caterpillar.shared import getstruct
 
 from ._base import Field, INVALID_DEFAULT, singleton
-from ._mixin import FieldStruct
+from ._mixin import FieldMixin, FieldStruct
 
 # Explicitly report deprecation warnings
 warnings.filterwarnings("default", category=DeprecationWarning, module=__name__)
 
-ENUM_STRICT = Flag("enum.strict")
+ENUM_STRICT: Flag[None] = Flag("enum.strict")
 
 
-class PyStructFormattedField(FieldStruct):
+class PyStructFormattedField(FieldStruct[_IT, _IT]):
     """
     A field class representing a binary format using format characters (e.g., 'i', 'x', etc.).
 
@@ -70,11 +83,11 @@ class PyStructFormattedField(FieldStruct):
     }
 
     def __init__(self, ch: str, type_: type) -> None:
-        self.text = ch
-        self.ty = type_
-        self.__bits__ = PyStruct.calcsize(self.text) * 8
-        self._is_padding = self.text == "x"
-        self.__byteorder__ = SysNative
+        self.text: str = ch
+        self.ty: type[_IT] = type_
+        self.__bits__: int = PyStruct.calcsize(self.text) * 8
+        self._is_padding: bool = self.text == "x"
+        self.__byteorder__: _EndianLike = SysNative
 
     def __fmt__(self) -> str:
         """
@@ -85,6 +98,7 @@ class PyStructFormattedField(FieldStruct):
         """
         return self.text
 
+    @override
     def __repr__(self) -> str:
         """
         String representation of the FormatField.
@@ -105,7 +119,7 @@ class PyStructFormattedField(FieldStruct):
         """
         return self.ty
 
-    def __size__(self, context) -> int:
+    def __size__(self, context: _ContextLike) -> int:
         """
         Calculate the size of the field in bytes.
 
@@ -117,7 +131,8 @@ class PyStructFormattedField(FieldStruct):
         """
         return self.__bits__ // 8
 
-    def pack_single(self, obj, context) -> None:
+    @override
+    def pack_single(self, obj: _IT, context: _ContextLike) -> None:
         """
         Pack a single value into the stream using the defined format character.
 
@@ -133,7 +148,8 @@ class PyStructFormattedField(FieldStruct):
         data = PyStruct.pack(fmt) if self._is_padding else PyStruct.pack(fmt, obj)
         context[CTX_STREAM].write(data)
 
-    def pack_seq(self, seq, context) -> None:
+    @override
+    def pack_seq(self, seq: Collection[_IT], context: _ContextLike) -> None:
         """
         Pack a sequence of values into the stream.
 
@@ -168,7 +184,8 @@ class PyStructFormattedField(FieldStruct):
 
         context[CTX_STREAM].write(PyStruct.pack(fmt, *seq))
 
-    def unpack_single(self, context):
+    @override
+    def unpack_single(self, context: _ContextLike):
         """
         Unpack a single value from the stream.
 
@@ -182,7 +199,8 @@ class PyStructFormattedField(FieldStruct):
         (value,) = PyStruct.unpack(fmt, context[CTX_STREAM].read(size))
         return value
 
-    def unpack_seq(self, context):
+    @override
+    def unpack_seq(self, context: _ContextLike) -> Collection[_IT]:
         """
         Unpack a sequence of values from the stream.
 
@@ -213,43 +231,52 @@ class PyStructFormattedField(FieldStruct):
 
 
 # Instances of FormatField with specific format specifiers
-padding = PyStructFormattedField("x", NoneType)
-char = PyStructFormattedField("c", str)
-boolean = PyStructFormattedField("?", bool)
+padding: Final[PyStructFormattedField[NoneType]] = PyStructFormattedField("x", NoneType)
+char: Final[PyStructFormattedField[str]] = PyStructFormattedField("c", str)
+boolean: Final[PyStructFormattedField[bool]] = PyStructFormattedField("?", bool)
 
-int8 = PyStructFormattedField("b", int)
-uint8 = PyStructFormattedField("B", int)
-int16 = PyStructFormattedField("h", int)
-uint16 = PyStructFormattedField("H", int)
-int32 = PyStructFormattedField("i", int)
-uint32 = PyStructFormattedField("I", int)
-int64 = PyStructFormattedField("q", int)
-uint64 = PyStructFormattedField("Q", int)
-
-
-ssize_t = PyStructFormattedField("n", int)
-size_t = PyStructFormattedField("N", int)
-
-float16 = PyStructFormattedField("e", float)
-float32 = PyStructFormattedField("f", float)
-float64 = PyStructFormattedField("d", float)
-double = float64
-
-void_ptr = PyStructFormattedField("P", int)
+int8: Final[PyStructFormattedField[int]] = PyStructFormattedField("b", int)
+uint8: Final[PyStructFormattedField[int]] = PyStructFormattedField("B", int)
+int16: Final[PyStructFormattedField[int]] = PyStructFormattedField("h", int)
+uint16: Final[PyStructFormattedField[int]] = PyStructFormattedField("H", int)
+int32: Final[PyStructFormattedField[int]] = PyStructFormattedField("i", int)
+uint32: Final[PyStructFormattedField[int]] = PyStructFormattedField("I", int)
+int64: Final[PyStructFormattedField[int]] = PyStructFormattedField("q", int)
+uint64: Final[PyStructFormattedField[int]] = PyStructFormattedField("Q", int)
 
 
-class Transformer(FieldStruct):
+ssize_t: Final[PyStructFormattedField[int]] = PyStructFormattedField("n", int)
+size_t: Final[PyStructFormattedField[int]] = PyStructFormattedField("N", int)
+
+float16: Final[PyStructFormattedField[float]] = PyStructFormattedField("e", float)
+float32: Final[PyStructFormattedField[float]] = PyStructFormattedField("f", float)
+float64: Final[PyStructFormattedField[float]] = PyStructFormattedField("d", float)
+double: Final[PyStructFormattedField[float]] = float64
+
+void_ptr: Final[PyStructFormattedField[int]] = PyStructFormattedField("P", int)
+
+
+_IT_transformed = TypeVar("_IT_transformed", default=Any)
+_OT_transformed = TypeVar("_OT_transformed", default=Any)
+
+
+class Transformer(
+    Generic[_IT, _IT_transformed, _OT, _OT_transformed],
+    FieldStruct[_IT, _OT],
+):
     """
     A class that acts as a transformer for encoding and decoding data using a wrapped _StructLike object.
     """
 
     __slots__ = ("struct",)
 
-    def __init__(self, struct) -> None:
-        self.struct = struct
-        self.__bits__ = getattr(self.struct, "__bits__", None)
+    def __init__(self, struct: _StructLike[_IT_transformed, _OT_transformed]) -> None:
+        self.struct: _StructLike[_IT_transformed, _OT_transformed] = struct
+        self.__bits__: _ContextLambda[int] | int | None = getattr(
+            self.struct, "__bits__", None
+        )
 
-    def __type__(self):
+    def __type__(self) -> type | str | None:
         """
         Get the type of the data encoded/decoded by the transformer.
 
@@ -257,7 +284,7 @@ class Transformer(FieldStruct):
         """
         return self.struct.__type__()
 
-    def __size__(self, context) -> int:
+    def __size__(self, context: _ContextLike) -> int:
         """
         Get the size of the data encoded/decoded by the transformer.
 
@@ -266,7 +293,7 @@ class Transformer(FieldStruct):
         """
         return self.struct.__size__(context)
 
-    def encode(self, obj, context):
+    def encode(self, obj: _IT, context: _ContextLike) -> _IT_transformed:
         """
         Encode data using the wrapped _StructLike object.
 
@@ -274,9 +301,9 @@ class Transformer(FieldStruct):
         :param context: The current context.
         :return: The encoded data.
         """
-        return obj
+        return obj  # pyright: ignore[reportReturnType]
 
-    def decode(self, parsed, context):
+    def decode(self, parsed: _OT_transformed, context: _ContextLike) -> _OT:
         """
         Decode data using the wrapped _StructLike object.
 
@@ -284,9 +311,10 @@ class Transformer(FieldStruct):
         :param context: The current context.
         :return: The decoded data.
         """
-        return parsed
+        return parsed  # pyright: ignore[reportReturnType]
 
-    def pack_single(self, obj, context) -> None:
+    @override
+    def pack_single(self, obj: _IT, context: _ContextLike) -> None:
         """
         Pack a single value into the stream using encoding.
 
@@ -296,7 +324,8 @@ class Transformer(FieldStruct):
         value = self.encode(obj, context)
         self.struct.__pack__(value, context)
 
-    def unpack_single(self, context):
+    @override
+    def unpack_single(self, context: _ContextLike) -> _OT:
         """
         Unpack a single value from the stream and decode it.
 
@@ -307,7 +336,7 @@ class Transformer(FieldStruct):
         return self.decode(value, context)
 
 
-class Const(Transformer):
+class Const(Transformer[_IT, _IT, _IT, _IT]):
     """
     A specialized Transformer that enforces a constant value during
     encoding and decoding.
@@ -334,11 +363,12 @@ class Const(Transformer):
 
     __slots__ = ("value",)
 
-    def __init__(self, value, struct) -> None:
+    def __init__(self, value: _IT, struct: _StructLike[_IT, _IT]) -> None:
         super().__init__(struct)
-        self.value = value
+        self.value: _IT = value
 
-    def encode(self, obj, context):
+    @override
+    def encode(self, obj: _IT, context: _ContextLike) -> _IT:
         """
         Encode data using the constant value. This method will always return
         the constant value, regardless of the input. Therefore, :code:`None`
@@ -356,7 +386,8 @@ class Const(Transformer):
         """
         return self.value
 
-    def decode(self, parsed, context):
+    @override
+    def decode(self, parsed: _IT, context: _ContextLike) -> _IT:
         """
         Decode data and ensure it matches the constant value. If the
         parsed value doesn't match, a `ValidationError` is raised.
@@ -381,7 +412,10 @@ class Const(Transformer):
         return self.value
 
 
-class Enum(Transformer):
+_EnumT = TypeVar("_EnumT")
+
+
+class Enum(Generic[_EnumT, _IT], Transformer[_EnumT, _IT, _EnumT | _IT, _IT]):
     """
     A specialized Transformer for encoding and decoding enumeration values.
 
@@ -414,15 +448,16 @@ class Enum(Transformer):
 
     def __init__(
         self,
-        model,
-        struct,
-        default=INVALID_DEFAULT,
+        model: type[_EnumT],
+        struct: _StructLike[_IT, _IT],
+        default: _EnumT | _IT | None | object = INVALID_DEFAULT,
     ) -> None:
         super().__init__(struct)
-        self.model = model
-        self.default = default
+        self.model: type[_EnumT] = model
+        self.default: _EnumT | _IT | object | None = default
 
-    def __type__(self):
+    @override
+    def __type__(self) -> type[_EnumT] | type[_IT]:
         """
         Determine the type for this transformation, which is either the enum type
         or a union of the enum and struct types, depending on the global field flags.
@@ -433,9 +468,10 @@ class Enum(Transformer):
         if ENUM_STRICT in GLOBAL_FIELD_FLAGS:
             return self.model
 
-        return self.model | self.struct.__type__()
+        return self.model | self.struct.__type__()  # pyright: ignore[reportReturnType]
 
-    def encode(self, obj, context):
+    @override
+    def encode(self, obj: _EnumT, context: _ContextLike) -> _IT:
         """
         Encode an enumeration value into its corresponding encoded representation.
 
@@ -458,7 +494,8 @@ class Enum(Transformer):
 
         return obj.value
 
-    def decode(self, parsed, context):
+    @override
+    def decode(self, parsed: _IT, context: _ContextLike) -> _EnumT:
         """
         Decode an encoded value (typically an integer) back to its corresponding
         enumeration value.
@@ -474,16 +511,16 @@ class Enum(Transformer):
         >>> unpack(1, cp_enum, as_field=True)
         Color.RED
         """
-        # pylint: disable-next=protected-access
-        by_name = self.model._member_map_.get(parsed)
+        # fmt: off
+        by_name: _EnumT = self.model._member_map_.get(parsed)  # pyright: ignore[reportAttributeAccessIssue, reportUnknownMemberType]
         if by_name is not None:
-            return by_name
+            return by_name  # pyright: ignore[reportUnknownVariableType]
 
-        # pylint: disable-next=protected-access
-        by_value = self.model._value2member_map_.get(parsed)
+        by_value: _EnumT = self.model._value2member_map_.get(parsed)  # pyright: ignore[reportAttributeAccessIssue, reportUnknownMemberType]
         if by_value is not None:
-            return by_value
+            return by_value  # pyright: ignore[reportUnknownVariableType]
 
+        # fmt: on
         default = self.default
         field = context.get(CTX_FIELD)
         if default is INVALID_DEFAULT and field:
@@ -499,23 +536,29 @@ class Enum(Transformer):
 
 
 class _EnumTypeConverter(registry.TypeConverter):
-    def matches(self, annotation) -> bool:
+    @override
+    def matches(self, annotation: object) -> bool:
         return isinstance(annotation, type) and issubclass(annotation, _EnumType)
 
-    def convert(self, annotation, kwargs: dict):
+    @override
+    def convert(self, annotation: object, kwargs: dict[str, Any]) -> _StructLike:
         struct_obj = getstruct(annotation)
         if not struct_obj:
             raise ValidationError(
                 f"Could not infer Enum struct: could not find __struct__ attribute on annotation {annotation!r}"
             )
-        return Enum(annotation, struct_obj)
+        return Enum(annotation, struct_obj)  # pyright: ignore[reportArgumentType]
 
 
 # TODO: document why this has to be at first position
 registry.annotation_registry.insert(0, _EnumTypeConverter())
 
 
-class Memory(FieldStruct):
+_MemoryIT = TypeVar("_MemoryIT", default=memoryview | bytes | bytearray)
+_MemoryOT = TypeVar("_MemoryOT", default=memoryview)
+
+
+class Memory(Generic[_MemoryIT, _MemoryOT], FieldStruct[_MemoryIT, _MemoryOT]):
     """
     A class representing a memory field that handles packing and unpacking byte-like objects
     of a specified length.
@@ -552,13 +595,10 @@ class Memory(FieldStruct):
 
     __slots__ = ("length",)
 
-    def __init__(
-        self,
-        length,
-    ) -> None:
-        self.length = length
+    def __init__(self, length: _ContextLambda[int] | int | _GreedyType) -> None:
+        self.length: _ContextLambda[int] | int | _GreedyType = length
 
-    def __type__(self) -> type:
+    def __type__(self) -> type[memoryview]:
         """
         Return the type of the field, which is `memoryview` for this class.
 
@@ -566,7 +606,7 @@ class Memory(FieldStruct):
         """
         return memoryview
 
-    def __size__(self, context) -> int:
+    def __size__(self, context: _ContextLike) -> int:  # actually int | _GreedyType
         """
         Calculate the size of the memory field based on the `length` parameter.
 
@@ -576,9 +616,12 @@ class Memory(FieldStruct):
         :param context: The current context.
         :return: The size of the field in bytes, or `Ellipsis` if the length is unspecified.
         """
-        return self.length(context) if callable(self.length) else self.length
+        return (
+            self.length(context) if callable(self.length) else self.length
+        )  # pyright: ignore[reportReturnType]
 
-    def pack_single(self, obj, context) -> None:
+    @override
+    def pack_single(self, obj: _MemoryIT, context: _ContextLike) -> None:
         """
         Pack a single byte object (memoryview or bytes) into the stream.
 
@@ -613,7 +656,8 @@ class Memory(FieldStruct):
                 )
         context[CTX_STREAM].write(obj)
 
-    def unpack_single(self, context):
+    @override
+    def unpack_single(self, context: _ContextLike) -> _MemoryOT:
         """
         Unpack a single byte object (memoryview) from the stream.
 
@@ -629,10 +673,12 @@ class Memory(FieldStruct):
         """
         stream: _StreamType = context[CTX_STREAM]
         size = self.__size__(context)
-        return memoryview(stream.read(size) if size is not Ellipsis else stream.read())
+        # fmt: off
+        return memoryview(stream.read(size) if size is not Ellipsis else stream.read())  # pyright: ignore[reportReturnType]
+        # fmt: on
 
 
-class Bytes(Memory):
+class Bytes(Memory[bytes, bytes]):
     """Byte sequences.
 
     Same class as :class:`Memory` but with a type of `bytes` instead of `memoryview`.
@@ -640,6 +686,7 @@ class Bytes(Memory):
 
     __slots__ = ()
 
+    @override
     def __type__(self) -> type:
         """
         Return the type associated with this `Bytes` field, which is `bytes`.
@@ -648,7 +695,8 @@ class Bytes(Memory):
         """
         return bytes
 
-    def unpack_single(self, context):
+    @override
+    def unpack_single(self, context: _ContextLike) -> bytes:
         """
         Unpack a single byte sequence (bytes) from the stream.
 
@@ -661,7 +709,7 @@ class Bytes(Memory):
         return super().unpack_single(context).obj
 
 
-class String(Memory):
+class String(Memory[str, str]):
     """String sequences.
 
     Same class as :class:`Memory` but with a type of `str` instead of `memoryview`.
@@ -674,16 +722,18 @@ class String(Memory):
                      If specified, the string will be decoded using this encoding (e.g., `utf-8`).
     """
 
-    __slots__ = ("encoding",)
+    __slots__ = ("encoding", "_encoding_is_lambda")
 
     def __init__(
         self,
-        length,
-        encoding=None,
+        length: int | _ContextLambda[int] | _GreedyType,
+        encoding: str | _ContextLambda[str] | None = None,
     ) -> None:
         super().__init__(length)
-        self.encoding = encoding or "utf-8"
+        self.encoding: str | _ContextLambda[str] = encoding or "utf-8"
+        self._encoding_is_lambda: bool = callable(self.encoding)
 
+    @override
     def __type__(self) -> type:
         """
         Return the type associated with this `String` field.
@@ -692,21 +742,26 @@ class String(Memory):
         """
         return str
 
-    def pack_single(self, obj: str, context) -> None:
+    @override
+    def pack_single(self, obj: str, context: _ContextLike) -> None:
         """Packs a single string into the stream."""
-        return super().pack_single(obj.encode(self.encoding), context)
+        # fmt: off
+        encoding: str = self.encoding if not self._encoding_is_lambda else self.encoding(context)  # pyright: ignore[reportAssignmentType, reportCallIssue]
+        return super().pack_single(obj.encode(encoding), context)  # pyright: ignore[reportArgumentType]
 
-    def unpack_single(self, context):
+    def unpack_single(self, context: _ContextLike) -> str:
         """
         Unpack a single string from the stream.
 
         :param context: The current context.
         :return: A `str` representing the unpacked string, decoded from bytes using the specified encoding.
         """
-        return super().unpack_single(context).obj.decode(self.encoding)
+        # fmt: off
+        encoding: str = self.encoding if not self._encoding_is_lambda else self.encoding(context)  # pyright: ignore[reportAssignmentType, reportCallIssue]
+        return super().unpack_single(context).obj.decode(encoding)  # pyright: ignore[reportAttributeAccessIssue]
 
 
-class CString(FieldStruct):
+class CString(FieldStruct[str, str]):
     """
     C-style strings (null-terminated or padded).
 
@@ -739,13 +794,13 @@ class CString(FieldStruct):
                 defaults to `0` (null byte).
     """
 
-    __slots__ = ("encoding", "pad", "_raw_pad")
+    __slots__ = ("encoding", "pad", "_raw_pad", "_encoding_is_lambda")
 
     def __init__(
         self,
-        length=None,
-        encoding=None,
-        pad=None,
+        length: int | _ContextLambda[int] | _GreedyType | None = None,
+        encoding: str | _ContextLambda[str] | None = None,
+        pad: int | str | None = None,
     ) -> None:
         """
         Initialize the String field with a fixed length or a length determined by a context lambda.
@@ -753,23 +808,22 @@ class CString(FieldStruct):
         :param length: The fixed length or a context lambda to determine the length dynamically.
         :param encoding: The encoding to use for string encoding/decoding (default is UTF-8).
         """
-        self.length = length or ...
-        self.encoding = encoding or "utf-8"
-        self.pad = pad or 0
-        if isinstance(self.pad, str):
-            if len(self.pad) != 1:
+        self.length: int | _ContextLambda[int] | _GreedyType = length or ...
+        self.encoding: str | _ContextLambda[str] = encoding or "utf-8"
+        self.pad: int = 0
+        self._encoding_is_lambda: bool = callable(self.encoding)
+        if isinstance(pad, str):
+            if len(pad) != 1:
                 raise ValueError(
                     f"Invalid padding {pad!r}. Padding must be a single character."
                 )
-            self.pad = ord(self.pad)
+            self.pad = ord(pad)
+        else:
+            self.pad = pad or 0
 
-        if not isinstance(self.pad, int):
-            raise ValueError(
-                f"Invalid padding {pad!r}. Padding must be a an integer or a single character."
-            )
-        self._raw_pad = self.pad.to_bytes(1, byteorder="big")
+        self._raw_pad: bytes = self.pad.to_bytes(1, byteorder="big")
 
-    def __class_getitem__(cls, dim) -> Field:
+    def __class_getitem__(cls, dim: _LengthT) -> Field:
         """
         Allows indexing for `CString` class to support field dimensioning.
 
@@ -778,7 +832,7 @@ class CString(FieldStruct):
         """
         return CString(...)[dim]
 
-    def __size__(self, context):
+    def __size__(self, context: _ContextLike) -> int | _GreedyType:
         """
         Returns the size of the `CString` field.
 
@@ -795,7 +849,8 @@ class CString(FieldStruct):
         """
         return str
 
-    def pack_single(self, obj: str, context) -> None:
+    @override
+    def pack_single(self, obj: str, context: _ContextLike) -> None:
         """
         Pack a single string into the stream with padding.
 
@@ -807,22 +862,25 @@ class CString(FieldStruct):
         :param context: The current context.
         :raises ValidationError: If the string is too long for the fixed length.
         """
-        encoded = obj.encode(self.encoding)
+        # fmt: off
+        encoding: str = self.encoding(context) if self._encoding_is_lambda else self.encoding  # pyright: ignore[reportCallIssue, reportAssignmentType]
+        encoded = obj.encode(encoding)
         stream = context[CTX_STREAM]
         if self.length is not Ellipsis:
             length = self.__size__(context)
             obj_length = len(obj)
-            if obj_length > length:
+            if obj_length > length:  # pyright: ignore[reportOperatorIssue]
                 raise ValidationError(
                     f"String {obj!r} is too long for the fixed length of {length} bytes."
                 )
             stream.write(encoded)
-            stream.write(self._raw_pad * (length - obj_length))
+            stream.write(self._raw_pad * (length - obj_length))  # pyright: ignore[reportOperatorIssue]
         else:
             stream.write(encoded)
             stream.write(self._raw_pad)
 
-    def unpack_single(self, context):
+    @override
+    def unpack_single(self, context: _ContextLike) -> str:
         """
         Unpack a single C-style string from the stream.
 
@@ -836,6 +894,7 @@ class CString(FieldStruct):
         :return: The unpacked string, stripped of padding, decoded with
                  the specified encoding.
         """
+        # fmt: off
         if self.length is Ellipsis:
             # Parse actual C-String
             stream = context[CTX_STREAM]
@@ -850,10 +909,11 @@ class CString(FieldStruct):
             length = self.__size__(context)
             value: bytes = context[CTX_STREAM].read(length)
 
-        return value.rstrip(self._raw_pad).decode(self.encoding)
+        encoding: str = self.encoding(context) if self._encoding_is_lambda else self.encoding   # pyright: ignore[reportCallIssue, reportAssignmentType]
+        return value.rstrip(self._raw_pad).decode(encoding)
 
 
-class ConstString(Const):
+class ConstString(Const[str]):
     """
     A specialized constant field for handling fixed string values.
 
@@ -888,7 +948,9 @@ class ConstString(Const):
 
     __slots__ = ()
 
-    def __init__(self, value: str, encoding=None) -> None:
+    def __init__(
+        self, value: str, encoding: str | _ContextLambda[str] | None = None
+    ) -> None:
         if not isinstance(value, str):
             raise TypeError("value must be a string")
 
@@ -899,14 +961,14 @@ class ConstString(Const):
 
 
 @registry.TypeConverter(str)
-def _str_type_converter(annotation: str, kwargs: dict) -> ConstString:
+def _str_type_converter(annotation: str, kwargs: dict[str, Any]) -> ConstString:
     return ConstString(annotation)
 
 
 registry.annotation_registry.append(_str_type_converter)
 
 
-class ConstBytes(Const):
+class ConstBytes(Const[bytes]):
     """
     A constant field for handling fixed bytes values.
 
@@ -933,14 +995,14 @@ class ConstBytes(Const):
 
 
 @registry.TypeConverter(bytes)
-def _bytes_type_converter(annotation: bytes, kwargs: dict) -> ConstBytes:
+def _bytes_type_converter(annotation: bytes, kwargs: dict[str, Any]) -> ConstBytes:
     return ConstBytes(annotation)
 
 
 registry.annotation_registry.append(_bytes_type_converter)
 
 
-class Computed(FieldStruct):
+class Computed(Generic[_IT], FieldStruct[NoneType, _IT]):
     """
     A specialized field for representing computed or dynamically calculated values.
 
@@ -966,19 +1028,20 @@ class Computed(FieldStruct):
 
     __slots__ = ("value",)
 
-    def __init__(self, value) -> None:
-        self.value = value
+    def __init__(self, value: _IT | _ContextLambda[_IT]) -> None:
+        self.value: _IT | _ContextLambda[_IT] = value
         self.__bits__ = 0
 
-    def __type__(self):
+    def __type__(self) -> type:
         """
         Return the type of the computed field.
 
         :return: `Any` if callable, otherwise the type of the constant value.
         """
-        return Any if callable(self.value) else type(self.value)
+        return object if callable(self.value) else type(self.value)
 
-    def __pack__(self, obj, context) -> None:
+    @override
+    def __pack__(self, obj: NoneType, context: _ContextLike) -> None:
         """
         No packing is needed for computed fields, as the value is computed dynamically.
 
@@ -990,7 +1053,7 @@ class Computed(FieldStruct):
         """
         pass
 
-    def __size__(self, context) -> int:
+    def __size__(self, context: _ContextLike) -> int:
         """
         Return the size of the computed field.
 
@@ -1001,7 +1064,8 @@ class Computed(FieldStruct):
         """
         return 0
 
-    def __unpack__(self, context):
+    @override
+    def __unpack__(self, context: _ContextLike) -> _IT:
         """
         Unpack the computed value based on the context.
 
@@ -1011,9 +1075,11 @@ class Computed(FieldStruct):
         :param context: The current context.
         :return: The computed value or the constant value.
         """
-        return self.value(context) if callable(self.value) else self.value
+        # fmt: off
+        return self.value(context) if callable(self.value) else self.value  # pyright: ignore[reportReturnType]
 
-    def pack_single(self, obj, context) -> None:
+    @override
+    def pack_single(self, obj: NoneType, context: _ContextLike) -> None:
         """
         No packing is needed for computed fields.
 
@@ -1023,18 +1089,19 @@ class Computed(FieldStruct):
         # No need for an implementation
         pass
 
-    def unpack_single(self, context) -> None:
+    @override
+    def unpack_single(self, context: _ContextLike) -> _IT:
         """
         No unpacking is needed for computed fields.
 
         :param context: The current context.
         """
         # No need for an implementation
-        pass
+        raise NotImplemented
 
 
 @singleton
-class Pass(FieldStruct):
+class Pass(FieldStruct[NoneType, NoneType]):
     """
     A specialized field that does nothing during packing and unpacking.
 
@@ -1083,25 +1150,30 @@ class Pass(FieldStruct):
         """
         return None.__class__
 
-    def __pack__(self, obj, context) -> None:
+    @override
+    def __pack__(self, obj: None, context: _ContextLike) -> None:
         pass
 
-    def __size__(self, context) -> int:
+    def __size__(self, context: _ContextLike) -> int:
         return 0
 
-    def __unpack__(self, context):
-        return None
-
-    def pack_single(self, obj, context) -> None:
-        # No need for an implementation
+    @override
+    def __unpack__(self, context: _ContextLike) -> None:
         pass
 
-    def unpack_single(self, context) -> None:
-        # No need for an implementation
+    @override
+    def pack_single(self, obj: None, context: _ContextLike) -> None:
+        pass
+
+    @override
+    def unpack_single(self, context: _ContextLike) -> None:
         pass
 
 
-class Prefixed(FieldStruct):
+_PrefixIOT = TypeVar("_PrefixIOT", default=bytes)
+
+
+class Prefixed(Generic[_PrefixIOT], FieldStruct[_PrefixIOT, _PrefixIOT]):
     """
     A specialized field for handling data with a prefix (typically indicating length or size).
 
@@ -1137,13 +1209,13 @@ class Prefixed(FieldStruct):
 
     def __init__(
         self,
-        prefix,
-        struct=None,
-        encoding=None,
+        prefix: _StructLike[int, int],
+        struct: _StructLike[_PrefixIOT, _PrefixIOT] | None = None,
+        encoding: str | None = None,
     ):
-        self.prefix = prefix
-        self.struct = struct
-        self.encoding = encoding
+        self.prefix: _StructLike[int, int] = prefix
+        self.struct: _StructLike[_PrefixIOT, _PrefixIOT] | None = struct
+        self.encoding: str | None = encoding
         # Support str as second argument
         if isinstance(struct, str):
             warnings.warn(
@@ -1152,7 +1224,7 @@ class Prefixed(FieldStruct):
             )
             self.encoding, self.struct = struct, None
 
-    def __type__(self):
+    def __type__(self) -> type | str | None:
         """
         Return the type associated with this Prefixed field.
 
@@ -1163,7 +1235,7 @@ class Prefixed(FieldStruct):
         """
         return bytes if self.struct is None else self.struct.__type__()
 
-    def __size__(self, context) -> int:
+    def __size__(self, context: _ContextLike) -> int:
         """
         Prefixed fields do not have a fixed size.
 
@@ -1174,7 +1246,8 @@ class Prefixed(FieldStruct):
         """
         raise DynamicSizeError("Prefixed does not store a size", context)
 
-    def pack_single(self, obj, context) -> None:
+    @override
+    def pack_single(self, obj: _PrefixIOT, context: _ContextLike) -> None:
         """
         Pack a single object into the stream, with the prefix indicating the size.
 
@@ -1183,21 +1256,23 @@ class Prefixed(FieldStruct):
         :param obj: The object to pack (should be a byte sequence).
         :param context: The current context.
         """
+        # fmt: off
         if self.struct is not None:
             data = BytesIO()
             with WithoutContextVar(context, CTX_STREAM, data):
                 self.struct.__pack__(obj, context)
 
             context[CTX_SEQ] = False
-            obj = data.getvalue()
+            obj = data.getvalue()  # pyright: ignore[reportAssignmentType]
 
         elif self.encoding:
-            obj = obj.encode(self.encoding)
+            obj = obj.encode(self.encoding)  # pyright: ignore[reportAttributeAccessIssue]
 
-        self.prefix.__pack__(len(obj), context)
+        self.prefix.__pack__(len(obj), context)  # pyright: ignore[reportArgumentType]
         context[CTX_STREAM].write(obj)
 
-    def unpack_single(self, context):
+    @override
+    def unpack_single(self, context: _ContextLike) -> _PrefixIOT:
         """
         Unpack a single object from the stream, using the prefix to determine the size.
 
@@ -1209,9 +1284,6 @@ class Prefixed(FieldStruct):
         :return: The unpacked object, which is either raw bytes or the data structure.
         """
         size = self.prefix.__unpack__(context)
-        if not isinstance(size, int):
-            raise TypeError(f"Expected int, got {type(size)}")
-
         data = context[CTX_STREAM].read(size)
         obj = data
         if self.struct is not None:
@@ -1225,7 +1297,7 @@ class Prefixed(FieldStruct):
         return obj
 
 
-class Int(FieldStruct):
+class Int(FieldStruct[int, int]):
     """Generic Integer
 
     This class handles packing and unpacking integer values with a specified bit size, either
@@ -1238,14 +1310,13 @@ class Int(FieldStruct):
 
     __slots__ = ("signed", "size")
 
-    def __init__(self, bits: int, signed=True) -> None:
-        self.signed = signed
-        self.__bits__ = bits
-        if not isinstance(bits, int):
-            raise ValueError(f"Invalid int size: {bits!r} - expected int")
-        self.size = self.__bits__ // 8
-        self.__byteorder__ = SysNative
+    def __init__(self, bits: int, signed: bool = True) -> None:
+        self.signed: bool = signed
+        self.__bits__: int = bits
+        self.size: int = self.__bits__ // 8
+        self.__byteorder__: _EndianLike = SysNative
 
+    @override
     def __repr__(self) -> str:
         name = "int"
         if not self.signed:
@@ -1261,7 +1332,7 @@ class Int(FieldStruct):
         """
         return int
 
-    def __size__(self, context) -> int:
+    def __size__(self, context: _ContextLike) -> int:
         """
         Return the size of the integer in bytes.
 
@@ -1270,7 +1341,8 @@ class Int(FieldStruct):
         """
         return self.size
 
-    def pack_single(self, obj: int, context) -> None:
+    @override
+    def pack_single(self, obj: int, context: _ContextLike) -> None:
         """
         Pack a single integer value into the stream.
 
@@ -1294,7 +1366,8 @@ class Int(FieldStruct):
             )
         )
 
-    def unpack_single(self, context) -> int:
+    @override
+    def unpack_single(self, context: _ContextLike) -> int:
         """
         Unpack a single integer value from the stream.
 
@@ -1326,11 +1399,11 @@ class UInt(Int):
         super().__init__(bits, signed=False)
 
 
-int24 = Int(24)
-uint24 = UInt(24)
+int24: Final[Int] = Int(24)
+uint24: Final[UInt] = UInt(24)
 
 
-class Aligned(FieldStruct):
+class Aligned(FieldStruct[_IT, _OT]):
     """
     Alignment of a struct (before or after)
 
@@ -1373,21 +1446,21 @@ class Aligned(FieldStruct):
 
     def __init__(
         self,
-        struct,
-        alignment,
-        after=False,
-        before=False,
-        filler=None,
+        struct: _StructLike[_IT, _OT],
+        alignment: int | _ContextLambda[int],
+        after: bool = False,
+        before: bool = False,
+        filler: int | str | None = None,
     ) -> None:
         if not before and not after:
             raise ValueError("Must specify either before or after")
 
-        self.struct = struct
-        self.alignment = alignment
-        self._after = after
-        self._before = before
+        self.struct: _StructLike[_IT, _OT] = struct
+        self.alignment: int | _ContextLambda[int] = alignment
+        self._after: bool = after
+        self._before: bool = before
         if filler is None:
-            self._filler = 0x00
+            self._filler: int = 0x00
         else:
             if isinstance(filler, str):
                 self._filler = ord(filler)
@@ -1405,7 +1478,7 @@ class Aligned(FieldStruct):
         """
         return self.struct.__type__()
 
-    def __size__(self, context) -> int:
+    def __size__(self, context: _ContextLike) -> int:
         """
         Calculate the size of the aligned field, accounting for padding based on the alignment.
 
@@ -1421,7 +1494,7 @@ class Aligned(FieldStruct):
         struct_size = self.struct.__size__(context)
         return struct_size + (self.alignment - (struct_size % self.alignment))
 
-    def unpack_alignment(self, context):
+    def unpack_alignment(self, context: _ContextLike) -> None:
         """
         Unpack padding for the alignment, verifying that the correct amount of padding is present.
 
@@ -1444,7 +1517,8 @@ class Aligned(FieldStruct):
                 f"Expected {size} bytes of padding (value={self._filler!r}), got {data.count(self._filler)}"
             )
 
-    def unpack_single(self, context):
+    @override
+    def unpack_single(self, context: _ContextLike) -> _OT:
         """
         Unpack a single aligned field from the stream.
 
@@ -1461,7 +1535,7 @@ class Aligned(FieldStruct):
             self.unpack_alignment(context)
         return obj
 
-    def pack_alignment(self, context):
+    def pack_alignment(self, context: _ContextLike) -> None:
         """
         Apply padding for the alignment before or after the structure, depending on
         the `before` and `after` settings.
@@ -1473,7 +1547,8 @@ class Aligned(FieldStruct):
         size = value - (stream.tell() % value)
         stream.write(bytes([self._filler] * size))
 
-    def pack_single(self, obj, context) -> None:
+    @override
+    def pack_single(self, obj: _IT, context: _ContextLike) -> None:
         """
         Pack a single aligned field into the stream, applying padding if necessary.
 
@@ -1487,7 +1562,7 @@ class Aligned(FieldStruct):
             self.pack_alignment(context)
 
 
-def align(alignment):
+def align(alignment: int | _ContextLambda[int]) -> _ContextLambda[int]:
     """
     Create a context lambda to calculate the alignment padding required at the current stream position.
 
@@ -1514,13 +1589,13 @@ def align(alignment):
 
     def _get_aligned_size(context: _ContextLike):
         pos = context[CTX_STREAM].tell()
-        value = alignment(context) if callable(alignment) else alignment
+        value: int = alignment(context) if callable(alignment) else alignment
         return value - (pos % value)
 
     return _get_aligned_size
 
 
-class Lazy(FieldStruct):
+class Lazy(FieldStruct[_IT, _OT]):
     """
     A lazy field struct that defers the creation of the underlying struct until it is needed.
 
@@ -1549,14 +1624,14 @@ class Lazy(FieldStruct):
                    when the field is accessed.
     """
 
-    def __init__(self, struct) -> None:
+    def __init__(self, struct: Callable[[], _StructLike[_IT, _OT]]) -> None:
         if not callable(struct):
             raise TypeError(f"struct must be a callable - got {struct!r}")
 
-        self.struct_fn = struct
+        self.struct_fn: Callable[[], _StructLike[_IT, _OT]] = struct
 
     @cached_property
-    def struct(self) -> _StructLike:
+    def struct(self) -> _StructLike[_IT, _OT]:
         """
         Get the underlying struct by invoking the callable.
 
@@ -1567,16 +1642,16 @@ class Lazy(FieldStruct):
         """
         return self.struct_fn()
 
-    def __bits__(self):
+    def __bits__(self) -> int:
         """
         Get the bit representation of the Lazy struct by delegating to the underlying struct.
 
         :return: The bit representation of the struct.
         :rtype: str
         """
-        return self.struct.__bits__()
+        return self.struct.__bits__()  # pyright: ignore[reportAttributeAccessIssue]
 
-    def __type__(self):
+    def __type__(self) -> type | str | None:
         """
         Get the type associated with the Lazy struct by delegating to the underlying struct.
 
@@ -1585,7 +1660,7 @@ class Lazy(FieldStruct):
         """
         return self.struct.__type__()
 
-    def __size__(self, context) -> int:
+    def __size__(self, context: _ContextLike) -> int:
         """
         Get the size of the Lazy struct by delegating to the underlying struct.
 
@@ -1595,7 +1670,8 @@ class Lazy(FieldStruct):
         """
         return self.struct.__size__(context)
 
-    def pack_single(self, obj, context) -> None:
+    @override
+    def pack_single(self, obj: _IT, context: _ContextLike) -> None:
         """
         Pack a single value using the Lazy struct by delegating to the underlying struct.
 
@@ -1604,7 +1680,8 @@ class Lazy(FieldStruct):
         """
         self.struct.__pack__(obj, context)
 
-    def unpack_single(self, context):
+    @override
+    def unpack_single(self, context: _ContextLike) -> _OT:
         """
         Unpack a single value using the Lazy struct by delegating to the underlying struct.
 
@@ -1615,7 +1692,7 @@ class Lazy(FieldStruct):
 
 
 @singleton
-class Uuid(FieldStruct):
+class Uuid(FieldStruct[UUID, UUID]):
     """
     A field for handling UUID values.
 
@@ -1646,7 +1723,7 @@ class Uuid(FieldStruct):
         """
         return UUID
 
-    def __size__(self, context) -> int:
+    def __size__(self, context: _ContextLike) -> int:
         """
         Get the size of the UUID field.
 
@@ -1665,7 +1742,8 @@ class Uuid(FieldStruct):
         """
         return 128
 
-    def __pack__(self, obj: UUID, context) -> None:
+    @override
+    def __pack__(self, obj: UUID, context: _ContextLike) -> None:
         """
         Pack a UUID object into the stream.
 
@@ -1676,9 +1754,10 @@ class Uuid(FieldStruct):
         :param context: The current context, which includes the stream and byte order.
         """
         is_le = context[CTX_FIELD].order.ch == LITTLE_ENDIAN_FMT
-        super().__pack__(obj.bytes_le if is_le else obj.bytes, context)
+        context[CTX_STREAM].write(obj.bytes_le if is_le else obj.bytes)
 
-    def __unpack__(self, context) -> UUID:
+    @override
+    def __unpack__(self, context: _ContextLike) -> UUID:
         """
         Unpack a UUID from the stream.
 
@@ -1725,23 +1804,25 @@ class AsLengthRef:
         "name",
     )
 
-    def __init__(self, name: str, target: str, struct=None) -> None:
-        self.struct = struct
-        self.name = f"_obj.{name}"
-        self.target = f"_obj.{target}"
+    def __init__(
+        self, name: str, target: str, struct: _StructLike[int, int] | None = None
+    ) -> None:
+        self.struct: _StructLike[int, int] | None = struct
+        self.name: str = f"_obj.{name}"
+        self.target: str = f"_obj.{target}"
 
-    def __mod__(self, other) -> Self:
+    def __mod__(self, other: _StructLike[int, int]) -> Self:
         self.struct = other
         return self
 
-    def __rmod__(self, other) -> Self:
+    def __rmod__(self, other: _StructLike[int, int]) -> Self:
         self.struct = other
         return self
 
     def __type__(self) -> type:
         return int
 
-    def __size__(self, context) -> int:
+    def __size__(self, context: _ContextLike) -> int:
         if self.struct is None:
             return 0
         return self.struct.__size__(context)
@@ -1749,19 +1830,19 @@ class AsLengthRef:
     def __bits__(self) -> int:
         if self.struct is None:
             return 0
-        return self.struct.__bits__()
+        return self.struct.__bits__()  # pyright: ignore[reportAttributeAccessIssue]
 
-    def __pack__(self, obj, context):
+    def __pack__(self, obj: None, context: _ContextLike):
         # object is optional
         if self.struct is None:
             raise ValueError("struct is not defined")
 
         target_obj = context.__context_getattr__(self.target)
-        length = len(target_obj)
+        length: int = len(target_obj)
         context.__context_setattr__(self.name, length)
         self.struct.__pack__(length, context)
 
-    def __unpack__(self, context):
+    def __unpack__(self, context: _ContextLike) -> int:
         if self.struct is None:
             raise ValueError("struct is not defined")
 
@@ -1769,6 +1850,7 @@ class AsLengthRef:
         context.__context_setattr__(self.name, length)
         return length
 
+    @override
     def __repr__(self) -> str:
         name = self.target.removeprefix("_obj.")
         return f"<LengthRef of .{name}>"

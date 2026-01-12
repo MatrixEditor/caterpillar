@@ -124,12 +124,12 @@ class _SupportsType(Protocol):
     def __type__(self) -> type | str | None: ...
 
 
-class _ContainsStruct(Protocol):
+class _ContainsStruct(Protocol[_IT_contra, _OT]):
     """
     An abstract base class indicating that a class contains a _StructLike object.
     """
 
-    __struct__: _StructLike
+    __struct__: _StructLike[_IT_contra, _OT]
 
 
 @runtime_checkable
