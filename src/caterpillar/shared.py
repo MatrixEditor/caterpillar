@@ -12,15 +12,24 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-from typing import Any
-from caterpillar.abc import _ContextLambda
+# pyright: reportPrivateUsage=false
+from typing_extensions import Final, override
+
+from caterpillar.abc import (
+    _ContextLambda,
+    _StructLike,
+    _IT,
+    _OT,
+    _SupportsType,
+    _ContainsStruct,
+)
 
 # --- Shared Concepts ---
 # TODO: This section needs some docs
 
 # additional modifies set in the root context of each operation
-MODE_PACK = 0
-MODE_UNPACK = 1
+MODE_PACK: Final[int] = 0
+MODE_UNPACK: Final[int] = 1
 
 # REVISIT: taken from reference
 #: All models annotated with either @struct or @bitfield are struct
@@ -29,12 +38,12 @@ MODE_UNPACK = 1
 #: Internally, any types utilizing this attribute can be employed within a
 #: struct, bitfield, or sequence definition. The type of the stored value
 #: must be conforming to the _StructLike protocol.
-ATTR_STRUCT = "__struct__"
-ATTR_BYTEORDER = "__byteorder__"
-ATTR_TYPE = "__type__"
-ATTR_BITS = "__bits__"
-ATTR_SIGNED = "__signed__"
-ATTR_TEMPLATE = "__template__"
+ATTR_STRUCT: Final[str] = "__struct__"
+ATTR_BYTEORDER: Final[str] = "__byteorder__"
+ATTR_TYPE: Final[str] = "__type__"
+ATTR_BITS: Final[str] = "__bits__"
+ATTR_SIGNED: Final[str] = "__signed__"
+ATTR_TEMPLATE: Final[str] = "__template__"
 
 # TODO: add to reference
 # NEW CONCEPT: Actions
@@ -55,8 +64,8 @@ ATTR_TEMPLATE = "__template__"
 #
 #   The action will be executed before the next field is parsed and won't
 #   be stored in the model of the struct.
-ATTR_ACTION_PACK = "__action_pack__"
-ATTR_ACTION_UNPACK = "__action_unpack__"
+ATTR_ACTION_PACK: Final[str] = "__action_pack__"
+ATTR_ACTION_UNPACK: Final[str] = "__action_unpack__"
 
 
 class Action:
@@ -97,14 +106,20 @@ class Action:
     :type unpack: _ContextLambda | None
     """
 
-    __slots__ = (ATTR_ACTION_PACK, ATTR_ACTION_UNPACK)
+    __slots__: tuple[str, str] = (ATTR_ACTION_PACK, ATTR_ACTION_UNPACK)
 
-    def __init__(self, pack=None, unpack=None, both=None) -> None:
-        self.__action_pack__ = pack
-        self.__action_unpack__ = unpack
+    def __init__(
+        self,
+        pack: _ContextLambda[None] | None = None,
+        unpack: _ContextLambda[None] | None = None,
+        both: _ContextLambda[None] | None = None,
+    ) -> None:
+        self.__action_pack__: _ContextLambda[None] | None = pack
+        self.__action_unpack__: _ContextLambda[None] | None = unpack
         if both is not None:
             self.__action_pack__ = self.__action_unpack__ = both
 
+    @override
     def __repr__(self) -> str:
         """
         Return a string representation of the action, showing its callable name
@@ -134,7 +149,7 @@ class Action:
         return f"{name}({self.__action_pack__.__qualname__}, {self.__action_unpack__.__qualname__})"
 
     @staticmethod
-    def is_action(obj: Any) -> bool:
+    def is_action(obj: object) -> bool:
         """
         Checks if the given object is an instance of an `Action` class,
         based on the presence of the `__action_pack__` or `__action_unpack__` attributes.
@@ -149,7 +164,7 @@ class Action:
         )
 
 
-def hasstruct(obj) -> bool:
+def hasstruct(obj: object) -> bool:
     """
     Check if the given object has a structure attribute.
 
@@ -159,7 +174,9 @@ def hasstruct(obj) -> bool:
     return hasattr(obj.__class__ if not isinstance(obj, type) else obj, ATTR_STRUCT)
 
 
-def getstruct(obj, /, __default=None):
+def getstruct(
+    obj: object, /, __default: _StructLike | None = None
+) -> _StructLike[_IT, _OT] | None:
     """
     Get the structure attribute of the given object.
 
@@ -170,12 +187,12 @@ def getstruct(obj, /, __default=None):
     return getattr(obj, ATTR_STRUCT, __default)
 
 
-def typeof(struct):
+def typeof(struct: _StructLike | _SupportsType | _ContainsStruct | object) -> type:
     if hasstruct(struct):
-        struct = getstruct(struct)
+        struct = getstruct(struct) or struct
 
     __type__ = getattr(struct, ATTR_TYPE, None)
     if not __type__:
-        return Any
+        return object
     # this function must return a type
-    return __type__() or Any
+    return __type__() or object
