@@ -103,7 +103,7 @@ class TypeConverter:
 annotation_registry: list[TypeConverter] = []
 
 
-def to_struct(obj: object, **kwargs: dict[str, Any]) -> _StructLike:
+def to_struct(obj: object, **kwargs: Any) -> _StructLike:  # pyright: ignore[reportAny]
     """Convert an object to a :code:`_StruckLike` object using registered type converters.
 
     This function will not convert any objects that are already

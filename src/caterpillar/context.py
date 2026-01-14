@@ -27,7 +27,7 @@ from dataclasses import dataclass
 from caterpillar.exception import StructException
 from caterpillar.registry import to_struct
 from caterpillar.options import Flag
-from caterpillar.abc import _ContextLike, _ContextLambda, _IT, _ContextFactoryLike
+from caterpillar.abc import _ContextLike, _ContextLambda, _IT, _OT,  _ContextFactoryLike
 
 
 CTX_PARENT = "_parent"
@@ -442,7 +442,7 @@ class _ContextPathOp(Protocol):
 # fmt: on
 
 
-class ContextPath(ExprMixin):
+class ContextPath(Generic[_OT], ExprMixin):
     """
     Represents a lambda function for retrieving a value from a Context based on a specified path.
     """
@@ -461,7 +461,7 @@ class ContextPath(ExprMixin):
         self.call_kwargs: dict[str, Any] = dict()
         self.getitem_args: list[Any] = list()
 
-    def __call__(self, context: _ContextLike | None = None, **kwds: Any) -> Self | Any:
+    def __call__(self, context: _ContextLike) -> _OT:
         """
         Calls the lambda function to retrieve a value from a Context.
 
@@ -469,6 +469,7 @@ class ContextPath(ExprMixin):
         :param kwds: Additional keyword arguments.
         :return: The value retrieved from the Context based on the path.
         """
+        # REVISIT: find a way to implement calls
         if context is None:
             self._ops_.append((operator.call, [], kwds))
             return self
@@ -489,7 +490,7 @@ class ContextPath(ExprMixin):
         return object
 
     @override
-    def __getattribute__(self, key: str) -> ContextPath:
+    def __getattribute__(self, key: str) -> ContextPath[_IT]:
         """
         Gets an attribute from the ContextPath, creating a new instance if needed.
 
