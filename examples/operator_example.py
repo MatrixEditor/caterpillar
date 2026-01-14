@@ -1,4 +1,3 @@
-# type: ignore
 from caterpillar.py import struct, uint16, Operator, S_REPLACE_TYPES
 from caterpillar.shortcuts import f
 

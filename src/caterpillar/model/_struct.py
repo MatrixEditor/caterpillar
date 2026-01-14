@@ -21,7 +21,7 @@ from io import BytesIO, IOBase
 from collections import OrderedDict
 from collections.abc import Collection, Iterable
 from shutil import copyfileobj
-from typing import Any, Callable, Generic, ParamSpec, TypeVar
+from typing import Any, Callable, Generic, Literal, ParamSpec, TypeVar
 from types import TracebackType
 from typing_extensions import dataclass_transform, override, overload, Buffer
 
@@ -248,36 +248,51 @@ def _make_struct(
 @dataclass_transform()
 def struct(
     cls: type[_ModelT],
-    /,
-    *,
+    kw_only: Literal[False] = False,
     options: Iterable[_OptionLike] | None = None,
     order: _EndianLike | None = None,
     arch: _ArchLike | None = None,
     field_options: Iterable[_OptionLike] | None = None,
-    kw_only: bool = False,
+
+) -> type[_ModelT]: ...
+@overload
+@dataclass_transform(kw_only_default=True)
+def struct(
+    cls: type[_ModelT],
+    kw_only: Literal[True] = True,
+    options: Iterable[_OptionLike] | None = None,
+    order: _EndianLike | None = None,
+    arch: _ArchLike | None = None,
+    field_options: Iterable[_OptionLike] | None = None,
 ) -> type[_ModelT]: ...
 @overload
 @dataclass_transform()
 def struct(
     cls: None = None,
-    /,
-    *,
+    kw_only: Literal[False] = False,
     options: Iterable[_OptionLike] | None = None,
     order: _EndianLike | None = None,
     arch: _ArchLike | None = None,
     field_options: Iterable[_OptionLike] | None = None,
-    kw_only: bool = False,
+) -> Callable[[_ModelT], type[_ModelT]]: ...
+@overload
+@dataclass_transform(kw_only_default=True)
+def struct(
+    cls: None = None,
+    kw_only: Literal[True] = True,
+    options: Iterable[_OptionLike] | None = None,
+    order: _EndianLike | None = None,
+    arch: _ArchLike | None = None,
+    field_options: Iterable[_OptionLike] | None = None,
 ) -> Callable[[_ModelT], type[_ModelT]]: ...
 @dataclass_transform()
 def struct(
     cls: type[_ModelT] | None = None,
-    # /,
-    # *,
+    kw_only: bool = False,
     options: Iterable[_OptionLike] | None = None,
     order: _EndianLike | None = None,
     arch: _ArchLike | None = None,
     field_options: Iterable[_OptionLike] | None = None,
-    kw_only: bool = False,
 ) -> type[_ModelT] | Callable[[_ModelT], type[_ModelT]]:
     """
     Decorator to create a Struct class.

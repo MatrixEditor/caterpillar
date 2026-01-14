@@ -105,7 +105,7 @@ def set_union_flags(*flags: _OptionLike) -> None:
     configure(GLOBAL_UNION_OPTIONS, *flags)
 
 
-def get_flags(obj: object, attr: str | None = None) -> list[_OptionLike] | None:
+def get_flags(obj: object, attr: str | None = None) -> list[_OptionLike]:
     """
     Get the flags associated with an object.
 
@@ -113,7 +113,7 @@ def get_flags(obj: object, attr: str | None = None) -> list[_OptionLike] | None:
     :param attr: The attribute name containing the flags (default is "flags").
     :return: The set of flags, or None if no flags are present.
     """
-    return getattr(obj, attr or "flags", None)
+    return list(getattr(obj, attr or "flags", None) or [])
 
 
 def has_flag(flag: _OptionLike[_VT], obj: object, attr: str | None = None) -> bool:

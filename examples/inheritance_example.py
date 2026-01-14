@@ -1,15 +1,9 @@
-# type: ignore
-from caterpillar.py import struct, pack, unpack, this, uint8, int32, Bytes
+from caterpillar.py import struct, pack, unpack, this, Bytes
 from caterpillar.shortcuts import f
 from caterpillar.types import int32_t, int8_t
 
-try:
-    from rich import print
-except ImportError:
-    pass
 
-
-@struct
+@struct(kw_only=True)
 class BaseFormat:
     magic: f[bytes, b"BASE"] = b"BASE"
     length: int8_t

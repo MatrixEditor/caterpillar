@@ -21,7 +21,7 @@ def test_registry_invalid_add():
 def test_registry_valid_add():
     # A valid type converter should throw no errors
     @registry.TypeConverter(int)
-    def int_converter(annotation, kwargs):
+    def int_converter(annotation: int, kwargs):
         return Const(annotation, uint16)
 
     registry.annotation_registry.append(int_converter)

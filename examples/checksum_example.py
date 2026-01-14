@@ -1,13 +1,13 @@
 import typing
-from rich import print
+
 from cryptography.hazmat.primitives import hashes
 
-from caterpillar.py import struct, Bytes, pack, unpack, this
+from caterpillar.py import Struct, getstruct, struct, Bytes, pack, unpack, this
 from caterpillar.fields.digest import HMAC
 from caterpillar.shortcuts import f
 
 
-@struct
+@struct(kw_only=True)
 class Format:
     key: f[bytes, b"MAGIC"] = b"MAGIC"
 
@@ -20,7 +20,9 @@ class Format:
 
 
 print(Format(user_data=b"hello world"))
-print(Format.__struct__.fields)
+s = getstruct(Format)
+assert isinstance(s, Struct)
+print(s.fields)
 data = pack(Format(user_data=b"hello world"))
 print(data)
 

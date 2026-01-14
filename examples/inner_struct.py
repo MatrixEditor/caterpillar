@@ -1,11 +1,5 @@
-# type: ignore
 from caterpillar.py import struct, pack, unpack, uint8
 from caterpillar.shortcuts import f
-
-try:
-    from rich import print
-except ImportError:
-    pass
 
 
 @struct

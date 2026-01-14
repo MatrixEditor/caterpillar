@@ -1,4 +1,3 @@
-# type: ignore
 import typing
 from caterpillar.py import (
     Bitfield,

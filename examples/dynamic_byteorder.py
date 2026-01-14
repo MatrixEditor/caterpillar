@@ -5,7 +5,7 @@ MY_BIG_ENDIAN_ID = 0
 MY_LITTLE_ENDIAN_ID = 1
 
 
-@struct(order=BigEndian)
+@struct(order=BigEndian, kw_only=True)
 class Format:
     spec: f[int, uint8] = MY_BIG_ENDIAN_ID
 

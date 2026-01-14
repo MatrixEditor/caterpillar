@@ -63,7 +63,10 @@ from .context import (
     CTX_PATH,
     CTX_SEQ,
     CTX_ARCH,
+    CTX_ROOT,
+    CTX_ORDER,
     ExprMixin,
+    root,
 )
 from .exception import (
     StructException,
@@ -101,6 +104,11 @@ from .options import (
     get_flags,
     has_flag,
     O_ARRAY_FACTORY,
+    B_GROUP_END,
+    B_GROUP_KEEP,
+    B_GROUP_NEW,
+    B_NO_AUTO_BOOL,
+    B_OVERWRITE_ALIGNMENT,
 )
 from ._common import WithoutContextVar, iseof, pack_seq, unpack_seq
 from .shared import (
@@ -118,6 +126,7 @@ from .shared import (
     MODE_PACK,
     MODE_UNPACK,
     typeof,
+    identity,
 )
 
 __all__ = [
@@ -376,4 +385,13 @@ __all__ = [
     "Else",
     "ElseIf",
     "IOHook",
+    "CTX_ROOT",
+    "CTX_ORDER",
+    "root",
+    "B_GROUP_END",
+    "B_GROUP_KEEP",
+    "B_GROUP_NEW",
+    "B_NO_AUTO_BOOL",
+    "B_OVERWRITE_ALIGNMENT",
+    "identity",
 ]

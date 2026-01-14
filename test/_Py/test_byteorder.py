@@ -5,7 +5,7 @@ from caterpillar.py import struct, pack, unpack, uint16, uint32
 from caterpillar.types import uint16_t, uint32_t, uint8_t
 from caterpillar.context import CTX_ORDER, SetContextVar, ctx, this
 from caterpillar.shortcuts import f
-from caterpillar.abc import _ContextLike
+from caterpillar.abc import _ContextLike  # pyright: ignore[reportPrivateUsage]
 
 
 def test_dyn_byteorder_pack():
@@ -58,7 +58,7 @@ def test_dyn_byteorder_unpack():
 def test_dyn_byteorder_key():
     # dynamic byteorder allows specifying a key to get the
     # byteorder from the context
-    @struct(order=Dynamic(this.spec))
+    @struct(order=Dynamic(this.spec), kw_only=True)
     class Format:
         # The target context value can be either a string containing
         # the endian format character, a ByteOrder object or any value
@@ -92,7 +92,7 @@ def test_dyn_byteorder_func():
 def test_dyn_byteorder_mixed():
     # dynamic byteorder can also be applied to one field at a time
     # instead of all fields within a struct
-    @struct(order=BigEndian)
+    @struct(order=BigEndian, kw_only=True)
     class Format:
         spec: uint8_t = 0
         a: f[int, DynByteOrder(key=this.spec) + uint16]

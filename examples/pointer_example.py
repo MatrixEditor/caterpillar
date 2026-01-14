@@ -1,4 +1,3 @@
-# type: ignore
 from caterpillar.fields import pointer
 from caterpillar.py import (
     set_struct_flags,
@@ -11,12 +10,6 @@ from caterpillar.py import (
     x86
 )
 from caterpillar.shortcuts import f
-from caterpillar.fields.pointer import uintptr_fn
-from caterpillar.abc import _StructLike
-try:
-    from rich import print
-except ImportError:
-    pass
 
 set_struct_flags(S_REPLACE_TYPES)
 

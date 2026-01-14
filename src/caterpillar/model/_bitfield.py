@@ -1100,7 +1100,7 @@ def _make_bitfield(
 
 
 @overload
-@dataclass_transform()
+@dataclass_transform(kw_only_default=True)
 def bitfield(
     cls: type[_VT],
     /,
@@ -1112,7 +1112,7 @@ def bitfield(
     alignment: int | None = None,
 ) -> type[_VT]: ...
 @overload
-@dataclass_transform()
+@dataclass_transform(kw_only_default=True)
 def bitfield(
     cls: None = None,
     /,
@@ -1123,7 +1123,7 @@ def bitfield(
     field_options: Iterable[_OptionLike] | None = None,
     alignment: int | None = None,
 ) -> Callable[[type[_VT]], type[_VT]]: ...
-@dataclass_transform()
+@dataclass_transform(kw_only_default=True)
 def bitfield(
     cls: type[_VT] | None = None,
     /,
