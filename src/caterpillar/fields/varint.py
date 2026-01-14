@@ -13,19 +13,25 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from __future__ import annotations
+import typing
+from typing_extensions import override
 
 from caterpillar.exception import InvalidValueError, DynamicSizeError, StreamError
 from caterpillar.byteorder import LittleEndian, LITTLE_ENDIAN_FMT
 from caterpillar.context import CTX_FIELD, CTX_STREAM
 from caterpillar.options import Flag
+from caterpillar.abc import _ContextLike, _EndianLike, _StreamType
 
 from ._mixin import FieldStruct
+
+if typing.TYPE_CHECKING:
+    from caterpillar.fields import Field
 
 
 VARINT_LSB = Flag("varint.lsb")
 
 
-class VarInt(FieldStruct):
+class VarInt(FieldStruct[int, int]):
     """Variable-length integer struct.
 
     This class implements variable-length unsigned integer for big-endian and
@@ -46,18 +52,18 @@ class VarInt(FieldStruct):
     b'\\x00\\x88'
     """
 
-    __slots__ = ("__byteorder__",)
+    __slots__: tuple[str, ...] = ("__byteorder__",)
 
     def __init__(self):
-        self.__byteorder__ = LittleEndian
+        self.__byteorder__: _EndianLike = LittleEndian
 
     def __type__(self) -> type:
         return int
 
-    def __size__(self, context) -> int:
+    def __size__(self, context: _ContextLike) -> int:
         raise DynamicSizeError("VarInt has dynamic size!")
 
-    def bit_config(self, context) -> tuple:
+    def bit_config(self, context: _ContextLike) -> tuple[int, ...]:
         high_bit = 1 << 7
         low_bit = 0
         if field := context.get(CTX_FIELD):
@@ -66,28 +72,26 @@ class VarInt(FieldStruct):
                 low_bit = 1 << 7
         return high_bit, low_bit
 
-    def pack_single(self, obj, context) -> None:
+    @override
+    def pack_single(self, obj: int, context: _ContextLike) -> None:
         """
         Pack a single value into the stream.
 
         :param obj: The value to pack.
         :param context: The current context.
         """
-        if obj is None:
-            raise InvalidValueError("NoneType can't be interpreted as a VarInt!")
-
         if obj < 0:
             raise InvalidValueError("Invalid negative value for VarInt encoding!")
 
-        stream = context[CTX_STREAM]
-        field = context.get(CTX_FIELD)
-        order = field.order if field else self.__byteorder__
-        is_little = order.ch == LITTLE_ENDIAN_FMT
+        stream: _StreamType = context[CTX_STREAM]
+        field: "Field" = context.get(CTX_FIELD)
+        order: _EndianLike = field.order if field else self.__byteorder__
+        is_little: bool = order.ch == LITTLE_ENDIAN_FMT
 
         hb, lb = self.bit_config(context)
         # This implementation is using LittleEndian. Later we can use reverse to
         # apply little endian encoding.
-        data = []
+        data: list[int] = []
         while obj > 0b01111111:
             data.append(obj & 0x7F)
             obj >>= 7
@@ -103,7 +107,8 @@ class VarInt(FieldStruct):
         # Just write all bytes to the stream
         stream.write(bytes(data))
 
-    def unpack_single(self, context):
+    @override
+    def unpack_single(self, context: _ContextLike) -> int:
         """
         Unpack a single value from the stream.
 
@@ -111,11 +116,11 @@ class VarInt(FieldStruct):
         :param context: The current context.
         :return: The unpacked value.
         """
-        stream = context[CTX_STREAM]
-        data = []
+        stream: _StreamType = context[CTX_STREAM]
+        data: list[int] = []
         _, lb = self.bit_config(context)
         shift = 0
-        is_little = context[CTX_FIELD].order.ch == LITTLE_ENDIAN_FMT
+        is_little: bool = context[CTX_FIELD].order.ch == LITTLE_ENDIAN_FMT
 
         while True:
             # Note tha unpack operation here to retrieve one byte only
@@ -142,4 +147,4 @@ class VarInt(FieldStruct):
         return value
 
 
-vint = VarInt()
+vint: typing.Final[VarInt] = VarInt()
