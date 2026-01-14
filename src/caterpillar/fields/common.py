@@ -18,8 +18,8 @@ import struct as PyStruct
 import warnings
 
 from io import BytesIO
-from typing import Any, Callable, Generic, TypeVar
-from typing_extensions import Final, Self, override
+from typing import Any, Callable, Generic
+from typing_extensions import Final, Self, override, TypeVar
 from types import NoneType
 from functools import cached_property
 from enum import Enum as _EnumType
@@ -50,7 +50,7 @@ from caterpillar._common import WithoutContextVar
 from caterpillar.shared import getstruct
 
 from ._base import Field, INVALID_DEFAULT, singleton
-from ._mixin import FieldMixin, FieldStruct
+from ._mixin import FieldStruct
 
 # Explicitly report deprecation warnings
 warnings.filterwarnings("default", category=DeprecationWarning, module=__name__)
@@ -245,8 +245,8 @@ int64: Final[PyStructFormattedField[int]] = PyStructFormattedField("q", int)
 uint64: Final[PyStructFormattedField[int]] = PyStructFormattedField("Q", int)
 
 
-ssize_t: Final[PyStructFormattedField[int]] = PyStructFormattedField("n", int)
-size_t: Final[PyStructFormattedField[int]] = PyStructFormattedField("N", int)
+ssize: Final[PyStructFormattedField[int]] = PyStructFormattedField("n", int)
+size: Final[PyStructFormattedField[int]] = PyStructFormattedField("N", int)
 
 float16: Final[PyStructFormattedField[float]] = PyStructFormattedField("e", float)
 float32: Final[PyStructFormattedField[float]] = PyStructFormattedField("f", float)
@@ -336,7 +336,7 @@ class Transformer(
         return self.decode(value, context)
 
 
-class Const(Transformer[_IT, _IT, _IT, _IT]):
+class Const(Transformer[NoneType, _IT, _IT, _IT]):
     """
     A specialized Transformer that enforces a constant value during
     encoding and decoding.
@@ -368,7 +368,7 @@ class Const(Transformer[_IT, _IT, _IT, _IT]):
         self.value: _IT = value
 
     @override
-    def encode(self, obj: _IT, context: _ContextLike) -> _IT:
+    def encode(self, obj: None, context: _ContextLike) -> _IT:
         """
         Encode data using the constant value. This method will always return
         the constant value, regardless of the input. Therefore, :code:`None`
@@ -593,7 +593,7 @@ class Memory(Generic[_MemoryIT, _MemoryOT], FieldStruct[_MemoryIT, _MemoryOT]):
                    - Ellipsis (`...`), indicating the length is unspecified and the entire stream should be read.
     """
 
-    __slots__ = ("length",)
+    __slots__: tuple[str] = ("length",)
 
     def __init__(self, length: _ContextLambda[int] | int | _GreedyType) -> None:
         self.length: _ContextLambda[int] | int | _GreedyType = length
@@ -832,14 +832,15 @@ class CString(FieldStruct[str, str]):
         """
         return CString(...)[dim]
 
-    def __size__(self, context: _ContextLike) -> int | _GreedyType:
+    def __size__(self, context: _ContextLike) -> int:
         """
         Returns the size of the `CString` field.
 
         :param context: The context used to determine the size.
         :return: The length of the field in bytes.
         """
-        return self.length(context) if callable(self.length) else self.length
+        # fmt: off
+        return self.length(context) if callable(self.length) else self.length  # pyright: ignore[reportReturnType]
 
     def __type__(self) -> type:
         """

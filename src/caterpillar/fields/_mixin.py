@@ -16,7 +16,7 @@
 from io import BytesIO
 from collections.abc import Collection, Iterable
 from functools import partial
-from typing import Any, Callable, Collection, Generic, TypeVar
+from typing import Any, Callable, Generic
 from typing_extensions import Self, override
 
 from caterpillar.byteorder import byteorder
@@ -36,6 +36,7 @@ from caterpillar.abc import (
     _OptionLike,
     _EndianLike,
     _SwitchLambda,
+    _ArgType,
 )
 
 
@@ -366,7 +367,7 @@ class Operator(Generic[_IT, _OT]):
 
 # utility methods
 def get_args(
-    args: _ContextLambda[Any] | object | list[Any | _ContextLambda[Any]],
+    args: _ArgType | list[_ArgType],
     context: _ContextLike,
 ) -> list[Any]:
     """
@@ -386,9 +387,7 @@ def get_args(
     return args
 
 
-def get_kwargs(
-    kwargs: dict[str, Any | _ContextLambda[Any]], context: _ContextLike
-) -> dict[str, Any]:
+def get_kwargs(kwargs: dict[str, _ArgType], context: _ContextLike) -> dict[str, Any]:
     """
     Process a dictionary of keyword arguments, replacing callable values with their
     results.
