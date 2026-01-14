@@ -12,17 +12,21 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# pyright: reportAny=false, reportExplicitAny=false, reportPrivateUsage=false
 import inspect
 import dataclasses as dc
 
 from tempfile import TemporaryFile
 from io import BytesIO, IOBase
 from collections import OrderedDict
+from collections.abc import Collection, Iterable
 from shutil import copyfileobj
+from typing import Any, Callable, Generic, ParamSpec, TypeVar
+from types import TracebackType
+from typing_extensions import dataclass_transform, override, overload, Buffer
 
 from caterpillar.shared import getstruct, hasstruct, ATTR_STRUCT
-from caterpillar.abc import _SupportsUnpack, _SupportsSize
-from caterpillar.context import O_CONTEXT_FACTORY, CTX_STREAM
+from caterpillar.context import O_CONTEXT_FACTORY, CTX_STREAM, Context
 from caterpillar.exception import InvalidValueError
 from caterpillar.options import (
     S_EVAL_ANNOTATIONS,
@@ -35,12 +39,28 @@ from caterpillar.options import (
 from caterpillar.fields import Field, INVALID_DEFAULT
 from caterpillar import registry
 from caterpillar.shared import MODE_PACK, MODE_UNPACK
-
+from caterpillar.abc import (
+    _ContainsStruct,
+    _OT,
+    _IT,
+    _SupportsPack,
+    _StreamType,
+    _SupportsUnpack,
+    _ContextLike,
+    _StructLike,
+    _SupportsSize,
+    _OptionLike,
+    _EndianLike,
+    _ArchLike,
+)
 from ._base import Sequence
 
 
+_ModelT = TypeVar("_ModelT")
+
+
 # REVISIT: remove dataclasses dependency
-class Struct(Sequence):
+class Struct(Sequence[type[_ModelT], _ModelT, _ModelT]):
     """
     Represents a structured data model for serialization and deserialization.
 
@@ -50,24 +70,25 @@ class Struct(Sequence):
     :param options: Additional options specifying what to include in the final class.
     """
 
-    _member_map_: dict
+    # NOT PRESENT!!
+    # _member_map_: dict
     # An internal field that maps the field names of all class attributes to their
     # corresponding struct fields.
 
-    __slots__ = ("kw_only",)
+    __slots__: tuple[str, ...] = ("kw_only", "_union_hook")
 
     def __init__(
         self,
-        model: type,
-        order=None,
-        arch=None,
-        options=None,
-        field_options=None,
-        kw_only=False,
-        hook_cls=None,
+        model: type[_ModelT],
+        order: _EndianLike | None = None,
+        arch: _ArchLike | None = None,
+        options: Iterable[_OptionLike] | None = None,
+        field_options: Iterable[_OptionLike] | None = None,
+        kw_only: bool = False,
+        hook_cls: type["UnionHook[_ModelT]"] | None = None,
     ) -> None:
-        self.kw_only = kw_only
-        options = set(options or [])
+        self.kw_only: bool = kw_only
+        options: set[_OptionLike] = set(options or [])
         options.update(
             GLOBAL_UNION_OPTIONS if S_UNION in options else GLOBAL_STRUCT_OPTIONS
         )
@@ -81,21 +102,25 @@ class Struct(Sequence):
         setattr(self.model, ATTR_STRUCT, self)
         # Add additional options based on the struct's type
         slots = self.has_option(S_SLOTS)
-        self.model = dc.dataclass(self.model, kw_only=self.kw_only, slots=slots)
+        self.model: type[_ModelT] = dc.dataclass(
+            self.model, kw_only=self.kw_only, slots=slots
+        )
 
         setattr(self.model, "__class_getitem__", _struct_getitem(self))
         if self.is_union:
             # install a hook
-            self._union_hook = (hook_cls or UnionHook)(self)
+            self._union_hook: UnionHook = (hook_cls or UnionHook)(self)
             setattr(self.model, "__init__", _union_init(self._union_hook))
             setattr(self.model, "__setattr__", _union_setattr(self._union_hook))
         if self.has_option(S_ADD_BYTES):
             setattr(self.model, "__bytes__", _struct_bytes(self))
 
-    def __type__(self):
+    @override
+    def __type__(self) -> type[_ModelT]:
         return self.model
 
-    def _prepare_fields(self):
+    @override
+    def _prepare_fields(self) -> dict[str, Any]:
         # We will inspect all base classes in reverse order and selectively
         # utilize classes that store a struct instance. Beginning at position
         # -1, concluding at 0, and using a step size of -1:
@@ -104,31 +129,39 @@ class Struct(Sequence):
                 # Importing all fields instead of the entire struct.
                 # The default behavior on importing structs is implemented
                 # by the Sequence class.
-                self += getstruct(candidate)
+                self += candidate.__struct__
 
-        eval_str = self.has_option(S_EVAL_ANNOTATIONS)
+        eval_str: bool = self.has_option(S_EVAL_ANNOTATIONS)
         # The why is described in detail here: https://docs.python.org/3/howto/annotations.html
         return inspect.get_annotations(self.model, eval_str=eval_str)
 
-    def _set_default(self, name: str, value) -> None:
+    @override
+    def _set_default(self, name: str, value: Any) -> None:
         setattr(self.model, name, value)
 
-    def _process_default(self, name, annotation, had_default=False):
+    @override
+    def _process_default(
+        self, name: str, annotation: Any, had_default: bool = False
+    ) -> Any:
         default = super()._process_default(name, annotation, had_default)
         if default is INVALID_DEFAULT and had_default:
             self.kw_only = True
         return default
 
+    @override
     def _replace_type(self, name: str, type_: type) -> None:
         self.model.__annotations__[name] = type_
 
+    @override
     def _remove_from_model(self, name: str) -> None:
         self.model.__annotations__.pop(name)
 
-    def unpack_one(self, context):
+    @override
+    def unpack_one(self, context: _ContextLike) -> _ModelT:
         return self.model(**super().unpack_one(context))
 
-    def get_value(self, obj, name: str, field: Field):
+    @override
+    def get_value(self, obj: _ModelT, name: str, field: Field) -> Any | None:
         return getattr(obj, name, None)
 
 
@@ -138,46 +171,57 @@ class _StructTypeConverter(registry.TypeConverter):
     def __init__(self) -> None:
         super().__init__()
 
-    def matches(self, annotation) -> bool:
+    @override
+    def matches(self, annotation: Any) -> bool:
         return isinstance(annotation, type) and getstruct(annotation) is not None
 
-    def convert(self, annotation, kwargs: dict):
-        return getstruct(annotation)
+    @override
+    def convert(self, annotation: Any, kwargs: dict[str, Any]) -> _StructLike:
+        return getstruct(annotation)  # pyright: ignore[reportReturnType]
 
 
 registry.annotation_registry.append(_StructTypeConverter())
 
 
-def _struct_bytes(model: Struct):
-    def to_bytes(self) -> bytes:
+def _struct_bytes(model: Struct[_ModelT]) -> Callable[[_ModelT], bytes]:
+    def to_bytes(self: _ModelT) -> bytes:
         return pack(self, model)
 
     return to_bytes
 
 
-def _struct_getitem(model: Struct):
-    def class_getitem(*args):
-        if len(args) == 2:
-            _, dim = args
-        elif len(args) != 1:
-            raise InvalidValueError(f"Expected only one paremeter, got: {args!r}")
-        else:
-            (dim,) = args
+P = ParamSpec("P")
 
-        return Field(model, amount=dim)
+
+def _struct_getitem(
+    model: Struct[_ModelT],
+) -> Callable[P, Field[Collection[_ModelT], Collection[_ModelT]]]:
+    def class_getitem(*args: P.args, **kwargs: P.kwargs):
+        dim: int = 1
+        # REVISIT: check args
+        match len(args):
+            case 2:
+                _, dim = args  # pyright: ignore[reportAssignmentType]
+            case 1:
+                (dim,) = args  # pyright: ignore[reportAssignmentType]
+            case _:
+                raise InvalidValueError(f"Expected only one paremeter, got: {args!r}")
+
+        return Field(model)[dim]
 
     return class_getitem
 
 
+@dataclass_transform()
 def _make_struct(
-    cls: type,
-    options=None,
-    order=None,
-    arch=None,
-    field_options=None,
-    kw_only=False,
-    hook_cls=None,
-) -> type:
+    cls: type[_ModelT],
+    options: Iterable[_OptionLike] | None = None,
+    order: _EndianLike | None = None,
+    arch: _ArchLike | None = None,
+    field_options: Iterable[_OptionLike] | None = None,
+    kw_only: bool = False,
+    hook_cls: type["UnionHook"] | None = None,
+) -> type[_ModelT]:
     """
     Helper function to create a Struct class.
 
@@ -200,16 +244,41 @@ def _make_struct(
     return _.model
 
 
+@overload
+@dataclass_transform()
 def struct(
-    cls=None,
+    cls: type[_ModelT],
     /,
     *,
-    options=None,
-    order=None,
-    arch=None,
-    field_options=None,
-    kw_only=False,
-):
+    options: Iterable[_OptionLike] | None = None,
+    order: _EndianLike | None = None,
+    arch: _ArchLike | None = None,
+    field_options: Iterable[_OptionLike] | None = None,
+    kw_only: bool = False,
+) -> type[_ModelT]: ...
+@overload
+@dataclass_transform()
+def struct(
+    cls: None = None,
+    /,
+    *,
+    options: Iterable[_OptionLike] | None = None,
+    order: _EndianLike | None = None,
+    arch: _ArchLike | None = None,
+    field_options: Iterable[_OptionLike] | None = None,
+    kw_only: bool = False,
+) -> Callable[[_ModelT], type[_ModelT]]: ...
+@dataclass_transform()
+def struct(
+    cls: type[_ModelT] | None = None,
+    # /,
+    # *,
+    options: Iterable[_OptionLike] | None = None,
+    order: _EndianLike | None = None,
+    arch: _ArchLike | None = None,
+    field_options: Iterable[_OptionLike] | None = None,
+    kw_only: bool = False,
+) -> type[_ModelT] | Callable[[_ModelT], type[_ModelT]]:
     """
     Decorator to create a Struct class.
 
@@ -221,7 +290,7 @@ def struct(
     :return: The created Struct class or a wrapper function if cls is not provided.
     """
 
-    def wrap(cls):
+    def wrap(cls: type[_ModelT]) -> type[_ModelT]:
         return _make_struct(
             cls,
             order=order,
@@ -241,10 +310,10 @@ def struct(
             kw_only=kw_only,
         )
 
-    return wrap
+    return wrap  # pyright: ignore[reportReturnType]
 
 
-class UnionHook:
+class UnionHook(Generic[_ModelT]):
     """Implementation of a hook to simulate union types.
 
     It will hook two methods of the target model type: :code:`__init__` and
@@ -257,36 +326,36 @@ class UnionHook:
     these two methods can be used as a union hook.
     """
 
-    struct: Struct
+    struct: Struct[_ModelT]
     """The struct reference"""
 
     max_size: int
     """The static (cached) maximum size of the union"""
 
-    def __init__(self, struct_: Struct) -> None:
+    def __init__(self, struct_: Struct[_ModelT]) -> None:
         self.struct = struct_
         # Dynamic size is not allowed and will throw an error here
         self.max_size = sizeof(struct_)
         # These attributes are set by default
-        self._processing_ = False
-        self._model_init_ = struct_.model.__init__
+        self._processing_: bool = False
+        self._model_init_: Callable[..., None] = struct_.model.__init__
 
     def __enter__(self) -> None:
         # shortcut for disabling permanent attribute refresh during
         # init and refresh phases
         self._processing_ = True
 
-    def __exit__(self, exc_type, exc_value, traceback) -> None:
+    def __exit__(self, exc_type: type, exc_value: Exception, traceback: TracebackType):
         # This variable MUST be reset afterward
         self._processing_ = False
 
-    def __model_init__(self, obj, *args, **kwargs) -> None:
+    def __model_init__(self, obj: _ModelT, *args: Any, **kwargs: Any) -> None:
         # since it is possible now, to specify non-kw_only constructors,
         # we have to capture both, args and kwargs
         with self:
             return self._model_init_(obj, *args, **kwargs)
 
-    def __model_setattr__(self, obj, key: str, new_value) -> None:
+    def __model_setattr__(self, obj: _ModelT, key: str, new_value: Any) -> None:
         # The target attribute will alyaws be set
         object.__setattr__(obj, key, new_value)
 
@@ -301,7 +370,9 @@ class UnionHook:
             # delegation into method allows for customisation
             self.refresh(obj, key, new_value, members)
 
-    def refresh(self, obj, key: str, new_value, members) -> None:
+    def refresh(
+        self, obj: _ModelT, key: str, new_value: Any, members: dict[str, Field]
+    ) -> None:
         # DEFAULT: retrieve the current field and temporarily pack its data
         field = members[key]
         data = pack(new_value, field)
@@ -315,36 +386,63 @@ class UnionHook:
 
             # we can simply use setattr here
             object.__setattr__(obj, name, unpack(field, stream))
-            stream.seek(0)
+            stream.seek(0)  # pyright: ignore[reportUnusedCallResult]
 
 
-def _union_init(hook):
+def _union_init(hook: UnionHook[_ModelT]) -> Callable[..., None]:
     # wrapper function to capture the calling instance
-    def init(self, *args, **kwargs) -> None:
+    def init(self: _ModelT, *args: P.args, **kwargs: P.kwargs) -> None:
         return hook.__model_init__(self, *args, **kwargs)
 
     return init
 
 
-def _union_setattr(hook):
+def _union_setattr(hook: UnionHook[_ModelT]) -> Callable[..., None]:
     # wrapper function to capture the calling instance
-    def setattribute(self, key: str, value) -> None:
+    def setattribute(self: _ModelT, key: str, value: Any) -> None:
         hook.__model_setattr__(self, key, value)
 
     return setattribute
 
 
+@overload
+@dataclass_transform()
 def union(
-    cls=None,
+    cls: None = None,
     /,
     *,
-    options=None,
-    order=None,
-    arch=None,
-    field_options=None,
-    kw_only=False,
-    hook_cls=None,
-):
+    options: Iterable[_OptionLike] | None = None,
+    order: _EndianLike | None = None,
+    arch: _ArchLike | None = None,
+    field_options: Iterable[_OptionLike] | None = None,
+    kw_only: bool = False,
+    hook_cls: type[UnionHook[_ModelT]] | None = None,
+) -> Callable[[type[_ModelT]], type[_ModelT]]: ...
+@overload
+@dataclass_transform()
+def union(
+    cls: type[_ModelT],
+    /,
+    *,
+    options: Iterable[_OptionLike] | None = None,
+    order: _EndianLike | None = None,
+    arch: _ArchLike | None = None,
+    field_options: Iterable[_OptionLike] | None = None,
+    kw_only: bool = False,
+    hook_cls: type[UnionHook[_ModelT]] | None = None,
+) -> type[_ModelT]: ...
+@dataclass_transform()
+def union(
+    cls: type[_ModelT] | None = None,
+    /,
+    *,
+    options: Iterable[_OptionLike] | None = None,
+    order: _EndianLike | None = None,
+    arch: _ArchLike | None = None,
+    field_options: Iterable[_OptionLike] | None = None,
+    kw_only: bool = False,
+    hook_cls: type[UnionHook[_ModelT]] | None = None,
+) -> type[_ModelT] | Callable[[type[_ModelT]], type[_ModelT]]:
     """
     Decorator to create a Union class.
 
@@ -357,7 +455,7 @@ def union(
     """
     options = set(list(options or []) + [S_UNION])
 
-    def wrap(cls):
+    def wrap(cls: type[_ModelT]) -> type[_ModelT]:
         return _make_struct(
             cls,
             order=order,
@@ -382,14 +480,53 @@ def union(
     return wrap
 
 
+@overload
 def pack(
-    obj,
-    struct=None,
+    obj: _ContainsStruct[_IT, _OT],
+    struct: None = None,
+    /,
+    **kwargs: Any,
+) -> bytes: ...
+@overload
+def pack(
+    # fallback to allow arbitrary objects
+    obj: object,
+    struct: None = None,
+    /,
+    **kwds: Any,
+) -> bytes: ...
+@overload
+def pack(
+    obj: _IT,
+    struct: _SupportsPack[_IT],
+    /,
+    **kwargs: Any,
+) -> bytes: ...
+@overload
+def pack(
+    obj: _IT,
+    # support arbitrary struct types
+    struct: type[_IT],
+    /,
+    **kwargs: Any,
+) -> bytes: ...
+
+
+# @overload
+# def pack(
+#     obj: _IT,
+#     struct: _ContainsStruct[_IT, _OT],
+#     /,
+#     **kwargs: Any,
+# ) -> bytes: ...
+def pack(
+    obj: _IT | _ContainsStruct[_IT, _OT],
+    struct: _SupportsPack[_IT] | type[_IT] | _ContainsStruct[_IT, _OT] | None = None,
     /,
     *,
-    use_tempfile=False,
-    as_field=False,
-    **kwds,
+    use_tempfile: bool = False,
+    as_field: bool = False,
+    **kwargs: Any,
 ) -> bytes:
     """
     Pack an object into a bytes buffer using the specified struct.
@@ -401,18 +538,75 @@ def pack(
     :return: The packed bytes.
     """
     buffer = BytesIO()
-    pack_into(obj, buffer, struct, use_tempfile=use_tempfile, as_field=as_field, **kwds)
+    pack_into(
+        obj, buffer, struct, use_tempfile=use_tempfile, as_field=as_field, **kwargs
+    )  # pyright: ignore[reportArgumentType, reportCallIssue]
     return buffer.getvalue()
 
 
+@overload
 def pack_into(
-    obj,
-    buffer,
-    struct=None,
+    obj: _ContainsStruct[_IT, _OT],
+    buffer: _StreamType,
+    struct: None = None,
     /,
     *,
-    use_tempfile=False,
-    as_field=False,
+    use_tempfile: bool = ...,
+    as_field: bool = ...,
+    **kwds: Any,
+) -> None: ...
+@overload
+def pack_into(
+    obj: object,
+    buffer: _StreamType,
+    struct: None = None,
+    /,
+    *,
+    use_tempfile: bool = ...,
+    as_field: bool = ...,
+    **kwds: Any,
+) -> None: ...
+@overload
+def pack_into(
+    obj: _IT,
+    buffer: _StreamType,
+    struct: _SupportsPack[_IT],
+    /,
+    *,
+    use_tempfile: bool = ...,
+    as_field: bool = ...,
+    **kwds: Any,
+) -> None: ...
+@overload
+def pack_into(
+    obj: _IT,
+    buffer: _StreamType,
+    struct: type[_IT],
+    /,
+    *,
+    use_tempfile: bool = ...,
+    as_field: bool = ...,
+    **kwds: Any,
+) -> None: ...
+@overload
+def pack_into(
+    obj: _IT,
+    buffer: _StreamType,
+    struct: _ContainsStruct[_IT, _OT],
+    /,
+    *,
+    use_tempfile: bool = ...,
+    as_field: bool = ...,
+    **kwds: Any,
+) -> None: ...
+def pack_into(
+    obj: _IT | _ContainsStruct[_IT, _OT],
+    buffer: _StreamType,
+    struct: type[_IT] | _ContainsStruct[_IT, _OT] | _SupportsPack[_IT] | None = None,
+    /,
+    *,
+    use_tempfile: bool = False,
+    as_field: bool = False,
     **kwds,
 ) -> None:
     """
@@ -453,10 +647,11 @@ def pack_into(
 
     :raises TypeError: If no `struct` is specified and cannot be inferred from the object.
     """
-    offsets = OrderedDict()
+    # fmt: off
+    offsets: OrderedDict[int, int] = OrderedDict()
     # NOTE: we don't have to set _root here because the default root context
     # will be this instance.
-    context = O_CONTEXT_FACTORY.value(
+    context = (O_CONTEXT_FACTORY.value or Context)(
         _parent=None,
         _path="<root>",
         _pos=0,
@@ -480,15 +675,15 @@ def pack_into(
         # NOTE: this implementation is exprimental - use this option with caution.
         with TemporaryFile() as stream:
             context[CTX_STREAM] = stream
-            struct.__pack__(obj, context)
+            struct.__pack__(obj, context)  # pyright: ignore[reportAttributeAccessIssue, reportArgumentType]
 
             for offset, value in offsets.items():
-                stream.seek(start)
+                stream.seek(start)  # pyright: ignore[reportUnusedCallResult]
                 buffer.write(stream.read(offset - start))
                 buffer.write(value)
                 start = offset
             if len(offsets) == 0:
-                stream.seek(0)
+                stream.seek(0)  # pyright: ignore[reportUnusedCallResult]
                 copyfileobj(stream, buffer)
 
     else:
@@ -496,7 +691,7 @@ def pack_into(
         # elements and then apply all offset-packed objects.
         stream = BytesIO()
         context[CTX_STREAM] = stream
-        struct.__pack__(obj, context)
+        struct.__pack__(obj, context) # pyright: ignore[reportAttributeAccessIssue, reportArgumentType]
 
         content = stream.getbuffer()
         if len(offsets) == 0:
@@ -508,14 +703,69 @@ def pack_into(
                 start = offset
 
 
+@overload
 def pack_file(
-    obj,
+    obj: _ContainsStruct[_IT, _OT],
     filename: str,
-    struct=None,
+    struct: None = None,
     /,
     *,
-    use_tempfile=False,
-    as_field=False,
+    use_tempfile: bool = ...,
+    as_field: bool = ...,
+    **kwds: Any,
+) -> None: ...
+@overload
+def pack_file(
+    obj: object,
+    filename: str,
+    struct: None = None,
+    /,
+    *,
+    use_tempfile: bool = ...,
+    as_field: bool = ...,
+    **kwds: Any,
+) -> None: ...
+@overload
+def pack_file(
+    obj: _IT,
+    filename: str,
+    struct: _SupportsPack[_IT],
+    /,
+    *,
+    use_tempfile: bool = ...,
+    as_field: bool = ...,
+    **kwds: Any,
+) -> None: ...
+@overload
+def pack_file(
+    obj: _IT,
+    filename: str,
+    struct: type[_IT],
+    /,
+    *,
+    use_tempfile: bool = ...,
+    as_field: bool = ...,
+    **kwds: Any,
+) -> None: ...
+@overload
+def pack_file(
+    obj: _IT,
+    filename: str,
+    struct: _ContainsStruct[_IT, _OT],
+    /,
+    *,
+    use_tempfile: bool = ...,
+    as_field: bool = ...,
+    **kwds: Any,
+) -> None: ...
+def pack_file(
+    obj: _IT | _ContainsStruct[_IT, _OT],
+    filename: str,
+    struct: _SupportsPack[_IT] | type[_IT] | _ContainsStruct[_IT, _OT] | None = None,
+    /,
+    *,
+    use_tempfile: bool = False,
+    as_field: bool = False,
     **kwds,
 ) -> None:
     """
@@ -528,18 +778,39 @@ def pack_file(
 
     :return: None
     """
+    # fmt: off
     with open(filename, "w+b") as fp:
-        pack_into(obj, fp, struct, use_tempfile=use_tempfile, as_field=as_field, **kwds)
+        pack_into(obj, fp, struct, use_tempfile=use_tempfile, as_field=as_field, **kwds)  # pyright: ignore[reportCallIssue, reportArgumentType]
 
 
+@overload
 def unpack(
-    struct,
-    buffer,
+    struct: _ContainsStruct[_IT, _OT],
+    buffer: Buffer | _StreamType,
     /,
-    *,
-    as_field=False,
+    **kwds: Any,
+) -> _OT: ...
+@overload
+def unpack(
+    struct: _SupportsUnpack[_OT],
+    buffer: Buffer | _StreamType,
+    /,
+    **kwds: Any,
+) -> _OT: ...
+@overload
+def unpack(
+    struct: type[_OT],
+    buffer: Buffer | _StreamType,
+    /,
+    **kwds: Any,
+) -> _OT: ...
+def unpack(
+    struct: type[_OT] | _SupportsUnpack[_OT] | _ContainsStruct[_IT, _OT],
+    buffer: Buffer | _StreamType,
+    /,
+    as_field: bool = False,
     **kwds,
-):
+) -> _OT:
     """
     Unpack an object from a bytes buffer or stream using the specified struct.
 
@@ -565,9 +836,10 @@ def unpack(
 
     :raises TypeError: If the `struct` is not a valid struct instance.
     """
+    # fmt: off
     # prepare the data stream
     stream = buffer if isinstance(buffer, IOBase) else BytesIO(buffer)
-    context = O_CONTEXT_FACTORY.value(
+    context = (O_CONTEXT_FACTORY.value or Context)(
         _path="<root>",
         _parent=None,
         _io=stream,
@@ -577,9 +849,9 @@ def unpack(
         mode=MODE_UNPACK,
     )
     if as_field:
-        struct = Field(struct)
+        struct = Field(struct)  # pyright: ignore[reportArgumentType]
     elif hasstruct(struct):
-        struct = getstruct(struct)
+        struct = getstruct(struct)  # pyright: ignore[reportAssignmentType]
 
     if not isinstance(struct, _SupportsUnpack):
         raise TypeError(f"{type(struct).__name__} is not a valid struct instance!")
@@ -587,13 +859,40 @@ def unpack(
     return struct.__unpack__(context)
 
 
+@overload
 def unpack_file(
-    struct,
+    struct: _ContainsStruct[_IT, _OT],
     filename: str,
     /,
     *,
-    as_field=False,
-    **kwds,
+    as_field: bool = False,
+    **kwds: Any,
+) -> _OT: ...
+@overload
+def unpack_file(
+    struct: _SupportsUnpack[_OT],
+    filename: str,
+    /,
+    *,
+    as_field: bool = False,
+    **kwds: Any,
+) -> _OT: ...
+@overload
+def unpack_file(
+    struct: type[_OT],
+    filename: str,
+    /,
+    *,
+    as_field: bool = False,
+    **kwds: Any,
+) -> _OT: ...
+def unpack_file(
+    struct: type[_OT] | _SupportsUnpack[_OT] | _ContainsStruct[_IT, _OT],
+    filename: str,
+    /,
+    *,
+    as_field: bool = False,
+    **kwds: Any,
 ):
     """
     Unpack an object from a file using the specified struct.
@@ -608,8 +907,14 @@ def unpack_file(
         return unpack(struct, fp, as_field=as_field, **kwds)
 
 
-def sizeof(obj, **kwds) -> int:
-    context = O_CONTEXT_FACTORY.value(_parent=None, _path="<root>", **kwds)
+@overload
+def sizeof(obj: _SupportsSize, **kwds: Any) -> int: ...
+@overload
+def sizeof(obj: _ContainsStruct, **kwds: Any) -> int: ...
+@overload
+def sizeof(obj: type, **kwds: Any) -> int: ...
+def sizeof(obj: _SupportsSize | _ContainsStruct | type, **kwds: Any) -> int:
+    context = (O_CONTEXT_FACTORY.value or Context)(_parent=None, _path="<root>", **kwds)
     struct_ = obj
     if hasstruct(struct_):
         struct_ = getstruct(struct_)

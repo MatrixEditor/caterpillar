@@ -12,7 +12,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+import enum
+
 from collections.abc import Iterable
+from typing import Any, Callable, Final, Generic, Literal
+from typing_extensions import Self, dataclass_transform, overload, override, TypeVar
 from caterpillar.fields.common import Int
 from caterpillar.shared import (
     ATTR_ACTION_PACK,
@@ -44,9 +48,24 @@ from caterpillar.fields import (
     INVALID_DEFAULT,
 )
 from caterpillar.exception import StructException
-from caterpillar.context import CTX_PATH, O_CONTEXT_FACTORY, CTX_OBJECT, CTX_STREAM
-
+from caterpillar.context import (
+    CTX_PATH,
+    O_CONTEXT_FACTORY,
+    CTX_OBJECT,
+    CTX_STREAM,
+    Context,
+)
+from caterpillar.abc import (
+    _StructLike,
+    _StreamType,
+    _ActionLike,
+    _ContextLike,
+    _OptionLike,
+    _ArchLike,
+    _EndianLike,
+)
 from ._struct import Struct, sizeof
+from ._base import Sequence
 
 
 # --- Bitfield Concept ---
@@ -133,14 +152,14 @@ from ._struct import Struct, sizeof
 #       - Note: Option order affects behavior and must be considered carefully.
 
 #: The default alignment (in bits) used for bitfield group boundaries
-DEFAULT_ALIGNMENT = 8
+DEFAULT_ALIGNMENT: int = 8
 
 #: Alias for the `B_GROUP_NEW` flag, used to indicate that a new bitfield group should be started.
-NewGroup = B_GROUP_NEW
+NewGroup: Final[Flag[None]] = B_GROUP_NEW
 
 #: Alias for the `B_GROUP_END` flag, used to indicate that the current bitfield group
 #: should be finalized.
-EndGroup = B_GROUP_END
+EndGroup: Final[Flag[None]] = B_GROUP_END
 
 
 class SetAlignment:
@@ -157,10 +176,10 @@ class SetAlignment:
     """
 
     def __init__(self, new_alignment: int) -> None:
-        self.alignment = new_alignment
+        self.alignment: int = new_alignment
 
     @staticmethod
-    def flag(new_alignment: int):
+    def flag(new_alignment: int) -> Flag[int]:
         """Create a :class:`Flag` instance representing a request to set a new alignment.
 
         This method is intended for use where a generic :class:`Flag` is expected rather than a full
@@ -175,11 +194,12 @@ class SetAlignment:
         """
         return Flag("bitfield.new_alignment", new_alignment)
 
+    @override
     def __hash__(self) -> int:
         return hash("SetAlignment")
 
 
-def getbits(obj) -> int:
+def getbits(obj: object) -> int:
     """Retrieve the bit-width of a given object.
 
     This function checks for a :py:func:`__bits__` attribute on the object. The object must either implement
@@ -198,11 +218,12 @@ def getbits(obj) -> int:
     :rtype: int
     :raises AttributeError: If the object does not have an attribute defined by :attr:`ATTR_BITS`.
     """
-    __bits__ = getattr(obj, ATTR_BITS)
+    # fmt: off
+    __bits__: Callable[[], int] | int = getattr(obj, ATTR_BITS)  # pyright: ignore[reportAny]
     return __bits__() if callable(__bits__) else __bits__
 
 
-def issigned(obj) -> bool:
+def issigned(obj: object) -> bool:
     """Determine whether a given object represents a signed field.
 
     :param obj: The object for which signedness should be determined.
@@ -213,7 +234,10 @@ def issigned(obj) -> bool:
     return bool(getattr(obj, ATTR_SIGNED, None))
 
 
-class BitfieldValueFactory:
+_VT = TypeVar("_VT", default=int)
+
+
+class BitfieldValueFactory(Generic[_VT]):
     """
     A generic factory class responsible for converting values between Python objects and integers
     for use in bitfield entries.
@@ -225,12 +249,12 @@ class BitfieldValueFactory:
     :type target: type, optional
     """
 
-    __slots__ = ("target",)
+    __slots__: tuple[str, ...] = ("target",)
 
-    def __init__(self, target=None) -> None:
-        self.target = target or int
+    def __init__(self, target: Callable[[int], _VT] | None = None) -> None:
+        self.target: Callable[[int], _VT] | type[int] = target or int
 
-    def to_int(self, obj) -> int:
+    def to_int(self, obj: _VT) -> int:
         """Convert a Python object to an integer.
 
         :param obj: The object to convert.
@@ -238,7 +262,7 @@ class BitfieldValueFactory:
         :return: The integer representation of the object.
         :rtype: int
         """
-        return int(obj)
+        return int(obj)  # pyright: ignore[reportArgumentType]
 
     def from_int(self, value: int):
         """Convert an integer to the target object type.
@@ -251,7 +275,10 @@ class BitfieldValueFactory:
         return self.target(value)
 
 
-class EnumFactory(BitfieldValueFactory):
+_EnumT = TypeVar("_EnumT", bound=enum.Enum)
+
+
+class EnumFactory(Generic[_EnumT], BitfieldValueFactory[_EnumT | int]):
     """A value factory for enum-like types used in bitfields.
 
     This factory attempts to convert between integers and enumeration instances,
@@ -278,11 +305,12 @@ class EnumFactory(BitfieldValueFactory):
         factory.from_int(2)  # -> ValueError (strict mode)
     """
 
-    def __init__(self, model, strict=False) -> None:
+    def __init__(self, model: type[_EnumT], strict: bool = False) -> None:
         super().__init__(model)
-        self.strict = strict
+        self.strict: bool = strict
 
-    def from_int(self, value: int):
+    @override
+    def from_int(self, value: int) -> int | _EnumT:
         """
         Convert an integer into an enum instance or raw int.
 
@@ -300,7 +328,7 @@ class EnumFactory(BitfieldValueFactory):
             return value
 
 
-class CharFactory(BitfieldValueFactory):
+class CharFactory(BitfieldValueFactory[str]):
     """
     A value factory for handling single ASCII/Unicode characters as integers.
 
@@ -311,7 +339,8 @@ class CharFactory(BitfieldValueFactory):
     def __init__(self) -> None:
         super().__init__(str)
 
-    def from_int(self, value: int):
+    @override
+    def from_int(self, value: int) -> str:
         """
         Convert an integer to its character representation.
 
@@ -322,7 +351,8 @@ class CharFactory(BitfieldValueFactory):
         """
         return chr(value)
 
-    def to_int(self, obj) -> int:
+    @override
+    def to_int(self, obj: str) -> int:
         """
         Convert a character to its integer (ordinal) representation.
 
@@ -353,22 +383,37 @@ class BitfieldEntry:
     :type action: Any
     """
 
-    __slots__ = ("bit", "width", "name", "factory", "action", "low_mask")
+    __slots__: tuple[str, ...] = (
+        "bit",
+        "width",
+        "name",
+        "factory",
+        "action",
+        "low_mask",
+    )
 
     def __init__(
-        self, bit: int, width: int, name: str, factory=None, action=None
+        self,
+        bit: int,
+        width: int,
+        name: str,
+        factory: BitfieldValueFactory | type[BitfieldValueFactory] | None = None,
+        action: _ActionLike | None = None,
     ) -> None:
-        self.bit = bit
-        self.width = width
-        self.name = name
-        self.factory = factory or BitfieldValueFactory()
-        if isinstance(self.factory, type):
-            self.factory = self.factory()
-        self.action = action
-        self.low_mask = (1 << self.width) - 1
+        # fmt: off
+        self.bit: int = bit
+        self.width: int = width
+        self.name: str = name
+        factory = factory or BitfieldValueFactory()
+        if isinstance(factory, type):
+            self.factory: BitfieldValueFactory = self.factory()  # pyright: ignore[reportCallIssue]
+        else:
+            self.factory = factory
+        self.action: _ActionLike | None = action
+        self.low_mask: int = (1 << self.width) - 1
 
     @staticmethod
-    def new_action(action):
+    def new_action(action: _ActionLike) -> "BitfieldEntry":
         """
         Create a new action-type entry (e.g., padding, control directive).
 
@@ -400,6 +445,7 @@ class BitfieldEntry:
         """
         return self.action is not None
 
+    @override
     def __repr__(self) -> str:
         """
         Return a human-readable string representation of the bitfield entry.
@@ -429,11 +475,11 @@ class BitfieldGroup:
     :type bit_count: int
     """
 
-    __slots__ = ("entries", "bit_count")
+    __slots__: tuple[str, ...] = ("entries", "bit_count")
 
     def __init__(self, bit_count: int) -> None:
-        self.bit_count = bit_count
-        self.entries = []
+        self.bit_count: int = bit_count
+        self.entries: list[BitfieldEntry] = []
 
     def is_field(self) -> bool:
         """
@@ -444,23 +490,23 @@ class BitfieldGroup:
         """
         return self.bit_count == -1
 
-    def get_field(self):
+    def get_field(self) -> Field:
         """
         Get the single field from this group.
 
         :return: The field object.
         :rtype: BitfieldEntry
         """
-        return self.entries[0]
+        return self.entries[0]  # pyright: ignore[reportReturnType]
 
-    def set_field(self, field):
+    def set_field(self, field: BitfieldEntry | Field):
         """
         Set the group to hold only the given field and mark it as a standalone field group.
 
         :param field: The field to store in this group.
         :type field: BitfieldEntry
         """
-        self.entries = [field]
+        self.entries = [field]  # pyright: ignore[reportAttributeAccessIssue]
         self.bit_count = -1
 
     def align_to(self, alignment: int):
@@ -484,7 +530,7 @@ class BitfieldGroup:
         """
         return len(self.entries) == 0
 
-    def get_size(self, context=None):
+    def get_size(self, context: _ContextLike | None = None) -> int:
         """
         Get the size of this group in bytes.
 
@@ -499,7 +545,7 @@ class BitfieldGroup:
 
         return self.bit_count // 8
 
-    def get_bits(self, context=None):
+    def get_bits(self, context: _ContextLike | None = None):
         """
         Get the total number of bits in this group.
 
@@ -510,6 +556,7 @@ class BitfieldGroup:
         """
         return self.get_size(context) * 8
 
+    @override
     def __repr__(self) -> str:
         if self.is_field():
             return repr(self.get_field())
@@ -517,7 +564,7 @@ class BitfieldGroup:
         return f"<BitfieldGroup ({self.bit_count}) {self.entries!r}>"
 
 
-class Bitfield(Struct):
+class Bitfield(Struct[_VT]):
     """
     A Bitfield represents a packed structure composed of bit-level fields. This
     class allows for the declarative definition of compact memory representations
@@ -548,26 +595,26 @@ class Bitfield(Struct):
     :type alignment: Optional[int]
     """
 
-    __slots__ = (
+    __slots__: tuple[str, ...] = (
         "groups",
         "alignment",
     )
 
     def __init__(
         self,
-        model,
-        order=None,
-        arch=None,
-        options=None,
-        field_options=None,
-        alignment=None,
+        model: type[_VT],
+        order: _EndianLike | None = None,
+        arch: _ArchLike | None = None,
+        options: Iterable[_OptionLike] | None = None,
+        field_options: Iterable[_OptionLike] | None = None,
+        alignment: int | None = None,
     ) -> None:
-        self.alignment = alignment or DEFAULT_ALIGNMENT
+        self.alignment: int = alignment or DEFAULT_ALIGNMENT
         # These fields remain private and will be deleted after processing
-        self._current_alignment = self.alignment
-        self._current_group = BitfieldGroup(self._current_alignment)
-        self._bit_pos = 0
-        self.groups = [self._current_group]
+        self._current_alignment: int = self.alignment
+        self._current_group: BitfieldGroup = BitfieldGroup(self._current_alignment)
+        self._bit_pos: int = 0
+        self.groups: list[BitfieldGroup] = [self._current_group]
         super().__init__(
             model=model,
             order=order,
@@ -586,7 +633,8 @@ class Bitfield(Struct):
         del self._current_alignment
         del self._current_group
 
-    def __add__(self, sequence):
+    @override
+    def __add__(self, sequence: Sequence[Any, Any, Any]) -> Self:
         """
         Append another Bitfield instance to this one.
 
@@ -605,7 +653,7 @@ class Bitfield(Struct):
         self.groups.extend(sequence.groups)
         return super(Struct, self).__add__(sequence)
 
-    def _process_align(self, options) -> Field:
+    def _process_align(self, options: list[_OptionLike] | None) -> Field:
         """
         Process an alignment directive.
 
@@ -638,7 +686,15 @@ class Bitfield(Struct):
 
         return Field(Pass)
 
-    def _process_bits(self, name: str, bits: int, factory=None, options=None) -> Field:
+    def _process_bits(
+        self,
+        name: str,
+        bits: int,
+        factory: (
+            BitfieldValueFactory[Any] | type[BitfieldValueFactory[Any]] | None
+        ) = None,
+        options: list[_OptionLike] | None = None,
+    ) -> Field:
         """
         Process a bitfield entry with a given width.
 
@@ -670,7 +726,13 @@ class Bitfield(Struct):
         return Field(Int(bits))
 
     def _process_bits_field(
-        self, name: str, field, options=None, factory=None
+        self,
+        name: str,
+        field: Field,
+        options: list[_OptionLike] | None = None,
+        factory: (
+            BitfieldValueFactory[Any] | type[BitfieldValueFactory[Any]] | None
+        ) = None,
     ) -> Field:
         """
         Process a bitfield that wraps another field instance.
@@ -727,7 +789,12 @@ class Bitfield(Struct):
 
         return field
 
-    def _process_options(self, options, entry=None) -> bool:
+    def _process_options(
+        self,
+        options: list[_OptionLike | SetAlignment],
+        entry: BitfieldEntry | None = None,
+    ) -> bool:
+        # fmt: off
         consumed = False
         for option in options or []:
             if self._process_alignment_option(option):
@@ -735,7 +802,7 @@ class Bitfield(Struct):
 
             group = self._current_group
             alignment = self._current_alignment
-            if option.name == EndGroup.name:
+            if option.name == EndGroup.name:  # pyright: ignore[reportAttributeAccessIssue]
                 if entry:
                     group.entries.append(entry)
                     self._bit_pos += entry.width
@@ -744,7 +811,7 @@ class Bitfield(Struct):
 
                 group.align_to(alignment)
                 self._current_group = self._new_group(alignment)
-            elif option.name == NewGroup.name:
+            elif option.name == NewGroup.name:  # pyright: ignore[reportAttributeAccessIssue]
                 # finalize current group, create a new one and add the entry to the newly
                 # created group
                 group.align_to(alignment)
@@ -758,13 +825,19 @@ class Bitfield(Struct):
                     consumed = True
         return consumed
 
-    def _new_group(self, alignment):
+    def _new_group(self, alignment: int) -> BitfieldGroup:
         new_group = BitfieldGroup(alignment)
         self.groups.append(new_group)
         self._bit_pos = 0
         return new_group
 
-    def _process_alignment_option(self, option):
+    @overload
+    def _process_alignment_option(self, option: SetAlignment) -> Literal[True]: ...
+    @overload
+    def _process_alignment_option(self, option: _OptionLike[Any]) -> Literal[False]: ...
+    def _process_alignment_option(
+        self, option: SetAlignment | _OptionLike[Any]
+    ) -> bool:
         if isinstance(option, SetAlignment):
             # update current working alignment
             self._current_alignment = option.alignment or DEFAULT_ALIGNMENT
@@ -778,7 +851,8 @@ class Bitfield(Struct):
 
         return False
 
-    def _process_field(self, name: str, annotation, default):
+    @override
+    def _process_field(self, name: str, annotation: Any, default: Any) -> Field:
         arch = self.arch or system_arch
         order = getattr(annotation, ATTR_BYTEORDER, self.order or SysNative)
         match annotation:
@@ -845,7 +919,8 @@ class Bitfield(Struct):
                     field = Field(field, order=order, arch=arch, default=default)
                 return self._process_bits_field(name, field)
 
-    def _included(self, name: str, default, annotation) -> bool:
+    @override
+    def _included(self, name: str, default: Any, annotation: Any) -> bool:
         if not super()._included(name, default, annotation):
             return False
 
@@ -860,12 +935,14 @@ class Bitfield(Struct):
             return width.bits != 0
         return True
 
+    @override
     def _replace_type(self, name: str, type_: type) -> None:
         entry = self.get_entry(name)
         if entry is not None:
             if not entry.factory:
                 type_ = int
             elif isinstance(entry.factory, BitfieldValueFactory):
+                # REVISIT: what if .target is a function?
                 type_ = entry.factory.target or object
             else:
                 type_ = object
@@ -873,7 +950,8 @@ class Bitfield(Struct):
         # else: must be a field with a known type
         return super()._replace_type(name, type_)
 
-    def __size__(self, context) -> int:
+    @override
+    def __size__(self, context: _ContextLike) -> int:
         """
         Calculate the total size of the bitfield structure.
 
@@ -894,10 +972,11 @@ class Bitfield(Struct):
         """
         return sum(map(lambda g: g.get_bits(), self.groups))
 
-    def unpack_one(self, context):
-        init_data = O_CONTEXT_FACTORY.value()
-        context[CTX_OBJECT] = O_CONTEXT_FACTORY.value(_parent=context)
-        base_path = context[CTX_PATH]
+    @override
+    def unpack_one(self, context: _ContextLike) -> _VT:
+        init_data = (O_CONTEXT_FACTORY.value or Context)()
+        context[CTX_OBJECT] = (O_CONTEXT_FACTORY.value or Context)(_parent=context)
+        base_path: str = context[CTX_PATH]
         # REVISIT
         endian = "little" if self.order.ch == LITTLE_ENDIAN_FMT else "big"
         for group in self.groups:
@@ -939,9 +1018,10 @@ class Bitfield(Struct):
 
                     init_data[entry.name] = value
 
-        return self.model(**init_data)
+        return self.model(**init_data)  # pyright: ignore[reportCallIssue]
 
-    def pack_one(self, obj, context) -> None:
+    @override
+    def pack_one(self, obj: _VT, context: _ContextLike) -> None:
         base_path = context[CTX_PATH]
         # REVISIT
         endian = "little" if self.order.ch == LITTLE_ENDIAN_FMT else "big"
@@ -979,31 +1059,34 @@ class Bitfield(Struct):
                     )
                 context[CTX_STREAM].write(value.to_bytes(group.bit_count // 8, endian))
 
-    def add_action(self, action) -> None:
+    @override
+    def add_action(self, action: _ActionLike) -> None:
         self._current_group.entries.append(
             BitfieldEntry(0, 0, "<action>", action=action)
         )
         return super().add_action(action)
 
-    def get_entry(self, name: str):
+    def get_entry(self, name: str) -> BitfieldEntry | None:
+        # fmt: off
         for group in self.groups:
             if group.is_field():
                 continue
 
             for entry in group.entries:
-                if entry.name == name:
-                    return entry
+                if entry.name == name:  # pyright: ignore[reportAttributeAccessIssue]
+                    return entry  # pyright: ignore[reportReturnType]
 
 
+@dataclass_transform()
 def _make_bitfield(
-    cls: type,
+    cls: type[_VT],
     /,
     *,
-    options,
-    order=None,
-    arch=None,
-    field_options=None,
-    alignment=None,
+    order: _EndianLike | None = None,
+    arch: _ArchLike | None = None,
+    options: Iterable[_OptionLike] | None = None,
+    field_options: Iterable[_OptionLike] | None = None,
+    alignment: int | None = None,
 ) -> type:
     _ = Bitfield(
         cls,
@@ -1013,19 +1096,44 @@ def _make_bitfield(
         field_options=field_options,
         alignment=alignment,
     )
-    return cls
+    return _.model
 
 
+@overload
+@dataclass_transform()
 def bitfield(
-    cls=None,
+    cls: type[_VT],
     /,
     *,
-    options=None,
-    order=None,
-    arch=None,
-    field_options=None,
-    alignment=None,
-):
+    order: _EndianLike | None = None,
+    arch: _ArchLike | None = None,
+    options: Iterable[_OptionLike] | None = None,
+    field_options: Iterable[_OptionLike] | None = None,
+    alignment: int | None = None,
+) -> type[_VT]: ...
+@overload
+@dataclass_transform()
+def bitfield(
+    cls: None = None,
+    /,
+    *,
+    order: _EndianLike | None = None,
+    arch: _ArchLike | None = None,
+    options: Iterable[_OptionLike] | None = None,
+    field_options: Iterable[_OptionLike] | None = None,
+    alignment: int | None = None,
+) -> Callable[[type[_VT]], type[_VT]]: ...
+@dataclass_transform()
+def bitfield(
+    cls: type[_VT] | None = None,
+    /,
+    *,
+    order: _EndianLike | None = None,
+    arch: _ArchLike | None = None,
+    options: Iterable[_OptionLike] | None = None,
+    field_options: Iterable[_OptionLike] | None = None,
+    alignment: int | None = None,
+) -> type[_VT] | Callable[[type[_VT]], type[_VT]]:
     """
     Decorator that transforms a class definition into a :class:`Bitfield` structure.
 
@@ -1065,7 +1173,7 @@ def bitfield(
         unpacked = unpack(Packet, packed)
     """
 
-    def wrap(cls):
+    def wrap(cls: type[_VT]) -> type[_VT]:
         return _make_bitfield(
             cls,
             options=options,
