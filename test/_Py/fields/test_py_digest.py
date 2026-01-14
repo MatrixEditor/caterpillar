@@ -1,9 +1,9 @@
-# pyright: reportInvalidTypeForm=false
+import typing
 import pytest
 import sys
 
 from caterpillar.exception import ValidationError
-from caterpillar.py import Bytes, unpack, pack, struct
+from caterpillar.py import Bytes, Struct, unpack, pack, struct
 from caterpillar.fields.digest import (
     DigestField,
     Md5,
@@ -13,41 +13,49 @@ from caterpillar.fields.digest import (
     Sha2_256_Algo,
     Sha2_256_Field,
 )
-from caterpillar.shared import ATTR_ACTION_PACK
+from caterpillar.shared import ATTR_ACTION_PACK, getstruct
+from caterpillar.shortcuts import f
 
+UserDataT = f[bytes, Bytes(10)]
 
 if (sys.version_info.major, sys.version_info.minor) < (3, 14):
 
     @struct
     class FormatMd5:
         with Md5("hash", verify=False):
-            user_data: Bytes(10)
+            user_data: UserDataT
 
     @struct
     class FormatSha2_256:
         with Sha2_256("hash", verify=True):
-            user_data: Bytes(10)
-
+            user_data: UserDataT
 
 else:
 
     @struct
     class FormatMd5:
-        _hash_begin: DigestField.begin("hash", Md5_Algo)
-        user_data: Bytes(10)
-        hash: Md5_Field("hash", verify=False) = None
+        # actions won't be visible afterwards
+        if not typing.TYPE_CHECKING:
+            _hash_begin: DigestField.begin("hash", Md5_Algo)
+
+        user_data: UserDataT
+        hash: f[bytes, Md5_Field("hash", verify=False)] = b""
 
     @struct
     class FormatSha2_256:
-        _hash_begin: DigestField.begin("hash", Sha2_256_Algo)
-        user_data: Bytes(10)
-        hash: Sha2_256_Field("hash", verify=True) = None
+        if not typing.TYPE_CHECKING:
+            _hash_begin: DigestField.begin("hash", Sha2_256_Algo)
+
+        user_data: UserDataT
+        hash: f[bytes, Sha2_256_Field("hash", verify=True)] = b""
 
 
 def test_digest_init():
     # must be an action
     # actions are stored in tuples
-    assert hasattr(FormatMd5.__struct__.fields[0].field, ATTR_ACTION_PACK)
+    s = getstruct(FormatMd5)
+    assert isinstance(s, Struct)
+    assert hasattr(s.fields[0].field, ATTR_ACTION_PACK)
 
     _ = FormatMd5(user_data=b"1234567890")
     # assert obj.hash.__class__ is _DigestValue
@@ -65,4 +73,4 @@ def test_digest_md5():
 def test_digest_verify():
     invalid = b"1234567890" + b"\x00" * 32
     with pytest.raises(ValidationError):
-        unpack(FormatSha2_256, invalid)
+        _ = unpack(FormatSha2_256, invalid)

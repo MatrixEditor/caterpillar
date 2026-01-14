@@ -1,9 +1,8 @@
-# pyright: reportInvalidTypeForm=false, reportUninitializedInstanceVariable=false
 import pytest
 
 from caterpillar.byteorder import BigEndian
 from caterpillar.fields.common import Bytes, AsLengthRef, uint8, uint16
-from caterpillar.shortcuts import this, struct, pack, unpack
+from caterpillar.shortcuts import f, this, struct, pack, unpack
 
 
 @struct(order=BigEndian)
@@ -13,9 +12,9 @@ class Format:
     # with this length reference:
     # length : uint16 % AsLengthRef("length", "payload") = 0
     # or
-    length: AsLengthRef("length", "payload", uint16) = 0
-    value: uint8
-    payload: Bytes(this.length)
+    length: f[int, AsLengthRef("length", "payload", uint16)] = 0
+    value: f[int, uint8]
+    payload: f[bytes, Bytes(this.length)]
 
 
 def test_lengthref():

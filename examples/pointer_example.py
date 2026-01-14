@@ -1,4 +1,5 @@
 # type: ignore
+from caterpillar.fields import pointer
 from caterpillar.py import (
     set_struct_flags,
     uintptr,
@@ -9,8 +10,9 @@ from caterpillar.py import (
     struct,
     x86
 )
+from caterpillar.shortcuts import f
 from caterpillar.fields.pointer import uintptr_fn
-
+from caterpillar.abc import _StructLike
 try:
     from rich import print
 except ImportError:
@@ -18,10 +20,9 @@ except ImportError:
 
 set_struct_flags(S_REPLACE_TYPES)
 
-
 @struct(kw_only=False, order=BigEndian)
 class Format:
-    address: uintptr * CString(...)
+    address: f[pointer[str], uintptr * CString(...)]
 
 
 data = b"\x00\x00\x00\x04Hello, World!\x00"

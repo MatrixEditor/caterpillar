@@ -20,4 +20,4 @@ def test_const_unpack_error():
     field = Const(42, uint8)
     with pytest.raises(ValidationError):
         # must raise an exception
-        unpack(field, b"\x24", as_field=True)
+        _ = unpack(field, b"\x24", as_field=True)

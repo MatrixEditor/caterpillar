@@ -1,26 +1,27 @@
 # type: ignore
+from caterpillar.shortcuts import f
 from caterpillar.py import struct, BigEndian, this, unpack, uint8
 
-try:
-    from rich import print
-except ImportError:
-    pass
+# try:
+#     from rich import print
+# except ImportError:
+#     pass
 
 
 @struct(order=BigEndian)
 class Format:
-    magic: b"BMP"
-    width: uint8
-    height: uint8
-    pixels: uint8[this.width * this.height]
+    magic: f[bytes, b"BMP"]
+    width: f[int, uint8]
+    height: f[int, uint8]
+    pixels: f[list[int], uint8[this.width * this.height]]
 
 
 @struct(order=BigEndian)
 class Format2:
-    magic: b"BMP"
-    width: uint8
-    height: uint8
-    pixels: uint8[...]
+    magic: f[bytes, b"BMP"]
+    width: f[int, uint8]
+    height: f[int, uint8]
+    pixels: f[list[int], uint8[...]]
 
 
 print(unpack(Format[...], b"BMP\x02\x02\x00\x01\x02\x03BMP\x00\x00"))
