@@ -13,10 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # pyright: reportPrivateUsage=false, reportAny=false
-
-from typing import Any, Generic, TypeVar
 from io import BytesIO
-from typing_extensions import Self, override
+from collections.abc import Collection
+from typing import Any, Generic
+from typing_extensions import Self, override, TypeVar
 
 from caterpillar.abc import (
     _StructLike,
@@ -29,7 +29,8 @@ from caterpillar.abc import (
     _ContextLike,
     _ContextLambda,
     _OptionLike,
-    _SwitchLambda,
+    _ContainsStruct,
+    _SwitchOptionsT,
     _LengthT,
     _StreamType,
 )
@@ -80,12 +81,12 @@ class Field(Generic[_IT, _OT]):
 
     def __init__(
         self,
-        struct: _StructLike[_IT, _OT] | _ContextLambda[_OT],
+        struct: _StructLike[_IT, _OT] | _ContextLambda[_OT] | _ContainsStruct[_IT, _OT],
         order: _EndianLike | None = None,
         offset: _ContextLambda[int] | int = -1,
         flags: set[_OptionLike] | None = None,
         amount: _LengthT = 0,
-        options: _SwitchLambda | dict[str, Any] | None = None,
+        options: _SwitchOptionsT | None = None,
         condition: _ContextLambda[bool] | bool = True,
         arch: _ArchLike | None = None,
         default: object = INVALID_DEFAULT,
@@ -136,7 +137,10 @@ class Field(Generic[_IT, _OT]):
         return self.__struct  # pyright: ignore[reportReturnType]
 
     @struct.setter
-    def struct(self, value: _StructLike[_IT, _OT] | _ContextLambda[_OT]) -> None:
+    def struct(
+        self,
+        value: _StructLike[_IT, _OT] | _ContextLambda[_OT] | _ContainsStruct[_IT, _OT],
+    ) -> None:
         self.__struct = getstruct(value) or value
         # pre-computed state of this field
         self._is_lambda = callable(self.__struct)
@@ -217,12 +221,12 @@ class Field(Generic[_IT, _OT]):
         self._is_seq = (value not in (0, None)) or self._amount_is_lambda
 
     @property
-    def options(self) -> _SwitchLambda | dict[str, Any] | None:
+    def options(self) -> _SwitchOptionsT | None:
         """The switch-case options dictionary."""
         return self.__options
 
     @options.setter
-    def options(self, value: _SwitchLambda | dict[str, Any] | None):
+    def options(self, value: _SwitchOptionsT | None):
         self.__options = value
         self._switch_is_lambda = callable(value)
         self._switch_has_default = (
@@ -282,7 +286,7 @@ class Field(Generic[_IT, _OT]):
         self.offset = offset
         return self
 
-    def __getitem__(self, dim: _LengthT) -> Self:
+    def __getitem__(self, dim: _LengthT) -> "Field[Collection[_IT], Collection[_OT]]":
         """
         Sets the number of elements using the indexing operator (e.g.,
         field[3]).
@@ -294,9 +298,9 @@ class Field(Generic[_IT, _OT]):
             dim, (_GreedyType, int, _PrefixedType, _ContextLambda)
         )
         self.amount = dim
-        return self
+        return self  # pyright: ignore[reportReturnType]
 
-    def __rshift__(self, switch: _SwitchLambda | dict[str, Any]) -> Self:
+    def __rshift__(self, switch: _SwitchOptionsT) -> Self:
         """
         Defines switch-case mappings using the '>>' operator.
 
@@ -445,8 +449,8 @@ class Field(Generic[_IT, _OT]):
 
         return return_type  # pyright: ignore[reportReturnType]
 
-    def get_name(self):
-        return getattr(self, "__name__", None)
+    def get_name(self) -> str:
+        return getattr(self, "__name__", "_")
 
     # IO related stuff
     def __unpack__(self, context: _ContextLike) -> _OT:

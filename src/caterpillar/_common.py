@@ -51,7 +51,7 @@ class WithoutContextVar:
         self.old_value: Any = context[name]
         self.value: Any = value
         self.name: str = name
-        self.field: "Field" = context[CTX_FIELD]
+        self.field: "Field[Any, Any]" = context[CTX_FIELD]
 
     def __enter__(self) -> None:
         self.context[self.name] = self.value
@@ -78,7 +78,7 @@ def unpack_seq(
     :rtype: List[Any]
     """
     stream: _StreamType = context[CTX_STREAM]  # pyright: ignore[reportAny]
-    field: "Field" = context[CTX_FIELD]  # pyright: ignore[reportAny]
+    field: "Field[Any, Any]" = context[CTX_FIELD]  # pyright: ignore[reportAny]
     # TODO: add an exception here
     assert field and context[CTX_SEQ]
 
@@ -150,11 +150,11 @@ def pack_seq(
     :raises InvalidValueError: if the input object is not iterable
     """
     stream: _StreamType = context[CTX_STREAM]  # pyright: ignore[reportAny]
-    field: "Field" = context[CTX_FIELD]  # pyright: ignore[reportAny]
+    field: "Field[Any, Any]" = context[CTX_FIELD]  # pyright: ignore[reportAny]
     base_path: str = context[CTX_PATH]  # pyright: ignore[reportAny]
     # REVISIT: when to use field.length(context)
     count: int = len(seq)
-    length: _LengthT = field.amount
+    length: _LengthT | None = field.amount
     # pylint: disable-next=unidiomatic-typecheck
     if type(length) is _PrefixedType:
         struct: _SupportsPack[int] = length.start  # pyright: ignore[reportAny]
