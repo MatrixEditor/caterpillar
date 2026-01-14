@@ -12,9 +12,19 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# pyright: reportPrivateUsage=false
 from io import RawIOBase
+from typing import Callable
+from typing_extensions import override, Buffer
 
 from caterpillar.context import CTX_STREAM
+from caterpillar.abc import _ContextLike, _ContextLambda
+
+HookInit = _ContextLambda[None]
+HookUpdate = Callable[[bytes, _ContextLike], bytes | None]
+HookRead = Callable[[bytes, _ContextLike], bytes | None]
+HookWrite = Callable[[bytes, _ContextLike], bytes | None]
+HookFinish = _ContextLambda[None]
 
 
 class IOHook(RawIOBase):
@@ -41,17 +51,23 @@ class IOHook(RawIOBase):
     """
 
     def __init__(
-        self, io, init=None, update=None, read=None, write=None, finish=None
+        self,
+        io: RawIOBase | None,
+        init: HookInit | None = None,
+        update: HookUpdate | None = None,
+        read: HookRead | None = None,
+        write: HookWrite | None = None,
+        finish: HookFinish | None = None,
     ) -> None:
         # NOTE: no validation here if _io is valid, because
         # self.init will set it
-        self._io = io
-        self._init = init
-        self._update = update
-        self._read = read
-        self._write = write
-        self._finish = finish
-        self._context = None
+        self._io: RawIOBase | None = io
+        self._init: HookInit | None = init
+        self._update: HookUpdate | None = update
+        self._read: HookRead | None = read
+        self._write: HookWrite | None = write
+        self._finish: HookFinish | None = finish
+        self._context: _ContextLike | None = None
 
     def assert_context_set(self) -> None:
         """
@@ -62,7 +78,7 @@ class IOHook(RawIOBase):
         if self._context is None:
             raise ValueError("Context is not set")
 
-    def init(self, context) -> None:
+    def init(self, context: _ContextLike) -> None:
         """
         Initialize the I/O hook with the provided context. This triggers the
         `init` hook, if available, and sets up the context for subsequent operations.
@@ -76,7 +92,7 @@ class IOHook(RawIOBase):
         self._io = context[CTX_STREAM]
         self._context[CTX_STREAM] = self
 
-    def finish(self, context) -> None:
+    def finish(self, context: _ContextLike) -> None:
         """
         Finalize the I/O hook by calling the `finish` hook (if provided) and
         restoring the original I/O stream in the context.
@@ -90,6 +106,7 @@ class IOHook(RawIOBase):
         context[CTX_STREAM] = self._io
         self._context = None
 
+    @override
     def seekable(self) -> bool:
         """
         Checks if the underlying I/O stream is seekable.
@@ -97,8 +114,9 @@ class IOHook(RawIOBase):
         :return: True if the stream supports seeking, otherwise False.
         :rtype: bool
         """
-        return self._io.seekable()
+        return self._io.seekable()  # pyright: ignore[reportOptionalMemberAccess]
 
+    @override
     def readable(self) -> bool:
         """
         Checks if the underlying I/O stream is readable.
@@ -106,9 +124,10 @@ class IOHook(RawIOBase):
         :return: True if the stream supports reading, otherwise False.
         :rtype: bool
         """
-        return super().readable()
+        return self._io.readable()  # pyright: ignore[reportOptionalMemberAccess]
 
-    def read(self, size: int = -1):
+    @override
+    def read(self, size: int = -1) -> bytes | None:
         """
         Read data from the stream, applying the optional hooks (if any).
 
@@ -120,8 +139,9 @@ class IOHook(RawIOBase):
         :return: The read data, possibly modified by the hooks.
         :rtype: Union[bytes, None]
         """
+        # fmt: off
         self.assert_context_set()
-        data = self._io.read(size)
+        data = self._io.read(size)  # pyright: ignore[reportOptionalMemberAccess]
         if data is None:
             return
 
@@ -133,7 +153,8 @@ class IOHook(RawIOBase):
 
         return data
 
-    def write(self, b, /):
+    @override
+    def write(self, b: Buffer, /) -> int:
         """
         Write data to the stream, applying the optional hooks (if any).
 
@@ -152,8 +173,9 @@ class IOHook(RawIOBase):
         if self._write:
             b = self._write(b, self._context) or b
 
-        return self._io.write(b)
+        return self._io.write(b)  # pyright: ignore[reportOptionalMemberAccess]
 
+    @override
     def writable(self) -> bool:
         """
         Checks if the underlying I/O stream is writable.
@@ -163,6 +185,7 @@ class IOHook(RawIOBase):
         """
         return self._io.writable()
 
+    @override
     def tell(self) -> int:
         """
         Returns the current position of the underlying stream.
@@ -172,6 +195,7 @@ class IOHook(RawIOBase):
         """
         return self._io.tell()
 
+    @override
     def seek(self, offset: int, whence: int = 0) -> int:
         """
         Move the cursor to a new position in the underlying stream.

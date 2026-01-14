@@ -8,10 +8,6 @@ from caterpillar.py import (
     LittleEndian as le,
 )
 
-try:
-    from rich import print
-except ImportError:
-    pass
 
 fields = {
     "be + vint": be + vint,

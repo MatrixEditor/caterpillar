@@ -11,11 +11,7 @@ from caterpillar.py import (
     pack,
     this,
 )
-
-try:
-    from rich import print
-except ImportError:
-    pass
+from caterpillar.types import uint8_t
 
 set_struct_flags(S_REPLACE_TYPES)
 
@@ -25,7 +21,7 @@ class BaseFormat:
     """Default class documentation"""
 
     #: inline comment
-    f1: uint8
+    f1: uint8_t
 
 
 A = TemplateTypeVar("A")
@@ -50,7 +46,7 @@ Format8 = derive(FormatTemplate, uint8, partial=True)
 @struct
 class Format(derive(Format8, B=uint8)):
     #: inline comment
-    f4: uint8
+    f4: uint8_t
 
 
 #: inline data comment

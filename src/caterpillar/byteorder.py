@@ -12,14 +12,23 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# pyright: reportPrivateUsage=false
 import inspect
 
 from sys import maxsize
 from platform import machine
 from dataclasses import dataclass
 from enum import Enum
-from typing_extensions import override
+from typing import Callable
+from typing_extensions import Final, override
 
+from caterpillar.abc import (
+    _EndianLike,
+    _SupportsSetEndian,
+    _OT,
+    _ContextLambda,
+    _ContextLike,
+)
 from caterpillar.shared import ATTR_BYTEORDER
 from caterpillar.context import CTX_ORDER
 
@@ -53,7 +62,7 @@ class ByteOrder:
 
     size: Size = Size.STANDARD
 
-    def apply(self, other):
+    def apply(self, other: object) -> None:
         """
         Applies the byte order information to another object.
 
@@ -61,7 +70,7 @@ class ByteOrder:
         """
         setattr(other, ATTR_BYTEORDER, self)
 
-    def __add__(self, other):
+    def __add__(self, other: _SupportsSetEndian[_OT]) -> _OT:
         """
         Adds the byte order information to another object using the
         `__set_byteorder__` method.
@@ -71,7 +80,7 @@ class ByteOrder:
         """
         return other.__set_byteorder__(self)
 
-    def __or__(self, other):
+    def __or__(self, other: _OT) -> _OT:
         """
         Applies the byte order information to another object using the `apply` method.
 
@@ -140,23 +149,25 @@ class DynByteOrder:
 
     def __init__(
         self,
-        name=None,
-        key=None,
-        func=None,
-        init_ch=None,
+        name: str | None = None,
+        key: str | _ContextLambda[str | _EndianLike | bool] | None = None,
+        func: Callable[[], _EndianLike] | _ContextLambda[_EndianLike] | None = None,
+        init_ch: str | None = None,
     ) -> None:
-        self.name = name or "<Dynamic>"
-        self.__ch = init_ch or LITTLE_ENDIAN_FMT
-        self.func = func
-        self._ctx_func = False
+        self.name: str = name or "<Dynamic>"
+        self.__ch: str = init_ch or LITTLE_ENDIAN_FMT
+        self.func: Callable[[], _EndianLike] | _ContextLambda[_EndianLike] | None = func
+        self._ctx_func: bool = False
         if func is not None:
             spec = inspect.getfullargspec(func)
             if len(spec.args) == 1:
                 self._ctx_func = True
-        self.key = key
-        self.__key_str = isinstance(self.key, str)
+        self.key: str | _ContextLambda[str | _EndianLike | bool] | None = key
+        self.__key_str: bool = isinstance(self.key, str)
 
-    def __call__(self, key):
+    def __call__(
+        self, key: str | _ContextLambda[str | _EndianLike | bool]
+    ) -> "DynByteOrder":
         """Create a derived dynamic byte order bound to a new key.
 
         :param key: Context key or callable used for byte order lookup
@@ -166,7 +177,7 @@ class DynByteOrder:
         """
         return DynByteOrder(self.name, key, self.func, self.__ch)
 
-    def getch(self, context) -> str:
+    def getch(self, context: _ContextLike) -> str:
         """Resolve the byte order format character from a context.
 
         Resolution order:
@@ -193,7 +204,7 @@ class DynByteOrder:
             if self.__key_str:
                 byte_order = context.__context_getattr__(self.key)
             else:
-                byte_order = self.key(context)
+                byte_order: str | _EndianLike | bool = self.key(context)
         else:
             root_context = context._root
             byte_order = (root_context or {}).get(CTX_ORDER, SysNative)
@@ -217,7 +228,7 @@ class DynByteOrder:
         frame = inspect.currentframe()
         if frame is not None and frame.f_back is not None:
             ctx_frame = frame.f_back
-            context = ctx_frame.f_locals.get("context")
+            context: _ContextLike | None = ctx_frame.f_locals.get("context")
             if context is not None:
                 self.__ch = self.getch(context)
         return self.__ch
@@ -233,7 +244,7 @@ class DynByteOrder:
         """
         self.__ch = value
 
-    def __add__(self, other):
+    def __add__(self, other: _SupportsSetEndian[_OT]) -> _OT:
         """Apply this byte order to another object.
 
         Delegates to the other object's byte order assignment method.
@@ -250,20 +261,23 @@ class DynByteOrder:
         return f"<DynByteOrder little={self.ch == LITTLE_ENDIAN_FMT}>"
 
 
-LITTLE_ENDIAN_FMT = "<"
+LITTLE_ENDIAN_FMT: Final[str] = "<"
 
 # Instances representing commonly used byte orders
-Native = ByteOrder("Native", "=")
-BigEndian = ByteOrder("Big Endian", ">")
-LittleEndian = ByteOrder("Little Endian", LITTLE_ENDIAN_FMT)
-NetEndian = ByteOrder("Network", "!")
-SysNative = ByteOrder(
-    "SysNative", "@", ByteOrder.Alignment.NATIVE, ByteOrder.Size.NATIVE
+Native: Final[ByteOrder] = ByteOrder("Native", "=")
+BigEndian: Final[ByteOrder] = ByteOrder("Big Endian", ">")
+LittleEndian: Final[ByteOrder] = ByteOrder("Little Endian", LITTLE_ENDIAN_FMT)
+NetEndian: Final[ByteOrder] = ByteOrder("Network", "!")
+SysNative: Final[ByteOrder] = ByteOrder(
+    "SysNative",
+    "@",
+    ByteOrder.Alignment.NATIVE,
+    ByteOrder.Size.NATIVE,
 )
-Dynamic = DynByteOrder()
+Dynamic: Final[DynByteOrder] = DynByteOrder()
 
 
-def byteorder(obj, default=None):
+def byteorder(obj: object, default: _EndianLike | None = None) -> _EndianLike:
     """
     Get the byte order of an object, defaulting to SysNative if not explicitly set.
 
@@ -273,7 +287,7 @@ def byteorder(obj, default=None):
     return getattr(obj, ATTR_BYTEORDER, default or SysNative)
 
 
-def byteorder_is_little(obj) -> bool:
+def byteorder_is_little(obj: object) -> bool:
     """
     Check if the byte order of an object is little-endian.
     """
@@ -293,21 +307,21 @@ class Arch:
     ptr_size: int
 
 
-system_arch: Arch = Arch(machine(), 64 if maxsize > 2**32 else 32)
+system_arch: Final[Arch] = Arch(machine(), 64 if maxsize > 2**32 else 32)
 
 # common architectures
-x86 = Arch("x86", 32)
-x86_64 = Arch("x86-64", 64)
-ARM = Arch("ARM", 32)
-ARM64 = Arch("ARM64", 64)
-AARCH64 = ARM64
-PowerPC = Arch("PowerPC", 32)
-PowerPC64 = Arch("PowerPC64", 64)
-MIPS = Arch("MIPS", 32)
-MIPS64 = Arch("MIPS64", 64)
-SPARC = Arch("SPARC", 32)
-SPARC64 = Arch("SPARC64", 64)
-RISC_V64 = Arch("RISK-V64", 64)
-RISC_V = Arch("RISK-V", 32)
-AMD = Arch("AMD", 32)
-AMD64 = Arch("AMD64", 64)
+x86: Final[Arch] = Arch("x86", 32)
+x86_64: Final[Arch] = Arch("x86-64", 64)
+ARM: Final[Arch] = Arch("ARM", 32)
+ARM64: Final[Arch] = Arch("ARM64", 64)
+AARCH64: Final[Arch] = ARM64
+PowerPC: Final[Arch] = Arch("PowerPC", 32)
+PowerPC64: Final[Arch] = Arch("PowerPC64", 64)
+MIPS: Final[Arch] = Arch("MIPS", 32)
+MIPS64: Final[Arch] = Arch("MIPS64", 64)
+SPARC: Final[Arch] = Arch("SPARC", 32)
+SPARC64: Final[Arch] = Arch("SPARC64", 64)
+RISC_V64: Final[Arch] = Arch("RISK-V64", 64)
+RISC_V: Final[Arch] = Arch("RISK-V", 32)
+AMD: Final[Arch] = Arch("AMD", 32)
+AMD64: Final[Arch] = Arch("AMD64", 64)

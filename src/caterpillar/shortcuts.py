@@ -12,6 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+from typing import Annotated as f # exported as alias
 from .byteorder import (
     AARCH64,
     AMD,
@@ -86,4 +87,5 @@ __all__ = [
     "P",
     "G",
     "Dynamic",
+    "f",
 ]
