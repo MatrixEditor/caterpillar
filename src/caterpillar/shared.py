@@ -13,7 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # pyright: reportPrivateUsage=false
-from typing_extensions import Final, override
+from typing import TYPE_CHECKING, overload
+from typing_extensions import Final, override, TypeIs
 
 from caterpillar.abc import (
     _ContextLambda,
@@ -23,6 +24,9 @@ from caterpillar.abc import (
     _SupportsType,
     _ContainsStruct,
 )
+
+if TYPE_CHECKING:
+    from caterpillar.fields import FieldStruct
 
 # --- Shared Concepts ---
 # TODO: This section needs some docs
@@ -66,6 +70,10 @@ ATTR_TEMPLATE: Final[str] = "__template__"
 #   be stored in the model of the struct.
 ATTR_ACTION_PACK: Final[str] = "__action_pack__"
 ATTR_ACTION_UNPACK: Final[str] = "__action_unpack__"
+
+
+def identity(value: _OT) -> "_ContextLambda[_OT]":
+    return lambda context: value
 
 
 class Action:
@@ -164,7 +172,7 @@ class Action:
         )
 
 
-def hasstruct(obj: object) -> bool:
+def hasstruct(obj: object) -> TypeIs[_ContainsStruct]:
     """
     Check if the given object has a structure attribute.
 
@@ -174,9 +182,27 @@ def hasstruct(obj: object) -> bool:
     return hasattr(obj.__class__ if not isinstance(obj, type) else obj, ATTR_STRUCT)
 
 
+@overload
+def getstruct(
+    obj: type[_IT],
+    /,
+    __default: None = None,
+) -> "FieldStruct[_IT, _IT]": ...
+@overload
+def getstruct(
+    obj: _ContainsStruct[_IT, _OT],
+    /,
+    __default: None = None,
+) -> _StructLike[_IT, _OT]: ...
+@overload
+def getstruct(
+    obj: object,
+    /,
+    __default: _StructLike | None = None,
+) -> "_StructLike | FieldStruct | None": ...
 def getstruct(
     obj: object, /, __default: _StructLike | None = None
-) -> _StructLike[_IT, _OT] | None:
+) -> "_StructLike | FieldStruct | None":
     """
     Get the structure attribute of the given object.
 
@@ -195,4 +221,10 @@ def typeof(struct: _StructLike | _SupportsType | _ContainsStruct | object) -> ty
     if not __type__:
         return object
     # this function must return a type
-    return __type__() or object
+    rtype = object
+    try:
+        rtype = __type__()  # pyright: ignore[reportAny]
+    except NotImplementedError:
+        pass
+
+    return rtype if rtype and rtype != NotImplemented else object
