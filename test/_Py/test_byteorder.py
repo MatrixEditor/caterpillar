@@ -1,11 +1,80 @@
 import typing
 
 from caterpillar.byteorder import Dynamic, DynByteOrder, BigEndian, LittleEndian
-from caterpillar.py import struct, pack, unpack, uint16, uint32
-from caterpillar.types import uint16_t, uint32_t, uint8_t
+from caterpillar.py import struct, pack, uint64, unpack, uint16, uint32
+from caterpillar.types import uint16_t, uint32_t, uint64_t, uint8_t
 from caterpillar.context import CTX_ORDER, SetContextVar, ctx, this
 from caterpillar.shortcuts import f
 from caterpillar.abc import _ContextLike  # pyright: ignore[reportPrivateUsage]
+
+
+def test_byteorder_pack_explicit():
+    value = 0x123456789ABCDEF
+    raw_le = bytes.fromhex("efcdab8967452301")
+    raw_be = bytes.fromhex("0123456789abcdef")
+
+    # 1. explicit use of byteorder without a @struct type
+    assert pack(value, uint64, order=LittleEndian) == raw_le
+    assert pack(value, uint64, order=BigEndian) == raw_be
+    assert unpack(uint64, raw_be, order=BigEndian) == value
+    assert unpack(uint64, raw_le, order=LittleEndian) == value
+    # sanity check
+    assert unpack(uint64, raw_le, order=BigEndian) != value
+
+
+def test_byteorder_pack_struct_implicit():
+    value = 0x123456789ABCDEF
+    raw_le = bytes.fromhex("efcdab8967452301")
+
+    # 2 implicit use of byteorder in a @struct type
+    @struct(order=LittleEndian)
+    class Format:
+        value_le: uint64_t
+
+    obj = Format(value_le=value)
+    assert pack(obj) == raw_le
+    assert unpack(Format, raw_le) == obj
+
+
+def test_byteorder_struct_explicit():
+    value = 0x123456789ABCDEF
+    raw_le = bytes.fromhex("efcdab8967452301")
+    raw_be = bytes.fromhex("0123456789abcdef")
+
+    # 3. explicit use of byteorder in a @struct type
+    @struct(order=LittleEndian)
+    class Format:
+        value_le: uint64_t
+        # fields with an endian already set, won't be affected
+        # by the change in @struct(...)
+        value_be: f[int, uint64, BigEndian]
+
+    obj = Format(value, value)
+    assert pack(obj) == raw_le + raw_be
+    assert pack(obj) != raw_be + raw_le
+    assert unpack(Format, raw_le + raw_be) == obj
+    assert unpack(Format, raw_be + raw_le) != obj
+
+
+def test_byteorder_struct_inner():
+    value = 0x123456789ABCDEF
+    raw_le = bytes.fromhex("efcdab8967452301")
+
+    # 4. Inner types / referenced types
+    @struct(order=LittleEndian)
+    class Inner:
+        # endian is set to 'little'
+        value_le: uint64_t
+
+    @struct(order=BigEndian)
+    class Format:
+        # even though BigEndian is applied here,
+        # the inner struct already defines little
+        inner: Inner
+
+    obj = Format(Inner(value))
+    assert pack(obj) == raw_le
+    assert unpack(Format, raw_le) == obj
 
 
 def test_dyn_byteorder_pack():
@@ -16,15 +85,13 @@ def test_dyn_byteorder_pack():
         a: uint16_t
         b: uint32_t
 
-    config = {CTX_ORDER: BigEndian}
     obj = Format(a=0x1234, b=0x56789ABC)
 
     # 1. Pack with BigEndian
-    data_be = pack(obj, **config)
+    data_be = pack(obj, order=BigEndian)
 
     # 2. Pack with LittleEndian
-    config[CTX_ORDER] = LittleEndian
-    data_le = pack(obj, **config)
+    data_le = pack(obj, order=LittleEndian)
 
     # data must be different for each endian
     assert data_be != data_le
@@ -40,17 +107,15 @@ def test_dyn_byteorder_unpack():
 
     # Prepare data in BigEndian format
     obj_be = Format(a=0x12, b=0x3456)
-    data_be = pack(obj_be, **{CTX_ORDER: BigEndian})
+    data_be = pack(obj_be, order=BigEndian)
 
     # Unpack with BigEndian
-    config = {CTX_ORDER: BigEndian}
-    unpacked_be = unpack(Format, data_be, **config)
+    unpacked_be = unpack(Format, data_be, order=BigEndian)
     assert unpacked_be.a == 0x12
     assert unpacked_be.b == 0x3456
 
     # Unpack with LittleEndian
-    config[CTX_ORDER] = LittleEndian
-    unpacked_le = unpack(Format, data_be, **config)
+    unpacked_le = unpack(Format, data_be, order=LittleEndian)
     assert unpacked_le.a == 0x12
     assert unpacked_le.b != 0x3456  # Value should differ due to endian change
 
@@ -109,7 +174,7 @@ def test_dyn_byteorder_mixed():
 
 def test_dyn_byteorder_action():
     # byteorder based on a custom pre-computed context value
-    def byteorder_func(context: _ContextLike):
+    def byteorder_func(context: _ContextLike):  # pyright: ignore[reportUnusedParameter]
         # custom implementation...
         return LittleEndian
 

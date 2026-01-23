@@ -14,7 +14,7 @@ M = Operator(lambda a, b: a[b*2])
 class Format:
     # __annotations__ should contain typing.List[int] as we've specified the
     # documentation option.
-    f1: f[int, uint16 /M/ 3]
+    f1: f[list[int], uint16 /M/ 3]
 
 print(Format.__annotations__)
 

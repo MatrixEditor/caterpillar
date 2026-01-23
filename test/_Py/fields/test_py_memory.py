@@ -1,7 +1,6 @@
 import pytest
 
-from caterpillar.py import Memory, ctx, pack, unpack, ValidationError
-
+from caterpillar.py import Memory, pack, root, unpack, ValidationError
 
 def test_memory_unpack():
     memory = Memory(10)
@@ -18,7 +17,7 @@ def test_memory_length():
     with pytest.raises(ValidationError):
         _ = pack(b"12345678901", memory, as_field=True)
 
-    dyn_memory = Memory(lambda context: ctx._root.length(context))
+    dyn_memory = Memory(root.length)
     assert len(unpack(dyn_memory, b"123456789011", as_field=True, length=10)) == 10
 
     greedy_memory = Memory(...)

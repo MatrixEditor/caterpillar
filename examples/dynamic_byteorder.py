@@ -1,5 +1,6 @@
-from caterpillar.py import struct, uint16, uint32, uint8, pack
+from caterpillar.py import struct, uint16, pack
 from caterpillar.shortcuts import f, this, Dynamic, BigEndian
+from caterpillar.types import uint32_t, uint8_t
 
 MY_BIG_ENDIAN_ID = 0
 MY_LITTLE_ENDIAN_ID = 1
@@ -7,10 +8,12 @@ MY_LITTLE_ENDIAN_ID = 1
 
 @struct(order=BigEndian, kw_only=True)
 class Format:
-    spec: f[int, uint8] = MY_BIG_ENDIAN_ID
+    spec: uint8_t = MY_BIG_ENDIAN_ID
 
     a: f[int, Dynamic(this.spec) + uint16]
-    b: f[int, uint32]
+    # also possible
+    # a: f[int, uint16, Dynamic(this.spec)]
+    b: uint32_t
 
 
 obj_be = Format(spec=MY_BIG_ENDIAN_ID, a=0x1234, b=0x56789ABC)
