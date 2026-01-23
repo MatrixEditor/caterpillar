@@ -17,15 +17,34 @@ just like any other operator.
 
 Here's an example that demonstrates how to define and use a custom operator:
 
-.. code-block:: python
+.. tab-set::
+    :sync-group: syntax
 
-    from caterpillar.fields import Operator
+    .. tab-item:: Default Syntax
+        :sync: default
 
-    M = Operator(lambda s, count: s[count * 2])
+        .. code-block:: python
 
-    @struct
-    class Format:
-        values: uint16 /M/ 3
+            from caterpillar.fields import Operator
+
+            M = Operator(lambda s, count: s[count * 2])
+
+            @struct
+            class Format:
+                values: uint16 /M/ 3
+
+    .. tab-item:: Extended Syntax (>=2.8.0)
+        :sync: extended
+
+        .. code-block:: python
+
+            from caterpillar.fields import Operator
+
+            M = Operator(lambda s, count: s[count * 2])
+
+            @struct
+            class Format:
+                values: f[list[int], uint16 /M/ 3]
 
 - **Pre-processing Stage**:
   Custom operators are applied during the **pre-processing** phase. This means

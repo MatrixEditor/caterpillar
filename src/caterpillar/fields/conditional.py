@@ -126,7 +126,7 @@ class If(ConditionContext):
     # is using the built-in conditional execution model from the Field
     # class.
 
-
+# TODO(REVISIT): fix Annotated[...] annotation handling
 class ElseIf(ConditionContext):
     """ElseIf-statement implementation for class definitions.
 

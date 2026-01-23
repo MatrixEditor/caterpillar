@@ -13,11 +13,27 @@ To define a pointer in *Caterpillar*, you can use the :code:`*` operator in conj
 a field, which indicates that the field should behave like a pointer to another data
 type. Here's an example:
 
-.. code-block:: python
+.. tab-set::
+    :sync-group: syntax
 
-    @struct
-    class Format:
-        name: uintptr *CString(...)      # Using multiplication to model a pointer
+    .. tab-item:: Default Syntax
+        :sync: default
+
+        .. code-block:: python
+
+            @struct
+            class Format:
+                name: uintptr *CString(...)      # Using multiplication to model a pointer
+
+    .. tab-item:: Extended Syntax (>=2.8.0)
+        :sync: extended
+
+        .. code-block:: python
+
+            @struct
+            class Format:
+                # Using multiplication to model a pointer
+                name: f[pointer[str], uintptr *CString(...)]
 
 
 The behavior of a pointer depends on the architecture it is being unpacked on. For

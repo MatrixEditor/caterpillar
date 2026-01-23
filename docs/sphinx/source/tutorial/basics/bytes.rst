@@ -39,15 +39,32 @@ Let's implement a struct for the `fDAT <https://www.w3.org/TR/png/#fdAT-chunk>`_
 of the PNG format, which stores frame data. In this case, we use the :code:`Memory`
 struct to handle the frame data.
 
-.. code-block:: python
-    :caption: Implementation for the frame data chunk
+.. tab-set::
+    :sync-group: syntax
 
-    @struct(order=BigEndian)                    # <-- endianess as usual
-    class FDATChunk:
-        sequence_number: uint32
-        # We rather use a memory instance here instead of Bytes()
-        frame_data: Memory(parent.length - 4)
+    .. tab-item:: Default Syntax
+        :sync: default
 
+        .. code-block:: python
+            :caption: Implementation for the frame data chunk
+
+            @struct(order=BigEndian)                    # <-- endianess as usual
+            class FDATChunk:
+                sequence_number: uint32
+                # We rather use a memory instance here instead of Bytes()
+                frame_data: Memory(parent.length - 4)
+
+    .. tab-item:: Extended Syntax (>=2.8.0)
+        :sync: extended
+
+        .. code-block:: python
+            :caption: Implementation for the frame data chunk
+
+            @struct(order=BigEndian)                    # <-- endianess as usual
+            class FDATChunk:
+                sequence_number: uint32_t
+                # We rather use a memory instance here instead of Bytes()
+                frame_data: f[bytes, Memory(parent.length - 4)]
 
 .. admonition:: Challenge
 
@@ -56,13 +73,35 @@ struct to handle the frame data.
 
     .. dropdown:: Solution
 
-        .. code-block:: python
-            :caption: Sample implementation of the *zTXt* chunk
+        .. tab-set::
+            :sync-group: syntax
 
-            @struct                             # <-- actually, we don't need a specific byteorder
-            class ZTXTChunk:
-                keyword: CString(...)           # <-- variable length
-                compression_method: uint8
-                # Okay, we haven't introduced this struct yet, but Memory() or Bytes()
-                # would heve been okay, too.
-                text: ZLibCompressed(parent.length - lenof(this.keyword) - 1)
+            .. tab-item:: Default Syntax
+                :sync: default
+
+                .. code-block:: python
+                    :caption: Sample implementation of the *zTXt* chunk
+
+                    @struct                             # <-- actually, we don't need a specific byteorder
+                    class ZTXTChunk:
+                        keyword: CString(...)           # <-- variable length
+                        compression_method: uint8
+                        # Okay, we haven't introduced this struct yet, but Memory() or Bytes()
+                        # would heve been okay too.
+                        text: ZLibCompressed(parent.length - lenof(this.keyword) - 1)
+
+            .. tab-item:: Extended Syntax (>=2.8.0)
+                :sync: extended
+
+                .. code-block:: python
+                    :caption: Sample implementation of the *zTXt* chunk
+
+                    @struct                             # <-- actually, we don't need a specific byteorder
+                    class ZTXTChunk:
+                        keyword: cstr_t                 # <-- variable length
+                        compression_method: uint8_t
+                        # Okay, we haven't introduced this struct yet, but Memory() or Bytes()
+                        # would heve been okay too.
+                        text: f[bytes,
+                            ZLibCompressed(parent.length - lenof(this.keyword) - 1)
+                        ]

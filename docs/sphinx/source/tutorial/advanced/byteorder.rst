@@ -32,21 +32,46 @@ Example: struct-wide dynamic byte order
 Let's consider the following struct definition. The dynamic endian configuration will be applied
 to all fields that haven't got an endian already set.
 
-.. code-block:: python
-    :linenos:
+.. tab-set::
+    :sync-group: syntax
 
-    @struct(order=Dynamic)
-    class Format:
-        a: uint16           # litte endian or big endian is decided using
-        b: uint32           # a global context variable
+    .. tab-item:: Default Syntax
+        :sync: default
 
-    obj = Format(a=0x1234, b=0x56789ABC)
+        .. code-block:: python
+            :linenos:
 
-    # pack the object using BigEndian
-    pack(obj, order=BigEndian)
+            @struct(order=Dynamic)
+            class Format:
+                a: uint16           # litte endian or big endian is decided using
+                b: uint32           # a global context variable
 
-    # now pack with little endian
-    pack(obj, order=LittleEndian)
+            obj = Format(a=0x1234, b=0x56789ABC)
+
+            # pack the object using BigEndian
+            pack(obj, order=BigEndian)
+
+            # now pack with little endian
+            pack(obj, order=LittleEndian)
+
+    .. tab-item:: Extended Syntax (>=2.8.0)
+        :sync: extended
+
+        .. code-block:: python
+            :linenos:
+
+            @struct(order=Dynamic)
+            class Format:
+                a: uint16_t         # litte endian or big endian is decided using
+                b: uint32_t         # a global context variable
+
+            obj = Format(a=0x1234, b=0x56789ABC)
+
+            # pack the object using BigEndian
+            pack(obj, order=BigEndian)
+
+            # now pack with little endian
+            pack(obj, order=LittleEndian)
 
 Here we pass an additional global context variable named :attr:`~caterpillar.context.CTX_ORDER` (``"_order"``)
 to the packing and unpacking process. The dynamic endian will automatically infer the order based on this
@@ -58,16 +83,34 @@ Example: field-level dynamic byte order
 The same concept as shown above can be applied to single fields too. By default, the endian to use must be
 given as a global context variable as described before.
 
-.. code-block:: python
-    :linenos:
+.. tab-set::
+    :sync-group: syntax
 
-    @struct(order=LittleEndian)
-    class Format:
-        a: uint16
-        b: Dynamic + uint32   # only this field will be affected
+    .. tab-item:: Default Syntax
+        :sync: default
 
-    # packing and unpacking is the same as in the previous example
+        .. code-block:: python
+            :linenos:
 
+            @struct(order=LittleEndian)
+            class Format:
+                a: uint16
+                b: Dynamic + uint32   # only this field will be affected
+
+            # packing and unpacking is the same as in the previous example
+
+    .. tab-item:: Extended Syntax (>=2.8.0)
+        :sync: extended
+
+        .. code-block:: python
+            :linenos:
+
+            @struct(order=LittleEndian)
+            class Format:
+                a: uint16_t
+                b: f[int, Dynamic + uint32]   # only this field will be affected
+
+            # packing and unpacking is the same as in the previous example
 
 Example: context key reference
 ------------------------------
@@ -78,22 +121,55 @@ so called *context key* can be specified, which can take one of the following fo
 
 *   direct reference: just a string reference
 
-    .. code-block:: python
+    .. tab-set::
+        :sync-group: syntax
 
-        # ...
-        spec: uint8
-        number: Dynamic(key="spec")
-        # ...
+        .. tab-item:: Default Syntax
+            :sync: default
+
+            .. code-block:: python
+
+                # ...
+                spec: uint8
+                number: Dynamic(key="spec") + uint32
+                # ...
+
+        .. tab-item:: Extended Syntax (>=2.8.0)
+            :sync: extended
+
+            .. code-block:: python
+
+                # ...
+                spec: uint8_t
+                number: f[int, Dynamic(key="spec") + uint32]
+                # ...
 
 *   context-lambda: a function that takes the current context as its first parameter and
     returns the target endian configuration value.
 
-    .. code-block:: python
+    .. tab-set::
+        :sync-group: syntax
 
-        # ...
-        spec: uint8
-        number: Dynamic(key=this.spec)
-        # ...
+        .. tab-item:: Default Syntax
+            :sync: default
+
+            .. code-block:: python
+
+                # ...
+                spec: uint8
+                number: Dynamic(key=this.spec) + uint32
+                # ...
+
+        .. tab-item:: Extended Syntax (>=2.8.0)
+            :sync: extended
+
+            .. code-block:: python
+
+                # ...
+                spec: uint8
+                number: f[int, Dynamic(key=this.spec) + uint32]
+                # ...
+
 
 The target endianess is decided based on the context value:
 
@@ -106,23 +182,51 @@ The target endianess is decided based on the context value:
 
 As an example, consider the following definition:
 
-.. code-block:: python
-    :linenos:
+.. tab-set::
+    :sync-group: syntax
 
-    @struct(order=BigEndian)
-    class Format:
-        spec: uint8 = 0
-        a: DynByteOrder(key=this.spec) + uint16
-        # alternatively
-        # a: Dynamic(this.spec) + uint16
-        b: uint32
+    .. tab-item:: Default Syntax
+        :sync: default
 
-    # packing and unpacking does not require the extra endian value
-    obj = Format(spec=0, a=0x1234, b=0x56789ABC)
-    # 0 -> False, results in BigEndian
-    data_be = pack(obj)
+        .. code-block:: python
+            :linenos:
 
-    # 1 -> True, results in LittleEndian
-    obj.spec = 1
-    data_le = pack(obj)
+            @struct(order=BigEndian)
+            class Format:
+                spec: uint8 = 0
+                a: DynByteOrder(key=this.spec) + uint16
+                # alternatively
+                # a: Dynamic(this.spec) + uint16
+                b: uint32
 
+            # packing and unpacking does not require the extra endian value
+            obj = Format(spec=0, a=0x1234, b=0x56789ABC)
+            # 0 -> False, results in BigEndian
+            data_be = pack(obj)
+
+            # 1 -> True, results in LittleEndian
+            obj.spec = 1
+            data_le = pack(obj)
+
+    .. tab-item:: Extended Syntax (>=2.8.0)
+        :sync: extended
+
+        .. code-block:: python
+            :linenos:
+
+            @struct(order=BigEndian)
+            class Format:
+                spec: uint8_t = 0
+                a: f[int, DynByteOrder(key=this.spec) + uint16]
+                # alternatively
+                # a: f[int, uint16, Dynamic(this.spec)]
+                b: uint32_t
+
+            # packing and unpacking does not require the extra endian value
+            obj = Format(spec=0, a=0x1234, b=0x56789ABC)
+            # 0 -> False, results in BigEndian
+            data_be = pack(obj)
+
+            # 1 -> True, results in LittleEndian
+            obj.spec = 1
+            data_le = pack(obj)

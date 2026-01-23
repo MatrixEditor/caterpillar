@@ -23,41 +23,45 @@ options will be added in the future. Documentation is [here >](https://matrixedi
 * insert proper types into the class definition to support documentation and
 * it helps you to create cleaner and more compact code.
 * There is also a feature that lets you dynamically change the endian within a struct!
-* You can even extend Caterpillar and write your parsing logic in C or C++!!
-
-> [!NOTE]
-> Python 3.14 breaks `with` statements in class definitions since `__annotations__` are added at the end
-> of a class definition. Therefore, `Digest` and conditional statements **ARE NOT SUPPORTED** using the `with` syntax in Python 3.14+.
-> As of version `2.4.5` the `Digest` class has a counterpart (`DigestField`), which can be used to manually specify a digest without
-> the need of a `ẁith` statement.
-
+* You can even extend Caterpillar and write your parsing logic in C or C++
+* All struct definitions can be typing compliant!!! (tested with pyright)
 
 ## Give me some code!
 
+*The following code is typing compliant, meaning your static type checker won't*
+*scream at you when developing with this code*.
+
 ```python
 from caterpillar.py import *
+from caterpillar.types import *
 
 @bitfield(order=LittleEndian)
 class Header:
-    version : 4                # 4bit integer
-    valid   : 1                # 1bit flag (boolean)
-    ident   : (8, CharFactory) # 8bit char
+    version : int4_t                   # 4bit integer
+    valid   : int1_t                   # 1bit flag (boolean)
+    ident   : f[str, (8, CharFactory)] # 8bit char
     # automatic alignment to 16bits
 
-@struct(order=LittleEndian)
+THE_KEY = b"ITS MAGIC"
+
+@struct(order=LittleEndian, kw_only=True)
 class Format:
-    magic  : b"ITS MAGIC"        # Supports string and byte constants directly
+    magic  : f[bytes, THE_KEY] = THE_KEY  # Supports string and byte constants directly
     header : Header
-    a      : uint8               # Primitive data types
-    b      : Dynamic + int32     # dynamic endian based on global config
-    length : uint8               # String fields with computed lengths
-    name   : String(this.length) #  -> you can also use Prefixed(uint8)
+    a      : uint8_t                      # Primitive data types
+    b      : f[int, Dynamic + int32]      # dynamic endian based on global config
+    length : uint8_t                      # String fields with computed lengths
+    name   : f[str, String(this.length)]  #  -> you can also use Prefixed(uint8)
 
-    _hash_begin : DigestField.begin("hash", Md5_Algo)   # custom actions, e.g. for hashes
-    names       : CString[uint8::]                      # Sequences with prefixed, computed lengths
-    hash        : Md5_Field("hash", verify=True) = None # automatic hash creation and verification + default value
+    # custom actions, e.g. for hashes
+    _hash_begin : f[None, DigestField.begin("hash", Md5_Algo)] = None
+    # Sequences with prefixed, computed lengths    -+ part of the MD5 hash
+    names       : f[list[str], CString[uint8::]] #  |
+    #                                              -+
+    # automatic hash creation and verification + default value
+    hash        : f[bytes, Md5_Field("hash", verify=True)] = b""
 
-# Instantiation (keyword-only arguments, magic is auto-inferred):
+# Creation (keyword-only arguments, magic is auto-inferred):
 obj = Format(
     header=Header(version=2, valid=True, ident="F"),
     a=1,
@@ -66,21 +70,31 @@ obj = Format(
     name="foo",
     names=["a", "b"]
 )
-# Packing the object, reads as 'PACK obj FROM Format'
+
+# Packing the object; reads as 'PACK obj FROM Format'
 # objects of struct classes can be packed right away
-blob = pack(obj, Format)
+data_le = pack(obj, Format)
 # results in: b'ITS MAGIC0*\x01\x02\x00\x00\x00\x03foo\x02a\x00b\x00)\x9a...'
 
 # Unpacking the binary data, reads as 'UNPACK Format FROM blob'
-obj2 = unpack(Format, blob)
+obj2 = unpack(Format, data_le)
+assert obj2.names == obj.names
 
-# to pack with a different endian for field 'b', use _order
-data = pack(obj, Format, _order=BigEndian)
+# to pack with a different endian for field 'b', use 'order'
+data_be = pack(obj, Format, order=BigEndian)
+assert data_le != data_be
 ```
 
-This library offers extensive functionality beyond basic struct handling. For further details
+> [!NOTE]
+> Python 3.14 breaks `with` statements in class definitions since `__annotations__` are added at the end
+> of a class definition. Therefore, `Digest` and conditional statements **ARE NOT SUPPORTED** using the `with` syntax in Python 3.14+.
+> As of version `2.4.5` the `Digest` class has a counterpart (`DigestField`), which can be used to manually specify a digest without
+> the need of a `ẁith` statement.
+
+This library offers extensive functionality beyond basic struct definitions. For further details
 on its powerful features, explore the official [documentation](https://matrixeditor.github.io/caterpillar/),
 [examples](./examples/), and [test cases](./test/).
+
 
 ## Installation
 

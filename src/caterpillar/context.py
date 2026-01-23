@@ -19,7 +19,7 @@ import operator
 import sys
 import warnings
 
-from typing import Callable, Any, Generic, Protocol
+from typing import Annotated, Callable, Any, Generic, Protocol, get_origin
 from typing_extensions import Final, Self, override, TypeVar
 from types import FrameType, TracebackType
 from dataclasses import dataclass
@@ -341,17 +341,13 @@ class ConditionContext:
         new_names = set(self.annotations) - set(self.namelist)
         for name in new_names:
             # modify newly created fields
-            field: object = self.annotations[name]  # pyright: ignore[reportAny]
-            if isinstance(field, Field):
-                # field already defined/created -> check for condition
-                if field.has_condition():
-                    # the field's condition AND this one must be true
-                    field.condition = BinaryExpression(
-                        operator.and_, field.condition, self.func
-                    )
-                else:
-                    field //= self.func
-            else:
+            field: Field | Any = self.annotations[name]  # pyright: ignore[reportAny]
+            is_annotated = get_origin(field) is Annotated
+            annotated_type = extra_options = None
+            if get_origin(field) is Annotated:
+                annotated_type, field, extra_options = field
+
+            if not isinstance(field, Field):
                 # create a field (other attributes will be modified later)
 
                 # ISSUE #15: The annotation must be converted to a _StructLike
@@ -362,7 +358,23 @@ class ConditionContext:
                     struct_obj = Field(struct_obj)
 
                 struct_obj.condition = self.func
-                self.annotations[name] = struct_obj
+                field = struct_obj
+
+            # field already defined/created -> check for condition
+            if field.has_condition():
+                # the field's condition AND this one must be true
+                field.condition = BinaryExpression(
+                    operator.and_, field.condition, self.func
+                )
+            else:
+                field //= self.func
+
+            # rebuild the annotated field
+            self.annotations[name] = (
+                Annotated[annotated_type, field, *extra_options]
+                if is_annotated
+                else field
+            )
 
         self.annotations = dict()
         self.namelist = list()
@@ -562,6 +574,7 @@ class ContextLength(ExprMixin):
     @override
     def __repr__(self) -> str:
         return f"len({self.path!r})"
+
 
 # fmt: off
 this: Final[ContextPath[_ContextLike]] = ContextPath(CTX_OBJECT)
