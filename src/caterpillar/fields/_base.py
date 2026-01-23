@@ -34,7 +34,12 @@ from caterpillar.abc import (
     _LengthT,
     _StreamType,
 )
-from caterpillar.byteorder import SysNative, system_arch
+from caterpillar.byteorder import (
+    O_DEFAULT_ARCH,
+    O_DEFAULT_ENDIAN,
+    LittleEndian,
+    system_arch,
+)
 from caterpillar.exception import (
     DynamicSizeError,
     StructException,
@@ -111,21 +116,23 @@ class Field(Generic[_IT, _OT]):
         self.__offset = None
         self.__amount = None
         self.__options = None  # Historically named; represents switch mappings
+        self.__order = None
+        self.__arch = None
 
         # initialization via property setters
         self.struct = struct
         self.condition = condition
-        self.order = order or SysNative
+        self.order = order
         self.flags = set(flags or [])
-        self.bits = bits
-        self.arch = arch or system_arch
+        self.bits: _ContextLambda[int] | int | None = bits
+        self.arch = arch
         self.offset = offset
         self.amount = amount or None
         self.options = options
 
         # INVALID_DEFAULT indicates that no default was explicitly set;
         # allows None to be used as a valid default
-        self.default = default
+        self.default: object = default
 
     # -- Property Definitions (Input validation not enforced) --
 
@@ -136,14 +143,16 @@ class Field(Generic[_IT, _OT]):
         """
         return self.__struct  # pyright: ignore[reportReturnType]
 
+    # fmt: off
     @struct.setter
     def struct(
         self,
-        value: _StructLike[_IT, _OT] | _ContextLambda[_OT] | _ContainsStruct[_IT, _OT],
+        value: _StructLike[_IT, _OT] | _ContextLambda[_OT] | _ContainsStruct[_IT, _OT],  # pyright: ignore[reportPropertyTypeMismatch]
     ) -> None:
         self.__struct = getstruct(value) or value
         # pre-computed state of this field
         self._is_lambda = callable(self.__struct)
+    # fmt: on
 
     @property
     def condition(self) -> _ContextLambda[bool] | bool:
@@ -177,7 +186,7 @@ class Field(Generic[_IT, _OT]):
         """
         self.flags.add(flag)
 
-    def has_flag(self, flag: _OptionLike) -> bool:
+    def has_flag(self, flag: _OptionLike[Any]) -> bool:
         """Checks whether this field stores the given flag.
 
         :param flag: the flag to lookup
@@ -234,6 +243,32 @@ class Field(Generic[_IT, _OT]):
             and not self._switch_is_lambda
             and DEFAULT_OPTION in value  # pyright: ignore[reportOperatorIssue]
         )
+
+    @property
+    def order(self) -> _EndianLike:
+        return self.__order or O_DEFAULT_ENDIAN.value or LittleEndian
+
+    @order.setter
+    def order(
+        self, value: _EndianLike | None  # pyright: ignore[reportPropertyTypeMismatch]
+    ) -> None:
+        self.__order: _EndianLike | None = value
+
+    def has_order(self) -> bool:
+        return bool(self.__order)
+
+    @property
+    def arch(self) -> _ArchLike:
+        return self.__arch or O_DEFAULT_ARCH.value or system_arch
+
+    @arch.setter
+    def arch(
+        self, value: _ArchLike | None  # pyright: ignore[reportPropertyTypeMismatch]
+    ) -> None:
+        self.__arch = value
+
+    def has_arch(self) -> bool:
+        return bool(self.__arch)
 
     def _verify_context_value(
         self, value: object, expected: type | tuple[type, ...]
@@ -352,12 +387,12 @@ class Field(Generic[_IT, _OT]):
         """
         return self.get_type()
 
-    __ixor__ = __xor__
-    __ior__ = __or__
-    __ifloordiv__ = __floordiv__
-    __irshift__ = __rshift__
-    __imatmul__ = __matmul__
-    __isub__ = __rsub__
+    __ixor__ = __xor__  # pyright: ignore[reportUnannotatedClassAttribute]
+    __ior__ = __or__  # pyright: ignore[reportUnannotatedClassAttribute]
+    __ifloordiv__ = __floordiv__  # pyright: ignore[reportUnannotatedClassAttribute]
+    __irshift__ = __rshift__  # pyright: ignore[reportUnannotatedClassAttribute]
+    __imatmul__ = __matmul__  # pyright: ignore[reportUnannotatedClassAttribute]
+    __isub__ = __rsub__  # pyright: ignore[reportUnannotatedClassAttribute]
 
     def is_seq(self) -> bool:
         """Returns whether this field is sequential.

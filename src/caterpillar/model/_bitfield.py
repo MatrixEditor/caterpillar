@@ -12,6 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# pyright: reportPrivateUsage=false
 import enum
 
 from collections.abc import Iterable
@@ -21,15 +22,14 @@ from caterpillar.fields.common import Int
 from caterpillar.shared import (
     ATTR_ACTION_PACK,
     ATTR_ACTION_UNPACK,
-    ATTR_BYTEORDER,
     typeof,
     ATTR_BITS,
     ATTR_SIGNED,
 )
 from caterpillar.byteorder import (
     LITTLE_ENDIAN_FMT,
-    SysNative,
-    system_arch,
+    O_DEFAULT_ENDIAN,
+    LittleEndian,
 )
 from caterpillar.options import (
     B_GROUP_NEW,
@@ -49,6 +49,7 @@ from caterpillar.fields import (
 )
 from caterpillar.exception import StructException
 from caterpillar.context import (
+    CTX_FIELD,
     CTX_PATH,
     O_CONTEXT_FACTORY,
     CTX_OBJECT,
@@ -57,7 +58,6 @@ from caterpillar.context import (
 )
 from caterpillar.abc import (
     _StructLike,
-    _StreamType,
     _ActionLike,
     _ContextLike,
     _OptionLike,
@@ -67,6 +67,7 @@ from caterpillar.abc import (
 from ._struct import Struct, sizeof
 from ._base import Sequence
 
+_AnnotationT = int | tuple[int, ...] | Any
 
 # --- Bitfield Concept ---
 # NEW REVISED CONCEPT
@@ -852,9 +853,11 @@ class Bitfield(Struct[_VT]):
         return False
 
     @override
-    def _process_field(self, name: str, annotation: Any, default: Any) -> Field:
-        arch = self.arch or system_arch
-        order = getattr(annotation, ATTR_BYTEORDER, self.order or SysNative)
+    def _process_field(
+        self, name: str, annotation: _AnnotationT, default: Any
+    ) -> Field:
+        arch: _ArchLike | None = self.arch
+        order: _EndianLike | None = self.order #getattr(annotation, ATTR_BYTEORDER, None)
         match annotation:
             case int():
                 if annotation == 0:
@@ -906,10 +909,14 @@ class Bitfield(Struct[_VT]):
                     # rule no. 5
                     return self._process_bits(name, width, factory, options)
 
-                field = width
+                field: _StructLike = width
                 if not isinstance(field, Field):
                     field = Field(field, order=order, arch=arch, default=default)
-
+                else:
+                    if not field.has_order():
+                        field.order = order
+                    if not field.has_arch():
+                        field.arch = arch
                 return self._process_bits_field(name, field, options, factory)
 
             case _:
@@ -917,6 +924,11 @@ class Bitfield(Struct[_VT]):
                 field = self._process_annotation(annotation, default, order, arch)
                 if not isinstance(field, Field):
                     field = Field(field, order=order, arch=arch, default=default)
+                else:
+                    if not field.has_order():
+                        field.order = order
+                    if not field.has_arch():
+                        field.arch = arch
                 return self._process_bits_field(name, field)
 
     @override
@@ -976,9 +988,16 @@ class Bitfield(Struct[_VT]):
     def unpack_one(self, context: _ContextLike) -> _VT:
         init_data = (O_CONTEXT_FACTORY.value or Context)()
         context[CTX_OBJECT] = (O_CONTEXT_FACTORY.value or Context)(_parent=context)
+
+        field: Field | None = context.get(CTX_FIELD)
         base_path: str = context[CTX_PATH]
         # REVISIT
-        endian = "little" if self.order.ch == LITTLE_ENDIAN_FMT else "big"
+        order: _EndianLike = (
+            field.order
+            if field
+            else (self.order or O_DEFAULT_ENDIAN.value or LittleEndian)
+        )
+        endian = "little" if order.ch == LITTLE_ENDIAN_FMT else "big"
         for group in self.groups:
             if group.is_field():
                 # unpack using field instance
@@ -1023,12 +1042,18 @@ class Bitfield(Struct[_VT]):
     @override
     def pack_one(self, obj: _VT, context: _ContextLike) -> None:
         base_path = context[CTX_PATH]
+        field: Field | None = context.get(CTX_FIELD)
         # REVISIT
-        endian = "little" if self.order.ch == LITTLE_ENDIAN_FMT else "big"
+        order: _EndianLike = (
+            field.order
+            if field
+            else (self.order or O_DEFAULT_ENDIAN.value or LittleEndian)
+        )
+        endian = "little" if order.ch == LITTLE_ENDIAN_FMT else "big"
         for group in self.groups:
             if group.is_field():
                 field = group.get_field()
-                name = field.__name__
+                name = field.get_name()
                 context[CTX_PATH] = f"{base_path}.{name}"
                 if name in self._members:
                     value = self.get_value(obj, name, field)
@@ -1073,8 +1098,8 @@ class Bitfield(Struct[_VT]):
                 continue
 
             for entry in group.entries:
-                if entry.name == name:  # pyright: ignore[reportAttributeAccessIssue]
-                    return entry  # pyright: ignore[reportReturnType]
+                if entry.name == name:
+                    return entry
 
 
 @dataclass_transform()

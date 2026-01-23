@@ -23,6 +23,7 @@ from caterpillar.abc import (
     _OT,
     _SupportsType,
     _ContainsStruct,
+    _ActionLike,
 )
 
 if TYPE_CHECKING:
@@ -48,6 +49,8 @@ ATTR_TYPE: Final[str] = "__type__"
 ATTR_BITS: Final[str] = "__bits__"
 ATTR_SIGNED: Final[str] = "__signed__"
 ATTR_TEMPLATE: Final[str] = "__template__"
+ATTR_PACK: Final[str] = "__pack__"
+ATTR_UNPACK: Final[str] = "__unpack__"
 
 # TODO: add to reference
 # NEW CONCEPT: Actions
@@ -70,7 +73,6 @@ ATTR_TEMPLATE: Final[str] = "__template__"
 #   be stored in the model of the struct.
 ATTR_ACTION_PACK: Final[str] = "__action_pack__"
 ATTR_ACTION_UNPACK: Final[str] = "__action_unpack__"
-
 
 def identity(value: _OT) -> "_ContextLambda[_OT]":
     return lambda context: value
@@ -157,7 +159,7 @@ class Action:
         return f"{name}({self.__action_pack__.__qualname__}, {self.__action_unpack__.__qualname__})"
 
     @staticmethod
-    def is_action(obj: object) -> bool:
+    def is_action(obj: object) -> TypeIs[_ActionLike]:
         """
         Checks if the given object is an instance of an `Action` class,
         based on the presence of the `__action_pack__` or `__action_unpack__` attributes.

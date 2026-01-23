@@ -20,14 +20,14 @@ import sys
 import warnings
 
 from typing import Callable, Any, Generic, Protocol
-from typing_extensions import Final, Self, override
+from typing_extensions import Final, Self, override, TypeVar
 from types import FrameType, TracebackType
 from dataclasses import dataclass
 
 from caterpillar.exception import StructException
 from caterpillar.registry import to_struct
 from caterpillar.options import Flag
-from caterpillar.abc import _ContextLike, _ContextLambda, _IT, _OT,  _ContextFactoryLike
+from caterpillar.abc import _ContextLike, _ContextLambda, _IT, _ContextFactoryLike
 
 
 CTX_PARENT = "_parent"
@@ -194,7 +194,7 @@ class ExprMixin:
     def __lshift__(self, other: object) -> BinaryExpression:
         return BinaryExpression(operator.lshift, self, other)
 
-    __div__ = __truediv__
+    __div__ = __truediv__  # pyright: ignore[reportUnannotatedClassAttribute]
 
     def __radd__(self, other: object) -> BinaryExpression:
         return BinaryExpression(operator.add, other, self)
@@ -442,7 +442,10 @@ class _ContextPathOp(Protocol):
 # fmt: on
 
 
-class ContextPath(Generic[_OT], ExprMixin):
+_T = TypeVar("_T")
+
+
+class ContextPath(Generic[_T], ExprMixin):
     """
     Represents a lambda function for retrieving a value from a Context based on a specified path.
     """
@@ -461,7 +464,7 @@ class ContextPath(Generic[_OT], ExprMixin):
         self.call_kwargs: dict[str, Any] = dict()
         self.getitem_args: list[Any] = list()
 
-    def __call__(self, context: _ContextLike) -> _OT:
+    def __call__(self, context: _ContextLike) -> _T:
         """
         Calls the lambda function to retrieve a value from a Context.
 
@@ -560,8 +563,8 @@ class ContextLength(ExprMixin):
     def __repr__(self) -> str:
         return f"len({self.path!r})"
 
-
-this: Final[ContextPath] = ContextPath(CTX_OBJECT)
-ctx: Final[ContextPath] = ContextPath()
-parent: Final[ContextPath] = ContextPath(".".join([CTX_PARENT, CTX_OBJECT]))
-root: Final[ContextPath] = ContextPath(CTX_ROOT)
+# fmt: off
+this: Final[ContextPath[_ContextLike]] = ContextPath(CTX_OBJECT)
+ctx: Final[ContextPath[_ContextLike]] = ContextPath()
+parent: Final[ContextPath[_ContextLike]] = ContextPath(".".join([CTX_PARENT, CTX_OBJECT]))
+root: Final[ContextPath[_ContextLike]] = ContextPath(CTX_ROOT)

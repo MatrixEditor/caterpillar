@@ -17,7 +17,11 @@ import typing
 from typing_extensions import override
 
 from caterpillar.exception import InvalidValueError, DynamicSizeError, StreamError
-from caterpillar.byteorder import LittleEndian, LITTLE_ENDIAN_FMT
+from caterpillar.byteorder import (
+    O_DEFAULT_ENDIAN,
+    LittleEndian,
+    LITTLE_ENDIAN_FMT,
+)
 from caterpillar.context import CTX_FIELD, CTX_STREAM
 from caterpillar.options import Flag
 from caterpillar.abc import _ContextLike, _EndianLike, _StreamType
@@ -55,7 +59,7 @@ class VarInt(FieldStruct[int, int]):
     __slots__: tuple[str, ...] = ("__byteorder__",)
 
     def __init__(self):
-        self.__byteorder__: _EndianLike = LittleEndian
+        self.__byteorder__: _EndianLike | None = None
 
     def __type__(self) -> type:
         return int
@@ -85,7 +89,11 @@ class VarInt(FieldStruct[int, int]):
 
         stream: _StreamType = context[CTX_STREAM]
         field: "Field" = context.get(CTX_FIELD)
-        order: _EndianLike = field.order if field else self.__byteorder__
+        order: _EndianLike = (
+            field.order
+            if field
+            else (self.__byteorder__ or O_DEFAULT_ENDIAN.value or LittleEndian)
+        )
         is_little: bool = order.ch == LITTLE_ENDIAN_FMT
 
         hb, lb = self.bit_config(context)

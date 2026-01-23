@@ -28,9 +28,11 @@ from caterpillar.abc import (
     _OT,
     _ContextLambda,
     _ContextLike,
+    _ArchLike,
 )
 from caterpillar.shared import ATTR_BYTEORDER
 from caterpillar.context import CTX_ORDER
+from caterpillar.options import Flag
 
 
 @dataclass(frozen=True)
@@ -195,16 +197,18 @@ class DynByteOrder:
         :rtype: str
         """
         if self.func is not None:
+            # fmt: off
             if self._ctx_func:
-                return self.func(context).ch
+                return self.func(context).ch  # pyright: ignore[reportCallIssue, reportUnknownMemberType, reportUnknownVariableType]
             else:
-                return self.func().ch
+                return self.func().ch  # pyright: ignore[reportCallIssue, reportUnknownMemberType, reportUnknownVariableType]
 
         if self.key is not None:
+            # fmt: off
             if self.__key_str:
-                byte_order = context.__context_getattr__(self.key)
+                byte_order = context.__context_getattr__(self.key)  # pyright: ignore[reportArgumentType]
             else:
-                byte_order: str | _EndianLike | bool = self.key(context)
+                byte_order: str | _EndianLike | bool = self.key(context)  # pyright: ignore[reportCallIssue]
         else:
             root_context = context._root
             byte_order = (root_context or {}).get(CTX_ORDER, SysNative)
@@ -276,6 +280,8 @@ SysNative: Final[ByteOrder] = ByteOrder(
 )
 Dynamic: Final[DynByteOrder] = DynByteOrder()
 
+O_DEFAULT_ENDIAN: Final[Flag[_EndianLike]] = Flag("option.endian", value=None)
+
 
 def byteorder(obj: object, default: _EndianLike | None = None) -> _EndianLike:
     """
@@ -294,7 +300,7 @@ def byteorder_is_little(obj: object) -> bool:
     return getattr(obj, "ch", LITTLE_ENDIAN_FMT) == LITTLE_ENDIAN_FMT
 
 
-@dataclass(frozen=True)
+@dataclass
 class Arch:
     """
     Represents a system architecture with a name and an indication of whether it is 64-bit.
@@ -325,3 +331,5 @@ RISC_V64: Final[Arch] = Arch("RISK-V64", 64)
 RISC_V: Final[Arch] = Arch("RISK-V", 32)
 AMD: Final[Arch] = Arch("AMD", 32)
 AMD64: Final[Arch] = Arch("AMD64", 64)
+
+O_DEFAULT_ARCH: Final[Flag[_ArchLike]] = Flag("option.arch", system_arch)

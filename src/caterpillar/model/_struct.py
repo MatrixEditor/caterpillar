@@ -25,7 +25,13 @@ from typing import Any, Callable, Generic, Literal, ParamSpec, TypeVar
 from types import TracebackType
 from typing_extensions import dataclass_transform, override, overload, Buffer
 
-from caterpillar.shared import getstruct, hasstruct, ATTR_STRUCT
+from caterpillar.byteorder import (
+    O_DEFAULT_ARCH,
+    O_DEFAULT_ENDIAN,
+    LittleEndian,
+    system_arch,
+)
+from caterpillar.shared import ATTR_PACK, getstruct, hasstruct, ATTR_STRUCT
 from caterpillar.context import O_CONTEXT_FACTORY, CTX_STREAM, Context
 from caterpillar.exception import InvalidValueError
 from caterpillar.options import (
@@ -109,7 +115,7 @@ class Struct(Sequence[type[_ModelT], _ModelT, _ModelT]):
         setattr(self.model, "__class_getitem__", _struct_getitem(self))
         if self.is_union:
             # install a hook
-            self._union_hook: UnionHook = (hook_cls or UnionHook)(self)
+            self._union_hook: UnionHook[_ModelT] = (hook_cls or UnionHook)(self)
             setattr(self.model, "__init__", _union_init(self._union_hook))
             setattr(self.model, "__setattr__", _union_setattr(self._union_hook))
         if self.has_option(S_ADD_BYTES):
@@ -129,7 +135,7 @@ class Struct(Sequence[type[_ModelT], _ModelT, _ModelT]):
                 # Importing all fields instead of the entire struct.
                 # The default behavior on importing structs is implemented
                 # by the Sequence class.
-                self += candidate.__struct__
+                self += candidate.__struct__  # pyright: ignore[reportOperatorIssue]
 
         eval_str: bool = self.has_option(S_EVAL_ANNOTATIONS)
         # The why is described in detail here: https://docs.python.org/3/howto/annotations.html
@@ -220,7 +226,7 @@ def _make_struct(
     arch: _ArchLike | None = None,
     field_options: Iterable[_OptionLike] | None = None,
     kw_only: bool = False,
-    hook_cls: type["UnionHook"] | None = None,
+    hook_cls: type["UnionHook[_ModelT]"] | None = None,
 ) -> type[_ModelT]:
     """
     Helper function to create a Struct class.
@@ -253,7 +259,6 @@ def struct(
     order: _EndianLike | None = None,
     arch: _ArchLike | None = None,
     field_options: Iterable[_OptionLike] | None = None,
-
 ) -> type[_ModelT]: ...
 @overload
 @dataclass_transform(kw_only_default=True)
@@ -500,6 +505,11 @@ def pack(
     obj: _ContainsStruct[_IT, _OT],
     struct: None = None,
     /,
+    *,
+    use_tempfile: bool = False,
+    as_field: bool = False,
+    order: _EndianLike | None = None,
+    arch: _ArchLike | None = None,
     **kwargs: Any,
 ) -> bytes: ...
 @overload
@@ -508,6 +518,11 @@ def pack(
     obj: object,
     struct: None = None,
     /,
+    *,
+    use_tempfile: bool = False,
+    as_field: bool = False,
+    order: _EndianLike | None = None,
+    arch: _ArchLike | None = None,
     **kwds: Any,
 ) -> bytes: ...
 @overload
@@ -515,6 +530,11 @@ def pack(
     obj: _IT,
     struct: _SupportsPack[_IT],
     /,
+    *,
+    use_tempfile: bool = False,
+    as_field: bool = False,
+    order: _EndianLike | None = None,
+    arch: _ArchLike | None = None,
     **kwargs: Any,
 ) -> bytes: ...
 @overload
@@ -523,6 +543,11 @@ def pack(
     # support arbitrary struct types
     struct: type[_IT],
     /,
+    *,
+    use_tempfile: bool = False,
+    as_field: bool = False,
+    order: _EndianLike | None = None,
+    arch: _ArchLike | None = None,
     **kwargs: Any,
 ) -> bytes: ...
 
@@ -541,6 +566,8 @@ def pack(
     *,
     use_tempfile: bool = False,
     as_field: bool = False,
+    order: _EndianLike | None = None,
+    arch: _ArchLike | None = None,
     **kwargs: Any,
 ) -> bytes:
     """
@@ -553,9 +580,16 @@ def pack(
     :return: The packed bytes.
     """
     buffer = BytesIO()
-    pack_into(
-        obj, buffer, struct, use_tempfile=use_tempfile, as_field=as_field, **kwargs
-    )  # pyright: ignore[reportArgumentType, reportCallIssue]
+    pack_into(  # pyright: ignore[reportCallIssue]
+        obj,
+        buffer,
+        struct,  # pyright: ignore[reportArgumentType]
+        order=order,
+        arch=arch,
+        use_tempfile=use_tempfile,
+        as_field=as_field,
+        **kwargs,
+    )
     return buffer.getvalue()
 
 
@@ -568,6 +602,8 @@ def pack_into(
     *,
     use_tempfile: bool = ...,
     as_field: bool = ...,
+    order: _EndianLike | None = ...,
+    arch: _ArchLike | None = None,
     **kwds: Any,
 ) -> None: ...
 @overload
@@ -579,6 +615,8 @@ def pack_into(
     *,
     use_tempfile: bool = ...,
     as_field: bool = ...,
+    order: _EndianLike | None = ...,
+    arch: _ArchLike | None = None,
     **kwds: Any,
 ) -> None: ...
 @overload
@@ -590,6 +628,8 @@ def pack_into(
     *,
     use_tempfile: bool = ...,
     as_field: bool = ...,
+    order: _EndianLike | None = ...,
+    arch: _ArchLike | None = None,
     **kwds: Any,
 ) -> None: ...
 @overload
@@ -601,6 +641,8 @@ def pack_into(
     *,
     use_tempfile: bool = ...,
     as_field: bool = ...,
+    order: _EndianLike | None = ...,
+    arch: _ArchLike | None = None,
     **kwds: Any,
 ) -> None: ...
 @overload
@@ -612,6 +654,8 @@ def pack_into(
     *,
     use_tempfile: bool = ...,
     as_field: bool = ...,
+    order: _EndianLike | None = ...,
+    arch: _ArchLike | None = None,
     **kwds: Any,
 ) -> None: ...
 def pack_into(
@@ -622,7 +666,9 @@ def pack_into(
     *,
     use_tempfile: bool = False,
     as_field: bool = False,
-    **kwds,
+    order: _EndianLike | None = None,
+    arch: _ArchLike | None = None,
+    **kwds: Any,
 ) -> None:
     """
     Pack an object into the specified buffer using the specified struct.
@@ -672,50 +718,68 @@ def pack_into(
         _pos=0,
         _offsets=offsets,
         _is_seq=False,
+        _order=order or O_DEFAULT_ENDIAN.value or LittleEndian,
+        _arch=arch or O_DEFAULT_ARCH.value or system_arch,
         mode=MODE_PACK,
         **kwds,
     )
     if struct is None:
         struct = getstruct(obj)
     elif as_field:
-        struct = Field(struct)
+        struct = Field(struct)  # pyright: ignore[reportArgumentType]
     elif hasstruct(struct):
         struct = getstruct(struct)
 
     if struct is None:
         raise TypeError("struct must be specified")
 
-    start = 0
-    if use_tempfile:
-        # NOTE: this implementation is exprimental - use this option with caution.
-        with TemporaryFile() as stream:
-            context[CTX_STREAM] = stream
-            struct.__pack__(obj, context)  # pyright: ignore[reportAttributeAccessIssue, reportArgumentType]
+    if not hasattr(struct, ATTR_PACK):
+        raise TypeError(
+            f"pack* called with an unknown struct type ({type(struct)}) - "
+            + "no __pack__ defined!"
+        )
 
-            for offset, value in offsets.items():
-                stream.seek(start)  # pyright: ignore[reportUnusedCallResult]
-                buffer.write(stream.read(offset - start))
-                buffer.write(value)
-                start = offset
-            if len(offsets) == 0:
-                stream.seek(0)  # pyright: ignore[reportUnusedCallResult]
-                copyfileobj(stream, buffer)
+    prev_order = O_DEFAULT_ENDIAN.value
+    prev_arch = O_DEFAULT_ARCH.value
+    if order:
+        O_DEFAULT_ENDIAN.value = order
+    if arch:
+        O_DEFAULT_ARCH.value = prev_arch
+    try:
+        start = 0
+        if use_tempfile:
+            # NOTE: this implementation is exprimental - use this option with caution.
+            with TemporaryFile() as stream:
+                context[CTX_STREAM] = stream
+                struct.__pack__(obj, context)  # pyright: ignore[reportAttributeAccessIssue, reportArgumentType]
 
-    else:
-        # Default implementation: We use an in-memory buffer to store all packed
-        # elements and then apply all offset-packed objects.
-        stream = BytesIO()
-        context[CTX_STREAM] = stream
-        struct.__pack__(obj, context) # pyright: ignore[reportAttributeAccessIssue, reportArgumentType]
+                for offset, value in offsets.items():
+                    stream.seek(start)  # pyright: ignore[reportUnusedCallResult]
+                    buffer.write(stream.read(offset - start))
+                    buffer.write(value)
+                    start = offset
+                if len(offsets) == 0:
+                    stream.seek(0)  # pyright: ignore[reportUnusedCallResult]
+                    copyfileobj(stream, buffer)
 
-        content = stream.getbuffer()
-        if len(offsets) == 0:
-            buffer.write(content)
         else:
-            for offset, value in offsets.items():
-                buffer.write(content[start:offset])
-                buffer.write(value)
-                start = offset
+            # Default implementation: We use an in-memory buffer to store all packed
+            # elements and then apply all offset-packed objects.
+            stream = BytesIO()
+            context[CTX_STREAM] = stream
+            struct.__pack__(obj, context) # pyright: ignore[reportAttributeAccessIssue, reportArgumentType]
+
+            content = stream.getbuffer()
+            if len(offsets) == 0:
+                buffer.write(content)
+            else:
+                for offset, value in offsets.items():
+                    buffer.write(content[start:offset])
+                    buffer.write(value)
+                    start = offset
+    finally:
+        O_DEFAULT_ENDIAN.value = prev_order
+        O_DEFAULT_ARCH.value = prev_arch
 
 
 @overload
@@ -727,6 +791,8 @@ def pack_file(
     *,
     use_tempfile: bool = ...,
     as_field: bool = ...,
+    order: _EndianLike | None = ...,
+    arch: _ArchLike | None = ...,
     **kwds: Any,
 ) -> None: ...
 @overload
@@ -738,6 +804,8 @@ def pack_file(
     *,
     use_tempfile: bool = ...,
     as_field: bool = ...,
+    order: _EndianLike | None = ...,
+    arch: _ArchLike | None = ...,
     **kwds: Any,
 ) -> None: ...
 @overload
@@ -749,6 +817,8 @@ def pack_file(
     *,
     use_tempfile: bool = ...,
     as_field: bool = ...,
+    order: _EndianLike | None = ...,
+    arch: _ArchLike | None = ...,
     **kwds: Any,
 ) -> None: ...
 @overload
@@ -760,6 +830,8 @@ def pack_file(
     *,
     use_tempfile: bool = ...,
     as_field: bool = ...,
+    order: _EndianLike | None = ...,
+    arch: _ArchLike | None = ...,
     **kwds: Any,
 ) -> None: ...
 @overload
@@ -771,6 +843,8 @@ def pack_file(
     *,
     use_tempfile: bool = ...,
     as_field: bool = ...,
+    order: _EndianLike | None = ...,
+    arch: _ArchLike | None = ...,
     **kwds: Any,
 ) -> None: ...
 def pack_file(
@@ -781,7 +855,9 @@ def pack_file(
     *,
     use_tempfile: bool = False,
     as_field: bool = False,
-    **kwds,
+    order: _EndianLike | None = None,
+    arch: _ArchLike | None = None,
+    **kwds: Any,
 ) -> None:
     """
     Pack an object into a file using the specified struct.
@@ -793,9 +869,17 @@ def pack_file(
 
     :return: None
     """
-    # fmt: off
     with open(filename, "w+b") as fp:
-        pack_into(obj, fp, struct, use_tempfile=use_tempfile, as_field=as_field, **kwds)  # pyright: ignore[reportCallIssue, reportArgumentType]
+        pack_into(  # pyright: ignore[reportCallIssue]
+            obj,
+            fp,
+            struct,  # pyright: ignore[reportArgumentType]
+            use_tempfile=use_tempfile,
+            as_field=as_field,
+            order=order,
+            arch=arch,
+            **kwds,
+        )
 
 
 @overload
@@ -803,6 +887,10 @@ def unpack(
     struct: _ContainsStruct[_IT, _OT],
     buffer: Buffer | _StreamType,
     /,
+    *,
+    as_field: bool = False,
+    order: _EndianLike | None = None,
+    arch: _ArchLike | None = None,
     **kwds: Any,
 ) -> _OT: ...
 @overload
@@ -810,6 +898,10 @@ def unpack(
     struct: _SupportsUnpack[_OT],
     buffer: Buffer | _StreamType,
     /,
+    *,
+    as_field: bool = False,
+    order: _EndianLike | None = None,
+    arch: _ArchLike | None = None,
     **kwds: Any,
 ) -> _OT: ...
 @overload
@@ -817,6 +909,10 @@ def unpack(
     struct: type[_OT],
     buffer: Buffer | _StreamType,
     /,
+    *,
+    as_field: bool = False,
+    order: _EndianLike | None = None,
+    arch: _ArchLike | None = None,
     **kwds: Any,
 ) -> _OT: ...
 def unpack(
@@ -824,7 +920,9 @@ def unpack(
     buffer: Buffer | _StreamType,
     /,
     as_field: bool = False,
-    **kwds,
+    order: _EndianLike | None = None,
+    arch: _ArchLike | None = None,
+    **kwds: Any,
 ) -> _OT:
     """
     Unpack an object from a bytes buffer or stream using the specified struct.
@@ -858,20 +956,33 @@ def unpack(
         _path="<root>",
         _parent=None,
         _io=stream,
-        **kwds,
         _pos=0,
         _is_seq=False,
+        _order=order or O_DEFAULT_ENDIAN.value or LittleEndian,
+        _arch=arch or O_DEFAULT_ARCH.value or system_arch,
         mode=MODE_UNPACK,
+        **kwds,
     )
     if as_field:
         struct = Field(struct)  # pyright: ignore[reportArgumentType]
     elif hasstruct(struct):
-        struct = getstruct(struct)  # pyright: ignore[reportAssignmentType]
+        struct = getstruct(struct)
 
     if not isinstance(struct, _SupportsUnpack):
         raise TypeError(f"{type(struct).__name__} is not a valid struct instance!")
 
-    return struct.__unpack__(context)
+    prev_order = O_DEFAULT_ENDIAN.value
+    prev_arch = O_DEFAULT_ARCH.value
+    if order:
+        O_DEFAULT_ENDIAN.value = order
+    if arch:
+        O_DEFAULT_ARCH.value = arch
+
+    try:
+        return struct.__unpack__(context)
+    finally:
+        O_DEFAULT_ARCH.value = prev_arch
+        O_DEFAULT_ENDIAN.value = prev_order
 
 
 @overload
@@ -881,6 +992,8 @@ def unpack_file(
     /,
     *,
     as_field: bool = False,
+    order: _EndianLike | None = None,
+    arch: _ArchLike | None = None,
     **kwds: Any,
 ) -> _OT: ...
 @overload
@@ -890,6 +1003,8 @@ def unpack_file(
     /,
     *,
     as_field: bool = False,
+    order: _EndianLike | None = None,
+    arch: _ArchLike | None = None,
     **kwds: Any,
 ) -> _OT: ...
 @overload
@@ -899,6 +1014,8 @@ def unpack_file(
     /,
     *,
     as_field: bool = False,
+    order: _EndianLike | None = None,
+    arch: _ArchLike | None = None,
     **kwds: Any,
 ) -> _OT: ...
 def unpack_file(
@@ -907,6 +1024,8 @@ def unpack_file(
     /,
     *,
     as_field: bool = False,
+    order: _EndianLike | None = None,
+    arch: _ArchLike | None = None,
     **kwds: Any,
 ):
     """
@@ -919,7 +1038,7 @@ def unpack_file(
     :return: The unpacked object.
     """
     with open(filename, "rb") as fp:
-        return unpack(struct, fp, as_field=as_field, **kwds)
+        return unpack(struct, fp, as_field=as_field, arch=arch, order=order, **kwds)
 
 
 @overload

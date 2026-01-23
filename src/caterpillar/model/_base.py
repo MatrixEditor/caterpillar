@@ -28,11 +28,6 @@ from caterpillar.context import (
     O_CONTEXT_FACTORY,
     Context,
 )
-from caterpillar.byteorder import (
-    LittleEndian,
-    SysNative,
-    system_arch,
-)
 from caterpillar.exception import StructException, ValidationError
 from caterpillar.options import (
     S_DISCARD_CONST,
@@ -51,7 +46,6 @@ from caterpillar.shared import (
     ATTR_ACTION_PACK,
     ATTR_ACTION_UNPACK,
     Action,
-    ATTR_BYTEORDER,
 )
 from caterpillar import registry
 from caterpillar.abc import (
@@ -97,6 +91,8 @@ class _Member:
 _SeqModelT = TypeVar("_SeqModelT", default=dict[str, Any])
 _SeqOT = TypeVar("_SeqOT", default=dict[str, Any])
 _SeqIT = TypeVar("_SeqIT", default=dict[str, Any])
+_ExtraOptionT = _EndianLike | _ArchLike | _OptionLike[Any]
+_AnnotationT = str | bytes | Field | type | _ActionLike | Any
 
 
 class Sequence(Generic[_SeqModelT, _SeqIT, _SeqOT], FieldMixin[_SeqIT, _SeqOT]):
@@ -131,7 +127,7 @@ class Sequence(Generic[_SeqModelT, _SeqIT, _SeqOT], FieldMixin[_SeqIT, _SeqOT]):
     ) -> None:
         self.model: _SeqModelT = model
         self.arch: _ArchLike | None = arch
-        self.order: _EndianLike = order or LittleEndian
+        self.order: _EndianLike | None = order
         self.options: set[_OptionLike] = set(options or [])
         self.field_options: set[_OptionLike] = set(field_options or [])
 
@@ -177,7 +173,7 @@ class Sequence(Generic[_SeqModelT, _SeqIT, _SeqOT], FieldMixin[_SeqIT, _SeqOT]):
         """
         return option in self.options
 
-    def _included(self, name: str, default: object, annotation: object) -> bool:
+    def _included(self, name: str, default: object, annotation: _AnnotationT) -> bool:
         """
         Check if a field with the given name should be included.
 
@@ -199,8 +195,8 @@ class Sequence(Generic[_SeqModelT, _SeqIT, _SeqOT], FieldMixin[_SeqIT, _SeqOT]):
         pass
 
     def _process_default(
-        self, name: str, annotation: object, had_default: bool = False
-    ):
+        self, name: str, annotation: _AnnotationT, had_default: bool = False
+    ) -> Any:
         default: Any = getattr(self.model, name, INVALID_DEFAULT)
         # constant values that are not in the form of fields, structs or types should
         # be wrapped into constant values. For more information, see _process_field
@@ -245,8 +241,9 @@ class Sequence(Generic[_SeqModelT, _SeqIT, _SeqOT], FieldMixin[_SeqIT, _SeqOT]):
                 continue
 
             annotated_type: type | None = None
+            extra_options: Iterable[_ExtraOptionT] = []
             if get_origin(annotation) is Annotated:
-                annotated_type, annotation, *_ = get_args(annotation)
+                annotated_type, annotation, *extra_options = get_args(annotation)
 
             # Process each field and its annotation. In addition, fields with a name in
             # the form of '_[0-9]*' will be removed (if enabled)
@@ -258,6 +255,19 @@ class Sequence(Generic[_SeqModelT, _SeqIT, _SeqOT], FieldMixin[_SeqIT, _SeqOT]):
                 removables.append(name)
 
             field = self._process_field(name, annotation, default)
+            for extra_option in extra_options:
+                match extra_option:
+                    case _ArchLike():
+                        field.arch = extra_option
+                    case _EndianLike():
+                        field.order = extra_option
+                    case _OptionLike():
+                        field.add_flag(extra_option)
+                    case _:
+                        raise ValidationError(
+                            f"Could not add extra option: unsupported type ({type(extra_option)})"
+                        )
+
             # we call add_field to safely add the created field
             self.add_field(name, field, is_included)
             if self.has_option(S_REPLACE_TYPES):
@@ -267,17 +277,17 @@ class Sequence(Generic[_SeqModelT, _SeqIT, _SeqOT], FieldMixin[_SeqIT, _SeqOT]):
         for name in removables:
             self._remove_from_model(name)
 
-    def _prepare_fields(self) -> dict[str, Any]:
+    def _prepare_fields(self) -> dict[str, _AnnotationT]:
         return self.model  # pyright: ignore[reportReturnType]
 
     def _process_annotation(
         self,
-        annotation: object,
+        annotation: _AnnotationT,
         default: object,  # REVISIT: unused
-        order: _EndianLike,
-        arch: _ArchLike,
+        order: _EndianLike | None,
+        arch: _ArchLike | None,
     ) -> _StructLike:
-        return registry.to_struct(annotation, arch=arch, order=order)
+        return registry.to_struct(annotation)
 
     def _process_field(self, name: str, annotation: object, default: object) -> Field:
         """
@@ -293,29 +303,34 @@ class Sequence(Generic[_SeqModelT, _SeqIT, _SeqOT], FieldMixin[_SeqIT, _SeqOT]):
 
         # The order and arch of the field can be overridden by the annotation
         # and should not get applied if this seq does not define it.
-        order = getattr(annotation, ATTR_BYTEORDER, self.order)
+        order = self.order  #  or getattr(annotation, ATTR_BYTEORDER, None)
         arch = self.arch
-        result = self._process_annotation(annotation, default, order, arch)
+        result = self._process_annotation(annotation, default, order=order, arch=arch)
         if isinstance(result, Field):
             field = result
         else:
             struct = result
 
         if struct is not None:
-            field = Field(struct, order, arch=arch, default=default)
+            field = Field(struct, default=default)
 
         if field is None:
+            type_name = (
+                self.model.__name__
+                if isinstance(self.model, type)
+                else f"<{self.__class__.__name__}>"
+            )
             msg = (
-                f"Field '{self.model.__name__}.{name}' could not be created, because "
+                f"Field '{type_name}.{name}' could not be created, because "
                 "the placed annotation does not have a corresponding handler:\n "
                 f"type: {type(annotation)},\n annotation: {annotation!r}"
             )
             raise ValidationError(msg)
         field.default = default
-        if field.order is SysNative:
-            field.order = self.order or field.order
-        if field.arch is system_arch:
-            field.arch = self.arch or field.arch
+        if not field.has_order():
+            field.order = order
+        if not field.has_arch():
+            field.arch = arch
         field.flags.update(self.field_options)
         # field.flags.update({hash(x): x for x in self.field_options})
         return field

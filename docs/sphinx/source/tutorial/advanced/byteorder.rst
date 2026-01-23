@@ -35,22 +35,18 @@ to all fields that haven't got an endian already set.
 .. code-block:: python
     :linenos:
 
-    from caterpillar.context import CTX_ORDER
-
     @struct(order=Dynamic)
     class Format:
         a: uint16           # litte endian or big endian is decided using
         b: uint32           # a global context variable
 
-    config = {CTX_ORDER: BigEndian}
     obj = Format(a=0x1234, b=0x56789ABC)
 
     # pack the object using BigEndian
-    pack(obj, **config)
+    pack(obj, order=BigEndian)
 
     # now pack with little endian
-    config[CTX_ORDER] = LittleEndian
-    pack(obj, **config)
+    pack(obj, order=LittleEndian)
 
 Here we pass an additional global context variable named :attr:`~caterpillar.context.CTX_ORDER` (``"_order"``)
 to the packing and unpacking process. The dynamic endian will automatically infer the order based on this
@@ -65,9 +61,7 @@ given as a global context variable as described before.
 .. code-block:: python
     :linenos:
 
-    from caterpillar.context import CTX_ORDER
-
-    @struct
+    @struct(order=LittleEndian)
     class Format:
         a: uint16
         b: Dynamic + uint32   # only this field will be affected
