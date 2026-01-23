@@ -118,7 +118,7 @@ from caterpillar.abc import (
         (DigestFieldAction, _ActionLike),
     ],
 )
-def test_protocol(obj: type, proto_ty: type) -> None:
+def test_py_protocol(obj: type, proto_ty: type) -> None:
     assert isinstance(
         obj, proto_ty
     ), f"Class {obj.__name__} does not conform to the {proto_ty.__name__} protocol"

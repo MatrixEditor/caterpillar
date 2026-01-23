@@ -235,15 +235,15 @@ class Sequence(Generic[_SeqModelT, _SeqIT, _SeqOT], FieldMixin[_SeqIT, _SeqOT]):
         annotations = self._prepare_fields()
         had_default = False
         for name, annotation in annotations.items():
-            if Action.is_action(annotation):
-                self.add_action(annotation)
-                removables.append(name)
-                continue
-
             annotated_type: type | None = None
             extra_options: Iterable[_ExtraOptionT] = []
             if get_origin(annotation) is Annotated:
                 annotated_type, annotation, *extra_options = get_args(annotation)
+
+            if Action.is_action(annotation):
+                self.add_action(annotation)
+                removables.append(name)
+                continue
 
             # Process each field and its annotation. In addition, fields with a name in
             # the form of '_[0-9]*' will be removed (if enabled)
