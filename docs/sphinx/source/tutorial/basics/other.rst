@@ -18,16 +18,34 @@ validate these constants against the parsed data, saving you from manually addin
 them in every time.
 
 For instance, a PNG file starts with a known sequence of magic bytes:
-:code:`\x89PNG\x0D\x0A\x1A\x0A`. You can define these constants directly in your
+:code:`\\x89PNG\\x0D\\x0A\\x1A\\x0A`. You can define these constants directly in your
 struct like so:
 
-.. code-block:: python
-    :caption: Starting the *main* PNG struct
+.. tab-set::
+    :sync-group: syntax
 
-    @struct(order=BigEndian) # <-- will be relevant later on
-    class PNG:
-        magic: b"\x89PNG\x0D\x0A\x1A\x0A"
-        # other fields will be defined at the end of this tutorial.
+    .. tab-item:: Default Syntax
+        :sync: default
+
+        .. code-block:: python
+            :caption: Starting the *main* PNG struct
+
+            @struct(order=BigEndian) # <-- will be relevant later on
+            class PNG:
+                magic: b"\x89PNG\x0D\x0A\x1A\x0A"
+                # other fields will be defined at the end of this tutorial.
+
+
+    .. tab-item:: Extended Syntax (>=2.8.0)
+        :sync: extended
+
+        .. code-block:: python
+            :caption: Starting the *main* PNG struct
+
+            @struct(order=BigEndian) # <-- will be relevant later on
+            class PNG:
+                magic: f[bytes, b"\x89PNG\x0D\x0A\x1A\x0A"]
+                # other fields will be defined at the end of this tutorial.
 
 
 For raw constant values, *Caterpillar* provides the :class:`~caterpillar.py.Const`
@@ -61,13 +79,30 @@ or unpacking process.
 You might want to compute the real gamma value for a PNG chunk, based on another field
 in the struct:
 
-.. code-block:: python
-    :caption: Example implementation of the *gAMA* chunk
+.. tab-set::
+    :sync-group: syntax
 
-    @struct(order=BigEndian)    # <-- same as usual
-    class GAMAChunk:
-        gamma: uint32
-        gamma_value: Computed(this.gamma / 100000)
+    .. tab-item:: Default Syntax
+        :sync: default
+
+        .. code-block:: python
+            :caption: Example implementation of the *gAMA* chunk
+
+            @struct(order=BigEndian)    # <-- same as usual
+            class GAMAChunk:
+                gamma: uint32
+                gamma_value: Computed(this.gamma / 100000)
+
+    .. tab-item:: Extended Syntax (>=2.8.0)
+        :sync: extended
+
+        .. code-block:: python
+            :caption: Example implementation of the *gAMA* chunk
+
+            @struct(order=BigEndian)    # <-- same as usual
+            class GAMAChunk:
+                gamma: uint32_t
+                gamma_value: f[float, Computed(this.gamma / 100000)] = 0.0
 
 Pass
 ~~~~
@@ -77,7 +112,21 @@ process. It doesn't affect the data stream in any way.
 
 You can use `Pass` when you simply need to skip over certain parts of the data without modifying them:
 
->>> @struct
-... class Format:
-...     foo: Pass  # This won't affect the stream and will store None
-...
+.. tab-set::
+    :sync-group: syntax
+
+    .. tab-item:: Default Syntax
+        :sync: default
+
+        >>> @struct
+        ... class Format:
+        ...     foo: Pass  # This won't affect the stream and will store None
+        ...
+
+    .. tab-item:: Extended Syntax (>=2.8.0)
+        :sync: extended
+
+        >>> @struct
+        ... class Format:
+        ...     foo: pass_t = None  # This won't affect the stream and will store None
+        ...

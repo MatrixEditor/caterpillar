@@ -13,30 +13,83 @@ let's revisit the PNG format implementation and define a common chunk type using
 switch-case structure.
 
 
-.. code-block:: python
-    :caption: Implementation of the general `chunk layout <https://www.w3.org/TR/png/#5Chunk-layout>`_
+.. tab-set::
+   :sync-group: syntax
 
-    @struct(order=BigEndian)
-    class PNGChunk:
-        length: uint32          # length of the data field (1)
-        type: Bytes(4)
-        data: F(this.type) >> { # just use right shift (2)
-            b"IHDR": IHDRChunk,
-            b"PLTE": PLTEChunk, # the key must be comparable to this.type
-            b"pHYs": PHYSChunk,
-            b"iTXt": ITXTChunk,
-            b"tIME": TIMEChunk,
-            b"tEXt": TEXTChunk,
-            b"iTXt": ITXTChunk,
-            b"fDAT": FDATChunk,
-            b"zTXt": ZTXTChunk,
-            b"gAMA": GAMAChunk,
-            # Special case: IEND chunk, which doesn’t need to parse any data
-            b"IEND": Pass # (4)
-            # As we don't define all chunks here for now, a default
-            # option must be provided
-            DEFAULT_OPTION: Memory(this.length) # (3)
-        }
+   .. tab-item:: Default Syntax
+      :sync: default
+
+      .. code-block:: python
+         :caption: Implementation of the general `chunk layout <https://www.w3.org/TR/png/#5Chunk-layout>`_
+
+         @struct(order=BigEndian)
+         class PNGChunk:
+            length: uint32          # length of the data field (1)
+            type: Bytes(4)
+            data: F(this.type) >> { # just use right shift (2)
+                  b"IHDR": IHDRChunk,
+                  b"PLTE": PLTEChunk, # the key must be comparable to this.type
+                  b"pHYs": PHYSChunk,
+                  b"iTXt": ITXTChunk,
+                  b"tIME": TIMEChunk,
+                  b"tEXt": TEXTChunk,
+                  b"iTXt": ITXTChunk,
+                  b"fDAT": FDATChunk,
+                  b"zTXt": ZTXTChunk,
+                  b"gAMA": GAMAChunk,
+                  # Special case: IEND chunk, which doesn’t need to parse any data
+                  b"IEND": Pass # (4)
+                  # As we don't define all chunks here for now, a default
+                  # option must be provided
+                  DEFAULT_OPTION: Memory(this.length) # (3)
+            }
+
+   .. tab-item:: Extended Syntax (>=2.8.0)
+      :sync: extended
+
+      .. code-block:: python
+         :caption: Implementation of the general `chunk layout`
+
+         # just for your type checker:
+         ChunkT = (
+            IHDRChunk
+            | PLTEChunk
+            | PHYSChunk
+            | ITXTChunk
+            | TIMEChunk
+            | TEXTChunk
+            | ITXTChunk
+            | FDATChunk
+            | ZTXTChunk
+            | GAMAChunk
+            | None # pass (4)
+            | memoryview # all unknown chnks
+         )
+
+         @struct(order=BigEndian)
+         class PNGChunk:
+            length: uint32_t          # length of the data field (1)
+            type: f[bytes, Bytes(4)]
+            data: f[ChunkT,
+               F(this.type) >> { # just use right shift (2)
+                  b"IHDR": IHDRChunk,
+                  b"PLTE": PLTEChunk, # the key must be comparable to this.type
+                  b"pHYs": PHYSChunk,
+                  b"iTXt": ITXTChunk,
+                  b"tIME": TIMEChunk,
+                  b"tEXt": TEXTChunk,
+                  b"iTXt": ITXTChunk,
+                  b"fDAT": FDATChunk,
+                  b"zTXt": ZTXTChunk,
+                  b"gAMA": GAMAChunk,
+                  # Special case: IEND chunk, which doesn’t need to parse any data
+                  b"IEND": Pass # (4)
+                  # As we don't define all chunks here for now, a default
+                  # option must be provided
+                  DEFAULT_OPTION: Memory(this.length) # (3)
+               }
+            ]
+
 
 1. **Length and Type**:
    The `PNGChunk` struct has two main fields: `length` (the length of the data field) and `type`

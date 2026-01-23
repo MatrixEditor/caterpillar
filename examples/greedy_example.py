@@ -1,26 +1,39 @@
-# type: ignore
+import typing
+
+from caterpillar.shortcuts import f
 from caterpillar.py import struct, BigEndian, this, unpack, uint8
-
-try:
-    from rich import print
-except ImportError:
-    pass
+from caterpillar.abc import _LengthT  # pyright: ignore[reportPrivateUsage]
+from caterpillar.types import uint8_t
 
 
-@struct(order=BigEndian)
+BMP_MAGIC = b"BMP"
+# reusable types can be defined using the f[...] shortcut
+magic_t = f[bytes, BMP_MAGIC]
+
+
+@struct(order=BigEndian, kw_only=True)
 class Format:
-    magic: b"BMP"
-    width: uint8
-    height: uint8
-    pixels: uint8[this.width * this.height]
+    magic: magic_t = BMP_MAGIC
+    width: uint8_t
+    height: uint8_t
+    pixels: f[list[int], uint8[this.width * this.height]]
+
+    # Workaround for typing issues when using Class[...]
+    if typing.TYPE_CHECKING:
+
+        def __class_getitem__(cls, length: _LengthT): ...
 
 
-@struct(order=BigEndian)
+@struct(order=BigEndian, kw_only=True)
 class Format2:
-    magic: b"BMP"
-    width: uint8
-    height: uint8
-    pixels: uint8[...]
+    magic: magic_t = BMP_MAGIC
+    width: uint8_t
+    height: uint8_t
+    pixels: f[list[int], uint8[...]]
+
+    if typing.TYPE_CHECKING:
+
+        def __class_getitem__(cls, length: _LengthT): ...
 
 
 print(unpack(Format[...], b"BMP\x02\x02\x00\x01\x02\x03BMP\x00\x00"))

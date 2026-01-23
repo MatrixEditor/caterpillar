@@ -19,14 +19,33 @@ Let's take a look at another chunk from the PNG format: the `pHYS <https://www.w
 It contains two 4-byte unsigned integers that represent pixel density. Since PNG files use **big-endian** encoding
 for integers, we need to configure the struct to handle this correctly.
 
-.. code-block:: python
-    :caption: Configuring a struct-wide endianess
+.. tab-set::
+    :sync-group: syntax
 
-    @struct(order=BigEndian)        # <-- extra argument to apply the order to all fields.
-    class PHYSChunk:
-        pixels_per_unit_x: uint32   # <-- same definition as above
-        pixels_per_unit_y: uint32
-        unit: uint8                 # <-- endianess meaningless, only one byte
+    .. tab-item:: Default Syntax
+        :sync: default
+
+        .. code-block:: python
+            :caption: Configuring a struct-wide endianess
+
+            @struct(order=BigEndian)        # <-- extra argument to apply the order to all fields.
+            class PHYSChunk:
+                pixels_per_unit_x: uint32   # <-- same definition as above
+                pixels_per_unit_y: uint32
+                unit: uint8                 # <-- endianess meaningless, only one byte
+
+    .. tab-item:: Extended Syntax (>=2.8.0)
+        :sync: extended
+
+        .. code-block:: python
+            :caption: Configuring a struct-wide endianess
+
+            @struct(order=BigEndian)        # <-- extra argument to apply the order to all fields.
+            class PHYSChunk:
+                pixels_per_unit_x: uint32_t # <-- same definition as above
+                pixels_per_unit_y: uint32_t
+                unit: uint8_t               # <-- endianess meaningless, only one byte
+
 
 In both cases, the :code:`pixels_per_unit_x` and :code:`pixels_per_unit_y` fields are 4 bytes long,
 so they will be interpreted using big-endian encoding. The :code:`unit` field is only 1 byte, so
@@ -52,17 +71,38 @@ with the struct using the :class:`~caterpillar.byteorder.Arch` class with the :c
 
         Example implementation
 
-        .. code-block:: python
-            :linenos:
+        .. tab-set::
+            :sync-group: syntax
 
-            @struct(order=BigEndian)
-            class TIMEChunk:
-                year: uint16        # <-- we could also use: BigEndian + uint16
-                month: uint8
-                day: uint8
-                hour: uint8
-                minute: uint8
-                second: uint8
+            .. tab-item:: Default Syntax
+                :sync: default
+
+                .. code-block:: python
+                    :linenos:
+
+                    @struct(order=BigEndian)
+                    class TIMEChunk:
+                        year: uint16        # <-- we could also use: BigEndian + uint16
+                        month: uint8
+                        day: uint8
+                        hour: uint8
+                        minute: uint8
+                        second: uint8
+
+            .. tab-item:: Extended Syntax (>=2.8.0)
+                :sync: extended
+
+                .. code-block:: python
+                    :linenos:
+
+                    @struct(order=BigEndian)
+                    class TIMEChunk:
+                        year: uint16_t   # <-- we could also use: f[int, BigEndian + uint16]
+                        month: uint8_t
+                        day: uint8_t
+                        hour: uint8_t
+                        minute: uint8_t
+                        second: uint8_t
 
         As you can see, the struct is fairly simple. The year field is 2 bytes, and the rest are
         single-byte fields. By applying :code:`BigEndian` or :code:`BIG_ENDIAN` to the struct,

@@ -16,16 +16,33 @@ efficient.
 structs that adjust their size based on the current context. This framework enables you
 to write complex structures in a compact and readable manner.
 
+.. tab-set::
 
-.. code-block::
-   :caption: Simple example of a custom struct
+   .. tab-item:: Default Syntax
 
-   @struct
-   class Format:
-      magic: b"Foo"                       # constant values
-      name: CString(...)                  # \x00-terminated String without a fixed length
-      value: le + uint16                  # little endian encoding
-      entries: be + CString[uint32::]     # arrays with big-endian prefixed length
+      .. code-block::
+         :caption: Simple example of a custom struct
+
+         @struct
+         class Format:
+            magic: b"Foo"                       # constant values
+            name: CString(...)                  # \x00-terminated String without a fixed length
+            value: le + uint16                  # little endian encoding
+            entries: be + CString[uint32::]     # arrays with big-endian prefixed length
+
+
+   .. tab-item:: Extended Syntax (>=2.8.0)
+
+      .. code-block::
+         :caption: Simple example of a custom struct with type annotations in-place
+
+         @struct
+         class Format:
+            magic:   f[bytes, b"Foo"]                     # constant values
+            name:    cstr_t                               # \x00-terminated String without a fixed length
+            value:   f[int, le + uint16]                  # little endian encoding
+            entries: f[list[str], be + CString[uint32::]] # arrays with big-endian prefixed length
+
 
 
 .. admonition:: Hold up, wait a minute!
@@ -57,6 +74,9 @@ Format(magic=b'Foo', name='Hello, World!', value=10, entries=['Bar', 'Baz'])
   No problem! It is possible to shrink the memory space occupied by unpacked objects up
   to 4 times. More information are provided when discussing available configuration
   :ref:`options`.
+
+- And *YES*, this library tries to enforce strong typing wherever appliacable and supported.
+  More on that topic later in the tutorial. ...ref...
 
 
 Where to start?

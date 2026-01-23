@@ -10,12 +10,6 @@ deeper into more advanced concepts. This section will help you master the usage 
 specialized features, and by the end of this tutorial, you'll be well-equipped to
 create and manipulate your own custom struct classes in Python.
 
-.. attention::
-    Please note that many of the structs and techniques presented here are still
-    evolving. For instance, the :class:`~caterpillar.model.BitField` class is
-    still being refined, and its current usage may not be as intuitive as you
-    might expect.
-
 .. toctree::
     :caption: Advanced Topics for Catepillar (Python)
     :maxdepth: 2
@@ -36,14 +30,33 @@ create and manipulate your own custom struct classes in Python.
 We finish this tutorial by completing our PNG format implementation. As the format is just
 a collection of chunks, we can simply alter the *main* struct from before:
 
-.. code-block:: python
-    :caption: Final PNG implementation
+.. tab-set::
+    :sync-group: syntax
 
-    @struct
-    class PNG:
-        magic: b"\x89PNG\x0D\x0A\x1A\x0A"
-        # We don't know the length, therefore we need greedy parsing
-        chunks: PNGChunk[...]
+    .. tab-item:: Default Syntax
+        :sync: default
+
+        .. code-block:: python
+            :caption: Final PNG implementation
+
+            @struct
+            class PNG:
+                magic: b"\x89PNG\x0D\x0A\x1A\x0A"
+                # We don't know the length, therefore we need greedy parsing
+                chunks: PNGChunk[...]
+
+    .. tab-item:: Extended Syntax (>=2.8.0)
+        :sync: extended
+
+        .. code-block:: python
+            :caption: Final PNG implementation
+
+            @struct
+            class PNG:
+                magic: f[bytes, b"\x89PNG\x0D\x0A\x1A\x0A"]
+                # We don't know the length, therefore we need greedy parsing
+                chunks: f[list[PNGChunk], PNGChunk[...]]
+
 
 **Thats it!** We now have a qualified PNG image parser **and** builder just using some
 Python class definitions.

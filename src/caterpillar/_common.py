@@ -12,9 +12,22 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# pyright: reportPrivateUsage=false, reportExplicitAny=false, reportCallIssue=false
+from collections.abc import Collection
 import itertools
 
-from caterpillar.abc import _PrefixedType
+from types import TracebackType
+from typing import TYPE_CHECKING, Any, Callable
+
+from caterpillar.abc import (
+    _PrefixedType,
+    _ContextLike,
+    _OT,
+    _IT,
+    _StreamType,
+    _LengthT,
+    _SupportsPack,
+)
 from caterpillar.context import (
     CTX_PATH,
     CTX_FIELD,
@@ -23,30 +36,38 @@ from caterpillar.context import (
     CTX_STREAM,
     CTX_SEQ,
     O_CONTEXT_FACTORY,
+    Context,
 )
 from caterpillar.exception import Stop, StructException, InvalidValueError
 from caterpillar.options import O_ARRAY_FACTORY
 
+if TYPE_CHECKING:
+    from caterpillar.fields import Field
+
 
 class WithoutContextVar:
-    def __init__(self, context, name, value) -> None:
-        self.context = context
-        self.old_value = context[name]
-        self.value = value
-        self.name = name
-        self.field = context[CTX_FIELD]
+    def __init__(self, context: _ContextLike, name: str, value: Any) -> None:
+        self.context: _ContextLike = context
+        self.old_value: Any = context[name]
+        self.value: Any = value
+        self.name: str = name
+        self.field: "Field[Any, Any] | None" = context.get(CTX_FIELD)
 
     def __enter__(self) -> None:
         self.context[self.name] = self.value
 
-    def __exit__(self, exc_type, exc_value, traceback) -> None:
+    def __exit__(
+        self, exc_type: type, exc_value: Exception, traceback: TracebackType
+    ) -> None:
         self.context[self.name] = self.old_value
         # We have to apply the right field as instance of the Field class
         # might set their own value into the context.
         self.context[CTX_FIELD] = self.field
 
 
-def unpack_seq(context, unpack_one):
+def unpack_seq(
+    context: _ContextLike, unpack_one: Callable[[_ContextLike], _OT]
+) -> Collection[_OT]:
     """Generic function to unpack sequenced elements.
 
     :param stream: the input stream
@@ -56,16 +77,17 @@ def unpack_seq(context, unpack_one):
     :return: a list of unpacked elements
     :rtype: List[Any]
     """
-    stream = context[CTX_STREAM]
-    field = context[CTX_FIELD]
+    stream: _StreamType = context[CTX_STREAM]  # pyright: ignore[reportAny]
+    field: "Field[Any, Any]" = context[CTX_FIELD]  # pyright: ignore[reportAny]
+    # TODO: add an exception here
     assert field and context[CTX_SEQ]
 
     length = field.length(context)
-    base_path = context[CTX_PATH]
+    base_path: str = context[CTX_PATH]  # pyright: ignore[reportAny]
     # Special elements '_index' and '_length' can be referenced within
     # the new context. The '_pos' attribute will be adjusted automatically.
-    values = []  # always list (maybe add factory)
-    seq_context = O_CONTEXT_FACTORY.value(
+    values: list[_OT] = []  # always list (maybe add factory)
+    seq_context = (O_CONTEXT_FACTORY.value or Context)(
         _root=context._root,
         _parent=context,
         _io=stream,
@@ -78,11 +100,12 @@ def unpack_seq(context, unpack_one):
     greedy = length is Ellipsis
     # pylint: disable-next=unidiomatic-typecheck
     prefixed = type(length) is _PrefixedType
+    # fmt: off
     if prefixed:
         # We have to temporarily remove the array status from the parsing field
         with WithoutContextVar(context, CTX_SEQ, False):
             field.amount = 1
-            new_length = length.start.__unpack__(context)
+            new_length = length.start.__unpack__(context)  # pyright: ignore[reportAny]
             field.amount, length = length, new_length
 
         if not isinstance(length, int):
@@ -90,12 +113,11 @@ def unpack_seq(context, unpack_one):
                 f"Prefix struct returned non-integer: {length!r}", context
             )
 
-    for i in range(length) if not greedy else itertools.count():
+    for i in range(length) if not greedy else itertools.count():  # pyright: ignore[reportArgumentType]
         try:
             seq_context[CTX_PATH] = f"{base_path}.{i}"
             seq_context[CTX_INDEX] = i
             values.append(unpack_one(seq_context))
-
             # NOTE: we introduce this check to reduce time when unpacking
             # a greedy range of elements.
             if greedy and iseof(stream):
@@ -106,13 +128,17 @@ def unpack_seq(context, unpack_one):
             if greedy:
                 break
             raise StructException(str(exc), context) from exc
-
+    # fmt: on
     if O_ARRAY_FACTORY.value:
         return O_ARRAY_FACTORY.value(values)
     return values
 
 
-def pack_seq(seq, context, pack_one) -> None:
+def pack_seq(
+    seq: Collection[_IT],
+    context: _ContextLike,
+    pack_one: Callable[[_IT, _ContextLike], None],
+) -> None:
     """Generic function to pack sequenced elements.
 
     :param seq: the iterable of elements
@@ -123,15 +149,15 @@ def pack_seq(seq, context, pack_one) -> None:
     :type context: _ContextLike
     :raises InvalidValueError: if the input object is not iterable
     """
-    stream = context[CTX_STREAM]
-    field = context[CTX_FIELD]
-    base_path = context[CTX_PATH]
+    stream: _StreamType = context[CTX_STREAM]  # pyright: ignore[reportAny]
+    field: "Field[Any, Any]" = context[CTX_FIELD]  # pyright: ignore[reportAny]
+    base_path: str = context[CTX_PATH]  # pyright: ignore[reportAny]
     # REVISIT: when to use field.length(context)
-    count = len(seq)
-    length = field.amount
+    count: int = len(seq)
+    length: _LengthT | None = field.amount
     # pylint: disable-next=unidiomatic-typecheck
     if type(length) is _PrefixedType:
-        struct = length.start
+        struct: _SupportsPack[int] = length.start  # pyright: ignore[reportAny]
         # We have to temporatily alter the field's values,
         with WithoutContextVar(context, CTX_SEQ, False):
             field.amount = 1
@@ -140,7 +166,7 @@ def pack_seq(seq, context, pack_one) -> None:
 
     # Special elements '_index' and '_length' can be referenced within
     # the new context. The '_pos' attribute will be adjusted automatically.
-    seq_context = O_CONTEXT_FACTORY.value(
+    seq_context = (O_CONTEXT_FACTORY.value or Context)(
         _root=context._root,
         _parent=context,
         _io=stream,
@@ -164,7 +190,7 @@ def pack_seq(seq, context, pack_one) -> None:
             raise StructException(str(exc), seq_context) from exc
 
 
-def iseof(stream) -> bool:
+def iseof(stream: _StreamType) -> bool:
     """
     Check if the stream is at the end of the file.
 
@@ -174,5 +200,5 @@ def iseof(stream) -> bool:
     """
     pos = stream.tell()
     eof = not stream.read(1)
-    stream.seek(pos)
+    stream.seek(pos)  # pyright: ignore[reportUnusedCallResult]
     return eof

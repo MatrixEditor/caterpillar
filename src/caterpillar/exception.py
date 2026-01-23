@@ -12,14 +12,18 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# pyright: reportPrivateUsage=false
 import sys
+
+from caterpillar.abc import _ContextLike
+
 
 class StructException(Exception):
     """Base class for all struct-related exceptions"""
 
-    def __init__(self, message: str, context=None) -> None:
+    def __init__(self, message: str, context: _ContextLike | None = None) -> None:
         super().__init__(message)
-        self.context = context
+        self.context: _ContextLike | None = context
         if context and sys.version_info >= (3, 12):
             self.add_note(f"Context-Path: {context.__context_getattr__('_path')}")
 

@@ -28,6 +28,7 @@ from caterpillar.shortcuts import (
     LittleEndian,
     ctx,
     pack_file,
+    f
 )
 
 try:
@@ -54,7 +55,7 @@ class NIBHeader:
 
     # Here we define a constant value, which will raise an exception
     # upon a different parsed value.
-    magic: b"NIBArchive"
+    magic: f[bytes, b"NIBArchive"]
     """example field doc comment"""
 
     # Primitive types can be used just like this
