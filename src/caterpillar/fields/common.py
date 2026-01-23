@@ -19,7 +19,7 @@ import warnings
 
 from io import BytesIO
 from typing import Any, Callable, Generic
-from typing_extensions import Final, Self, override, TypeVar
+from typing_extensions import Buffer, Final, Self, override, TypeVar
 from types import NoneType
 from functools import cached_property
 from enum import Enum as _EnumType
@@ -48,14 +48,13 @@ from caterpillar.byteorder import (
     LITTLE_ENDIAN_FMT,
     O_DEFAULT_ENDIAN,
     LittleEndian,
-    SysNative,
 )
 from caterpillar import registry
 from caterpillar._common import WithoutContextVar
 from caterpillar.shared import getstruct
 
 from ._base import Field, INVALID_DEFAULT, singleton
-from ._mixin import FieldStruct
+from ._mixin import ByteOrderMixin, FieldMixin, FieldStruct
 
 # Explicitly report deprecation warnings
 warnings.filterwarnings("default", category=DeprecationWarning, module=__name__)
@@ -245,7 +244,7 @@ class PyStructFormattedField(FieldStruct[_IT, _IT]):
 
 
 # Instances of FormatField with specific format specifiers
-padding: Final[PyStructFormattedField[NoneType]] = PyStructFormattedField("x", NoneType)
+# padding: Final[PyStructFormattedField[NoneType]] = PyStructFormattedField("x", NoneType)
 char: Final[PyStructFormattedField[str]] = PyStructFormattedField("c", str)
 boolean: Final[PyStructFormattedField[bool]] = PyStructFormattedField("?", bool)
 
@@ -268,6 +267,170 @@ float64: Final[PyStructFormattedField[float]] = PyStructFormattedField("d", floa
 double: Final[PyStructFormattedField[float]] = float64
 
 void_ptr: Final[PyStructFormattedField[int]] = PyStructFormattedField("P", int)
+
+
+class Padding(ByteOrderMixin[None, None]):
+    """
+    A field that consumes or produces a fixed byte pattern.
+
+    The :class:`Padding` type is a special field used to consume or
+    generate a predetermined byte sequence during packing or unpacking.
+    It can be used both as a standalone field and as part of a larger
+    field specification where a *length* is applied.
+
+    >>> pack(None, padding) == b"\\x00"
+    b"\\x00"
+
+    :param fill: The byte pattern to consume or produce.  It may be
+        either a single integer in the range ``0``-``255`` (which will
+        be converted to a one-byte ``bytes`` instance) or a :class:`Buffer`
+        object from which a :class:`bytes` sequence is constructed.
+        Defaults to ``0x00``.
+    :type fill: Buffer | int, optional
+    :param strict: When ``True`` the unpacking process verifies that
+        the data read from the stream matches the expected pattern
+        exactly.  If the data length is not an exact multiple of the
+        ``fill`` length, or if any byte differs, a :class:`ValidationError`
+        will be raised.  Defaults to ``False``.
+    :type strict: bool, optional
+    """
+
+    __slots__: tuple[str, ...] = ("fill", "strict")
+
+    def __init__(self, fill: Buffer | int = 0x00, strict: bool = False) -> None:
+        super().__init__()
+        self.strict: bool = strict
+        match fill:
+            case int():
+                self.fill: bytes = bytes([fill])
+            case Buffer():
+                self.fill = bytes(fill)
+
+    def __size__(self, context: _ContextLike) -> int:
+        """
+        Return the size of the padding pattern in bytes.
+
+        :param context: A context object that may be used by the field
+            to determine its size.  The padding field ignores the context
+            and simply returns the length of its ``fill`` attribute.
+        :type context: _ContextLike
+        :return: The length of the padding pattern.
+        :rtype: int
+        """
+        return len(self.fill)
+
+    def __type__(self) -> type:
+        """
+        Return the underlying Python type represented by the field.
+
+        :return: ``NoneType`` - the padding field has no direct value.
+        :rtype: type
+        """
+        return NoneType
+
+    def __unpack__(self, context: _ContextLike) -> None:
+        """
+        Consume the padding from the stream and validate it.
+
+        The method reads a block of data from the stream.  If a parent
+        field specifies a length, that many bytes are read; otherwise
+        the entire stream is consumed.  When ``strict`` is enabled,
+        the read data is validated against the expected padding pattern.
+
+        :param context: Context containing the stream and optional field
+            descriptor.  The stream is accessed via ``context[CTX_STREAM]``,
+            and the optional parent field via ``context.get(CTX_FIELD)``.
+        :type context: _ContextLike
+        :raises ValidationError: If ``strict`` is ``True`` and the
+            length of the data is not a multiple of the padding length
+            or the data does not match the pattern.
+        :raises TypeError: If the field length is provided but is not an
+            integer.
+        """
+        field: Field | None = context.get(CTX_FIELD)
+        stream: _StreamType = context[CTX_STREAM]
+        fill_length = self.__size__(context)
+        if not field:
+            # no length, just unpack one time
+            data = stream.read(fill_length)
+        else:
+            amount = field.length(context)
+            if amount is _GreedyType:
+                data = stream.read()
+            else:
+                if not isinstance(amount, int):
+                    raise TypeError(
+                        "Invalid length type - prefixed length is not supported"
+                    )
+                data = stream.read(amount)
+        if self.strict:
+            if len(data) % fill_length != 0:
+                raise ValidationError(
+                    f"Parsed padding length({len(data)}) is not a "
+                    + f"multiple of fill pattern({len(self.fill)})",
+                    context,
+                )
+            amount = len(data) // fill_length
+            if data != self.fill * amount:
+                raise ValidationError(
+                    "Parsed padding does not match fill pattern:\n"
+                    + f"- parsed: {data.hex()}h\n"
+                    + f"- fill  : {self.fill.hex()}h * {amount}",
+                    context,
+                )
+
+    def __pack__(self, obj: None, context: _ContextLike) -> None:
+        """
+        Write the padding pattern to the stream.
+
+        The amount of padding written depends on the optional parent
+        field.  If the field length is ``Ellipsis`` (``...``) or omitted,
+        a single padding block is written.  Otherwise the padding is
+        repeated ``amount`` times.
+
+        :param obj: The value to pack; padding has no direct value so
+            this argument is ignored.
+        :type obj: None
+        :param context: Context containing the stream and optional field
+            descriptor.  The stream is accessed via ``context[CTX_STREAM]``,
+            and the optional parent field via ``context.get(CTX_FIELD)``.
+        :type context: _ContextLike
+        :raises TypeError: If the field length is provided but is not an
+            integer.
+        """
+        field: Field | None = context.get(CTX_FIELD)
+        stream: _StreamType = context[CTX_STREAM]
+        if not field:
+            stream.write(self.fill)
+        else:
+            amount = field.length(context)
+            if amount is Ellipsis:
+                stream.write(self.fill)
+            else:
+                if not isinstance(amount, int):
+                    raise TypeError(
+                        "Invalid length type - prefixed length is not supported"
+                    )
+                stream.write(self.fill * amount)
+
+    def __getitem__(self, dim: _LengthT) -> Field[None, None]:
+        """
+        Return a :class:`Field` instance with this padding as its
+        ``field`` and ``dim`` as its length.
+
+        This allows the padding to be used in nested field
+        definitions such as ``padding[5]`` or ``Padding(...)[10]``.
+
+        :param dim: The length (or ``...`` for greedy) that the
+            resulting field should consume or produce.
+        :type dim: _LengthT
+        :return: A new :class:`Field` instance wrapping this padding.
+        :rtype: Field[None, None]
+        """
+        return Field(self, amount=dim)
+
+
+padding: Final[Padding] = Padding()
 
 
 _IT_transformed = TypeVar("_IT_transformed", default=Any)

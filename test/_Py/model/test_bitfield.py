@@ -1,4 +1,3 @@
-import typing
 import enum
 
 from caterpillar.model import (
@@ -14,9 +13,18 @@ from caterpillar.model import (
 from caterpillar.options import (
     S_REPLACE_TYPES,
 )
-from caterpillar.fields import uint16, uint24, uint32, Bytes, uint8
+from caterpillar.fields import uint16, Bytes, uint8
 from caterpillar.shared import getstruct
 from caterpillar.shortcuts import f
+from caterpillar.types import (
+    balign_t,
+    int1_t,
+    int2_t,
+    int3_t,
+    uint16_t,
+    uint24_t,
+    uint32_t,
+)
 
 
 def test_bitfield_syntax__standard():
@@ -40,8 +48,12 @@ def test_bitfield_syntax__align():
     @bitfield
     class FormatA:
         a: f[int, 3]
-        if not typing.TYPE_CHECKING:
-            _: 0
+        # either specify manually (typing compliant)
+        # _: f[None, 0] = None
+        # or use the pre-defined type
+        _: balign_t = None
+        # or use syntax direclty (pyright will scream at you)
+        # _: 0
         b: f[int, 4]
 
     bfield = getstruct(FormatA)
@@ -61,9 +73,9 @@ def test_bitfield_syntax__struct():
     # syntax no. 3 (generic struct)
     @bitfield
     class FormatA:
-        a: f[int, uint16]
-        b: f[int, uint32]
-        c: f[int, uint24]
+        a: uint16_t
+        b: uint32_t
+        c: uint24_t
 
     # just like a @struct definition
     assert sizeof(FormatA) == 2 + 4 + 3
@@ -103,10 +115,9 @@ def test_bitfield_syntax__extended():
         a1: f[str, (4, str)]
         # 2bits converted to Enum
         a2: f[SimpleEnum | int, (2, SimpleEnum)]
-        if not typing.TYPE_CHECKING:
-            # alignment is 8 bits, finalize group and set alignment
-            # to 16bits for next group
-            _: f[None, (0, SetAlignment(16))]
+        # alignment is 8 bits, finalize group and set alignment
+        # to 16bits for next group
+        _: f[None, (0, SetAlignment(16))] = None
         # 10bits entry for current group, then finalize group
         b1: f[int, (10, EndGroup)]
         # 12bits in new group
@@ -135,8 +146,7 @@ def test_bitfield__replace_types():
     class FormatA:
         a1: f[str, (4, str)]  # a1: str
         a2: f[SimpleEnum, (2, SimpleEnum)]  # a2: SimpleEnum
-        if not typing.TYPE_CHECKING:
-            _: 0
+        _: balign_t = None
         b1: f[bytes, Bytes(6)]  # b1: bytes
 
     annotations = FormatA.__annotations__
@@ -156,8 +166,7 @@ def test_bitfield__unpack():
     class FormatA:
         a1: f[str, (4, CharFactory)]  # a1: str
         a2: f[SimpleEnum, (2, SimpleEnum)]  # a2: SimpleEnum
-        if not typing.TYPE_CHECKING:
-            _: 0
+        _: balign_t = None
         b1: f[bytes, Bytes(6)]  # b1: bytes
 
     # 0b00110100.to_bytes()
@@ -171,12 +180,11 @@ def test_bitfield__unpack():
 def test_bitfield__pack():
     @bitfield
     class FormatA:
-        a1: f[int, 1]
-        a2: f[int, 2]
-        a3: f[int, 3]
-        if not typing.TYPE_CHECKING:
-            _: 0
-        b1: f[int, uint16]
+        a1: int1_t
+        a2: int2_t
+        a3: int3_t
+        _: balign_t = None
+        b1: uint16_t
 
     obj = FormatA(a1=True, a2=3, a3=5, b1=0xFF00)
     # 0b1_11_101_00.to_bytes()

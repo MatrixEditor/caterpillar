@@ -30,6 +30,7 @@ from .common import (
     Prefixed,
     Int,
     UInt,
+    Padding,
     padding,
     char,
     boolean,
@@ -260,4 +261,5 @@ __all__ = [
     "Else",
     "ElseIf",
     "IOHook",
+    "Padding",
 ]

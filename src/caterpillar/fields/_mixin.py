@@ -40,7 +40,13 @@ from caterpillar.abc import (
 )
 
 
-class FieldMixin(Generic[_IT, _OT]):
+class ByteOrderMixin(Generic[_IT, _OT]):
+    def __set_byteorder__(self, order: _EndianLike) -> Field[_IT, _OT]:
+        """Returns a field with the given byteorder"""
+        return Field(self, order=order)
+
+
+class FieldMixin(ByteOrderMixin[_IT, _OT]):
     """A simple mixin to support operators used to create :class:`Field` instances."""
 
     def __or__(self, flag: _OptionLike) -> Field[_IT, _OT]:
@@ -68,10 +74,6 @@ class FieldMixin(Generic[_IT, _OT]):
     def __floordiv__(self, condition: _ContextLambda[bool] | bool) -> Field[_IT, _OT]:
         """Returns a field with the given condition"""
         return Field(self, byteorder(self)) // condition
-
-    def __set_byteorder__(self, order: _EndianLike) -> Field[_IT, _OT]:
-        """Returns a field with the given byteorder"""
-        return Field(self, order=order)
 
     def __rsub__(self, bits: _ContextLambda[int] | int) -> Field[_IT, _OT]:
         """Returns a field with the given bit count"""

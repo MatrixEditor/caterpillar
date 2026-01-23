@@ -37,6 +37,7 @@ from .fields.common import (
     Uuid,
     Pass,
     CString,
+    void_ptr,
 )
 from .fields.varint import vint
 from .fields.net import MAC, IPv4Address, IPv6Address
@@ -63,6 +64,7 @@ float16_t = f[float, float16]
 float32_t = f[float, float32]
 float64_t = f[float, float64]
 double_t = f[float, double]
+void_ptr_t = f[int, void_ptr]
 cstr_t = f[str, CString(...)]
 char_t = f[str, char]
 boolean_t = f[bool, boolean]
@@ -74,6 +76,10 @@ vint_t = f[int, vint]
 MAC_t = f[bytes, MAC]
 ipv6_t = f[ipaddress.IPv4Address, IPv6Address]
 ipv4_t = f[ipaddress.IPv4Address, IPv4Address]
+
+# TODO(REVISIT): naming convention
+# special type
+balign_t = f[None, 0]
 
 __all__ = [
     "uint8_t",
@@ -106,4 +112,6 @@ __all__ = [
     "int5_t",
     "int6_t",
     "int7_t",
+    "void_ptr_t",
+    "balign_t",
 ]

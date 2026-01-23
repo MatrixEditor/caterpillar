@@ -51,7 +51,7 @@ class WithoutContextVar:
         self.old_value: Any = context[name]
         self.value: Any = value
         self.name: str = name
-        self.field: "Field[Any, Any]" = context[CTX_FIELD]
+        self.field: "Field[Any, Any] | None" = context.get(CTX_FIELD)
 
     def __enter__(self) -> None:
         self.context[self.name] = self.value
