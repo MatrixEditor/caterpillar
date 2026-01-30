@@ -20,7 +20,6 @@ class Format:
     b3: f[int, 3 - int8] = 1      # default value is applied -> REVISIT: necessary?
     _1: int3_t                    # unnamed padding to the rest of the byte
 
-
 s = getstruct(Format)
 assert isinstance(s, Bitfield)
 print(s.groups)

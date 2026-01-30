@@ -413,4 +413,5 @@ __all__ = [
     "AsLengthRef",
     "struct_factory",
     "parentctx",
+    "bitfield_factory",
 ]

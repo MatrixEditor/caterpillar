@@ -42,6 +42,8 @@ from ._bitfield import (
     EnumFactory,
     CharFactory,
     DEFAULT_ALIGNMENT,
+    bitfield_factory,
+    BitfieldDefMixin,
 )
 from ._template import istemplate, template, TemplateTypeVar, derive
 
@@ -77,4 +79,6 @@ __all__ = [
     "Invisible",
     "StructDefMixin",
     "struct_factory",
+    "bitfield_factory",
+    "BitfieldDefMixin",
 ]

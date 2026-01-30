@@ -16,13 +16,22 @@
 import dataclasses
 import enum
 
-from collections.abc import Iterable
+from collections.abc import Collection, Iterable
 from typing import Any, Callable, Final, Generic, Literal
-from typing_extensions import Self, dataclass_transform, overload, override, TypeVar
+from typing_extensions import (
+    Buffer,
+    ClassVar,
+    Self,
+    dataclass_transform,
+    overload,
+    override,
+    TypeVar,
+)
 from caterpillar.fields.common import Int
 from caterpillar.shared import (
     ATTR_ACTION_PACK,
     ATTR_ACTION_UNPACK,
+    getstruct,
     typeof,
     ATTR_BITS,
     ATTR_SIGNED,
@@ -64,11 +73,14 @@ from caterpillar.abc import (
     _OptionLike,
     _ArchLike,
     _EndianLike,
+    _StreamType,
+    _LengthT,
 )
-from ._struct import Struct, sizeof, Invisible
+from ._struct import Struct, pack, sizeof, Invisible, unpack, unpack_file
 from ._base import Sequence
 
 _AnnotationT = int | tuple[int, ...] | Any  # pyright: ignore[reportExplicitAny]
+_ModelT = TypeVar("_ModelT")
 
 # --- Bitfield Concept ---
 # NEW REVISED CONCEPT
@@ -1107,126 +1119,175 @@ class Bitfield(Struct[_VT]):
                     return entry
 
 
-@dataclass_transform(field_specifiers=(dataclasses.field, Invisible))
-def _make_bitfield(
-    cls: type[_VT],
-    /,
-    *,
-    order: _EndianLike | None = None,
-    arch: _ArchLike | None = None,
-    options: Iterable[_OptionLike] | None = None,
-    field_options: Iterable[_OptionLike] | None = None,
-    alignment: int | None = None,
-) -> type:
-    _ = Bitfield(
-        cls,
-        order=order,
-        arch=arch,
-        options=options,
-        field_options=field_options,
-        alignment=alignment,
+class BitfieldDefMixin:
+    __struct__: ClassVar[Bitfield[Self]]
+
+    def __class_getitem__(
+        cls: type[_ModelT], dim: _LengthT
+    ) -> Field[Collection[_ModelT], Collection[_ModelT]]:
+        return getstruct(cls)[dim]
+
+    @classmethod
+    def from_bytes(
+        cls: type[_ModelT],
+        data: Buffer | _StreamType,
+        *,
+        order: _EndianLike | None = None,
+        arch: _ArchLike | None = None,
+        **kwargs: Any,
+    ) -> _ModelT:
+        return unpack(cls, data, order=order, arch=arch, **kwargs)
+
+    @classmethod
+    def from_file(
+        cls: type[_ModelT],
+        filename: str,
+        *,
+        order: _EndianLike | None = None,
+        arch: _ArchLike | None = None,
+        **kwargs: Any,
+    ) -> _ModelT:
+        return unpack_file(cls, filename, order=order, arch=arch, **kwargs)
+
+    def to_bytes(
+        self,
+        *,
+        order: _EndianLike | None = None,
+        arch: _ArchLike | None = None,
+        use_tempfile: bool = False,
+        **kwargs: Any,
+    ) -> bytes:
+        return pack(self, use_tempfile=use_tempfile, order=order, arch=arch, **kwargs)
+
+
+class bitfield_factory:
+    mixin: type[BitfieldDefMixin] = BitfieldDefMixin
+
+    @dataclass_transform(field_specifiers=(dataclasses.field, Invisible))
+    @staticmethod
+    def make_bitfield(
+        ty: type[_VT],
+        /,
+        *,
+        order: _EndianLike | None = None,
+        arch: _ArchLike | None = None,
+        options: Iterable[_OptionLike] | None = None,
+        field_options: Iterable[_OptionLike] | None = None,
+        alignment: int | None = None,
+    ) -> type:
+        b = Bitfield(
+            ty,
+            order=order,
+            arch=arch,
+            options=options,
+            field_options=field_options,
+            alignment=alignment,
+        )
+        return b.model
+
+    @overload
+    @dataclass_transform(
+        kw_only_default=True, field_specifiers=(dataclasses.field, Invisible)
     )
-    return _.model
+    @staticmethod
+    def bitfield(
+        ty: type[_VT],
+        /,
+        *,
+        order: _EndianLike | None = None,
+        arch: _ArchLike | None = None,
+        options: Iterable[_OptionLike] | None = None,
+        field_options: Iterable[_OptionLike] | None = None,
+        alignment: int | None = None,
+    ) -> type[_VT]: ...
+    @overload
+    @dataclass_transform(
+        kw_only_default=True, field_specifiers=(dataclasses.field, Invisible)
+    )
+    @staticmethod
+    def bitfield(
+        ty: None = None,
+        /,
+        *,
+        order: _EndianLike | None = None,
+        arch: _ArchLike | None = None,
+        options: Iterable[_OptionLike] | None = None,
+        field_options: Iterable[_OptionLike] | None = None,
+        alignment: int | None = None,
+    ) -> Callable[[type[_VT]], type[_VT]]: ...
+    @dataclass_transform(
+        kw_only_default=True, field_specifiers=(dataclasses.field, Invisible)
+    )
+    @staticmethod
+    def bitfield(
+        ty: type[_VT] | None = None,
+        /,
+        *,
+        order: _EndianLike | None = None,
+        arch: _ArchLike | None = None,
+        options: Iterable[_OptionLike] | None = None,
+        field_options: Iterable[_OptionLike] | None = None,
+        alignment: int | None = None,
+    ) -> type[_VT] | Callable[[type[_VT]], type[_VT]]:
+        """
+        Decorator that transforms a class definition into a :class:`Bitfield` structure.
 
+        This decorator enables defining bitfields using simple class syntax,
+        with support for custom alignment, ordering, architecture, and field options.
 
-@overload
-@dataclass_transform(
-    kw_only_default=True, field_specifiers=(dataclasses.field, Invisible)
-)
-def bitfield(
-    cls: type[_VT],
-    /,
-    *,
-    order: _EndianLike | None = None,
-    arch: _ArchLike | None = None,
-    options: Iterable[_OptionLike] | None = None,
-    field_options: Iterable[_OptionLike] | None = None,
-    alignment: int | None = None,
-) -> type[_VT]: ...
-@overload
-@dataclass_transform(
-    kw_only_default=True, field_specifiers=(dataclasses.field, Invisible)
-)
-def bitfield(
-    cls: None = None,
-    /,
-    *,
-    order: _EndianLike | None = None,
-    arch: _ArchLike | None = None,
-    options: Iterable[_OptionLike] | None = None,
-    field_options: Iterable[_OptionLike] | None = None,
-    alignment: int | None = None,
-) -> Callable[[type[_VT]], type[_VT]]: ...
-@dataclass_transform(
-    kw_only_default=True, field_specifiers=(dataclasses.field, Invisible)
-)
-def bitfield(
-    cls: type[_VT] | None = None,
-    /,
-    *,
-    order: _EndianLike | None = None,
-    arch: _ArchLike | None = None,
-    options: Iterable[_OptionLike] | None = None,
-    field_options: Iterable[_OptionLike] | None = None,
-    alignment: int | None = None,
-) -> type[_VT] | Callable[[type[_VT]], type[_VT]]:
-    """
-    Decorator that transforms a class definition into a :class:`Bitfield` structure.
+        :param cls: The user-defined class to transform.
+        :type cls: Optional[type]
+        :param options: A set of global or structure-specific options.
+        :type options: Optional[set]
+        :param order: Optional byte order for serialization (e.g., 'little' or 'big').
+        :type order: Optional[str]
+        :param arch: Optional architecture string (e.g., 'x86', 'arm').
+        :type arch: Optional[str]
+        :param field_options: Optional default options for fields.
+        :type field_options: Optional[set]
+        :param alignment: Optional alignment in bits.
+        :type alignment: Optional[int]
+        :return: The decorated class, enhanced as a `Bitfield` structure.
+        :rtype: type
 
-    This decorator enables defining bitfields using simple class syntax,
-    with support for custom alignment, ordering, architecture, and field options.
+        .. code-block:: python
 
-    :param cls: The user-defined class to transform.
-    :type cls: Optional[type]
-    :param options: A set of global or structure-specific options.
-    :type options: Optional[set]
-    :param order: Optional byte order for serialization (e.g., 'little' or 'big').
-    :type order: Optional[str]
-    :param arch: Optional architecture string (e.g., 'x86', 'arm').
-    :type arch: Optional[str]
-    :param field_options: Optional default options for fields.
-    :type field_options: Optional[set]
-    :param alignment: Optional alignment in bits.
-    :type alignment: Optional[int]
-    :return: The decorated class, enhanced as a `Bitfield` structure.
-    :rtype: type
+            from caterpillar.py import bitfield, SetAlignment, uint16
 
-    .. code-block:: python
+            @bitfield
+            class Packet:
+                version   : 3
+                type      : (5, SetAlignment(16))
+                length    : 10
+                _         : 0  # align to 16bits
+                payload   : uint16
 
-        from caterpillar.py import bitfield, SetAlignment, uint16
+            # You can now pack/unpack Packet instances as compact binary bitfields
+            pkt = Packet(version=1, type=2, length=128, payload=0xABCD)
+            packed = pack(pkt)
+            unpacked = unpack(Packet, packed)
+        """
 
-        @bitfield
-        class Packet:
-            version   : 3
-            type      : (5, SetAlignment(16))
-            length    : 10
-            _         : 0  # align to 16bits
-            payload   : uint16
+        def wrap(cls: type[_VT]) -> type[_VT]:
+            return bitfield_factory.make_bitfield(
+                cls,
+                options=options,
+                order=order,
+                arch=arch,
+                field_options=field_options,
+                alignment=alignment,
+            )
 
-        # You can now pack/unpack Packet instances as compact binary bitfields
-        pkt = Packet(version=1, type=2, length=128, payload=0xABCD)
-        packed = pack(pkt)
-        unpacked = unpack(Packet, packed)
-    """
+        if ty is not None:
+            return bitfield_factory.make_bitfield(
+                ty,
+                options=options,
+                order=order,
+                arch=arch,
+                field_options=field_options,
+                alignment=alignment,
+            )
 
-    def wrap(cls: type[_VT]) -> type[_VT]:
-        return _make_bitfield(
-            cls,
-            options=options,
-            order=order,
-            arch=arch,
-            field_options=field_options,
-            alignment=alignment,
-        )
+        return wrap
 
-    if cls is not None:
-        return _make_bitfield(
-            cls,
-            options=options,
-            order=order,
-            arch=arch,
-            field_options=field_options,
-            alignment=alignment,
-        )
-
-    return wrap
+bitfield = bitfield_factory.bitfield

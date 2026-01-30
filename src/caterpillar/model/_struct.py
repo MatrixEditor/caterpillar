@@ -234,6 +234,20 @@ def _struct_getitem(
 
 # TODO: docs
 def Invisible(*, init: bool = False, default: Any = None) -> Any:
+    """
+    Returns a dataclass field to identify fields invisible to the constructor.
+
+    Fields in a @struct definition marked with this field specifier won't be
+    visible in the constructor. For instance,
+
+    >>> @struct
+    ... class Format:
+    ...     a: uint32_t
+    ...     b: f[None, padding[2]] = Invisible()
+
+    In this case, field 'b' won't be visible in the constructor when using
+    a type checker.
+    """
     return dc.field(init=init, default=default, kw_only=True)
 
 
