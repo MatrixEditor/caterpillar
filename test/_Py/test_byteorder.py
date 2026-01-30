@@ -1,10 +1,22 @@
-import typing
-
-from caterpillar.byteorder import Dynamic, DynByteOrder, BigEndian, LittleEndian
-from caterpillar.py import struct, pack, uint64, unpack, uint16, uint32
+from caterpillar.py import (
+    Invisible,
+    struct,
+    pack,
+    uint64,
+    unpack,
+    uint16,
+    uint32,
+    Dynamic,
+    DynByteOrder,
+    BigEndian,
+    LittleEndian,
+    CTX_ORDER,
+    ctx,
+    this,
+    f,
+)
 from caterpillar.types import uint16_t, uint32_t, uint64_t, uint8_t
-from caterpillar.context import CTX_ORDER, SetContextVar, ctx, this
-from caterpillar.shortcuts import f
+from caterpillar.context import SetContextVar
 from caterpillar.abc import _ContextLike  # pyright: ignore[reportPrivateUsage]
 
 
@@ -183,10 +195,12 @@ def test_dyn_byteorder_action():
         a: uint16_t
         # --- All fields below use the dynamic byteorder if annotated
         #     with Dynamic
-        if not typing.TYPE_CHECKING:
-            _spec: SetContextVar(CTX_ORDER, byteorder_func)
+        _spec: f[None, SetContextVar(CTX_ORDER, byteorder_func)] = Invisible()
         b: f[int, Dynamic(ctx._order) + uint32]
 
     obj = Format(a=0x1234, b=0x56789ABC)
     data = pack(obj)
     assert data.hex() == "1234bc9a7856"
+
+
+test_dyn_byteorder_action()

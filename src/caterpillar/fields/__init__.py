@@ -31,6 +31,8 @@ from .common import (
     Int,
     UInt,
     Padding,
+    AsLengthRef,
+    Timestamp,
     padding,
     char,
     boolean,
@@ -262,4 +264,6 @@ __all__ = [
     "ElseIf",
     "IOHook",
     "Padding",
+    "AsLengthRef",
+    "Timestamp",
 ]

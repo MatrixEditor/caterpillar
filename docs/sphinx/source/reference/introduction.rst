@@ -35,23 +35,60 @@ The biggest advantage of *Caterpillar* is the lack of external dependencies (tho
 dependencies). Additionally, the minimal lines of code required to define structures speak for themselves, as
 demonstrated in the following example from `examples/formats/caf`:
 
-.. code-block:: python
-    :linenos:
 
-    @struct(order=BigEndian)
-    class CAFChunk:
-        # Include other structs just like that
-        chunk_header: CAFChunkHeader
-        # Built-in support for switch-case structures
-        data: Field(this.chunk_header.chunk_type) >> {
-            b"desc": CAFAudioFormat,
-            b"info": CAFStringsChunk,
-            b"pakt": CAFPacketTable,
-            b"data": CAFData,
-            b"free": padding[this.chunk_header.chunk_size],
-            # the fallback struct given with a default option
-            DEFAULT_OPTION: Bytes(this.chunk_header.chunk_size),
-        }
+.. tab-set::
+    :sync-group: syntax
+
+    .. tab-item:: Default Syntax
+        :sync: default
+
+        .. code-block:: python
+            :linenos:
+
+            @struct(order=BigEndian)
+            class CAFChunk:
+                # Include other structs just like that
+                chunk_header: CAFChunkHeader
+                # Built-in support for switch-case structures
+                data: Field(this.chunk_header.chunk_type) >> {
+                    b"desc": CAFAudioFormat,
+                    b"info": CAFStringsChunk,
+                    b"pakt": CAFPacketTable,
+                    b"data": CAFData,
+                    b"free": padding[this.chunk_header.chunk_size],
+                    # the fallback struct given with a default option
+                    DEFAULT_OPTION: Bytes(this.chunk_header.chunk_size),
+                }
+
+    .. tab-item:: Extended Syntax (>=2.8.0)
+        :sync: extended
+
+        .. code-block:: python
+            :linenos:
+
+            CAFChunkDataT = (
+                CAFAudioFormat
+                | CAFStringsChunk
+                | CAFPacketTable
+                | CAFData
+                | None
+                | bytes
+            )
+
+            @struct(order=BigEndian)
+            class CAFChunk:
+                # Include other structs just like that
+                chunk_header: CAFChunkHeader
+                # Built-in support for switch-case structures
+                data: f[CAFChunkDataT, Field(this.chunk_header.chunk_type) >> {
+                    b"desc": CAFAudioFormat,
+                    b"info": CAFStringsChunk,
+                    b"pakt": CAFPacketTable,
+                    b"data": CAFData,
+                    b"free": padding[this.chunk_header.chunk_size],
+                    # the fallback struct given with a default option
+                    DEFAULT_OPTION: Bytes(this.chunk_header.chunk_size),
+                }]
 
 
 How does this even work?
@@ -68,6 +105,14 @@ of Python 3.12, there are no conflicts in using annotations for defining fields.
 
 By using annotations, we can simply define a default value if desired, eliminating the need to make the code
 more complex by using assignments.
+
+Extended syntax:
+
+.. code-block:: python
+
+    @struct
+    class Format:
+        # <name> : f[ <type>, <field>, <extra_options> ] = <default_value>
 
 
 Pros & Cons
@@ -89,8 +134,20 @@ Construct. The files used in the benchmark are provided below:
 
     .. tab-item:: caterpillar
 
-        .. literalinclude:: ./snippets/comparison_1_caterpillar.py
-            :language: python
+        .. tab-set::
+            :sync-group: syntax
+
+            .. tab-item:: Default Syntax
+                :sync: default
+
+                .. literalinclude:: ./snippets/comparison_1_caterpillar.py
+                    :language: python
+
+            .. tab-item:: Extended Syntax (>=2.8.0)
+                :sync: extended
+
+                .. literalinclude:: ./snippets/comparison_1_caterpillar_ext.py
+                    :language: python
 
         .. note::
             It actually makes no time-related difference if we define the :code:`Format` field directly or put it into

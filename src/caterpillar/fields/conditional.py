@@ -19,7 +19,7 @@ from typing_extensions import override, Self
 
 from caterpillar.context import ConditionContext
 from caterpillar.exception import ValidationError
-from caterpillar.shared import typeof, identity
+from caterpillar.shared import typeof, constval
 from caterpillar.abc import _ContextLambda, _ContextLike, _StructLike
 
 from ._base import Field
@@ -72,7 +72,7 @@ class ConditionalChain:
         idx: int = len(self.chain)
         self.chain[idx] = struct
         if isinstance(func, bool):
-            func = identity(func)
+            func = constval(func)
         self.conditions.append(func)
 
     def get_struct(self, context: _ContextLike) -> _StructLike | None:

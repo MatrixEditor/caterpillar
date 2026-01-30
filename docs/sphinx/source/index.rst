@@ -38,9 +38,9 @@ to write complex structures in a compact and readable manner.
 
          @struct
          class Format:
-            magic:   f[bytes, b"Foo"]                     # constant values
-            name:    cstr_t                               # \x00-terminated String without a fixed length
-            value:   f[int, le + uint16]                  # little endian encoding
+            magic  : f[bytes, b"Foo"] = Invisible()       # constant values
+            name   : cstr_t                               # \x00-terminated String without a fixed length
+            value  : f[int, le + uint16]                  # little endian encoding
             entries: f[list[str], be + CString[uint32::]] # arrays with big-endian prefixed length
 
 

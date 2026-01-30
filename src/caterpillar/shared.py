@@ -74,7 +74,7 @@ ATTR_UNPACK: Final[str] = "__unpack__"
 ATTR_ACTION_PACK: Final[str] = "__action_pack__"
 ATTR_ACTION_UNPACK: Final[str] = "__action_unpack__"
 
-def identity(value: _OT) -> "_ContextLambda[_OT]":
+def constval(value: _OT) -> "_ContextLambda[_OT]":
     return lambda context: value
 
 

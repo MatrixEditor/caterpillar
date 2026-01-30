@@ -23,7 +23,14 @@ from collections.abc import Collection, Iterable
 from shutil import copyfileobj
 from typing import Any, Callable, Generic, Literal, ParamSpec, TypeVar
 from types import TracebackType
-from typing_extensions import dataclass_transform, override, overload, Buffer
+from typing_extensions import (
+    ClassVar,
+    Self,
+    dataclass_transform,
+    override,
+    overload,
+    Buffer,
+)
 
 from caterpillar.byteorder import (
     O_DEFAULT_ARCH,
@@ -33,7 +40,7 @@ from caterpillar.byteorder import (
 )
 from caterpillar.shared import ATTR_PACK, getstruct, hasstruct, ATTR_STRUCT
 from caterpillar.context import O_CONTEXT_FACTORY, CTX_STREAM, Context
-from caterpillar.exception import InvalidValueError
+from caterpillar.exception import DynamicSizeError, InvalidValueError
 from caterpillar.options import (
     S_EVAL_ANNOTATIONS,
     S_UNION,
@@ -58,6 +65,7 @@ from caterpillar.abc import (
     _OptionLike,
     _EndianLike,
     _ArchLike,
+    _LengthT,
 )
 from ._base import Sequence
 
@@ -94,7 +102,7 @@ class Struct(Sequence[type[_ModelT], _ModelT, _ModelT]):
         hook_cls: type["UnionHook[_ModelT]"] | None = None,
     ) -> None:
         self.kw_only: bool = kw_only
-        options: set[_OptionLike] = set(options or [])
+        options = set(options or [])
         options.update(
             GLOBAL_UNION_OPTIONS if S_UNION in options else GLOBAL_STRUCT_OPTIONS
         )
@@ -161,6 +169,12 @@ class Struct(Sequence[type[_ModelT], _ModelT, _ModelT]):
     @override
     def _remove_from_model(self, name: str) -> None:
         self.model.__annotations__.pop(name)
+        default = getattr(self.model, name, None)
+        # Invisible adds a dataclass.Field to the class definition. We have
+        # to remove in order to prevent errors
+        if isinstance(default, dc.Field):
+            # mitigation for: TypeError: 'XXX' is a field but has no type annotation
+            delattr(self.model, name)
 
     @override
     def unpack_one(self, context: _ContextLike) -> _ModelT:
@@ -218,119 +232,176 @@ def _struct_getitem(
     return class_getitem
 
 
-@dataclass_transform()
-def _make_struct(
-    cls: type[_ModelT],
-    options: Iterable[_OptionLike] | None = None,
-    order: _EndianLike | None = None,
-    arch: _ArchLike | None = None,
-    field_options: Iterable[_OptionLike] | None = None,
-    kw_only: bool = False,
-    hook_cls: type["UnionHook[_ModelT]"] | None = None,
-) -> type[_ModelT]:
-    """
-    Helper function to create a Struct class.
-
-    :param cls: The target class used as the base model.
-    :param options: Additional options specifying what to include in the final class.
-    :param order: Optional configuration value for the byte order of a field.
-    :param arch: Global architecture definition (will be inferred on all fields).
-
-    :return: The created Struct class.
-    """
-    _ = Struct(
-        cls,
-        order=order,
-        arch=arch,
-        options=options,
-        field_options=field_options,
-        kw_only=kw_only,
-        hook_cls=hook_cls,
-    )
-    return _.model
+# TODO: docs
+def Invisible(*, init: bool = False, default: Any = None) -> Any:
+    return dc.field(init=init, default=default, kw_only=True)
 
 
-@overload
-@dataclass_transform()
-def struct(
-    cls: type[_ModelT],
-    kw_only: Literal[False] = False,
-    options: Iterable[_OptionLike] | None = None,
-    order: _EndianLike | None = None,
-    arch: _ArchLike | None = None,
-    field_options: Iterable[_OptionLike] | None = None,
-) -> type[_ModelT]: ...
-@overload
-@dataclass_transform(kw_only_default=True)
-def struct(
-    cls: type[_ModelT],
-    kw_only: Literal[True] = True,
-    options: Iterable[_OptionLike] | None = None,
-    order: _EndianLike | None = None,
-    arch: _ArchLike | None = None,
-    field_options: Iterable[_OptionLike] | None = None,
-) -> type[_ModelT]: ...
-@overload
-@dataclass_transform()
-def struct(
-    cls: None = None,
-    kw_only: Literal[False] = False,
-    options: Iterable[_OptionLike] | None = None,
-    order: _EndianLike | None = None,
-    arch: _ArchLike | None = None,
-    field_options: Iterable[_OptionLike] | None = None,
-) -> Callable[[_ModelT], type[_ModelT]]: ...
-@overload
-@dataclass_transform(kw_only_default=True)
-def struct(
-    cls: None = None,
-    kw_only: Literal[True] = True,
-    options: Iterable[_OptionLike] | None = None,
-    order: _EndianLike | None = None,
-    arch: _ArchLike | None = None,
-    field_options: Iterable[_OptionLike] | None = None,
-) -> Callable[[_ModelT], type[_ModelT]]: ...
-@dataclass_transform()
-def struct(
-    cls: type[_ModelT] | None = None,
-    kw_only: bool = False,
-    options: Iterable[_OptionLike] | None = None,
-    order: _EndianLike | None = None,
-    arch: _ArchLike | None = None,
-    field_options: Iterable[_OptionLike] | None = None,
-) -> type[_ModelT] | Callable[[_ModelT], type[_ModelT]]:
-    """
-    Decorator to create a Struct class.
+class StructDefMixin:
+    __struct__: ClassVar[Struct[Self]]
 
-    :param cls: The target class used as the base model.
-    :param options: Additional options specifying what to include in the final class.
-    :param order: Optional configuration value for the byte order of a field.
-    :param arch: Global architecture definition (will be inferred on all fields).
+    def __class_getitem__(
+        cls: type[_ModelT], dim: _LengthT
+    ) -> Field[Collection[_ModelT], Collection[_ModelT]]:
+        return getstruct(cls)[dim]
 
-    :return: The created Struct class or a wrapper function if cls is not provided.
-    """
+    @classmethod
+    def from_bytes(
+        cls: type[_ModelT],
+        data: Buffer | _StreamType,
+        *,
+        order: _EndianLike | None = None,
+        arch: _ArchLike | None = None,
+        **kwargs: Any,
+    ) -> _ModelT:
+        return unpack(cls, data, order=order, arch=arch, **kwargs)
 
-    def wrap(cls: type[_ModelT]) -> type[_ModelT]:
-        return _make_struct(
-            cls,
+    @classmethod
+    def from_file(
+        cls: type[_ModelT],
+        filename: str,
+        *,
+        order: _EndianLike | None = None,
+        arch: _ArchLike | None = None,
+        **kwargs: Any,
+    ) -> _ModelT:
+        return unpack_file(cls, filename, order=order, arch=arch, **kwargs)
+
+    def to_bytes(
+        self,
+        *,
+        order: _EndianLike | None = None,
+        arch: _ArchLike | None = None,
+        use_tempfile: bool = False,
+        **kwargs: Any,
+    ) -> bytes:
+        return pack(self, use_tempfile=use_tempfile, order=order, arch=arch, **kwargs)
+
+
+class struct_factory:
+    mixin: type[StructDefMixin] = StructDefMixin
+
+    @overload
+    @dataclass_transform(field_specifiers=(dc.field, Invisible))
+    @staticmethod
+    def new(
+        ty: type[_ModelT],
+        kw_only: Literal[False] = False,
+        options: Iterable[_OptionLike] | None = None,
+        order: _EndianLike | None = None,
+        arch: _ArchLike | None = None,
+        field_options: Iterable[_OptionLike] | None = None,
+    ) -> type[_ModelT]: ...
+    @overload
+    @dataclass_transform(kw_only_default=True, field_specifiers=(dc.field, Invisible))
+    @staticmethod
+    def new(
+        ty: type[_ModelT],
+        kw_only: Literal[True] = True,
+        options: Iterable[_OptionLike] | None = None,
+        order: _EndianLike | None = None,
+        arch: _ArchLike | None = None,
+        field_options: Iterable[_OptionLike] | None = None,
+    ) -> type[_ModelT]: ...
+    @overload
+    @dataclass_transform(field_specifiers=(dc.field, Invisible))
+    @staticmethod
+    def new(
+        ty: None = None,
+        kw_only: Literal[False] = False,
+        options: Iterable[_OptionLike] | None = None,
+        order: _EndianLike | None = None,
+        arch: _ArchLike | None = None,
+        field_options: Iterable[_OptionLike] | None = None,
+    ) -> Callable[[_ModelT], type[_ModelT]]: ...
+    @overload
+    @dataclass_transform(kw_only_default=True, field_specifiers=(dc.field, Invisible))
+    @staticmethod
+    def new(
+        ty: None = None,
+        kw_only: Literal[True] = True,
+        options: Iterable[_OptionLike] | None = None,
+        order: _EndianLike | None = None,
+        arch: _ArchLike | None = None,
+        field_options: Iterable[_OptionLike] | None = None,
+    ) -> Callable[[_ModelT], type[_ModelT]]: ...
+    @dataclass_transform(field_specifiers=(dc.field, Invisible))
+    @staticmethod
+    def new(
+        ty: type[_ModelT] | None = None,
+        kw_only: bool = False,
+        options: Iterable[_OptionLike] | None = None,
+        order: _EndianLike | None = None,
+        arch: _ArchLike | None = None,
+        field_options: Iterable[_OptionLike] | None = None,
+    ) -> type[_ModelT] | Callable[[_ModelT], type[_ModelT]]:
+        """
+        Decorator to create a Struct class.
+
+        :param cls: The target class used as the base model.
+        :param options: Additional options specifying what to include in the final class.
+        :param order: Optional configuration value for the byte order of a field.
+        :param arch: Global architecture definition (will be inferred on all fields).
+
+        :return: The created Struct class or a wrapper function if cls is not provided.
+        """
+
+        def wrap(cls: type[_ModelT]) -> type[_ModelT]:
+            return struct_factory.make_struct(
+                cls,
+                order=order,
+                arch=arch,
+                options=options,
+                field_options=field_options,
+                kw_only=kw_only,
+            )
+
+        if ty is not None:
+            return struct_factory.make_struct(
+                ty,
+                order=order,
+                arch=arch,
+                options=options,
+                field_options=field_options,
+                kw_only=kw_only,
+            )
+
+        return wrap  # pyright: ignore[reportReturnType]
+
+    @dataclass_transform(field_specifiers=(dc.field, Invisible))
+    @staticmethod
+    def make_struct(
+        ty: type[_ModelT],
+        options: Iterable[_OptionLike] | None = None,
+        order: _EndianLike | None = None,
+        arch: _ArchLike | None = None,
+        field_options: Iterable[_OptionLike] | None = None,
+        kw_only: bool = False,
+        hook_cls: type["UnionHook[_ModelT]"] | None = None,
+    ) -> type[_ModelT]:
+        """
+        Helper function to create a Struct class.
+
+        :param cls: The target class used as the base model.
+        :param options: Additional options specifying what to include in the final class.
+        :param order: Optional configuration value for the byte order of a field.
+        :param arch: Global architecture definition (will be inferred on all fields).
+
+        :return: The created Struct class.
+        """
+        s = Struct(
+            ty,
             order=order,
             arch=arch,
             options=options,
             field_options=field_options,
             kw_only=kw_only,
+            hook_cls=hook_cls,
         )
+        return s.model
 
-    if cls is not None:
-        return _make_struct(
-            cls,
-            order=order,
-            arch=arch,
-            options=options,
-            field_options=field_options,
-            kw_only=kw_only,
-        )
 
-    return wrap  # pyright: ignore[reportReturnType]
+struct = struct_factory.new
 
 
 class UnionHook(Generic[_ModelT]):
@@ -426,7 +497,7 @@ def _union_setattr(hook: UnionHook[_ModelT]) -> Callable[..., None]:
 
 
 @overload
-@dataclass_transform()
+@dataclass_transform(field_specifiers=(dc.field, Invisible))
 def union(
     cls: None = None,
     /,
@@ -439,7 +510,7 @@ def union(
     hook_cls: type[UnionHook[_ModelT]] | None = None,
 ) -> Callable[[type[_ModelT]], type[_ModelT]]: ...
 @overload
-@dataclass_transform()
+@dataclass_transform(field_specifiers=(dc.field, Invisible))
 def union(
     cls: type[_ModelT],
     /,
@@ -451,7 +522,7 @@ def union(
     kw_only: bool = False,
     hook_cls: type[UnionHook[_ModelT]] | None = None,
 ) -> type[_ModelT]: ...
-@dataclass_transform()
+@dataclass_transform(field_specifiers=(dc.field, Invisible))
 def union(
     cls: type[_ModelT] | None = None,
     /,
@@ -476,7 +547,7 @@ def union(
     options = set(list(options or []) + [S_UNION])
 
     def wrap(cls: type[_ModelT]) -> type[_ModelT]:
-        return _make_struct(
+        return struct_factory.make_struct(
             cls,
             order=order,
             arch=arch,
@@ -487,7 +558,7 @@ def union(
         )
 
     if cls is not None:
-        return _make_struct(
+        return struct_factory.make_struct(
             cls,
             order=order,
             arch=arch,
@@ -1056,4 +1127,7 @@ def sizeof(obj: _SupportsSize | _ContainsStruct | type, **kwds: Any) -> int:
     if not isinstance(struct_, _SupportsSize):
         raise TypeError(f"{type(struct_).__name__} does not support size calculation!")
 
-    return struct_.__size__(context)
+    size = struct_.__size__(context)
+    if not isinstance(size, int):  # pyright: ignore[reportUnnecessaryIsInstance]
+        raise DynamicSizeError(f"Struct {struct_} is using a dynamic size ", context)
+    return size

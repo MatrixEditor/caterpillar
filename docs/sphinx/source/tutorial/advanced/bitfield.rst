@@ -50,31 +50,94 @@ Each field is defined using one of five patterns:
 
 1. Basic fixed-size bits field:
 
-   A standard field defines a name and the number of bits it occupies. Example::
+   A standard field defines a name and the number of bits it occupies. Example:
 
-       @bitfield
-       class Format:
-           flag : 1 # means the field flag uses 1 bit.
+
+
+.. tab-set::
+    :sync-group: syntax
+
+    .. tab-item:: Default Syntax
+        :sync: default
+
+        .. code-block:: python
+
+            @bitfield
+            class Format:
+                flag : 1 # means the field flag uses 1 bit.
+
+
+    .. tab-item:: Extended Syntax (>=2.8.0)
+        :sync: extended
+
+        .. code-block:: python
+
+            @bitfield
+            class Format:
+                flag : f[int, 1] # means the field flag uses 1 bit.
+                # or using a type
+                flag : int1_t
 
 2. Basic fixed-size bits field with type from struct:
 
    You can specify how the bits should be interpreted using a type that will be
-   resolved from the given struct using the :class:`_SupportsType` protocol::
+   resolved from the given struct using the :class:`_SupportsType` protocol:
 
-       @bitfield
-       class Format:
-           valid : 1 - boolean # the 1-bit field should be interpreted as a bool
+
+.. tab-set::
+    :sync-group: syntax
+
+    .. tab-item:: Default Syntax
+        :sync: default
+
+        .. code-block:: python
+
+            @bitfield
+            class Format:
+                valid : 1 - boolean # the 1-bit field should be interpreted as a bool
+
+    .. tab-item:: Extended Syntax (>=2.8.0)
+        :sync: extended
+
+        .. code-block:: python
+
+            @bitfield
+            class Format:
+                # the 1-bit field should be interpreted as a bool
+                valid : f[bool, 1 - boolean]
+
 
 3. Alignment:
 
    If you define a field with a size of ``0``, it forces the Bitfield to align the current group
-   to the next byte boundary. Afterwards, the current group is finalized and a new one is started::
+   to the next byte boundary. Afterwards, the current group is finalized and a new one is started.
+   To use the automatic alignment in the extended syntax, use :attr:`balign_t`.
 
-        @bitfield
-        class Format:
-            flag  : 1
-            _     : 0 # align to 8bits
-            valid : 1 - boolean        # size will be 2x 8bits
+
+.. tab-set::
+    :sync-group: syntax
+
+    .. tab-item:: Default Syntax
+        :sync: default
+
+        .. code-block:: python
+
+                @bitfield
+                class Format:
+                    flag  : 1
+                    _     : 0 # align to 8bits
+                    valid : 1 - boolean        # size will be 2x 8bits
+
+    .. tab-item:: Extended Syntax (>=2.8.0)
+        :sync: extended
+
+        .. code-block:: python
+
+                @bitfield
+                class Format:
+                    flag  : int1_t
+                    _     : balign_t = Invisible() # align to 8bits
+                    valid : f[bool, 1 - boolean]  # size will be 2x 8bits
 
 4. Struct-like Field:
 
@@ -84,13 +147,30 @@ Each field is defined using one of five patterns:
 5. Custom Factory with Options:
 
    For advanced cases, you can specify not only the number of bits and a factory (a type converter)
-   but also additional options to fine-tune grouping or alignment::
+   but also additional options to fine-tune grouping or alignment:
 
-      @bitfield
-      class Format:
-        # 7bits, converted to char and alignment set to 24bits
-        name : (7, CharFactory, SetAlignment(24))
+.. tab-set::
+    :sync-group: syntax
 
+    .. tab-item:: Default Syntax
+        :sync: default
+
+        .. code-block:: python
+
+            @bitfield
+            class Format:
+                # 7bits, converted to char and alignment set to 24bits
+                name : (7, CharFactory, SetAlignment(24))
+
+    .. tab-item:: Extended Syntax (>=2.8.0)
+        :sync: extended
+
+        .. code-block:: python
+
+            @bitfield
+            class Format:
+                # 7bits, converted to char and alignment set to 24bits
+                name : f[str, (7, CharFactory, SetAlignment(24))]
 
 Practical Example
 -----------------
@@ -98,20 +178,44 @@ Practical Example
 One practical example of using BitFields is implementing the chunk-naming convention
 for PNG files. Here's how you might define the options for a chunk using a bitfield structure:
 
-.. code-block:: python
-    :caption: Implementing the `chunk-naming <https://www.w3.org/TR/png/#5Chunk-naming-conventions>`_ convention
+.. tab-set::
+    :sync-group: syntax
 
-    @bitfield(opions={S_DISCARD_UNNAMED})
-    class ChunkOption:
-        _     : 2               # <-- first two bits are not used
-        value : 1               # automatically boolean
+    .. tab-item:: Default Syntax
+        :sync: default
 
-    @struct
-    class ChunkOptions:
-        ancillary    : ChunkOption # f0
-        private      : ChunkOption # f1
-        reserved     : ChunkOption # f2
-        safe_to_copy : ChunkOption # f3
+        .. code-block:: python
+            :caption: Implementing the `chunk-naming <https://www.w3.org/TR/png/#5Chunk-naming-conventions>`_ convention
+
+            @bitfield(opions={S_DISCARD_UNNAMED})
+            class ChunkOption:
+                _     : 2               # <-- first two bits are not used
+                value : 1               # automatically boolean
+
+            @struct
+            class ChunkOptions:
+                ancillary    : ChunkOption # f0
+                private      : ChunkOption # f1
+                reserved     : ChunkOption # f2
+                safe_to_copy : ChunkOption # f3
+
+    .. tab-item:: Extended Syntax (>=2.8.0)
+        :sync: extended
+
+        .. code-block:: python
+            :caption: Implementing the `chunk-naming` convention
+
+            @bitfield(opions={S_DISCARD_UNNAMED})
+            class ChunkOption:
+                _     : f[None, 2] = Invisible() # <-- first two bits are not used
+                value : int1_t                   # automatically boolean
+
+            @struct
+            class ChunkOptions:
+                ancillary    : ChunkOption # f0
+                private      : ChunkOption # f1
+                reserved     : ChunkOption # f2
+                safe_to_copy : ChunkOption # f3
 
 In the example above, each field within the :code:`ChunkOptions` class is assigned
 8bits according to the :code:`ChunkOption` bitfield.

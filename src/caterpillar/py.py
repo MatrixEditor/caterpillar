@@ -12,7 +12,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-from typing import Annotated as f
+from typing import Annotated
+
+f = Annotated
 
 # use this module to import everything Python related
 from .registry import TypeConverter, annotation_registry, to_struct
@@ -68,6 +70,9 @@ from .context import (
     CTX_ORDER,
     ExprMixin,
     root,
+    SetContextVar,
+    O_CONTEXT_FACTORY,
+    parentctx,
 )
 from .exception import (
     StructException,
@@ -127,7 +132,9 @@ from .shared import (
     MODE_PACK,
     MODE_UNPACK,
     typeof,
-    identity,
+    constval,
+    ATTR_PACK,
+    ATTR_UNPACK,
 )
 
 __all__ = [
@@ -394,7 +401,16 @@ __all__ = [
     "B_GROUP_NEW",
     "B_NO_AUTO_BOOL",
     "B_OVERWRITE_ALIGNMENT",
-    "identity",
+    "constval",
     "f",
     "Padding",
+    "Invisible",
+    "O_CONTEXT_FACTORY",
+    "SetContextVar",
+    "ATTR_PACK",
+    "ATTR_UNPACK",
+    "StructDefMixin",
+    "AsLengthRef",
+    "struct_factory",
+    "parentctx",
 ]

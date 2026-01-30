@@ -1,4 +1,3 @@
-import typing
 from caterpillar.py import (
     Bitfield,
     bitfield,
@@ -7,16 +6,16 @@ from caterpillar.py import (
     int8,
     unpack,
     pack,
+    Invisible
 )
 from caterpillar.shortcuts import f
-from caterpillar.types import int1_t, int3_t
+from caterpillar.types import balign_t, int1_t, int3_t
 
 
 @bitfield
 class Format:
     b1: int1_t                    # inferred uint8 type with a width of one bit
-    if not typing.TYPE_CHECKING:
-        _: 0                      # start new uint8 with 7 unused bits
+    _: balign_t = Invisible()     # start new uint8 with 7 unused bits
     b2: f[str, (2, CharFactory)]  # wraps parsed int to char (string)
     b3: f[int, 3 - int8] = 1      # default value is applied -> REVISIT: necessary?
     _1: int3_t                    # unnamed padding to the rest of the byte

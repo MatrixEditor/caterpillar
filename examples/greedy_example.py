@@ -1,5 +1,6 @@
 import typing
 
+from caterpillar.model._struct import struct_factory
 from caterpillar.shortcuts import f
 from caterpillar.py import struct, BigEndian, this, unpack, uint8
 from caterpillar.abc import _LengthT  # pyright: ignore[reportPrivateUsage]
@@ -10,18 +11,12 @@ BMP_MAGIC = b"BMP"
 # reusable types can be defined using the f[...] shortcut
 magic_t = f[bytes, BMP_MAGIC]
 
-
 @struct(order=BigEndian, kw_only=True)
-class Format:
+class Format(struct_factory.mixin):
     magic: magic_t = BMP_MAGIC
     width: uint8_t
     height: uint8_t
     pixels: f[list[int], uint8[this.width * this.height]]
-
-    # Workaround for typing issues when using Class[...]
-    if typing.TYPE_CHECKING:
-
-        def __class_getitem__(cls, length: _LengthT): ...
 
 
 @struct(order=BigEndian, kw_only=True)
@@ -31,6 +26,7 @@ class Format2:
     height: uint8_t
     pixels: f[list[int], uint8[...]]
 
+    # Workaround for typing issues when using Class[...]
     if typing.TYPE_CHECKING:
 
         def __class_getitem__(cls, length: _LengthT): ...

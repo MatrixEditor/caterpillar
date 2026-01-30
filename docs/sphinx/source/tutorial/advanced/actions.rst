@@ -34,9 +34,12 @@ For example:
 
         .. code-block:: python
 
+            def my_action(context: _ContextLike):
+                print("Hello, World!")
+
             @struct
             class Format:
-                _: f[None, Action(pack=lambda context: print("Hello, World!"))] = None
+                _: f[None, Action(pack=my_action)] = Invisible()
                 a: uint8_t
 
 In this case, when the struct is packed, it will print :code:`"Hello, World!"` to the
@@ -113,7 +116,7 @@ specialized message digest like SHA256 (see :class:`~caterpillar.py.Digest`):
                     @struct
                     class Format:
                         key: f[bytes, b"..."]
-                        _hash_begin: f[None, DigestField.begin("hash", Sha2_256_Algo)] = None
+                        _hash_begin: f[None, DigestField.begin("hash", Sha2_256_Algo)] = Invisible()
                         user_data: f[bytes, Bytes(50)]
                         # the 'hash' attribute must be set manually
                         hash: f[bytes, DigestField("hash", Bytes(32), verify=True)] = b""

@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # pyright: reportPrivateUsage=false
+import dataclasses
 import enum
 
 from collections.abc import Iterable
@@ -64,10 +65,10 @@ from caterpillar.abc import (
     _ArchLike,
     _EndianLike,
 )
-from ._struct import Struct, sizeof
+from ._struct import Struct, sizeof, Invisible
 from ._base import Sequence
 
-_AnnotationT = int | tuple[int, ...] | Any
+_AnnotationT = int | tuple[int, ...] | Any  # pyright: ignore[reportExplicitAny]
 
 # --- Bitfield Concept ---
 # NEW REVISED CONCEPT
@@ -654,7 +655,9 @@ class Bitfield(Struct[_VT]):
         self.groups.extend(sequence.groups)
         return super(Struct, self).__add__(sequence)
 
-    def _process_align(self, options: list[_OptionLike] | None) -> Field:
+    def _process_align(
+        self, options: list[_OptionLike[Any] | SetAlignment] | None
+    ) -> Field:
         """
         Process an alignment directive.
 
@@ -675,15 +678,13 @@ class Bitfield(Struct[_VT]):
             self._bit_pos = self._current_group.bit_count
 
         for option in options or []:
-            if self._process_alignment_option(option):
-                continue
-
-            alignment = self._current_alignment
-            group = self._current_group
-            if option.name in (EndGroup.name, NewGroup.name):
-                # finalize current group (same effect for alignment statement)
-                group.align_to(alignment)
-                self._current_group = self._new_group(alignment)
+            if not self._process_alignment_option(option):
+                alignment = self._current_alignment
+                group = self._current_group
+                if option.name in (EndGroup.name, NewGroup.name):
+                    # finalize current group (same effect for alignment statement)
+                    group.align_to(alignment)
+                    self._current_group = self._new_group(alignment)
 
         return Field(Pass)
 
@@ -694,7 +695,7 @@ class Bitfield(Struct[_VT]):
         factory: (
             BitfieldValueFactory[Any] | type[BitfieldValueFactory[Any]] | None
         ) = None,
-        options: list[_OptionLike] | None = None,
+        options: list[_OptionLike[Any] | SetAlignment] | None = None,
     ) -> Field:
         """
         Process a bitfield entry with a given width.
@@ -730,7 +731,7 @@ class Bitfield(Struct[_VT]):
         self,
         name: str,
         field: Field,
-        options: list[_OptionLike] | None = None,
+        options: list[_OptionLike[Any] | SetAlignment] | None = None,
         factory: (
             BitfieldValueFactory[Any] | type[BitfieldValueFactory[Any]] | None
         ) = None,
@@ -754,7 +755,9 @@ class Bitfield(Struct[_VT]):
             # we don't need to check for NewGroup and EndGroup options here as no
             # bits are specified and the field gets its own group.
             for option in options or []:
-                self._process_alignment_option(option)
+                self._process_alignment_option(
+                    option
+                )  # pyright: ignore[reportUnusedCallResult]
 
             # bits not present -> treat defintion as simple field, which means we finalize
             # the current group, create a new FIELD GROUP and another new one after that
@@ -792,7 +795,7 @@ class Bitfield(Struct[_VT]):
 
     def _process_options(
         self,
-        options: list[_OptionLike | SetAlignment],
+        options: list[_OptionLike[Any] | SetAlignment] | None,
         entry: BitfieldEntry | None = None,
     ) -> bool:
         # fmt: off
@@ -857,7 +860,9 @@ class Bitfield(Struct[_VT]):
         self, name: str, annotation: _AnnotationT, default: Any
     ) -> Field:
         arch: _ArchLike | None = self.arch
-        order: _EndianLike | None = self.order #getattr(annotation, ATTR_BYTEORDER, None)
+        order: _EndianLike | None = (
+            self.order
+        )  # getattr(annotation, ATTR_BYTEORDER, None)
         match annotation:
             case int():
                 if annotation == 0:
@@ -1102,7 +1107,7 @@ class Bitfield(Struct[_VT]):
                     return entry
 
 
-@dataclass_transform()
+@dataclass_transform(field_specifiers=(dataclasses.field, Invisible))
 def _make_bitfield(
     cls: type[_VT],
     /,
@@ -1125,7 +1130,9 @@ def _make_bitfield(
 
 
 @overload
-@dataclass_transform(kw_only_default=True)
+@dataclass_transform(
+    kw_only_default=True, field_specifiers=(dataclasses.field, Invisible)
+)
 def bitfield(
     cls: type[_VT],
     /,
@@ -1137,7 +1144,9 @@ def bitfield(
     alignment: int | None = None,
 ) -> type[_VT]: ...
 @overload
-@dataclass_transform(kw_only_default=True)
+@dataclass_transform(
+    kw_only_default=True, field_specifiers=(dataclasses.field, Invisible)
+)
 def bitfield(
     cls: None = None,
     /,
@@ -1148,7 +1157,9 @@ def bitfield(
     field_options: Iterable[_OptionLike] | None = None,
     alignment: int | None = None,
 ) -> Callable[[type[_VT]], type[_VT]]: ...
-@dataclass_transform(kw_only_default=True)
+@dataclass_transform(
+    kw_only_default=True, field_specifiers=(dataclasses.field, Invisible)
+)
 def bitfield(
     cls: type[_VT] | None = None,
     /,

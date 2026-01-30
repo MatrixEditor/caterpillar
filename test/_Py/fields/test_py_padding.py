@@ -1,6 +1,6 @@
 import pytest
 
-from caterpillar.py import ValidationError, identity, padding, pack, unpack, Padding
+from caterpillar.py import ValidationError, constval, padding, pack, unpack, Padding
 
 
 def test_py_padding():
@@ -44,5 +44,5 @@ def test_py_padding_custom_unpack_strict():
 
 
 def test_py_padding_context_length():
-    pad = padding[identity(10)] # always 10
+    pad = padding[constval(10)] # always 10
     assert pack(None, pad) == b"\x00" * 10

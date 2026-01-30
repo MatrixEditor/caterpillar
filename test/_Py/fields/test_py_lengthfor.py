@@ -1,12 +1,20 @@
 import pytest
 
-from caterpillar.byteorder import BigEndian
-from caterpillar.fields.common import Bytes, AsLengthRef, uint8, uint16
-from caterpillar.shortcuts import f, this, struct, pack, unpack
+from caterpillar.py import (
+    Bytes,
+    AsLengthRef,
+    struct_factory,
+    uint8,
+    uint16,
+    f,
+    this,
+    struct,
+    BigEndian,
+)
 
 
-@struct(order=BigEndian)
-class Format:
+@struct(order=BigEndian, kw_only=True)
+class Format(struct_factory.mixin):
     # Syntax is not limited to direct specification-
     # Use the modulo operator to assign a target struct
     # with this length reference:
@@ -22,8 +30,10 @@ def test_lengthref():
     # length will be set to 5 when packing the object
     assert len(obj.payload) == 5
     assert obj.length == 0
-    assert pack(obj) == b"\x00\x05\x01hello"
+    assert obj.to_bytes() == b"\x00\x05\x01hello"
     assert obj.length == 5
 
     data = b"\x00\x05\x01hello"
-    assert unpack(Format, data).length == 5
+    assert Format.from_bytes(data).length == 5
+    # or
+    # assert unpack(Format, data).length == 5

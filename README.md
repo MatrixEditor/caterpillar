@@ -31,6 +31,44 @@ options will be added in the future. Documentation is [here >](https://matrixedi
 *The following code is typing compliant, meaning your static type checker won't*
 *scream at you when developing with this code*.
 
+<details>
+<summary><i>If you want to check out the default syntax, open this block.</i></summary>
+
+```python
+from caterpillar.py import *
+from caterpillar.types import *
+
+@bitfield(order=LittleEndian)
+class Header:
+    version : 4                   # 4bit integer
+    valid   : 1                   # 1bit flag (boolean)
+    ident   : (8, CharFactory)    # 8bit char
+    # automatic alignment to 16bits
+
+THE_KEY = b"ITS MAGIC"
+
+@struct(order=LittleEndian, kw_only=True)
+class Format:
+    magic  : THE_KEY                      # Supports string and byte constants directly
+    header : Header
+    a      : uint8                        # Primitive data types
+    b      : Dynamic + int32              # dynamic endian based on global config
+    length : uint8                        # String fields with computed lengths
+    name   : String(this.length)          #  -> you can also use Prefixed(uint8)
+
+    # custom actions, e.g. for hashes
+    _hash_begin : DigestField.begin("hash", Md5_Algo)
+    # Sequences with prefixed, computed lengths    -+ part of the MD5 hash
+    names       : CString[uint8::]               #  |
+    #                                              -+
+    # automatic hash creation and verification + default value
+    hash        : Md5_Field("hash", verify=True)
+
+# Creation, packing and unpacking remains the same
+```
+
+</details>
+
 ```python
 from caterpillar.py import *
 from caterpillar.types import *
@@ -80,7 +118,7 @@ data_le = pack(obj, Format)
 obj2 = unpack(Format, data_le)
 assert obj2.names == obj.names
 
-# to pack with a different endian for field 'b', use 'order'
+# to pack with a different endian for fields 'a' and 'b', use 'order'
 data_be = pack(obj, Format, order=BigEndian)
 assert data_le != data_be
 ```

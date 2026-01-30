@@ -24,6 +24,9 @@ from ._struct import (
     pack_into,
     pack_file,
     sizeof,
+    Invisible,
+    StructDefMixin,
+    struct_factory,
 )
 from ._bitfield import (
     Bitfield,
@@ -71,4 +74,7 @@ __all__ = [
     "EnumFactory",
     "CharFactory",
     "DEFAULT_ALIGNMENT",
+    "Invisible",
+    "StructDefMixin",
+    "struct_factory",
 ]

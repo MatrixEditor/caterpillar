@@ -13,17 +13,27 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # pyright: reportPrivateUsage=false, reportAny=false, reportExplicitAny=false
-from collections.abc import Collection
+import datetime
+from datetime import tzinfo
 import struct as PyStruct
 import warnings
 
 from io import BytesIO
-from typing import Any, Callable, Generic
-from typing_extensions import Buffer, Final, Self, override, TypeVar
+from typing import Any, Callable, Generic, override
+from typing_extensions import (
+    Buffer,
+    Final,
+    Self,
+    SupportsFloat,
+    SupportsIndex,
+    override,
+    TypeVar,
+)
 from types import NoneType
 from functools import cached_property
 from enum import Enum as _EnumType
 from uuid import UUID
+from collections.abc import Collection
 
 from caterpillar.abc import (
     _StructLike,
@@ -51,7 +61,7 @@ from caterpillar.byteorder import (
 )
 from caterpillar import registry
 from caterpillar._common import WithoutContextVar
-from caterpillar.shared import getstruct
+from caterpillar.shared import getstruct, typeof
 
 from ._base import Field, INVALID_DEFAULT, singleton
 from ._mixin import ByteOrderMixin, FieldMixin, FieldStruct
@@ -2050,3 +2060,40 @@ class AsLengthRef:
     def __repr__(self) -> str:
         name = self.target.removeprefix("_obj.")
         return f"<LengthRef of .{name}>"
+
+
+_TimestampT = TypeVar("_TimestampT", bound=SupportsFloat | SupportsIndex)
+
+
+class Timestamp(
+    Transformer[
+        datetime.datetime,  # IN
+        _TimestampT,  # ENCODED
+        datetime.datetime,  # OUT
+        _TimestampT,  # PARSED
+    ]
+):
+    def __init__(
+        self,
+        struct: _StructLike[_TimestampT, _TimestampT] = float64,
+        tz: datetime.tzinfo | None = None,
+        fp: bool | None = None,
+    ) -> None:
+        super().__init__(struct)
+        self.tz: tzinfo | None = tz
+        self.floating_point: bool = bool(fp)
+        if fp is None:
+            try:
+                self.floating_point = issubclass(typeof(struct), float)
+            except Exception:
+                pass  # silently ignore
+
+    @override
+    def encode(self, obj: datetime.datetime, context: _ContextLike) -> _TimestampT:
+        ts = obj.timestamp()
+        # fmt: off
+        return ts if self.floating_point else int(ts)  # pyright: ignore[reportReturnType]
+
+    @override
+    def decode(self, parsed: _TimestampT, context: _ContextLike) -> datetime.datetime:
+        return datetime.datetime.fromtimestamp(float(parsed), self.tz)

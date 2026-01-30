@@ -580,4 +580,5 @@ class ContextLength(ExprMixin):
 this: Final[ContextPath[_ContextLike]] = ContextPath(CTX_OBJECT)
 ctx: Final[ContextPath[_ContextLike]] = ContextPath()
 parent: Final[ContextPath[_ContextLike]] = ContextPath(".".join([CTX_PARENT, CTX_OBJECT]))
+parentctx: Final[ContextPath[_ContextLike]] = ContextPath(CTX_PARENT)
 root: Final[ContextPath[_ContextLike]] = ContextPath(CTX_ROOT)

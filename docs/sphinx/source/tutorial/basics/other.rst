@@ -44,7 +44,7 @@ struct like so:
 
             @struct(order=BigEndian) # <-- will be relevant later on
             class PNG:
-                magic: f[bytes, b"\x89PNG\x0D\x0A\x1A\x0A"]
+                magic: f[bytes, b"\x89PNG\x0D\x0A\x1A\x0A"] = Invisible()
                 # other fields will be defined at the end of this tutorial.
 
 

@@ -9,6 +9,7 @@ from caterpillar.model import (
     unpack,
     CharFactory,
     pack,
+    Invisible
 )
 from caterpillar.options import (
     S_REPLACE_TYPES,
@@ -51,7 +52,7 @@ def test_bitfield_syntax__align():
         # either specify manually (typing compliant)
         # _: f[None, 0] = None
         # or use the pre-defined type
-        _: balign_t = None
+        _: balign_t = Invisible()
         # or use syntax direclty (pyright will scream at you)
         # _: 0
         b: f[int, 4]
@@ -117,7 +118,7 @@ def test_bitfield_syntax__extended():
         a2: f[SimpleEnum | int, (2, SimpleEnum)]
         # alignment is 8 bits, finalize group and set alignment
         # to 16bits for next group
-        _: f[None, (0, SetAlignment(16))] = None
+        _: f[None, (0, SetAlignment(16))] = Invisible()
         # 10bits entry for current group, then finalize group
         b1: f[int, (10, EndGroup)]
         # 12bits in new group
@@ -146,7 +147,7 @@ def test_bitfield__replace_types():
     class FormatA:
         a1: f[str, (4, str)]  # a1: str
         a2: f[SimpleEnum, (2, SimpleEnum)]  # a2: SimpleEnum
-        _: balign_t = None
+        _: balign_t = Invisible()
         b1: f[bytes, Bytes(6)]  # b1: bytes
 
     annotations = FormatA.__annotations__
@@ -166,7 +167,7 @@ def test_bitfield__unpack():
     class FormatA:
         a1: f[str, (4, CharFactory)]  # a1: str
         a2: f[SimpleEnum, (2, SimpleEnum)]  # a2: SimpleEnum
-        _: balign_t = None
+        _: balign_t = Invisible()
         b1: f[bytes, Bytes(6)]  # b1: bytes
 
     # 0b00110100.to_bytes()
@@ -183,7 +184,7 @@ def test_bitfield__pack():
         a1: int1_t
         a2: int2_t
         a3: int3_t
-        _: balign_t = None
+        _: balign_t = Invisible()
         b1: uint16_t
 
     obj = FormatA(a1=True, a2=3, a3=5, b1=0xFF00)
