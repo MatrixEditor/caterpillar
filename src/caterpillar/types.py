@@ -12,6 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+from datetime import datetime
 import ipaddress
 import uuid
 
@@ -37,6 +38,7 @@ from .fields.common import (
     Uuid,
     Pass,
     CString,
+    Timestamp,
     void_ptr,
 )
 from .fields.varint import vint
@@ -76,6 +78,7 @@ vint_t = f[int, vint]
 MAC_t = f[bytes, MAC]
 ipv6_t = f[ipaddress.IPv4Address, IPv6Address]
 ipv4_t = f[ipaddress.IPv4Address, IPv4Address]
+timestamp_t = f[datetime, Timestamp()]
 
 # TODO(REVISIT): naming convention
 # special type
@@ -114,4 +117,5 @@ __all__ = [
     "int7_t",
     "void_ptr_t",
     "balign_t",
+    "timestamp_t",
 ]

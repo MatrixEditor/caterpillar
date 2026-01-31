@@ -12,9 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-from typing import Annotated
-
-f = Annotated
+from typing import Annotated as f
 
 # use this module to import everything Python related
 from .registry import TypeConverter, annotation_registry, to_struct

@@ -19,7 +19,7 @@ import struct as PyStruct
 import warnings
 
 from io import BytesIO
-from typing import Any, Callable, Generic, override
+from typing import Any, Callable, Generic
 from typing_extensions import (
     Buffer,
     Final,
@@ -64,7 +64,7 @@ from caterpillar._common import WithoutContextVar
 from caterpillar.shared import getstruct, typeof
 
 from ._base import Field, INVALID_DEFAULT, singleton
-from ._mixin import ByteOrderMixin, FieldMixin, FieldStruct
+from ._mixin import ByteOrderMixin, FieldStruct
 
 # Explicitly report deprecation warnings
 warnings.filterwarnings("default", category=DeprecationWarning, module=__name__)
@@ -996,7 +996,7 @@ class CString(FieldStruct[str, str]):
                 defaults to `0` (null byte).
     """
 
-    __slots__ = ("encoding", "pad", "_raw_pad", "_encoding_is_lambda")
+    __slots__: tuple[str, ...] = ("encoding", "pad", "_raw_pad", "_encoding_is_lambda")
 
     def __init__(
         self,
@@ -1067,17 +1067,17 @@ class CString(FieldStruct[str, str]):
         """
         # fmt: off
         encoding: str = self.encoding(context) if self._encoding_is_lambda else self.encoding  # pyright: ignore[reportCallIssue, reportAssignmentType]
-        encoded = obj.encode(encoding)
-        stream = context[CTX_STREAM]
+        encoded: bytes = obj.encode(encoding)
+        stream: _StreamType = context[CTX_STREAM]
         if self.length is not Ellipsis:
             length = self.__size__(context)
             obj_length = len(obj)
-            if obj_length > length:  # pyright: ignore[reportOperatorIssue]
+            if obj_length > length:
                 raise ValidationError(
                     f"String {obj!r} is too long for the fixed length of {length} bytes."
                 )
             stream.write(encoded)
-            stream.write(self._raw_pad * (length - obj_length))  # pyright: ignore[reportOperatorIssue]
+            stream.write(self._raw_pad * (length - obj_length))
         else:
             stream.write(encoded)
             stream.write(self._raw_pad)
@@ -1149,7 +1149,7 @@ class ConstString(Const[str]):
                      If `None`, the default system encoding is used.
     """
 
-    __slots__ = ()
+    __slots__: tuple[()] = ()
 
     def __init__(
         self, value: str, encoding: str | _ContextLambda[str] | None = None
@@ -1190,11 +1190,12 @@ class ConstBytes(Const[bytes]):
     :param value: The constant bytes value to be encoded/decoded.
     """
 
-    __slots__ = ()
+    __slots__: tuple[()] = ()
 
     def __init__(self, value: bytes) -> None:
         super().__init__(value, Bytes(len(value)))
-        self.__bits__ = len(value) * 8
+        # fmt: off
+        self.__bits__: int = len(value) * 8  # pyright: ignore[reportIncompatibleVariableOverride]
 
 
 @registry.TypeConverter(bytes)
@@ -1229,11 +1230,11 @@ class Computed(Generic[_IT], FieldStruct[NoneType, _IT]):
                   based on the context.
     """
 
-    __slots__ = ("value",)
+    __slots__: tuple[str, ...] = ("value",)
 
     def __init__(self, value: _IT | _ContextLambda[_IT]) -> None:
         self.value: _IT | _ContextLambda[_IT] = value
-        self.__bits__ = 0
+        self.__bits__: int = 0
 
     def __type__(self) -> type:
         """
@@ -2073,12 +2074,40 @@ class Timestamp(
         _TimestampT,  # PARSED
     ]
 ):
+    """Transformer for serializing and deserializing ``datetime.datetime``
+    objects to and from Unix timestamps.
+
+    This transformer converts a ``datetime.datetime`` instance into a Unix
+    timestamp during encoding and reconstructs a ``datetime.datetime`` from a
+    timestamp during decoding. The timestamp may be represented as either a
+    floating-point or integer value depending on the provided configuration.
+
+    >>> field = Timestamp(float64)
+    >>> pack(datetime.datetime.now(), field)
+    b'...'
+    >>> unpack(field, _)
+    datetime.datetime(1990, 1, 1, 0, 0, 0, 0)
+
+
+    :param struct: A struct-like object responsible for encoding/decoding the
+        timestamp representation, defaults to ``float64``
+    :type struct: _StructLike[_TimestampT, _TimestampT], optional
+    :param tz: Timezone information used when reconstructing the datetime
+        during decoding, defaults to None
+    :type tz: datetime.tzinfo | None, optional
+    :param fp: Explicit flag indicating whether the timestamp should be treated
+        as floating-point. If None, the type is inferred from ``struct``,
+        defaults to None
+    :type fp: bool | None, optional
+    """
+
     def __init__(
         self,
-        struct: _StructLike[_TimestampT, _TimestampT] = float64,
+        struct: _StructLike[_TimestampT, _TimestampT] = uint32,
         tz: datetime.tzinfo | None = None,
         fp: bool | None = None,
     ) -> None:
+        """Constructor method"""
         super().__init__(struct)
         self.tz: tzinfo | None = tz
         self.floating_point: bool = bool(fp)
@@ -2090,10 +2119,34 @@ class Timestamp(
 
     @override
     def encode(self, obj: datetime.datetime, context: _ContextLike) -> _TimestampT:
+        """Encode a ``datetime.datetime`` object into a Unix timestamp.
+
+        The resulting timestamp is returned as either a floating-point or
+        integer value depending on the ``floating_point`` configuration.
+
+        :param obj: Datetime object to be encoded
+        :type obj: datetime.datetime
+        :param context: Transformation context used during encoding
+        :type context: _ContextLike
+        :return: Unix timestamp representation of the datetime
+        :rtype: _TimestampT
+        """
         ts = obj.timestamp()
         # fmt: off
         return ts if self.floating_point else int(ts)  # pyright: ignore[reportReturnType]
 
     @override
     def decode(self, parsed: _TimestampT, context: _ContextLike) -> datetime.datetime:
+        """Decode a Unix timestamp into a ``datetime.datetime`` object.
+
+        The timestamp is converted to a float before constructing the datetime
+        instance. The configured timezone is applied if provided.
+
+        :param parsed: Parsed timestamp value
+        :type parsed: _TimestampT
+        :param context: Transformation context used during decoding
+        :type context: _ContextLike
+        :return: Reconstructed datetime object
+        :rtype: datetime.datetime
+        """
         return datetime.datetime.fromtimestamp(float(parsed), self.tz)

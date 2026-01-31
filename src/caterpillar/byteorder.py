@@ -266,21 +266,37 @@ class DynByteOrder:
 
 
 LITTLE_ENDIAN_FMT: Final[str] = "<"
+"""Struct format character representing little-endian byte order."""
 
 # Instances representing commonly used byte orders
 Native: Final[ByteOrder] = ByteOrder("Native", "=")
+"""Predefined :class:`ByteOrder` instance representing native platform byte order."""
+
 BigEndian: Final[ByteOrder] = ByteOrder("Big Endian", ">")
+"""Predefined :class:`ByteOrder` instance representing big-endian byte order."""
+
 LittleEndian: Final[ByteOrder] = ByteOrder("Little Endian", LITTLE_ENDIAN_FMT)
+"""Predefined :class:`ByteOrder` instance representing little-endian byte order."""
+
 NetEndian: Final[ByteOrder] = ByteOrder("Network", "!")
+"""Predefined :class:`ByteOrder` instance representing network byte order."""
+
 SysNative: Final[ByteOrder] = ByteOrder(
     "SysNative",
     "@",
     ByteOrder.Alignment.NATIVE,
     ByteOrder.Size.NATIVE,
 )
+"""Predefined :class:`ByteOrder` instance representing system-native byte order
+with native alignment and size rules.
+"""
+
 Dynamic: Final[DynByteOrder] = DynByteOrder()
+"""Predefined :class:`DynByteOrder` instance for runtime-determined byte order.
+"""
 
 O_DEFAULT_ENDIAN: Final[Flag[_EndianLike]] = Flag("option.endian", value=None)
+"""Default flag option representing an unspecified byte order."""
 
 
 def byteorder(obj: object, default: _EndianLike | None = None) -> _EndianLike:

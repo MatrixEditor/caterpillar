@@ -25,9 +25,9 @@ to write complex structures in a compact and readable manner.
 
          @struct
          class Format:
-            magic: b"Foo"                       # constant values
-            name: CString(...)                  # \x00-terminated String without a fixed length
-            value: le + uint16                  # little endian encoding
+            magic  : b"Foo"                     # constant values
+            name   : CString(...)               # \x00-terminated String without a fixed length
+            value  : le + uint16                # little endian encoding
             entries: be + CString[uint32::]     # arrays with big-endian prefixed length
 
 
@@ -36,7 +36,7 @@ to write complex structures in a compact and readable manner.
       .. code-block::
          :caption: Simple example of a custom struct with type annotations in-place
 
-         @struct
+         @struct(kw_only=True)                            # keyword-only constructor arguments
          class Format:
             magic  : f[bytes, b"Foo"] = Invisible()       # constant values
             name   : cstr_t                               # \x00-terminated String without a fixed length
@@ -76,7 +76,7 @@ Format(magic=b'Foo', name='Hello, World!', value=10, entries=['Bar', 'Baz'])
   :ref:`options`.
 
 - And *YES*, this library tries to enforce strong typing wherever appliacable and supported.
-  More on that topic later in the tutorial. ...ref...
+  More on that topic later in the tutorial: :ref:`first_steps-extended-syntax`
 
 
 Where to start?

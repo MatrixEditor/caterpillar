@@ -16,10 +16,9 @@
 import dataclasses
 import enum
 
-from collections.abc import Collection, Iterable
+from collections.abc import Iterable
 from typing import Any, Callable, Final, Generic, Literal
 from typing_extensions import (
-    Buffer,
     ClassVar,
     Self,
     dataclass_transform,
@@ -31,7 +30,6 @@ from caterpillar.fields.common import Int
 from caterpillar.shared import (
     ATTR_ACTION_PACK,
     ATTR_ACTION_UNPACK,
-    getstruct,
     typeof,
     ATTR_BITS,
     ATTR_SIGNED,
@@ -73,10 +71,13 @@ from caterpillar.abc import (
     _OptionLike,
     _ArchLike,
     _EndianLike,
-    _StreamType,
-    _LengthT,
 )
-from ._struct import Struct, pack, sizeof, Invisible, unpack, unpack_file
+from ._struct import (
+    Struct,
+    StructDefMixin,
+    sizeof,
+    Invisible,
+)
 from ._base import Sequence
 
 _AnnotationT = int | tuple[int, ...] | Any  # pyright: ignore[reportExplicitAny]
@@ -1119,48 +1120,29 @@ class Bitfield(Struct[_VT]):
                     return entry
 
 
-class BitfieldDefMixin:
-    __struct__: ClassVar[Bitfield[Self]]
+class BitfieldDefMixin(StructDefMixin):
+    """Mixin extending :class:`StructDefMixin` for ``Bitfield``-based models.
 
-    def __class_getitem__(
-        cls: type[_ModelT], dim: _LengthT
-    ) -> Field[Collection[_ModelT], Collection[_ModelT]]:
-        return getstruct(cls)[dim]
+    This mixin behaves identically to :class:`StructDefMixin` but binds the
+    ``__struct__`` attribute to a :class:`Bitfield` definition instead of a
+    regular :class:`Struct`. It allows bitfield models to reuse the same
+    convenience API (``from_bytes``, ``to_bytes``, ``[]`` operator, etc.)
+    while operating on compact bit-level layouts.
+    """
 
-    @classmethod
-    def from_bytes(
-        cls: type[_ModelT],
-        data: Buffer | _StreamType,
-        *,
-        order: _EndianLike | None = None,
-        arch: _ArchLike | None = None,
-        **kwargs: Any,
-    ) -> _ModelT:
-        return unpack(cls, data, order=order, arch=arch, **kwargs)
-
-    @classmethod
-    def from_file(
-        cls: type[_ModelT],
-        filename: str,
-        *,
-        order: _EndianLike | None = None,
-        arch: _ArchLike | None = None,
-        **kwargs: Any,
-    ) -> _ModelT:
-        return unpack_file(cls, filename, order=order, arch=arch, **kwargs)
-
-    def to_bytes(
-        self,
-        *,
-        order: _EndianLike | None = None,
-        arch: _ArchLike | None = None,
-        use_tempfile: bool = False,
-        **kwargs: Any,
-    ) -> bytes:
-        return pack(self, use_tempfile=use_tempfile, order=order, arch=arch, **kwargs)
+    # fmt: off
+    __struct__: ClassVar[Bitfield[Self]]  # pyright: ignore[reportIncompatibleVariableOverride]
 
 
 class bitfield_factory:
+    """Factory for transforming plain classes into ``Bitfield`` models.
+
+    This factory mirrors the behavior of :class:`struct_factory` but targets
+    bit-level structures. It allows developers to declare compact bitfield
+    layouts using class syntax while retaining full type-checker awareness
+    through ``@dataclass_transform``.
+    """
+
     mixin: type[BitfieldDefMixin] = BitfieldDefMixin
 
     @dataclass_transform(field_specifiers=(dataclasses.field, Invisible))
@@ -1175,6 +1157,29 @@ class bitfield_factory:
         field_options: Iterable[_OptionLike] | None = None,
         alignment: int | None = None,
     ) -> type:
+        """Create a ``Bitfield`` model from a class definition.
+
+        This helper performs the underlying transformation by constructing
+        a :class:`Bitfield` instance and returning the generated model class.
+
+        :param ty: The base class to transform into a Bitfield model
+        :type ty: type[_VT]
+        :param order: Byte order used during serialization, defaults to None
+        :type order: _EndianLike | None, optional
+        :param arch: Architecture configuration inferred by fields,
+            defaults to None
+        :type arch: _ArchLike | None, optional
+        :param options: Additional options controlling bitfield behavior,
+            defaults to None
+        :type options: Iterable[_OptionLike] | None, optional
+        :param field_options: Default options applied to bitfield members,
+            defaults to None
+        :type field_options: Iterable[_OptionLike] | None, optional
+        :param alignment: Optional bit alignment constraint, defaults to None
+        :type alignment: int | None, optional
+        :return: The generated Bitfield model class
+        :rtype: type
+        """
         b = Bitfield(
             ty,
             order=order,
@@ -1229,43 +1234,48 @@ class bitfield_factory:
         field_options: Iterable[_OptionLike] | None = None,
         alignment: int | None = None,
     ) -> type[_VT] | Callable[[type[_VT]], type[_VT]]:
-        """
-        Decorator that transforms a class definition into a :class:`Bitfield` structure.
+        """Decorator or direct transformer for creating a ``Bitfield`` model.
 
-        This decorator enables defining bitfields using simple class syntax,
-        with support for custom alignment, ordering, architecture, and field options.
+        This method can be used either as:
 
-        :param cls: The user-defined class to transform.
-        :type cls: Optional[type]
-        :param options: A set of global or structure-specific options.
-        :type options: Optional[set]
-        :param order: Optional byte order for serialization (e.g., 'little' or 'big').
-        :type order: Optional[str]
-        :param arch: Optional architecture string (e.g., 'x86', 'arm').
-        :type arch: Optional[str]
-        :param field_options: Optional default options for fields.
-        :type field_options: Optional[set]
-        :param alignment: Optional alignment in bits.
-        :type alignment: Optional[int]
-        :return: The decorated class, enhanced as a `Bitfield` structure.
-        :rtype: type
+        - A decorator: ``@bitfield_factory.bitfield(...)``
+        - A direct transformer: ``MyBitfield = bitfield_factory.bitfield(MyClass, ...)``
 
-        .. code-block:: python
+        It enables defining compact bit-level layouts using standard class
+        syntax while preserving dataclass semantics and static type checking.
 
-            from caterpillar.py import bitfield, SetAlignment, uint16
+        >>> from caterpillar.py import bitfield, SetAlignment, uint16
+        >>> @bitfield
+        ... class Packet:
+        ...     version   : 3
+        ...     type      : (5, SetAlignment(16))
+        ...     length    : 10
+        ...     _         : 0  # align to 16bits
+        ...     payload   : uint16
+        ...
+        >>> # You can now pack/unpack Packet instances as compact binary bitfields
+        >>> pkt = Packet(version=1, type=2, length=128, payload=0xABCD)
+        >>> packed = pack(pkt)
+        >>> unpacked = unpack(Packet, packed)
 
-            @bitfield
-            class Packet:
-                version   : 3
-                type      : (5, SetAlignment(16))
-                length    : 10
-                _         : 0  # align to 16bits
-                payload   : uint16
-
-            # You can now pack/unpack Packet instances as compact binary bitfields
-            pkt = Packet(version=1, type=2, length=128, payload=0xABCD)
-            packed = pack(pkt)
-            unpacked = unpack(Packet, packed)
+        :param ty: The user-defined class to transform. If None, a decorator
+            function is returned
+        :type ty: type[_VT] | None, optional
+        :param order: Byte order used during serialization, defaults to None
+        :type order: _EndianLike | None, optional
+        :param arch: Architecture configuration inferred by fields,
+            defaults to None
+        :type arch: _ArchLike | None, optional
+        :param options: Additional options controlling bitfield behavior,
+            defaults to None
+        :type options: Iterable[_OptionLike] | None, optional
+        :param field_options: Default options applied to bitfield members,
+            defaults to None
+        :type field_options: Iterable[_OptionLike] | None, optional
+        :param alignment: Optional bit alignment constraint, defaults to None
+        :type alignment: int | None, optional
+        :return: The decorated Bitfield model class or a decorator function
+        :rtype: type[_VT] | Callable[[type[_VT]], type[_VT]]
         """
 
         def wrap(cls: type[_VT]) -> type[_VT]:
@@ -1289,5 +1299,6 @@ class bitfield_factory:
             )
 
         return wrap
+
 
 bitfield = bitfield_factory.bitfield

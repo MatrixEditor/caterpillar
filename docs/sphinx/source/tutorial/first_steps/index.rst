@@ -44,6 +44,7 @@ imported the necessary components from *Caterpillar*:
     :caption: First Steps
 
     structdef
+    extended_syntax
     parsing
     configuration
     documentation

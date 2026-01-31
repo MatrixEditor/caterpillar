@@ -84,7 +84,7 @@ class Struct(Sequence[type[_ModelT], _ModelT, _ModelT]):
     :param options: Additional options specifying what to include in the final class.
     """
 
-    # NOT PRESENT!!
+    #!! NOT PRESENT !!
     # _member_map_: dict
     # An internal field that maps the field names of all class attributes to their
     # corresponding struct fields.
@@ -234,29 +234,77 @@ def _struct_getitem(
 
 # TODO: docs
 def Invisible(*, init: bool = False, default: Any = None) -> Any:
-    """
-    Returns a dataclass field to identify fields invisible to the constructor.
+    """Create a dataclass field that is hidden from the generated constructor.
 
-    Fields in a @struct definition marked with this field specifier won't be
-    visible in the constructor. For instance,
+    This helper returns a ``dataclasses.field`` configured so that the
+    associated attribute is not exposed as a parameter in the dataclass
+    ``__init__`` method. It is primarily intended for use in ``@struct``
+    definitions where certain fields (e.g., padding, metadata, or internally
+    managed values) should exist in the structure layout but must not be
+    user-provided during instantiation.
+
+    When used, type checkers and IDEs will treat the field as non-existent
+    from the constructor's perspective, while the field still participates in
+    the dataclass definition and underlying structure handling.
 
     >>> @struct
     ... class Format:
     ...     a: uint32_t
-    ...     b: f[None, padding[2]] = Invisible()
+    ...     b: f[bytes, b"const value"] = Invisible()
 
-    In this case, field 'b' won't be visible in the constructor when using
-    a type checker.
+    In this example, field ``b`` is part of the structure definition but is
+    not visible as an argument when constructing ``Format``.
+
+    :param init: Whether the field should be included in the generated
+        ``__init__`` method. This is typically set to ``False`` to hide the
+        field, defaults to False
+    :type init: bool, optional
+    :param default: Default value assigned to the field if not explicitly set,
+        defaults to None
+    :type default: Any, optional
+    :return: A configured ``dataclasses.field`` instance with ``kw_only=True``
+        and the specified visibility settings
+    :rtype: Any
     """
     return dc.field(init=init, default=default, kw_only=True)
 
 
 class StructDefMixin:
+    """Mixin providing convenience methods and typing support for ``@struct`` models.
+
+    This mixin centralizes common wrapper functionality required by structure
+    definitions so that individual model classes do not need to import or
+    reference low-level packing and unpacking utilities directly.
+
+    It provides:
+
+    - ``cls[...]`` support via ``__class_getitem__`` for defining repeated
+      fields using the indexing operator.
+    - ``cls.from_bytes(...)`` for constructing instances from raw binary data.
+    - ``cls.from_file(...)`` for constructing instances from files.
+    - ``obj.to_bytes(...)`` for serializing instances back into binary form.
+
+    The primary purpose of this mixin is to improve ergonomics and satisfy
+    static type checkers by exposing these behaviors directly on the model
+    class rather than requiring explicit imports of ``pack``/``unpack`` helpers.
+    """
+
     __struct__: ClassVar[Struct[Self]]
 
     def __class_getitem__(
         cls: type[_ModelT], dim: _LengthT
     ) -> Field[Collection[_ModelT], Collection[_ModelT]]:
+        """Enable ``cls[dim]`` syntax for defining repeated structure fields.
+
+        This method allows structure classes to be indexed using the ``[]``
+        operator in order to declare collections of that structure within
+        other structures.
+
+        :param dim: The length or dimension of the collection
+        :type dim: _LengthT
+        :return: A field descriptor representing a collection of the structure
+        :rtype: Field[Collection[_ModelT], Collection[_ModelT]]
+        """
         return getstruct(cls)[dim]
 
     @classmethod
@@ -268,6 +316,21 @@ class StructDefMixin:
         arch: _ArchLike | None = None,
         **kwargs: Any,
     ) -> _ModelT:
+        """Construct an instance from raw binary data or a stream.
+
+        This is a convenience wrapper around the underlying ``unpack``
+        function, allowing models to be instantiated directly from bytes
+        without importing parsing utilities.
+
+        :param data: Raw bytes or a readable stream containing serialized data
+        :type data: Buffer | _StreamType
+        :param order: Endianness override for parsing, defaults to None
+        :type order: _EndianLike | None, optional
+        :param arch: Architecture override for parsing, defaults to None
+        :type arch: _ArchLike | None, optional
+        :return: Parsed model instance
+        :rtype: _ModelT
+        """
         return unpack(cls, data, order=order, arch=arch, **kwargs)
 
     @classmethod
@@ -279,20 +342,102 @@ class StructDefMixin:
         arch: _ArchLike | None = None,
         **kwargs: Any,
     ) -> _ModelT:
+        """Construct an instance from a binary file on disk.
+
+        This is a convenience wrapper around ``unpack_file`` for reading and
+        parsing structured data directly from a file path.
+
+        :param filename: Path to the file containing serialized data
+        :type filename: str
+        :param order: Endianness override for parsing, defaults to None
+        :type order: _EndianLike | None, optional
+        :param arch: Architecture override for parsing, defaults to None
+        :type arch: _ArchLike | None, optional
+        :return: Parsed model instance
+        :rtype: _ModelT
+        """
         return unpack_file(cls, filename, order=order, arch=arch, **kwargs)
 
+    @overload
     def to_bytes(
         self,
         *,
+        fp: _StreamType,
         order: _EndianLike | None = None,
         arch: _ArchLike | None = None,
         use_tempfile: bool = False,
         **kwargs: Any,
-    ) -> bytes:
-        return pack(self, use_tempfile=use_tempfile, order=order, arch=arch, **kwargs)
+    ) -> None: ...
+    @overload
+    def to_bytes(
+        self,
+        *,
+        fp: None = None,
+        order: _EndianLike | None = None,
+        arch: _ArchLike | None = None,
+        use_tempfile: bool = False,
+        **kwargs: Any,
+    ) -> bytes: ...
+    def to_bytes(
+        self,
+        *,
+        fp: _StreamType | None = None,
+        order: _EndianLike | None = None,
+        arch: _ArchLike | None = None,
+        use_tempfile: bool = False,
+        **kwargs: Any,
+    ) -> bytes | None:
+        """Serialize the instance into its binary representation.
+
+        If ``fp`` is provided, the binary data is written directly into the
+        given stream using ``pack_into``. Otherwise, the binary data is
+        returned as a ``bytes`` object using ``pack``.
+
+        :param fp: Writable stream to receive the serialized data. If None,
+            the serialized bytes are returned, defaults to None
+        :type fp: _StreamType | None, optional
+        :param order: Endianness override for serialization, defaults to None
+        :type order: _EndianLike | None, optional
+        :param arch: Architecture override for serialization, defaults to None
+        :type arch: _ArchLike | None, optional
+        :param use_tempfile: Whether to use a temporary file during packing,
+            defaults to False
+        :type use_tempfile: bool, optional
+        :return: Serialized bytes if ``fp`` is None, otherwise None
+        :rtype: bytes | None
+        """
+        if fp is not None:
+            pack_into(
+                self,
+                fp,
+                use_tempfile=use_tempfile,
+                order=order,
+                arch=arch,
+                **kwargs,
+            )
+        else:
+            return pack(
+                self,
+                use_tempfile=use_tempfile,
+                order=order,
+                arch=arch,
+                **kwargs,
+            )
 
 
 class struct_factory:
+    """Factory responsible for converting plain classes into ``@struct`` models.
+
+    This factory provides decorator-style and direct-call APIs for transforming
+    a regular class definition into a fully configured ``Struct`` model. The
+    resulting class gains dataclass semantics and structure metadata.
+
+    .. admonition::
+        The use of ``@dataclass_transform`` ensures that static type checkers
+        understand the transformation and correctly interpret field specifiers
+        such as ``dataclasses.field`` and :func:`Invisible`.
+    """
+
     mixin: type[StructDefMixin] = StructDefMixin
 
     @overload
@@ -349,15 +494,41 @@ class struct_factory:
         arch: _ArchLike | None = None,
         field_options: Iterable[_OptionLike] | None = None,
     ) -> type[_ModelT] | Callable[[_ModelT], type[_ModelT]]:
-        """
-        Decorator to create a Struct class.
+        """Decorator or direct constructor for creating a ``Struct`` model.
 
-        :param cls: The target class used as the base model.
-        :param options: Additional options specifying what to include in the final class.
-        :param order: Optional configuration value for the byte order of a field.
-        :param arch: Global architecture definition (will be inferred on all fields).
+        This method can be used either as:
 
-        :return: The created Struct class or a wrapper function if cls is not provided.
+        - A decorator: ``@struct_factory.new(...)``
+        - A direct transformer: ``MyStruct = struct_factory.new(MyClass, ...)``
+
+        The method configures structure-wide options such as byte order,
+        architecture, and field-level behaviors, and returns a fully
+        initialized model class.
+
+        >>> @struct(order=LittleEndian)
+        ... class Format:
+        ...     field: f[int, uint32]
+
+        :param ty: The target class to be transformed into a Struct model.
+            If None, a decorator function is returned
+        :type ty: type[_ModelT] | None, optional
+        :param kw_only: Whether generated dataclass fields should be keyword-only,
+            defaults to False
+        :type kw_only: bool, optional
+        :param options: Additional options controlling structure behavior,
+            defaults to None
+        :type options: Iterable[_OptionLike] | None, optional
+        :param order: Global byte order configuration applied to all fields,
+            defaults to None
+        :type order: _EndianLike | None, optional
+        :param arch: Global architecture configuration inferred by fields,
+            defaults to None
+        :type arch: _ArchLike | None, optional
+        :param field_options: Additional options applied at the field level,
+            defaults to None
+        :type field_options: Iterable[_OptionLike] | None, optional
+        :return: A transformed Struct model class, or a decorator if ``ty`` is None
+        :rtype: type[_ModelT] | Callable[[_ModelT], type[_ModelT]]
         """
 
         def wrap(cls: type[_ModelT]) -> type[_ModelT]:
@@ -393,15 +564,32 @@ class struct_factory:
         kw_only: bool = False,
         hook_cls: type["UnionHook[_ModelT]"] | None = None,
     ) -> type[_ModelT]:
-        """
-        Helper function to create a Struct class.
+        """Internal helper that performs the actual Struct model creation.
 
-        :param cls: The target class used as the base model.
-        :param options: Additional options specifying what to include in the final class.
-        :param order: Optional configuration value for the byte order of a field.
-        :param arch: Global architecture definition (will be inferred on all fields).
+        This method instantiates a :class:`Struct` object using the provided
+        configuration and returns the generated model class.
 
-        :return: The created Struct class.
+        :param ty: The base class to transform into a Struct model
+        :type ty: type[_ModelT]
+        :param options: Additional options controlling structure behavior,
+            defaults to None
+        :type options: Iterable[_OptionLike] | None, optional
+        :param order: Global byte order configuration applied to all fields,
+            defaults to None
+        :type order: _EndianLike | None, optional
+        :param arch: Global architecture configuration inferred by fields,
+            defaults to None
+        :type arch: _ArchLike | None, optional
+        :param field_options: Additional options applied at the field level,
+            defaults to None
+        :type field_options: Iterable[_OptionLike] | None, optional
+        :param kw_only: Whether generated dataclass fields should be keyword-only,
+            defaults to False
+        :type kw_only: bool, optional
+        :param hook_cls: Optional hook class for union handling, defaults to None
+        :type hook_cls: type["UnionHook[_ModelT]"] | None, optional
+        :return: The generated Struct model class
+        :rtype: type[_ModelT]
         """
         s = Struct(
             ty,
@@ -416,7 +604,6 @@ class struct_factory:
 
 
 struct = struct_factory.new
-
 
 class UnionHook(Generic[_ModelT]):
     """Implementation of a hook to simulate union types.

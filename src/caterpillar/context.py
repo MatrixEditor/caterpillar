@@ -12,7 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# pyright: reportPrivateUsage=false, reportExplicitAny=false
+# pyright: reportPrivateUsage=false, reportExplicitAny=false, reportAny=false
 from __future__ import annotations
 
 import operator
@@ -20,7 +20,7 @@ import sys
 import warnings
 
 from typing import Annotated, Callable, Any, Generic, Protocol, get_origin
-from typing_extensions import Final, Self, override, TypeVar
+from typing_extensions import Final, Self, Sized, override, TypeVar
 from types import FrameType, TracebackType
 from dataclasses import dataclass
 
@@ -30,19 +30,47 @@ from caterpillar.options import Flag
 from caterpillar.abc import _ContextLike, _ContextLambda, _IT, _ContextFactoryLike
 
 
+###############################################################################
+# Default defined context items
+###############################################################################
 CTX_PARENT = "_parent"
+"""Identifies the parent object within the context tree."""
+
 CTX_OBJECT = "_obj"
+"""Refers to the current object associated with the context."""
+
 CTX_OFFSETS = "_offsets"
+"""Stores offset information used during stream parsing or generation."""
+
 CTX_STREAM = "_io"
+"""References the data stream associated with the packing or unpacking operation."""
+
 CTX_FIELD = "_field"
+"""Indicates the current field being processed within the structure."""
+
 CTX_VALUE = "_value"
+"""Stores the value associated with the current context node."""
+
 CTX_POS = "_pos"
+"""Represents the current position within the stream or structure."""
+
 CTX_INDEX = "_index"
+"""Maintains the index for sequence or array-based context elements."""
+
 CTX_PATH = "_path"
+"""Provides the full path to the current context object."""
+
 CTX_SEQ = "_is_seq"
-CTX_ARCH = "_arch"
+"""Holds a reference to the sequence object, if applicable."""
+
 CTX_ROOT = "_root"
+"""Points to the root of the entire context hierarchy."""
+
 CTX_ORDER = "_order"
+"""Stores the currently used endianess (only in root context)."""
+
+CTX_ARCH = "_arch"
+"""Stores the currently used architecture (only in root context)."""
 
 
 class Context(dict[str, Any]):
@@ -100,14 +128,23 @@ class Context(dict[str, Any]):
 
     @property
     def _root(self) -> _ContextLike:
-        return self.get("_root", self)  # pyright: ignore[reportAny]
+        return self.get("_root", self)
 
 
-O_CONTEXT_FACTORY: Flag[_ContextFactoryLike] = (
-    Flag(  # pyright: ignore[reportAssignmentType]
-        "option.context_factory", value=Context
-    )
+O_CONTEXT_FACTORY: Flag[_ContextFactoryLike] = Flag(
+    "option.context_factory",
+    value=Context,
 )
+"""
+Defines the default factory used to instantiate context objects during the
+packing and unpacking process. To use the C-extension :code:`Context`
+implementation for a 10% speed caveat, use:
+
+>>> from caterpillar.context import O_CONTEXT_FACTORY
+>>> from caterpillar.c import c_Context
+>>> # that's all you have to do
+>>> O_CONTEXT_FACTORY.value = c_Context
+"""
 
 
 class SetContextVar(Generic[_IT]):
@@ -341,7 +378,7 @@ class ConditionContext:
         new_names = set(self.annotations) - set(self.namelist)
         for name in new_names:
             # modify newly created fields
-            field: Field | Any = self.annotations[name]  # pyright: ignore[reportAny]
+            field: Field | Any = self.annotations[name]
             is_annotated = get_origin(field) is Annotated
             annotated_type = extra_options = None
             if get_origin(field) is Annotated:
@@ -367,7 +404,7 @@ class ConditionContext:
                     operator.and_, field.condition, self.func
                 )
             else:
-                field //= self.func
+                field //= self.func  # pyright: ignore[reportUnknownVariableType]
 
             # rebuild the annotated field
             self.annotations[name] = (
@@ -447,11 +484,10 @@ class UnaryExpression:
         self._cond.__exit__(exc_type, exc_value, traceback)
 
 
-# fmt: off
 class _ContextPathOp(Protocol):
     __name__: str
-    def __call__(self, *args: Any, **kwds: Any) -> Any: ...  # pyright: ignore[reportAny]
-# fmt: on
+
+    def __call__(self, *args: Any, **kwds: Any) -> Any: ...
 
 
 _T = TypeVar("_T")
@@ -485,12 +521,12 @@ class ContextPath(Generic[_T], ExprMixin):
         :return: The value retrieved from the Context based on the path.
         """
         # REVISIT: find a way to implement calls
-        if context is None:
-            self._ops_.append((operator.call, [], kwds))
-            return self
+        # if context is None:
+        #     self._ops_.append((operator.call, [], kwds))
+        #     return self
 
         if self.path is None:  # no path configured, just return the context itself
-            return context
+            return context  # pyright: ignore[reportReturnType]
 
         value = context.__context_getattr__(self.path)
         for operation, args, kwargs in self._ops_:
@@ -513,7 +549,7 @@ class ContextPath(Generic[_T], ExprMixin):
         :return: A new ContextPath instance with an updated path.
         """
         try:
-            return super().__getattribute__(key)  # pyright: ignore[reportAny]
+            return super().__getattribute__(key)
         except AttributeError:
             if not self.path:
                 return ContextPath(key)
@@ -550,18 +586,26 @@ class ContextPath(Generic[_T], ExprMixin):
         return self.path or ""
 
     @property
-    def parent(self) -> ContextPath:
+    def parent(self) -> ContextPath[_ContextLike]:
         path = f"{CTX_PARENT}.{CTX_OBJECT}"
         if not self.path:
             return ContextPath(path)
         return ContextPath(".".join([self.path, path]))
 
+    @property
+    def parentctx(self) -> ContextPath[_ContextLike]:
+        """
+        .. versionadded:: 2.8.0
+        """
+        path = CTX_PARENT if not self.path else f"{self.path}.{CTX_PARENT}"
+        return ContextPath(path)
+
 
 class ContextLength(ExprMixin):
-    def __init__(self, path: ContextPath) -> None:
-        self.path: ContextPath = path
+    def __init__(self, path: ContextPath[Sized]) -> None:
+        self.path: ContextPath[Sized] = path
 
-    def __call__(self, context: _ContextLike | None = None, **kwds: Any):
+    def __call__(self, context: _ContextLike) -> int:
         """
         Calls the lambda function to retrieve a value from a Context.
 
@@ -569,7 +613,7 @@ class ContextLength(ExprMixin):
         :param kwds: Additional keyword arguments (ignored in this implementation).
         :return: The value retrieved from the Context based on the path.
         """
-        return len(self.path(context))  # pyright: ignore[reportArgumentType]
+        return len(self.path(context))
 
     @override
     def __repr__(self) -> str:

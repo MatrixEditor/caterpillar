@@ -17,7 +17,7 @@ Context classes
 
 
 .. autoclass:: caterpillar.context.ContextPath
-    :members:
+    :members: __call__, __getattribute__, __repr__, parent, parentctx
 
 .. autoclass:: caterpillar.context.ContextLength
     :members:
@@ -27,6 +27,10 @@ Context classes
 
 
 .. autoclass:: caterpillar.context.ConditionContext
+
+
+.. autoclass:: caterpillar.context.SetContextVar
+    :members: __action_pack__, __action_unpack__
 
 
 Extra options
@@ -57,6 +61,10 @@ Special paths
 .. autoattribute:: caterpillar.context.ctx
 
 .. autoattribute:: caterpillar.context.parent
+
+.. autoattribute:: caterpillar.context.parentctx
+
+    .. versionadded:: 2.8.0
 
 .. autoattribute:: caterpillar.context.root
 
@@ -111,6 +119,18 @@ Special Attributes
 .. autoattribute:: caterpillar.context.CTX_ROOT
 
     Points to the root of the entire context hierarchy.
+
+.. autoattribute:: caterpillar.context.CTX_ORDER
+
+    Stores the currently used endianess (only in root context).
+
+    .. versionadded:: 2.7.0
+
+.. autoattribute:: caterpillar.context.CTX_ARCH
+
+    Stores the currently used architecture (only in root context).
+
+    .. versionadded:: 2.7.0
 
 
 Expressions
