@@ -209,17 +209,24 @@ Field Options
    runtime rather than being statically defined. This is used internally to support
    advanced features like variable-length fields.
 
+   .. deprecated:: 2.8.0
+      No longer used directly, but still supported.
+
 .. attribute:: caterpillar.options.F_SEQUENTIAL
 
    Indicates that this field should be processed sequentially relative to other
    fields, ensuring that order-dependent parsing or packing logic is respected.
    This is primarily for internal use in complex layouts.
 
+   .. deprecated:: 2.8.0
+      No longer used directly.
+
 .. attribute:: caterpillar.options.F_OFFSET_OVERRIDE
 
    Allows you to override the calculated offset for this field within its parent
    structure. This means, the offset used by the :meth:`struct.__matmul__`
    operation will be used from here on.
+
 
 Bit-field Options
 ^^^^^^^^^^^^^^^^^

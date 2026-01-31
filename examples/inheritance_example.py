@@ -1,16 +1,12 @@
-# type: ignore
-from caterpillar.py import struct, pack, unpack, this, uint8, int32, Bytes
-
-try:
-    from rich import print
-except ImportError:
-    pass
+from caterpillar.py import struct, pack, unpack, this, Bytes
+from caterpillar.shortcuts import f
+from caterpillar.types import int32_t, int8_t
 
 
-@struct
+@struct(kw_only=True)
 class BaseFormat:
-    magic: b"BASE"
-    length: uint8
+    magic: f[bytes, b"BASE"] = b"BASE"
+    length: int8_t
 
 
 # Extending our struct can be achieved through basic inheritance. All fields
@@ -21,9 +17,9 @@ class BaseFormat:
 # which will be ignored during processing.
 @struct
 class Format(BaseFormat):
-    foo: int32
+    foo: int32_t
     # Referencing fields from the super class is possible
-    data: Bytes(this.length)
+    data: f[bytes, Bytes(this.length)]
 
 
 obj = Format(length=5, foo=-1, data=bytes([i for i in range(5)]))

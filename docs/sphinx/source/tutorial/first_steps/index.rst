@@ -31,13 +31,20 @@ chunk definition upfront.
 Before diving into the examples, keep in mind that each code snippet assumes you've already
 imported the necessary components from *Caterpillar*:
 
->>> from caterpillar.py import struct, uint32, uint8, Bytes, F, Field
+>>> from caterpillar.py import *
+
+.. tip::
+    If you are working with caterpillar `>=2.8.0`, you can also import the default types for
+    extended syntax:
+
+    >>> from caterpillar.types import *
 
 
 .. toctree::
     :caption: First Steps
 
     structdef
+    extended_syntax
     parsing
     configuration
     documentation

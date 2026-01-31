@@ -17,12 +17,24 @@ import sys
 import inspect
 import types
 import dataclasses
+from types import ModuleType
+from typing import Any, Callable, TypeVar, overload
+from typing_extensions import override
 
-from caterpillar.abc import _GreedyType
 from caterpillar.fields import Field, INVALID_DEFAULT
 from caterpillar.model import Struct
 from caterpillar.options import S_UNION
 from caterpillar.shared import ATTR_TEMPLATE
+from caterpillar.abc import (
+    _LengthT,
+    _StructLike,
+    _ContextLambda,
+    _GreedyType,
+    _ContextLike,
+    _SwitchLambda,
+    _EndianLike,
+    _ArchLike,
+)
 
 
 class TemplateTypeVar:
@@ -46,13 +58,14 @@ class TemplateTypeVar:
     name: str
     """The bound name of this type variable"""
 
-    field_kwds: dict
+    field_kwds: dict[str, Any]
     """Arguments that will be passed to the created field instance."""
 
-    def __init__(self, name: str, **field_kwds) -> None:
+    def __init__(self, name: str, **field_kwds: Any) -> None:
         self.name = name
         self.field_kwds = field_kwds or {}
 
+    @override
     def __repr__(self) -> str:
         # This method is important for documentation and type hints.
         # We try to illustrate the generic type as good as possible.
@@ -64,30 +77,32 @@ class TemplateTypeVar:
         return f"~{self.name}[{count}]"
 
     # Now we have to implement all special operators defined in FieldMixin
-    def __getitem__(self, amount):
+    def __getitem__(self, amount: _LengthT) -> "TemplateTypeVar":
         return TemplateTypeVar(self.name, amount=amount, **self.field_kwds)
 
-    def __rshift__(self, switch):
+    def __rshift__(
+        self, switch: _SwitchLambda | dict[str, _StructLike]
+    ) -> "TemplateTypeVar":
         return TemplateTypeVar(self.name, options=switch, **self.field_kwds)
 
-    def __matmul__(self, offset):
+    def __matmul__(self, offset: int | _ContextLambda[int]) -> "TemplateTypeVar":
         return TemplateTypeVar(self.name, offset=offset, **self.field_kwds)
 
-    def __set_byteorder__(self, order):
+    def __set_byteorder__(self, order: _EndianLike) -> "TemplateTypeVar":
         return TemplateTypeVar(self.name, order=order, **self.field_kwds)
 
-    def __rsub__(self, bits):
+    def __rsub__(self, bits: int | _ContextLambda[int]) -> "TemplateTypeVar":
         return TemplateTypeVar(self.name, bits=bits, **self.field_kwds)
 
     # @scheduled_for_removal
-    def __floordiv__(self, condition):
+    def __floordiv__(self, condition: bool | _ContextLambda[bool]) -> "TemplateTypeVar":
         return TemplateTypeVar(self.name, condition=condition, **self.field_kwds)
 
     def to_field(
         self,
-        struct,
-        arch=None,
-        default=INVALID_DEFAULT,
+        struct: _StructLike | _ContextLambda,
+        arch: _ArchLike | None = None,
+        default: Any = INVALID_DEFAULT,
     ) -> Field:
         # REVISIT: what about flags?
         return Field(struct, arch=arch, default=default, **self.field_kwds)
@@ -113,8 +128,8 @@ def get_caller_module(frame: int = 1) -> str:
 
 @dataclasses.dataclass
 class TemplateInfo:
-    required_tys: dict
-    positional_tys: dict
+    required_tys: dict[str, Any]
+    positional_tys: dict[str, Any]
 
     def is_defined(self, name: str) -> bool:
         return name in list(self.required_tys) + list(self.positional_tys)
@@ -124,18 +139,23 @@ class TemplateInfo:
             raise ValueError(f"Typename {name!r} already defined!")
         self.required_tys[name] = None
 
-    def add_positional(self, name: str, default=None) -> None:
+    def add_positional(self, name: str, default: Any | None = None) -> None:
         if self.is_defined(name):
             raise ValueError(f"Typename {name!r} already defined!")
         self.positional_tys[name] = default
 
 
-def istemplate(obj) -> bool:
+def istemplate(obj: object) -> bool:
     """Return true if the object is a template."""
     return hasattr(obj, ATTR_TEMPLATE)
 
 
-def template(*args, **kwargs):
+_TemplateModelT = TypeVar("_TemplateModelT")
+
+
+def template(
+    *args: str | TemplateTypeVar, **kwargs: str | TemplateTypeVar
+) -> Callable[[type[_TemplateModelT]], type[_TemplateModelT]]:
     """
     Defines required template type variables if necessary and prepares
     template class definition.
@@ -146,11 +166,11 @@ def template(*args, **kwargs):
     if len(args) == 0 and len(kwargs) == 0:
         raise ValueError("Template class needs at least one template type var")
 
-    info = TemplateInfo({}, {})
-    module = sys.modules[get_caller_module(frame=2)]
-    disposable = []
+    info: TemplateInfo = TemplateInfo({}, {})
+    module: ModuleType = sys.modules[get_caller_module(frame=2)]
+    disposable: list[str] = []
     for value in args:
-        var: TemplateTypeVar = None
+        var: TemplateTypeVar
         match value:
             case str():
                 info.add_required(value)
@@ -179,7 +199,7 @@ def template(*args, **kwargs):
 
     # the class will get special attributes that identify it as
     # a template class
-    def create_template_class(cls) -> type:
+    def create_template_class(cls: type[_TemplateModelT]) -> type[_TemplateModelT]:
         for name in disposable:
             # Only temporary template vars will be removed
             delattr(module, name)
@@ -189,9 +209,9 @@ def template(*args, **kwargs):
     return create_template_class
 
 
-def get_mangled_name(model_ty: type, annotations: dict) -> str:
+def get_mangled_name(model_ty: type, annotations: dict[str, Any]) -> str:
     ty_name = model_ty.__name__
-    parts = []
+    parts: list[str] = []
     for name, value in annotations.items():
         parts.append(str(hash(f"{name}{value!r}")))
 
@@ -200,7 +220,12 @@ def get_mangled_name(model_ty: type, annotations: dict) -> str:
 
 
 def derive(
-    template_ty, *tys_args, partial=False, name=None, union=False, **tys_kwargs
+    template_ty: type,
+    *tys_args: _StructLike,
+    partial: bool = False,
+    name: str | _GreedyType | None = None,
+    union: bool = False,
+    **tys_kwargs: _StructLike,
 ) -> type:
     """Creates a new struct class based on the given template class.
 

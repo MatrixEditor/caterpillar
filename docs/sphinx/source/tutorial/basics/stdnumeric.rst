@@ -25,7 +25,11 @@ storing numeric values. The following integer types are available:
     - `uint8`, `uint16`, `uint24`, `uint32`, `uint64`, see :ref:`fields-common`
 
 - **Platform-Specific** Sizes:
-    - `ssize_t`, `size_t` (signed and unsigned sizes), see :ref:`fields-common`
+    - `ssize`, `size` (signed and unsigned sizes), see :ref:`fields-common`
+
+.. note::
+    All of these standard numeric types have a corresponding default type that
+    can be used in the extended syntax. For instance, ``int8`` is linked to ``int8_t``.
 
 Floating Point Types
 --------------------

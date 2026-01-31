@@ -15,24 +15,27 @@ Byteorder
 .. autoclass:: DynByteOrder
     :members:
 
-.. autofunction:: byteorder(obj, default: Optional[ByteOrder] = None) -> ByteOrder
+.. autofunction:: byteorder
 .. autofunction:: byteorder_is_little
 
 Standard Byteorder Instances
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. autoattribute:: caterpillar.byteorder.Native
+.. autodata:: caterpillar.byteorder.Native
 
-.. autoattribute:: caterpillar.byteorder.BigEndian
+.. autodata:: caterpillar.byteorder.BigEndian
 
-.. autoattribute:: caterpillar.byteorder.LittleEndian
+.. autodata:: caterpillar.byteorder.LittleEndian
 
-.. autoattribute:: caterpillar.byteorder.NetEndian
+.. autodata:: caterpillar.byteorder.NetEndian
 
-.. autoattribute:: caterpillar.byteorder.SysNative
+.. autodata:: caterpillar.byteorder.SysNative
 
-.. autoattribute:: caterpillar.byteorder.Dynamic
+.. autodata:: caterpillar.byteorder.Dynamic
 
+.. autodata:: caterpillar.byteorder.LITTLE_ENDIAN_FMT
+
+.. autodata:: caterpillar.byteorder.O_DEFAULT_ENDIAN
 
 
 Architecture

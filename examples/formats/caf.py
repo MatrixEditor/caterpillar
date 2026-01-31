@@ -25,11 +25,23 @@ except ImportError:
 # > https://developer.apple.com/library/archive/documentation/MusicAudio/Reference/CAFSpec/CAF_intro/CAF_intro.html
 # -------------------------------------------------------------------------
 import enum
+from typing import Any
 
+from caterpillar.shared import getstruct
+from caterpillar.types import (
+    cstr_t,
+    float64_t,
+    int32_t,
+    int64_t,
+    uint16_t,
+    uint32_t,
+    uint64_t,
+)
 from caterpillar.shortcuts import BigEndian, this, parent, opt
 from caterpillar.model import struct, unpack_file, pack_file
 from caterpillar.fields import *
-
+from caterpillar.shortcuts import f
+from caterpillar.abc import _StructLike
 
 opt.set_struct_flags(opt.S_SLOTS)
 try:
@@ -44,19 +56,19 @@ except ImportError:
 class CAFHeader:
     # These fields follow standard the definition without a direct
     # default value
-    file_type: b"caff"
-    file_version: uint16
+    file_type: f[bytes, b"caff"]
+    file_version: uint16_t
     # according to Apple, this field must be 0 for CAF c1 files and is reserved
     # for future usage
-    file_flags: uint16
+    file_flags: uint16_t
 
 
 @struct(order=BigEndian)
 class CAFChunkHeader:
     # As we don't know all possible chunk types, it is recommended to
     # use the Bytes struct here instead of an enum class.
-    chunk_type: Bytes(4)
-    chunk_size: uint64
+    chunk_type: f[bytes, Bytes(4)]
+    chunk_size: uint64_t
 
 
 # Enum classes are defined as simple as this. Note that the specified enum value
@@ -68,24 +80,24 @@ class AudioFormatFlags(enum.IntEnum):
 
 @struct(order=BigEndian)
 class CAFAudioFormat:
-    sample_rate: float64
+    sample_rate: float64_t
     # The explicit encoding here is for illustration purposes. The default
     # one is actually utf-8.
-    format_id: String(4, encoding="utf-8")
-    format_flags: Enum(AudioFormatFlags, uint32)
+    format_id: f[str, String(4, encoding="utf-8")]
+    format_flags: f[AudioFormatFlags, Enum(AudioFormatFlags, uint32)]
     # The next fields are all simple integer fields
-    bytes_per_packet: uint32
-    frames_per_packet: uint32
-    channels_per_frame: uint32
-    bits_per_channel: uint32
+    bytes_per_packet: uint32_t
+    frames_per_packet: uint32_t
+    channels_per_frame: uint32_t
+    bits_per_channel: uint32_t
 
 
 @struct(order=BigEndian)
 class CAFData:
-    edit_count: uint32
+    edit_count: uint32_t
     # The parent object can be referenced with a simple shortcut that accesses
     # the direct parent object context.
-    data: Memory(parent.chunk_header.chunk_size - 4)
+    data: f[bytes, Memory(parent.chunk_header.chunk_size - 4)]
 
 
 @struct(order=BigEndian)
@@ -93,8 +105,8 @@ class CAFInformation:
     # Here we use the _GreedyType to indicate that we don't known the size of
     # the string to parse. The struct will parse until it reads the termination
     # character '\x00'
-    key: CString(...)
-    value: CString(...)
+    key: cstr_t
+    value: cstr_t
 
 
 @struct(order=BigEndian)
@@ -102,64 +114,74 @@ class CAFStringsChunk:
     # A simple prefixed field where we use a reference to an already parsed value
     # as the length.
     # num_entries: uint32
-    strings: CAFInformation[uint32::]
+    strings: f[list[CAFInformation], CAFInformation[uint32::]]
 
 
 @struct(order=BigEndian)
 class CAFPacketTable:
     # note all signed integer fields here
-    num_packets: int64
-    num_valid_frames: int64
-    priming_frames: int32
-    remainder_frames: int32
+    num_packets: int64_t
+    num_valid_frames: int64_t
+    priming_frames: int32_t
+    remainder_frames: int32_t
     # The VarInt configuration doesn't have to be changed, as this file format uses
     # the default implementation.
-    table_data: vint[this.num_packets]
+    table_data: f[list[int], vint[this.num_packets]]
 
 
 @struct(order=BigEndian)
 class CAFChannelDesc:
-    channel_label: uint32
-    channel_flags: uint32
+    channel_label: uint32_t
+    channel_flags: uint32_t
     # fixed size arrays are also possible
-    coordinates: float32[3]
+    coordinates: f[list[float], float32[3]]
 
 
 @struct(order=BigEndian)
 class CAFChannelLayout:
-    channel_layout_tag: uint32
-    channel_bitmap: uint32
+    channel_layout_tag: uint32_t
+    channel_bitmap: uint32_t
     # REVISIT: the field 'num_descriptions' is obsolete here. There should be a
     # possibility to incorporate the field automatically into arrays.
-    num_descriptions: uint32
+    num_descriptions: uint32_t
     descriptions: CAFChannelDesc[this.num_descriptions]
 
 
+ChunkTypes = (
+    CAFAudioFormat | CAFStringsChunk | CAFPacketTable | CAFData | memoryview | None
+)
+
+
 @struct(order=BigEndian)
-class CAFChunk:
+class CAFChunk():
     chunk_header: CAFChunkHeader
     # this is another simple switch-case structure, but this time we define a
     # default option. NOTE: not all chunk types are implemented
-    data: Field(this.chunk_header.chunk_type) >> {
-        b"desc": CAFAudioFormat,
-        b"info": CAFStringsChunk,
-        b"pakt": CAFPacketTable,
-        b"data": CAFData,
-        # In order to save memory space, we can define a simple padding that inserts
-        # the missing data automatically
-        b"free": padding[this.chunk_header.chunk_size],
-        # NOTE: we use the special struct 'Memory' here as it makes the output more
-        # clear (bytes would consume unnecessary decoding time)
-        DEFAULT_OPTION: Memory(this.chunk_header.chunk_size),
-    }
+    data: f[
+        ChunkTypes,
+        Field(this.chunk_header.chunk_type)
+        >> {
+            b"desc": CAFAudioFormat,
+            b"info": CAFStringsChunk,
+            b"pakt": CAFPacketTable,
+            b"data": CAFData,
+            # In order to save memory space, we can define a simple padding that inserts
+            # the missing data automatically
+            b"free": padding[this.chunk_header.chunk_size],
+            # NOTE: we use the special struct 'Memory' here as it makes the output more
+            # clear (bytes would consume unnecessary decoding time)
+            DEFAULT_OPTION: Memory(this.chunk_header.chunk_size),
+        },
+    ]
 
+CAFChunk_t = f[list[CAFChunk], getstruct(CAFChunk)[...]]
 
 @struct(order=BigEndian)
 class CAF:
     # interestingly, this file format does not declare how many chunks are
     # stored in one file, so we have to use greedy parsing here.
     header: CAFHeader
-    chunks: CAFChunk[...]
+    chunks: CAFChunk_t
 
 
 if __name__ == "__main__":

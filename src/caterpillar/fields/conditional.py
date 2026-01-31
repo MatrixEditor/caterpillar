@@ -12,10 +12,15 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# pyright: reportPrivateUsage=false
+from types import TracebackType
 from typing import Any
+from typing_extensions import override, Self
+
 from caterpillar.context import ConditionContext
 from caterpillar.exception import ValidationError
-from caterpillar.shared import typeof
+from caterpillar.shared import typeof, constval
+from caterpillar.abc import _ContextLambda, _ContextLike, _StructLike
 
 from ._base import Field
 
@@ -33,22 +38,25 @@ class ConditionalChain:
     :class:`~caterpillar.fields.conditional.Else`.
     """
 
-    __slots__ = "chain", "conditions"
+    __slots__: tuple[str, ...] = "chain", "conditions"
 
-    def __init__(self, struct, condition) -> None:
-        self.chain = {}
-        self.conditions = []
+    def __init__(
+        self, struct: _StructLike, condition: _ContextLambda[bool] | bool
+    ) -> None:
+        self.chain: dict[int, _StructLike] = {}
+        self.conditions: list[_ContextLambda[bool] | None] = []
         self.add(struct, condition)
 
-    def __type__(self):
+    def __type__(self) -> type | str | None:
         target_type = None
         for struct_ty in self.chain.values():
             target_type = target_type | typeof(struct_ty)
 
-        return target_type
+        return target_type  # pyright: ignore[reportReturnType]
 
+    @override
     def __repr__(self) -> str:
-        annotation = []
+        annotation: list[str] = []
         count = len(self.chain)
         for i, entry in enumerate(self.chain.items()):
             func_idx, struct = entry
@@ -60,12 +68,14 @@ class ConditionalChain:
 
         return f"<Chain {', '.join(annotation)}>"
 
-    def add(self, struct, func) -> None:
-        idx = len(self.chain)
+    def add(self, struct: _StructLike, func: _ContextLambda[bool] | bool) -> None:
+        idx: int = len(self.chain)
         self.chain[idx] = struct
+        if isinstance(func, bool):
+            func = constval(func)
         self.conditions.append(func)
 
-    def get_struct(self, context):
+    def get_struct(self, context: _ContextLike) -> _StructLike | None:
         index = 0
         while index < len(self.chain):
             func = self.conditions[index]
@@ -73,16 +83,16 @@ class ConditionalChain:
                 return self.chain[index]
             index += 1
 
-    def __unpack__(self, context) -> Any:
+    def __unpack__(self, context: _ContextLike) -> object:
         struct = self.get_struct(context)
         return struct.__unpack__(context) if struct else None
 
-    def __pack__(self, obj: Any, context) -> None:
+    def __pack__(self, obj: object, context: _ContextLike) -> None:
         struct = self.get_struct(context)
         if struct:
             struct.__pack__(obj, context)
 
-    def __size__(self, context) -> int:
+    def __size__(self, context: _ContextLike) -> int:
         struct = self.get_struct(context)
         return struct.__size__(context) if struct else 0
 
@@ -116,7 +126,7 @@ class If(ConditionContext):
     # is using the built-in conditional execution model from the Field
     # class.
 
-
+# TODO(REVISIT): fix Annotated[...] annotation handling
 class ElseIf(ConditionContext):
     """ElseIf-statement implementation for class definitions.
 
@@ -137,24 +147,27 @@ class ElseIf(ConditionContext):
                 ...
     """
 
-    def __enter__(self):
-        self.depth = 3
-        super().__enter__()
+    @override
+    def __enter__(self) -> Self:
+        self.depth: int = 3
+        super().__enter__()  # pyright: ignore[reportUnusedCallResult]
         self.depth = 2
         # We have to copy all variables here as we want to
         # provide the possibility to re-define some fields.
-        self.annotations = self.annotations.copy()
+        self.annotations: dict[str, Any] = self.annotations.copy()
         return self
 
-    def __exit__(self, *_):
+    @override
+    def __exit__(self, exc_type: type, exc_value: Exception, traceback: TracebackType):
+        # fmt: off
         # we have to inspect no only new names but also defined ones
         frame = self.getframe(self.depth, "Could not enter condition context!")
-        annotations = frame.f_locals["__annotations__"]
+        annotations: dict[str, _StructLike] = frame.f_locals["__annotations__"]  # pyright: ignore[reportAny]
 
         # inspect defined fields
         for name in set(annotations) & set(self.namelist):
             new_field = annotations[name]
-            field = self.annotations[name]
+            field: _StructLike = self.annotations[name]  # pyright: ignore[reportAny]
             if field is not new_field:
                 # We can assume that the old field is already an instance
                 # of Field, otherwise it would have been defined outside
@@ -184,7 +197,7 @@ class ElseIf(ConditionContext):
 
         # inspect new fields
         self.annotations = annotations
-        super().__exit__()
+        super().__exit__(exc_type, exc_value, traceback)
 
 
 # REVISIT: There is one case where 'ELSE' is not applicable and will cause

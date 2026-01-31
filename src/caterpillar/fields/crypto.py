@@ -12,22 +12,46 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-from typing import Protocol, runtime_checkable
+# pyright: reportPrivateUsage=false
+
+
+from collections.abc import Iterable
+from typing import TYPE_CHECKING, Any, Protocol, runtime_checkable
+from typing_extensions import override
 
 from caterpillar.exception import UnsupportedOperation
 from caterpillar.exception import InvalidValueError
 from caterpillar.context import CTX_STREAM
+from caterpillar.abc import (
+    _ContextLambda,
+    _ContextLike,
+    _GreedyType,
+    _StructLike,
+    _IT,
+    _ArgType,
+)
+
 from .common import Memory, Bytes
 from ._mixin import get_args, get_kwargs
+
+if TYPE_CHECKING:
+    from cryptography.hazmat.primitives.ciphers import (
+        modes,
+        CipherAlgorithm,
+        CipherContext,
+    )
+    from cryptography.hazmat.primitives.padding import PaddingContext
 
 
 @runtime_checkable
 class Padding(Protocol):  # pylint: disable=missing-class-docstring
-    def unpadder(self):
+    def unpadder(self) -> "PaddingContext":
         """Abstract method to get an unpadder for padding."""
+        ...
 
-    def padder(self):
+    def padder(self) -> "PaddingContext":
         """Abstract method to get a padder for padding."""
+        ...
 
 
 class Encrypted(Memory):
@@ -53,14 +77,14 @@ class Encrypted(Memory):
     # REVISIT: this constructor looks ugly
     def __init__(
         self,
-        length,
-        algorithm,
-        mode,
-        padding=None,
-        algo_args=None,
-        mode_args=None,
-        padding_args=None,
-        post=None,
+        length: int | _GreedyType | _ContextLambda[int],
+        algorithm: type["CipherAlgorithm"],
+        mode: "type[modes.Mode] | modes.Mode",
+        padding: Padding | type[Padding] | None = None,
+        algo_args: Iterable[_ArgType] | None = None,
+        mode_args: Iterable[_ArgType] | None = None,
+        padding_args: Iterable[_ArgType] | None = None,
+        post: _StructLike | None = None,
     ) -> None:
         try:
             from cryptography.hazmat.primitives.ciphers import Cipher
@@ -74,15 +98,15 @@ class Encrypted(Memory):
             )
 
         super().__init__(length)
-        self._algo = algorithm
-        self._algo_args = algo_args
-        self._mode = mode
-        self._mode_args = mode_args
-        self._padding = padding
-        self._padding_args = padding_args
-        self.post = post
+        self._algo: "type[CipherAlgorithm]" = algorithm
+        self._algo_args: Iterable[_ArgType] | None = algo_args
+        self._mode: "type[modes.Mode] | modes.Mode" = mode
+        self._mode_args: Iterable[_ArgType] | None = mode_args
+        self._padding: Padding | type[Padding] | None = padding
+        self._padding_args: Iterable[_ArgType] | None = padding_args
+        self.post: _StructLike | None = post
 
-    def algorithm(self, context):
+    def algorithm(self, context: _ContextLike) -> "CipherAlgorithm":
         """
         Get the encryption algorithm instance.
 
@@ -91,11 +115,12 @@ class Encrypted(Memory):
         :return: An instance of the encryption algorithm.
         :rtype: algorithms.CipherAlgorithm
         """
+        # fmt: off
         from cryptography.hazmat.primitives.ciphers import CipherAlgorithm
 
-        return self.get_instance(CipherAlgorithm, self._algo, self._algo_args, context)
+        return self.get_instance(CipherAlgorithm, self._algo, self._algo_args, context)  # pyright: ignore[reportReturnType]
 
-    def mode(self, context):
+    def mode(self, context: _ContextLike) -> "modes.Mode | None":
         """
         Get the encryption mode instance.
 
@@ -108,7 +133,7 @@ class Encrypted(Memory):
 
         return self.get_instance(modes.Mode, self._mode, self._mode_args, context)
 
-    def padding(self, context) -> Padding:
+    def padding(self, context: _ContextLike) -> Padding | None:
         """
         Get the padding scheme instance.
 
@@ -119,7 +144,13 @@ class Encrypted(Memory):
         """
         return self.get_instance(Padding, self._padding, self._padding_args, context)
 
-    def get_instance(self, type_, field, args, context):
+    def get_instance(
+        self,
+        type_: type[_IT],
+        field: _IT | Any | None,
+        args: dict[str, _ArgType] | Iterable[_ArgType] | None,
+        context: _ContextLike,
+    ) -> _IT | None:
         """
         Get an instance of a specified type.
 
@@ -141,9 +172,13 @@ class Encrypted(Memory):
             args, kwargs = (), get_kwargs(args, context)
         else:
             args, kwargs = get_args(args, context), {}
-        return field(*args, **kwargs)
 
-    def pack_single(self, obj, context) -> None:
+        return field(*args, **kwargs)  # pyright: ignore[reportCallIssue]
+
+    @override
+    def pack_single(
+        self, obj: bytes | memoryview | bytearray, context: _ContextLike
+    ) -> None:
         """
         Pack a single element.
 
@@ -152,6 +187,7 @@ class Encrypted(Memory):
         :param context: The current operation context.
         :type context: _ContextLike
         """
+        # fmt: off
         from cryptography.hazmat.primitives.ciphers import Cipher
 
         cipher = Cipher(self.algorithm(context), self.mode(context))
@@ -162,10 +198,11 @@ class Encrypted(Memory):
             padder = padding.padder()
             data = padder.update(data) + padder.finalize()
 
-        encryptor = cipher.encryptor()
+        encryptor: "CipherContext" = cipher.encryptor()  # pyright: ignore[reportAttributeAccessIssue]
         super().pack_single(encryptor.update(data) + encryptor.finalize(), context)
 
-    def unpack_single(self, context):
+    @override
+    def unpack_single(self, context: _ContextLike) -> memoryview:
         """
         Unpack a single element.
 
@@ -174,18 +211,23 @@ class Encrypted(Memory):
         :return: The unpacked element as a memoryview.
         :rtype: memoryview
         """
+        # fmt: off
         from cryptography.hazmat.primitives.ciphers import Cipher
+
         value = super().unpack_single(context)
         cipher = Cipher(self.algorithm(context), self.mode(context))
 
-        decryptor = cipher.decryptor()
-        data = decryptor.update(bytes(value)) + decryptor.finalize()
+        decryptor: "CipherContext" = cipher.decryptor()  # pyright: ignore[reportAttributeAccessIssue]
+        data: bytes = decryptor.update(bytes(value)) + decryptor.finalize()
 
         padding = self.padding(context)
         if padding:
             unpadder = padding.unpadder()
             data = unpadder.update(data) + unpadder.finalize()
         return memoryview(data)
+
+
+_KeyType = int | str | bytes
 
 
 class KeyCipher(Bytes):
@@ -198,21 +240,34 @@ class KeyCipher(Bytes):
     # key_length: int
     # """Internal attribute to keep track of the key's length"""
 
-    __slots__ = "key", "key_length", "is_lazy"
+    __slots__: tuple[str, ...] = "key", "key_length", "key_fn"
 
-    def __init__(self, key, length=None) -> None:
+    def __init__(
+        self,
+        key: _KeyType | _ContextLambda[_KeyType],
+        length: _GreedyType | _ContextLambda[int] | int | None = None,
+    ) -> None:
         super().__init__(length or ...)
-        self.key = self.is_lazy = self.key_length = None
+        self.key: bytes = b""
+        self.key_fn: _ContextLambda[_KeyType] | None = None
+        self.key_length: int = -1
         self.set_key(key)
 
-    def set_key(self, key, context=None) -> None:
+    def is_lazy(self) -> bool:
+        return self.key_fn is not None
+
+    def set_key(
+        self,
+        key: _KeyType | _ContextLambda[_KeyType],
+        context: _ContextLike | None = None,
+    ) -> None:
         if callable(key) and context is None:
             # context lambda indicates the key will be computed at runtime
-            self.key = key
+            self.key_fn = key
             self.key_length = -1
-            self.is_lazy = True
             return
 
+        self.key_fn = None
         match key:
             case str():
                 self.key = key.encode()
@@ -226,48 +281,51 @@ class KeyCipher(Bytes):
                 )
 
         self.key_length = len(self.key)
-        self.is_lazy = False
 
-    def process(self, obj: bytes, context) -> bytes:
+    def process(self, obj: bytes, context: _ContextLike) -> bytes:
         length = len(obj)
         data = bytearray(length)
-        key = self.key
-        if self.is_lazy:
-            self.set_key(key(context), context)
+        if self.key_fn:
+            self.set_key(self.key_fn(context), context)
 
         self._do_process(obj, data)
         return bytes(data)
 
-    def _do_process(self, src: bytes, dest: bytearray):
+    def _do_process(self, src: bytes, dest: bytearray) -> None:
         raise NotImplementedError
 
-    def pack_single(self, obj: bytes, context) -> None:
+    @override
+    def pack_single(self, obj: bytes, context: _ContextLike) -> None:
         context[CTX_STREAM].write(self.process(obj, context))
 
-    def unpack_single(self, context) -> bytes:
+    @override
+    def unpack_single(self, context: _ContextLike) -> bytes:
         obj: bytes = super().unpack_single(context)
         return self.process(obj, context)
 
 
 class Xor(KeyCipher):
-    __slots__ = ()
+    __slots__: tuple[()] = ()
 
-    def _do_process(self, src: bytes, dest: bytearray):
+    @override
+    def _do_process(self, src: bytes, dest: bytearray) -> None:
         for i, e in enumerate(src):
             dest[i] = e ^ self.key[i % self.key_length]
 
 
 class Or(KeyCipher):
-    __slots__ = ()
+    __slots__: tuple[()] = ()
 
-    def _do_process(self, src: bytes, dest: bytearray):
+    @override
+    def _do_process(self, src: bytes, dest: bytearray) -> None:
         for i, e in enumerate(src):
             dest[i] = e | self.key[i % self.key_length]
 
 
 class And(KeyCipher):
-    __slots__ = ()
+    __slots__: tuple[()] = ()
 
-    def _do_process(self, src: bytes, dest: bytearray):
+    @override
+    def _do_process(self, src: bytes, dest: bytearray) -> None:
         for i, e in enumerate(src):
             dest[i] = e & self.key[i % self.key_length]
