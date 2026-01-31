@@ -13,6 +13,35 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # pyright: reportPrivateUsage=false, reportExplicitAny=false
+"""
+Module for managing and performing type conversions using custom handlers.
+
+This module provides the :class:`TypeConverter` class, which is designed to
+define and manage type conversion handlers for various Python annotations.
+These handlers allow you to convert different types (like `int`, `str`, etc.)
+into a specialized :class:`_StructLike` object, which could be used in custom
+@struct classes.
+
+The :class:`TypeConverter` class allows for both explicit and delegated
+conversions, where the user can define how each annotation should be converted,
+and even delegate the conversion to external functions.
+
+The module also provides a global registry (:data:`annotation_registry`) to
+store type converters and a utility function (:func:`to_struct`) to perform
+type conversions using these registered handlers.
+
+Example Usage:
+  Define a converter for `int` that converts to `uint16`:
+
+  >>> tc = TypeConverter(int, lambda a, _: Const(a, uint16))
+
+  Alternatively, you can use a decorator to define a type converter:
+
+  >>> @TypeConverter(int)
+  ... def int_converter(annotation, kwargs):
+  ...     return Const(annotation, uint16)
+"""
+
 from typing import Any, Callable
 from typing_extensions import override
 
@@ -99,7 +128,7 @@ class TypeConverter:
         return f"<{self.__class__.__name__} for {self.target.__name__}>"
 
 
-# A global registry to store type converters.
+#: A global registry to store type converters.
 annotation_registry: list[TypeConverter] = []
 
 

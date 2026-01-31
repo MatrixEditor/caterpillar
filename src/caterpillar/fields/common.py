@@ -14,7 +14,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # pyright: reportPrivateUsage=false, reportAny=false, reportExplicitAny=false
 import datetime
-from datetime import tzinfo
 import struct as PyStruct
 import warnings
 
@@ -254,29 +253,193 @@ class PyStructFormattedField(FieldStruct[_IT, _IT]):
 
 
 # Instances of FormatField with specific format specifiers
-# padding: Final[PyStructFormattedField[NoneType]] = PyStructFormattedField("x", NoneType)
 char: Final[PyStructFormattedField[str]] = PyStructFormattedField("c", str)
+"""Single byte character field.
+
+Represents exactly one byte and maps it to a Python ``str`` of length 1.
+
+Usage Example:
+  >>> pack("A", char)
+  b"A"
+  >>> unpack(char, b"A")
+  'A'
+"""
+
 boolean: Final[PyStructFormattedField[bool]] = PyStructFormattedField("?", bool)
+"""Boolean field stored as a single byte.
+
+Encoded as ``0x00`` for ``False`` and ``0x01`` for ``True``.
+
+Usage Example:
+  >>> pack(True, boolean)
+  b"\\x01"
+  >>> unpack(boolean, b"\\x00")
+  False
+"""
 
 int8: Final[PyStructFormattedField[int]] = PyStructFormattedField("b", int)
+"""Signed 8-bit integer field.
+
+Range: ``-128`` to ``127``.
+
+Usage Example:
+  >>> pack(-5, int8)
+  b"\\xfb"
+  >>> unpack(int8, b"\\xfb")
+  -5
+"""
+
 uint8: Final[PyStructFormattedField[int]] = PyStructFormattedField("B", int)
+"""Unsigned 8-bit integer field.
+
+Range: ``0`` to ``255``.
+
+Usage Example:
+  >>> pack(250, uint8)
+  b"\\xfa"
+  >>> unpack(uint8, b"\\xfa")
+  250
+"""
+
 int16: Final[PyStructFormattedField[int]] = PyStructFormattedField("h", int)
+"""Signed 16-bit integer field.
+
+Usage Example:
+  >>> pack(1024, int16)
+  b"\\x00\\x04"
+  >>> unpack(int16, b"\\x00\\x04")
+  1024
+"""
+
 uint16: Final[PyStructFormattedField[int]] = PyStructFormattedField("H", int)
+"""Unsigned 16-bit integer field.
+
+Usage Example:
+  >>> pack(65535, uint16)
+  b"\\xff\\xff"
+  >>> unpack(uint16, b"\\xff\\xff")
+  65535
+"""
+
 int32: Final[PyStructFormattedField[int]] = PyStructFormattedField("i", int)
+"""Signed 32-bit integer field.
+
+Usage Example:
+  >>> pack(123456, int32)
+  b"@\\xe2\\x01\\x00"
+  >>> unpack(int32, b"@\\xe2\\x01\\x00")
+  123456
+"""
+
 uint32: Final[PyStructFormattedField[int]] = PyStructFormattedField("I", int)
+"""Unsigned 32-bit integer field.
+
+Usage Example:
+  >>> pack(123456, uint32)
+  b"@\\xe2\\x01\\x00"
+  >>> unpack(uint32, b"@\\xe2\\x01\\x00")
+  123456
+"""
+
 int64: Final[PyStructFormattedField[int]] = PyStructFormattedField("q", int)
+"""Signed 64-bit integer field.
+
+Usage Example:
+  >>> pack(-1, int64)
+  b"\\xff\\xff\\xff\\xff\\xff\\xff\\xff\\xff"
+  >>> unpack(int64, b"\\xff\\xff\\xff\\xff\\xff\\xff\\xff\\xff")
+  -1
+"""
+
 uint64: Final[PyStructFormattedField[int]] = PyStructFormattedField("Q", int)
+"""Unsigned 64-bit integer field.
 
+Usage Example:
+  >>> pack(1, uint64)
+  b"\\x01\\x00\\x00\\x00\\x00\\x00\\x00\\x00"
+  >>> unpack(uint64, b"\\x01\\x00\\x00\\x00\\x00\\x00\\x00\\x00")
+  1
+"""
 
-ssize: Final[PyStructFormattedField[int]] = PyStructFormattedField("n", int)
-size: Final[PyStructFormattedField[int]] = PyStructFormattedField("N", int)
+pssize: Final[PyStructFormattedField[int]] = PyStructFormattedField("n", int)
+"""Signed platform-dependent size field.
+
+Size depends on the native architecture (32-bit or 64-bit).
+
+Usage Example:
+  >>> pack(42, ssize)
+  b"..."
+  >>> unpack(ssize, b"...")
+  42
+
+.. versionchanged:: 2.8.0
+    renaned from ``size_t`` to `pssize`
+"""
+
+psize: Final[PyStructFormattedField[int]] = PyStructFormattedField("N", int)
+"""Unsigned platform-dependent size field.
+
+Size depends on the native architecture (32-bit or 64-bit).
+
+Usage Example:
+  >>> pack(42, size)
+  b"..."
+  >>> unpack(size, b"...")
+  42
+
+.. versionchanged:: 2.8.0
+    renaned from ``size_t`` to `psize`
+"""
 
 float16: Final[PyStructFormattedField[float]] = PyStructFormattedField("e", float)
+"""Half-precision (16-bit) floating point field.
+
+Usage Example:
+  >>> pack(1.5, float16)
+  b"..."
+  >>> unpack(float16, b"...")
+  1.5
+"""
+
 float32: Final[PyStructFormattedField[float]] = PyStructFormattedField("f", float)
+"""Single-precision (32-bit) floating point field.
+
+Usage Example:
+  >>> pack(3.14, float32)
+  b"..."
+  >>> unpack(float32, b"...")
+  3.14
+"""
+
 float64: Final[PyStructFormattedField[float]] = PyStructFormattedField("d", float)
+"""Double-precision (64-bit) floating point field.
+
+Usage Example:
+  >>> pack(3.14, float64)
+  b"..."
+  >>> unpack(float64, b"...")
+  3.14
+"""
+
 double: Final[PyStructFormattedField[float]] = float64
+"""Alias for :code:`float64`.
+
+Usage Example:
+  >>> pack(3.14, double)
+  b"..."
+  >>> unpack(double, b"...")
+  3.14
+"""
 
 void_ptr: Final[PyStructFormattedField[int]] = PyStructFormattedField("P", int)
+"""Void pointer field represented as an integer memory address.
+
+Usage Example:
+  >>> pack(0x1000, void_ptr)
+  b"..."
+  >>> unpack(void_ptr, b"...")
+  4096
+"""
 
 
 class Padding(ByteOrderMixin[None, None]):
@@ -2109,7 +2272,7 @@ class Timestamp(
     ) -> None:
         """Constructor method"""
         super().__init__(struct)
-        self.tz: tzinfo | None = tz
+        self.tz: datetime.tzinfo | None = tz
         self.floating_point: bool = bool(fp)
         if fp is None:
             try:

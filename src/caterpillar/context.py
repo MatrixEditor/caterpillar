@@ -17,18 +17,30 @@ from __future__ import annotations
 
 import operator
 import sys
+import typing
 import warnings
 
-from typing import Annotated, Callable, Any, Generic, Protocol, get_origin
-from typing_extensions import Final, Self, Sized, override, TypeVar
+from typing import Annotated, Callable, Any, Generic, Protocol, get_origin, override
+from typing_extensions import Final, Literal, Self, Sized, overload, override, TypeVar
 from types import FrameType, TracebackType
 from dataclasses import dataclass
 
 from caterpillar.exception import StructException
 from caterpillar.registry import to_struct
 from caterpillar.options import Flag
-from caterpillar.abc import _ContextLike, _ContextLambda, _IT, _ContextFactoryLike
+from caterpillar.abc import (
+    _ContextLike,
+    _ContextLambda,
+    _IT,
+    _ContextFactoryLike,
+    _OT,
+    _StreamType,
+    _EndianLike,
+    _ArchLike,
+)
 
+if typing.TYPE_CHECKING:
+    from caterpillar.fields._base import Field
 
 ###############################################################################
 # Default defined context items
@@ -86,6 +98,32 @@ class Context(dict[str, Any]):
         """
         self[key] = value
 
+    @overload
+    def __getattribute__(self, key: Literal["_field"]) -> "Field[_IT, _OT] | None": ...
+    @overload
+    def __getattribute__(self, key: Literal["_parent"]) -> _ContextLike: ...
+    @overload
+    def __getattribute__(self, key: Literal["_obj"]) -> _ContextLike: ...
+    @overload
+    def __getattribute__(self, key: Literal["_offsets"]) -> dict[int, int]: ...
+    @overload
+    def __getattribute__(self, key: Literal["_io"]) -> _StreamType: ...
+    @overload
+    def __getattribute__(self, key: Literal["_pos"]) -> int: ...
+    @overload
+    def __getattribute__(self, key: Literal["_index"]) -> int: ...
+    @overload
+    def __getattribute__(self, key: Literal["_path"]) -> str: ...
+    @overload
+    def __getattribute__(self, key: Literal["_is_seq"]) -> bool: ...
+    @overload
+    def __getattribute__(self, key: Literal["_root"]) -> _ContextLike: ...
+    @overload
+    def __getattribute__(self, key: Literal["_order"]) -> _EndianLike: ...
+    @overload
+    def __getattribute__(self, key: Literal["_arch"]) -> _ArchLike: ...
+    @overload
+    def __getattribute__(self, key: str) -> Any: ...
     @override
     def __getattribute__(self, key: str) -> Any:
         """
@@ -129,6 +167,34 @@ class Context(dict[str, Any]):
     @property
     def _root(self) -> _ContextLike:
         return self.get("_root", self)
+
+    @overload
+    def __getitem__(self, key: Literal["_field"], /) -> "Field[_IT, _OT]": ...
+    @overload
+    def __getitem__(self, key: Literal["_order"], /) -> _EndianLike: ...
+    @overload
+    def __getitem__(self, key: Literal["_arch"], /) -> _ArchLike: ...
+    @overload
+    def __getitem__(self, key: Literal["_parent"], /) -> _ContextLike: ...
+    @overload
+    def __getitem__(self, key: Literal["_root"], /) -> _ContextLike: ...
+    @overload
+    def __getitem__(self, key: Literal["_io"], /) -> _StreamType: ...
+    @overload
+    def __getitem__(self, key: Literal["_offsets"], /) -> dict[int, int]: ...
+    @overload
+    def __getitem__(self, key: Literal["_index"], /) -> int: ...
+    @overload
+    def __getitem__(self, key: Literal["_path"], /) -> str: ...
+    @overload
+    def __getitem__(self, key: Literal["_is_seq"], /) -> bool: ...
+    @overload
+    def __getitem__(self, key: Literal["_pos"], /) -> int: ...
+    @overload
+    def __getitem__(self, key: str, /) -> Any: ...
+    @override
+    def __getitem__(self, key: str, /) -> Any:
+        return super().__getitem__(key)
 
 
 O_CONTEXT_FACTORY: Flag[_ContextFactoryLike] = Flag(
@@ -540,6 +606,39 @@ class ContextPath(Generic[_T], ExprMixin):
     def __type__(self) -> type:
         return object
 
+    # overloads to support the default paths
+    @overload
+    def __getattribute__(
+        self, key: Literal["_field"]
+    ) -> ContextPath["Field[_IT, _OT] | None"]: ...
+    @overload
+    def __getattribute__(
+        self, key: Literal["_parent"]
+    ) -> ContextPath[_ContextLike]: ...
+    @overload
+    def __getattribute__(self, key: Literal["_obj"]) -> ContextPath[_ContextLike]: ...
+    @overload
+    def __getattribute__(
+        self, key: Literal["_offsets"]
+    ) -> ContextPath[dict[int, int]]: ...
+    @overload
+    def __getattribute__(self, key: Literal["_io"]) -> ContextPath[_StreamType]: ...
+    @overload
+    def __getattribute__(self, key: Literal["_pos"]) -> ContextPath[int]: ...
+    @overload
+    def __getattribute__(self, key: Literal["_index"]) -> ContextPath[int]: ...
+    @overload
+    def __getattribute__(self, key: Literal["_path"]) -> ContextPath[str]: ...
+    @overload
+    def __getattribute__(self, key: Literal["_is_seq"]) -> ContextPath[bool]: ...
+    @overload
+    def __getattribute__(self, key: Literal["_root"]) -> ContextPath[_ContextLike]: ...
+    @overload
+    def __getattribute__(self, key: Literal["_order"]) -> ContextPath[_EndianLike]: ...
+    @overload
+    def __getattribute__(self, key: Literal["_arch"]) -> ContextPath[_ArchLike]: ...
+    @overload
+    def __getattribute__(self, key: str) -> ContextPath[_IT]: ...
     @override
     def __getattribute__(self, key: str) -> ContextPath[_IT]:
         """
@@ -622,7 +721,40 @@ class ContextLength(ExprMixin):
 
 # fmt: off
 this: Final[ContextPath[_ContextLike]] = ContextPath(CTX_OBJECT)
+"""Context path pointing to the current object in the evaluation context.
+
+This context path is used to reference the active object being processed when
+navigating or resolving nested structures using context paths.
+"""
+
 ctx: Final[ContextPath[_ContextLike]] = ContextPath()
+"""Context path pointing to the current evaluation context.
+
+This context path allows access to the full context dictionary rather than a
+specific object within it.
+"""
+
 parent: Final[ContextPath[_ContextLike]] = ContextPath(".".join([CTX_PARENT, CTX_OBJECT]))
+"""Context path pointing to the parent object's current object.
+
+This context path is used to reference the object belonging to the parent
+context level when navigating nested context structures.
+"""
+
 parentctx: Final[ContextPath[_ContextLike]] = ContextPath(CTX_PARENT)
+"""Context path pointing to the parent evaluation context.
+
+This context path allows access to the full parent context dictionary rather
+than only its object.
+
+.. versionadded:: 2.8.0
+"""
+
 root: Final[ContextPath[_ContextLike]] = ContextPath(CTX_ROOT)
+"""Context path pointing to the root evaluation context.
+
+This context path is used to reference the top-level context in a nested
+context hierarchy.
+
+.. versionadded:: 2.6.0
+"""

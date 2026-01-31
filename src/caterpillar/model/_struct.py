@@ -290,6 +290,7 @@ class StructDefMixin:
     """
 
     __struct__: ClassVar[Struct[Self]]
+    """A reference to the struct model of this class"""
 
     def __class_getitem__(
         cls: type[_ModelT], dim: _LengthT
@@ -498,8 +499,8 @@ class struct_factory:
 
         This method can be used either as:
 
-        - A decorator: ``@struct_factory.new(...)``
-        - A direct transformer: ``MyStruct = struct_factory.new(MyClass, ...)``
+        - A decorator: ``@struct(...)``
+        - A direct transformer: ``MyStruct = struct(MyClass, ...)``
 
         The method configures structure-wide options such as byte order,
         architecture, and field-level behaviors, and returns a fully

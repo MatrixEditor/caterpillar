@@ -1132,7 +1132,7 @@ class BitfieldDefMixin(StructDefMixin):
 
     # fmt: off
     __struct__: ClassVar[Bitfield[Self]]  # pyright: ignore[reportIncompatibleVariableOverride]
-
+    """Reference to the bitfield model"""
 
 class bitfield_factory:
     """Factory for transforming plain classes into ``Bitfield`` models.
@@ -1238,8 +1238,8 @@ class bitfield_factory:
 
         This method can be used either as:
 
-        - A decorator: ``@bitfield_factory.bitfield(...)``
-        - A direct transformer: ``MyBitfield = bitfield_factory.bitfield(MyClass, ...)``
+        - A decorator: ``@bitfield(...)``
+        - A direct transformer: ``MyBitfield = bitfield(MyClass, ...)``
 
         It enables defining compact bit-level layouts using standard class
         syntax while preserving dataclass semantics and static type checking.

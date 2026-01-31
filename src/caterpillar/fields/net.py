@@ -12,17 +12,15 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-from re import Pattern
-
-
 import ipaddress
 import binascii
 import re
-from typing import Final, Annotated as T
+
+from typing import Final
 from typing_extensions import override
 
-from caterpillar.abc import _ContextLike
-from caterpillar.fields.common import Transformer, uint32, UInt, Bytes
+from caterpillar.abc import _ContextLike  # pyright: ignore[reportPrivateUsage]
+from .common import Transformer, uint32, UInt, Bytes
 from ._base import singleton
 
 
@@ -127,7 +125,7 @@ class MACAddress(Transformer[str | bytes, bytes, bytes, bytes]):
     :param Optional[str] sep: The separator to use in the MAC address representation.
     """
 
-    DELIMITERS: Pattern[bytes] = re.compile(rb"[:-]")
+    DELIMITERS: re.Pattern[bytes] = re.compile(rb"[:-]")
 
     def __init__(self, sep: str | None = None, encoding: str | None = None) -> None:
         """
@@ -167,6 +165,5 @@ class MACAddress(Transformer[str | bytes, bytes, bytes, bytes]):
         return binascii.b2a_hex(parsed, self.sep)
 
 
-# shortcut for default MAC address format
+#: shortcut for default MAC address format
 MAC: Final[MACAddress] = MACAddress()
-

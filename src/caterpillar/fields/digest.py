@@ -12,7 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# pyright: reportPrivateUsage=false
+# pyright: reportPrivateUsage=false, reportExplicitAny=false
 import sys
 import hashlib
 from types import FrameType, TracebackType

@@ -56,21 +56,15 @@ Extra options
 Special paths
 -------------
 
-.. autoattribute:: caterpillar.context.this
+.. autodata:: caterpillar.context.this
 
-.. autoattribute:: caterpillar.context.ctx
+.. autodata:: caterpillar.context.ctx
 
-.. autoattribute:: caterpillar.context.parent
+.. autodata:: caterpillar.context.parent
 
-.. autoattribute:: caterpillar.context.parentctx
+.. autodata:: caterpillar.context.parentctx
 
-    .. versionadded:: 2.8.0
-
-.. autoattribute:: caterpillar.context.root
-
-    Provides access to the root-level context object.
-
-    .. versionadded:: 2.6.0
+.. autodata:: caterpillar.context.root
 
 
 Special Attributes

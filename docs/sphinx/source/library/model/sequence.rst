@@ -8,6 +8,7 @@ Sequence
 
 .. autoclass:: Sequence
     :members:
+    :private-members:
 
     .. versionchanged:: 2.6.0
         The :code:`Sequence` class now internally uses another class (``_Member``)

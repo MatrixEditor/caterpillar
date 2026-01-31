@@ -18,6 +18,7 @@ Library
    registry
    shared
    fields/index.rst
+   hooks
 
 
 .. _library-index-capi:

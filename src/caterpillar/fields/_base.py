@@ -12,7 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# pyright: reportPrivateUsage=false, reportAny=false
+# pyright: reportPrivateUsage=false, reportAny=false, reportExplicitAny=false
 from io import BytesIO
 from collections.abc import Collection
 from typing import Any, Generic

@@ -13,8 +13,37 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # pyright: reportPrivateUsage=false
+"""
+Module containing shared constants and utility functions for managing
+and processing structs.
+
+This module defines a set of constants and functions used across different
+operations involving structs, bitfields, and related concepts. It includes
+key attributes for managing struct definitions, mode constants for packing
+/unpacking operations, and action handling for custom processing.
+
+The module introduces the concept of "Actions", which are used to define
+custom behavior that should be executed before parsing a struct field (e.g.,
+installing IO hooks for checksums or hash calculations). Actions are
+represented by classes with `__action_XX` methods.
+
+Usage Example:
+  To define a struct that executes a custom action before parsing a field:
+
+  >>> class MyAction:
+  >>>     def __action_unpack__(self, context: _ContextLike) -> None:
+  >>>         ...
+  >>>
+  >>> @struct
+  >>> class MyStruct:
+  >>>     any_name: MyAction()
+
+In this case, the action will be executed before parsing any subsequent fields
+and won't be stored as part of the struct model.
+"""
+
 from typing import TYPE_CHECKING, overload
-from typing_extensions import Final, override, TypeIs
+from typing_extensions import Final, Literal, override, TypeIs
 
 from caterpillar.abc import (
     _ContextLambda,
@@ -32,49 +61,93 @@ if TYPE_CHECKING:
 # --- Shared Concepts ---
 # TODO: This section needs some docs
 
-# additional modifies set in the root context of each operation
-MODE_PACK: Final[int] = 0
-MODE_UNPACK: Final[int] = 1
+# Constants defining packing/unpacking modes
+MODE_PACK: Literal[0] = 0
+"""Constant representing packing mode."""
+MODE_UNPACK: Literal[1] = 1
+"""Constant representing unpacking mode."""
 
-# REVISIT: taken from reference
-#: All models annotated with either @struct or @bitfield are struct
-#: containers. Thus, they store the additional class attribute `__struct__`.
-#:
-#: Internally, any types utilizing this attribute can be employed within a
-#: struct, bitfield, or sequence definition. The type of the stored value
-#: must be conforming to the _StructLike protocol.
+# Constants defining struct-related attributes
 ATTR_STRUCT: Final[str] = "__struct__"
-ATTR_BYTEORDER: Final[str] = "__byteorder__"
-ATTR_TYPE: Final[str] = "__type__"
-ATTR_BITS: Final[str] = "__bits__"
-ATTR_SIGNED: Final[str] = "__signed__"
-ATTR_TEMPLATE: Final[str] = "__template__"
-ATTR_PACK: Final[str] = "__pack__"
-ATTR_UNPACK: Final[str] = "__unpack__"
+"""
+All models annotated with either ``@struct`` or ``@bitfield`` are struct
+containers. Thus, they store the additional class attribute :code:`__struct__`.
 
-# TODO: add to reference
-# NEW CONCEPT: Actions
-# An annotation that is equipped with an action attribute indicates that
-# the struct will execute this very action instead of parsing the field.
-#
-# PROPOSAL:
-#   For instance, an action could be used to install an IOHook on the
-#   current stream (checksum or hash calculation).
-#
-#       class MyAction:
-#           def __action__(self, context: _ContextLike) -> None:
-#               ...
-#
-#       @struct
-#       class MyStruct:
-#           any_name: MyAction()
-#
-#   The action will be executed before the next field is parsed and won't
-#   be stored in the model of the struct.
+Internally, any types utilizing this attribute can be employed within a
+struct, bitfield, or sequence definition. The type of the stored value
+must be conforming to the :class:`_StructLike` protocol.
+
+.. versionchanged:: 2.5.0
+    This attribute is now used when callung :func:`getstruct` or :func:`hasstruct`.
+"""
+
+ATTR_BYTEORDER: Final[str] = "__byteorder__"
+"""Attribute representing the byte order of a struct.
+
+.. versionadded:: 2.5.0
+    Moved from *caterpillar.byteorder*.
+"""
+
+ATTR_TYPE: Final[str] = "__type__"
+"""Attribute that stores the type of the struct.
+
+.. versionadded:: 2.5.0
+"""
+
+ATTR_BITS: Final[str] = "__bits__"
+"""Attribute representing the number of bits in a struct.
+
+.. versionadded:: 2.5.0
+    Moved from *caterpillar.model._bitfield*.
+"""
+
+ATTR_SIGNED: Final[str] = "__signed__"
+"""Attribute that marks a struct as signed.
+
+.. versionadded:: 2.5.0
+    Moved from *caterpillar.model._bitfield*.
+"""
+
+ATTR_TEMPLATE: Final[str] = "__template__"
+"""Attribute that provides the template for the struct.
+
+.. versionadded:: 2.5.0
+    Moved from *caterpillar.model._template*.
+"""
+
+ATTR_PACK: Final[str] = "__pack__"
+"""Attribute that defines packing behavior for the struct.
+
+.. versionadded:: 2.8.0
+"""
+ATTR_UNPACK: Final[str] = "__unpack__"
+"""Attribute that defines unpacking behavior for the struct.
+
+.. versionadded:: 2.8.0
+"""
+
+# Constants for actions during packing and unpacking
 ATTR_ACTION_PACK: Final[str] = "__action_pack__"
+"""Attribute indicating an action to be executed during packing.
+
+.. versionadded:: 2.4.0
+"""
+
 ATTR_ACTION_UNPACK: Final[str] = "__action_unpack__"
+"""Attribute indicating an action to be executed during unpacking.
+
+.. versionadded:: 2.4.0
+"""
+
 
 def constval(value: _OT) -> "_ContextLambda[_OT]":
+    """Returns a lambda that returns a constant value when invoked.
+
+    :param value: The constant value to be returned by the lambda.
+    :type value: _OT
+    :return: A lambda function that, when called, returns the given constant value.
+    :rtype: _ContextLambda[_OT]
+    """
     return lambda context: value
 
 
@@ -216,6 +289,17 @@ def getstruct(
 
 
 def typeof(struct: _StructLike | _SupportsType | _ContainsStruct | object) -> type:
+    """Returns the type of a given struct or object, checking for a custom type annotation.
+
+    If the given object has a `__type__` attribute, this function returns that type. If not, it
+    returns the object's default type. If the type cannot be resolved, the function defaults to
+    returning `object`.
+
+    :param struct: The struct or object whose type is to be resolved.
+    :type struct: _StructLike | _SupportsType | _ContainsStruct | object
+    :return: The resolved type of the struct or object.
+    :rtype: type
+    """
     if hasstruct(struct):
         struct = getstruct(struct) or struct
 

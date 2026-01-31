@@ -12,7 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# pyright: reportPrivateUsage=false
+# pyright: reportPrivateUsage=false, reportAny=false, reportExplicitAny=false
 import re
 
 from collections.abc import Iterable
@@ -164,7 +164,7 @@ class Sequence(Generic[_SeqModelT, _SeqIT, _SeqOT], FieldMixin[_SeqIT, _SeqOT]):
     def __type__(self) -> type:
         return dict
 
-    def has_option(self, option: _OptionLike) -> bool:
+    def has_option(self, option: _OptionLike[Any]) -> bool:
         """
         Check if the struct has a specific option.
 

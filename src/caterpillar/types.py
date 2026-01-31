@@ -33,8 +33,8 @@ from .fields.common import (
     float32,
     float64,
     double,
-    size,
-    ssize,
+    psize,
+    pssize,
     Uuid,
     Pass,
     CString,
@@ -60,8 +60,8 @@ int32_t = f[int, int32]
 uint32_t = f[int, uint32]
 int64_t = f[int, int64]
 uint64_t = f[int, uint64]
-ssize_t = f[int, ssize]
-size_t = f[int, size]
+ssize_t = f[int, pssize]
+size_t = f[int, psize]
 float16_t = f[float, float16]
 float32_t = f[float, float32]
 float64_t = f[float, float64]
