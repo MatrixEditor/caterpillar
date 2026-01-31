@@ -46,43 +46,265 @@ from .fields.net import MAC, IPv4Address, IPv6Address
 from .shortcuts import f
 
 int1_t = f[int, 1]
-int2_t = f[int, 2]
-int3_t = f[int, 3]
-int4_t = f[int, 4]
-int5_t = f[int, 5]
-int6_t = f[int, 6]
-int7_t = f[int, 7]
-int8_t = f[int, int8]
-uint8_t = f[int, uint8]
-int16_t = f[int, int16]
-uint16_t = f[int, uint16]
-int32_t = f[int, int32]
-uint32_t = f[int, uint32]
-int64_t = f[int, int64]
-uint64_t = f[int, uint64]
-ssize_t = f[int, pssize]
-size_t = f[int, psize]
-float16_t = f[float, float16]
-float32_t = f[float, float32]
-float64_t = f[float, float64]
-double_t = f[float, double]
-void_ptr_t = f[int, void_ptr]
-cstr_t = f[str, CString(...)]
-char_t = f[str, char]
-boolean_t = f[bool, boolean]
-pass_t = f[None, Pass]
-uint24_t = f[int, uint24]
-int24_t = f[int, int24]
-uuid_t = f[uuid.UUID, Uuid]
-vint_t = f[int, vint]
-MAC_t = f[bytes, MAC]
-ipv6_t = f[ipaddress.IPv4Address, IPv6Address]
-ipv4_t = f[ipaddress.IPv4Address, IPv4Address]
-timestamp_t = f[datetime, Timestamp()]
+"""Signed 1-bit integer field.
 
-# TODO(REVISIT): naming convention
-# special type
+Represents a single signed bit typically used in bitfield definitions.
+
+Usage Example:
+  >>> @bitfield
+  ... class Flags:
+  ...     enabled: int1_t
+
+.. note::
+    Only usable in bitfields.
+
+.. versionadded:: 2.8.0
+"""
+
+int2_t = f[int, 2]
+"""Signed 2-bit integer field for compact bitfield storage.
+
+.. note::
+    Only usable in bitfields.
+
+.. versionadded:: 2.8.0
+"""
+
+int3_t = f[int, 3]
+"""Signed 3-bit integer field for compact bitfield storage.
+
+.. note::
+    Only usable in bitfields.
+
+.. versionadded:: 2.8.0
+"""
+
+int4_t = f[int, 4]
+"""Signed 4-bit integer field for compact bitfield storage.
+
+.. note::
+    Only usable in bitfields.
+
+.. versionadded:: 2.8.0
+"""
+
+int5_t = f[int, 5]
+"""Signed 5-bit integer field for compact bitfield storage.
+
+.. note::
+    Only usable in bitfields.
+
+.. versionadded:: 2.8.0
+"""
+
+int6_t = f[int, 6]
+"""Signed 6-bit integer field for compact bitfield storage.
+
+.. note::
+    Only usable in bitfields.
+
+.. versionadded:: 2.8.0
+"""
+
+int7_t = f[int, 7]
+"""Signed 7-bit integer field for compact bitfield storage.
+
+.. note::
+    Only usable in bitfields.
+
+.. versionadded:: 2.8.0
+"""
+
+int8_t = f[int, int8]
+"""Signed 8-bit integer field.
+
+Usage Example:
+  >>> @bitfield
+  ... class Packet:
+  ...     value: int8_t
+
+.. versionadded:: 2.8.0
+"""
+
+uint8_t = f[int, uint8]
+"""Unsigned 8-bit integer field.
+
+.. versionadded:: 2.8.0
+"""
+
+int16_t = f[int, int16]
+"""Signed 16-bit integer field.
+
+.. versionadded:: 2.8.0
+"""
+
+uint16_t = f[int, uint16]
+"""Unsigned 16-bit integer field.
+
+.. versionadded:: 2.8.0
+"""
+
+int32_t = f[int, int32]
+"""Signed 32-bit integer field.
+
+.. versionadded:: 2.8.0
+"""
+
+uint32_t = f[int, uint32]
+"""Unsigned 32-bit integer field.
+
+.. versionadded:: 2.8.0
+"""
+
+int64_t = f[int, int64]
+"""Signed 64-bit integer field.
+
+.. versionadded:: 2.8.0
+"""
+
+uint64_t = f[int, uint64]
+"""Unsigned 64-bit integer field.
+
+.. versionadded:: 2.8.0
+"""
+
+ssize_t = f[int, pssize]
+"""Signed platform-sized integer field.
+
+.. versionadded:: 2.8.0
+"""
+
+size_t = f[int, psize]
+"""Unsigned platform-sized integer field.
+
+.. versionadded:: 2.8.0
+"""
+
+float16_t = f[float, float16]
+"""16-bit floating point field.
+
+.. versionadded:: 2.8.0
+"""
+
+float32_t = f[float, float32]
+"""32-bit floating point field.
+
+.. versionadded:: 2.8.0
+"""
+
+float64_t = f[float, float64]
+"""64-bit floating point field.
+
+.. versionadded:: 2.8.0
+"""
+
+double_t = f[float, double]
+"""Alias for 64-bit floating point field.
+
+.. versionadded:: 2.8.0
+"""
+
+void_ptr_t = f[int, void_ptr]
+"""Pointer-sized integer field representing a memory address.
+
+.. versionadded:: 2.8.0
+"""
+
+cstr_t = f[str, CString(...)]
+"""C-style null-terminated string field with a dynamic size.
+
+Usage Example:
+  >>> name: cstr_t
+
+.. versionadded:: 2.8.0
+"""
+
+char_t = f[str, char]
+"""Single character field.
+
+.. versionadded:: 2.8.0
+"""
+
+boolean_t = f[bool, boolean]
+"""Boolean field stored as a single byte.
+
+.. versionadded:: 2.8.0
+"""
+
+pass_t = f[None, Pass]
+"""Placeholder field that consumes no data and performs no action.
+
+.. versionadded:: 2.8.0
+"""
+
+uint24_t = f[int, uint24]
+"""Unsigned 24-bit integer field.
+
+.. versionadded:: 2.8.0
+"""
+
+int24_t = f[int, int24]
+"""Signed 24-bit integer field.
+
+.. versionadded:: 2.8.0
+"""
+
+uuid_t = f[uuid.UUID, Uuid]
+"""UUID field mapped to :class:`uuid.UUID`.
+
+Usage Example:
+  >>> identifier: uuid_t
+
+.. versionadded:: 2.8.0
+"""
+
+vint_t = f[int, vint]
+"""Variable-length integer field using a compact encoding.
+
+.. versionadded:: 2.8.0
+"""
+
+MAC_t = f[bytes, MAC]
+"""MAC address field represented as 6 raw bytes.
+
+.. versionadded:: 2.8.0
+"""
+
+ipv6_t = f[ipaddress.IPv4Address, IPv6Address]
+"""IPv6 address field mapped to :class:`ipaddress.IPv6Address`.
+
+.. versionadded:: 2.8.0
+"""
+
+ipv4_t = f[ipaddress.IPv4Address, IPv4Address]
+"""IPv4 address field mapped to :class:`ipaddress.IPv4Address`.
+
+.. versionadded:: 2.8.0
+"""
+
+timestamp_t = f[datetime, Timestamp()]
+"""Timestamp field mapped to :class:`datetime.datetime`.
+
+.. versionadded:: 2.8.0
+"""
+
 balign_t = f[None, 0]
+"""Bit-alignment field used to align to the next byte boundary in bitfields.
+
+This type **MUST** be used together with :func:`Invisible` to remove it
+from the constructor::
+
+    @bitfield
+    class Format:
+        value: int2_t
+        _    : balign_t     = Invisible() # not visible to the type checker
+
+.. note::
+    Only usable in bitfields.
+
+.. versionadded:: 2.8.0
+"""
+
 
 __all__ = [
     "uint8_t",

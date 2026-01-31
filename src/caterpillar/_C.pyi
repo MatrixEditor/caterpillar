@@ -1,17 +1,31 @@
-from collections.abc import Collection, Iterable
+# Copyright (C) MatrixEditor 2023-2025
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# pyright: reportExplicitAny=false, reportAny=false, reportPrivateUsage=false
+from collections.abc import Collection
 from typing import Any, Generic
 from typing_extensions import override, Self
 from caterpillar.abc import (
     _OT,
     _IT,
-    _ArchLike,
     _EndianLike,
     _SupportsSetEndian,
     _ContextLike,
     _LengthT,
     _StructLike,
-    _SwitchLike,
     _ContextLambda,
+    _SwitchOptionsT,
 )
 from caterpillar import native_support
 
@@ -22,38 +36,44 @@ if native_support():
     LITTLE_ENDIAN: c_Endian
     NATIVE_ENDIAN: c_Endian
 
-    class c_Arch(_ArchLike):
+    class c_Arch:
         name: str
         ptr_size: int
         def __init__(self, name: str, ptr_size: int) -> None: ...
+        @override
         def __eq__(self, other: object) -> bool: ...
         def __ge__(self, other: object) -> bool: ...
         def __gt__(self, other: object) -> bool: ...
+        @override
         def __hash__(self) -> int: ...
         def __le__(self, other: object) -> bool: ...
         def __lt__(self, other: object) -> bool: ...
+        @override
         def __ne__(self, other: object) -> bool: ...
 
-    class c_Endian(_EndianLike):
+    class c_Endian:
         ch: str
         name: str
         def __init__(self, name: str, ch: int) -> None: ...
         def __add__(self, other: _SupportsSetEndian[_OT]) -> _OT: ...
+        @override
         def __eq__(self, other: object) -> bool: ...
         def __ge__(self, other: object) -> bool: ...
         def __gt__(self, other: object) -> bool: ...
+        @override
         def __hash__(self) -> int: ...
         def __le__(self, other: object) -> bool: ...
         def __lt__(self, other: object) -> bool: ...
+        @override
         def __ne__(self, other: object) -> bool: ...
         def __radd__(self, other: _SupportsSetEndian[_OT]) -> _OT: ...
 
-    class c_Option:
+    class c_Option(Generic[_IT]):
         name: str
-        value: Any
-        def __init__(self, name: str, value: Any = ...) -> None: ...
+        value: _IT | None
+        def __init__(self, name: str, value: _IT | None = ...) -> None: ...
         @override
-        def __eq__(self, value: object | c_Option, /) -> bool: ...
+        def __eq__(self, value: object | c_Option[_IT], /) -> bool: ...
         @override
         def __hash__(self) -> int: ...
 
@@ -73,7 +93,7 @@ if native_support():
         def __pack__(self, obj: _IT, context: _ContextLike) -> None: ...
         def __pack_many__(
             self,
-            obj: Iterable[_IT],
+            obj: Collection[_IT],
             context: _ContextLike,
             lengthinfo: LengthInfo,
         ) -> None: ...
@@ -82,14 +102,14 @@ if native_support():
             self,
             context: _ContextLike,
             lengthinfo: LengthInfo,
-        ) -> Iterable[_OT]: ...
+        ) -> Collection[_OT]: ...
         def __type__(self) -> type | str | None: ...
         def __size__(self, context: _ContextLike) -> int: ...
         def __bits__(self) -> int: ...
 
     class BuiltinAtom(Atom[_IT, _OT]):
         def __getitem__(self, dim: _LengthT) -> Repeated[_IT, _OT]: ...
-        def __rshift__(self, cases: _SwitchLike[Any, Any]) -> Switch: ...
+        def __rshift__(self, cases: _SwitchOptionsT) -> Switch: ...
 
     class Repeated(BuiltinAtom[Collection[_IT], Collection[_OT]]):
         atom: _StructLike[_IT, _OT]
@@ -109,13 +129,13 @@ if native_support():
         def __set_byteorder__(self, order: _EndianLike) -> Self: ...
 
     class Switch(BuiltinAtom[Any, Any]):
-        cases: _SwitchLike[Any, Any]
+        cases: _SwitchOptionsT
         atom: _StructLike[Any, Any] | _ContextLambda[Any]
 
         def __init__(
             self,
             atom: _StructLike[Any, Any] | _ContextLambda[Any],
-            cases: _SwitchLike[Any, Any],
+            cases: _SwitchOptionsT,
         ) -> None: ...
         @override
         def __pack__(self, obj: Any, context: _ContextLike) -> None: ...

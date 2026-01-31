@@ -20,9 +20,6 @@ Digests
 .. autoclass:: caterpillar.fields.DigestFieldAction
     :members:
 
-.. autoclass:: caterpillar.fields.DigestValue
-    :members:
-
 .. autoclass:: caterpillar.fields.HMACAlgorithm
     :members:
 
