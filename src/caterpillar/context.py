@@ -20,7 +20,7 @@ import sys
 import typing
 import warnings
 
-from typing import Annotated, Callable, Any, Generic, Protocol, get_origin, override
+from typing import Annotated, Callable, Any, Generic, Protocol, get_origin
 from typing_extensions import Final, Literal, Self, Sized, overload, override, TypeVar
 from types import FrameType, TracebackType
 from dataclasses import dataclass
@@ -448,7 +448,7 @@ class ConditionContext:
             is_annotated = get_origin(field) is Annotated
             annotated_type = extra_options = None
             if get_origin(field) is Annotated:
-                annotated_type, field, extra_options = field
+                annotated_type, field, *extra_options = field
 
             if not isinstance(field, Field):
                 # create a field (other attributes will be modified later)
@@ -474,7 +474,8 @@ class ConditionContext:
 
             # rebuild the annotated field
             self.annotations[name] = (
-                Annotated[annotated_type, field, *extra_options]
+                # Python 3.10 does not allow *extra_options
+                Annotated[annotated_type, field, extra_options]
                 if is_annotated
                 else field
             )
@@ -599,7 +600,7 @@ class ContextPath(Generic[_T], ExprMixin):
             value = operation(value, *args, **kwargs)
         return value
 
-    def __getitem__(self, key: str) -> Self:
+    def __getitem__(self, key: Any) -> Self:
         self._ops_.append((operator.getitem, [key], {}))
         return self
 

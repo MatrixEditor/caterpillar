@@ -12,7 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# pyright: reportPrivateUsage=false
+# pyright: reportPrivateUsage=false, reportAny=false, reportExplicitAny=false
 from typing import Any, Protocol, runtime_checkable
 from typing_extensions import override
 
@@ -88,8 +88,7 @@ class Compressed(Transformer[bytes, bytes, bytes, bytes]):
         decomp_kwargs: dict[str, Any] | None = None,
     ) -> None:
         if hasstruct(struct):
-            # fmt: off
-            struct: _StructLike[bytes, bytes] = getstruct(struct)  # pyright: ignore[reportAssignmentType]
+            struct = getstruct(struct)
         super().__init__(struct)
         self.compressor: _Compressor = compressor
         self.comp_args: dict[str, Any] = comp_kwargs or {}

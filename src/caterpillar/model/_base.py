@@ -255,7 +255,13 @@ class Sequence(Generic[_SeqModelT, _SeqIT, _SeqOT], FieldMixin[_SeqIT, _SeqOT]):
                 removables.append(name)
 
             field = self._process_field(name, annotation, default)
-            for extra_option in extra_options:
+            # a small hack to support 3.10
+            options = list(extra_options)
+            if len(options) == 1 and isinstance(options[0], Iterable):
+                # fmt: off
+                options: list[_ExtraOptionT] = options[0]  # pyright: ignore[reportAssignmentType]
+
+            for extra_option in options:
                 match extra_option:
                     case _ArchLike():
                         field.arch = extra_option

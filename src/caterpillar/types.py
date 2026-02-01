@@ -45,8 +45,19 @@ from .fields.varint import vint
 from .fields.net import MAC, IPv4Address, IPv6Address
 from .shortcuts import f
 
+bool1_t = f[bool, 1]
+"""1-bit integer field (boolean).
+
+Represents a single bit typically used in bitfield definitions.
+
+.. note::
+    Only usable in bitfields.
+
+.. versionadded:: 2.8.0
+"""
+
 int1_t = f[int, 1]
-"""Signed 1-bit integer field.
+"""1-bit integer field.
 
 Represents a single signed bit typically used in bitfield definitions.
 
@@ -62,7 +73,7 @@ Usage Example:
 """
 
 int2_t = f[int, 2]
-"""Signed 2-bit integer field for compact bitfield storage.
+"""2-bit integer field for compact bitfield storage.
 
 .. note::
     Only usable in bitfields.
@@ -71,7 +82,7 @@ int2_t = f[int, 2]
 """
 
 int3_t = f[int, 3]
-"""Signed 3-bit integer field for compact bitfield storage.
+"""3-bit integer field for compact bitfield storage.
 
 .. note::
     Only usable in bitfields.
@@ -80,7 +91,7 @@ int3_t = f[int, 3]
 """
 
 int4_t = f[int, 4]
-"""Signed 4-bit integer field for compact bitfield storage.
+"""4-bit integer field for compact bitfield storage.
 
 .. note::
     Only usable in bitfields.
@@ -89,7 +100,7 @@ int4_t = f[int, 4]
 """
 
 int5_t = f[int, 5]
-"""Signed 5-bit integer field for compact bitfield storage.
+"""5-bit integer field for compact bitfield storage.
 
 .. note::
     Only usable in bitfields.
@@ -98,7 +109,7 @@ int5_t = f[int, 5]
 """
 
 int6_t = f[int, 6]
-"""Signed 6-bit integer field for compact bitfield storage.
+"""6-bit integer field for compact bitfield storage.
 
 .. note::
     Only usable in bitfields.
@@ -107,7 +118,7 @@ int6_t = f[int, 6]
 """
 
 int7_t = f[int, 7]
-"""Signed 7-bit integer field for compact bitfield storage.
+"""7-bit integer field for compact bitfield storage.
 
 .. note::
     Only usable in bitfields.
