@@ -27,6 +27,7 @@ options will be added in the future. Documentation is [here >](https://matrixedi
 * All struct definitions can be typing compliant!!! (tested with pyright)
 
 ## Give me some code!
+
 *The following code is typing compliant, meaning your static type checker won't*
 *scream at you when developing with this code*.
 
