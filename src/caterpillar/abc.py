@@ -344,7 +344,9 @@ class _SwitchLambda(Protocol):
 
 
 _SwitchOptionsT = _SwitchLambda | dict[Any, Any]
-
+"""
+.. versionadded 2.8.0
+"""
 
 @runtime_checkable
 class _SupportsBits(Protocol):
@@ -391,6 +393,11 @@ class _ArrayFactoryLike(Protocol[_IT]):
 
 
 class _ContextFactoryLike(Protocol):
+    """
+
+    .. versionadded 2.8.0
+    """
+
     def __call__(self, **kwargs: Any) -> _ContextLike: ...
 
 

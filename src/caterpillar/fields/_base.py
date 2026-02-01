@@ -485,6 +485,11 @@ class Field(Generic[_IT, _OT]):
         return return_type  # pyright: ignore[reportReturnType]
 
     def get_name(self) -> str:
+        """Returns the name of this field.
+
+        .. versionchanged:: 2.8.0
+            now always returns a string
+        """
         return getattr(self, "__name__", "_")
 
     # IO related stuff

@@ -798,6 +798,10 @@ class Enum(Generic[_EnumT, _IT], Transformer[_EnumT, _IT, _EnumT | _IT, _IT]):
     :param struct: The _StructLike object to be wrapped.
     :param default: The default value to return if decoding encounters an unrecognized value.
                     Default is `INVALID_DEFAULT`.
+    :param strict: controls whether the parsed value has to conform to the input enum model.
+
+    .. versionchanged:: 2.8.0
+        Add new 'strict' option.
     """
 
     __slots__: tuple[str, ...] = ("model", "default", "strict")

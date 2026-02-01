@@ -109,6 +109,9 @@ def get_flags(obj: object, attr: str | None = None) -> list[_OptionLike]:
     """
     Get the flags associated with an object.
 
+    .. versionchanged:: 2.8.0
+        now always returns a list
+
     :param obj: The object.
     :param attr: The attribute name containing the flags (default is "flags").
     :return: The set of flags, or None if no flags are present.
