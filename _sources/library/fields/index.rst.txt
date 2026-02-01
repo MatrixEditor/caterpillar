@@ -17,3 +17,4 @@ structs that are compatible with a :class:`Field`.
     common.rst
     compression.rst
     crypto.rst
+    net.rst

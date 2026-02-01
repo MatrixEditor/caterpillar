@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>2.2.3. Byte Sequences &#8212; Caterpillar 2.7.0 documentation</title>
+    <title>2.2.3. Byte Sequences &#8212; Caterpillar 2.8.0 documentation</title>
   
   
   
@@ -41,9 +41,9 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=dfec817d"></script>
-    <script src="../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/documentation_options.js?v=69ff2ef9"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../_static/design-tabs.js?v=f930bc37"></script>
@@ -54,7 +54,7 @@
     <link rel="prev" title="2.2.2. String Types" href="string.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.7.0" />
+  <meta name="docsearch:version" content="2.8.0" />
   </head>
   
   
@@ -116,7 +116,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.7.0</p>
+    <p class="title logo__title">Caterpillar 2.8.0</p>
   
 </a></div>
     
@@ -334,9 +334,10 @@
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1 has-children"><a class="reference internal" href="../first_steps/index.html">2.1. First Steps</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../first_steps/structdef.html">2.1.1. Defining Structs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../first_steps/parsing.html">2.1.2. Working with Structs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../first_steps/configuration.html">2.1.3. Configuring structs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../first_steps/documentation.html">2.1.4. Documenting Structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../first_steps/extended_syntax.html">2.1.2. Extended Syntax</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../first_steps/parsing.html">2.1.3. Working with Structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../first_steps/configuration.html">2.1.4. Configuring structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../first_steps/documentation.html">2.1.5. Documenting Structs</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">2.2. Basic Concepts</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
@@ -465,6 +466,10 @@ sizes based on your needs.</p>
 <p>Let’s implement a struct for the <a class="reference external" href="https://www.w3.org/TR/png/#fdAT-chunk">fDAT</a> chunk
 of the PNG format, which stores frame data. In this case, we use the <code class="code docutils literal notranslate"><span class="pre">Memory</span></code>
 struct to handle the frame data.</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" data-sync-group="syntax" data-sync-id="default" for="sd-tab-item-0">
+Default Syntax</label><div class="sd-tab-content docutils">
 <div class="literal-block-wrapper docutils container" id="id1">
 <div class="code-block-caption"><span class="caption-text">Implementation for the frame data chunk</span><a class="headerlink" href="#id1" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span>                    <span class="c1"># &lt;-- endianess as usual</span>
@@ -475,6 +480,22 @@ struct to handle the frame data.</p>
 </pre></div>
 </div>
 </div>
+</div>
+<input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" data-sync-group="syntax" data-sync-id="extended" for="sd-tab-item-1">
+Extended Syntax (&gt;=2.8.0)</label><div class="sd-tab-content docutils">
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">Implementation for the frame data chunk</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span>                    <span class="c1"># &lt;-- endianess as usual</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">FDATChunk</span><span class="p">:</span>
+    <span class="n">sequence_number</span><span class="p">:</span> <span class="n">uint32_t</span>
+    <span class="c1"># We rather use a memory instance here instead of Bytes()</span>
+    <span class="n">frame_data</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">Memory</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">length</span> <span class="o">-</span> <span class="mi">4</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
 <div class="admonition-challenge admonition">
 <p class="admonition-title">Challenge</p>
 <p>If you feel ready for a more advanced structure, try implementing the
@@ -482,16 +503,40 @@ struct to handle the frame data.</p>
 <details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
 <summary class="sd-summary-title sd-card-header">
 <span class="sd-summary-text">Solution</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
-<div class="literal-block-wrapper docutils container" id="id2">
-<div class="code-block-caption"><span class="caption-text">Sample implementation of the <em>zTXt</em> chunk</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-2" name="sd-tab-set-1" type="radio">
+<label class="sd-tab-label" data-sync-group="syntax" data-sync-id="default" for="sd-tab-item-2">
+Default Syntax</label><div class="sd-tab-content docutils">
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">Sample implementation of the <em>zTXt</em> chunk</span><a class="headerlink" href="#id3" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>                             <span class="c1"># &lt;-- actually, we don&#39;t need a specific byteorder</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ZTXTChunk</span><span class="p">:</span>
     <span class="n">keyword</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>           <span class="c1"># &lt;-- variable length</span>
     <span class="n">compression_method</span><span class="p">:</span> <span class="n">uint8</span>
     <span class="c1"># Okay, we haven&#39;t introduced this struct yet, but Memory() or Bytes()</span>
-    <span class="c1"># would heve been okay, too.</span>
+    <span class="c1"># would heve been okay too.</span>
     <span class="n">text</span><span class="p">:</span> <span class="n">ZLibCompressed</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">length</span> <span class="o">-</span> <span class="n">lenof</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">keyword</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
 </pre></div>
+</div>
+</div>
+</div>
+<input id="sd-tab-item-3" name="sd-tab-set-1" type="radio">
+<label class="sd-tab-label" data-sync-group="syntax" data-sync-id="extended" for="sd-tab-item-3">
+Extended Syntax (&gt;=2.8.0)</label><div class="sd-tab-content docutils">
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">Sample implementation of the <em>zTXt</em> chunk</span><a class="headerlink" href="#id4" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>                             <span class="c1"># &lt;-- actually, we don&#39;t need a specific byteorder</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ZTXTChunk</span><span class="p">:</span>
+    <span class="n">keyword</span><span class="p">:</span> <span class="n">cstr_t</span>                 <span class="c1"># &lt;-- variable length</span>
+    <span class="n">compression_method</span><span class="p">:</span> <span class="n">uint8_t</span>
+    <span class="c1"># Okay, we haven&#39;t introduced this struct yet, but Memory() or Bytes()</span>
+    <span class="c1"># would heve been okay too.</span>
+    <span class="n">text</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span>
+        <span class="n">ZLibCompressed</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">length</span> <span class="o">-</span> <span class="n">lenof</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">keyword</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="p">]</span>
+</pre></div>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -594,7 +639,7 @@ struct to handle the frame data.</p>
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     <br/>
   </p>
 </div>

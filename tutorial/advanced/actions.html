@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>2.3.6. Actions &#8212; Caterpillar 2.7.0 documentation</title>
+    <title>2.3.6. Actions &#8212; Caterpillar 2.8.0 documentation</title>
   
   
   
@@ -41,9 +41,9 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=dfec817d"></script>
-    <script src="../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/documentation_options.js?v=69ff2ef9"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../_static/design-tabs.js?v=f930bc37"></script>
@@ -54,7 +54,7 @@
     <link rel="prev" title="2.3.5. Conditional Fields" href="conditional.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.7.0" />
+  <meta name="docsearch:version" content="2.8.0" />
   </head>
   
   
@@ -116,7 +116,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.7.0</p>
+    <p class="title logo__title">Caterpillar 2.8.0</p>
   
 </a></div>
     
@@ -334,9 +334,10 @@
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1 has-children"><a class="reference internal" href="../first_steps/index.html">2.1. First Steps</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../first_steps/structdef.html">2.1.1. Defining Structs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../first_steps/parsing.html">2.1.2. Working with Structs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../first_steps/configuration.html">2.1.3. Configuring structs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../first_steps/documentation.html">2.1.4. Documenting Structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../first_steps/extended_syntax.html">2.1.2. Extended Syntax</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../first_steps/parsing.html">2.1.3. Working with Structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../first_steps/configuration.html">2.1.4. Configuring structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../first_steps/documentation.html">2.1.5. Documenting Structs</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../basics/index.html">2.2. Basic Concepts</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -446,11 +447,30 @@ processing at different stages.</p>
 </ul>
 <p>An action can be as simple as executing a function during packing or unpacking.
 For example:</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" data-sync-group="syntax" data-sync-id="default" for="sd-tab-item-0">
+Default Syntax</label><div class="sd-tab-content docutils">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
     <span class="n">_</span><span class="p">:</span> <span class="n">Action</span><span class="p">(</span><span class="n">pack</span><span class="o">=</span><span class="k">lambda</span> <span class="n">ctx</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Hello, World!&quot;</span><span class="p">))</span>
     <span class="n">a</span><span class="p">:</span> <span class="n">uint8</span>
 </pre></div>
+</div>
+</div>
+<input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" data-sync-group="syntax" data-sync-id="extended" for="sd-tab-item-1">
+Extended Syntax (&gt;=2.8.0)</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">my_action</span><span class="p">(</span><span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Hello, World!&quot;</span><span class="p">)</span>
+
+<span class="nd">@struct</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
+    <span class="n">_</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">Action</span><span class="p">(</span><span class="n">pack</span><span class="o">=</span><span class="n">my_action</span><span class="p">)]</span> <span class="o">=</span> <span class="n">Invisible</span><span class="p">()</span>
+    <span class="n">a</span><span class="p">:</span> <span class="n">uint8_t</span>
+</pre></div>
+</div>
+</div>
 </div>
 <p>In this case, when the struct is packed, it will print <code class="code docutils literal notranslate"><span class="pre">&quot;Hello,</span> <span class="pre">World!&quot;</span></code> to the
 console. Actions like this can be used for logging, validation, or other side
@@ -466,9 +486,13 @@ checksums or cryptographic hash values before or after processing fields. For
 example, you can use an action to automatically wrap a sequence of fields with a
 specialized message digest like SHA256 (see <code class="xref py py-class docutils literal notranslate"><span class="pre">Digest</span></code>):</p>
 <div class="sd-tab-set docutils">
-<input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
-<label class="sd-tab-label" for="sd-tab-item-0">
+<input checked="checked" id="sd-tab-item-2" name="sd-tab-set-1" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-2">
 Python &lt;= 3.13</label><div class="sd-tab-content docutils">
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-4" name="sd-tab-set-2" type="radio">
+<label class="sd-tab-label" data-sync-group="syntax" data-sync-id="default" for="sd-tab-item-4">
+Default Syntax</label><div class="sd-tab-content docutils">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
     <span class="n">key</span><span class="p">:</span> <span class="sa">b</span><span class="s2">&quot;...&quot;</span>
@@ -478,9 +502,27 @@ Python &lt;= 3.13</label><div class="sd-tab-content docutils">
 </pre></div>
 </div>
 </div>
-<input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
-<label class="sd-tab-label" for="sd-tab-item-1">
+<input id="sd-tab-item-5" name="sd-tab-set-2" type="radio">
+<label class="sd-tab-label" data-sync-group="syntax" data-sync-id="extended" for="sd-tab-item-5">
+Extended Syntax (&gt;=2.8.0)</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
+    <span class="n">key</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;...&quot;</span><span class="p">]</span>
+    <span class="k">with</span> <span class="n">Sha2_256</span><span class="p">(</span><span class="s2">&quot;hash&quot;</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="n">user_data</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">Bytes</span><span class="p">(</span><span class="mi">50</span><span class="p">)]</span>
+    <span class="c1"># the &#39;hash&#39; attribute will be set automatically</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<input id="sd-tab-item-3" name="sd-tab-set-1" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-3">
 Python &gt;= 3.14</label><div class="sd-tab-content docutils">
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-6" name="sd-tab-set-3" type="radio">
+<label class="sd-tab-label" data-sync-group="syntax" data-sync-id="default" for="sd-tab-item-6">
+Default Syntax</label><div class="sd-tab-content docutils">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
     <span class="n">key</span><span class="p">:</span> <span class="sa">b</span><span class="s2">&quot;...&quot;</span>
@@ -493,6 +535,23 @@ Python &gt;= 3.14</label><div class="sd-tab-content docutils">
 </pre></div>
 </div>
 </div>
+<input id="sd-tab-item-7" name="sd-tab-set-3" type="radio">
+<label class="sd-tab-label" data-sync-group="syntax" data-sync-id="extended" for="sd-tab-item-7">
+Extended Syntax (&gt;=2.8.0)</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
+    <span class="n">key</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;...&quot;</span><span class="p">]</span>
+    <span class="n">_hash_begin</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">DigestField</span><span class="o">.</span><span class="n">begin</span><span class="p">(</span><span class="s2">&quot;hash&quot;</span><span class="p">,</span> <span class="n">Sha2_256_Algo</span><span class="p">)]</span> <span class="o">=</span> <span class="n">Invisible</span><span class="p">()</span>
+    <span class="n">user_data</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">Bytes</span><span class="p">(</span><span class="mi">50</span><span class="p">)]</span>
+    <span class="c1"># the &#39;hash&#39; attribute must be set manually</span>
+    <span class="nb">hash</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">DigestField</span><span class="p">(</span><span class="s2">&quot;hash&quot;</span><span class="p">,</span> <span class="n">Bytes</span><span class="p">(</span><span class="mi">32</span><span class="p">),</span> <span class="n">verify</span><span class="o">=</span><span class="kc">True</span><span class="p">)]</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;&quot;</span>
+    <span class="c1"># or</span>
+    <span class="nb">hash</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">Sha2_256_Field</span><span class="p">(</span><span class="s2">&quot;hash&quot;</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="kc">True</span><span class="p">)]</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
 </div>
 <p>In this example, the <code class="code docutils literal notranslate"><span class="pre">user_data</span></code> field is wrapped with the <code class="code docutils literal notranslate"><span class="pre">Sha2_256</span></code> digest action.
 When the struct is packed, a SHA256 hash is computed for the <code class="code docutils literal notranslate"><span class="pre">user_data</span></code> and stored
@@ -500,8 +559,8 @@ in the <code class="code docutils literal notranslate"><span class="pre">hash</s
 with, the verification step will raise an error.</p>
 <p>The resulting struct includes the following fields:</p>
 <div class="sd-tab-set docutils">
-<input checked="checked" id="sd-tab-item-2" name="sd-tab-set-1" type="radio">
-<label class="sd-tab-label" for="sd-tab-item-2">
+<input checked="checked" id="sd-tab-item-8" name="sd-tab-set-4" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-8">
 Python &lt;= 3.13</label><div class="sd-tab-content docutils">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Format</span><span class="o">.</span><span class="n">__struct__</span><span class="o">.</span><span class="n">fields</span>
 <span class="go">[</span>
@@ -515,8 +574,8 @@ Python &lt;= 3.13</label><div class="sd-tab-content docutils">
 </pre></div>
 </div>
 </div>
-<input id="sd-tab-item-3" name="sd-tab-set-1" type="radio">
-<label class="sd-tab-label" for="sd-tab-item-3">
+<input id="sd-tab-item-9" name="sd-tab-set-4" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-9">
 Python &gt;= 3.14</label><div class="sd-tab-content docutils">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Format</span><span class="o">.</span><span class="n">__struct__</span><span class="o">.</span><span class="n">fields</span>
 <span class="go">[</span>
@@ -632,7 +691,7 @@ Python &gt;= 3.14</label><div class="sd-tab-content docutils">
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     <br/>
   </p>
 </div>

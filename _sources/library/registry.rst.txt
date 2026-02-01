@@ -4,7 +4,5 @@
 Annotation Registry
 *******************
 
-*TODO*
-
 .. automodule:: caterpillar.registry
     :members:

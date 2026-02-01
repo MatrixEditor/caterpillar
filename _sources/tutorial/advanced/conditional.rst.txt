@@ -21,15 +21,34 @@ fields dynamically, depending on the value of other fields or context.
 
 Here's an example demonstrating how to use conditional fields for versioned structs:
 
-.. code-block:: python
-    :caption: Conditional fields (e.g. for versioned structs)
+.. tab-set::
+    :sync-group: syntax
 
-    @struct
-    class Format:
-        version: uint32
-        # all following fields will be bound to the condition
-        with this.version == 1:
-            header: uint8
+    .. tab-item:: Default Syntax
+        :sync: default
+
+        .. code-block:: python
+            :caption: Conditional fields (e.g. for versioned structs)
+
+            @struct
+            class Format:
+                version: uint32
+                # all following fields will be bound to the condition
+                with this.version == 1:
+                    header: uint8
+
+    .. tab-item:: Extended Syntax (>=2.8.0)
+        :sync: extended
+
+        .. code-block:: python
+            :caption: Conditional fields (e.g. for versioned structs)
+
+            @struct
+            class Format:
+                version: uint32_t
+                # all following fields will be bound to the condition
+                with this.version == 1:
+                    header: uint8_t
 
 Key Concepts
 ------------
@@ -55,22 +74,47 @@ Conditional fields are particularly useful when dealing with versioned structs,
 where the structure of the data may change based on the version number or other
 factors. For example:
 
-.. code-block:: python
-    :caption: Conditional fields (e.g. for versioned structs)
 
-    @struct
-    class Format:
-        version: uint32
-        # all following fields will be bound to the condition
-        with this.version == 1:
-            length: uint8
-            extra: uint8
-            data: Bytes(this.length)
-        # Use else-if over 'Else' alone
-        with ElseIf(this.version == 2):
-            name: CString(16)
-            data: Prefixed(uint8)
+.. tab-set::
+    :sync-group: syntax
 
+    .. tab-item:: Default Syntax
+        :sync: default
+
+        .. code-block:: python
+            :caption: Conditional fields (e.g. for versioned structs)
+
+            @struct
+            class Format:
+                version: uint32
+                # all following fields will be bound to the condition
+                with this.version == 1:
+                    length: uint8
+                    extra: uint8
+                    data: Bytes(this.length)
+                # Use else-if over 'Else' alone
+                with ElseIf(this.version == 2):
+                    name: CString(16)
+                    data: Prefixed(uint8)
+
+    .. tab-item:: Extended Syntax (>=2.8.0)
+        :sync: extended
+
+        .. code-block:: python
+            :caption: Conditional fields (e.g. for versioned structs)
+
+            @struct
+            class Format:
+                version: uint32_t
+                # all following fields will be bound to the condition
+                with this.version == 1:
+                    length: uint8_t
+                    extra: uint8_t
+                    data: f[bytes, Bytes(this.length)]
+                # Use else-if over 'Else' alone
+                with ElseIf(this.version == 2):
+                    name: f[str, CString(16)]
+                    data: f[bytes, Prefixed(uint8)]
 
 Best Practices
 ---------------

@@ -16,12 +16,31 @@ There are two types of actions you can define:
 An action can be as simple as executing a function during packing or unpacking.
 For example:
 
-.. code-block:: python
+.. tab-set::
+    :sync-group: syntax
 
-    @struct
-    class Format:
-        _: Action(pack=lambda ctx: print("Hello, World!"))
-        a: uint8
+    .. tab-item:: Default Syntax
+        :sync: default
+
+        .. code-block:: python
+
+            @struct
+            class Format:
+                _: Action(pack=lambda ctx: print("Hello, World!"))
+                a: uint8
+
+    .. tab-item:: Extended Syntax (>=2.8.0)
+        :sync: extended
+
+        .. code-block:: python
+
+            def my_action(context: _ContextLike):
+                print("Hello, World!")
+
+            @struct
+            class Format:
+                _: f[None, Action(pack=my_action)] = Invisible()
+                a: uint8_t
 
 In this case, when the struct is packed, it will print :code:`"Hello, World!"` to the
 console. Actions like this can be used for logging, validation, or other side
@@ -42,30 +61,67 @@ specialized message digest like SHA256 (see :class:`~caterpillar.py.Digest`):
 
     .. tab-item:: Python <= 3.13
 
-        .. code-block:: python
+        .. tab-set::
+            :sync-group: syntax
 
-            @struct
-            class Format:
-                key: b"..."
-                with Sha2_256("hash", verify=True):
-                    user_data: Bytes(50)
-                # the 'hash' attribute will be set automatically
+            .. tab-item:: Default Syntax
+                :sync: default
 
+                .. code-block:: python
+
+                    @struct
+                    class Format:
+                        key: b"..."
+                        with Sha2_256("hash", verify=True):
+                            user_data: Bytes(50)
+                        # the 'hash' attribute will be set automatically
+
+            .. tab-item:: Extended Syntax (>=2.8.0)
+                :sync: extended
+
+                .. code-block:: python
+
+                    @struct
+                    class Format:
+                        key: f[bytes, b"..."]
+                        with Sha2_256("hash", verify=True):
+                            user_data: f[bytes, Bytes(50)]
+                        # the 'hash' attribute will be set automatically
 
     .. tab-item:: Python >= 3.14
 
-        .. code-block:: python
+       .. tab-set::
+            :sync-group: syntax
 
-            @struct
-            class Format:
-                key: b"..."
-                _hash_begin: DigestField.begin("hash", Sha2_256_Algo)
-                user_data: Bytes(50)
-                # the 'hash' attribute must be set manually
-                hash: DigestField("hash", Bytes(32), verify=True) = None
-                # or
-                hash: Sha2_256_Field("hash", verify=True) = None
+            .. tab-item:: Default Syntax
+                :sync: default
 
+                .. code-block:: python
+
+                    @struct
+                    class Format:
+                        key: b"..."
+                        _hash_begin: DigestField.begin("hash", Sha2_256_Algo)
+                        user_data: Bytes(50)
+                        # the 'hash' attribute must be set manually
+                        hash: DigestField("hash", Bytes(32), verify=True) = None
+                        # or
+                        hash: Sha2_256_Field("hash", verify=True) = None
+
+            .. tab-item:: Extended Syntax (>=2.8.0)
+                :sync: extended
+
+                .. code-block:: python
+
+                    @struct
+                    class Format:
+                        key: f[bytes, b"..."]
+                        _hash_begin: f[None, DigestField.begin("hash", Sha2_256_Algo)] = Invisible()
+                        user_data: f[bytes, Bytes(50)]
+                        # the 'hash' attribute must be set manually
+                        hash: f[bytes, DigestField("hash", Bytes(32), verify=True)] = b""
+                        # or
+                        hash: f[bytes, Sha2_256_Field("hash", verify=True)] = b""
 
 
 

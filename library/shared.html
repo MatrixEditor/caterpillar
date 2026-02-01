@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>4.7. Shared Concepts &#8212; Caterpillar 2.7.0 documentation</title>
+    <title>4.7. Shared Concepts &#8212; Caterpillar 2.8.0 documentation</title>
   
   
   
@@ -41,9 +41,9 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=dfec817d"></script>
-    <script src="../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/documentation_options.js?v=69ff2ef9"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
@@ -54,7 +54,7 @@
     <link rel="prev" title="4.6. Annotation Registry" href="registry.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.7.0" />
+  <meta name="docsearch:version" content="2.8.0" />
   </head>
   
   
@@ -116,7 +116,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.7.0</p>
+    <p class="title logo__title">Caterpillar 2.8.0</p>
   
 </a></div>
     
@@ -350,8 +350,11 @@
 <li class="toctree-l2"><a class="reference internal" href="fields/common.html">4.8.2. Common Structs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fields/compression.html">4.8.3. Compression Structs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fields/crypto.html">4.8.4. Cryptographic Structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fields/net.html">4.8.5. Network Structs</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1"><a class="reference internal" href="hooks.html">4.9. Hooks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ext_types.html">4.10. Types (Extended Syntax)</a></li>
 </ul>
 </div>
 </nav></div>
@@ -414,9 +417,46 @@
                   
   <section id="module-caterpillar.shared">
 <span id="shared-concepts"></span><span id="lib-shared"></span><h1><span class="section-number">4.7. </span>Shared Concepts<a class="headerlink" href="#module-caterpillar.shared" title="Link to this heading">#</a></h1>
-<dl class="py attribute">
+<p>Module containing shared constants and utility functions for managing
+and processing structs.</p>
+<p>This module defines a set of constants and functions used across different
+operations involving structs, bitfields, and related concepts. It includes
+key attributes for managing struct definitions, mode constants for packing
+/unpacking operations, and action handling for custom processing.</p>
+<p>The module introduces the concept of “Actions”, which are used to define
+custom behavior that should be executed before parsing a struct field (e.g.,
+installing IO hooks for checksums or hash calculations). Actions are
+represented by classes with <cite>__action_XX</cite> methods.</p>
+<dl>
+<dt>Usage Example:</dt><dd><p>To define a struct that executes a custom action before parsing a field:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span><span class="w"> </span><span class="nc">MyAction</span><span class="p">:</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="k">def</span><span class="w"> </span><span class="nf">__action_unpack__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="o">...</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nd">@struct</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span><span class="w"> </span><span class="nc">MyStruct</span><span class="p">:</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">any_name</span><span class="p">:</span> <span class="n">MyAction</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<p>In this case, the action will be executed before parsing any subsequent fields
+and won’t be stored as part of the struct model.</p>
+<dl class="py data">
+<dt class="sig sig-object py" id="caterpillar.shared.MODE_PACK">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.shared.</span></span><span class="sig-name descname"><span class="pre">MODE_PACK</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">0</span></span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></span><a class="headerlink" href="#caterpillar.shared.MODE_PACK" title="Link to this definition">#</a></dt>
+<dd><p>Constant representing packing mode.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="caterpillar.shared.MODE_UNPACK">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.shared.</span></span><span class="sig-name descname"><span class="pre">MODE_UNPACK</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></span><a class="headerlink" href="#caterpillar.shared.MODE_UNPACK" title="Link to this definition">#</a></dt>
+<dd><p>Constant representing unpacking mode.</p>
+</dd></dl>
+
+<dl class="py data">
 <dt class="sig sig-object py" id="caterpillar.shared.ATTR_STRUCT">
-<span class="sig-prename descclassname"><span class="pre">caterpillar.shared.</span></span><span class="sig-name descname"><span class="pre">ATTR_STRUCT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&quot;__struct__&quot;</span></em><a class="headerlink" href="#caterpillar.shared.ATTR_STRUCT" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">caterpillar.shared.</span></span><span class="sig-name descname"><span class="pre">ATTR_STRUCT</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Final</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'__struct__'</span></span><a class="headerlink" href="#caterpillar.shared.ATTR_STRUCT" title="Link to this definition">#</a></dt>
 <dd><p>All models annotated with either <code class="docutils literal notranslate"><span class="pre">&#64;struct</span></code> or <code class="docutils literal notranslate"><span class="pre">&#64;bitfield</span></code> are struct
 containers. Thus, they store the additional class attribute <code class="code docutils literal notranslate"><span class="pre">__struct__</span></code>.</p>
 <p>Internally, any types utilizing this attribute can be employed within a
@@ -427,108 +467,107 @@ must be conforming to the <a class="reference internal" href="../reference/datam
 </div>
 </dd></dl>
 
-<dl class="py attribute">
+<dl class="py data">
 <dt class="sig sig-object py" id="caterpillar.shared.ATTR_BYTEORDER">
-<span class="sig-prename descclassname"><span class="pre">caterpillar.shared.</span></span><span class="sig-name descname"><span class="pre">ATTR_BYTEORDER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&quot;__byteorder__&quot;</span></em><a class="headerlink" href="#caterpillar.shared.ATTR_BYTEORDER" title="Link to this definition">#</a></dt>
-<dd><div class="versionadded">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.shared.</span></span><span class="sig-name descname"><span class="pre">ATTR_BYTEORDER</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Final</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'__byteorder__'</span></span><a class="headerlink" href="#caterpillar.shared.ATTR_BYTEORDER" title="Link to this definition">#</a></dt>
+<dd><p>Attribute representing the byte order of a struct.</p>
+<div class="versionadded">
 <p><span class="versionmodified added">Added in version 2.5.0: </span>Moved from <em>caterpillar.byteorder</em>.</p>
 </div>
 </dd></dl>
 
-<dl class="py attribute">
+<dl class="py data">
 <dt class="sig sig-object py" id="caterpillar.shared.ATTR_TYPE">
-<span class="sig-prename descclassname"><span class="pre">caterpillar.shared.</span></span><span class="sig-name descname"><span class="pre">ATTR_TYPE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&quot;__type__&quot;</span></em><a class="headerlink" href="#caterpillar.shared.ATTR_TYPE" title="Link to this definition">#</a></dt>
-<dd><div class="versionadded">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.shared.</span></span><span class="sig-name descname"><span class="pre">ATTR_TYPE</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Final</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'__type__'</span></span><a class="headerlink" href="#caterpillar.shared.ATTR_TYPE" title="Link to this definition">#</a></dt>
+<dd><p>Attribute that stores the type of the struct.</p>
+<div class="versionadded">
 <p><span class="versionmodified added">Added in version 2.5.0.</span></p>
 </div>
 </dd></dl>
 
-<dl class="py attribute">
+<dl class="py data">
 <dt class="sig sig-object py" id="caterpillar.shared.ATTR_BITS">
-<span class="sig-prename descclassname"><span class="pre">caterpillar.shared.</span></span><span class="sig-name descname"><span class="pre">ATTR_BITS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&quot;__bits__&quot;</span></em><a class="headerlink" href="#caterpillar.shared.ATTR_BITS" title="Link to this definition">#</a></dt>
-<dd><div class="versionadded">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.shared.</span></span><span class="sig-name descname"><span class="pre">ATTR_BITS</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Final</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'__bits__'</span></span><a class="headerlink" href="#caterpillar.shared.ATTR_BITS" title="Link to this definition">#</a></dt>
+<dd><p>Attribute representing the number of bits in a struct.</p>
+<div class="versionadded">
 <p><span class="versionmodified added">Added in version 2.5.0: </span>Moved from <em>caterpillar.model._bitfield</em>.</p>
 </div>
 </dd></dl>
 
-<dl class="py attribute">
+<dl class="py data">
 <dt class="sig sig-object py" id="caterpillar.shared.ATTR_SIGNED">
-<span class="sig-prename descclassname"><span class="pre">caterpillar.shared.</span></span><span class="sig-name descname"><span class="pre">ATTR_SIGNED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&quot;__signed__&quot;</span></em><a class="headerlink" href="#caterpillar.shared.ATTR_SIGNED" title="Link to this definition">#</a></dt>
-<dd><div class="versionadded">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.shared.</span></span><span class="sig-name descname"><span class="pre">ATTR_SIGNED</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Final</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'__signed__'</span></span><a class="headerlink" href="#caterpillar.shared.ATTR_SIGNED" title="Link to this definition">#</a></dt>
+<dd><p>Attribute that marks a struct as signed.</p>
+<div class="versionadded">
 <p><span class="versionmodified added">Added in version 2.5.0: </span>Moved from <em>caterpillar.model._bitfield</em>.</p>
 </div>
 </dd></dl>
 
-<dl class="py attribute">
+<dl class="py data">
 <dt class="sig sig-object py" id="caterpillar.shared.ATTR_TEMPLATE">
-<span class="sig-prename descclassname"><span class="pre">caterpillar.shared.</span></span><span class="sig-name descname"><span class="pre">ATTR_TEMPLATE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&quot;__template__&quot;</span></em><a class="headerlink" href="#caterpillar.shared.ATTR_TEMPLATE" title="Link to this definition">#</a></dt>
-<dd><div class="versionadded">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.shared.</span></span><span class="sig-name descname"><span class="pre">ATTR_TEMPLATE</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Final</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'__template__'</span></span><a class="headerlink" href="#caterpillar.shared.ATTR_TEMPLATE" title="Link to this definition">#</a></dt>
+<dd><p>Attribute that provides the template for the struct.</p>
+<div class="versionadded">
 <p><span class="versionmodified added">Added in version 2.5.0: </span>Moved from <em>caterpillar.model._template</em>.</p>
 </div>
 </dd></dl>
 
-<dl class="py attribute">
+<dl class="py data">
+<dt class="sig sig-object py" id="caterpillar.shared.ATTR_PACK">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.shared.</span></span><span class="sig-name descname"><span class="pre">ATTR_PACK</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Final</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'__pack__'</span></span><a class="headerlink" href="#caterpillar.shared.ATTR_PACK" title="Link to this definition">#</a></dt>
+<dd><p>Attribute that defines packing behavior for the struct.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.8.0.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="caterpillar.shared.ATTR_UNPACK">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.shared.</span></span><span class="sig-name descname"><span class="pre">ATTR_UNPACK</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Final</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'__unpack__'</span></span><a class="headerlink" href="#caterpillar.shared.ATTR_UNPACK" title="Link to this definition">#</a></dt>
+<dd><p>Attribute that defines unpacking behavior for the struct.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.8.0.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py data">
 <dt class="sig sig-object py" id="caterpillar.shared.ATTR_ACTION_PACK">
-<span class="sig-prename descclassname"><span class="pre">caterpillar.shared.</span></span><span class="sig-name descname"><span class="pre">ATTR_ACTION_PACK</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&quot;__action_pack__&quot;</span></em><a class="headerlink" href="#caterpillar.shared.ATTR_ACTION_PACK" title="Link to this definition">#</a></dt>
-<dd><div class="versionadded">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.shared.</span></span><span class="sig-name descname"><span class="pre">ATTR_ACTION_PACK</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Final</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'__action_pack__'</span></span><a class="headerlink" href="#caterpillar.shared.ATTR_ACTION_PACK" title="Link to this definition">#</a></dt>
+<dd><p>Attribute indicating an action to be executed during packing.</p>
+<div class="versionadded">
 <p><span class="versionmodified added">Added in version 2.4.0.</span></p>
 </div>
 </dd></dl>
 
-<dl class="py attribute">
+<dl class="py data">
 <dt class="sig sig-object py" id="caterpillar.shared.ATTR_ACTION_UNPACK">
-<span class="sig-prename descclassname"><span class="pre">caterpillar.shared.</span></span><span class="sig-name descname"><span class="pre">ATTR_ACTION_UNPACK</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&quot;__action_unpack__&quot;</span></em><a class="headerlink" href="#caterpillar.shared.ATTR_ACTION_UNPACK" title="Link to this definition">#</a></dt>
-<dd><div class="versionadded">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.shared.</span></span><span class="sig-name descname"><span class="pre">ATTR_ACTION_UNPACK</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Final</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'__action_unpack__'</span></span><a class="headerlink" href="#caterpillar.shared.ATTR_ACTION_UNPACK" title="Link to this definition">#</a></dt>
+<dd><p>Attribute indicating an action to be executed during unpacking.</p>
+<div class="versionadded">
 <p><span class="versionmodified added">Added in version 2.4.0.</span></p>
 </div>
 </dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="caterpillar.shared.MODE_PACK">
-<span class="sig-prename descclassname"><span class="pre">caterpillar.shared.</span></span><span class="sig-name descname"><span class="pre">MODE_PACK</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#caterpillar.shared.MODE_PACK" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="caterpillar.shared.MODE_UNPACK">
-<span class="sig-prename descclassname"><span class="pre">caterpillar.shared.</span></span><span class="sig-name descname"><span class="pre">MODE_UNPACK</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#caterpillar.shared.MODE_UNPACK" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
 <dl class="py function">
-<dt class="sig sig-object py" id="caterpillar.shared.getstruct">
-<span class="sig-prename descclassname"><span class="pre">caterpillar.shared.</span></span><span class="sig-name descname"><span class="pre">getstruct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="positional-only-separator o"><abbr title="Positional-only parameter separator (PEP 570)"><span class="pre">/</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">__default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caterpillar/shared.html#getstruct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.shared.getstruct" title="Link to this definition">#</a></dt>
-<dd><p>Get the structure attribute of the given object.</p>
+<dt class="sig sig-object py" id="caterpillar.shared.constval">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.shared.</span></span><span class="sig-name descname"><span class="pre">constval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_OT</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">_ContextLambda</span><span class="p"><span class="pre">[</span></span><span class="pre">_OT</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/caterpillar/shared.html#constval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.shared.constval" title="Link to this definition">#</a></dt>
+<dd><p>Returns a lambda that returns a constant value when invoked.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>obj</strong> – The object to get the structure attribute from.</p>
+<dd class="field-odd"><p><strong>value</strong> (<em>_OT</em>) – The constant value to be returned by the lambda.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The structure attribute of the object.</p>
+<dd class="field-even"><p>A lambda function that, when called, returns the given constant value.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../reference/datamodel/protocols/contextlambda.html#ContextLambda" title="_ContextLambda">_ContextLambda</a>[_OT]</p>
 </dd>
 </dl>
 </dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="caterpillar.shared.hasstruct">
-<span class="sig-prename descclassname"><span class="pre">caterpillar.shared.</span></span><span class="sig-name descname"><span class="pre">hasstruct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/caterpillar/shared.html#hasstruct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.shared.hasstruct" title="Link to this definition">#</a></dt>
-<dd><p>Check if the given object has a structure attribute.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>obj</strong> – The object to check.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>True if the object has a structure attribute, else False.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="caterpillar.shared.typeof">
-<span class="sig-prename descclassname"><span class="pre">caterpillar.shared.</span></span><span class="sig-name descname"><span class="pre">typeof</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">struct</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caterpillar/shared.html#typeof"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.shared.typeof" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="caterpillar.shared.Action">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.shared.</span></span><span class="sig-name descname"><span class="pre">Action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pack</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unpack</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">both</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caterpillar/shared.html#Action"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.shared.Action" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">caterpillar.shared.</span></span><span class="sig-name descname"><span class="pre">Action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pack</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ContextLambda</span><span class="p"><span class="pre">[</span></span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unpack</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ContextLambda</span><span class="p"><span class="pre">[</span></span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">both</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ContextLambda</span><span class="p"><span class="pre">[</span></span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caterpillar/shared.html#Action"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.shared.Action" title="Link to this definition">#</a></dt>
 <dd><p>A class representing an action to be executed during the parsing or processing
 of a struct. This is used for cases where a field requires an operation to be
 performed instead of directly storing data.</p>
@@ -561,6 +600,76 @@ during struct processing.</p>
 <li><p><strong>pack</strong> (<a class="reference internal" href="../reference/datamodel/protocols/contextlambda.html#ContextLambda" title="_ContextLambda"><em>_ContextLambda</em></a><em> | </em><em>None</em>) – The callable that will be executed before packing the struct (optional).</p></li>
 <li><p><strong>unpack</strong> (<a class="reference internal" href="../reference/datamodel/protocols/contextlambda.html#ContextLambda" title="_ContextLambda"><em>_ContextLambda</em></a><em> | </em><em>None</em>) – The callable that will be executed before unpacking the struct (optional).</p></li>
 </ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="caterpillar.shared.Action.is_action">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">is_action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">TypeIs</span><span class="p"><span class="pre">[</span></span><span class="pre">_SupportsActionPack</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_SupportsActionUnpack</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/caterpillar/shared.html#Action.is_action"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.shared.Action.is_action" title="Link to this definition">#</a></dt>
+<dd><p>Checks if the given object is an instance of an <cite>Action</cite> class,
+based on the presence of the <cite>__action_pack__</cite> or <cite>__action_unpack__</cite> attributes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>obj</strong> (<em>Any</em>) – The object to check.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the object has either a <cite>__action_pack__</cite> or <cite>__action_unpack__</cite> attribute, indicating it is an action.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="caterpillar.shared.hasstruct">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.shared.</span></span><span class="sig-name descname"><span class="pre">hasstruct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">TypeIs</span><span class="p"><span class="pre">[</span></span><span class="pre">_ContainsStruct</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/caterpillar/shared.html#hasstruct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.shared.hasstruct" title="Link to this definition">#</a></dt>
+<dd><p>Check if the given object has a structure attribute.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>obj</strong> – The object to check.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the object has a structure attribute, else False.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="caterpillar.shared.getstruct">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.shared.</span></span><span class="sig-name descname"><span class="pre">getstruct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span><span class="p"><span class="pre">[</span></span><span class="pre">_IT</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="positional-only-separator o"><abbr title="Positional-only parameter separator (PEP 570)"><span class="pre">/</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">__default</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="fields/field_model.html#caterpillar.fields.FieldStruct" title="caterpillar.fields.FieldStruct"><span class="pre">FieldStruct</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_IT</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">_IT</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/caterpillar/shared.html#getstruct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.shared.getstruct" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.shared.</span></span><span class="sig-name descname"><span class="pre">getstruct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ContainsStruct</span><span class="p"><span class="pre">[</span></span><span class="pre">_IT</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">_OT</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="positional-only-separator o"><abbr title="Positional-only parameter separator (PEP 570)"><span class="pre">/</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">__default</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">_StructLike</span><span class="p"><span class="pre">[</span></span><span class="pre">_IT</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">_OT</span><span class="p"><span class="pre">]</span></span></span></span></dt>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.shared.</span></span><span class="sig-name descname"><span class="pre">getstruct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="positional-only-separator o"><abbr title="Positional-only parameter separator (PEP 570)"><span class="pre">/</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">__default</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_StructLike</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../reference/datamodel/protocols/structlike.html#StructLike" title="_StructLike"><span class="pre">_StructLike</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="fields/field_model.html#caterpillar.fields.FieldStruct" title="caterpillar.fields.FieldStruct"><span class="pre">FieldStruct</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span></dt>
+<dd><p>Get the structure attribute of the given object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>obj</strong> – The object to get the structure attribute from.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The structure attribute of the object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="caterpillar.shared.typeof">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.shared.</span></span><span class="sig-name descname"><span class="pre">typeof</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">struct</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_StructLike</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_SupportsType</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_ContainsStruct</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">object</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">type</span></span></span><a class="reference internal" href="../_modules/caterpillar/shared.html#typeof"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.shared.typeof" title="Link to this definition">#</a></dt>
+<dd><p>Returns the type of a given struct or object, checking for a custom type annotation.</p>
+<p>If the given object has a <cite>__type__</cite> attribute, this function returns that type. If not, it
+returns the object’s default type. If the type cannot be resolved, the function defaults to
+returning <cite>object</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>struct</strong> (<a class="reference internal" href="../reference/datamodel/protocols/structlike.html#StructLike" title="_StructLike"><em>_StructLike</em></a><em> | </em><a class="reference internal" href="../reference/datamodel/protocols/structlike.html#SupportsType" title="_SupportsType"><em>_SupportsType</em></a><em> | </em><a class="reference internal" href="../reference/datamodel/protocols/structlike.html#ContainsStruct" title="_ContainsStruct"><em>_ContainsStruct</em></a><em> | </em><em>object</em>) – The struct or object whose type is to be resolved.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The resolved type of the struct or object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>type</p>
 </dd>
 </dl>
 </dd></dl>
@@ -614,20 +723,26 @@ during struct processing.</p>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.shared.MODE_PACK"><code class="docutils literal notranslate"><span class="pre">MODE_PACK</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.shared.MODE_UNPACK"><code class="docutils literal notranslate"><span class="pre">MODE_UNPACK</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.shared.ATTR_STRUCT"><code class="docutils literal notranslate"><span class="pre">ATTR_STRUCT</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.shared.ATTR_BYTEORDER"><code class="docutils literal notranslate"><span class="pre">ATTR_BYTEORDER</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.shared.ATTR_TYPE"><code class="docutils literal notranslate"><span class="pre">ATTR_TYPE</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.shared.ATTR_BITS"><code class="docutils literal notranslate"><span class="pre">ATTR_BITS</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.shared.ATTR_SIGNED"><code class="docutils literal notranslate"><span class="pre">ATTR_SIGNED</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.shared.ATTR_TEMPLATE"><code class="docutils literal notranslate"><span class="pre">ATTR_TEMPLATE</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.shared.ATTR_PACK"><code class="docutils literal notranslate"><span class="pre">ATTR_PACK</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.shared.ATTR_UNPACK"><code class="docutils literal notranslate"><span class="pre">ATTR_UNPACK</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.shared.ATTR_ACTION_PACK"><code class="docutils literal notranslate"><span class="pre">ATTR_ACTION_PACK</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.shared.ATTR_ACTION_UNPACK"><code class="docutils literal notranslate"><span class="pre">ATTR_ACTION_UNPACK</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.shared.MODE_PACK"><code class="docutils literal notranslate"><span class="pre">MODE_PACK</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.shared.MODE_UNPACK"><code class="docutils literal notranslate"><span class="pre">MODE_UNPACK</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.shared.getstruct"><code class="docutils literal notranslate"><span class="pre">getstruct()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.shared.constval"><code class="docutils literal notranslate"><span class="pre">constval()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.shared.Action"><code class="docutils literal notranslate"><span class="pre">Action</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.shared.Action.is_action"><code class="docutils literal notranslate"><span class="pre">Action.is_action()</span></code></a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.shared.hasstruct"><code class="docutils literal notranslate"><span class="pre">hasstruct()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.shared.getstruct"><code class="docutils literal notranslate"><span class="pre">getstruct()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.shared.typeof"><code class="docutils literal notranslate"><span class="pre">typeof()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.shared.Action"><code class="docutils literal notranslate"><span class="pre">Action</span></code></a></li>
 </ul>
   </nav></div>
 
@@ -674,7 +789,7 @@ during struct processing.</p>
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     <br/>
   </p>
 </div>

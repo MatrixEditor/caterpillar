@@ -4,6 +4,9 @@
 Field Model
 ***********
 
+Standard Interface
+------------------
+
 .. autoclass:: caterpillar.fields.Field
     :members:
     :private-members:
@@ -16,6 +19,13 @@ Field Model
     :members:
     :special-members:
 
+.. autofunction:: caterpillar.fields.get_args
+
+.. autofunction:: caterpillar.fields.get_kwargs
+
+Chains and Conditionals
+-----------------------
+
 .. autoclass:: caterpillar.fields.Chain
     :members:
     :special-members:
@@ -25,3 +35,4 @@ Field Model
 
 .. autoclass:: caterpillar.fields.ElseIf
     :members:
+

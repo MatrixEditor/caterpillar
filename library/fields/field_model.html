@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>4.8.1. Field Model &#8212; Caterpillar 2.7.0 documentation</title>
+    <title>4.8.1. Field Model &#8212; Caterpillar 2.8.0 documentation</title>
   
   
   
@@ -41,9 +41,9 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=dfec817d"></script>
-    <script src="../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/documentation_options.js?v=69ff2ef9"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../_static/design-tabs.js?v=f930bc37"></script>
@@ -54,7 +54,7 @@
     <link rel="prev" title="4.8. Fields" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.7.0" />
+  <meta name="docsearch:version" content="2.8.0" />
   </head>
   
   
@@ -116,7 +116,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.7.0</p>
+    <p class="title logo__title">Caterpillar 2.8.0</p>
   
 </a></div>
     
@@ -350,8 +350,11 @@
 <li class="toctree-l2"><a class="reference internal" href="common.html">4.8.2. Common Structs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="compression.html">4.8.3. Compression Structs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="crypto.html">4.8.4. Cryptographic Structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="net.html">4.8.5. Network Structs</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1"><a class="reference internal" href="../hooks.html">4.9. Hooks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ext_types.html">4.10. Types (Extended Syntax)</a></li>
 </ul>
 </div>
 </nav></div>
@@ -417,9 +420,11 @@
                   
   <section id="field-model">
 <span id="id1"></span><h1><span class="section-number">4.8.1. </span>Field Model<a class="headerlink" href="#field-model" title="Link to this heading">#</a></h1>
+<section id="standard-interface">
+<h2><span class="section-number">4.8.1.1. </span>Standard Interface<a class="headerlink" href="#standard-interface" title="Link to this heading">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="caterpillar.fields.Field">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.fields.</span></span><span class="sig-name descname"><span class="pre">Field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">struct</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset=-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flags=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amount=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">condition=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arch=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default=&lt;object</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bits=None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/_base.html#Field"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Field" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">caterpillar.fields.</span></span><span class="sig-name descname"><span class="pre">Field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">struct:</span> <span class="pre">~caterpillar.abc._StructLike[~caterpillar.abc._IT,</span> <span class="pre">~caterpillar.abc._OT]</span> <span class="pre">|</span> <span class="pre">~caterpillar.abc._ContextLambda[~caterpillar.abc._OT]</span> <span class="pre">|</span> <span class="pre">~caterpillar.abc._ContainsStruct[~caterpillar.abc._IT,</span> <span class="pre">~caterpillar.abc._OT],</span> <span class="pre">order:</span> <span class="pre">~caterpillar.abc._EndianLike</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">offset:</span> <span class="pre">~caterpillar.abc._ContextLambda[int]</span> <span class="pre">|</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">-1,</span> <span class="pre">flags:</span> <span class="pre">set[~caterpillar.abc._OptionLike]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">amount:</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">slice</span> <span class="pre">|</span> <span class="pre">~types.EllipsisType</span> <span class="pre">|</span> <span class="pre">~caterpillar.abc._ContextLambda[int]</span> <span class="pre">=</span> <span class="pre">0,</span> <span class="pre">options:</span> <span class="pre">~caterpillar.abc._SwitchLambda</span> <span class="pre">|</span> <span class="pre">dict[~typing.Any,</span> <span class="pre">~typing.Any]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">condition:</span> <span class="pre">~caterpillar.abc._ContextLambda[bool]</span> <span class="pre">|</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True,</span> <span class="pre">arch:</span> <span class="pre">~caterpillar.abc._ArchLike</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">default:</span> <span class="pre">object</span> <span class="pre">=</span> <span class="pre">&lt;object</span> <span class="pre">object&gt;,</span> <span class="pre">bits:</span> <span class="pre">~caterpillar.abc._ContextLambda[int]</span> <span class="pre">|</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/_base.html#Field"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Field" title="Link to this definition">#</a></dt>
 <dd><p>Represents a field in a data structure.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -439,25 +444,25 @@
 </dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="caterpillar.fields.Field.struct">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">struct</span></span><a class="headerlink" href="#caterpillar.fields.Field.struct" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">struct</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">_StructLike</span><span class="p"><span class="pre">[</span></span><span class="pre">_IT</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">_OT</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_ContextLambda</span><span class="p"><span class="pre">[</span></span><span class="pre">_OT</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#caterpillar.fields.Field.struct" title="Link to this definition">#</a></dt>
 <dd><p>The internal structure for this field.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="caterpillar.fields.Field.condition">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">condition</span></span><a class="headerlink" href="#caterpillar.fields.Field.condition" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">condition</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">_ContextLambda</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#caterpillar.fields.Field.condition" title="Link to this definition">#</a></dt>
 <dd><p>The field’s condition expression or value.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="caterpillar.fields.Field.flags">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">flags</span></span><a class="headerlink" href="#caterpillar.fields.Field.flags" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">flags</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">set</span><span class="p"><span class="pre">[</span></span><span class="pre">_OptionLike</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#caterpillar.fields.Field.flags" title="Link to this definition">#</a></dt>
 <dd><p>The set of flags associated with this field.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.fields.Field.add_flag">
-<span class="sig-name descname"><span class="pre">add_flag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flag</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_base.html#Field.add_flag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Field.add_flag" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">add_flag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_OptionLike</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_base.html#Field.add_flag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Field.add_flag" title="Link to this definition">#</a></dt>
 <dd><p>Adds a flag to this field.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -471,7 +476,7 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.fields.Field.has_flag">
-<span class="sig-name descname"><span class="pre">has_flag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../options.html#caterpillar.options.Flag" title="caterpillar.options.Flag"><span class="pre">Flag</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_base.html#Field.has_flag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Field.has_flag" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">has_flag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_OptionLike</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_base.html#Field.has_flag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Field.has_flag" title="Link to this definition">#</a></dt>
 <dd><p>Checks whether this field stores the given flag.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -488,7 +493,7 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.fields.Field.remove_flag">
-<span class="sig-name descname"><span class="pre">remove_flag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../options.html#caterpillar.options.Flag" title="caterpillar.options.Flag"><span class="pre">Flag</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_base.html#Field.remove_flag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Field.remove_flag" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">remove_flag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_OptionLike</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_base.html#Field.remove_flag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Field.remove_flag" title="Link to this definition">#</a></dt>
 <dd><p>Removes a flag from this field.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -502,25 +507,45 @@
 
 <dl class="py property">
 <dt class="sig sig-object py" id="caterpillar.fields.Field.offset">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">offset</span></span><a class="headerlink" href="#caterpillar.fields.Field.offset" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">offset</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">_ContextLambda</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#caterpillar.fields.Field.offset" title="Link to this definition">#</a></dt>
 <dd><p>The field’s offset.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="caterpillar.fields.Field.amount">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">amount</span></span><a class="headerlink" href="#caterpillar.fields.Field.amount" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">amount</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">slice</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">EllipsisType</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_ContextLambda</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#caterpillar.fields.Field.amount" title="Link to this definition">#</a></dt>
 <dd><p>The repetition count for this field.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="caterpillar.fields.Field.options">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">options</span></span><a class="headerlink" href="#caterpillar.fields.Field.options" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">options</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">_SwitchLambda</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#caterpillar.fields.Field.options" title="Link to this definition">#</a></dt>
 <dd><p>The switch-case options dictionary.</p>
 </dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="caterpillar.fields.Field.order">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">order</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">_EndianLike</span></span><a class="headerlink" href="#caterpillar.fields.Field.order" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caterpillar.fields.Field.has_order">
+<span class="sig-name descname"><span class="pre">has_order</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_base.html#Field.has_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Field.has_order" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="caterpillar.fields.Field.arch">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">arch</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">_ArchLike</span></span><a class="headerlink" href="#caterpillar.fields.Field.arch" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caterpillar.fields.Field.has_arch">
+<span class="sig-name descname"><span class="pre">has_arch</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_base.html#Field.has_arch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Field.has_arch" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.fields.Field._verify_context_value">
-<span class="sig-name descname"><span class="pre">_verify_context_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_base.html#Field._verify_context_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Field._verify_context_value" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">_verify_context_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">type</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_base.html#Field._verify_context_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Field._verify_context_value" title="Link to this definition">#</a></dt>
 <dd><p>Verifies that a value is either of the expected type(s) or is a callable.
 Used to validate inputs for context-aware fields.</p>
 <dl class="field-list simple">
@@ -552,7 +577,7 @@ Used to validate inputs for context-aware fields.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.fields.Field.is_enabled">
-<span class="sig-name descname"><span class="pre">is_enabled</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_base.html#Field.is_enabled"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Field.is_enabled" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">is_enabled</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ContextLike</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_base.html#Field.is_enabled"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Field.is_enabled" title="Link to this definition">#</a></dt>
 <dd><p>Evaluates the condition of this field.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -575,7 +600,7 @@ Used to validate inputs for context-aware fields.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.fields.Field.length">
-<span class="sig-name descname"><span class="pre">length</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/_base.html#Field.length"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Field.length" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">length</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ContextLike</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">EllipsisType</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">slice</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_base.html#Field.length"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Field.length" title="Link to this definition">#</a></dt>
 <dd><p>Calculates the sequence length of this field.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -595,7 +620,7 @@ Used to validate inputs for context-aware fields.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.fields.Field.get_struct">
-<span class="sig-name descname"><span class="pre">get_struct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/_base.html#Field.get_struct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Field.get_struct" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">get_struct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ContextLike</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">_StructLike</span><span class="p"><span class="pre">[</span></span><span class="pre">_IT</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">_OT</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_base.html#Field.get_struct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Field.get_struct" title="Link to this definition">#</a></dt>
 <dd><p>Returns the struct from stored options.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -615,13 +640,13 @@ Used to validate inputs for context-aware fields.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.fields.Field.get_offset">
-<span class="sig-name descname"><span class="pre">get_offset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_base.html#Field.get_offset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Field.get_offset" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">get_offset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ContextLike</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_base.html#Field.get_offset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Field.get_offset" title="Link to this definition">#</a></dt>
 <dd><p>Returns the offset position of this field</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.fields.Field.get_type">
-<span class="sig-name descname"><span class="pre">get_type</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/_base.html#Field.get_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Field.get_type" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">get_type</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">type</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_base.html#Field.get_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Field.get_type" title="Link to this definition">#</a></dt>
 <dd><p>Returns the annotation type for this field</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -635,25 +660,29 @@ Used to validate inputs for context-aware fields.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.fields.Field.get_name">
-<span class="sig-name descname"><span class="pre">get_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/_base.html#Field.get_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Field.get_name" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">get_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_base.html#Field.get_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Field.get_name" title="Link to this definition">#</a></dt>
+<dd><p>Returns the name of this field.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 2.8.0: </span>now always returns a string</p>
+</div>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="caterpillar.fields.FieldMixin">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.fields.</span></span><span class="sig-name descname"><span class="pre">FieldMixin</span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_mixin.html#FieldMixin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.FieldMixin" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">caterpillar.fields.</span></span><span class="sig-name descname"><span class="pre">FieldMixin</span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_mixin.html#FieldMixin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.FieldMixin" title="Link to this definition">#</a></dt>
 <dd><p>A simple mixin to support operators used to create <a class="reference internal" href="#caterpillar.fields.Field" title="caterpillar.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a> instances.</p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="caterpillar.fields.FieldStruct">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.fields.</span></span><span class="sig-name descname"><span class="pre">FieldStruct</span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_mixin.html#FieldStruct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.FieldStruct" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">caterpillar.fields.</span></span><span class="sig-name descname"><span class="pre">FieldStruct</span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_mixin.html#FieldStruct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.FieldStruct" title="Link to this definition">#</a></dt>
 <dd><p>A mix-in class combining the behavior of _StructLike with additional
 functionality for packing and unpacking structured data.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.fields.FieldStruct.pack_single">
-<span class="sig-name descname"><span class="pre">pack_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_mixin.html#FieldStruct.pack_single"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.FieldStruct.pack_single" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">pack_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_IT</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ContextLike</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_mixin.html#FieldStruct.pack_single"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.FieldStruct.pack_single" title="Link to this definition">#</a></dt>
 <dd><p>Abstract method to pack a single element.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -670,7 +699,7 @@ functionality for packing and unpacking structured data.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.fields.FieldStruct.unpack_single">
-<span class="sig-name descname"><span class="pre">unpack_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/_mixin.html#FieldStruct.unpack_single"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.FieldStruct.unpack_single" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">unpack_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ContextLike</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">_OT</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_mixin.html#FieldStruct.unpack_single"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.FieldStruct.unpack_single" title="Link to this definition">#</a></dt>
 <dd><p>Abstract method to unpack a single element.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -687,7 +716,7 @@ functionality for packing and unpacking structured data.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.fields.FieldStruct.pack_seq">
-<span class="sig-name descname"><span class="pre">pack_seq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_mixin.html#FieldStruct.pack_seq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.FieldStruct.pack_seq" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">pack_seq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Collection</span><span class="p"><span class="pre">[</span></span><span class="pre">_IT</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ContextLike</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_mixin.html#FieldStruct.pack_seq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.FieldStruct.pack_seq" title="Link to this definition">#</a></dt>
 <dd><p>Pack a sequence of elements using the provided context.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -701,7 +730,7 @@ functionality for packing and unpacking structured data.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.fields.FieldStruct.unpack_seq">
-<span class="sig-name descname"><span class="pre">unpack_seq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/_mixin.html#FieldStruct.unpack_seq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.FieldStruct.unpack_seq" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">unpack_seq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ContextLike</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Collection</span><span class="p"><span class="pre">[</span></span><span class="pre">_OT</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_mixin.html#FieldStruct.unpack_seq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.FieldStruct.unpack_seq" title="Link to this definition">#</a></dt>
 <dd><p>Unpack a sequence of elements using the provided context.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -715,7 +744,7 @@ functionality for packing and unpacking structured data.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.fields.FieldStruct.__pack__">
-<span class="sig-name descname"><span class="pre">__pack__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_mixin.html#FieldStruct.__pack__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.FieldStruct.__pack__" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">__pack__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_IT</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ContextLike</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_mixin.html#FieldStruct.__pack__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.FieldStruct.__pack__" title="Link to this definition">#</a></dt>
 <dd><p>Pack data based on whether the field is sequential or not.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -729,7 +758,7 @@ functionality for packing and unpacking structured data.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.fields.FieldStruct.__unpack__">
-<span class="sig-name descname"><span class="pre">__unpack__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/_mixin.html#FieldStruct.__unpack__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.FieldStruct.__unpack__" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">__unpack__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ContextLike</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">_OT</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_mixin.html#FieldStruct.__unpack__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.FieldStruct.__unpack__" title="Link to this definition">#</a></dt>
 <dd><p>Unpack data based on whether the field is sequential or not.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -752,26 +781,55 @@ functionality for packing and unpacking structured data.</p>
 </dl>
 </dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="caterpillar.fields.FieldStruct.__byteorder__">
-<span class="sig-name descname"><span class="pre">__byteorder__</span></span><a class="headerlink" href="#caterpillar.fields.FieldStruct.__byteorder__" title="Link to this definition">#</a></dt>
-<dd><p>An internal field used to measure the byte order of this struct.</p>
-<p>Note that this field will be used during processing only and not during
-parsing or building data. In addition, the actual byte order should be
-retrieved using the <a class="reference internal" href="#caterpillar.fields.Field" title="caterpillar.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a> instance within the context.</p>
 </dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="caterpillar.fields.FieldStruct.__bits__">
-<span class="sig-name descname"><span class="pre">__bits__</span></span><a class="headerlink" href="#caterpillar.fields.FieldStruct.__bits__" title="Link to this definition">#</a></dt>
-<dd><p>TBD</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="caterpillar.fields.get_args">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.fields.</span></span><span class="sig-name descname"><span class="pre">get_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ContextLambda</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">_ContextLambda</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ContextLike</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_mixin.html#get_args"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.get_args" title="Link to this definition">#</a></dt>
+<dd><p>Get arguments for an instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>args</strong> (<em>Any</em>) – Input arguments.</p></li>
+<li><p><strong>context</strong> (<a class="reference internal" href="../../reference/datamodel/protocols/contextlike.html#ContextLike" title="_ContextLike"><em>_ContextLike</em></a>) – The current operation context.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of processed arguments.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="caterpillar.fields.get_kwargs">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.fields.</span></span><span class="sig-name descname"><span class="pre">get_kwargs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">_ContextLambda</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ContextLike</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_mixin.html#get_kwargs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.get_kwargs" title="Link to this definition">#</a></dt>
+<dd><p>Process a dictionary of keyword arguments, replacing callable values with their
+results.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>kwargs</strong> (<em>dict</em>) – Dictionary of keyword arguments.</p></li>
+<li><p><strong>context</strong> (<a class="reference internal" href="../../reference/datamodel/protocols/contextlike.html#ContextLike" title="_ContextLike"><em>_ContextLike</em></a>) – The current operation context.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A new dictionary with processed keyword arguments.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
 </dd></dl>
 
+</section>
+<section id="chains-and-conditionals">
+<h2><span class="section-number">4.8.1.2. </span>Chains and Conditionals<a class="headerlink" href="#chains-and-conditionals" title="Link to this heading">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="caterpillar.fields.Chain">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.fields.</span></span><span class="sig-name descname"><span class="pre">Chain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">structs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/_mixin.html#Chain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Chain" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">caterpillar.fields.</span></span><span class="sig-name descname"><span class="pre">Chain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_StructLike</span><span class="p"><span class="pre">[</span></span><span class="pre">_IT</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">structs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_StructLike</span><span class="p"><span class="pre">[</span></span><span class="pre">bytes</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tail</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_StructLike</span><span class="p"><span class="pre">[</span></span><span class="pre">bytes</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">_OT</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/_mixin.html#Chain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Chain" title="Link to this definition">#</a></dt>
 <dd><p>Represents a chain of structures where each structure in the chain is linked
 to the next one, forming a sequence.</p>
 <dl class="field-list simple">
@@ -792,12 +850,12 @@ to the next one, forming a sequence.</p>
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.fields.Chain.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">structs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_mixin.html#Chain.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Chain.__init__" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_StructLike</span><span class="p"><span class="pre">[</span></span><span class="pre">_IT</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">structs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_StructLike</span><span class="p"><span class="pre">[</span></span><span class="pre">bytes</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tail</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_StructLike</span><span class="p"><span class="pre">[</span></span><span class="pre">bytes</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">_OT</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_mixin.html#Chain.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Chain.__init__" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="caterpillar.fields.Chain.head">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">head</span></span><a class="headerlink" href="#caterpillar.fields.Chain.head" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">head</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">_StructLike</span><span class="p"><span class="pre">[</span></span><span class="pre">_IT</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#caterpillar.fields.Chain.head" title="Link to this definition">#</a></dt>
 <dd><p>Get the head of the chain, i.e., the first structure.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -811,7 +869,7 @@ to the next one, forming a sequence.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="caterpillar.fields.Chain.tail">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tail</span></span><a class="headerlink" href="#caterpillar.fields.Chain.tail" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">tail</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">_StructLike</span><span class="p"><span class="pre">[</span></span><span class="pre">bytes</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">_OT</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#caterpillar.fields.Chain.tail" title="Link to this definition">#</a></dt>
 <dd><p>Get the tail of the chain, i.e., the last structure.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -825,7 +883,7 @@ to the next one, forming a sequence.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.fields.Chain.__size__">
-<span class="sig-name descname"><span class="pre">__size__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_mixin.html#Chain.__size__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Chain.__size__" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">__size__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ContextLike</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_mixin.html#Chain.__size__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Chain.__size__" title="Link to this definition">#</a></dt>
 <dd><p>Calculate the size of the chain in bytes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -842,7 +900,7 @@ to the next one, forming a sequence.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.fields.Chain.__type__">
-<span class="sig-name descname"><span class="pre">__type__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">type</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_mixin.html#Chain.__type__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Chain.__type__" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">__type__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">type</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_mixin.html#Chain.__type__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Chain.__type__" title="Link to this definition">#</a></dt>
 <dd><p>Get the type of the tail structure in the chain.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -856,7 +914,7 @@ to the next one, forming a sequence.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.fields.Chain.__and__">
-<span class="sig-name descname"><span class="pre">__and__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/_mixin.html#Chain.__and__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Chain.__and__" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">__and__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#caterpillar.fields.Chain" title="caterpillar.fields._mixin.Chain"><span class="pre">Chain</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_StructLike</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_ContainsStruct</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Self</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_mixin.html#Chain.__and__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Chain.__and__" title="Link to this definition">#</a></dt>
 <dd><p>Concatenate another structure to the end of the chain.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -873,7 +931,7 @@ to the next one, forming a sequence.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.fields.Chain.__rand__">
-<span class="sig-name descname"><span class="pre">__rand__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/_mixin.html#Chain.__rand__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Chain.__rand__" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">__rand__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#caterpillar.fields.Chain" title="caterpillar.fields._mixin.Chain"><span class="pre">Chain</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Self</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_mixin.html#Chain.__rand__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Chain.__rand__" title="Link to this definition">#</a></dt>
 <dd><p>Concatenate another structure to the beginning of the chain.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -890,7 +948,7 @@ to the next one, forming a sequence.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.fields.Chain.unpack_single">
-<span class="sig-name descname"><span class="pre">unpack_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/_mixin.html#Chain.unpack_single"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Chain.unpack_single" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">unpack_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ContextLike</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">_OT</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_mixin.html#Chain.unpack_single"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Chain.unpack_single" title="Link to this definition">#</a></dt>
 <dd><p>Unpack a single data instance from the chain.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -907,7 +965,7 @@ to the next one, forming a sequence.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.fields.Chain.pack_single">
-<span class="sig-name descname"><span class="pre">pack_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_mixin.html#Chain.pack_single"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Chain.pack_single" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">pack_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_IT</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ContextLike</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/_mixin.html#Chain.pack_single"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Chain.pack_single" title="Link to this definition">#</a></dt>
 <dd><p>Pack a single data instance into the chain.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -923,7 +981,7 @@ to the next one, forming a sequence.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="caterpillar.fields.If">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.fields.</span></span><span class="sig-name descname"><span class="pre">If</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">condition</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/conditional.html#If"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.If" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">caterpillar.fields.</span></span><span class="sig-name descname"><span class="pre">If</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">condition</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ContextLambda</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/conditional.html#If"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.If" title="Link to this definition">#</a></dt>
 <dd><p>If-statement implementation for class definitions.</p>
 <div class="versionchanged">
 <p><span class="versionmodified changed">Changed in version 2.4.5: </span>Python 3.14 is <strong>not</strong> supported.</p>
@@ -947,7 +1005,7 @@ to display the condition as well.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="caterpillar.fields.ElseIf">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.fields.</span></span><span class="sig-name descname"><span class="pre">ElseIf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">condition</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/conditional.html#ElseIf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.ElseIf" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">caterpillar.fields.</span></span><span class="sig-name descname"><span class="pre">ElseIf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">condition</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ContextLambda</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/conditional.html#ElseIf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.ElseIf" title="Link to this definition">#</a></dt>
 <dd><p>ElseIf-statement implementation for class definitions.</p>
 <div class="versionchanged">
 <p><span class="versionmodified changed">Changed in version 2.4.3: </span>Python 3.14 is <strong>not</strong> supported.</p>
@@ -965,6 +1023,7 @@ to display the condition as well.</p>
 </div>
 </dd></dl>
 
+</section>
 </section>
 
 
@@ -1014,54 +1073,64 @@ to display the condition as well.</p>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field"><code class="docutils literal notranslate"><span class="pre">Field</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.struct"><code class="docutils literal notranslate"><span class="pre">Field.struct</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.condition"><code class="docutils literal notranslate"><span class="pre">Field.condition</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.flags"><code class="docutils literal notranslate"><span class="pre">Field.flags</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.add_flag"><code class="docutils literal notranslate"><span class="pre">Field.add_flag()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.has_flag"><code class="docutils literal notranslate"><span class="pre">Field.has_flag()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.remove_flag"><code class="docutils literal notranslate"><span class="pre">Field.remove_flag()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.offset"><code class="docutils literal notranslate"><span class="pre">Field.offset</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.amount"><code class="docutils literal notranslate"><span class="pre">Field.amount</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.options"><code class="docutils literal notranslate"><span class="pre">Field.options</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field._verify_context_value"><code class="docutils literal notranslate"><span class="pre">Field._verify_context_value()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.is_seq"><code class="docutils literal notranslate"><span class="pre">Field.is_seq()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.is_enabled"><code class="docutils literal notranslate"><span class="pre">Field.is_enabled()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.has_condition"><code class="docutils literal notranslate"><span class="pre">Field.has_condition()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.length"><code class="docutils literal notranslate"><span class="pre">Field.length()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.get_struct"><code class="docutils literal notranslate"><span class="pre">Field.get_struct()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.get_offset"><code class="docutils literal notranslate"><span class="pre">Field.get_offset()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.get_type"><code class="docutils literal notranslate"><span class="pre">Field.get_type()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.get_name"><code class="docutils literal notranslate"><span class="pre">Field.get_name()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#standard-interface">4.8.1.1. Standard Interface</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field"><code class="docutils literal notranslate"><span class="pre">Field</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.struct"><code class="docutils literal notranslate"><span class="pre">Field.struct</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.condition"><code class="docutils literal notranslate"><span class="pre">Field.condition</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.flags"><code class="docutils literal notranslate"><span class="pre">Field.flags</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.add_flag"><code class="docutils literal notranslate"><span class="pre">Field.add_flag()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.has_flag"><code class="docutils literal notranslate"><span class="pre">Field.has_flag()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.remove_flag"><code class="docutils literal notranslate"><span class="pre">Field.remove_flag()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.offset"><code class="docutils literal notranslate"><span class="pre">Field.offset</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.amount"><code class="docutils literal notranslate"><span class="pre">Field.amount</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.options"><code class="docutils literal notranslate"><span class="pre">Field.options</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.order"><code class="docutils literal notranslate"><span class="pre">Field.order</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.has_order"><code class="docutils literal notranslate"><span class="pre">Field.has_order()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.arch"><code class="docutils literal notranslate"><span class="pre">Field.arch</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.has_arch"><code class="docutils literal notranslate"><span class="pre">Field.has_arch()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field._verify_context_value"><code class="docutils literal notranslate"><span class="pre">Field._verify_context_value()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.is_seq"><code class="docutils literal notranslate"><span class="pre">Field.is_seq()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.is_enabled"><code class="docutils literal notranslate"><span class="pre">Field.is_enabled()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.has_condition"><code class="docutils literal notranslate"><span class="pre">Field.has_condition()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.length"><code class="docutils literal notranslate"><span class="pre">Field.length()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.get_struct"><code class="docutils literal notranslate"><span class="pre">Field.get_struct()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.get_offset"><code class="docutils literal notranslate"><span class="pre">Field.get_offset()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.get_type"><code class="docutils literal notranslate"><span class="pre">Field.get_type()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Field.get_name"><code class="docutils literal notranslate"><span class="pre">Field.get_name()</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.FieldMixin"><code class="docutils literal notranslate"><span class="pre">FieldMixin</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.FieldStruct"><code class="docutils literal notranslate"><span class="pre">FieldStruct</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.FieldStruct.pack_single"><code class="docutils literal notranslate"><span class="pre">FieldStruct.pack_single()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.FieldStruct.unpack_single"><code class="docutils literal notranslate"><span class="pre">FieldStruct.unpack_single()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.FieldStruct.pack_seq"><code class="docutils literal notranslate"><span class="pre">FieldStruct.pack_seq()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.FieldStruct.unpack_seq"><code class="docutils literal notranslate"><span class="pre">FieldStruct.unpack_seq()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.FieldStruct.__pack__"><code class="docutils literal notranslate"><span class="pre">FieldStruct.__pack__()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.FieldStruct.__unpack__"><code class="docutils literal notranslate"><span class="pre">FieldStruct.__unpack__()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.FieldStruct.__repr__"><code class="docutils literal notranslate"><span class="pre">FieldStruct.__repr__()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.FieldStruct.__byteorder__"><code class="docutils literal notranslate"><span class="pre">FieldStruct.__byteorder__</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.FieldStruct.__bits__"><code class="docutils literal notranslate"><span class="pre">FieldStruct.__bits__</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.FieldMixin"><code class="docutils literal notranslate"><span class="pre">FieldMixin</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.FieldStruct"><code class="docutils literal notranslate"><span class="pre">FieldStruct</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.FieldStruct.pack_single"><code class="docutils literal notranslate"><span class="pre">FieldStruct.pack_single()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.FieldStruct.unpack_single"><code class="docutils literal notranslate"><span class="pre">FieldStruct.unpack_single()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.FieldStruct.pack_seq"><code class="docutils literal notranslate"><span class="pre">FieldStruct.pack_seq()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.FieldStruct.unpack_seq"><code class="docutils literal notranslate"><span class="pre">FieldStruct.unpack_seq()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.FieldStruct.__pack__"><code class="docutils literal notranslate"><span class="pre">FieldStruct.__pack__()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.FieldStruct.__unpack__"><code class="docutils literal notranslate"><span class="pre">FieldStruct.__unpack__()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.FieldStruct.__repr__"><code class="docutils literal notranslate"><span class="pre">FieldStruct.__repr__()</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Chain"><code class="docutils literal notranslate"><span class="pre">Chain</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Chain.__init__"><code class="docutils literal notranslate"><span class="pre">Chain.__init__()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Chain.head"><code class="docutils literal notranslate"><span class="pre">Chain.head</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Chain.tail"><code class="docutils literal notranslate"><span class="pre">Chain.tail</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Chain.__size__"><code class="docutils literal notranslate"><span class="pre">Chain.__size__()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Chain.__type__"><code class="docutils literal notranslate"><span class="pre">Chain.__type__()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Chain.__and__"><code class="docutils literal notranslate"><span class="pre">Chain.__and__()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Chain.__rand__"><code class="docutils literal notranslate"><span class="pre">Chain.__rand__()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Chain.unpack_single"><code class="docutils literal notranslate"><span class="pre">Chain.unpack_single()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Chain.pack_single"><code class="docutils literal notranslate"><span class="pre">Chain.pack_single()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.get_args"><code class="docutils literal notranslate"><span class="pre">get_args()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.get_kwargs"><code class="docutils literal notranslate"><span class="pre">get_kwargs()</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.If"><code class="docutils literal notranslate"><span class="pre">If</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.ElseIf"><code class="docutils literal notranslate"><span class="pre">ElseIf</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#chains-and-conditionals">4.8.1.2. Chains and Conditionals</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Chain"><code class="docutils literal notranslate"><span class="pre">Chain</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Chain.__init__"><code class="docutils literal notranslate"><span class="pre">Chain.__init__()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Chain.head"><code class="docutils literal notranslate"><span class="pre">Chain.head</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Chain.tail"><code class="docutils literal notranslate"><span class="pre">Chain.tail</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Chain.__size__"><code class="docutils literal notranslate"><span class="pre">Chain.__size__()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Chain.__type__"><code class="docutils literal notranslate"><span class="pre">Chain.__type__()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Chain.__and__"><code class="docutils literal notranslate"><span class="pre">Chain.__and__()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Chain.__rand__"><code class="docutils literal notranslate"><span class="pre">Chain.__rand__()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Chain.unpack_single"><code class="docutils literal notranslate"><span class="pre">Chain.unpack_single()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Chain.pack_single"><code class="docutils literal notranslate"><span class="pre">Chain.pack_single()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.If"><code class="docutils literal notranslate"><span class="pre">If</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.ElseIf"><code class="docutils literal notranslate"><span class="pre">ElseIf</span></code></a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 
@@ -1108,7 +1177,7 @@ to display the condition as well.</p>
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     <br/>
   </p>
 </div>

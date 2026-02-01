@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>2.1.3. Configuring structs &#8212; Caterpillar 2.7.0 documentation</title>
+    <title>2.1.4. Configuring structs &#8212; Caterpillar 2.8.0 documentation</title>
   
   
   
@@ -41,20 +41,20 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=dfec817d"></script>
-    <script src="../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/documentation_options.js?v=69ff2ef9"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'tutorial/first_steps/configuration';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="2.1.4. Documenting Structs" href="documentation.html" />
-    <link rel="prev" title="2.1.2. Working with Structs" href="parsing.html" />
+    <link rel="next" title="2.1.5. Documenting Structs" href="documentation.html" />
+    <link rel="prev" title="2.1.3. Working with Structs" href="parsing.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.7.0" />
+  <meta name="docsearch:version" content="2.8.0" />
   </head>
   
   
@@ -116,7 +116,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.7.0</p>
+    <p class="title logo__title">Caterpillar 2.8.0</p>
   
 </a></div>
     
@@ -334,9 +334,10 @@
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">2.1. First Steps</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="structdef.html">2.1.1. Defining Structs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="parsing.html">2.1.2. Working with Structs</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">2.1.3. Configuring structs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="documentation.html">2.1.4. Documenting Structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extended_syntax.html">2.1.2. Extended Syntax</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parsing.html">2.1.3. Working with Structs</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">2.1.4. Configuring structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation.html">2.1.5. Documenting Structs</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../basics/index.html">2.2. Basic Concepts</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -416,7 +417,7 @@
     
     <li class="breadcrumb-item"><a href="index.html" class="nav-link"><span class="section-number">2.1. </span>First Steps</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">2.1.3. </span>Configuring structs</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">2.1.4. </span>Configuring structs</span></li>
   </ul>
 </nav>
 </div>
@@ -434,7 +435,7 @@
                 <article class="bd-article">
                   
   <section id="configuring-structs">
-<span id="first-steps-config"></span><h1><span class="section-number">2.1.3. </span>Configuring structs<a class="headerlink" href="#configuring-structs" title="Link to this heading">#</a></h1>
+<span id="first-steps-config"></span><h1><span class="section-number">2.1.4. </span>Configuring structs<a class="headerlink" href="#configuring-structs" title="Link to this heading">#</a></h1>
 <p>When working with binary data, it’s essential to account for how the data is ordered, particularly
 when dealing with multi-byte fields. The <strong>endianess</strong> of the data specifies the byte order:
 either <strong>big-endian</strong> (most significant byte first) or <strong>little-endian</strong> (least significant byte first).
@@ -448,6 +449,10 @@ In this section, we’ll look at how to configure the endianess for structs in <
 <p>Let’s take a look at another chunk from the PNG format: the <a class="reference external" href="https://www.w3.org/TR/png/#11pHYs">pHYS</a> chunk.
 It contains two 4-byte unsigned integers that represent pixel density. Since PNG files use <strong>big-endian</strong> encoding
 for integers, we need to configure the struct to handle this correctly.</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" data-sync-group="syntax" data-sync-id="default" for="sd-tab-item-0">
+Default Syntax</label><div class="sd-tab-content docutils">
 <div class="literal-block-wrapper docutils container" id="id1">
 <div class="code-block-caption"><span class="caption-text">Configuring a struct-wide endianess</span><a class="headerlink" href="#id1" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span>        <span class="c1"># &lt;-- extra argument to apply the order to all fields.</span>
@@ -456,6 +461,22 @@ for integers, we need to configure the struct to handle this correctly.</p>
     <span class="n">pixels_per_unit_y</span><span class="p">:</span> <span class="n">uint32</span>
     <span class="n">unit</span><span class="p">:</span> <span class="n">uint8</span>                 <span class="c1"># &lt;-- endianess meaningless, only one byte</span>
 </pre></div>
+</div>
+</div>
+</div>
+<input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" data-sync-group="syntax" data-sync-id="extended" for="sd-tab-item-1">
+Extended Syntax (&gt;=2.8.0)</label><div class="sd-tab-content docutils">
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">Configuring a struct-wide endianess</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span>        <span class="c1"># &lt;-- extra argument to apply the order to all fields.</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PHYSChunk</span><span class="p">:</span>
+    <span class="n">pixels_per_unit_x</span><span class="p">:</span> <span class="n">uint32_t</span> <span class="c1"># &lt;-- same definition as above</span>
+    <span class="n">pixels_per_unit_y</span><span class="p">:</span> <span class="n">uint32_t</span>
+    <span class="n">unit</span><span class="p">:</span> <span class="n">uint8_t</span>               <span class="c1"># &lt;-- endianess meaningless, only one byte</span>
+</pre></div>
+</div>
+</div>
 </div>
 </div>
 <p>In both cases, the <code class="code docutils literal notranslate"><span class="pre">pixels_per_unit_x</span></code> and <code class="code docutils literal notranslate"><span class="pre">pixels_per_unit_y</span></code> fields are 4 bytes long,
@@ -478,6 +499,10 @@ as a challenge.</p>
 <summary class="sd-summary-title sd-card-header">
 <span class="sd-summary-icon"><svg version="1.1" width="1.0em" height="1.0em" class="sd-octicon sd-octicon-check" viewBox="0 0 16 16" aria-hidden="true"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path></svg></span><span class="sd-summary-text">Solution</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
 <p class="sd-card-text">Example implementation</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-2" name="sd-tab-set-1" type="radio">
+<label class="sd-tab-label" data-sync-group="syntax" data-sync-id="default" for="sd-tab-item-2">
+Default Syntax</label><div class="sd-tab-content docutils">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span>
 <span class="linenos">2</span><span class="k">class</span><span class="w"> </span><span class="nc">TIMEChunk</span><span class="p">:</span>
 <span class="linenos">3</span>    <span class="n">year</span><span class="p">:</span> <span class="n">uint16</span>        <span class="c1"># &lt;-- we could also use: BigEndian + uint16</span>
@@ -487,6 +512,22 @@ as a challenge.</p>
 <span class="linenos">7</span>    <span class="n">minute</span><span class="p">:</span> <span class="n">uint8</span>
 <span class="linenos">8</span>    <span class="n">second</span><span class="p">:</span> <span class="n">uint8</span>
 </pre></div>
+</div>
+</div>
+<input id="sd-tab-item-3" name="sd-tab-set-1" type="radio">
+<label class="sd-tab-label" data-sync-group="syntax" data-sync-id="extended" for="sd-tab-item-3">
+Extended Syntax (&gt;=2.8.0)</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span>
+<span class="linenos">2</span><span class="k">class</span><span class="w"> </span><span class="nc">TIMEChunk</span><span class="p">:</span>
+<span class="linenos">3</span>    <span class="n">year</span><span class="p">:</span> <span class="n">uint16_t</span>   <span class="c1"># &lt;-- we could also use: f[int, BigEndian + uint16]</span>
+<span class="linenos">4</span>    <span class="n">month</span><span class="p">:</span> <span class="n">uint8_t</span>
+<span class="linenos">5</span>    <span class="n">day</span><span class="p">:</span> <span class="n">uint8_t</span>
+<span class="linenos">6</span>    <span class="n">hour</span><span class="p">:</span> <span class="n">uint8_t</span>
+<span class="linenos">7</span>    <span class="n">minute</span><span class="p">:</span> <span class="n">uint8_t</span>
+<span class="linenos">8</span>    <span class="n">second</span><span class="p">:</span> <span class="n">uint8_t</span>
+</pre></div>
+</div>
+</div>
 </div>
 <p class="sd-card-text">As you can see, the struct is fairly simple. The year field is 2 bytes, and the rest are
 single-byte fields. By applying <code class="code docutils literal notranslate"><span class="pre">BigEndian</span></code> or <code class="code docutils literal notranslate"><span class="pre">BIG_ENDIAN</span></code> to the struct,
@@ -511,7 +552,7 @@ we ensure that the fields that require endian configuration are handled correctl
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title"><span class="section-number">2.1.2. </span>Working with Structs</p>
+        <p class="prev-next-title"><span class="section-number">2.1.3. </span>Working with Structs</p>
       </div>
     </a>
     <a class="right-next"
@@ -519,7 +560,7 @@ we ensure that the fields that require endian configuration are handled correctl
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">2.1.4. </span>Documenting Structs</p>
+        <p class="prev-next-title"><span class="section-number">2.1.5. </span>Documenting Structs</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -577,7 +618,7 @@ we ensure that the fields that require endian configuration are handled correctl
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     <br/>
   </p>
 </div>

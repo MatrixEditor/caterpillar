@@ -1,0 +1,970 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>4.10. Types (Extended Syntax) &#8212; Caterpillar 2.8.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=c1cc8b61" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=69ff2ef9"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'library/ext_types';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Development" href="../development/index.html" />
+    <link rel="prev" title="4.9. Hooks" href="hooks.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2.8.0" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Caterpillar 2.8.0</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../installing/index.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorial/index.html">
+    Tutorial
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../reference/index.html">
+    Reference
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Library
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../development/index.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/MatrixEditor/caterpillar" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../installing/index.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorial/index.html">
+    Tutorial
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../reference/index.html">
+    Reference
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Library
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../development/index.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/MatrixEditor/caterpillar" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Python API</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="byteorder.html">4.1. Byteorder and Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="options.html">4.2. Options / Flags</a></li>
+<li class="toctree-l1"><a class="reference internal" href="context.html">4.3. Context</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exceptions.html">4.4. Exceptions</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="model.html">4.5. Struct Model</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="model/sequence.html">4.5.1. Sequence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model/struct.html">4.5.2. Struct</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model/bitfield.html">4.5.3. Bitfield</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model/template.html">4.5.4. Templates</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="registry.html">4.6. Annotation Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="shared.html">4.7. Shared Concepts</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="fields/index.html">4.8. Fields</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="fields/field_model.html">4.8.1. Field Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fields/common.html">4.8.2. Common Structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fields/compression.html">4.8.3. Compression Structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fields/crypto.html">4.8.4. Cryptographic Structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fields/net.html">4.8.5. Network Structs</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="hooks.html">4.9. Hooks</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">4.10. Types (Extended Syntax)</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link"><span class="section-number">4. </span>Library</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">4.10. </span>Types (Extended Syntax)</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="module-caterpillar.types">
+<span id="types-extended-syntax"></span><span id="library-extended-types"></span><h1><span class="section-number">4.10. </span>Types (Extended Syntax)<a class="headerlink" href="#module-caterpillar.types" title="Link to this heading">#</a></h1>
+<dl class="py data">
+<dt class="sig sig-object py" id="caterpillar.types.uint8_t">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.types.</span></span><span class="sig-name descname"><span class="pre">uint8_t</span></span><a class="headerlink" href="#caterpillar.types.uint8_t" title="Link to this definition">#</a></dt>
+<dd><p>Unsigned 8-bit integer field.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.8.0.</span></p>
+</div>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, &lt;int8&gt;]</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="caterpillar.types.uint16_t">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.types.</span></span><span class="sig-name descname"><span class="pre">uint16_t</span></span><a class="headerlink" href="#caterpillar.types.uint16_t" title="Link to this definition">#</a></dt>
+<dd><p>Unsigned 16-bit integer field.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.8.0.</span></p>
+</div>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, &lt;int16&gt;]</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="caterpillar.types.uint24_t">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.types.</span></span><span class="sig-name descname"><span class="pre">uint24_t</span></span><a class="headerlink" href="#caterpillar.types.uint24_t" title="Link to this definition">#</a></dt>
+<dd><p>Unsigned 24-bit integer field.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.8.0.</span></p>
+</div>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, &lt;uint24&gt;]</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="caterpillar.types.uint32_t">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.types.</span></span><span class="sig-name descname"><span class="pre">uint32_t</span></span><a class="headerlink" href="#caterpillar.types.uint32_t" title="Link to this definition">#</a></dt>
+<dd><p>Unsigned 32-bit integer field.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.8.0.</span></p>
+</div>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, &lt;int32&gt;]</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="caterpillar.types.uint64_t">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.types.</span></span><span class="sig-name descname"><span class="pre">uint64_t</span></span><a class="headerlink" href="#caterpillar.types.uint64_t" title="Link to this definition">#</a></dt>
+<dd><p>Unsigned 64-bit integer field.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.8.0.</span></p>
+</div>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, &lt;int64&gt;]</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="caterpillar.types.int8_t">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.types.</span></span><span class="sig-name descname"><span class="pre">int8_t</span></span><a class="headerlink" href="#caterpillar.types.int8_t" title="Link to this definition">#</a></dt>
+<dd><p>Signed 8-bit integer field.</p>
+<dl>
+<dt>Usage Example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@bitfield</span>
+<span class="gp">... </span><span class="k">class</span><span class="w"> </span><span class="nc">Packet</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">value</span><span class="p">:</span> <span class="n">int8_t</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.8.0.</span></p>
+</div>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, &lt;int8&gt;]</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="caterpillar.types.int16_t">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.types.</span></span><span class="sig-name descname"><span class="pre">int16_t</span></span><a class="headerlink" href="#caterpillar.types.int16_t" title="Link to this definition">#</a></dt>
+<dd><p>Signed 16-bit integer field.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.8.0.</span></p>
+</div>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, &lt;int16&gt;]</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="caterpillar.types.int24_t">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.types.</span></span><span class="sig-name descname"><span class="pre">int24_t</span></span><a class="headerlink" href="#caterpillar.types.int24_t" title="Link to this definition">#</a></dt>
+<dd><p>Signed 24-bit integer field.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.8.0.</span></p>
+</div>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, &lt;int24&gt;]</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="caterpillar.types.int32_t">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.types.</span></span><span class="sig-name descname"><span class="pre">int32_t</span></span><a class="headerlink" href="#caterpillar.types.int32_t" title="Link to this definition">#</a></dt>
+<dd><p>Signed 32-bit integer field.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.8.0.</span></p>
+</div>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, &lt;int32&gt;]</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="caterpillar.types.int64_t">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.types.</span></span><span class="sig-name descname"><span class="pre">int64_t</span></span><a class="headerlink" href="#caterpillar.types.int64_t" title="Link to this definition">#</a></dt>
+<dd><p>Signed 64-bit integer field.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.8.0.</span></p>
+</div>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, &lt;int64&gt;]</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="caterpillar.types.float16_t">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.types.</span></span><span class="sig-name descname"><span class="pre">float16_t</span></span><a class="headerlink" href="#caterpillar.types.float16_t" title="Link to this definition">#</a></dt>
+<dd><p>16-bit floating point field.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.8.0.</span></p>
+</div>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, &lt;float16&gt;]</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="caterpillar.types.float32_t">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.types.</span></span><span class="sig-name descname"><span class="pre">float32_t</span></span><a class="headerlink" href="#caterpillar.types.float32_t" title="Link to this definition">#</a></dt>
+<dd><p>32-bit floating point field.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.8.0.</span></p>
+</div>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, &lt;float32&gt;]</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="caterpillar.types.float64_t">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.types.</span></span><span class="sig-name descname"><span class="pre">float64_t</span></span><a class="headerlink" href="#caterpillar.types.float64_t" title="Link to this definition">#</a></dt>
+<dd><p>64-bit floating point field.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.8.0.</span></p>
+</div>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, &lt;float64&gt;]</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="caterpillar.types.double_t">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.types.</span></span><span class="sig-name descname"><span class="pre">double_t</span></span><a class="headerlink" href="#caterpillar.types.double_t" title="Link to this definition">#</a></dt>
+<dd><p>Alias for 64-bit floating point field.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.8.0.</span></p>
+</div>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, &lt;float64&gt;]</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="caterpillar.types.size_t">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.types.</span></span><span class="sig-name descname"><span class="pre">size_t</span></span><a class="headerlink" href="#caterpillar.types.size_t" title="Link to this definition">#</a></dt>
+<dd><p>Unsigned platform-sized integer field.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.8.0.</span></p>
+</div>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, &lt;int64&gt;]</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="caterpillar.types.ssize_t">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.types.</span></span><span class="sig-name descname"><span class="pre">ssize_t</span></span><a class="headerlink" href="#caterpillar.types.ssize_t" title="Link to this definition">#</a></dt>
+<dd><p>Signed platform-sized integer field.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.8.0.</span></p>
+</div>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, &lt;int64&gt;]</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="caterpillar.types.uuid_t">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.types.</span></span><span class="sig-name descname"><span class="pre">uuid_t</span></span><a class="headerlink" href="#caterpillar.types.uuid_t" title="Link to this definition">#</a></dt>
+<dd><p>UUID field mapped to <code class="xref py py-class docutils literal notranslate"><span class="pre">uuid.UUID</span></code>.</p>
+<dl>
+<dt>Usage Example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">identifier</span><span class="p">:</span> <span class="n">uuid_t</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.8.0.</span></p>
+</div>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">UUID</span></code>, &lt;Uuid&gt;]</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="caterpillar.types.pass_t">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.types.</span></span><span class="sig-name descname"><span class="pre">pass_t</span></span><a class="headerlink" href="#caterpillar.types.pass_t" title="Link to this definition">#</a></dt>
+<dd><p>Placeholder field that consumes no data and performs no action.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.8.0.</span></p>
+</div>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>, &lt;Pass&gt;]</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="caterpillar.types.cstr_t">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.types.</span></span><span class="sig-name descname"><span class="pre">cstr_t</span></span><a class="headerlink" href="#caterpillar.types.cstr_t" title="Link to this definition">#</a></dt>
+<dd><p>C-style null-terminated string field with a dynamic size.</p>
+<dl>
+<dt>Usage Example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">name</span><span class="p">:</span> <span class="n">cstr_t</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.8.0.</span></p>
+</div>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, &lt;CString&gt;]</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="caterpillar.types.MAC_t">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.types.</span></span><span class="sig-name descname"><span class="pre">MAC_t</span></span><a class="headerlink" href="#caterpillar.types.MAC_t" title="Link to this definition">#</a></dt>
+<dd><p>MAC address field represented as 6 raw bytes.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.8.0.</span></p>
+</div>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code>, &lt;MACAddress&gt;]</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="caterpillar.types.ipv4_t">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.types.</span></span><span class="sig-name descname"><span class="pre">ipv4_t</span></span><a class="headerlink" href="#caterpillar.types.ipv4_t" title="Link to this definition">#</a></dt>
+<dd><p>IPv4 address field mapped to <code class="xref py py-class docutils literal notranslate"><span class="pre">ipaddress.IPv4Address</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.8.0.</span></p>
+</div>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">IPv4Address</span></code>, &lt;IPv4Address&gt;]</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="caterpillar.types.ipv6_t">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.types.</span></span><span class="sig-name descname"><span class="pre">ipv6_t</span></span><a class="headerlink" href="#caterpillar.types.ipv6_t" title="Link to this definition">#</a></dt>
+<dd><p>IPv6 address field mapped to <code class="xref py py-class docutils literal notranslate"><span class="pre">ipaddress.IPv6Address</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.8.0.</span></p>
+</div>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">IPv4Address</span></code>, &lt;IPv6Address&gt;]</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="caterpillar.types.vint_t">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.types.</span></span><span class="sig-name descname"><span class="pre">vint_t</span></span><a class="headerlink" href="#caterpillar.types.vint_t" title="Link to this definition">#</a></dt>
+<dd><p>Variable-length integer field using a compact encoding.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.8.0.</span></p>
+</div>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, &lt;VarInt&gt;]</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="caterpillar.types.int1_t">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.types.</span></span><span class="sig-name descname"><span class="pre">int1_t</span></span><a class="headerlink" href="#caterpillar.types.int1_t" title="Link to this definition">#</a></dt>
+<dd><p>1-bit integer field.</p>
+<p>Represents a single signed bit typically used in bitfield definitions.</p>
+<dl>
+<dt>Usage Example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@bitfield</span>
+<span class="gp">... </span><span class="k">class</span><span class="w"> </span><span class="nc">Flags</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">enabled</span><span class="p">:</span> <span class="n">int1_t</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Only usable in bitfields.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.8.0.</span></p>
+</div>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, 1]</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="caterpillar.types.int2_t">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.types.</span></span><span class="sig-name descname"><span class="pre">int2_t</span></span><a class="headerlink" href="#caterpillar.types.int2_t" title="Link to this definition">#</a></dt>
+<dd><p>2-bit integer field for compact bitfield storage.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Only usable in bitfields.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.8.0.</span></p>
+</div>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, 2]</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="caterpillar.types.int3_t">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.types.</span></span><span class="sig-name descname"><span class="pre">int3_t</span></span><a class="headerlink" href="#caterpillar.types.int3_t" title="Link to this definition">#</a></dt>
+<dd><p>3-bit integer field for compact bitfield storage.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Only usable in bitfields.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.8.0.</span></p>
+</div>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, 3]</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="caterpillar.types.int4_t">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.types.</span></span><span class="sig-name descname"><span class="pre">int4_t</span></span><a class="headerlink" href="#caterpillar.types.int4_t" title="Link to this definition">#</a></dt>
+<dd><p>4-bit integer field for compact bitfield storage.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Only usable in bitfields.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.8.0.</span></p>
+</div>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, 4]</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="caterpillar.types.int5_t">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.types.</span></span><span class="sig-name descname"><span class="pre">int5_t</span></span><a class="headerlink" href="#caterpillar.types.int5_t" title="Link to this definition">#</a></dt>
+<dd><p>5-bit integer field for compact bitfield storage.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Only usable in bitfields.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.8.0.</span></p>
+</div>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, 5]</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="caterpillar.types.int6_t">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.types.</span></span><span class="sig-name descname"><span class="pre">int6_t</span></span><a class="headerlink" href="#caterpillar.types.int6_t" title="Link to this definition">#</a></dt>
+<dd><p>6-bit integer field for compact bitfield storage.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Only usable in bitfields.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.8.0.</span></p>
+</div>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, 6]</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="caterpillar.types.int7_t">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.types.</span></span><span class="sig-name descname"><span class="pre">int7_t</span></span><a class="headerlink" href="#caterpillar.types.int7_t" title="Link to this definition">#</a></dt>
+<dd><p>7-bit integer field for compact bitfield storage.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Only usable in bitfields.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.8.0.</span></p>
+</div>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, 7]</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="caterpillar.types.void_ptr_t">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.types.</span></span><span class="sig-name descname"><span class="pre">void_ptr_t</span></span><a class="headerlink" href="#caterpillar.types.void_ptr_t" title="Link to this definition">#</a></dt>
+<dd><p>Pointer-sized integer field representing a memory address.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.8.0.</span></p>
+</div>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, &lt;int64&gt;]</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="caterpillar.types.balign_t">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.types.</span></span><span class="sig-name descname"><span class="pre">balign_t</span></span><a class="headerlink" href="#caterpillar.types.balign_t" title="Link to this definition">#</a></dt>
+<dd><p>Bit-alignment field used to align to the next byte boundary in bitfields.</p>
+<p>This type <strong>MUST</strong> be used together with <code class="xref py py-func docutils literal notranslate"><span class="pre">Invisible()</span></code> to remove it
+from the constructor:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@bitfield</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
+    <span class="n">value</span><span class="p">:</span> <span class="n">int2_t</span>
+    <span class="n">_</span>    <span class="p">:</span> <span class="n">balign_t</span>     <span class="o">=</span> <span class="n">Invisible</span><span class="p">()</span> <span class="c1"># not visible to the type checker</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Only usable in bitfields.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.8.0.</span></p>
+</div>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>, 0]</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="caterpillar.types.timestamp_t">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.types.</span></span><span class="sig-name descname"><span class="pre">timestamp_t</span></span><a class="headerlink" href="#caterpillar.types.timestamp_t" title="Link to this definition">#</a></dt>
+<dd><p>Timestamp field mapped to <code class="xref py py-class docutils literal notranslate"><span class="pre">datetime.datetime</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.8.0.</span></p>
+</div>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code>, &lt;Timestamp&gt;]</p>
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="hooks.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title"><span class="section-number">4.9. </span>Hooks</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../development/index.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Development</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.types.uint8_t"><code class="docutils literal notranslate"><span class="pre">uint8_t</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.types.uint16_t"><code class="docutils literal notranslate"><span class="pre">uint16_t</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.types.uint24_t"><code class="docutils literal notranslate"><span class="pre">uint24_t</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.types.uint32_t"><code class="docutils literal notranslate"><span class="pre">uint32_t</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.types.uint64_t"><code class="docutils literal notranslate"><span class="pre">uint64_t</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.types.int8_t"><code class="docutils literal notranslate"><span class="pre">int8_t</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.types.int16_t"><code class="docutils literal notranslate"><span class="pre">int16_t</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.types.int24_t"><code class="docutils literal notranslate"><span class="pre">int24_t</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.types.int32_t"><code class="docutils literal notranslate"><span class="pre">int32_t</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.types.int64_t"><code class="docutils literal notranslate"><span class="pre">int64_t</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.types.float16_t"><code class="docutils literal notranslate"><span class="pre">float16_t</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.types.float32_t"><code class="docutils literal notranslate"><span class="pre">float32_t</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.types.float64_t"><code class="docutils literal notranslate"><span class="pre">float64_t</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.types.double_t"><code class="docutils literal notranslate"><span class="pre">double_t</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.types.size_t"><code class="docutils literal notranslate"><span class="pre">size_t</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.types.ssize_t"><code class="docutils literal notranslate"><span class="pre">ssize_t</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.types.uuid_t"><code class="docutils literal notranslate"><span class="pre">uuid_t</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.types.pass_t"><code class="docutils literal notranslate"><span class="pre">pass_t</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.types.cstr_t"><code class="docutils literal notranslate"><span class="pre">cstr_t</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.types.MAC_t"><code class="docutils literal notranslate"><span class="pre">MAC_t</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.types.ipv4_t"><code class="docutils literal notranslate"><span class="pre">ipv4_t</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.types.ipv6_t"><code class="docutils literal notranslate"><span class="pre">ipv6_t</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.types.vint_t"><code class="docutils literal notranslate"><span class="pre">vint_t</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.types.int1_t"><code class="docutils literal notranslate"><span class="pre">int1_t</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.types.int2_t"><code class="docutils literal notranslate"><span class="pre">int2_t</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.types.int3_t"><code class="docutils literal notranslate"><span class="pre">int3_t</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.types.int4_t"><code class="docutils literal notranslate"><span class="pre">int4_t</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.types.int5_t"><code class="docutils literal notranslate"><span class="pre">int5_t</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.types.int6_t"><code class="docutils literal notranslate"><span class="pre">int6_t</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.types.int7_t"><code class="docutils literal notranslate"><span class="pre">int7_t</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.types.void_ptr_t"><code class="docutils literal notranslate"><span class="pre">void_ptr_t</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.types.balign_t"><code class="docutils literal notranslate"><span class="pre">balign_t</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.types.timestamp_t"><code class="docutils literal notranslate"><span class="pre">timestamp_t</span></code></a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/library/ext_types.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2025, MatrixEditor.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

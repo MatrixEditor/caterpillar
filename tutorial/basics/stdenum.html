@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>2.2.1.2. Enumerations &#8212; Caterpillar 2.7.0 documentation</title>
+    <title>2.2.1.2. Enumerations &#8212; Caterpillar 2.8.0 documentation</title>
   
   
   
@@ -41,9 +41,9 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=dfec817d"></script>
-    <script src="../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/documentation_options.js?v=69ff2ef9"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../_static/design-tabs.js?v=f930bc37"></script>
@@ -54,7 +54,7 @@
     <link rel="prev" title="2.2.1.1. Numeric Types" href="stdnumeric.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.7.0" />
+  <meta name="docsearch:version" content="2.8.0" />
   </head>
   
   
@@ -116,7 +116,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.7.0</p>
+    <p class="title logo__title">Caterpillar 2.8.0</p>
   
 </a></div>
     
@@ -334,9 +334,10 @@
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1 has-children"><a class="reference internal" href="../first_steps/index.html">2.1. First Steps</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../first_steps/structdef.html">2.1.1. Defining Structs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../first_steps/parsing.html">2.1.2. Working with Structs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../first_steps/configuration.html">2.1.3. Configuring structs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../first_steps/documentation.html">2.1.4. Documenting Structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../first_steps/extended_syntax.html">2.1.2. Extended Syntax</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../first_steps/parsing.html">2.1.3. Working with Structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../first_steps/configuration.html">2.1.4. Configuring structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../first_steps/documentation.html">2.1.5. Documenting Structs</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">2.2. Basic Concepts</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
@@ -445,6 +446,10 @@ you can easily integrate standard Python enumerations, which are classes extendi
 <p>For example, in the case of the  <a class="reference external" href="https://www.w3.org/TR/png/#11pHYs">pHYS</a> chunk
 from the PNG format, you can use an enum for the <code class="code docutils literal notranslate"><span class="pre">unit</span></code> field, which represents
 the unit of measurement (like “meter”). Here’s how you would define it:</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" data-sync-group="syntax" data-sync-id="default" for="sd-tab-item-0">
+Default Syntax</label><div class="sd-tab-content docutils">
 <div class="literal-block-wrapper docutils container" id="id1">
 <div class="code-block-caption"><span class="caption-text">Simple enumeration in a struct definition</span><a class="headerlink" href="#id1" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">enum</span>
@@ -462,12 +467,38 @@ the unit of measurement (like “meter”). Here’s how you would define it:</p
 </pre></div>
 </div>
 </div>
+</div>
+<input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" data-sync-group="syntax" data-sync-id="extended" for="sd-tab-item-1">
+Extended Syntax (&gt;=2.8.0)</label><div class="sd-tab-content docutils">
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">Simple enumeration in a struct definition</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">enum</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">PHYSUnit</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">IntEnum</span><span class="p">):</span> <span class="c1"># &lt;-- the enum value doesn&#39;t have to be int</span>
+    <span class="n">__struct__</span> <span class="o">=</span> <span class="n">uint8</span>        <span class="c1"># &lt;-- to make the code even more compact, use this</span>
+    <span class="n">UNKNOWN</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">METRE</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span>         <span class="c1"># &lt;-- same as before</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PHYSChunk</span><span class="p">:</span>
+    <span class="n">pixels_per_unit_x</span><span class="p">:</span> <span class="n">uint32_t</span>
+    <span class="n">pixels_per_unit_y</span><span class="p">:</span> <span class="n">uint32_t</span>
+    <span class="n">unit</span><span class="p">:</span> <span class="n">PHYSUnit</span>               <span class="c1"># &lt;-- now we have an auto-enumeration</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
 <ul class="simple">
 <li><p>You can specify a default value for the enum field, which will be used as a fallback if the unpacked data contains a value not in the enumeration.</p></li>
 <li><p>If no default is provided and the unpacked data contains an unexpected value, an error will be raised.</p></li>
 </ul>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 2.8.0: </span><em>caterpillar</em> now supports <code class="docutils literal notranslate"><span class="pre">IntFlag</span></code> as enum models.</p>
 </div>
 </section>
 
@@ -553,7 +584,7 @@ the unit of measurement (like “meter”). Here’s how you would define it:</p
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     <br/>
   </p>
 </div>

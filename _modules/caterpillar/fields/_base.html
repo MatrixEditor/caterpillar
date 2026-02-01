@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>caterpillar.fields._base &#8212; Caterpillar 2.7.0 documentation</title>
+    <title>caterpillar.fields._base &#8212; Caterpillar 2.8.0 documentation</title>
   
   
   
@@ -40,9 +40,9 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=dfec817d"></script>
-    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/documentation_options.js?v=69ff2ef9"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
@@ -51,7 +51,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.7.0" />
+  <meta name="docsearch:version" content="2.8.0" />
   </head>
   
   
@@ -113,7 +113,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.7.0</p>
+    <p class="title logo__title">Caterpillar 2.8.0</p>
   
 </a></div>
     
@@ -390,14 +390,34 @@
 <span class="c1">#</span>
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+<span class="c1"># pyright: reportPrivateUsage=false, reportAny=false, reportExplicitAny=false</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">io</span><span class="w"> </span><span class="kn">import</span> <span class="n">BytesIO</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Collection</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Generic</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Self</span><span class="p">,</span> <span class="n">override</span><span class="p">,</span> <span class="n">TypeVar</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.abc</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">_StructLike</span><span class="p">,</span>
     <span class="n">_GreedyType</span><span class="p">,</span>
     <span class="n">_PrefixedType</span><span class="p">,</span>
+    <span class="n">_IT</span><span class="p">,</span>
+    <span class="n">_OT</span><span class="p">,</span>
+    <span class="n">_EndianLike</span><span class="p">,</span>
+    <span class="n">_ArchLike</span><span class="p">,</span>
+    <span class="n">_ContextLike</span><span class="p">,</span>
+    <span class="n">_ContextLambda</span><span class="p">,</span>
+    <span class="n">_OptionLike</span><span class="p">,</span>
+    <span class="n">_ContainsStruct</span><span class="p">,</span>
+    <span class="n">_SwitchOptionsT</span><span class="p">,</span>
+    <span class="n">_LengthT</span><span class="p">,</span>
+    <span class="n">_StreamType</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.byteorder</span><span class="w"> </span><span class="kn">import</span> <span class="n">ByteOrder</span><span class="p">,</span> <span class="n">SysNative</span><span class="p">,</span> <span class="n">system_arch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.byteorder</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">O_DEFAULT_ARCH</span><span class="p">,</span>
+    <span class="n">O_DEFAULT_ENDIAN</span><span class="p">,</span>
+    <span class="n">LittleEndian</span><span class="p">,</span>
+    <span class="n">system_arch</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.exception</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DynamicSizeError</span><span class="p">,</span>
     <span class="n">StructException</span><span class="p">,</span>
@@ -408,26 +428,28 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.options</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">GLOBAL_FIELD_FLAGS</span><span class="p">,</span>
     <span class="n">F_DYNAMIC</span><span class="p">,</span>
-    <span class="n">Flag</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">CTX_OFFSETS</span><span class="p">,</span> <span class="n">CTX_STREAM</span><span class="p">,</span> <span class="n">CTX_FIELD</span><span class="p">,</span> <span class="n">CTX_VALUE</span><span class="p">,</span> <span class="n">CTX_SEQ</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar</span><span class="w"> </span><span class="kn">import</span> <span class="n">registry</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.shared</span><span class="w"> </span><span class="kn">import</span> <span class="n">getstruct</span><span class="p">,</span> <span class="n">typeof</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">singleton</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+<span class="n">_T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;_T&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">singleton</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">_T</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Simple wrapper to enable singleton structs.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="bp">cls</span><span class="p">()</span>
 
 
 <span class="c1"># Constant representing an invalid default value</span>
-<span class="n">INVALID_DEFAULT</span> <span class="o">=</span> <span class="nb">object</span><span class="p">()</span>
-<span class="n">DEFAULT_OPTION</span> <span class="o">=</span> <span class="nb">object</span><span class="p">()</span>
+<span class="n">INVALID_DEFAULT</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="nb">object</span><span class="p">()</span>
+<span class="n">DEFAULT_OPTION</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="nb">object</span><span class="p">()</span>
 
 
 <div class="viewcode-block" id="Field">
 <a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.Field">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">Field</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Field</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">_IT</span><span class="p">,</span> <span class="n">_OT</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents a field in a data structure.</span>
 
 <span class="sd">    :param struct: The structure or callable used to define the field&#39;s type.</span>
@@ -444,28 +466,28 @@
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">struct</span><span class="p">,</span>
-        <span class="n">order</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">offset</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">flags</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">amount</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-        <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">condition</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">arch</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">default</span><span class="o">=</span><span class="n">INVALID_DEFAULT</span><span class="p">,</span>
-        <span class="n">bits</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">struct</span><span class="p">:</span> <span class="n">_StructLike</span><span class="p">[</span><span class="n">_IT</span><span class="p">,</span> <span class="n">_OT</span><span class="p">]</span> <span class="o">|</span> <span class="n">_ContextLambda</span><span class="p">[</span><span class="n">_OT</span><span class="p">]</span> <span class="o">|</span> <span class="n">_ContainsStruct</span><span class="p">[</span><span class="n">_IT</span><span class="p">,</span> <span class="n">_OT</span><span class="p">],</span>
+        <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">offset</span><span class="p">:</span> <span class="n">_ContextLambda</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">flags</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">_OptionLike</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">amount</span><span class="p">:</span> <span class="n">_LengthT</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">options</span><span class="p">:</span> <span class="n">_SwitchOptionsT</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">condition</span><span class="p">:</span> <span class="n">_ContextLambda</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">default</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="n">INVALID_DEFAULT</span><span class="p">,</span>
+        <span class="n">bits</span><span class="p">:</span> <span class="n">_ContextLambda</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># Cached flags to optimize packing/unpacking performance</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_is_lambda</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_has_cond</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cond_is_lambda</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_is_seq</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_keep_pos</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_has_offset</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_offset_is_lambda</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_amount_is_lambda</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_switch_is_lambda</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_switch_has_default</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_is_lambda</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_has_cond</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cond_is_lambda</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_is_seq</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_keep_pos</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_has_offset</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_offset_is_lambda</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_amount_is_lambda</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_switch_is_lambda</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_switch_has_default</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="c1"># private variable initialization</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__struct</span> <span class="o">=</span> <span class="kc">None</span>
@@ -474,62 +496,69 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__offset</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__amount</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__options</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Historically named; represents switch mappings</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__order</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__arch</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="c1"># initialization via property setters</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">struct</span> <span class="o">=</span> <span class="n">struct</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">condition</span> <span class="o">=</span> <span class="n">condition</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">=</span> <span class="n">order</span> <span class="ow">or</span> <span class="n">SysNative</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">=</span> <span class="n">order</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">flags</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">flags</span> <span class="ow">or</span> <span class="p">[])</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">bits</span> <span class="o">=</span> <span class="n">bits</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">arch</span> <span class="o">=</span> <span class="n">arch</span> <span class="ow">or</span> <span class="n">system_arch</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bits</span><span class="p">:</span> <span class="n">_ContextLambda</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">bits</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">arch</span> <span class="o">=</span> <span class="n">arch</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="n">offset</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">amount</span> <span class="o">=</span> <span class="n">amount</span> <span class="ow">or</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="n">options</span>
 
         <span class="c1"># INVALID_DEFAULT indicates that no default was explicitly set;</span>
         <span class="c1"># allows None to be used as a valid default</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="n">default</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="n">default</span>
 
     <span class="c1"># -- Property Definitions (Input validation not enforced) --</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">struct</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">struct</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_StructLike</span><span class="p">[</span><span class="n">_IT</span><span class="p">,</span> <span class="n">_OT</span><span class="p">]</span> <span class="o">|</span> <span class="n">_ContextLambda</span><span class="p">[</span><span class="n">_OT</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The internal structure for this field.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__struct</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__struct</span>  <span class="c1"># pyright: ignore[reportReturnType]</span>
 
+    <span class="c1"># fmt: off</span>
     <span class="nd">@struct</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">struct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__struct</span> <span class="o">=</span> <span class="n">getstruct</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">struct</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">value</span><span class="p">:</span> <span class="n">_StructLike</span><span class="p">[</span><span class="n">_IT</span><span class="p">,</span> <span class="n">_OT</span><span class="p">]</span> <span class="o">|</span> <span class="n">_ContextLambda</span><span class="p">[</span><span class="n">_OT</span><span class="p">]</span> <span class="o">|</span> <span class="n">_ContainsStruct</span><span class="p">[</span><span class="n">_IT</span><span class="p">,</span> <span class="n">_OT</span><span class="p">],</span>  <span class="c1"># pyright: ignore[reportPropertyTypeMismatch]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__struct</span> <span class="o">=</span> <span class="n">getstruct</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">or</span> <span class="n">value</span>
         <span class="c1"># pre-computed state of this field</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_is_lambda</span> <span class="o">=</span> <span class="nb">callable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__struct</span><span class="p">)</span>
+    <span class="c1"># fmt: on</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">condition</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">condition</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_ContextLambda</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The field&#39;s condition expression or value.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__condition</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__condition</span>  <span class="c1"># pyright: ignore[reportReturnType]</span>
 
     <span class="nd">@condition</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">condition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">condition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">_ContextLambda</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="nb">bool</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__condition</span> <span class="o">=</span> <span class="n">value</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_has_cond</span> <span class="o">=</span> <span class="n">value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cond_is_lambda</span> <span class="o">=</span> <span class="nb">callable</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">flags</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">flags</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="n">_OptionLike</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The set of flags associated with this field.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__flags</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__flags</span>  <span class="c1"># pyright: ignore[reportReturnType]</span>
 
     <span class="nd">@flags</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">flags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">flags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">_OptionLike</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__flags</span> <span class="o">=</span> <span class="n">value</span>
 
 <div class="viewcode-block" id="Field.add_flag">
 <a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.Field.add_flag">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">add_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flag</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flag</span><span class="p">:</span> <span class="n">_OptionLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds a flag to this field.</span>
 
@@ -542,7 +571,7 @@
 
 <div class="viewcode-block" id="Field.has_flag">
 <a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.Field.has_flag">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">has_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flag</span><span class="p">:</span> <span class="n">Flag</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flag</span><span class="p">:</span> <span class="n">_OptionLike</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Checks whether this field stores the given flag.</span>
 
 <span class="sd">        :param flag: the flag to lookup</span>
@@ -555,7 +584,7 @@
 
 <div class="viewcode-block" id="Field.remove_flag">
 <a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.Field.remove_flag">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">remove_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flag</span><span class="p">:</span> <span class="n">Flag</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remove_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flag</span><span class="p">:</span> <span class="n">_OptionLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Removes a flag from this field.</span>
 
@@ -567,44 +596,80 @@
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">offset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">offset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_ContextLambda</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The field&#39;s offset.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__offset</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__offset</span>  <span class="c1"># pyright: ignore[reportReturnType]</span>
 
     <span class="nd">@offset</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">offset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">offset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">_ContextLambda</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="nb">int</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__offset</span> <span class="o">=</span> <span class="n">value</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_has_offset</span> <span class="o">=</span> <span class="n">value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_offset_is_lambda</span> <span class="o">=</span> <span class="nb">callable</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_keep_pos</span> <span class="o">=</span> <span class="n">value</span> <span class="ow">in</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">amount</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">amount</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_LengthT</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The repetition count for this field.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__amount</span>
 
     <span class="nd">@amount</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">amount</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">amount</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">_LengthT</span> <span class="o">|</span> <span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__amount</span> <span class="o">=</span> <span class="n">value</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_amount_is_lambda</span> <span class="o">=</span> <span class="nb">callable</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_is_seq</span> <span class="o">=</span> <span class="p">(</span><span class="n">value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_amount_is_lambda</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">options</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">options</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_SwitchOptionsT</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The switch-case options dictionary.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__options</span>
 
     <span class="nd">@options</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">_SwitchOptionsT</span> <span class="o">|</span> <span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__options</span> <span class="o">=</span> <span class="n">value</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_switch_is_lambda</span> <span class="o">=</span> <span class="nb">callable</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_switch_has_default</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">value</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_switch_is_lambda</span> <span class="ow">and</span> <span class="n">DEFAULT_OPTION</span> <span class="ow">in</span> <span class="n">value</span>
+            <span class="nb">bool</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_switch_is_lambda</span>
+            <span class="ow">and</span> <span class="n">DEFAULT_OPTION</span> <span class="ow">in</span> <span class="n">value</span>  <span class="c1"># pyright: ignore[reportOperatorIssue]</span>
         <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">order</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_EndianLike</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__order</span> <span class="ow">or</span> <span class="n">O_DEFAULT_ENDIAN</span><span class="o">.</span><span class="n">value</span> <span class="ow">or</span> <span class="n">LittleEndian</span>
+
+    <span class="nd">@order</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">order</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span>  <span class="c1"># pyright: ignore[reportPropertyTypeMismatch]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">value</span>
+
+<div class="viewcode-block" id="Field.has_order">
+<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.Field.has_order">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_order</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__order</span><span class="p">)</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">arch</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_ArchLike</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__arch</span> <span class="ow">or</span> <span class="n">O_DEFAULT_ARCH</span><span class="o">.</span><span class="n">value</span> <span class="ow">or</span> <span class="n">system_arch</span>
+
+    <span class="nd">@arch</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">arch</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span>  <span class="c1"># pyright: ignore[reportPropertyTypeMismatch]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__arch</span> <span class="o">=</span> <span class="n">value</span>
+
+<div class="viewcode-block" id="Field.has_arch">
+<a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.Field.has_arch">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_arch</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__arch</span><span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="Field._verify_context_value">
 <a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.Field._verify_context_value">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">_verify_context_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">expected</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_verify_context_value</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">expected</span><span class="p">:</span> <span class="nb">type</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">type</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Verifies that a value is either of the expected type(s) or is a callable.</span>
 <span class="sd">        Used to validate inputs for context-aware fields.</span>
@@ -623,7 +688,7 @@
 
     <span class="c1"># --- Operator Overloads ---</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__or__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flag</span><span class="p">):</span>  <span class="c1"># add flags</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__or__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flag</span><span class="p">:</span> <span class="n">_OptionLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>  <span class="c1"># add flags</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds a flag using the &#39;|&#39; operator.</span>
 
@@ -633,7 +698,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">add_flag</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__xor__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flag</span><span class="p">):</span>  <span class="c1"># remove flags:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__xor__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flag</span><span class="p">:</span> <span class="n">_OptionLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>  <span class="c1"># remove flags:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Removes a flag using the &#39;^&#39; operator.</span>
 
@@ -643,7 +708,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">remove_flag</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__matmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">offset</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__matmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">offset</span><span class="p">:</span> <span class="n">_ContextLambda</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets the field&#39;s offset using the &#39;@&#39; operator.</span>
 
@@ -654,7 +719,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="n">offset</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="n">_LengthT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Field[Collection[_IT], Collection[_OT]]&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets the number of elements using the indexing operator (e.g.,</span>
 <span class="sd">        field[3]).</span>
@@ -662,11 +727,13 @@
 <span class="sd">        :param dim: Repetition count or dynamic type.</span>
 <span class="sd">        :return: The updated Field instance.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_verify_context_value</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="p">(</span><span class="n">_GreedyType</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">_PrefixedType</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_verify_context_value</span><span class="p">(</span>
+            <span class="n">dim</span><span class="p">,</span> <span class="p">(</span><span class="n">_GreedyType</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">_PrefixedType</span><span class="p">,</span> <span class="n">_ContextLambda</span><span class="p">)</span>
+        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">amount</span> <span class="o">=</span> <span class="n">dim</span>
-        <span class="k">return</span> <span class="bp">self</span>
+        <span class="k">return</span> <span class="bp">self</span>  <span class="c1"># pyright: ignore[reportReturnType]</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__rshift__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">switch</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__rshift__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">switch</span><span class="p">:</span> <span class="n">_SwitchOptionsT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Defines switch-case mappings using the &#39;&gt;&gt;&#39; operator.</span>
 
@@ -677,7 +744,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="n">switch</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__floordiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">condition</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__floordiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">condition</span><span class="p">:</span> <span class="n">_ContextLambda</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets the field&#39;s condition using the &#39;//&#39; operator.</span>
 
@@ -688,7 +755,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">condition</span> <span class="o">=</span> <span class="n">condition</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__rsub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bits</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__rsub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bits</span><span class="p">:</span> <span class="n">_ContextLambda</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets the number of bits for bit-packed fields using the reverse &#39;-&#39;</span>
 <span class="sd">        operator.</span>
@@ -700,7 +767,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">bits</span> <span class="o">=</span> <span class="n">bits</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__set_byteorder__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__set_byteorder__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Explicitly sets the byte order for this field.</span>
 
@@ -710,7 +777,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">=</span> <span class="n">order</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__type__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__type__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the resolved type of the field, typically from the struct.</span>
 
@@ -718,12 +785,12 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_type</span><span class="p">()</span>
 
-    <span class="fm">__ixor__</span> <span class="o">=</span> <span class="fm">__xor__</span>
-    <span class="fm">__ior__</span> <span class="o">=</span> <span class="fm">__or__</span>
-    <span class="fm">__ifloordiv__</span> <span class="o">=</span> <span class="fm">__floordiv__</span>
-    <span class="fm">__irshift__</span> <span class="o">=</span> <span class="fm">__rshift__</span>
-    <span class="fm">__imatmul__</span> <span class="o">=</span> <span class="fm">__matmul__</span>
-    <span class="fm">__isub__</span> <span class="o">=</span> <span class="fm">__rsub__</span>
+    <span class="fm">__ixor__</span> <span class="o">=</span> <span class="fm">__xor__</span>  <span class="c1"># pyright: ignore[reportUnannotatedClassAttribute]</span>
+    <span class="fm">__ior__</span> <span class="o">=</span> <span class="fm">__or__</span>  <span class="c1"># pyright: ignore[reportUnannotatedClassAttribute]</span>
+    <span class="fm">__ifloordiv__</span> <span class="o">=</span> <span class="fm">__floordiv__</span>  <span class="c1"># pyright: ignore[reportUnannotatedClassAttribute]</span>
+    <span class="fm">__irshift__</span> <span class="o">=</span> <span class="fm">__rshift__</span>  <span class="c1"># pyright: ignore[reportUnannotatedClassAttribute]</span>
+    <span class="fm">__imatmul__</span> <span class="o">=</span> <span class="fm">__matmul__</span>  <span class="c1"># pyright: ignore[reportUnannotatedClassAttribute]</span>
+    <span class="fm">__isub__</span> <span class="o">=</span> <span class="fm">__rsub__</span>  <span class="c1"># pyright: ignore[reportUnannotatedClassAttribute]</span>
 
 <div class="viewcode-block" id="Field.is_seq">
 <a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.Field.is_seq">[docs]</a>
@@ -738,7 +805,7 @@
 
 <div class="viewcode-block" id="Field.is_enabled">
 <a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.Field.is_enabled">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">is_enabled</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_enabled</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Evaluates the condition of this field.</span>
 
 <span class="sd">        :param context: the context on which to operate</span>
@@ -761,7 +828,7 @@
 
 <div class="viewcode-block" id="Field.length">
 <a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.Field.length">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">length</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">length</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_GreedyType</span> <span class="o">|</span> <span class="n">_PrefixedType</span> <span class="o">|</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculates the sequence length of this field.</span>
 
 <span class="sd">        :param context: the context on which to operate</span>
@@ -778,7 +845,7 @@
 
 <div class="viewcode-block" id="Field.get_struct">
 <a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.Field.get_struct">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_struct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_struct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_StructLike</span><span class="p">[</span><span class="n">_IT</span><span class="p">,</span> <span class="n">_OT</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the struct from stored options.</span>
 
 <span class="sd">        :param value: the unpacked or packed value</span>
@@ -790,12 +857,12 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># treat &#39;value&#39; as the key of specified options</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_switch_is_lambda</span><span class="p">:</span>
-            <span class="n">struct</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+            <span class="n">struct</span><span class="p">:</span> <span class="n">_StructLike</span><span class="p">[</span><span class="n">_IT</span><span class="p">,</span> <span class="n">_OT</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_switch_has_default</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">OptionError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Option </span><span class="si">{</span><span class="n">value</span><span class="si">!r}</span><span class="s2"> not found!&quot;</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
 
-            <span class="n">struct</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">DEFAULT_OPTION</span><span class="p">)</span>
+            <span class="n">struct</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">DEFAULT_OPTION</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">struct</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># The struct must be non-null</span>
@@ -803,19 +870,19 @@
                 <span class="sa">f</span><span class="s2">&quot;Could not find switch value for: </span><span class="si">{</span><span class="n">value</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">context</span>
             <span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">getstruct</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">struct</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">getstruct</span><span class="p">(</span><span class="n">struct</span><span class="p">)</span> <span class="ow">or</span> <span class="n">struct</span>  <span class="c1"># pyright: ignore[reportUnknownVariableType]</span></div>
 
 
 <div class="viewcode-block" id="Field.get_offset">
 <a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.Field.get_offset">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_offset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_offset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the offset position of this field&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span><span class="n">context</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_offset_is_lambda</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span></div>
 
 
 <div class="viewcode-block" id="Field.get_type">
 <a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.Field.get_type">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the annotation type for this field</span>
 
 <span class="sd">        :return: the annotation type</span>
@@ -827,23 +894,28 @@
 
         <span class="c1"># We construct a Union type hint as an alternative:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_switch_is_lambda</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">Any</span>
+            <span class="k">return</span> <span class="nb">object</span>
 
-        <span class="n">return_type</span> <span class="o">=</span> <span class="n">Any</span>
+        <span class="n">return_type</span> <span class="o">=</span> <span class="nb">object</span>
         <span class="k">for</span> <span class="n">switch_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
             <span class="n">return_type</span> <span class="o">=</span> <span class="n">return_type</span> <span class="o">|</span> <span class="n">typeof</span><span class="p">(</span><span class="n">switch_type</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">return_type</span></div>
+        <span class="k">return</span> <span class="n">return_type</span>  <span class="c1"># pyright: ignore[reportReturnType]</span></div>
 
 
 <div class="viewcode-block" id="Field.get_name">
 <a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.Field.get_name">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;__name__&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the name of this field.</span>
+
+<span class="sd">        .. versionchanged:: 2.8.0</span>
+<span class="sd">            now always returns a string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;__name__&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span></div>
 
 
     <span class="c1"># IO related stuff</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">__unpack__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__unpack__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_OT</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Reads packed data from the given stream.</span>
 
 <span class="sd">        This method returns nothing if this field is disabled and applies switch if</span>
@@ -853,31 +925,31 @@
 <span class="sd">        :type context: _ContextLike</span>
 <span class="sd">        :return: the parsed data</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">stream</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_STREAM</span><span class="p">]</span>
+        <span class="n">stream</span><span class="p">:</span> <span class="n">_StreamType</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_STREAM</span><span class="p">]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_has_cond</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_enabled</span><span class="p">(</span><span class="n">context</span><span class="p">):</span>
             <span class="c1"># Disabled fields or context lambdas won&#39;t pack any data</span>
             <span class="k">return</span>
-
+        <span class="c1"># fmt: off</span>
         <span class="c1"># Using this inlined version of self.is_seq(), we reduce the amount of</span>
         <span class="c1"># calls made to the method and save A LOT of time.</span>
         <span class="c1"># pylint: disable-next=protected-access</span>
         <span class="n">context</span><span class="p">[</span><span class="n">CTX_SEQ</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_seq</span>
         <span class="c1"># pylint: disable-next=protected-access</span>
-        <span class="n">keep_pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_keep_pos</span>
+        <span class="n">keep_pos</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_keep_pos</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_lambda</span><span class="p">:</span>  <span class="c1"># REVISIT: maybe hardcode this</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">keep_pos</span><span class="p">:</span>
-                <span class="n">fallback</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
+                <span class="n">fallback</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_has_offset</span><span class="p">:</span>
-                <span class="n">offset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span><span class="n">context</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_offset_is_lambda</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span>
-                <span class="n">stream</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">offset</span><span class="p">)</span>
+                <span class="n">offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span><span class="n">context</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_offset_is_lambda</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span>
+                <span class="n">stream</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">offset</span><span class="p">)</span>  <span class="c1"># pyright: ignore[reportUnusedCallResult]</span>
 
             <span class="n">context</span><span class="p">[</span><span class="n">CTX_FIELD</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span>
             <span class="c1"># Switch is applicable AFTER we parsed the first value</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">struct</span><span class="o">.</span><span class="n">__unpack__</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">keep_pos</span><span class="p">:</span>
-                    <span class="n">stream</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">fallback</span><span class="p">)</span>
+                    <span class="n">stream</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">fallback</span><span class="p">)</span>  <span class="c1"># pyright: ignore[reportUnusedCallResult]</span>
             <span class="c1"># pylint: disable-next=broad-exception-caught</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exc</span><span class="p">,</span> <span class="n">StructException</span><span class="p">):</span>
@@ -888,7 +960,7 @@
                     <span class="k">raise</span> <span class="n">exc</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># Context functions should be executed with top priority</span>
-            <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">struct</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+            <span class="n">value</span><span class="p">:</span> <span class="n">_OT</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">struct</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>  <span class="c1"># pyright: ignore[reportUnknownVariableType]</span>
 
         <span class="c1"># unpack using switch</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">:</span>
@@ -897,10 +969,10 @@
             <span class="c1"># position afterward.</span>
             <span class="n">context</span><span class="p">[</span><span class="n">CTX_VALUE</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
             <span class="n">value</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">__unpack__</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
-
+        <span class="c1"># fmt; on</span>
         <span class="k">return</span> <span class="n">value</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__pack__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__pack__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">_IT</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Writes the given object to the provided stream.</span>
 
 <span class="sd">        There are several options associated with this function. First, disabled</span>
@@ -923,7 +995,7 @@
             <span class="c1"># Disabled fields or context lambdas won&#39;t pack any data</span>
             <span class="k">return</span>
 
-        <span class="n">stream</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_STREAM</span><span class="p">]</span>
+        <span class="n">stream</span><span class="p">:</span> <span class="n">_StreamType</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_STREAM</span><span class="p">]</span>
         <span class="n">keep_pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_keep_pos</span>
         <span class="n">has_offset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_has_offset</span>
         <span class="n">context</span><span class="p">[</span><span class="n">CTX_FIELD</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span>
@@ -936,7 +1008,9 @@
             <span class="c1"># TODO: implement F_OFFSET_OVERRIDE</span>
             <span class="c1"># We write the current field into a temporary memory buffer</span>
             <span class="c1"># and add it after all processing hasbeen finished.</span>
-            <span class="n">offset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span><span class="n">context</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_offset_is_lambda</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span>
+            <span class="n">offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span><span class="n">context</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_offset_is_lambda</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span>
+            <span class="p">)</span>
             <span class="n">base_stream</span> <span class="o">=</span> <span class="n">stream</span>
             <span class="n">stream</span> <span class="o">=</span> <span class="n">BytesIO</span><span class="p">()</span>
             <span class="n">context</span><span class="p">[</span><span class="n">CTX_STREAM</span><span class="p">]</span> <span class="o">=</span> <span class="n">stream</span>
@@ -960,14 +1034,14 @@
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">has_offset</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">keep_pos</span><span class="p">:</span>
             <span class="c1"># The position shouldn&#39;t be persisted reset the stream</span>
-            <span class="n">stream</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">fallback</span><span class="p">)</span>
+            <span class="n">stream</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">fallback</span><span class="p">)</span>  <span class="c1"># pyright: ignore[reportUnusedCallResult]</span>
 
         <span class="k">if</span> <span class="n">has_offset</span><span class="p">:</span>
             <span class="c1"># Place the stream into the internal offset map</span>
             <span class="n">context</span><span class="o">.</span><span class="n">_root</span><span class="p">[</span><span class="n">CTX_OFFSETS</span><span class="p">][</span><span class="n">offset</span><span class="p">]</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">getbuffer</span><span class="p">()</span>
             <span class="n">context</span><span class="p">[</span><span class="n">CTX_STREAM</span><span class="p">]</span> <span class="o">=</span> <span class="n">base_stream</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__size__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__size__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculates the size of this field.</span>
 
 <span class="sd">        There are several situations to bear in mind when executing this function:</span>
@@ -998,9 +1072,9 @@
         <span class="n">count</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="k">if</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_SEQ</span><span class="p">]:</span>
             <span class="n">count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">count</span><span class="p">,</span> <span class="n">_GreedyType</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">count</span><span class="p">,</span> <span class="p">(</span><span class="n">_GreedyType</span><span class="p">,</span> <span class="n">_PrefixedType</span><span class="p">)):</span>
                 <span class="k">raise</span> <span class="n">DynamicSizeError</span><span class="p">(</span>
-                    <span class="s2">&quot;Greedy field does not have a fixed size!&quot;</span><span class="p">,</span> <span class="n">context</span>
+                    <span class="s2">&quot;Greedy or prefixed fields does not have a fixed size!&quot;</span><span class="p">,</span> <span class="n">context</span>
                 <span class="p">)</span>
 
         <span class="n">struct</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">struct</span>
@@ -1019,6 +1093,7 @@
         <span class="k">return</span> <span class="n">count</span> <span class="o">*</span> <span class="n">size</span>
 
     <span class="c1"># representation, maybe revisit</span>
+    <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span> <span class="ow">or</span> <span class="s2">&quot;&lt;unnamed&gt;&quot;</span>
         <span class="n">offset</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;, offset=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_has_offset</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
@@ -1028,6 +1103,7 @@
             <span class="sa">f</span><span class="s2">&quot;options=</span><span class="si">{</span><span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">)</span><span class="si">}{</span><span class="n">offset</span><span class="si">}</span><span class="s2">)&quot;</span>
         <span class="p">)</span>
 
+    <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span></div>
 
@@ -1035,10 +1111,10 @@
 
 <span class="c1"># --- private type converter ---</span>
 <span class="nd">@registry</span><span class="o">.</span><span class="n">TypeConverter</span><span class="p">(</span><span class="n">_StructLike</span><span class="p">)</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">_type_converter</span><span class="p">(</span><span class="n">annotation</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_type_converter</span><span class="p">(</span><span class="n">annotation</span><span class="p">:</span> <span class="n">_StructLike</span><span class="p">[</span><span class="n">_IT</span><span class="p">,</span> <span class="n">_OT</span><span class="p">],</span> <span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Field</span><span class="p">[</span><span class="n">_IT</span><span class="p">,</span> <span class="n">_OT</span><span class="p">]:</span>
     <span class="c1"># REVISIT: more options ?</span>
-    <span class="n">arch</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;arch&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-    <span class="n">order</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;order&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;arch&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;order&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">Field</span><span class="p">(</span><span class="n">annotation</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span> <span class="n">arch</span><span class="o">=</span><span class="n">arch</span><span class="p">)</span>
 
 
@@ -1046,19 +1122,22 @@
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">_CallableTypeConverter</span><span class="p">(</span><span class="n">registry</span><span class="o">.</span><span class="n">TypeConverter</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">matches</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">annotation</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="nd">@override</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">matches</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">annotation</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="c1"># must be a callable but not a type</span>
         <span class="k">return</span> <span class="nb">callable</span><span class="p">(</span><span class="n">annotation</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">annotation</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">convert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">annotation</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">arch</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;arch&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="n">order</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;order&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="nd">@override</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">convert</span><span class="p">(</span>  <span class="c1"># pyright: ignore[reportIncompatibleMethodOverride]</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">annotation</span><span class="p">:</span> <span class="n">_ContextLambda</span><span class="p">[</span><span class="n">_OT</span><span class="p">],</span> <span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Field</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">_OT</span><span class="p">]:</span>
+        <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;arch&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;order&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="c1"># callables are treates as context lambdas</span>
         <span class="k">return</span> <span class="n">Field</span><span class="p">(</span><span class="n">annotation</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span> <span class="n">arch</span><span class="o">=</span><span class="n">arch</span><span class="p">)</span>
 
 
 <span class="n">registry</span><span class="o">.</span><span class="n">annotation_registry</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_CallableTypeConverter</span><span class="p">())</span>
-
 </pre></div>
 
                 </article>
@@ -1109,7 +1188,7 @@
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     <br/>
   </p>
 </div>

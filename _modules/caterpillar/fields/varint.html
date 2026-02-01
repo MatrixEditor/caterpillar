@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>caterpillar.fields.varint &#8212; Caterpillar 2.7.0 documentation</title>
+    <title>caterpillar.fields.varint &#8212; Caterpillar 2.8.0 documentation</title>
   
   
   
@@ -40,9 +40,9 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=dfec817d"></script>
-    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/documentation_options.js?v=69ff2ef9"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
@@ -51,7 +51,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.7.0" />
+  <meta name="docsearch:version" content="2.8.0" />
   </head>
   
   
@@ -113,7 +113,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.7.0</p>
+    <p class="title logo__title">Caterpillar 2.8.0</p>
   
 </a></div>
     
@@ -391,13 +391,23 @@
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">typing</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">override</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.exception</span><span class="w"> </span><span class="kn">import</span> <span class="n">InvalidValueError</span><span class="p">,</span> <span class="n">DynamicSizeError</span><span class="p">,</span> <span class="n">StreamError</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.byteorder</span><span class="w"> </span><span class="kn">import</span> <span class="n">LittleEndian</span><span class="p">,</span> <span class="n">LITTLE_ENDIAN_FMT</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.byteorder</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">O_DEFAULT_ENDIAN</span><span class="p">,</span>
+    <span class="n">LittleEndian</span><span class="p">,</span>
+    <span class="n">LITTLE_ENDIAN_FMT</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">CTX_FIELD</span><span class="p">,</span> <span class="n">CTX_STREAM</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.options</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flag</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">_ContextLike</span><span class="p">,</span> <span class="n">_EndianLike</span><span class="p">,</span> <span class="n">_StreamType</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">._mixin</span><span class="w"> </span><span class="kn">import</span> <span class="n">FieldStruct</span>
+
+<span class="k">if</span> <span class="n">typing</span><span class="o">.</span><span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.fields</span><span class="w"> </span><span class="kn">import</span> <span class="n">Field</span>
 
 
 <span class="n">VARINT_LSB</span> <span class="o">=</span> <span class="n">Flag</span><span class="p">(</span><span class="s2">&quot;varint.lsb&quot;</span><span class="p">)</span>
@@ -405,7 +415,7 @@
 
 <div class="viewcode-block" id="VarInt">
 <a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.VarInt">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">VarInt</span><span class="p">(</span><span class="n">FieldStruct</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">VarInt</span><span class="p">(</span><span class="n">FieldStruct</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Variable-length integer struct.</span>
 
 <span class="sd">    This class implements variable-length unsigned integer for big-endian and</span>
@@ -426,18 +436,18 @@
 <span class="sd">    b&#39;\\x00\\x88&#39;</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;__byteorder__&quot;</span><span class="p">,)</span>
+    <span class="vm">__slots__</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;__byteorder__&quot;</span><span class="p">,)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__byteorder__</span> <span class="o">=</span> <span class="n">LittleEndian</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__byteorder__</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__type__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">int</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__size__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__size__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">DynamicSizeError</span><span class="p">(</span><span class="s2">&quot;VarInt has dynamic size!&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">bit_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bit_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
         <span class="n">high_bit</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">7</span>
         <span class="n">low_bit</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">if</span> <span class="n">field</span> <span class="o">:=</span> <span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">CTX_FIELD</span><span class="p">):</span>
@@ -448,28 +458,30 @@
 
 <div class="viewcode-block" id="VarInt.pack_single">
 <a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.VarInt.pack_single">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">pack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="nd">@override</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Pack a single value into the stream.</span>
 
 <span class="sd">        :param obj: The value to pack.</span>
 <span class="sd">        :param context: The current context.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">obj</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">InvalidValueError</span><span class="p">(</span><span class="s2">&quot;NoneType can&#39;t be interpreted as a VarInt!&quot;</span><span class="p">)</span>
-
         <span class="k">if</span> <span class="n">obj</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">InvalidValueError</span><span class="p">(</span><span class="s2">&quot;Invalid negative value for VarInt encoding!&quot;</span><span class="p">)</span>
 
-        <span class="n">stream</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_STREAM</span><span class="p">]</span>
-        <span class="n">field</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">CTX_FIELD</span><span class="p">)</span>
-        <span class="n">order</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">order</span> <span class="k">if</span> <span class="n">field</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">__byteorder__</span>
-        <span class="n">is_little</span> <span class="o">=</span> <span class="n">order</span><span class="o">.</span><span class="n">ch</span> <span class="o">==</span> <span class="n">LITTLE_ENDIAN_FMT</span>
+        <span class="n">stream</span><span class="p">:</span> <span class="n">_StreamType</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_STREAM</span><span class="p">]</span>
+        <span class="n">field</span><span class="p">:</span> <span class="s2">&quot;Field&quot;</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">CTX_FIELD</span><span class="p">)</span>
+        <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">field</span><span class="o">.</span><span class="n">order</span>
+            <span class="k">if</span> <span class="n">field</span>
+            <span class="k">else</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__byteorder__</span> <span class="ow">or</span> <span class="n">O_DEFAULT_ENDIAN</span><span class="o">.</span><span class="n">value</span> <span class="ow">or</span> <span class="n">LittleEndian</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">is_little</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">order</span><span class="o">.</span><span class="n">ch</span> <span class="o">==</span> <span class="n">LITTLE_ENDIAN_FMT</span>
 
         <span class="n">hb</span><span class="p">,</span> <span class="n">lb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bit_config</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
         <span class="c1"># This implementation is using LittleEndian. Later we can use reverse to</span>
         <span class="c1"># apply little endian encoding.</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">data</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">while</span> <span class="n">obj</span> <span class="o">&gt;</span> <span class="mb">0b01111111</span><span class="p">:</span>
             <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obj</span> <span class="o">&amp;</span> <span class="mh">0x7F</span><span class="p">)</span>
             <span class="n">obj</span> <span class="o">&gt;&gt;=</span> <span class="mi">7</span>
@@ -488,7 +500,8 @@
 
 <div class="viewcode-block" id="VarInt.unpack_single">
 <a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.VarInt.unpack_single">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">unpack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+    <span class="nd">@override</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">unpack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Unpack a single value from the stream.</span>
 
@@ -496,11 +509,11 @@
 <span class="sd">        :param context: The current context.</span>
 <span class="sd">        :return: The unpacked value.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">stream</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_STREAM</span><span class="p">]</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">stream</span><span class="p">:</span> <span class="n">_StreamType</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_STREAM</span><span class="p">]</span>
+        <span class="n">data</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">lb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bit_config</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
         <span class="n">shift</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">is_little</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_FIELD</span><span class="p">]</span><span class="o">.</span><span class="n">order</span><span class="o">.</span><span class="n">ch</span> <span class="o">==</span> <span class="n">LITTLE_ENDIAN_FMT</span>
+        <span class="n">is_little</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_FIELD</span><span class="p">]</span><span class="o">.</span><span class="n">order</span><span class="o">.</span><span class="n">ch</span> <span class="o">==</span> <span class="n">LITTLE_ENDIAN_FMT</span>
 
         <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
             <span class="c1"># Note tha unpack operation here to retrieve one byte only</span>
@@ -529,7 +542,7 @@
 
 
 
-<span class="n">vint</span> <span class="o">=</span> <span class="n">VarInt</span><span class="p">()</span>
+<span class="n">vint</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Final</span><span class="p">[</span><span class="n">VarInt</span><span class="p">]</span> <span class="o">=</span> <span class="n">VarInt</span><span class="p">()</span>
 </pre></div>
 
                 </article>
@@ -580,7 +593,7 @@
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     <br/>
   </p>
 </div>

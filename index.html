@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Welcome to Caterpillar’s documentation! &#8212; Caterpillar 2.7.0 documentation</title>
+    <title>Welcome to Caterpillar’s documentation! &#8212; Caterpillar 2.8.0 documentation</title>
   
   
   
@@ -41,9 +41,9 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="_static/documentation_options.js?v=dfec817d"></script>
-    <script src="_static/doctools.js?v=9bcbadda"></script>
-    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/documentation_options.js?v=69ff2ef9"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="_static/copybutton.js?v=f281be69"></script>
     <script src="_static/design-tabs.js?v=f930bc37"></script>
@@ -53,7 +53,7 @@
     <link rel="next" title="1. Installation" href="installing/index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.7.0" />
+  <meta name="docsearch:version" content="2.8.0" />
   </head>
   
   
@@ -115,7 +115,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.7.0</p>
+    <p class="title logo__title">Caterpillar 2.8.0</p>
   
 </a></div>
     
@@ -367,15 +367,36 @@ efficient.</p>
 <p>🐛 lets you define standard structs with a fixed size while also supporting dynamic
 structs that adjust their size based on the current context. This framework enables you
 to write complex structures in a compact and readable manner.</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-0">
+Default Syntax</label><div class="sd-tab-content docutils">
 <div class="literal-block-wrapper docutils container" id="id1">
 <div class="code-block-caption"><span class="caption-text">Simple example of a custom struct</span><a class="headerlink" href="#id1" title="Link to this code">#</a></div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
-   <span class="n">magic</span><span class="p">:</span> <span class="sa">b</span><span class="s2">&quot;Foo&quot;</span>                       <span class="c1"># constant values</span>
-   <span class="n">name</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>                  <span class="c1"># \x00-terminated String without a fixed length</span>
-   <span class="n">value</span><span class="p">:</span> <span class="n">le</span> <span class="o">+</span> <span class="n">uint16</span>                  <span class="c1"># little endian encoding</span>
+   <span class="n">magic</span>  <span class="p">:</span> <span class="sa">b</span><span class="s2">&quot;Foo&quot;</span>                     <span class="c1"># constant values</span>
+   <span class="n">name</span>   <span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>               <span class="c1"># \x00-terminated String without a fixed length</span>
+   <span class="n">value</span>  <span class="p">:</span> <span class="n">le</span> <span class="o">+</span> <span class="n">uint16</span>                <span class="c1"># little endian encoding</span>
    <span class="n">entries</span><span class="p">:</span> <span class="n">be</span> <span class="o">+</span> <span class="n">CString</span><span class="p">[</span><span class="n">uint32</span><span class="p">::]</span>     <span class="c1"># arrays with big-endian prefixed length</span>
 </pre></div>
+</div>
+</div>
+</div>
+<input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-1">
+Extended Syntax (&gt;=2.8.0)</label><div class="sd-tab-content docutils">
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">Simple example of a custom struct with type annotations in-place</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span><span class="p">(</span><span class="n">kw_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>                            <span class="c1"># keyword-only constructor arguments</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
+   <span class="n">magic</span>  <span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;Foo&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Invisible</span><span class="p">()</span>       <span class="c1"># constant values</span>
+   <span class="n">name</span>   <span class="p">:</span> <span class="n">cstr_t</span>                               <span class="c1"># \x00-terminated String without a fixed length</span>
+   <span class="n">value</span>  <span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">le</span> <span class="o">+</span> <span class="n">uint16</span><span class="p">]</span>                  <span class="c1"># little endian encoding</span>
+   <span class="n">entries</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">be</span> <span class="o">+</span> <span class="n">CString</span><span class="p">[</span><span class="n">uint32</span><span class="p">::]]</span> <span class="c1"># arrays with big-endian prefixed length</span>
+</pre></div>
+</div>
+</div>
 </div>
 </div>
 <div class="admonition-hold-up-wait-a-minute admonition">
@@ -405,6 +426,8 @@ have to worry about documenting fields. Just apply the documentation as usual.</
 No problem! It is possible to shrink the memory space occupied by unpacked objects up
 to 4 times. More information are provided when discussing available configuration
 <a class="reference internal" href="library/options.html#options"><span class="std std-ref">Options / Flags</span></a>.</p></li>
+<li><p>And <em>YES</em>, this library tries to enforce strong typing wherever appliacable and supported.
+More on that topic later in the tutorial: <a class="reference internal" href="tutorial/first_steps/extended_syntax.html#first-steps-extended-syntax"><span class="std std-ref">Extended Syntax</span></a></p></li>
 </ul>
 </section>
 <section id="where-to-start">
@@ -576,7 +599,7 @@ C Reference</div>
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     <br/>
   </p>
 </div>

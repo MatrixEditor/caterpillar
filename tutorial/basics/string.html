@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>2.2.2. String Types &#8212; Caterpillar 2.7.0 documentation</title>
+    <title>2.2.2. String Types &#8212; Caterpillar 2.8.0 documentation</title>
   
   
   
@@ -41,9 +41,9 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=dfec817d"></script>
-    <script src="../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/documentation_options.js?v=69ff2ef9"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../_static/design-tabs.js?v=f930bc37"></script>
@@ -54,7 +54,7 @@
     <link rel="prev" title="2.2.1.3. Arrays / Lists" href="stdlist.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.7.0" />
+  <meta name="docsearch:version" content="2.8.0" />
   </head>
   
   
@@ -116,7 +116,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.7.0</p>
+    <p class="title logo__title">Caterpillar 2.8.0</p>
   
 </a></div>
     
@@ -334,9 +334,10 @@
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1 has-children"><a class="reference internal" href="../first_steps/index.html">2.1. First Steps</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../first_steps/structdef.html">2.1.1. Defining Structs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../first_steps/parsing.html">2.1.2. Working with Structs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../first_steps/configuration.html">2.1.3. Configuring structs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../first_steps/documentation.html">2.1.4. Documenting Structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../first_steps/extended_syntax.html">2.1.2. Extended Syntax</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../first_steps/parsing.html">2.1.3. Working with Structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../first_steps/configuration.html">2.1.4. Configuring structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../first_steps/documentation.html">2.1.5. Documenting Structs</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">2.2. Basic Concepts</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
@@ -452,6 +453,10 @@ or dynamic length.</p>
 <p>The <code class="code docutils literal notranslate"><span class="pre">CString</span></code> type is used to handle strings that end with a null byte. It
 extends beyond simple C-style strings. Here’s how you might define a structure using a
 <code class="code docutils literal notranslate"><span class="pre">CString</span></code>:</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" data-sync-group="syntax" data-sync-id="default" for="sd-tab-item-0">
+Default Syntax</label><div class="sd-tab-content docutils">
 <div class="literal-block-wrapper docutils container" id="id1">
 <div class="code-block-caption"><span class="caption-text">The <a class="reference external" href="https://www.w3.org/TR/png/#11tEXt">tEXt</a> chunk structure</span><a class="headerlink" href="#id1" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.py</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
@@ -460,13 +465,41 @@ extends beyond simple C-style strings. Here’s how you might define a structure
 <span class="nd">@struct</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">TEXTChunk</span><span class="p">:</span>
     <span class="c1"># dynamic sized string that ends with a null-byte</span>
-    <span class="n">keyword</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;ISO-8859-1&quot;</span><span class="p">)</span>
+    <span class="n">keyword</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;ISO-8859-1&quot;</span><span class="p">]</span>
     <span class="c1"># static sized string based on the current context. some notes:</span>
     <span class="c1">#   - parent.length is the current chunkt&#39;s length</span>
     <span class="c1">#   - lenof(...) is the runtime length of the context variable</span>
     <span class="c1">#   - 1 because of the extra null-byte that is stripped from keyword</span>
     <span class="n">text</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;ISO-8859-1&quot;</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="n">parent</span><span class="o">.</span><span class="n">length</span> <span class="o">-</span> <span class="n">lenof</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">keword</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
 </pre></div>
+</div>
+</div>
+</div>
+<input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" data-sync-group="syntax" data-sync-id="extended" for="sd-tab-item-1">
+Extended Syntax (&gt;=2.8.0)</label><div class="sd-tab-content docutils">
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">The <cite>tEXt</cite> chunk structure</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.py</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.shortcuts</span><span class="w"> </span><span class="kn">import</span> <span class="n">lenof</span>
+
+<span class="nd">@struct</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TEXTChunk</span><span class="p">:</span>
+    <span class="c1"># dynamic sized string that ends with a null-byte</span>
+    <span class="n">keyword</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">CString</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;ISO-8859-1&quot;</span><span class="p">))</span>
+    <span class="c1"># static sized string based on the current context. some notes:</span>
+    <span class="c1">#   - parent.length is the current chunkt&#39;s length</span>
+    <span class="c1">#   - lenof(...) is the runtime length of the context variable</span>
+    <span class="c1">#   - 1 because of the extra null-byte that is stripped from keyword</span>
+    <span class="n">text</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span>
+        <span class="n">CString</span><span class="p">(</span>
+            <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;ISO-8859-1&quot;</span><span class="p">,</span>
+            <span class="n">length</span><span class="o">=</span><span class="n">parent</span><span class="o">.</span><span class="n">length</span> <span class="o">-</span> <span class="n">lenof</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">keword</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="p">]</span>
+</pre></div>
+</div>
+</div>
 </div>
 </div>
 <div class="admonition-challenge admonition">
@@ -477,6 +510,10 @@ This chunk uses a combination of strings and fixed-length fields. Here’s a pos
 <summary class="sd-summary-title sd-card-header">
 <span class="sd-summary-icon"><svg version="1.1" width="1.0em" height="1.0em" class="sd-octicon sd-octicon-check" viewBox="0 0 16 16" aria-hidden="true"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path></svg></span><span class="sd-summary-text">Solution</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
 <p class="sd-card-text">This solution serves as an example and isn’t the only way to approach it!</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-2" name="sd-tab-set-1" type="radio">
+<label class="sd-tab-label" data-sync-group="syntax" data-sync-id="default" for="sd-tab-item-2">
+Default Syntax</label><div class="sd-tab-content docutils">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nd">@struct</span>
 <span class="linenos"> 2</span><span class="k">class</span><span class="w"> </span><span class="nc">ITXTChunk</span><span class="p">:</span>
 <span class="linenos"> 3</span>    <span class="n">keyword</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
@@ -493,6 +530,32 @@ This chunk uses a combination of strings and fixed-length fields. Here’s a pos
 </pre></div>
 </div>
 </div>
+<input id="sd-tab-item-3" name="sd-tab-set-1" type="radio">
+<label class="sd-tab-label" data-sync-group="syntax" data-sync-id="extended" for="sd-tab-item-3">
+Extended Syntax (&gt;=2.8.0)</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.types</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="linenos"> 2</span>
+<span class="linenos"> 3</span><span class="nd">@struct</span>
+<span class="linenos"> 4</span><span class="k">class</span><span class="w"> </span><span class="nc">ITXTChunk</span><span class="p">:</span>
+<span class="linenos"> 5</span>    <span class="n">keyword</span><span class="p">:</span> <span class="n">cstr_t</span>
+<span class="linenos"> 6</span>    <span class="n">compression_flag</span><span class="p">:</span> <span class="n">uint8_t</span>
+<span class="linenos"> 7</span>    <span class="c1"># we actually don&#39;t need an Enum here</span>
+<span class="linenos"> 8</span>    <span class="n">compression_method</span><span class="p">:</span> <span class="n">uint8_t</span>
+<span class="linenos"> 9</span>    <span class="n">language_tag</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">CString</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;ASCII&quot;</span><span class="p">)]</span>
+<span class="linenos">10</span>    <span class="n">translated_keyword</span><span class="p">:</span> <span class="n">cstr_t</span>
+<span class="linenos">11</span>    <span class="c1"># length is calculated with parent.length - len(keyword)+len(b&quot;\x00&quot;) - ...</span>
+<span class="linenos">12</span>    <span class="n">text</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span>
+<span class="linenos">13</span>        <span class="nb">str</span><span class="p">,</span>
+<span class="linenos">14</span>        <span class="n">CString</span><span class="p">(</span>
+<span class="linenos">15</span>            <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span>
+<span class="linenos">16</span>            <span class="n">length</span><span class="o">=</span><span class="n">parent</span><span class="o">.</span><span class="n">length</span> <span class="o">-</span> <span class="n">lenof</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">translated_keyword</span><span class="p">)</span> <span class="o">-</span> <span class="n">lenof</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">keyword</span><span class="p">)</span> <span class="o">-</span> <span class="mi">5</span><span class="p">,</span>
+<span class="linenos">17</span>        <span class="p">)</span>
+<span class="linenos">18</span>    <span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
 </details></div>
 <p>You can also customize the string’s termination character if needed:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span> <span class="o">=</span> <span class="n">CString</span><span class="p">(</span><span class="n">pad</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\x0A</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -505,9 +568,9 @@ This chunk uses a combination of strings and fixed-length fields. Here’s a pos
 length of the string is prefixed to the actual data. This is useful when dealing
 with raw bytes or strings with a length indicator.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">Prefixed</span><span class="p">(</span><span class="n">uint8</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="s2">&quot;Hello, World!&quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">as_field</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="s2">&quot;Hello, World!&quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
 <span class="go">b&#39;\rHello, World!&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">as_field</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span>
 <span class="go">&#39;Hello, World!&#39;</span>
 </pre></div>
 </div>
@@ -610,7 +673,7 @@ with raw bytes or strings with a length indicator.</p>
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     <br/>
   </p>
 </div>

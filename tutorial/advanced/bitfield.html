@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>2.3.7. Bitfields &#8212; Caterpillar 2.7.0 documentation</title>
+    <title>2.3.7. Bitfields &#8212; Caterpillar 2.8.0 documentation</title>
   
   
   
@@ -41,9 +41,9 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=dfec817d"></script>
-    <script src="../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/documentation_options.js?v=69ff2ef9"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../_static/design-tabs.js?v=f930bc37"></script>
@@ -54,7 +54,7 @@
     <link rel="prev" title="2.3.6. Actions" href="actions.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.7.0" />
+  <meta name="docsearch:version" content="2.8.0" />
   </head>
   
   
@@ -116,7 +116,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.7.0</p>
+    <p class="title logo__title">Caterpillar 2.8.0</p>
   
 </a></div>
     
@@ -334,9 +334,10 @@
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1 has-children"><a class="reference internal" href="../first_steps/index.html">2.1. First Steps</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../first_steps/structdef.html">2.1.1. Defining Structs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../first_steps/parsing.html">2.1.2. Working with Structs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../first_steps/configuration.html">2.1.3. Configuring structs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../first_steps/documentation.html">2.1.4. Documenting Structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../first_steps/extended_syntax.html">2.1.2. Extended Syntax</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../first_steps/parsing.html">2.1.3. Working with Structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../first_steps/configuration.html">2.1.4. Configuring structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../first_steps/documentation.html">2.1.5. Documenting Structs</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../basics/index.html">2.2. Basic Concepts</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -474,32 +475,89 @@ the system infers layout while giving you the tools to align fields precisely wh
 <ol class="arabic">
 <li><p>Basic fixed-size bits field:</p>
 <p>A standard field defines a name and the number of bits it occupies. Example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@bitfield</span>
+</li>
+</ol>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" data-sync-group="syntax" data-sync-id="default" for="sd-tab-item-0">
+Default Syntax</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@bitfield</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
     <span class="n">flag</span> <span class="p">:</span> <span class="mi">1</span> <span class="c1"># means the field flag uses 1 bit.</span>
 </pre></div>
 </div>
-</li>
+</div>
+<input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" data-sync-group="syntax" data-sync-id="extended" for="sd-tab-item-1">
+Extended Syntax (&gt;=2.8.0)</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@bitfield</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
+    <span class="n">flag</span> <span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="c1"># means the field flag uses 1 bit.</span>
+    <span class="c1"># or using a type</span>
+    <span class="n">flag</span> <span class="p">:</span> <span class="n">int1_t</span>
+</pre></div>
+</div>
+</div>
+</div>
+<ol class="arabic" start="2">
 <li><p>Basic fixed-size bits field with type from struct:</p>
 <p>You can specify how the bits should be interpreted using a type that will be
 resolved from the given struct using the <a class="reference internal" href="../../reference/datamodel/protocols/structlike.html#SupportsType" title="_SupportsType"><code class="xref py py-class docutils literal notranslate"><span class="pre">_SupportsType</span></code></a> protocol:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@bitfield</span>
+</li>
+</ol>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-2" name="sd-tab-set-1" type="radio">
+<label class="sd-tab-label" data-sync-group="syntax" data-sync-id="default" for="sd-tab-item-2">
+Default Syntax</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@bitfield</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
     <span class="n">valid</span> <span class="p">:</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">boolean</span> <span class="c1"># the 1-bit field should be interpreted as a bool</span>
 </pre></div>
 </div>
-</li>
+</div>
+<input id="sd-tab-item-3" name="sd-tab-set-1" type="radio">
+<label class="sd-tab-label" data-sync-group="syntax" data-sync-id="extended" for="sd-tab-item-3">
+Extended Syntax (&gt;=2.8.0)</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@bitfield</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
+    <span class="c1"># the 1-bit field should be interpreted as a bool</span>
+    <span class="n">valid</span> <span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">boolean</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<ol class="arabic" start="3">
 <li><p>Alignment:</p>
 <p>If you define a field with a size of <code class="docutils literal notranslate"><span class="pre">0</span></code>, it forces the Bitfield to align the current group
-to the next byte boundary. Afterwards, the current group is finalized and a new one is started:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@bitfield</span>
+to the next byte boundary. Afterwards, the current group is finalized and a new one is started.
+To use the automatic alignment in the extended syntax, use <code class="xref py py-attr docutils literal notranslate"><span class="pre">balign_t</span></code>.</p>
+</li>
+</ol>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-4" name="sd-tab-set-2" type="radio">
+<label class="sd-tab-label" data-sync-group="syntax" data-sync-id="default" for="sd-tab-item-4">
+Default Syntax</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@bitfield</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
     <span class="n">flag</span>  <span class="p">:</span> <span class="mi">1</span>
     <span class="n">_</span>     <span class="p">:</span> <span class="mi">0</span> <span class="c1"># align to 8bits</span>
     <span class="n">valid</span> <span class="p">:</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">boolean</span>        <span class="c1"># size will be 2x 8bits</span>
 </pre></div>
 </div>
-</li>
+</div>
+<input id="sd-tab-item-5" name="sd-tab-set-2" type="radio">
+<label class="sd-tab-label" data-sync-group="syntax" data-sync-id="extended" for="sd-tab-item-5">
+Extended Syntax (&gt;=2.8.0)</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@bitfield</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
+    <span class="n">flag</span>  <span class="p">:</span> <span class="n">int1_t</span>
+    <span class="n">_</span>     <span class="p">:</span> <span class="n">balign_t</span> <span class="o">=</span> <span class="n">Invisible</span><span class="p">()</span> <span class="c1"># align to 8bits</span>
+    <span class="n">valid</span> <span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">boolean</span><span class="p">]</span>  <span class="c1"># size will be 2x 8bits</span>
+</pre></div>
+</div>
+</div>
+</div>
+<ol class="arabic" start="4">
 <li><p>Struct-like Field:</p>
 <p>You can embed an entire struct-like class inside the Bitfield. (Any object conforming to the
 <a class="reference internal" href="../../reference/datamodel/protocols/structlike.html#StructLike" title="_StructLike"><code class="xref py py-class docutils literal notranslate"><span class="pre">_StructLike</span></code></a> protocol).</p>
@@ -507,19 +565,39 @@ to the next byte boundary. Afterwards, the current group is finalized and a new 
 <li><p>Custom Factory with Options:</p>
 <p>For advanced cases, you can specify not only the number of bits and a factory (a type converter)
 but also additional options to fine-tune grouping or alignment:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@bitfield</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
-  <span class="c1"># 7bits, converted to char and alignment set to 24bits</span>
-  <span class="n">name</span> <span class="p">:</span> <span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="n">CharFactory</span><span class="p">,</span> <span class="n">SetAlignment</span><span class="p">(</span><span class="mi">24</span><span class="p">))</span>
-</pre></div>
-</div>
 </li>
 </ol>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-6" name="sd-tab-set-3" type="radio">
+<label class="sd-tab-label" data-sync-group="syntax" data-sync-id="default" for="sd-tab-item-6">
+Default Syntax</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@bitfield</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
+    <span class="c1"># 7bits, converted to char and alignment set to 24bits</span>
+    <span class="n">name</span> <span class="p">:</span> <span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="n">CharFactory</span><span class="p">,</span> <span class="n">SetAlignment</span><span class="p">(</span><span class="mi">24</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<input id="sd-tab-item-7" name="sd-tab-set-3" type="radio">
+<label class="sd-tab-label" data-sync-group="syntax" data-sync-id="extended" for="sd-tab-item-7">
+Extended Syntax (&gt;=2.8.0)</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@bitfield</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
+    <span class="c1"># 7bits, converted to char and alignment set to 24bits</span>
+    <span class="n">name</span> <span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="n">CharFactory</span><span class="p">,</span> <span class="n">SetAlignment</span><span class="p">(</span><span class="mi">24</span><span class="p">))]</span>
+</pre></div>
+</div>
+</div>
+</div>
 </section>
 <section id="practical-example">
 <h2><span class="section-number">2.3.7.3. </span>Practical Example<a class="headerlink" href="#practical-example" title="Link to this heading">#</a></h2>
 <p>One practical example of using BitFields is implementing the chunk-naming convention
 for PNG files. Here’s how you might define the options for a chunk using a bitfield structure:</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-8" name="sd-tab-set-4" type="radio">
+<label class="sd-tab-label" data-sync-group="syntax" data-sync-id="default" for="sd-tab-item-8">
+Default Syntax</label><div class="sd-tab-content docutils">
 <div class="literal-block-wrapper docutils container" id="id1">
 <div class="code-block-caption"><span class="caption-text">Implementing the <a class="reference external" href="https://www.w3.org/TR/png/#5Chunk-naming-conventions">chunk-naming</a> convention</span><a class="headerlink" href="#id1" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@bitfield</span><span class="p">(</span><span class="n">opions</span><span class="o">=</span><span class="p">{</span><span class="n">S_DISCARD_UNNAMED</span><span class="p">})</span>
@@ -534,6 +612,28 @@ for PNG files. Here’s how you might define the options for a chunk using a bit
     <span class="n">reserved</span>     <span class="p">:</span> <span class="n">ChunkOption</span> <span class="c1"># f2</span>
     <span class="n">safe_to_copy</span> <span class="p">:</span> <span class="n">ChunkOption</span> <span class="c1"># f3</span>
 </pre></div>
+</div>
+</div>
+</div>
+<input id="sd-tab-item-9" name="sd-tab-set-4" type="radio">
+<label class="sd-tab-label" data-sync-group="syntax" data-sync-id="extended" for="sd-tab-item-9">
+Extended Syntax (&gt;=2.8.0)</label><div class="sd-tab-content docutils">
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">Implementing the <cite>chunk-naming</cite> convention</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@bitfield</span><span class="p">(</span><span class="n">opions</span><span class="o">=</span><span class="p">{</span><span class="n">S_DISCARD_UNNAMED</span><span class="p">})</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ChunkOption</span><span class="p">:</span>
+    <span class="n">_</span>     <span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">Invisible</span><span class="p">()</span> <span class="c1"># &lt;-- first two bits are not used</span>
+    <span class="n">value</span> <span class="p">:</span> <span class="n">int1_t</span>                   <span class="c1"># automatically boolean</span>
+
+<span class="nd">@struct</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ChunkOptions</span><span class="p">:</span>
+    <span class="n">ancillary</span>    <span class="p">:</span> <span class="n">ChunkOption</span> <span class="c1"># f0</span>
+    <span class="n">private</span>      <span class="p">:</span> <span class="n">ChunkOption</span> <span class="c1"># f1</span>
+    <span class="n">reserved</span>     <span class="p">:</span> <span class="n">ChunkOption</span> <span class="c1"># f2</span>
+    <span class="n">safe_to_copy</span> <span class="p">:</span> <span class="n">ChunkOption</span> <span class="c1"># f3</span>
+</pre></div>
+</div>
+</div>
 </div>
 </div>
 <p>In the example above, each field within the <code class="code docutils literal notranslate"><span class="pre">ChunkOptions</span></code> class is assigned
@@ -660,7 +760,7 @@ pack multiple flags or small values into a single byte or a group of bytes.</p>
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     <br/>
   </p>
 </div>

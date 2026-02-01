@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>2.1.1. Defining Structs &#8212; Caterpillar 2.7.0 documentation</title>
+    <title>2.1.1. Defining Structs &#8212; Caterpillar 2.8.0 documentation</title>
   
   
   
@@ -41,20 +41,20 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=dfec817d"></script>
-    <script src="../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/documentation_options.js?v=69ff2ef9"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'tutorial/first_steps/structdef';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="2.1.2. Working with Structs" href="parsing.html" />
+    <link rel="next" title="2.1.2. Extended Syntax" href="extended_syntax.html" />
     <link rel="prev" title="2.1. First Steps" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.7.0" />
+  <meta name="docsearch:version" content="2.8.0" />
   </head>
   
   
@@ -116,7 +116,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.7.0</p>
+    <p class="title logo__title">Caterpillar 2.8.0</p>
   
 </a></div>
     
@@ -334,9 +334,10 @@
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">2.1. First Steps</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">2.1.1. Defining Structs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="parsing.html">2.1.2. Working with Structs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="configuration.html">2.1.3. Configuring structs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="documentation.html">2.1.4. Documenting Structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extended_syntax.html">2.1.2. Extended Syntax</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parsing.html">2.1.3. Working with Structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html">2.1.4. Configuring structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation.html">2.1.5. Documenting Structs</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../basics/index.html">2.2. Basic Concepts</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -439,6 +440,10 @@
 is key to leveraging the full power of <em>Caterpillar</em>. In this section, we’ll begin by
 defining a simple struct for the  <a class="reference external" href="https://www.w3.org/TR/png/#11PLTE">PLTE</a> chunk of
 a PNG file, which consists of three-byte entries.</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" data-sync-group="syntax" data-sync-id="default" for="sd-tab-item-0">
+Default Syntax</label><div class="sd-tab-content docutils">
 <div class="literal-block-wrapper docutils container" id="id1">
 <div class="code-block-caption"><span class="caption-text">RGB struct for the PLTE chunk</span><a class="headerlink" href="#id1" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.py</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span> <span class="c1"># &lt;-- just import everything</span>
@@ -449,6 +454,25 @@ a PNG file, which consists of three-byte entries.</p>
     <span class="n">g</span><span class="p">:</span> <span class="n">uint8</span>
     <span class="n">b</span><span class="p">:</span> <span class="n">uint8</span>
 </pre></div>
+</div>
+</div>
+</div>
+<input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" data-sync-group="syntax" data-sync-id="extended" for="sd-tab-item-1">
+Extended Syntax (&gt;=2.8.0)</label><div class="sd-tab-content docutils">
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">RGB struct for the PLTE chunk</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.py</span><span class="w"> </span><span class="kn">import</span> <span class="n">struct</span>     <span class="c1"># &lt;-- struct creator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">uint8_t</span> <span class="c1"># &lt;-- basic integer type</span>
+
+<span class="nd">@struct</span>         <span class="c1"># &lt;-- just decorate the class with the struct() function</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RGB</span><span class="p">:</span>
+    <span class="n">r</span><span class="p">:</span> <span class="n">uint8_t</span>  <span class="c1"># &lt;-- a field can be defined just like this</span>
+    <span class="n">g</span><span class="p">:</span> <span class="n">uint8_t</span>
+    <span class="n">b</span><span class="p">:</span> <span class="n">uint8_t</span>
+</pre></div>
+</div>
+</div>
 </div>
 </div>
 <p>By using the <code class="code docutils literal notranslate"><span class="pre">&#64;struct</span></code> decorator, we’ve defined the <code class="code docutils literal notranslate"><span class="pre">RGB</span></code> class as
@@ -490,11 +514,11 @@ on how to enable this option, refer to the documentation on <a class="reference 
       </div>
     </a>
     <a class="right-next"
-       href="parsing.html"
+       href="extended_syntax.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">2.1.2. </span>Working with Structs</p>
+        <p class="prev-next-title"><span class="section-number">2.1.2. </span>Extended Syntax</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -552,7 +576,7 @@ on how to enable this option, refer to the documentation on <a class="reference 
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     <br/>
   </p>
 </div>

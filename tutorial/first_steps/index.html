@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>2.1. First Steps &#8212; Caterpillar 2.7.0 documentation</title>
+    <title>2.1. First Steps &#8212; Caterpillar 2.8.0 documentation</title>
   
   
   
@@ -41,9 +41,9 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=dfec817d"></script>
-    <script src="../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/documentation_options.js?v=69ff2ef9"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../_static/design-tabs.js?v=f930bc37"></script>
@@ -54,7 +54,7 @@
     <link rel="prev" title="2. Tutorial" href="../index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.7.0" />
+  <meta name="docsearch:version" content="2.8.0" />
   </head>
   
   
@@ -116,7 +116,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.7.0</p>
+    <p class="title logo__title">Caterpillar 2.8.0</p>
   
 </a></div>
     
@@ -334,9 +334,10 @@
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">2.1. First Steps</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="structdef.html">2.1.1. Defining Structs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="parsing.html">2.1.2. Working with Structs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="configuration.html">2.1.3. Configuring structs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="documentation.html">2.1.4. Documenting Structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extended_syntax.html">2.1.2. Extended Syntax</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parsing.html">2.1.3. Working with Structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html">2.1.4. Configuring structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation.html">2.1.5. Documenting Structs</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../basics/index.html">2.2. Basic Concepts</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -454,20 +455,33 @@ chunk definition upfront.</p>
 </div>
 <p>Before diving into the examples, keep in mind that each code snippet assumes you’ve already
 imported the necessary components from <em>Caterpillar</em>:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.py</span><span class="w"> </span><span class="kn">import</span> <span class="n">struct</span><span class="p">,</span> <span class="n">uint32</span><span class="p">,</span> <span class="n">uint8</span><span class="p">,</span> <span class="n">Bytes</span><span class="p">,</span> <span class="n">F</span><span class="p">,</span> <span class="n">Field</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.py</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 </pre></div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>If you are working with caterpillar <cite>&gt;=2.8.0</cite>, you can also import the default types for
+extended syntax:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.types</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+</pre></div>
+</div>
 </div>
 <div class="toctree-wrapper compound">
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">First Steps</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="structdef.html">2.1.1. Defining Structs</a></li>
-<li class="toctree-l1"><a class="reference internal" href="parsing.html">2.1.2. Working with Structs</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="parsing.html#packing-data">2.1.2.1. Packing data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="parsing.html#unpacking-data">2.1.2.2. Unpacking data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="extended_syntax.html">2.1.2. Extended Syntax</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="extended_syntax.html#the-role-of-the-field-descriptor">2.1.2.1. The role of the field descriptor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extended_syntax.html#invisible-fields">2.1.2.2. Invisible Fields</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="configuration.html">2.1.3. Configuring structs</a></li>
-<li class="toctree-l1"><a class="reference internal" href="documentation.html">2.1.4. Documenting Structs</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="parsing.html">2.1.3. Working with Structs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="parsing.html#packing-data">2.1.3.1. Packing data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parsing.html#unpacking-data">2.1.3.2. Unpacking data</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">2.1.4. Configuring structs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="documentation.html">2.1.5. Documenting Structs</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="documentation.html#formats.nibarchive.NIBHeader"><code class="docutils literal notranslate"><span class="pre">NIBHeader</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="documentation.html#formats.nibarchive.NIBHeader.magic"><code class="docutils literal notranslate"><span class="pre">NIBHeader.magic</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="documentation.html#formats.nibarchive.NIBHeader.unknown_1"><code class="docutils literal notranslate"><span class="pre">NIBHeader.unknown_1</span></code></a></li>
@@ -478,7 +492,7 @@ imported the necessary components from <em>Caterpillar</em>:</p>
 </ul>
 </div>
 <section id="next-steps">
-<h2><span class="section-number">2.1.5. </span>Next Steps<a class="headerlink" href="#next-steps" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">2.1.6. </span>Next Steps<a class="headerlink" href="#next-steps" title="Link to this heading">#</a></h2>
 <p>With the basics of defining, using, and documenting structs covered, we’re
 ready to dive deeper into more advanced topics. The
 upcoming sections will explore basic structs, array definitions, enum inclusion, and much more.</p>
@@ -532,7 +546,7 @@ upcoming sections will explore basic structs, array definitions, enum inclusion,
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#next-steps">2.1.5. Next Steps</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#next-steps">2.1.6. Next Steps</a></li>
 </ul>
   </nav></div>
 
@@ -579,7 +593,7 @@ upcoming sections will explore basic structs, array definitions, enum inclusion,
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     <br/>
   </p>
 </div>

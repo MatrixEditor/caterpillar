@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>caterpillar.fields.digest &#8212; Caterpillar 2.7.0 documentation</title>
+    <title>caterpillar.fields.digest &#8212; Caterpillar 2.8.0 documentation</title>
   
   
   
@@ -40,9 +40,9 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=dfec817d"></script>
-    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/documentation_options.js?v=69ff2ef9"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
@@ -51,7 +51,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.7.0" />
+  <meta name="docsearch:version" content="2.8.0" />
   </head>
   
   
@@ -113,7 +113,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.7.0</p>
+    <p class="title logo__title">Caterpillar 2.8.0</p>
   
 </a></div>
     
@@ -390,8 +390,12 @@
 <span class="c1">#</span>
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
+<span class="c1"># pyright: reportPrivateUsage=false, reportExplicitAny=false</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">hashlib</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">types</span><span class="w"> </span><span class="kn">import</span> <span class="n">FrameType</span><span class="p">,</span> <span class="n">TracebackType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">Protocol</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Self</span><span class="p">,</span> <span class="n">override</span><span class="p">,</span> <span class="n">TypeVar</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">zlib</span>
 
@@ -399,10 +403,14 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.exception</span><span class="w"> </span><span class="kn">import</span> <span class="n">StructException</span><span class="p">,</span> <span class="n">ValidationError</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.shared</span><span class="w"> </span><span class="kn">import</span> <span class="n">Action</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.fields.hook</span><span class="w"> </span><span class="kn">import</span> <span class="n">IOHook</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">_ContextLambda</span><span class="p">,</span> <span class="n">_ContextLike</span><span class="p">,</span> <span class="n">_StructLike</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">._base</span><span class="w"> </span><span class="kn">import</span> <span class="n">Field</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">Bytes</span><span class="p">,</span> <span class="n">uint32</span>
 
 <span class="n">DEFAULT_DIGEST_PATH</span> <span class="o">=</span> <span class="s2">&quot;digest&quot;</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">cryptography.hazmat.primitives</span><span class="w"> </span><span class="kn">import</span> <span class="n">hashes</span><span class="p">,</span> <span class="n">hmac</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">_DigestValue</span><span class="p">:</span>
@@ -413,13 +421,21 @@
 <span class="sd">    the context of cryptographic algorithms or other hash-like operations.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
+    <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&gt;&quot;</span>
 
 
+<span class="n">_AlgoObjT</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;_AlgoObjT&quot;</span><span class="p">)</span>
+<span class="n">_AlgoReturnT</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;_AlgoReturnT&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="nb">bytes</span><span class="p">)</span>
+<span class="n">_AlgoUpadeFunc</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">_AlgoObjT</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">_ContextLike</span><span class="p">],</span> <span class="n">_AlgoObjT</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span>
+<span class="n">_AlgoFinishFunc</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">_AlgoObjT</span><span class="p">,</span> <span class="n">_ContextLike</span><span class="p">],</span> <span class="n">_AlgoReturnT</span><span class="p">]</span>
+<span class="n">_AlgoCreateFunc</span> <span class="o">=</span> <span class="n">_ContextLambda</span><span class="p">[</span><span class="n">_AlgoObjT</span><span class="p">]</span>
+
+
 <div class="viewcode-block" id="Algorithm">
 <a class="viewcode-back" href="../../../library/fields/crypto.html#caterpillar.fields.Algorithm">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">Algorithm</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Algorithm</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">_AlgoObjT</span><span class="p">,</span> <span class="n">_AlgoReturnT</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    .. versionadded:: 2.4.0</span>
 
@@ -457,14 +473,21 @@
 <span class="sd">    :type name: Optional[str]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;_create&quot;</span><span class="p">,</span> <span class="s2">&quot;_update&quot;</span><span class="p">,</span> <span class="s2">&quot;_digest&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">)</span>
+    <span class="vm">__slots__</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;_create&quot;</span><span class="p">,</span> <span class="s2">&quot;_update&quot;</span><span class="p">,</span> <span class="s2">&quot;_digest&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">create</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">update</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">digest</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_create</span> <span class="o">=</span> <span class="n">create</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_update</span> <span class="o">=</span> <span class="n">update</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_digest</span> <span class="o">=</span> <span class="n">digest</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">create</span><span class="p">:</span> <span class="n">_AlgoCreateFunc</span><span class="p">[</span><span class="n">_AlgoObjT</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">update</span><span class="p">:</span> <span class="n">_AlgoUpadeFunc</span><span class="p">[</span><span class="n">_AlgoObjT</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">digest</span><span class="p">:</span> <span class="n">_AlgoFinishFunc</span><span class="p">[</span><span class="n">_AlgoObjT</span><span class="p">,</span> <span class="n">_AlgoReturnT</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_create</span><span class="p">:</span> <span class="n">_AlgoCreateFunc</span><span class="p">[</span><span class="n">_AlgoObjT</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">create</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update</span><span class="p">:</span> <span class="n">_AlgoUpadeFunc</span><span class="p">[</span><span class="n">_AlgoObjT</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">update</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_digest</span><span class="p">:</span> <span class="n">_AlgoFinishFunc</span><span class="p">[</span><span class="n">_AlgoObjT</span><span class="p">,</span> <span class="n">_AlgoReturnT</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">digest</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">name</span> <span class="ow">or</span> <span class="s2">&quot;&lt;algo&gt;&quot;</span>
 
+    <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return a string representation of the Algorithm instance.</span>
@@ -476,7 +499,9 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> name=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">&#39;&lt;not set&gt;&#39;</span><span class="si">!r}</span><span class="s2">&gt;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+<div class="viewcode-block" id="Algorithm.create">
+<a class="viewcode-back" href="../../../library/fields/crypto.html#caterpillar.fields.Algorithm.create">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_AlgoObjT</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create an instance of the algorithm or checksum using the provided context.</span>
 
@@ -491,9 +516,14 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
 
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;create() is not implemented for this algorithm&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;create() is not implemented for this algorithm&quot;</span><span class="p">)</span></div>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algo_obj</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Algorithm.update">
+<a class="viewcode-back" href="../../../library/fields/crypto.html#caterpillar.fields.Algorithm.update">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">algo_obj</span><span class="p">:</span> <span class="n">_AlgoObjT</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_AlgoObjT</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Update the algorithm or checksum with the given data.</span>
 
@@ -512,9 +542,12 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_update</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="n">algo_obj</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
 
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;update() is not implemented for this algorithm&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;update() is not implemented for this algorithm&quot;</span><span class="p">)</span></div>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">digest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algo_obj</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+
+<div class="viewcode-block" id="Algorithm.digest">
+<a class="viewcode-back" href="../../../library/fields/crypto.html#caterpillar.fields.Algorithm.digest">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">digest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algo_obj</span><span class="p">:</span> <span class="n">_AlgoObjT</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_AlgoReturnT</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute the digest or checksum value from the algorithm instance.</span>
 
@@ -532,12 +565,13 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_digest</span><span class="p">(</span><span class="n">algo_obj</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
 
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;digest() is not implemented for this algorithm&quot;</span><span class="p">)</span></div>
+</div>
 
 
 
 <div class="viewcode-block" id="Digest">
 <a class="viewcode-back" href="../../../library/fields/crypto.html#caterpillar.fields.Digest">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">Digest</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Digest</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">_AlgoObjT</span><span class="p">,</span> <span class="n">_AlgoReturnT</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A class to handle the creation, updating, and verification of digests</span>
 <span class="sd">    using a specified algorithm.</span>
 
@@ -608,29 +642,36 @@
 <span class="sd">    :type path: Optional[str]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">,</span> <span class="n">struct</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">algorithm</span><span class="p">:</span> <span class="n">Algorithm</span><span class="p">[</span><span class="n">_AlgoObjT</span><span class="p">,</span> <span class="n">_AlgoReturnT</span><span class="p">],</span>
+        <span class="n">struct</span><span class="p">:</span> <span class="n">_StructLike</span><span class="p">[</span><span class="n">_AlgoReturnT</span><span class="p">,</span> <span class="n">_AlgoReturnT</span><span class="p">],</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">verify</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="o">.</span><span class="n">major</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="o">.</span><span class="n">minor</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">14</span><span class="p">):</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
                 <span class="s2">&quot;Python3.14 breaks support for Digest fields. The hash must be calculated &quot;</span>
-                <span class="s2">&quot;manually until a fix has been released.&quot;</span>
+                <span class="o">+</span> <span class="s2">&quot;manually until a fix has been released.&quot;</span>
             <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">algo</span> <span class="o">=</span> <span class="n">algorithm</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span> <span class="ow">or</span> <span class="n">DEFAULT_DIGEST_PATH</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">algo</span><span class="p">:</span> <span class="n">Algorithm</span><span class="p">[</span><span class="n">_AlgoObjT</span><span class="p">,</span> <span class="n">_AlgoReturnT</span><span class="p">]</span> <span class="o">=</span> <span class="n">algorithm</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">name</span> <span class="ow">or</span> <span class="n">DEFAULT_DIGEST_PATH</span>
         <span class="k">if</span> <span class="s2">&quot;.&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;Digest name must not contain &#39;.&#39; character. Use path instead.&quot;</span>
             <span class="p">)</span>
 
         <span class="c1"># IO will be initialized in self.begin</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_hook</span> <span class="o">=</span> <span class="n">IOHook</span><span class="p">(</span><span class="n">io</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">update</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">struct</span> <span class="o">=</span> <span class="n">struct</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_digest</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_verify</span> <span class="o">=</span> <span class="n">verify</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span> <span class="ow">or</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">CTX_OBJECT</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_hook</span><span class="p">:</span> <span class="n">IOHook</span> <span class="o">=</span> <span class="n">IOHook</span><span class="p">(</span><span class="n">io</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">update</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">struct</span><span class="p">:</span> <span class="n">_StructLike</span><span class="p">[</span><span class="n">_AlgoReturnT</span><span class="p">,</span> <span class="n">_AlgoReturnT</span><span class="p">]</span> <span class="o">=</span> <span class="n">struct</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_digest</span><span class="p">:</span> <span class="n">_AlgoReturnT</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="p">:</span> <span class="n">_AlgoObjT</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># pyright: ignore[reportAttributeAccessIssue]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_verify</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">verify</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">path</span> <span class="ow">or</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">CTX_OBJECT</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_get_annotations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_annotations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">:</span> <span class="n">FrameType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Retrieve the annotations (i.e., field definitions) from the current frame&#39;s local variables.</span>
 
@@ -644,18 +685,19 @@
             <span class="c1"># This will not work on Python3.14+ but supresses errors</span>
             <span class="k">if</span> <span class="s2">&quot;__annotations__&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">frame</span><span class="o">.</span><span class="n">f_locals</span><span class="p">:</span>
                 <span class="n">frame</span><span class="o">.</span><span class="n">f_locals</span><span class="p">[</span><span class="s2">&quot;__annotations__&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-
-            <span class="k">return</span> <span class="n">frame</span><span class="o">.</span><span class="n">f_locals</span><span class="p">[</span><span class="s2">&quot;__annotations__&quot;</span><span class="p">]</span>
+            <span class="c1"># fmt: off</span>
+            <span class="k">return</span> <span class="n">frame</span><span class="o">.</span><span class="n">f_locals</span><span class="p">[</span><span class="s2">&quot;__annotations__&quot;</span><span class="p">]</span> <span class="c1"># pyright: ignore[reportUnknownVariableType]</span>
         <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
             <span class="n">module</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">f_locals</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;__module__&quot;</span><span class="p">)</span>
             <span class="n">qualname</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">f_locals</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;__qualname__&quot;</span><span class="p">)</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Could not get annotations in </span><span class="si">{</span><span class="n">module</span><span class="si">}</span><span class="s2"> (context=</span><span class="si">{</span><span class="n">qualname</span><span class="si">!r}</span><span class="s2">)&quot;</span>
             <span class="k">raise</span> <span class="n">StructException</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
 
+    <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Digest(algo=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">algo</span><span class="si">!r}</span><span class="s2">, verify=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_verify</span><span class="si">!r}</span><span class="s2">)&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Install the start action for the digest field during struct definition.</span>
 
@@ -689,7 +731,7 @@
         <span class="n">annotations</span><span class="p">[</span><span class="n">start_action_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">Action</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">begin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">begin</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">:</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">traceback</span><span class="p">:</span> <span class="n">TracebackType</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Install the end action for the digest field and finalize the struct field definitions.</span>
 
@@ -714,7 +756,9 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verify</span><span class="p">:</span>
             <span class="n">annotations</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_verify&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Action</span><span class="p">(</span><span class="n">unpack</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">verfiy</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">begin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="Digest.begin">
+<a class="viewcode-back" href="../../../library/fields/crypto.html#caterpillar.fields.Digest.begin">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">begin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize the digest calculation at the beginning of packing/unpacking.</span>
 
@@ -725,9 +769,12 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_hook</span><span class="o">.</span><span class="n">_io</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_STREAM</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_hook</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">algo</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">algo</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">context</span><span class="p">)</span></div>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">end_pack</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+<div class="viewcode-block" id="Digest.end_pack">
+<a class="viewcode-back" href="../../../library/fields/crypto.html#caterpillar.fields.Digest.end_pack">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">end_pack</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Finalize the digest calculation at the end of packing/unpacking.</span>
 
@@ -738,9 +785,12 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_digest</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">algo</span><span class="o">.</span><span class="n">digest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
         <span class="n">context</span><span class="o">.</span><span class="n">__context_setattr__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_digest</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_hook</span><span class="o">.</span><span class="n">finish</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_hook</span><span class="o">.</span><span class="n">finish</span><span class="p">(</span><span class="n">context</span><span class="p">)</span></div>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">end_unpack</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+<div class="viewcode-block" id="Digest.end_unpack">
+<a class="viewcode-back" href="../../../library/fields/crypto.html#caterpillar.fields.Digest.end_unpack">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">end_unpack</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Finalize the digest calculation at the end of unpacking.</span>
 
@@ -750,9 +800,12 @@
 <span class="sd">        :type context: _ContextLike</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_digest</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">algo</span><span class="o">.</span><span class="n">digest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_hook</span><span class="o">.</span><span class="n">finish</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_hook</span><span class="o">.</span><span class="n">finish</span><span class="p">(</span><span class="n">context</span><span class="p">)</span></div>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+<div class="viewcode-block" id="Digest.update">
+<a class="viewcode-back" href="../../../library/fields/crypto.html#caterpillar.fields.Digest.update">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Update the checksum with new data during packing/unpacking.</span>
 
@@ -763,9 +816,12 @@
 <span class="sd">        :param context: The current context during packing/unpacking.</span>
 <span class="sd">        :type context: _ContextLike</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">algo</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">algo</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span></div>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">verfiy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+<div class="viewcode-block" id="Digest.verfiy">
+<a class="viewcode-back" href="../../../library/fields/crypto.html#caterpillar.fields.Digest.verfiy">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">verfiy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Verify the checksum upon unpacking.</span>
 
@@ -776,8 +832,9 @@
 <span class="sd">        :type context: _ContextLike</span>
 <span class="sd">        :raises ValidationError: If the digest verification fails.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># fmt: off</span>
         <span class="c1"># we assume self._verify is True</span>
-        <span class="n">digest</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">__context_getattr__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">digest</span><span class="p">:</span> <span class="n">_AlgoReturnT</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">__context_getattr__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>  <span class="c1"># pyright: ignore[reportAny]</span>
         <span class="k">if</span> <span class="n">digest</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_digest</span><span class="p">:</span>
             <span class="n">digest_raw</span> <span class="o">=</span> <span class="n">digest</span><span class="o">.</span><span class="n">hex</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">digest</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span> <span class="k">else</span> <span class="n">digest</span>
             <span class="n">expected_digest_raw</span> <span class="o">=</span> <span class="p">(</span>
@@ -792,18 +849,19 @@
                 <span class="p">),</span>
                 <span class="n">context</span><span class="p">,</span>
             <span class="p">)</span></div>
+</div>
 
 
 
-<span class="n">CTX_DIGEST_OBJ</span> <span class="o">=</span> <span class="s2">&quot;_digest_obj&quot;</span>
-<span class="n">CTX_DIGEST_HOOK</span> <span class="o">=</span> <span class="s2">&quot;_digest_hook&quot;</span>
-<span class="n">CTX_DIGEST_ALGO</span> <span class="o">=</span> <span class="s2">&quot;_digest_algo&quot;</span>
-<span class="n">CTX_DIGEST</span> <span class="o">=</span> <span class="s2">&quot;_digest&quot;</span>
+<span class="n">CTX_DIGEST_OBJ</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;_digest_obj&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;_digest_obj&quot;</span>
+<span class="n">CTX_DIGEST_HOOK</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;_digest_hook&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;_digest_hook&quot;</span>
+<span class="n">CTX_DIGEST_ALGO</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;_digest_algo&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;_digest_algo&quot;</span>
+<span class="n">CTX_DIGEST</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;_digest&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;_digest&quot;</span>
 
 
 <div class="viewcode-block" id="DigestFieldAction">
 <a class="viewcode-back" href="../../../library/fields/crypto.html#caterpillar.fields.DigestFieldAction">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">DigestFieldAction</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DigestFieldAction</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">_AlgoObjT</span><span class="p">,</span> <span class="n">_AlgoReturnT</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    .. versionadded:: 2.4.5</span>
 
@@ -824,25 +882,32 @@
 <span class="sd">    :type algorithm: Algorithm</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">:</span> <span class="n">Algorithm</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">target</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">algo</span> <span class="o">=</span> <span class="n">algorithm</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_ctx_obj</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">CTX_DIGEST_OBJ</span><span class="si">}</span><span class="s2">__</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_ctx_hook</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">CTX_DIGEST_HOOK</span><span class="si">}</span><span class="s2">__</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_ctx_algo</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">CTX_DIGEST_ALGO</span><span class="si">}</span><span class="s2">__</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">:</span> <span class="n">Algorithm</span><span class="p">[</span><span class="n">_AlgoObjT</span><span class="p">,</span> <span class="n">_AlgoReturnT</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">target</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">algo</span><span class="p">:</span> <span class="n">Algorithm</span><span class="p">[</span><span class="n">_AlgoObjT</span><span class="p">,</span> <span class="n">_AlgoReturnT</span><span class="p">]</span> <span class="o">=</span> <span class="n">algorithm</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ctx_obj</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">CTX_DIGEST_OBJ</span><span class="si">}</span><span class="s2">__</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ctx_hook</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">CTX_DIGEST_HOOK</span><span class="si">}</span><span class="s2">__</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ctx_algo</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">CTX_DIGEST_ALGO</span><span class="si">}</span><span class="s2">__</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="DigestFieldAction.update">
+<a class="viewcode-back" href="../../../library/fields/crypto.html#caterpillar.fields.DigestFieldAction.update">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Updates the digest object with new data.</span>
 
 <span class="sd">        This method is registered with an IO hook so it gets triggered</span>
 <span class="sd">        automatically during reads/writes to accumulate digest state.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">obj</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_ctx_obj</span><span class="p">]</span>
+        <span class="n">obj</span><span class="p">:</span> <span class="n">_AlgoObjT</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_ctx_obj</span><span class="p">]</span>  <span class="c1"># pyright: ignore[reportAny]</span>
         <span class="n">new_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">algo</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
-        <span class="n">context</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_ctx_obj</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_obj</span> <span class="ow">or</span> <span class="n">obj</span>
+        <span class="n">context</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_ctx_obj</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_obj</span> <span class="ow">or</span> <span class="n">obj</span></div>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">begin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+<div class="viewcode-block" id="DigestFieldAction.begin">
+<a class="viewcode-back" href="../../../library/fields/crypto.html#caterpillar.fields.DigestFieldAction.begin">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">begin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes the digest algorithm and attaches an IO hook to track data.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -851,16 +916,18 @@
 
         <span class="n">hook</span> <span class="o">=</span> <span class="n">IOHook</span><span class="p">(</span><span class="n">io</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">update</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">)</span>
         <span class="n">hook</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
-        <span class="n">context</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_ctx_hook</span><span class="p">]</span> <span class="o">=</span> <span class="n">hook</span>
+        <span class="n">context</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_ctx_hook</span><span class="p">]</span> <span class="o">=</span> <span class="n">hook</span></div>
 
+
+    <span class="c1"># fmt: off</span>
     <span class="c1"># Both packing and unpacking will trigger the same logic</span>
-    <span class="n">__action_pack__</span> <span class="o">=</span> <span class="n">__action_unpack__</span> <span class="o">=</span> <span class="n">begin</span></div>
+    <span class="n">__action_pack__</span> <span class="o">=</span> <span class="n">__action_unpack__</span> <span class="o">=</span> <span class="n">begin</span>  <span class="c1"># pyright: ignore[reportUnannotatedClassAttribute]</span></div>
 
 
 
 <div class="viewcode-block" id="DigestField">
 <a class="viewcode-back" href="../../../library/fields/crypto.html#caterpillar.fields.DigestField">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">DigestField</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DigestField</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">_AlgoReturnT</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    .. versionadded:: 2.4.5</span>
 
@@ -889,43 +956,50 @@
 <span class="sd">    :type verify: bool</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">struct</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">target</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">struct</span> <span class="o">=</span> <span class="n">struct</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">verify</span> <span class="o">=</span> <span class="n">verify</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_ctx_obj</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">CTX_DIGEST_OBJ</span><span class="si">}</span><span class="s2">__</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_ctx_hook</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">CTX_DIGEST_HOOK</span><span class="si">}</span><span class="s2">__</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_ctx_digest</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">CTX_DIGEST</span><span class="si">}</span><span class="s2">__</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_ctx_algo</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">CTX_DIGEST_ALGO</span><span class="si">}</span><span class="s2">__</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">target</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">struct</span><span class="p">:</span> <span class="n">_StructLike</span><span class="p">[</span><span class="n">_AlgoReturnT</span><span class="p">,</span> <span class="n">_AlgoReturnT</span><span class="p">],</span>
+        <span class="n">verify</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">target</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">struct</span><span class="p">:</span> <span class="n">_StructLike</span><span class="p">[</span><span class="n">_AlgoReturnT</span><span class="p">,</span> <span class="n">_AlgoReturnT</span><span class="p">]</span> <span class="o">=</span> <span class="n">struct</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verify</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">verify</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ctx_obj</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">CTX_DIGEST_OBJ</span><span class="si">}</span><span class="s2">__</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ctx_hook</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">CTX_DIGEST_HOOK</span><span class="si">}</span><span class="s2">__</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ctx_digest</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">CTX_DIGEST</span><span class="si">}</span><span class="s2">__</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ctx_algo</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">CTX_DIGEST_ALGO</span><span class="si">}</span><span class="s2">__</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__type__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Defines the Python type returned after unpacking (always bytes).&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">bytes</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__size__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__size__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the size in bytes of the digest field.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">struct</span><span class="o">.</span><span class="n">__size__</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__pack__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__pack__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Called during packing. Computes the digest over all previously packed data,</span>
 <span class="sd">        stores it in the context, finalizes the IO hook, and packs the digest itself.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">digest</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_ctx_algo</span><span class="p">]</span><span class="o">.</span><span class="n">digest</span><span class="p">(</span><span class="n">context</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_ctx_obj</span><span class="p">],</span> <span class="n">context</span><span class="p">)</span>
+        <span class="c1"># fmt: off</span>
+        <span class="n">digest</span><span class="p">:</span> <span class="n">_AlgoReturnT</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_ctx_algo</span><span class="p">]</span><span class="o">.</span><span class="n">digest</span><span class="p">(</span><span class="n">context</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_ctx_obj</span><span class="p">],</span> <span class="n">context</span><span class="p">)</span>  <span class="c1"># pyright: ignore[reportAny]</span>
         <span class="n">context</span><span class="o">.</span><span class="n">__context_setattr__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">digest</span><span class="p">)</span>
-        <span class="n">context</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_ctx_hook</span><span class="p">]</span><span class="o">.</span><span class="n">finish</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+        <span class="n">context</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_ctx_hook</span><span class="p">]</span><span class="o">.</span><span class="n">finish</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>  <span class="c1"># pyright: ignore[reportAny]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">struct</span><span class="o">.</span><span class="n">__pack__</span><span class="p">(</span><span class="n">digest</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__unpack__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__unpack__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_AlgoReturnT</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Called during unpacking. Computes the digest over all preceding data, reads</span>
 <span class="sd">        the stored digest, optionally verifies it, and returns the unpacked value.</span>
 
 <span class="sd">        :raises ValidationError: If verification is enabled and the digest does not match.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">expected</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_ctx_algo</span><span class="p">]</span><span class="o">.</span><span class="n">digest</span><span class="p">(</span><span class="n">context</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_ctx_obj</span><span class="p">],</span> <span class="n">context</span><span class="p">)</span>
+        <span class="c1"># fmt: off</span>
+        <span class="n">expected</span><span class="p">:</span> <span class="n">_AlgoReturnT</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_ctx_algo</span><span class="p">]</span><span class="o">.</span><span class="n">digest</span><span class="p">(</span><span class="n">context</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_ctx_obj</span><span class="p">],</span> <span class="n">context</span><span class="p">)</span>  <span class="c1"># pyright: ignore[reportAny]</span>
         <span class="n">context</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_ctx_digest</span><span class="p">]</span> <span class="o">=</span> <span class="n">expected</span>
-        <span class="n">context</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_ctx_hook</span><span class="p">]</span><span class="o">.</span><span class="n">finish</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+        <span class="n">context</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_ctx_hook</span><span class="p">]</span><span class="o">.</span><span class="n">finish</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>  <span class="c1"># pyright: ignore[reportAny]</span>
 
         <span class="n">digest</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">struct</span><span class="o">.</span><span class="n">__unpack__</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verify</span> <span class="ow">and</span> <span class="n">digest</span> <span class="o">!=</span> <span class="n">expected</span><span class="p">:</span>
@@ -934,7 +1008,7 @@
             <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span>
                 <span class="p">(</span>
                     <span class="sa">f</span><span class="s2">&quot;Failed to verify digest of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> using &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;algorithm </span><span class="si">{</span><span class="n">context</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_ctx_algo</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">&#39;&lt;unnamed&gt;&#39;</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;algorithm </span><span class="si">{</span><span class="n">context</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_ctx_algo</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">&#39;&lt;unnamed&gt;&#39;</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span>  <span class="c1"># pyright: ignore[reportAny]</span>
                     <span class="sa">f</span><span class="s2">&quot; - Expected: </span><span class="si">{</span><span class="n">expected_raw</span><span class="si">!r}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span>
                     <span class="sa">f</span><span class="s2">&quot; - Actual: </span><span class="si">{</span><span class="n">digest_raw</span><span class="si">!r}</span><span class="s2">&quot;</span>
                 <span class="p">),</span>
@@ -943,8 +1017,12 @@
 
         <span class="k">return</span> <span class="n">digest</span>
 
+<div class="viewcode-block" id="DigestField.begin">
+<a class="viewcode-back" href="../../../library/fields/crypto.html#caterpillar.fields.DigestField.begin">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">begin</span><span class="p">(</span><span class="n">target</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">algo</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">begin</span><span class="p">(</span>
+        <span class="n">target</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">algo</span><span class="p">:</span> <span class="n">Algorithm</span><span class="p">[</span><span class="n">_AlgoObjT</span><span class="p">,</span> <span class="n">_AlgoReturnT</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;DigestFieldAction[_AlgoObjT, _AlgoReturnT]&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Factory method to create a DigestFieldAction used at the start of a struct</span>
 <span class="sd">        to set up hashing for the named digest field.</span>
 
@@ -956,11 +1034,21 @@
 <span class="sd">        :rtype: _Action</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">DigestFieldAction</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">algo</span><span class="p">)</span></div>
+</div>
 
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_DigestFactory</span><span class="p">(</span><span class="n">Protocol</span><span class="p">[</span><span class="n">_AlgoObjT</span><span class="p">,</span> <span class="n">_AlgoReturnT</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">verify</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Digest</span><span class="p">[</span><span class="n">_AlgoObjT</span><span class="p">,</span> <span class="n">_AlgoReturnT</span><span class="p">]:</span> <span class="o">...</span>
 
 
 <span class="c1"># --- public algorithms ---</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">_hash_digest</span><span class="p">(</span><span class="n">algo</span><span class="p">,</span> <span class="n">struct</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_hash_digest</span><span class="p">(</span>
+    <span class="n">algo</span><span class="p">:</span> <span class="n">Algorithm</span><span class="p">[</span><span class="n">_AlgoObjT</span><span class="p">,</span> <span class="n">_AlgoReturnT</span><span class="p">],</span>
+    <span class="n">struct</span><span class="p">:</span> <span class="n">_StructLike</span><span class="p">[</span><span class="n">_AlgoReturnT</span><span class="p">,</span> <span class="n">_AlgoReturnT</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_DigestFactory</span><span class="p">[</span><span class="n">_AlgoObjT</span><span class="p">,</span> <span class="n">_AlgoReturnT</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A utility function to create a `Digest` wrapper for a specific hash algorithm and struct.</span>
 <span class="sd">    The wrapper initializes the digest calculation based on the algorithm provided.</span>
@@ -974,26 +1062,28 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_wrapper</span><span class="p">(</span>
-        <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">verify</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Digest</span><span class="p">:</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">verify</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Digest</span><span class="p">[</span><span class="n">_AlgoObjT</span><span class="p">,</span> <span class="n">_AlgoReturnT</span><span class="p">]:</span>
         <span class="k">return</span> <span class="n">Digest</span><span class="p">(</span><span class="n">algo</span><span class="p">,</span> <span class="n">struct</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">verify</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">_wrapper</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_hash_digest_field</span><span class="p">(</span><span class="n">struct</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_hash_digest_field</span><span class="p">(</span>
+    <span class="n">struct</span><span class="p">:</span> <span class="n">_StructLike</span><span class="p">[</span><span class="n">_AlgoReturnT</span><span class="p">,</span> <span class="n">_AlgoReturnT</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">DigestField</span><span class="p">[</span><span class="n">_AlgoReturnT</span><span class="p">]]:</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_wrapper</span><span class="p">(</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">verify</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DigestField</span><span class="p">:</span>
+        <span class="n">verify</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DigestField</span><span class="p">[</span><span class="n">_AlgoReturnT</span><span class="p">]:</span>
         <span class="k">return</span> <span class="n">DigestField</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">struct</span><span class="o">=</span><span class="n">struct</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="n">verify</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">_wrapper</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_hashlib_algo</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_hashlib_algo</span><span class="p">(</span><span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">_AlgoObjT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Algorithm</span><span class="p">[</span><span class="n">_AlgoObjT</span><span class="p">,</span> <span class="n">_AlgoReturnT</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Creates an `Algorithm` object from a hash function (e.g., hashlib.sha256).</span>
 
@@ -1002,10 +1092,11 @@
 <span class="sd">    :return: An `Algorithm` instance that can be used with a Digest.</span>
 <span class="sd">    :rtype: Algorithm</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># fmt: off</span>
     <span class="k">return</span> <span class="n">Algorithm</span><span class="p">(</span>
         <span class="n">create</span><span class="o">=</span><span class="k">lambda</span> <span class="n">context</span><span class="p">:</span> <span class="n">func</span><span class="p">(),</span>
-        <span class="n">update</span><span class="o">=</span><span class="k">lambda</span> <span class="n">hash_obj</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">hash_obj</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">data</span><span class="p">),</span>
-        <span class="n">digest</span><span class="o">=</span><span class="k">lambda</span> <span class="n">hash_obj</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">hash_obj</span><span class="o">.</span><span class="n">digest</span><span class="p">(),</span>
+        <span class="n">update</span><span class="o">=</span><span class="k">lambda</span> <span class="n">hash_obj</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">hash_obj</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">data</span><span class="p">),</span>  <span class="c1"># pyright: ignore[reportAttributeAccessIssue]</span>
+        <span class="n">digest</span><span class="o">=</span><span class="k">lambda</span> <span class="n">hash_obj</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">hash_obj</span><span class="o">.</span><span class="n">digest</span><span class="p">(),</span>  <span class="c1"># pyright: ignore[reportAttributeAccessIssue]</span>
         <span class="n">name</span><span class="o">=</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
     <span class="p">)</span>
 
@@ -1031,7 +1122,9 @@
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">cryptography.hazmat.primitives</span><span class="w"> </span><span class="kn">import</span> <span class="n">hashes</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_cryptography_hash_algo</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_cryptography_hash_algo</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">hashes</span><span class="o">.</span><span class="n">HashAlgorithm</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Algorithm</span><span class="p">[</span><span class="n">hashes</span><span class="o">.</span><span class="n">Hash</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates an `Algorithm` from a cryptography `hashes.HashAlgorithm` class.</span>
 
@@ -1044,7 +1137,7 @@
             <span class="n">create</span><span class="o">=</span><span class="k">lambda</span> <span class="n">context</span><span class="p">:</span> <span class="n">hashes</span><span class="o">.</span><span class="n">Hash</span><span class="p">(</span><span class="bp">cls</span><span class="p">()),</span>
             <span class="n">update</span><span class="o">=</span><span class="k">lambda</span> <span class="n">hash_obj</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">hash_obj</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">data</span><span class="p">),</span>
             <span class="n">digest</span><span class="o">=</span><span class="k">lambda</span> <span class="n">hash_obj</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">hash_obj</span><span class="o">.</span><span class="n">finalize</span><span class="p">(),</span>
-            <span class="n">name</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">),</span>
+            <span class="n">name</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;hash_algo&gt;&quot;</span><span class="p">),</span>
         <span class="p">)</span>
 
     <span class="n">Sha1_Algo</span> <span class="o">=</span> <span class="n">_cryptography_hash_algo</span><span class="p">(</span><span class="n">hashes</span><span class="o">.</span><span class="n">SHA1</span><span class="p">)</span>
@@ -1081,7 +1174,7 @@
     <span class="n">Sha3_512_Algo</span> <span class="o">=</span> <span class="n">_hashlib_algo</span><span class="p">(</span><span class="n">hashlib</span><span class="o">.</span><span class="n">sha3_512</span><span class="p">)</span>
     <span class="n">Md5_Algo</span> <span class="o">=</span> <span class="n">_hashlib_algo</span><span class="p">(</span><span class="n">hashlib</span><span class="o">.</span><span class="n">md5</span><span class="p">)</span>
 
-    <span class="n">Sha1</span> <span class="o">=</span> <span class="n">_hash_digest</span><span class="p">(</span><span class="n">Sha1_Algo</span><span class="p">,</span> <span class="n">Bytes</span><span class="p">(</span><span class="mi">32</span><span class="p">))</span>
+    <span class="n">Sha1</span> <span class="o">=</span> <span class="n">_hash_digest</span><span class="p">(</span><span class="n">Sha1_Algo</span><span class="p">,</span> <span class="n">Bytes</span><span class="p">(</span><span class="mi">20</span><span class="p">))</span>
     <span class="n">Sha2_224</span> <span class="o">=</span> <span class="n">_hash_digest</span><span class="p">(</span><span class="n">Sha2_224_Algo</span><span class="p">,</span> <span class="n">Bytes</span><span class="p">(</span><span class="mi">28</span><span class="p">))</span>
     <span class="n">Sha2_256</span> <span class="o">=</span> <span class="n">_hash_digest</span><span class="p">(</span><span class="n">Sha2_256_Algo</span><span class="p">,</span> <span class="n">Bytes</span><span class="p">(</span><span class="mi">32</span><span class="p">))</span>
     <span class="n">Sha2_384</span> <span class="o">=</span> <span class="n">_hash_digest</span><span class="p">(</span><span class="n">Sha2_384_Algo</span><span class="p">,</span> <span class="n">Bytes</span><span class="p">(</span><span class="mi">48</span><span class="p">))</span>
@@ -1093,7 +1186,7 @@
     <span class="n">Md5</span> <span class="o">=</span> <span class="n">_hash_digest</span><span class="p">(</span><span class="n">Md5_Algo</span><span class="p">,</span> <span class="n">Bytes</span><span class="p">(</span><span class="mi">16</span><span class="p">))</span>
 
 
-<span class="n">Sha1_Field</span> <span class="o">=</span> <span class="n">_hash_digest_field</span><span class="p">(</span><span class="n">Bytes</span><span class="p">(</span><span class="mi">32</span><span class="p">))</span>
+<span class="n">Sha1_Field</span> <span class="o">=</span> <span class="n">_hash_digest_field</span><span class="p">(</span><span class="n">Bytes</span><span class="p">(</span><span class="mi">20</span><span class="p">))</span>
 <span class="n">Sha2_224_Field</span> <span class="o">=</span> <span class="n">_hash_digest_field</span><span class="p">(</span><span class="n">Bytes</span><span class="p">(</span><span class="mi">28</span><span class="p">))</span>
 <span class="n">Sha2_256_Field</span> <span class="o">=</span> <span class="n">_hash_digest_field</span><span class="p">(</span><span class="n">Bytes</span><span class="p">(</span><span class="mi">32</span><span class="p">))</span>
 <span class="n">Sha2_384_Field</span> <span class="o">=</span> <span class="n">_hash_digest_field</span><span class="p">(</span><span class="n">Bytes</span><span class="p">(</span><span class="mi">48</span><span class="p">))</span>
@@ -1105,7 +1198,9 @@
 <span class="n">Md5_Field</span> <span class="o">=</span> <span class="n">_hash_digest_field</span><span class="p">(</span><span class="n">Bytes</span><span class="p">(</span><span class="mi">16</span><span class="p">))</span>
 
 
-<span class="k">class</span><span class="w"> </span><span class="nc">HMACAlgorithm</span><span class="p">(</span><span class="n">Algorithm</span><span class="p">):</span>
+<div class="viewcode-block" id="HMACAlgorithm">
+<a class="viewcode-back" href="../../../library/fields/crypto.html#caterpillar.fields.HMACAlgorithm">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">HMACAlgorithm</span><span class="p">(</span><span class="n">Algorithm</span><span class="p">[</span><span class="s2">&quot;hmac.HMAC&quot;</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    HMAC (Hash-based Message Authentication Code) algorithm implementation.</span>
 
@@ -1114,55 +1209,71 @@
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">key</span><span class="p">,</span>
-        <span class="n">algorithm</span><span class="p">,</span>
+        <span class="n">key</span><span class="p">:</span> <span class="nb">bytes</span> <span class="o">|</span> <span class="n">_ContextLambda</span><span class="p">[</span><span class="nb">bytes</span><span class="p">],</span>
+        <span class="n">algorithm</span><span class="p">:</span> <span class="s2">&quot;hashes.HashAlgorithm&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;hmac_</span><span class="si">{</span><span class="n">algorithm</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_key</span> <span class="o">=</span> <span class="n">key</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_algorithm</span> <span class="o">=</span> <span class="n">algorithm</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_key</span><span class="p">:</span> <span class="nb">bytes</span> <span class="o">|</span> <span class="n">_ContextLambda</span><span class="p">[</span><span class="nb">bytes</span><span class="p">]</span> <span class="o">=</span> <span class="n">key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_algorithm</span><span class="p">:</span> <span class="s2">&quot;hashes.HashAlgorithm&quot;</span> <span class="o">=</span> <span class="n">algorithm</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+<div class="viewcode-block" id="HMACAlgorithm.create">
+<a class="viewcode-back" href="../../../library/fields/crypto.html#caterpillar.fields.HMACAlgorithm.create">[docs]</a>
+    <span class="nd">@override</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;hmac.HMAC&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates an HMAC object with the provided key and algorithm.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">cryptography.hazmat.primitives</span><span class="w"> </span><span class="kn">import</span> <span class="n">hmac</span>
 
         <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key</span><span class="p">(</span><span class="n">context</span><span class="p">)</span> <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_key</span><span class="p">)</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key</span>
-        <span class="k">return</span> <span class="n">hmac</span><span class="o">.</span><span class="n">HMAC</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_algorithm</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">hmac</span><span class="o">.</span><span class="n">HMAC</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_algorithm</span><span class="p">)</span></div>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algo_obj</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+
+<div class="viewcode-block" id="HMACAlgorithm.update">
+<a class="viewcode-back" href="../../../library/fields/crypto.html#caterpillar.fields.HMACAlgorithm.update">[docs]</a>
+    <span class="nd">@override</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algo_obj</span><span class="p">:</span> <span class="s2">&quot;hmac.HMAC&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Updates the HMAC object with new data.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">algo_obj</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">algo_obj</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">digest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algo_obj</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+
+<div class="viewcode-block" id="HMACAlgorithm.digest">
+<a class="viewcode-back" href="../../../library/fields/crypto.html#caterpillar.fields.HMACAlgorithm.digest">[docs]</a>
+    <span class="nd">@override</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">digest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algo_obj</span><span class="p">:</span> <span class="s2">&quot;hmac.HMAC&quot;</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Finalizes the HMAC object and returns the computed digest.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">algo_obj</span><span class="o">.</span><span class="n">finalize</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">algo_obj</span><span class="o">.</span><span class="n">finalize</span><span class="p">()</span></div>
+</div>
 
 
-<span class="k">class</span><span class="w"> </span><span class="nc">HMAC</span><span class="p">(</span><span class="n">Digest</span><span class="p">):</span>
+
+<div class="viewcode-block" id="HMAC">
+<a class="viewcode-back" href="../../../library/fields/crypto.html#caterpillar.fields.HMAC">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">HMAC</span><span class="p">(</span><span class="n">Digest</span><span class="p">[</span><span class="s2">&quot;hmac.HMAC&quot;</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    HMAC Digest handler, used to create and verify HMACs based on a provided key and algorithm.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">key</span><span class="p">,</span>
-        <span class="n">algorithm</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">verify</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">key</span><span class="p">:</span> <span class="nb">bytes</span> <span class="o">|</span> <span class="n">_ContextLambda</span><span class="p">[</span><span class="nb">bytes</span><span class="p">],</span>
+        <span class="n">algorithm</span><span class="p">:</span> <span class="s2">&quot;hashes.HashAlgorithm&quot;</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">verify</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">HMACAlgorithm</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">),</span>
             <span class="n">Bytes</span><span class="p">(</span><span class="n">algorithm</span><span class="o">.</span><span class="n">digest_size</span><span class="p">),</span>
-            <span class="n">name</span><span class="p">,</span>
+            <span class="n">name</span> <span class="ow">or</span> <span class="sa">f</span><span class="s2">&quot;hmac-</span><span class="si">{</span><span class="n">algorithm</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
             <span class="n">verify</span><span class="p">,</span>
             <span class="n">path</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="p">)</span></div>
+
 </pre></div>
 
                 </article>
@@ -1213,7 +1324,7 @@
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     <br/>
   </p>
 </div>

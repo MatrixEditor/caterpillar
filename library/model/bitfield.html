@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>4.5.3. Bitfield &#8212; Caterpillar 2.7.0 documentation</title>
+    <title>4.5.3. Bitfield &#8212; Caterpillar 2.8.0 documentation</title>
   
   
   
@@ -41,9 +41,9 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=dfec817d"></script>
-    <script src="../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/documentation_options.js?v=69ff2ef9"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../_static/design-tabs.js?v=f930bc37"></script>
@@ -54,7 +54,7 @@
     <link rel="prev" title="4.5.2. Struct" href="struct.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.7.0" />
+  <meta name="docsearch:version" content="2.8.0" />
   </head>
   
   
@@ -116,7 +116,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.7.0</p>
+    <p class="title logo__title">Caterpillar 2.8.0</p>
   
 </a></div>
     
@@ -350,8 +350,11 @@
 <li class="toctree-l2"><a class="reference internal" href="../fields/common.html">4.8.2. Common Structs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../fields/compression.html">4.8.3. Compression Structs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../fields/crypto.html">4.8.4. Cryptographic Structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fields/net.html">4.8.5. Network Structs</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1"><a class="reference internal" href="../hooks.html">4.9. Hooks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ext_types.html">4.10. Types (Extended Syntax)</a></li>
 </ul>
 </div>
 </nav></div>
@@ -420,11 +423,53 @@
 <div class="versionchanged">
 <p><span class="versionmodified changed">Changed in version 2.5.0: </span>New revised concept since v2.5.0.</p>
 </div>
+<p>Each Bitfield instance maintains a sequence of bitfield groups, where each group
+contains a collection of sized fields. A bitfield group may consist of either multiple
+entries (i.e., any types that can be converted to an integral type) or a single
+_StructLike object. For example, consider the following bitfield definition:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@bitfield</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
+    <span class="n">a1</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">a2</span><span class="p">:</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">boolean</span>
+    <span class="n">_</span> <span class="p">:</span> <span class="mi">0</span>
+    <span class="n">b1</span><span class="p">:</span> <span class="n">char</span>
+    <span class="n">c1</span><span class="p">:</span> <span class="n">uint32</span>
+</pre></div>
+</div>
+<p>This Bitfield definition will generate three distinct bitfield groups (labeled here as
+groups a, b, and c). By default, bitfields use 8-bit alignment, leading to the following
+layout:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Group</span>      <span class="n">Pos</span>       <span class="n">Bits</span>
+<span class="n">a</span>          <span class="mh">0x00</span>      <span class="mi">8</span>
+<span class="n">b</span>          <span class="mh">0x01</span>      <span class="mi">8</span>
+<span class="n">c</span>          <span class="mh">0x02</span>      <span class="mi">32</span>
+</pre></div>
+</div>
+<p>Internally, only the first group requires special bit-level parsing. The remaining groups
+(b and c) are treated as standard structures since they span full bytes or words without
+sub-byte alignment. This dynamic grouping mechanism allows leveraging full struct-like
+class definitions within bitfields.</p>
+<p>This new approach enables more complex and expressive bitfield definitions. The annotation
+syntax is therefore extended as follows:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>  +---------------------------------------------------+--------------------------------------+
+1.| &lt;name&gt; : &lt;bits&gt; [ - &lt;field&gt; ]                     | Standard field with optional type    |
+  +---------------------------------------------------+--------------------------------------+
+2.| &lt;name&gt; : 0                                        | Aligns to the next byte boundary     |
+  +---------------------------------------------------+--------------------------------------+
+3.| &lt;name&gt; : &lt;field&gt;                                  | Struct-like field (no bits consumed) |
+  +---------------------------------------------------+--------------------------------------+
+4.| &lt;name&gt; : (&lt;field&gt;,&lt;factory&gt;)                      | Field with custom type factory       |
+  +---------------------------------------------------+--------------------------------------+
+5.| &lt;name&gt; : (&lt;bits&gt;,&lt;factory&gt;[,&lt;options&gt;])           | bits with custom type factory        |
+  |        : (&lt;bits&gt;,[&lt;options&gt;])                     | and options                          |
+  +---------------------------------------------------+--------------------------------------+
+</pre></div>
+</div>
 <section id="main-interface">
 <h2><span class="section-number">4.5.3.1. </span>Main Interface<a class="headerlink" href="#main-interface" title="Link to this heading">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="caterpillar.model.Bitfield">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.model.</span></span><span class="sig-name descname"><span class="pre">Bitfield</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alignment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/model/_bitfield.html#Bitfield"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.Bitfield" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">caterpillar.model.</span></span><span class="sig-name descname"><span class="pre">Bitfield</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span><span class="p"><span class="pre">[</span></span><span class="pre">_VT</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_EndianLike</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ArchLike</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">_OptionLike</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_options</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">_OptionLike</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alignment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/model/_bitfield.html#Bitfield"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.Bitfield" title="Link to this definition">#</a></dt>
 <dd><p>A Bitfield represents a packed structure composed of bit-level fields. This
 class allows for the declarative definition of compact memory representations
 where each field can occupy an arbitrary number of bits, not necessarily
@@ -450,11 +495,11 @@ aligned to byte boundaries.</p>
 </dd>
 </dl>
 <div class="versionchanged">
-<p><span class="versionmodified changed">Changed in version 2.5.0: </span>Updated concept. See the _reference_ for more information.</p>
+<p><span class="versionmodified changed">Changed in version 2.5.0: </span>Updated concept. See the <a class="reference internal" href="../../reference/datamodel/bitfield.html#datamodel-standard-bitfield"><span class="std std-ref">Bit-field</span></a> reference for more information.</p>
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.model.Bitfield.add_action">
-<span class="sig-name descname"><span class="pre">add_action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/caterpillar/model/_bitfield.html#Bitfield.add_action"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.Bitfield.add_action" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">add_action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_SupportsActionPack</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_SupportsActionUnpack</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/caterpillar/model/_bitfield.html#Bitfield.add_action"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.Bitfield.add_action" title="Link to this definition">#</a></dt>
 <dd><p>Add an action to the struct.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -467,7 +512,7 @@ aligned to byte boundaries.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="caterpillar.model.BitfieldGroup">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.model.</span></span><span class="sig-name descname"><span class="pre">BitfieldGroup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bit_count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/model/_bitfield.html#BitfieldGroup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.BitfieldGroup" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">caterpillar.model.</span></span><span class="sig-name descname"><span class="pre">BitfieldGroup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bit_count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/model/_bitfield.html#BitfieldGroup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.BitfieldGroup" title="Link to this definition">#</a></dt>
 <dd><p>A group of one or more bitfield entries. Groups are used to organize fields within a single
 alignment unit and may represent either packed fields or standalone fields.</p>
 <dl class="field-list simple">
@@ -494,7 +539,7 @@ alignment unit and may represent either packed fields or standalone fields.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.model.BitfieldGroup.get_field">
-<span class="sig-name descname"><span class="pre">get_field</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/model/_bitfield.html#BitfieldGroup.get_field"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.BitfieldGroup.get_field" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">get_field</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../fields/field_model.html#caterpillar.fields.Field" title="caterpillar.fields._base.Field"><span class="pre">Field</span></a></span></span><a class="reference internal" href="../../_modules/caterpillar/model/_bitfield.html#BitfieldGroup.get_field"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.BitfieldGroup.get_field" title="Link to this definition">#</a></dt>
 <dd><p>Get the single field from this group.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -508,7 +553,7 @@ alignment unit and may represent either packed fields or standalone fields.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.model.BitfieldGroup.set_field">
-<span class="sig-name descname"><span class="pre">set_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/model/_bitfield.html#BitfieldGroup.set_field"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.BitfieldGroup.set_field" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">set_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#caterpillar.model.BitfieldEntry" title="caterpillar.model._bitfield.BitfieldEntry"><span class="pre">BitfieldEntry</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../fields/field_model.html#caterpillar.fields.Field" title="caterpillar.fields._base.Field"><span class="pre">Field</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/model/_bitfield.html#BitfieldGroup.set_field"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.BitfieldGroup.set_field" title="Link to this definition">#</a></dt>
 <dd><p>Set the group to hold only the given field and mark it as a standalone field group.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -544,7 +589,7 @@ alignment unit and may represent either packed fields or standalone fields.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.model.BitfieldGroup.get_size">
-<span class="sig-name descname"><span class="pre">get_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/model/_bitfield.html#BitfieldGroup.get_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.BitfieldGroup.get_size" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">get_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ContextLike</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="../../_modules/caterpillar/model/_bitfield.html#BitfieldGroup.get_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.BitfieldGroup.get_size" title="Link to this definition">#</a></dt>
 <dd><p>Get the size of this group in bytes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -561,7 +606,7 @@ alignment unit and may represent either packed fields or standalone fields.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.model.BitfieldGroup.get_bits">
-<span class="sig-name descname"><span class="pre">get_bits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/model/_bitfield.html#BitfieldGroup.get_bits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.BitfieldGroup.get_bits" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">get_bits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ContextLike</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/model/_bitfield.html#BitfieldGroup.get_bits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.BitfieldGroup.get_bits" title="Link to this definition">#</a></dt>
 <dd><p>Get the total number of bits in this group.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -580,7 +625,7 @@ alignment unit and may represent either packed fields or standalone fields.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="caterpillar.model.BitfieldEntry">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.model.</span></span><span class="sig-name descname"><span class="pre">BitfieldEntry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/model/_bitfield.html#BitfieldEntry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.BitfieldEntry" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">caterpillar.model.</span></span><span class="sig-name descname"><span class="pre">BitfieldEntry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#caterpillar.model.BitfieldValueFactory" title="caterpillar.model._bitfield.BitfieldValueFactory"><span class="pre">BitfieldValueFactory</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">type</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#caterpillar.model.BitfieldValueFactory" title="caterpillar.model._bitfield.BitfieldValueFactory"><span class="pre">BitfieldValueFactory</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_SupportsActionPack</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_SupportsActionUnpack</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/model/_bitfield.html#BitfieldEntry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.BitfieldEntry" title="Link to this definition">#</a></dt>
 <dd><p>Represents a single entry in a bitfield, including its bit position, width, name, and
 conversion behavior.</p>
 <p>May also represent a special action or directive instead of a field.</p>
@@ -600,7 +645,7 @@ conversion behavior.</p>
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.model.BitfieldEntry.new_action">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">new_action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/model/_bitfield.html#BitfieldEntry.new_action"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.BitfieldEntry.new_action" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">new_action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_SupportsActionPack</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_SupportsActionUnpack</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#caterpillar.model.BitfieldEntry" title="caterpillar.model._bitfield.BitfieldEntry"><span class="pre">BitfieldEntry</span></a></span></span><a class="reference internal" href="../../_modules/caterpillar/model/_bitfield.html#BitfieldEntry.new_action"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.BitfieldEntry.new_action" title="Link to this definition">#</a></dt>
 <dd><p>Create a new action-type entry (e.g., padding, control directive).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -650,7 +695,7 @@ conversion behavior.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="caterpillar.model.getbits">
-<span class="sig-prename descclassname"><span class="pre">caterpillar.model.</span></span><span class="sig-name descname"><span class="pre">getbits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="../../_modules/caterpillar/model/_bitfield.html#getbits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.getbits" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">caterpillar.model.</span></span><span class="sig-name descname"><span class="pre">getbits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="../../_modules/caterpillar/model/_bitfield.html#getbits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.getbits" title="Link to this definition">#</a></dt>
 <dd><p>Retrieve the bit-width of a given object.</p>
 <p>This function checks for a <code class="xref py py-func docutils literal notranslate"><span class="pre">__bits__()</span></code> attribute on the object. The object must either implement
 the <a class="reference internal" href="../../reference/datamodel/protocols/bitfield_extensions.html#SupportsBits" title="_SupportsBits"><code class="xref py py-class docutils literal notranslate"><span class="pre">_SupportsBits</span></code></a> or <a class="reference internal" href="../../reference/datamodel/protocols/bitfield_extensions.html#ContainsBits" title="_ContainsBits"><code class="xref py py-class docutils literal notranslate"><span class="pre">_ContainsBits</span></code></a> protocol.</p>
@@ -680,7 +725,7 @@ the <a class="reference internal" href="../../reference/datamodel/protocols/bitf
 
 <dl class="py function">
 <dt class="sig sig-object py" id="caterpillar.model.issigned">
-<span class="sig-prename descclassname"><span class="pre">caterpillar.model.</span></span><span class="sig-name descname"><span class="pre">issigned</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../../_modules/caterpillar/model/_bitfield.html#issigned"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.issigned" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">caterpillar.model.</span></span><span class="sig-name descname"><span class="pre">issigned</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../../_modules/caterpillar/model/_bitfield.html#issigned"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.issigned" title="Link to this definition">#</a></dt>
 <dd><p>Determine whether a given object represents a signed field.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -697,44 +742,52 @@ the <a class="reference internal" href="../../reference/datamodel/protocols/bitf
 
 <dl class="py function">
 <dt class="sig sig-object py" id="caterpillar.model.bitfield">
-<span class="sig-prename descclassname"><span class="pre">caterpillar.model.</span></span><span class="sig-name descname"><span class="pre">bitfield</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="positional-only-separator o"><abbr title="Positional-only parameter separator (PEP 570)"><span class="pre">/</span></abbr></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alignment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/model/_bitfield.html#bitfield"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.bitfield" title="Link to this definition">#</a></dt>
-<dd><p>Decorator that transforms a class definition into a <a class="reference internal" href="#caterpillar.model.Bitfield" title="caterpillar.model.Bitfield"><code class="xref py py-class docutils literal notranslate"><span class="pre">Bitfield</span></code></a> structure.</p>
-<p>This decorator enables defining bitfields using simple class syntax,
-with support for custom alignment, ordering, architecture, and field options.</p>
+<span class="sig-prename descclassname"><span class="pre">caterpillar.model.</span></span><span class="sig-name descname"><span class="pre">bitfield</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ty</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span><span class="p"><span class="pre">[</span></span><span class="pre">_VT</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="positional-only-separator o"><abbr title="Positional-only parameter separator (PEP 570)"><span class="pre">/</span></abbr></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_EndianLike</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ArchLike</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">_OptionLike</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_options</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">_OptionLike</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alignment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">type</span><span class="p"><span class="pre">[</span></span><span class="pre">_VT</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">type</span><span class="p"><span class="pre">[</span></span><span class="pre">_VT</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">type</span><span class="p"><span class="pre">[</span></span><span class="pre">_VT</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#caterpillar.model.bitfield" title="Link to this definition">#</a></dt>
+<dd><p>Decorator or direct transformer for creating a <code class="docutils literal notranslate"><span class="pre">Bitfield</span></code> model.</p>
+<p>This method can be used either as:</p>
+<ul class="simple">
+<li><p>A decorator: <code class="docutils literal notranslate"><span class="pre">&#64;bitfield(...)</span></code></p></li>
+<li><p>A direct transformer: <code class="docutils literal notranslate"><span class="pre">MyBitfield</span> <span class="pre">=</span> <span class="pre">bitfield(MyClass,</span> <span class="pre">...)</span></code></p></li>
+</ul>
+<p>It enables defining compact bit-level layouts using standard class
+syntax while preserving dataclass semantics and static type checking.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.py</span><span class="w"> </span><span class="kn">import</span> <span class="n">bitfield</span><span class="p">,</span> <span class="n">SetAlignment</span><span class="p">,</span> <span class="n">uint16</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nd">@bitfield</span>
+<span class="gp">... </span><span class="k">class</span><span class="w"> </span><span class="nc">Packet</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">version</span>   <span class="p">:</span> <span class="mi">3</span>
+<span class="gp">... </span>    <span class="nb">type</span>      <span class="p">:</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">SetAlignment</span><span class="p">(</span><span class="mi">16</span><span class="p">))</span>
+<span class="gp">... </span>    <span class="n">length</span>    <span class="p">:</span> <span class="mi">10</span>
+<span class="gp">... </span>    <span class="n">_</span>         <span class="p">:</span> <span class="mi">0</span>  <span class="c1"># align to 16bits</span>
+<span class="gp">... </span>    <span class="n">payload</span>   <span class="p">:</span> <span class="n">uint16</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># You can now pack/unpack Packet instances as compact binary bitfields</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pkt</span> <span class="o">=</span> <span class="n">Packet</span><span class="p">(</span><span class="n">version</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="mh">0xABCD</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">packed</span> <span class="o">=</span> <span class="n">pack</span><span class="p">(</span><span class="n">pkt</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unpacked</span> <span class="o">=</span> <span class="n">unpack</span><span class="p">(</span><span class="n">Packet</span><span class="p">,</span> <span class="n">packed</span><span class="p">)</span>
+</pre></div>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>cls</strong> (<em>Optional</em><em>[</em><em>type</em><em>]</em>) – The user-defined class to transform.</p></li>
-<li><p><strong>options</strong> (<em>Optional</em><em>[</em><em>set</em><em>]</em>) – A set of global or structure-specific options.</p></li>
-<li><p><strong>order</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – Optional byte order for serialization (e.g., ‘little’ or ‘big’).</p></li>
-<li><p><strong>arch</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – Optional architecture string (e.g., ‘x86’, ‘arm’).</p></li>
-<li><p><strong>field_options</strong> (<em>Optional</em><em>[</em><em>set</em><em>]</em>) – Optional default options for fields.</p></li>
-<li><p><strong>alignment</strong> (<em>Optional</em><em>[</em><em>int</em><em>]</em>) – Optional alignment in bits.</p></li>
+<li><p><strong>ty</strong> (<em>type</em><em>[</em><em>_VT</em><em>] </em><em>| </em><em>None</em><em>, </em><em>optional</em>) – The user-defined class to transform. If None, a decorator
+function is returned</p></li>
+<li><p><strong>order</strong> (<em>_EndianLike</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Byte order used during serialization, defaults to None</p></li>
+<li><p><strong>arch</strong> (<em>_ArchLike</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Architecture configuration inferred by fields,
+defaults to None</p></li>
+<li><p><strong>options</strong> (<em>Iterable</em><em>[</em><em>_OptionLike</em><em>] </em><em>| </em><em>None</em><em>, </em><em>optional</em>) – Additional options controlling bitfield behavior,
+defaults to None</p></li>
+<li><p><strong>field_options</strong> (<em>Iterable</em><em>[</em><em>_OptionLike</em><em>] </em><em>| </em><em>None</em><em>, </em><em>optional</em>) – Default options applied to bitfield members,
+defaults to None</p></li>
+<li><p><strong>alignment</strong> (<em>int</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Optional bit alignment constraint, defaults to None</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The decorated class, enhanced as a <cite>Bitfield</cite> structure.</p>
+<dd class="field-even"><p>The decorated Bitfield model class or a decorator function</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>type</p>
+<dd class="field-odd"><p>type[_VT] | Callable[[type[_VT]], type[_VT]]</p>
 </dd>
 </dl>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.py</span><span class="w"> </span><span class="kn">import</span> <span class="n">bitfield</span><span class="p">,</span> <span class="n">SetAlignment</span><span class="p">,</span> <span class="n">uint16</span>
-
-<span class="nd">@bitfield</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">Packet</span><span class="p">:</span>
-    <span class="n">version</span>   <span class="p">:</span> <span class="mi">3</span>
-    <span class="nb">type</span>      <span class="p">:</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">SetAlignment</span><span class="p">(</span><span class="mi">16</span><span class="p">))</span>
-    <span class="n">length</span>    <span class="p">:</span> <span class="mi">10</span>
-    <span class="n">_</span>         <span class="p">:</span> <span class="mi">0</span>  <span class="c1"># align to 16bits</span>
-    <span class="n">payload</span>   <span class="p">:</span> <span class="n">uint16</span>
-
-<span class="c1"># You can now pack/unpack Packet instances as compact binary bitfields</span>
-<span class="n">pkt</span> <span class="o">=</span> <span class="n">Packet</span><span class="p">(</span><span class="n">version</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="mh">0xABCD</span><span class="p">)</span>
-<span class="n">packed</span> <span class="o">=</span> <span class="n">pack</span><span class="p">(</span><span class="n">pkt</span><span class="p">)</span>
-<span class="n">unpacked</span> <span class="o">=</span> <span class="n">unpack</span><span class="p">(</span><span class="n">Packet</span><span class="p">,</span> <span class="n">packed</span><span class="p">)</span>
-</pre></div>
-</div>
 <div class="versionchanged">
 <p><span class="versionmodified changed">Changed in version 2.5.0: </span>Added the <code class="docutils literal notranslate"><span class="pre">alignment</span></code> parameter.</p>
 </div>
@@ -745,7 +798,7 @@ with support for custom alignment, ordering, architecture, and field options.</p
 <h2><span class="section-number">4.5.3.2. </span>Default Factory Classes<a class="headerlink" href="#default-factory-classes" title="Link to this heading">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="caterpillar.model.BitfieldValueFactory">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.model.</span></span><span class="sig-name descname"><span class="pre">BitfieldValueFactory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/model/_bitfield.html#BitfieldValueFactory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.BitfieldValueFactory" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">caterpillar.model.</span></span><span class="sig-name descname"><span class="pre">BitfieldValueFactory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">_VT</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/model/_bitfield.html#BitfieldValueFactory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.BitfieldValueFactory" title="Link to this definition">#</a></dt>
 <dd><p>A generic factory class responsible for converting values between Python objects and integers
 for use in bitfield entries.</p>
 <p>By default, the factory converts to and from Python’s built-in <code class="code docutils literal notranslate"><span class="pre">int</span></code> type, but it can be customized
@@ -760,7 +813,7 @@ to support any type that accepts an integer in its constructor and implements <c
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.model.BitfieldValueFactory.to_int">
-<span class="sig-name descname"><span class="pre">to_int</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="../../_modules/caterpillar/model/_bitfield.html#BitfieldValueFactory.to_int"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.BitfieldValueFactory.to_int" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">to_int</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_VT</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="../../_modules/caterpillar/model/_bitfield.html#BitfieldValueFactory.to_int"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.BitfieldValueFactory.to_int" title="Link to this definition">#</a></dt>
 <dd><p>Convert a Python object to an integer.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -796,7 +849,7 @@ to support any type that accepts an integer in its constructor and implements <c
 
 <dl class="py class">
 <dt class="sig sig-object py" id="caterpillar.model.CharFactory">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.model.</span></span><span class="sig-name descname"><span class="pre">CharFactory</span></span><a class="reference internal" href="../../_modules/caterpillar/model/_bitfield.html#CharFactory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.CharFactory" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">caterpillar.model.</span></span><span class="sig-name descname"><span class="pre">CharFactory</span></span><a class="reference internal" href="../../_modules/caterpillar/model/_bitfield.html#CharFactory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.CharFactory" title="Link to this definition">#</a></dt>
 <dd><p>A value factory for handling single ASCII/Unicode characters as integers.</p>
 <p>This factory allows treating a character field as a one-byte integer and vice versa,
 automatically converting during packing and unpacking.</p>
@@ -805,7 +858,7 @@ automatically converting during packing and unpacking.</p>
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.model.CharFactory.from_int">
-<span class="sig-name descname"><span class="pre">from_int</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/model/_bitfield.html#CharFactory.from_int"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.CharFactory.from_int" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">from_int</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../../_modules/caterpillar/model/_bitfield.html#CharFactory.from_int"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.CharFactory.from_int" title="Link to this definition">#</a></dt>
 <dd><p>Convert an integer to its character representation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -822,7 +875,7 @@ automatically converting during packing and unpacking.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.model.CharFactory.to_int">
-<span class="sig-name descname"><span class="pre">to_int</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="../../_modules/caterpillar/model/_bitfield.html#CharFactory.to_int"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.CharFactory.to_int" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">to_int</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="../../_modules/caterpillar/model/_bitfield.html#CharFactory.to_int"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.CharFactory.to_int" title="Link to this definition">#</a></dt>
 <dd><p>Convert a character to its integer (ordinal) representation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -841,7 +894,7 @@ automatically converting during packing and unpacking.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="caterpillar.model.EnumFactory">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.model.</span></span><span class="sig-name descname"><span class="pre">EnumFactory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/model/_bitfield.html#EnumFactory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.EnumFactory" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">caterpillar.model.</span></span><span class="sig-name descname"><span class="pre">EnumFactory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span><span class="p"><span class="pre">[</span></span><span class="pre">_EnumT</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/model/_bitfield.html#EnumFactory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.EnumFactory" title="Link to this definition">#</a></dt>
 <dd><p>A value factory for enum-like types used in bitfields.</p>
 <p>This factory attempts to convert between integers and enumeration instances,
 using the provided <code class="code docutils literal notranslate"><span class="pre">model</span></code> (which should support <code class="code docutils literal notranslate"><span class="pre">__int__</span></code>). It
@@ -875,7 +928,7 @@ can operate in strict or lenient mode:</p>
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.model.EnumFactory.from_int">
-<span class="sig-name descname"><span class="pre">from_int</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/model/_bitfield.html#EnumFactory.from_int"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.EnumFactory.from_int" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">from_int</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_EnumT</span></span></span><a class="reference internal" href="../../_modules/caterpillar/model/_bitfield.html#EnumFactory.from_int"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.EnumFactory.from_int" title="Link to this definition">#</a></dt>
 <dd><p>Convert an integer into an enum instance or raw int.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -915,7 +968,7 @@ can operate in strict or lenient mode:</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="caterpillar.model.SetAlignment">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.model.</span></span><span class="sig-name descname"><span class="pre">SetAlignment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_alignment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/model/_bitfield.html#SetAlignment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.SetAlignment" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">caterpillar.model.</span></span><span class="sig-name descname"><span class="pre">SetAlignment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_alignment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/model/_bitfield.html#SetAlignment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.SetAlignment" title="Link to this definition">#</a></dt>
 <dd><p>Instructional flag used to update the current bitfield alignment dynamically during
 bitfield generation.</p>
 <p>This class allows to explicitly set a new alignment boundary (in bits) for subsequent fields
@@ -928,7 +981,7 @@ organized and aligned.</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.model.SetAlignment.flag">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">flag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_alignment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/model/_bitfield.html#SetAlignment.flag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.SetAlignment.flag" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">flag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_alignment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../options.html#caterpillar.options.Flag" title="caterpillar.options.Flag"><span class="pre">Flag</span></a><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/caterpillar/model/_bitfield.html#SetAlignment.flag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.SetAlignment.flag" title="Link to this definition">#</a></dt>
 <dd><p>Create a <code class="xref py py-class docutils literal notranslate"><span class="pre">Flag</span></code> instance representing a request to set a new alignment.</p>
 <p>This method is intended for use where a generic <code class="xref py py-class docutils literal notranslate"><span class="pre">Flag</span></code> is expected rather than a full
 <a class="reference internal" href="#caterpillar.model.SetAlignment" title="caterpillar.model.SetAlignment"><code class="xref py py-class docutils literal notranslate"><span class="pre">SetAlignment</span></code></a> object, e.g. for setting options for a <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code>.</p>
@@ -944,6 +997,117 @@ organized and aligned.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="../options.html#caterpillar.options.Flag" title="caterpillar.options.Flag">Flag</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="bitfield-mixins">
+<h2><span class="section-number">4.5.3.4. </span>Bitfield Mixins<a class="headerlink" href="#bitfield-mixins" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="caterpillar.model.BitfieldDefMixin">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">caterpillar.model.</span></span><span class="sig-name descname"><span class="pre">BitfieldDefMixin</span></span><a class="reference internal" href="../../_modules/caterpillar/model/_bitfield.html#BitfieldDefMixin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.BitfieldDefMixin" title="Link to this definition">#</a></dt>
+<dd><p>Mixin extending <a class="reference internal" href="struct.html#caterpillar.model.StructDefMixin" title="caterpillar.model.StructDefMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructDefMixin</span></code></a> for <code class="docutils literal notranslate"><span class="pre">Bitfield</span></code>-based models.</p>
+<p>This mixin behaves identically to <a class="reference internal" href="struct.html#caterpillar.model.StructDefMixin" title="caterpillar.model.StructDefMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructDefMixin</span></code></a> but binds the
+<code class="docutils literal notranslate"><span class="pre">__struct__</span></code> attribute to a <a class="reference internal" href="#caterpillar.model.Bitfield" title="caterpillar.model.Bitfield"><code class="xref py py-class docutils literal notranslate"><span class="pre">Bitfield</span></code></a> definition instead of a
+regular <a class="reference internal" href="struct.html#caterpillar.model.Struct" title="caterpillar.model.Struct"><code class="xref py py-class docutils literal notranslate"><span class="pre">Struct</span></code></a>. It allows bitfield models to reuse the same
+convenience API (<code class="docutils literal notranslate"><span class="pre">from_bytes</span></code>, <code class="docutils literal notranslate"><span class="pre">to_bytes</span></code>, <code class="docutils literal notranslate"><span class="pre">[]</span></code> operator, etc.)
+while operating on compact bit-level layouts.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="caterpillar.model.bitfield_factory">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">caterpillar.model.</span></span><span class="sig-name descname"><span class="pre">bitfield_factory</span></span><a class="reference internal" href="../../_modules/caterpillar/model/_bitfield.html#bitfield_factory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.bitfield_factory" title="Link to this definition">#</a></dt>
+<dd><p>Factory for transforming plain classes into <code class="docutils literal notranslate"><span class="pre">Bitfield</span></code> models.</p>
+<p>This factory mirrors the behavior of <a class="reference internal" href="struct.html#caterpillar.model.struct_factory" title="caterpillar.model.struct_factory"><code class="xref py py-class docutils literal notranslate"><span class="pre">struct_factory</span></code></a> but targets
+bit-level structures. It allows developers to declare compact bitfield
+layouts using class syntax while retaining full type-checker awareness
+through <code class="docutils literal notranslate"><span class="pre">&#64;dataclass_transform</span></code>.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.model.bitfield_factory.mixin">
+<span class="sig-name descname"><span class="pre">mixin</span></span><a class="headerlink" href="#caterpillar.model.bitfield_factory.mixin" title="Link to this definition">#</a></dt>
+<dd><p>alias of <a class="reference internal" href="#caterpillar.model.BitfieldDefMixin" title="caterpillar.model._bitfield.BitfieldDefMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">BitfieldDefMixin</span></code></a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caterpillar.model.bitfield_factory.make_bitfield">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">make_bitfield</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ty</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span><span class="p"><span class="pre">[</span></span><span class="pre">_VT</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="positional-only-separator o"><abbr title="Positional-only parameter separator (PEP 570)"><span class="pre">/</span></abbr></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_EndianLike</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ArchLike</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">_OptionLike</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_options</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">_OptionLike</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alignment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">type</span></span></span><a class="reference internal" href="../../_modules/caterpillar/model/_bitfield.html#bitfield_factory.make_bitfield"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.bitfield_factory.make_bitfield" title="Link to this definition">#</a></dt>
+<dd><p>Create a <code class="docutils literal notranslate"><span class="pre">Bitfield</span></code> model from a class definition.</p>
+<p>This helper performs the underlying transformation by constructing
+a <a class="reference internal" href="#caterpillar.model.Bitfield" title="caterpillar.model.Bitfield"><code class="xref py py-class docutils literal notranslate"><span class="pre">Bitfield</span></code></a> instance and returning the generated model class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ty</strong> (<em>type</em><em>[</em><em>_VT</em><em>]</em>) – The base class to transform into a Bitfield model</p></li>
+<li><p><strong>order</strong> (<em>_EndianLike</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Byte order used during serialization, defaults to None</p></li>
+<li><p><strong>arch</strong> (<em>_ArchLike</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Architecture configuration inferred by fields,
+defaults to None</p></li>
+<li><p><strong>options</strong> (<em>Iterable</em><em>[</em><em>_OptionLike</em><em>] </em><em>| </em><em>None</em><em>, </em><em>optional</em>) – Additional options controlling bitfield behavior,
+defaults to None</p></li>
+<li><p><strong>field_options</strong> (<em>Iterable</em><em>[</em><em>_OptionLike</em><em>] </em><em>| </em><em>None</em><em>, </em><em>optional</em>) – Default options applied to bitfield members,
+defaults to None</p></li>
+<li><p><strong>alignment</strong> (<em>int</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Optional bit alignment constraint, defaults to None</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The generated Bitfield model class</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>type</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caterpillar.model.bitfield_factory.bitfield">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">bitfield</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ty</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span><span class="p"><span class="pre">[</span></span><span class="pre">_VT</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="positional-only-separator o"><abbr title="Positional-only parameter separator (PEP 570)"><span class="pre">/</span></abbr></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_EndianLike</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ArchLike</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">_OptionLike</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_options</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">_OptionLike</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alignment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">type</span><span class="p"><span class="pre">[</span></span><span class="pre">_VT</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/caterpillar/model/_bitfield.html#bitfield_factory.bitfield"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.model.bitfield_factory.bitfield" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">bitfield</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ty</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="positional-only-separator o"><abbr title="Positional-only parameter separator (PEP 570)"><span class="pre">/</span></abbr></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_EndianLike</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ArchLike</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">_OptionLike</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_options</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">_OptionLike</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alignment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">type</span><span class="p"><span class="pre">[</span></span><span class="pre">_VT</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">type</span><span class="p"><span class="pre">[</span></span><span class="pre">_VT</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span></dt>
+<dd><p>Decorator or direct transformer for creating a <code class="docutils literal notranslate"><span class="pre">Bitfield</span></code> model.</p>
+<p>This method can be used either as:</p>
+<ul class="simple">
+<li><p>A decorator: <code class="docutils literal notranslate"><span class="pre">&#64;bitfield(...)</span></code></p></li>
+<li><p>A direct transformer: <code class="docutils literal notranslate"><span class="pre">MyBitfield</span> <span class="pre">=</span> <span class="pre">bitfield(MyClass,</span> <span class="pre">...)</span></code></p></li>
+</ul>
+<p>It enables defining compact bit-level layouts using standard class
+syntax while preserving dataclass semantics and static type checking.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.py</span><span class="w"> </span><span class="kn">import</span> <span class="n">bitfield</span><span class="p">,</span> <span class="n">SetAlignment</span><span class="p">,</span> <span class="n">uint16</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nd">@bitfield</span>
+<span class="gp">... </span><span class="k">class</span><span class="w"> </span><span class="nc">Packet</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">version</span>   <span class="p">:</span> <span class="mi">3</span>
+<span class="gp">... </span>    <span class="nb">type</span>      <span class="p">:</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">SetAlignment</span><span class="p">(</span><span class="mi">16</span><span class="p">))</span>
+<span class="gp">... </span>    <span class="n">length</span>    <span class="p">:</span> <span class="mi">10</span>
+<span class="gp">... </span>    <span class="n">_</span>         <span class="p">:</span> <span class="mi">0</span>  <span class="c1"># align to 16bits</span>
+<span class="gp">... </span>    <span class="n">payload</span>   <span class="p">:</span> <span class="n">uint16</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># You can now pack/unpack Packet instances as compact binary bitfields</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pkt</span> <span class="o">=</span> <span class="n">Packet</span><span class="p">(</span><span class="n">version</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="mh">0xABCD</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">packed</span> <span class="o">=</span> <span class="n">pack</span><span class="p">(</span><span class="n">pkt</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unpacked</span> <span class="o">=</span> <span class="n">unpack</span><span class="p">(</span><span class="n">Packet</span><span class="p">,</span> <span class="n">packed</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ty</strong> (<em>type</em><em>[</em><em>_VT</em><em>] </em><em>| </em><em>None</em><em>, </em><em>optional</em>) – The user-defined class to transform. If None, a decorator
+function is returned</p></li>
+<li><p><strong>order</strong> (<em>_EndianLike</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Byte order used during serialization, defaults to None</p></li>
+<li><p><strong>arch</strong> (<em>_ArchLike</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Architecture configuration inferred by fields,
+defaults to None</p></li>
+<li><p><strong>options</strong> (<em>Iterable</em><em>[</em><em>_OptionLike</em><em>] </em><em>| </em><em>None</em><em>, </em><em>optional</em>) – Additional options controlling bitfield behavior,
+defaults to None</p></li>
+<li><p><strong>field_options</strong> (<em>Iterable</em><em>[</em><em>_OptionLike</em><em>] </em><em>| </em><em>None</em><em>, </em><em>optional</em>) – Default options applied to bitfield members,
+defaults to None</p></li>
+<li><p><strong>alignment</strong> (<em>int</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Optional bit alignment constraint, defaults to None</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The decorated Bitfield model class or a decorator function</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>type[_VT] | Callable[[type[_VT]], type[_VT]]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1052,6 +1216,16 @@ organized and aligned.</p>
 </li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bitfield-mixins">4.5.3.4. Bitfield Mixins</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.model.BitfieldDefMixin"><code class="docutils literal notranslate"><span class="pre">BitfieldDefMixin</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.model.bitfield_factory"><code class="docutils literal notranslate"><span class="pre">bitfield_factory</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.model.bitfield_factory.mixin"><code class="docutils literal notranslate"><span class="pre">bitfield_factory.mixin</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.model.bitfield_factory.make_bitfield"><code class="docutils literal notranslate"><span class="pre">bitfield_factory.make_bitfield()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.model.bitfield_factory.bitfield"><code class="docutils literal notranslate"><span class="pre">bitfield_factory.bitfield()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
   </nav></div>
 
@@ -1098,7 +1272,7 @@ organized and aligned.</p>
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     <br/>
   </p>
 </div>

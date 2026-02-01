@@ -5,17 +5,26 @@ Cryptographic Structs
 *********************
 
 
-Hashes
-------
+Digests
+-------
 
 .. autoclass:: caterpillar.fields.Algorithm
-
+    :members:
 
 .. autoclass:: caterpillar.fields.Digest
+    :members:
 
 .. autoclass:: caterpillar.fields.DigestField
+    :members:
 
 .. autoclass:: caterpillar.fields.DigestFieldAction
+    :members:
+
+.. autoclass:: caterpillar.fields.HMACAlgorithm
+    :members:
+
+.. autoclass:: caterpillar.fields.HMAC
+    :members:
 
 
 Ciphers

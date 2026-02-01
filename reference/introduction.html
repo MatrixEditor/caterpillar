@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>3.1. Introduction &#8212; Caterpillar 2.7.0 documentation</title>
+    <title>3.1. Introduction &#8212; Caterpillar 2.8.0 documentation</title>
   
   
   
@@ -41,9 +41,9 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=dfec817d"></script>
-    <script src="../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/documentation_options.js?v=69ff2ef9"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
@@ -54,7 +54,7 @@
     <link rel="prev" title="3. Reference" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.7.0" />
+  <meta name="docsearch:version" content="2.8.0" />
   </head>
   
   
@@ -116,7 +116,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.7.0</p>
+    <p class="title logo__title">Caterpillar 2.8.0</p>
   
 </a></div>
     
@@ -459,6 +459,10 @@ be beneficial including</p>
 <p>The biggest advantage of <em>Caterpillar</em> is the lack of external dependencies (though extensions can be integrated using
 dependencies). Additionally, the minimal lines of code required to define structures speak for themselves, as
 demonstrated in the following example from <cite>examples/formats/caf</cite>:</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" data-sync-group="syntax" data-sync-id="default" for="sd-tab-item-0">
+Default Syntax</label><div class="sd-tab-content docutils">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span>
 <span class="linenos"> 2</span><span class="k">class</span><span class="w"> </span><span class="nc">CAFChunk</span><span class="p">:</span>
 <span class="linenos"> 3</span>    <span class="c1"># Include other structs just like that</span>
@@ -475,6 +479,37 @@ demonstrated in the following example from <cite>examples/formats/caf</cite>:</p
 <span class="linenos">14</span>    <span class="p">}</span>
 </pre></div>
 </div>
+</div>
+<input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" data-sync-group="syntax" data-sync-id="extended" for="sd-tab-item-1">
+Extended Syntax (&gt;=2.8.0)</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="n">CAFChunkDataT</span> <span class="o">=</span> <span class="p">(</span>
+<span class="linenos"> 2</span>    <span class="n">CAFAudioFormat</span>
+<span class="linenos"> 3</span>    <span class="o">|</span> <span class="n">CAFStringsChunk</span>
+<span class="linenos"> 4</span>    <span class="o">|</span> <span class="n">CAFPacketTable</span>
+<span class="linenos"> 5</span>    <span class="o">|</span> <span class="n">CAFData</span>
+<span class="linenos"> 6</span>    <span class="o">|</span> <span class="kc">None</span>
+<span class="linenos"> 7</span>    <span class="o">|</span> <span class="nb">bytes</span>
+<span class="linenos"> 8</span><span class="p">)</span>
+<span class="linenos"> 9</span>
+<span class="linenos">10</span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span>
+<span class="linenos">11</span><span class="k">class</span><span class="w"> </span><span class="nc">CAFChunk</span><span class="p">:</span>
+<span class="linenos">12</span>    <span class="c1"># Include other structs just like that</span>
+<span class="linenos">13</span>    <span class="n">chunk_header</span><span class="p">:</span> <span class="n">CAFChunkHeader</span>
+<span class="linenos">14</span>    <span class="c1"># Built-in support for switch-case structures</span>
+<span class="linenos">15</span>    <span class="n">data</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="n">CAFChunkDataT</span><span class="p">,</span> <span class="n">Field</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">chunk_header</span><span class="o">.</span><span class="n">chunk_type</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="p">{</span>
+<span class="linenos">16</span>        <span class="sa">b</span><span class="s2">&quot;desc&quot;</span><span class="p">:</span> <span class="n">CAFAudioFormat</span><span class="p">,</span>
+<span class="linenos">17</span>        <span class="sa">b</span><span class="s2">&quot;info&quot;</span><span class="p">:</span> <span class="n">CAFStringsChunk</span><span class="p">,</span>
+<span class="linenos">18</span>        <span class="sa">b</span><span class="s2">&quot;pakt&quot;</span><span class="p">:</span> <span class="n">CAFPacketTable</span><span class="p">,</span>
+<span class="linenos">19</span>        <span class="sa">b</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">CAFData</span><span class="p">,</span>
+<span class="linenos">20</span>        <span class="sa">b</span><span class="s2">&quot;free&quot;</span><span class="p">:</span> <span class="n">padding</span><span class="p">[</span><span class="n">this</span><span class="o">.</span><span class="n">chunk_header</span><span class="o">.</span><span class="n">chunk_size</span><span class="p">],</span>
+<span class="linenos">21</span>        <span class="c1"># the fallback struct given with a default option</span>
+<span class="linenos">22</span>        <span class="n">DEFAULT_OPTION</span><span class="p">:</span> <span class="n">Bytes</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">chunk_header</span><span class="o">.</span><span class="n">chunk_size</span><span class="p">),</span>
+<span class="linenos">23</span>    <span class="p">}]</span>
+</pre></div>
+</div>
+</div>
+</div>
 <section id="how-does-this-even-work">
 <h3><span class="section-number">3.1.1.1. </span>How does this even work?<a class="headerlink" href="#how-does-this-even-work" title="Link to this heading">#</a></h3>
 <p><em>Caterpillar</em> utilizes Python’s annotations to build its model from processing class definitions. With the use
@@ -486,6 +521,12 @@ of Python 3.12, there are no conflicts in using annotations for defining fields.
 </div>
 <p>By using annotations, we can simply define a default value if desired, eliminating the need to make the code
 more complex by using assignments.</p>
+<p>Extended syntax:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
+    <span class="c1"># &lt;name&gt; : f[ &lt;type&gt;, &lt;field&gt;, &lt;extra_options&gt; ] = &lt;default_value&gt;</span>
+</pre></div>
+</div>
 </section>
 </section>
 <section id="pros-cons">
@@ -500,9 +541,13 @@ from the initial benchmark in the <a class="reference external" href="https://co
 generated code can only parse a format and not build it, the comparison is focused on
 Construct. The files used in the benchmark are provided below:</p>
 <div class="sd-tab-set docutils">
-<input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
-<label class="sd-tab-label" for="sd-tab-item-0">
+<input checked="checked" id="sd-tab-item-2" name="sd-tab-set-1" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-2">
 caterpillar</label><div class="sd-tab-content docutils">
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-7" name="sd-tab-set-2" type="radio">
+<label class="sd-tab-label" data-sync-group="syntax" data-sync-id="default" for="sd-tab-item-7">
+Default Syntax</label><div class="sd-tab-content docutils">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.shortcuts</span><span class="w"> </span><span class="kn">import</span> <span class="n">struct</span><span class="p">,</span> <span class="n">LittleEndian</span><span class="p">,</span> <span class="n">bitfield</span><span class="p">,</span> <span class="n">unpack</span><span class="p">,</span> <span class="n">pack</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.fields</span><span class="w"> </span><span class="kn">import</span> <span class="n">uint8</span><span class="p">,</span> <span class="n">UInt</span><span class="p">,</span> <span class="n">CString</span><span class="p">,</span> <span class="n">Prefixed</span><span class="p">,</span> <span class="n">uint32</span>
 
@@ -527,14 +572,45 @@ caterpillar</label><div class="sd-tab-content docutils">
 <span class="n">Format</span> <span class="o">=</span> <span class="n">LittleEndian</span> <span class="o">+</span> <span class="n">Item</span><span class="p">[</span><span class="n">uint32</span><span class="p">::]</span>
 </pre></div>
 </div>
+</div>
+<input id="sd-tab-item-8" name="sd-tab-set-2" type="radio">
+<label class="sd-tab-label" data-sync-group="syntax" data-sync-id="extended" for="sd-tab-item-8">
+Extended Syntax (&gt;=2.8.0)</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">typing</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.py</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.types</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+
+<span class="nd">@bitfield</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">LittleEndian</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Flags</span><span class="p">:</span>
+    <span class="n">bool1</span><span class="p">:</span> <span class="n">int1_t</span>
+    <span class="n">num4</span><span class="p">:</span> <span class="n">int3_t</span>
+    <span class="c1"># padding is generated automatically</span>
+
+
+<span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">LittleEndian</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Item</span><span class="p">(</span><span class="n">struct_factory</span><span class="o">.</span><span class="n">mixin</span><span class="p">):</span>
+    <span class="n">num1</span><span class="p">:</span> <span class="n">uint8_t</span>
+    <span class="n">num2</span><span class="p">:</span> <span class="n">uint24_t</span>
+    <span class="n">flags</span><span class="p">:</span> <span class="n">Flags</span>
+    <span class="n">fixedarray1</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">uint8</span><span class="p">[</span><span class="mi">3</span><span class="p">]]</span>
+    <span class="n">name1</span><span class="p">:</span> <span class="n">cstr_t</span>
+    <span class="n">name2</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">Prefixed</span><span class="p">(</span><span class="n">uint8</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)]</span>
+
+
+<span class="n">Format</span> <span class="o">=</span> <span class="n">Item</span><span class="p">[</span><span class="n">LittleEndian</span> <span class="o">+</span> <span class="n">uint32</span> <span class="p">:</span> <span class="p">:]</span>
+</pre></div>
+</div>
+</div>
+</div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>It actually makes no time-related difference if we define the <code class="code docutils literal notranslate"><span class="pre">Format</span></code> field directly or put it into
 a struct class.</p>
 </div>
 </div>
-<input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
-<label class="sd-tab-label" for="sd-tab-item-1">
+<input id="sd-tab-item-3" name="sd-tab-set-1" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-3">
 construct</label><div class="sd-tab-content docutils">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">construct</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 
@@ -562,8 +638,8 @@ construct</label><div class="sd-tab-content docutils">
 </pre></div>
 </div>
 </div>
-<input id="sd-tab-item-2" name="sd-tab-set-0" type="radio">
-<label class="sd-tab-label" for="sd-tab-item-2">
+<input id="sd-tab-item-4" name="sd-tab-set-1" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-4">
 kaitai</label><div class="sd-tab-content docutils">
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">meta</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">comparison_1_kaitai</span>
@@ -613,8 +689,8 @@ kaitai</label><div class="sd-tab-content docutils">
 </pre></div>
 </div>
 </div>
-<input id="sd-tab-item-3" name="sd-tab-set-0" type="radio">
-<label class="sd-tab-label" for="sd-tab-item-3">
+<input id="sd-tab-item-5" name="sd-tab-set-1" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-5">
 hachoir</label><div class="sd-tab-content docutils">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">hachoir.field</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">hachoir.stream</span><span class="w"> </span><span class="kn">import</span> <span class="n">StringInputStream</span>
@@ -646,8 +722,8 @@ hachoir</label><div class="sd-tab-content docutils">
 </pre></div>
 </div>
 </div>
-<input id="sd-tab-item-4" name="sd-tab-set-0" type="radio">
-<label class="sd-tab-label" for="sd-tab-item-4">
+<input id="sd-tab-item-6" name="sd-tab-set-1" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-6">
 mrcrowbar</label><div class="sd-tab-content docutils">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">mrcrowbar.fields</span><span class="w"> </span><span class="kn">import</span> <span class="n">Bits8</span><span class="p">,</span> <span class="n">UInt24_LE</span><span class="p">,</span> <span class="n">UInt32_LE</span><span class="p">,</span> <span class="n">BlockField</span><span class="p">,</span> <span class="n">UInt8</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">mrcrowbar.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Block</span><span class="p">,</span> <span class="n">CString</span><span class="p">,</span> <span class="n">CStringN</span>
@@ -683,8 +759,8 @@ Construct makes it comparable to Kaitai, but since compilation is not a primary 
 (<code class="code docutils literal notranslate"><span class="pre">[PyPy</span> <span class="pre">7.3.15</span> <span class="pre">with</span> <span class="pre">MSC</span> <span class="pre">v.1929</span> <span class="pre">64</span> <span class="pre">bit</span> <span class="pre">(AMD64)]</span></code>).</p>
 </div>
 <div class="sd-tab-set docutils">
-<input checked="checked" id="sd-tab-item-5" name="sd-tab-set-1" type="radio">
-<label class="sd-tab-label" for="sd-tab-item-5">
+<input checked="checked" id="sd-tab-item-9" name="sd-tab-set-3" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-9">
 caterpillar</label><div class="sd-tab-content docutils">
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(venv-3.12.1)</span><span class="go">&gt; python3 ./examples/comparison/comparison_1_caterpillar.py ./blob</span>
 <span class="go">Timeit measurements:</span>
@@ -698,8 +774,8 @@ caterpillar</label><div class="sd-tab-content docutils">
 </pre></div>
 </div>
 </div>
-<input id="sd-tab-item-6" name="sd-tab-set-1" type="radio">
-<label class="sd-tab-label" for="sd-tab-item-6">
+<input id="sd-tab-item-10" name="sd-tab-set-3" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-10">
 construct</label><div class="sd-tab-content docutils">
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(venv-3.12.1)</span><span class="go">&gt; python3 ./examples/comparison/comparison_1_construct.py ./blob</span>
 <span class="go">Parsing measurements:</span>
@@ -721,8 +797,8 @@ construct</label><div class="sd-tab-content docutils">
 </pre></div>
 </div>
 </div>
-<input id="sd-tab-item-7" name="sd-tab-set-1" type="radio">
-<label class="sd-tab-label" for="sd-tab-item-7">
+<input id="sd-tab-item-11" name="sd-tab-set-3" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-11">
 kaitai</label><div class="sd-tab-content docutils">
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(venv-3.12.1)</span><span class="go">&gt; python3 ./examples/comparison/comparison_1_kaitai.py ./blob</span>
 <span class="go">Parsing measurements:</span>
@@ -734,8 +810,8 @@ kaitai</label><div class="sd-tab-content docutils">
 </pre></div>
 </div>
 </div>
-<input id="sd-tab-item-8" name="sd-tab-set-1" type="radio">
-<label class="sd-tab-label" for="sd-tab-item-8">
+<input id="sd-tab-item-12" name="sd-tab-set-3" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-12">
 hachoir</label><div class="sd-tab-content docutils">
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(venv-3.12.1)</span><span class="go">&gt; python3 ./examples/comparison/comparison_1_hachoir.py ./blob</span>
 <span class="go">Parsing measurements:</span>
@@ -747,8 +823,8 @@ hachoir</label><div class="sd-tab-content docutils">
 </pre></div>
 </div>
 </div>
-<input id="sd-tab-item-9" name="sd-tab-set-1" type="radio">
-<label class="sd-tab-label" for="sd-tab-item-9">
+<input id="sd-tab-item-13" name="sd-tab-set-3" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-13">
 mrcrowbar</label><div class="sd-tab-content docutils">
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(venv-3.12.1)</span><span class="go">&gt; python3 ./examples/comparison/comparison_1_mrcrowbar.py ./blob</span>
 <span class="go">Parsing measurements:</span>
@@ -892,7 +968,7 @@ not assert perfection. Instead, it serves as an initial reference to start the b
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     <br/>
   </p>
 </div>

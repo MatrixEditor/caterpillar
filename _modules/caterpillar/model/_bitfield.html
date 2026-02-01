@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>caterpillar.model._bitfield &#8212; Caterpillar 2.7.0 documentation</title>
+    <title>caterpillar.model._bitfield &#8212; Caterpillar 2.8.0 documentation</title>
   
   
   
@@ -40,9 +40,9 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=dfec817d"></script>
-    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/documentation_options.js?v=69ff2ef9"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
@@ -51,7 +51,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.7.0" />
+  <meta name="docsearch:version" content="2.8.0" />
   </head>
   
   
@@ -113,7 +113,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.7.0</p>
+    <p class="title logo__title">Caterpillar 2.8.0</p>
   
 </a></div>
     
@@ -390,20 +390,32 @@
 <span class="c1">#</span>
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
+<span class="c1"># pyright: reportPrivateUsage=false</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">dataclasses</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">enum</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Final</span><span class="p">,</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">Literal</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ClassVar</span><span class="p">,</span>
+    <span class="n">Self</span><span class="p">,</span>
+    <span class="n">dataclass_transform</span><span class="p">,</span>
+    <span class="n">overload</span><span class="p">,</span>
+    <span class="n">override</span><span class="p">,</span>
+    <span class="n">TypeVar</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.fields.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">Int</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.shared</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">ATTR_ACTION_PACK</span><span class="p">,</span>
     <span class="n">ATTR_ACTION_UNPACK</span><span class="p">,</span>
-    <span class="n">ATTR_BYTEORDER</span><span class="p">,</span>
     <span class="n">typeof</span><span class="p">,</span>
     <span class="n">ATTR_BITS</span><span class="p">,</span>
     <span class="n">ATTR_SIGNED</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.byteorder</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">LITTLE_ENDIAN_FMT</span><span class="p">,</span>
-    <span class="n">SysNative</span><span class="p">,</span>
-    <span class="n">system_arch</span><span class="p">,</span>
+    <span class="n">O_DEFAULT_ENDIAN</span><span class="p">,</span>
+    <span class="n">LittleEndian</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.options</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">B_GROUP_NEW</span><span class="p">,</span>
@@ -422,10 +434,32 @@
     <span class="n">INVALID_DEFAULT</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.exception</span><span class="w"> </span><span class="kn">import</span> <span class="n">StructException</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">CTX_PATH</span><span class="p">,</span> <span class="n">O_CONTEXT_FACTORY</span><span class="p">,</span> <span class="n">CTX_OBJECT</span><span class="p">,</span> <span class="n">CTX_STREAM</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.context</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CTX_FIELD</span><span class="p">,</span>
+    <span class="n">CTX_PATH</span><span class="p">,</span>
+    <span class="n">O_CONTEXT_FACTORY</span><span class="p">,</span>
+    <span class="n">CTX_OBJECT</span><span class="p">,</span>
+    <span class="n">CTX_STREAM</span><span class="p">,</span>
+    <span class="n">Context</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.abc</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">_StructLike</span><span class="p">,</span>
+    <span class="n">_ActionLike</span><span class="p">,</span>
+    <span class="n">_ContextLike</span><span class="p">,</span>
+    <span class="n">_OptionLike</span><span class="p">,</span>
+    <span class="n">_ArchLike</span><span class="p">,</span>
+    <span class="n">_EndianLike</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">._struct</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Struct</span><span class="p">,</span>
+    <span class="n">StructDefMixin</span><span class="p">,</span>
+    <span class="n">sizeof</span><span class="p">,</span>
+    <span class="n">Invisible</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">._base</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">._struct</span><span class="w"> </span><span class="kn">import</span> <span class="n">Struct</span><span class="p">,</span> <span class="n">sizeof</span>
-
+<span class="n">_AnnotationT</span> <span class="o">=</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="n">Any</span>  <span class="c1"># pyright: ignore[reportExplicitAny]</span>
+<span class="n">_ModelT</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;_ModelT&quot;</span><span class="p">)</span>
 
 <span class="c1"># --- Bitfield Concept ---</span>
 <span class="c1"># NEW REVISED CONCEPT</span>
@@ -511,14 +545,14 @@
 <span class="c1">#       - Note: Option order affects behavior and must be considered carefully.</span>
 
 <span class="c1">#: The default alignment (in bits) used for bitfield group boundaries</span>
-<span class="n">DEFAULT_ALIGNMENT</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">DEFAULT_ALIGNMENT</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span>
 
 <span class="c1">#: Alias for the `B_GROUP_NEW` flag, used to indicate that a new bitfield group should be started.</span>
-<span class="n">NewGroup</span> <span class="o">=</span> <span class="n">B_GROUP_NEW</span>
+<span class="n">NewGroup</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">Flag</span><span class="p">[</span><span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="n">B_GROUP_NEW</span>
 
 <span class="c1">#: Alias for the `B_GROUP_END` flag, used to indicate that the current bitfield group</span>
 <span class="c1">#: should be finalized.</span>
-<span class="n">EndGroup</span> <span class="o">=</span> <span class="n">B_GROUP_END</span>
+<span class="n">EndGroup</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">Flag</span><span class="p">[</span><span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="n">B_GROUP_END</span>
 
 
 <div class="viewcode-block" id="SetAlignment">
@@ -537,12 +571,12 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_alignment</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">alignment</span> <span class="o">=</span> <span class="n">new_alignment</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alignment</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">new_alignment</span>
 
 <div class="viewcode-block" id="SetAlignment.flag">
 <a class="viewcode-back" href="../../../library/model/bitfield.html#caterpillar.model.SetAlignment.flag">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">flag</span><span class="p">(</span><span class="n">new_alignment</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">flag</span><span class="p">(</span><span class="n">new_alignment</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Flag</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a :class:`Flag` instance representing a request to set a new alignment.</span>
 
 <span class="sd">        This method is intended for use where a generic :class:`Flag` is expected rather than a full</span>
@@ -558,6 +592,7 @@
         <span class="k">return</span> <span class="n">Flag</span><span class="p">(</span><span class="s2">&quot;bitfield.new_alignment&quot;</span><span class="p">,</span> <span class="n">new_alignment</span><span class="p">)</span></div>
 
 
+    <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="s2">&quot;SetAlignment&quot;</span><span class="p">)</span></div>
 
@@ -565,7 +600,7 @@
 
 <div class="viewcode-block" id="getbits">
 <a class="viewcode-back" href="../../../library/model/bitfield.html#caterpillar.model.getbits">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">getbits</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">getbits</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Retrieve the bit-width of a given object.</span>
 
 <span class="sd">    This function checks for a :py:func:`__bits__` attribute on the object. The object must either implement</span>
@@ -584,14 +619,15 @@
 <span class="sd">    :rtype: int</span>
 <span class="sd">    :raises AttributeError: If the object does not have an attribute defined by :attr:`ATTR_BITS`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">__bits__</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">ATTR_BITS</span><span class="p">)</span>
+    <span class="c1"># fmt: off</span>
+    <span class="n">__bits__</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">ATTR_BITS</span><span class="p">)</span>  <span class="c1"># pyright: ignore[reportAny]</span>
     <span class="k">return</span> <span class="n">__bits__</span><span class="p">()</span> <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">__bits__</span><span class="p">)</span> <span class="k">else</span> <span class="n">__bits__</span></div>
 
 
 
 <div class="viewcode-block" id="issigned">
 <a class="viewcode-back" href="../../../library/model/bitfield.html#caterpillar.model.issigned">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">issigned</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">issigned</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Determine whether a given object represents a signed field.</span>
 
 <span class="sd">    :param obj: The object for which signedness should be determined.</span>
@@ -603,9 +639,12 @@
 
 
 
+<span class="n">_VT</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;_VT&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+
+
 <div class="viewcode-block" id="BitfieldValueFactory">
 <a class="viewcode-back" href="../../../library/model/bitfield.html#caterpillar.model.BitfieldValueFactory">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">BitfieldValueFactory</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BitfieldValueFactory</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">_VT</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A generic factory class responsible for converting values between Python objects and integers</span>
 <span class="sd">    for use in bitfield entries.</span>
@@ -617,14 +656,14 @@
 <span class="sd">    :type target: type, optional</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;target&quot;</span><span class="p">,)</span>
+    <span class="vm">__slots__</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;target&quot;</span><span class="p">,)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">target</span> <span class="ow">or</span> <span class="nb">int</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">int</span><span class="p">],</span> <span class="n">_VT</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">int</span><span class="p">],</span> <span class="n">_VT</span><span class="p">]</span> <span class="o">|</span> <span class="nb">type</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">target</span> <span class="ow">or</span> <span class="nb">int</span>
 
 <div class="viewcode-block" id="BitfieldValueFactory.to_int">
 <a class="viewcode-back" href="../../../library/model/bitfield.html#caterpillar.model.BitfieldValueFactory.to_int">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">to_int</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_int</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">_VT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert a Python object to an integer.</span>
 
 <span class="sd">        :param obj: The object to convert.</span>
@@ -632,7 +671,7 @@
 <span class="sd">        :return: The integer representation of the object.</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>  <span class="c1"># pyright: ignore[reportArgumentType]</span></div>
 
 
 <div class="viewcode-block" id="BitfieldValueFactory.from_int">
@@ -650,9 +689,12 @@
 
 
 
+<span class="n">_EnumT</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;_EnumT&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">enum</span><span class="o">.</span><span class="n">Enum</span><span class="p">)</span>
+
+
 <div class="viewcode-block" id="EnumFactory">
 <a class="viewcode-back" href="../../../library/model/bitfield.html#caterpillar.model.EnumFactory">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">EnumFactory</span><span class="p">(</span><span class="n">BitfieldValueFactory</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">EnumFactory</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">_EnumT</span><span class="p">],</span> <span class="n">BitfieldValueFactory</span><span class="p">[</span><span class="n">_EnumT</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A value factory for enum-like types used in bitfields.</span>
 
 <span class="sd">    This factory attempts to convert between integers and enumeration instances,</span>
@@ -679,13 +721,14 @@
 <span class="sd">        factory.from_int(2)  # -&gt; ValueError (strict mode)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">_EnumT</span><span class="p">],</span> <span class="n">strict</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">strict</span> <span class="o">=</span> <span class="n">strict</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">strict</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">strict</span>
 
 <div class="viewcode-block" id="EnumFactory.from_int">
 <a class="viewcode-back" href="../../../library/model/bitfield.html#caterpillar.model.EnumFactory.from_int">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">from_int</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="nd">@override</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_int</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">_EnumT</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert an integer into an enum instance or raw int.</span>
 
@@ -707,7 +750,7 @@
 
 <div class="viewcode-block" id="CharFactory">
 <a class="viewcode-back" href="../../../library/model/bitfield.html#caterpillar.model.CharFactory">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">CharFactory</span><span class="p">(</span><span class="n">BitfieldValueFactory</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CharFactory</span><span class="p">(</span><span class="n">BitfieldValueFactory</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A value factory for handling single ASCII/Unicode characters as integers.</span>
 
@@ -720,7 +763,8 @@
 
 <div class="viewcode-block" id="CharFactory.from_int">
 <a class="viewcode-back" href="../../../library/model/bitfield.html#caterpillar.model.CharFactory.from_int">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">from_int</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="nd">@override</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_int</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert an integer to its character representation.</span>
 
@@ -734,7 +778,8 @@
 
 <div class="viewcode-block" id="CharFactory.to_int">
 <a class="viewcode-back" href="../../../library/model/bitfield.html#caterpillar.model.CharFactory.to_int">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">to_int</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="nd">@override</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_int</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert a character to its integer (ordinal) representation.</span>
 
@@ -769,24 +814,39 @@
 <span class="sd">    :type action: Any</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;bit&quot;</span><span class="p">,</span> <span class="s2">&quot;width&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;factory&quot;</span><span class="p">,</span> <span class="s2">&quot;action&quot;</span><span class="p">,</span> <span class="s2">&quot;low_mask&quot;</span><span class="p">)</span>
+    <span class="vm">__slots__</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;bit&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;width&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;factory&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;action&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;low_mask&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">bit</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">factory</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="kc">None</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">bit</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">factory</span><span class="p">:</span> <span class="n">BitfieldValueFactory</span> <span class="o">|</span> <span class="nb">type</span><span class="p">[</span><span class="n">BitfieldValueFactory</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">action</span><span class="p">:</span> <span class="n">_ActionLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">bit</span> <span class="o">=</span> <span class="n">bit</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">width</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">factory</span> <span class="o">=</span> <span class="n">factory</span> <span class="ow">or</span> <span class="n">BitfieldValueFactory</span><span class="p">()</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">factory</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">factory</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">factory</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">action</span> <span class="o">=</span> <span class="n">action</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">low_mask</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="c1"># fmt: off</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">bit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">width</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="n">factory</span> <span class="o">=</span> <span class="n">factory</span> <span class="ow">or</span> <span class="n">BitfieldValueFactory</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">factory</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">factory</span><span class="p">:</span> <span class="n">BitfieldValueFactory</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">factory</span><span class="p">()</span>  <span class="c1"># pyright: ignore[reportCallIssue]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">factory</span> <span class="o">=</span> <span class="n">factory</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">action</span><span class="p">:</span> <span class="n">_ActionLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">action</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">low_mask</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
 
 <div class="viewcode-block" id="BitfieldEntry.new_action">
 <a class="viewcode-back" href="../../../library/model/bitfield.html#caterpillar.model.BitfieldEntry.new_action">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">new_action</span><span class="p">(</span><span class="n">action</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">new_action</span><span class="p">(</span><span class="n">action</span><span class="p">:</span> <span class="n">_ActionLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;BitfieldEntry&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a new action-type entry (e.g., padding, control directive).</span>
 
@@ -825,6 +885,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">action</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span></div>
 
 
+    <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return a human-readable string representation of the bitfield entry.</span>
@@ -857,11 +918,11 @@
 <span class="sd">    :type bit_count: int</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;entries&quot;</span><span class="p">,</span> <span class="s2">&quot;bit_count&quot;</span><span class="p">)</span>
+    <span class="vm">__slots__</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;entries&quot;</span><span class="p">,</span> <span class="s2">&quot;bit_count&quot;</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bit_count</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">bit_count</span> <span class="o">=</span> <span class="n">bit_count</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">entries</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bit_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">bit_count</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">BitfieldEntry</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
 <div class="viewcode-block" id="BitfieldGroup.is_field">
 <a class="viewcode-back" href="../../../library/model/bitfield.html#caterpillar.model.BitfieldGroup.is_field">[docs]</a>
@@ -877,26 +938,26 @@
 
 <div class="viewcode-block" id="BitfieldGroup.get_field">
 <a class="viewcode-back" href="../../../library/model/bitfield.html#caterpillar.model.BitfieldGroup.get_field">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_field</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_field</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Field</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the single field from this group.</span>
 
 <span class="sd">        :return: The field object.</span>
 <span class="sd">        :rtype: BitfieldEntry</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># pyright: ignore[reportReturnType]</span></div>
 
 
 <div class="viewcode-block" id="BitfieldGroup.set_field">
 <a class="viewcode-back" href="../../../library/model/bitfield.html#caterpillar.model.BitfieldGroup.set_field">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">set_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">:</span> <span class="n">BitfieldEntry</span> <span class="o">|</span> <span class="n">Field</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set the group to hold only the given field and mark it as a standalone field group.</span>
 
 <span class="sd">        :param field: The field to store in this group.</span>
 <span class="sd">        :type field: BitfieldEntry</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">entries</span> <span class="o">=</span> <span class="p">[</span><span class="n">field</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entries</span> <span class="o">=</span> <span class="p">[</span><span class="n">field</span><span class="p">]</span>  <span class="c1"># pyright: ignore[reportAttributeAccessIssue]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bit_count</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span></div>
 
 
@@ -929,7 +990,7 @@
 
 <div class="viewcode-block" id="BitfieldGroup.get_size">
 <a class="viewcode-back" href="../../../library/model/bitfield.html#caterpillar.model.BitfieldGroup.get_size">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the size of this group in bytes.</span>
 
@@ -947,7 +1008,7 @@
 
 <div class="viewcode-block" id="BitfieldGroup.get_bits">
 <a class="viewcode-back" href="../../../library/model/bitfield.html#caterpillar.model.BitfieldGroup.get_bits">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_bits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_bits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the total number of bits in this group.</span>
 
@@ -959,6 +1020,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_size</span><span class="p">(</span><span class="n">context</span><span class="p">)</span> <span class="o">*</span> <span class="mi">8</span></div>
 
 
+    <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_field</span><span class="p">():</span>
             <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_field</span><span class="p">())</span>
@@ -969,7 +1031,7 @@
 
 <div class="viewcode-block" id="Bitfield">
 <a class="viewcode-back" href="../../../library/model/bitfield.html#caterpillar.model.Bitfield">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">Bitfield</span><span class="p">(</span><span class="n">Struct</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Bitfield</span><span class="p">(</span><span class="n">Struct</span><span class="p">[</span><span class="n">_VT</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A Bitfield represents a packed structure composed of bit-level fields. This</span>
 <span class="sd">    class allows for the declarative definition of compact memory representations</span>
@@ -1000,26 +1062,26 @@
 <span class="sd">    :type alignment: Optional[int]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="vm">__slots__</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
         <span class="s2">&quot;groups&quot;</span><span class="p">,</span>
         <span class="s2">&quot;alignment&quot;</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">model</span><span class="p">,</span>
-        <span class="n">order</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">arch</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">field_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">alignment</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">model</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">_VT</span><span class="p">],</span>
+        <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">options</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">_OptionLike</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">field_options</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">_OptionLike</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">alignment</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">alignment</span> <span class="o">=</span> <span class="n">alignment</span> <span class="ow">or</span> <span class="n">DEFAULT_ALIGNMENT</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alignment</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">alignment</span> <span class="ow">or</span> <span class="n">DEFAULT_ALIGNMENT</span>
         <span class="c1"># These fields remain private and will be deleted after processing</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_current_alignment</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">alignment</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_current_group</span> <span class="o">=</span> <span class="n">BitfieldGroup</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_alignment</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_bit_pos</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">groups</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_group</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_alignment</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">alignment</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_group</span><span class="p">:</span> <span class="n">BitfieldGroup</span> <span class="o">=</span> <span class="n">BitfieldGroup</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_alignment</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bit_pos</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">BitfieldGroup</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_group</span><span class="p">]</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
             <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span>
@@ -1038,7 +1100,8 @@
         <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_alignment</span>
         <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_group</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">):</span>
+    <span class="nd">@override</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Append another Bitfield instance to this one.</span>
 
@@ -1057,7 +1120,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">sequence</span><span class="o">.</span><span class="n">groups</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">Struct</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__add__</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_process_align</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Field</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_process_align</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">_OptionLike</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="n">SetAlignment</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Field</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Process an alignment directive.</span>
 
@@ -1078,19 +1143,25 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_bit_pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_group</span><span class="o">.</span><span class="n">bit_count</span>
 
         <span class="k">for</span> <span class="n">option</span> <span class="ow">in</span> <span class="n">options</span> <span class="ow">or</span> <span class="p">[]:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_alignment_option</span><span class="p">(</span><span class="n">option</span><span class="p">):</span>
-                <span class="k">continue</span>
-
-            <span class="n">alignment</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_alignment</span>
-            <span class="n">group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_group</span>
-            <span class="k">if</span> <span class="n">option</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="p">(</span><span class="n">EndGroup</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">NewGroup</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
-                <span class="c1"># finalize current group (same effect for alignment statement)</span>
-                <span class="n">group</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">alignment</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_current_group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_new_group</span><span class="p">(</span><span class="n">alignment</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_alignment_option</span><span class="p">(</span><span class="n">option</span><span class="p">):</span>
+                <span class="n">alignment</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_alignment</span>
+                <span class="n">group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_group</span>
+                <span class="k">if</span> <span class="n">option</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="p">(</span><span class="n">EndGroup</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">NewGroup</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
+                    <span class="c1"># finalize current group (same effect for alignment statement)</span>
+                    <span class="n">group</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">alignment</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_current_group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_new_group</span><span class="p">(</span><span class="n">alignment</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">Field</span><span class="p">(</span><span class="n">Pass</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_process_bits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">bits</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">factory</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Field</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_process_bits</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">bits</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">factory</span><span class="p">:</span> <span class="p">(</span>
+            <span class="n">BitfieldValueFactory</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="nb">type</span><span class="p">[</span><span class="n">BitfieldValueFactory</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span>
+        <span class="p">)</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">options</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">_OptionLike</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="n">SetAlignment</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Field</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Process a bitfield entry with a given width.</span>
 
@@ -1122,7 +1193,13 @@
         <span class="k">return</span> <span class="n">Field</span><span class="p">(</span><span class="n">Int</span><span class="p">(</span><span class="n">bits</span><span class="p">))</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_process_bits_field</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">factory</span><span class="o">=</span><span class="kc">None</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">field</span><span class="p">:</span> <span class="n">Field</span><span class="p">,</span>
+        <span class="n">options</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">_OptionLike</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="n">SetAlignment</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">factory</span><span class="p">:</span> <span class="p">(</span>
+            <span class="n">BitfieldValueFactory</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="nb">type</span><span class="p">[</span><span class="n">BitfieldValueFactory</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span>
+        <span class="p">)</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Field</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Process a bitfield that wraps another field instance.</span>
@@ -1143,7 +1220,9 @@
             <span class="c1"># we don&#39;t need to check for NewGroup and EndGroup options here as no</span>
             <span class="c1"># bits are specified and the field gets its own group.</span>
             <span class="k">for</span> <span class="n">option</span> <span class="ow">in</span> <span class="n">options</span> <span class="ow">or</span> <span class="p">[]:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_process_alignment_option</span><span class="p">(</span><span class="n">option</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_process_alignment_option</span><span class="p">(</span>
+                    <span class="n">option</span>
+                <span class="p">)</span>  <span class="c1"># pyright: ignore[reportUnusedCallResult]</span>
 
             <span class="c1"># bits not present -&gt; treat defintion as simple field, which means we finalize</span>
             <span class="c1"># the current group, create a new FIELD GROUP and another new one after that</span>
@@ -1179,7 +1258,12 @@
 
         <span class="k">return</span> <span class="n">field</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_process_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">options</span><span class="p">,</span> <span class="n">entry</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_process_options</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">options</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">_OptionLike</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="n">SetAlignment</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">entry</span><span class="p">:</span> <span class="n">BitfieldEntry</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="c1"># fmt: off</span>
         <span class="n">consumed</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">for</span> <span class="n">option</span> <span class="ow">in</span> <span class="n">options</span> <span class="ow">or</span> <span class="p">[]:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_alignment_option</span><span class="p">(</span><span class="n">option</span><span class="p">):</span>
@@ -1187,7 +1271,7 @@
 
             <span class="n">group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_group</span>
             <span class="n">alignment</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_alignment</span>
-            <span class="k">if</span> <span class="n">option</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">EndGroup</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">option</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">EndGroup</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>  <span class="c1"># pyright: ignore[reportAttributeAccessIssue]</span>
                 <span class="k">if</span> <span class="n">entry</span><span class="p">:</span>
                     <span class="n">group</span><span class="o">.</span><span class="n">entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_bit_pos</span> <span class="o">+=</span> <span class="n">entry</span><span class="o">.</span><span class="n">width</span>
@@ -1196,7 +1280,7 @@
 
                 <span class="n">group</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">alignment</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_current_group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_new_group</span><span class="p">(</span><span class="n">alignment</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">option</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">NewGroup</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">option</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">NewGroup</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>  <span class="c1"># pyright: ignore[reportAttributeAccessIssue]</span>
                 <span class="c1"># finalize current group, create a new one and add the entry to the newly</span>
                 <span class="c1"># created group</span>
                 <span class="n">group</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">alignment</span><span class="p">)</span>
@@ -1210,13 +1294,19 @@
                     <span class="n">consumed</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="n">consumed</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_new_group</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alignment</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_new_group</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alignment</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BitfieldGroup</span><span class="p">:</span>
         <span class="n">new_group</span> <span class="o">=</span> <span class="n">BitfieldGroup</span><span class="p">(</span><span class="n">alignment</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_group</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_bit_pos</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">return</span> <span class="n">new_group</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_process_alignment_option</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">option</span><span class="p">):</span>
+    <span class="nd">@overload</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_process_alignment_option</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">option</span><span class="p">:</span> <span class="n">SetAlignment</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">True</span><span class="p">]:</span> <span class="o">...</span>
+    <span class="nd">@overload</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_process_alignment_option</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">option</span><span class="p">:</span> <span class="n">_OptionLike</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">False</span><span class="p">]:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_process_alignment_option</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">option</span><span class="p">:</span> <span class="n">SetAlignment</span> <span class="o">|</span> <span class="n">_OptionLike</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">option</span><span class="p">,</span> <span class="n">SetAlignment</span><span class="p">):</span>
             <span class="c1"># update current working alignment</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_current_alignment</span> <span class="o">=</span> <span class="n">option</span><span class="o">.</span><span class="n">alignment</span> <span class="ow">or</span> <span class="n">DEFAULT_ALIGNMENT</span>
@@ -1230,9 +1320,14 @@
 
         <span class="k">return</span> <span class="kc">False</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_process_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">annotation</span><span class="p">,</span> <span class="n">default</span><span class="p">):</span>
-        <span class="n">arch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">arch</span> <span class="ow">or</span> <span class="n">system_arch</span>
-        <span class="n">order</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">annotation</span><span class="p">,</span> <span class="n">ATTR_BYTEORDER</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="ow">or</span> <span class="n">SysNative</span><span class="p">)</span>
+    <span class="nd">@override</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_process_field</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">annotation</span><span class="p">:</span> <span class="n">_AnnotationT</span><span class="p">,</span> <span class="n">default</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Field</span><span class="p">:</span>
+        <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">arch</span>
+        <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">order</span>
+        <span class="p">)</span>  <span class="c1"># getattr(annotation, ATTR_BYTEORDER, None)</span>
         <span class="k">match</span> <span class="n">annotation</span><span class="p">:</span>
             <span class="k">case</span> <span class="nb">int</span><span class="p">():</span>
                 <span class="k">if</span> <span class="n">annotation</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -1284,10 +1379,14 @@
                     <span class="c1"># rule no. 5</span>
                     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_bits</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">factory</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span>
 
-                <span class="n">field</span> <span class="o">=</span> <span class="n">width</span>
+                <span class="n">field</span><span class="p">:</span> <span class="n">_StructLike</span> <span class="o">=</span> <span class="n">width</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">Field</span><span class="p">):</span>
                     <span class="n">field</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span> <span class="n">arch</span><span class="o">=</span><span class="n">arch</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">default</span><span class="p">)</span>
-
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">field</span><span class="o">.</span><span class="n">has_order</span><span class="p">():</span>
+                        <span class="n">field</span><span class="o">.</span><span class="n">order</span> <span class="o">=</span> <span class="n">order</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">field</span><span class="o">.</span><span class="n">has_arch</span><span class="p">():</span>
+                        <span class="n">field</span><span class="o">.</span><span class="n">arch</span> <span class="o">=</span> <span class="n">arch</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_bits_field</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">options</span><span class="p">,</span> <span class="n">factory</span><span class="p">)</span>
 
             <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
@@ -1295,9 +1394,15 @@
                 <span class="n">field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_annotation</span><span class="p">(</span><span class="n">annotation</span><span class="p">,</span> <span class="n">default</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">arch</span><span class="p">)</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">Field</span><span class="p">):</span>
                     <span class="n">field</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span> <span class="n">arch</span><span class="o">=</span><span class="n">arch</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">default</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">field</span><span class="o">.</span><span class="n">has_order</span><span class="p">():</span>
+                        <span class="n">field</span><span class="o">.</span><span class="n">order</span> <span class="o">=</span> <span class="n">order</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">field</span><span class="o">.</span><span class="n">has_arch</span><span class="p">():</span>
+                        <span class="n">field</span><span class="o">.</span><span class="n">arch</span> <span class="o">=</span> <span class="n">arch</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_bits_field</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">field</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_included</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="p">,</span> <span class="n">annotation</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="nd">@override</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_included</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">annotation</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_included</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">default</span><span class="p">,</span> <span class="n">annotation</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">False</span>
 
@@ -1312,12 +1417,14 @@
             <span class="k">return</span> <span class="n">width</span><span class="o">.</span><span class="n">bits</span> <span class="o">!=</span> <span class="mi">0</span>
         <span class="k">return</span> <span class="kc">True</span>
 
+    <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_replace_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">type_</span><span class="p">:</span> <span class="nb">type</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">entry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_entry</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">entry</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">entry</span><span class="o">.</span><span class="n">factory</span><span class="p">:</span>
                 <span class="n">type_</span> <span class="o">=</span> <span class="nb">int</span>
             <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">factory</span><span class="p">,</span> <span class="n">BitfieldValueFactory</span><span class="p">):</span>
+                <span class="c1"># REVISIT: what if .target is a function?</span>
                 <span class="n">type_</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">factory</span><span class="o">.</span><span class="n">target</span> <span class="ow">or</span> <span class="nb">object</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">type_</span> <span class="o">=</span> <span class="nb">object</span>
@@ -1325,7 +1432,8 @@
         <span class="c1"># else: must be a field with a known type</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_replace_type</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">type_</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__size__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="nd">@override</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__size__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculate the total size of the bitfield structure.</span>
 
@@ -1346,12 +1454,20 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">g</span><span class="p">:</span> <span class="n">g</span><span class="o">.</span><span class="n">get_bits</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="p">))</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">unpack_one</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
-        <span class="n">init_data</span> <span class="o">=</span> <span class="n">O_CONTEXT_FACTORY</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
-        <span class="n">context</span><span class="p">[</span><span class="n">CTX_OBJECT</span><span class="p">]</span> <span class="o">=</span> <span class="n">O_CONTEXT_FACTORY</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">_parent</span><span class="o">=</span><span class="n">context</span><span class="p">)</span>
-        <span class="n">base_path</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_PATH</span><span class="p">]</span>
+    <span class="nd">@override</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">unpack_one</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_VT</span><span class="p">:</span>
+        <span class="n">init_data</span> <span class="o">=</span> <span class="p">(</span><span class="n">O_CONTEXT_FACTORY</span><span class="o">.</span><span class="n">value</span> <span class="ow">or</span> <span class="n">Context</span><span class="p">)()</span>
+        <span class="n">context</span><span class="p">[</span><span class="n">CTX_OBJECT</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">O_CONTEXT_FACTORY</span><span class="o">.</span><span class="n">value</span> <span class="ow">or</span> <span class="n">Context</span><span class="p">)(</span><span class="n">_parent</span><span class="o">=</span><span class="n">context</span><span class="p">)</span>
+
+        <span class="n">field</span><span class="p">:</span> <span class="n">Field</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">CTX_FIELD</span><span class="p">)</span>
+        <span class="n">base_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_PATH</span><span class="p">]</span>
         <span class="c1"># REVISIT</span>
-        <span class="n">endian</span> <span class="o">=</span> <span class="s2">&quot;little&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="o">.</span><span class="n">ch</span> <span class="o">==</span> <span class="n">LITTLE_ENDIAN_FMT</span> <span class="k">else</span> <span class="s2">&quot;big&quot;</span>
+        <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">field</span><span class="o">.</span><span class="n">order</span>
+            <span class="k">if</span> <span class="n">field</span>
+            <span class="k">else</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="ow">or</span> <span class="n">O_DEFAULT_ENDIAN</span><span class="o">.</span><span class="n">value</span> <span class="ow">or</span> <span class="n">LittleEndian</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">endian</span> <span class="o">=</span> <span class="s2">&quot;little&quot;</span> <span class="k">if</span> <span class="n">order</span><span class="o">.</span><span class="n">ch</span> <span class="o">==</span> <span class="n">LITTLE_ENDIAN_FMT</span> <span class="k">else</span> <span class="s2">&quot;big&quot;</span>
         <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">group</span><span class="o">.</span><span class="n">is_field</span><span class="p">():</span>
                 <span class="c1"># unpack using field instance</span>
@@ -1391,16 +1507,23 @@
 
                     <span class="n">init_data</span><span class="p">[</span><span class="n">entry</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="o">**</span><span class="n">init_data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="o">**</span><span class="n">init_data</span><span class="p">)</span>  <span class="c1"># pyright: ignore[reportCallIssue]</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">pack_one</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="nd">@override</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pack_one</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">_VT</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">base_path</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_PATH</span><span class="p">]</span>
+        <span class="n">field</span><span class="p">:</span> <span class="n">Field</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">CTX_FIELD</span><span class="p">)</span>
         <span class="c1"># REVISIT</span>
-        <span class="n">endian</span> <span class="o">=</span> <span class="s2">&quot;little&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="o">.</span><span class="n">ch</span> <span class="o">==</span> <span class="n">LITTLE_ENDIAN_FMT</span> <span class="k">else</span> <span class="s2">&quot;big&quot;</span>
+        <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">field</span><span class="o">.</span><span class="n">order</span>
+            <span class="k">if</span> <span class="n">field</span>
+            <span class="k">else</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="ow">or</span> <span class="n">O_DEFAULT_ENDIAN</span><span class="o">.</span><span class="n">value</span> <span class="ow">or</span> <span class="n">LittleEndian</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">endian</span> <span class="o">=</span> <span class="s2">&quot;little&quot;</span> <span class="k">if</span> <span class="n">order</span><span class="o">.</span><span class="n">ch</span> <span class="o">==</span> <span class="n">LITTLE_ENDIAN_FMT</span> <span class="k">else</span> <span class="s2">&quot;big&quot;</span>
         <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">group</span><span class="o">.</span><span class="n">is_field</span><span class="p">():</span>
                 <span class="n">field</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">get_field</span><span class="p">()</span>
-                <span class="n">name</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="vm">__name__</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span>
                 <span class="n">context</span><span class="p">[</span><span class="n">CTX_PATH</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_path</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
                 <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_members</span><span class="p">:</span>
                     <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">field</span><span class="p">)</span>
@@ -1433,14 +1556,16 @@
 
 <div class="viewcode-block" id="Bitfield.add_action">
 <a class="viewcode-back" href="../../../library/model/bitfield.html#caterpillar.model.Bitfield.add_action">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">add_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="nd">@override</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">:</span> <span class="n">_ActionLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_current_group</span><span class="o">.</span><span class="n">entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
             <span class="n">BitfieldEntry</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;&lt;action&gt;&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="n">action</span><span class="p">)</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_action</span><span class="p">(</span><span class="n">action</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BitfieldEntry</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># fmt: off</span>
         <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">group</span><span class="o">.</span><span class="n">is_field</span><span class="p">():</span>
                 <span class="k">continue</span>
@@ -1451,100 +1576,200 @@
 
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_make_bitfield</span><span class="p">(</span>
-    <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span>
-    <span class="o">/</span><span class="p">,</span>
-    <span class="o">*</span><span class="p">,</span>
-    <span class="n">options</span><span class="p">,</span>
-    <span class="n">order</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">arch</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">field_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">alignment</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
-    <span class="n">_</span> <span class="o">=</span> <span class="n">Bitfield</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">,</span>
-        <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span>
-        <span class="n">arch</span><span class="o">=</span><span class="n">arch</span><span class="p">,</span>
-        <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span>
-        <span class="n">field_options</span><span class="o">=</span><span class="n">field_options</span><span class="p">,</span>
-        <span class="n">alignment</span><span class="o">=</span><span class="n">alignment</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="k">return</span> <span class="bp">cls</span>
+<div class="viewcode-block" id="BitfieldDefMixin">
+<a class="viewcode-back" href="../../../library/model/bitfield.html#caterpillar.model.BitfieldDefMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BitfieldDefMixin</span><span class="p">(</span><span class="n">StructDefMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mixin extending :class:`StructDefMixin` for ``Bitfield``-based models.</span>
 
-
-<div class="viewcode-block" id="bitfield">
-<a class="viewcode-back" href="../../../library/model/bitfield.html#caterpillar.model.bitfield">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">bitfield</span><span class="p">(</span>
-    <span class="bp">cls</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="o">/</span><span class="p">,</span>
-    <span class="o">*</span><span class="p">,</span>
-    <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">order</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">arch</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">field_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">alignment</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-<span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Decorator that transforms a class definition into a :class:`Bitfield` structure.</span>
-
-<span class="sd">    This decorator enables defining bitfields using simple class syntax,</span>
-<span class="sd">    with support for custom alignment, ordering, architecture, and field options.</span>
-
-<span class="sd">    :param cls: The user-defined class to transform.</span>
-<span class="sd">    :type cls: Optional[type]</span>
-<span class="sd">    :param options: A set of global or structure-specific options.</span>
-<span class="sd">    :type options: Optional[set]</span>
-<span class="sd">    :param order: Optional byte order for serialization (e.g., &#39;little&#39; or &#39;big&#39;).</span>
-<span class="sd">    :type order: Optional[str]</span>
-<span class="sd">    :param arch: Optional architecture string (e.g., &#39;x86&#39;, &#39;arm&#39;).</span>
-<span class="sd">    :type arch: Optional[str]</span>
-<span class="sd">    :param field_options: Optional default options for fields.</span>
-<span class="sd">    :type field_options: Optional[set]</span>
-<span class="sd">    :param alignment: Optional alignment in bits.</span>
-<span class="sd">    :type alignment: Optional[int]</span>
-<span class="sd">    :return: The decorated class, enhanced as a `Bitfield` structure.</span>
-<span class="sd">    :rtype: type</span>
-
-<span class="sd">    .. code-block:: python</span>
-
-<span class="sd">        from caterpillar.py import bitfield, SetAlignment, uint16</span>
-
-<span class="sd">        @bitfield</span>
-<span class="sd">        class Packet:</span>
-<span class="sd">            version   : 3</span>
-<span class="sd">            type      : (5, SetAlignment(16))</span>
-<span class="sd">            length    : 10</span>
-<span class="sd">            _         : 0  # align to 16bits</span>
-<span class="sd">            payload   : uint16</span>
-
-<span class="sd">        # You can now pack/unpack Packet instances as compact binary bitfields</span>
-<span class="sd">        pkt = Packet(version=1, type=2, length=128, payload=0xABCD)</span>
-<span class="sd">        packed = pack(pkt)</span>
-<span class="sd">        unpacked = unpack(Packet, packed)</span>
+<span class="sd">    This mixin behaves identically to :class:`StructDefMixin` but binds the</span>
+<span class="sd">    ``__struct__`` attribute to a :class:`Bitfield` definition instead of a</span>
+<span class="sd">    regular :class:`Struct`. It allows bitfield models to reuse the same</span>
+<span class="sd">    convenience API (``from_bytes``, ``to_bytes``, ``[]`` operator, etc.)</span>
+<span class="sd">    while operating on compact bit-level layouts.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">wrap</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">_make_bitfield</span><span class="p">(</span>
-            <span class="bp">cls</span><span class="p">,</span>
-            <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span>
+    <span class="c1"># fmt: off</span>
+    <span class="n">__struct__</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="n">Bitfield</span><span class="p">[</span><span class="n">Self</span><span class="p">]]</span>  <span class="c1"># pyright: ignore[reportIncompatibleVariableOverride]</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reference to the bitfield model&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="bitfield_factory">
+<a class="viewcode-back" href="../../../library/model/bitfield.html#caterpillar.model.bitfield_factory">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">bitfield_factory</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Factory for transforming plain classes into ``Bitfield`` models.</span>
+
+<span class="sd">    This factory mirrors the behavior of :class:`struct_factory` but targets</span>
+<span class="sd">    bit-level structures. It allows developers to declare compact bitfield</span>
+<span class="sd">    layouts using class syntax while retaining full type-checker awareness</span>
+<span class="sd">    through ``@dataclass_transform``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">mixin</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">BitfieldDefMixin</span><span class="p">]</span> <span class="o">=</span> <span class="n">BitfieldDefMixin</span>
+
+<div class="viewcode-block" id="bitfield_factory.make_bitfield">
+<a class="viewcode-back" href="../../../library/model/bitfield.html#caterpillar.model.bitfield_factory.make_bitfield">[docs]</a>
+    <span class="nd">@dataclass_transform</span><span class="p">(</span><span class="n">field_specifiers</span><span class="o">=</span><span class="p">(</span><span class="n">dataclasses</span><span class="o">.</span><span class="n">field</span><span class="p">,</span> <span class="n">Invisible</span><span class="p">))</span>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">make_bitfield</span><span class="p">(</span>
+        <span class="n">ty</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">_VT</span><span class="p">],</span>
+        <span class="o">/</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">options</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">_OptionLike</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">field_options</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">_OptionLike</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">alignment</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a ``Bitfield`` model from a class definition.</span>
+
+<span class="sd">        This helper performs the underlying transformation by constructing</span>
+<span class="sd">        a :class:`Bitfield` instance and returning the generated model class.</span>
+
+<span class="sd">        :param ty: The base class to transform into a Bitfield model</span>
+<span class="sd">        :type ty: type[_VT]</span>
+<span class="sd">        :param order: Byte order used during serialization, defaults to None</span>
+<span class="sd">        :type order: _EndianLike | None, optional</span>
+<span class="sd">        :param arch: Architecture configuration inferred by fields,</span>
+<span class="sd">            defaults to None</span>
+<span class="sd">        :type arch: _ArchLike | None, optional</span>
+<span class="sd">        :param options: Additional options controlling bitfield behavior,</span>
+<span class="sd">            defaults to None</span>
+<span class="sd">        :type options: Iterable[_OptionLike] | None, optional</span>
+<span class="sd">        :param field_options: Default options applied to bitfield members,</span>
+<span class="sd">            defaults to None</span>
+<span class="sd">        :type field_options: Iterable[_OptionLike] | None, optional</span>
+<span class="sd">        :param alignment: Optional bit alignment constraint, defaults to None</span>
+<span class="sd">        :type alignment: int | None, optional</span>
+<span class="sd">        :return: The generated Bitfield model class</span>
+<span class="sd">        :rtype: type</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">Bitfield</span><span class="p">(</span>
+            <span class="n">ty</span><span class="p">,</span>
             <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span>
             <span class="n">arch</span><span class="o">=</span><span class="n">arch</span><span class="p">,</span>
+            <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span>
             <span class="n">field_options</span><span class="o">=</span><span class="n">field_options</span><span class="p">,</span>
             <span class="n">alignment</span><span class="o">=</span><span class="n">alignment</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="k">return</span> <span class="n">b</span><span class="o">.</span><span class="n">model</span></div>
 
-    <span class="k">if</span> <span class="bp">cls</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">_make_bitfield</span><span class="p">(</span>
-            <span class="bp">cls</span><span class="p">,</span>
-            <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span>
-            <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span>
-            <span class="n">arch</span><span class="o">=</span><span class="n">arch</span><span class="p">,</span>
-            <span class="n">field_options</span><span class="o">=</span><span class="n">field_options</span><span class="p">,</span>
-            <span class="n">alignment</span><span class="o">=</span><span class="n">alignment</span><span class="p">,</span>
-        <span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">wrap</span></div>
+    <span class="nd">@overload</span>
+    <span class="nd">@dataclass_transform</span><span class="p">(</span>
+        <span class="n">kw_only_default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">field_specifiers</span><span class="o">=</span><span class="p">(</span><span class="n">dataclasses</span><span class="o">.</span><span class="n">field</span><span class="p">,</span> <span class="n">Invisible</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bitfield</span><span class="p">(</span>
+        <span class="n">ty</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">_VT</span><span class="p">],</span>
+        <span class="o">/</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">options</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">_OptionLike</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">field_options</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">_OptionLike</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">alignment</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">_VT</span><span class="p">]:</span> <span class="o">...</span>
+    <span class="nd">@overload</span>
+    <span class="nd">@dataclass_transform</span><span class="p">(</span>
+        <span class="n">kw_only_default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">field_specifiers</span><span class="o">=</span><span class="p">(</span><span class="n">dataclasses</span><span class="o">.</span><span class="n">field</span><span class="p">,</span> <span class="n">Invisible</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bitfield</span><span class="p">(</span>
+        <span class="n">ty</span><span class="p">:</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">/</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">options</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">_OptionLike</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">field_options</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">_OptionLike</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">alignment</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">type</span><span class="p">[</span><span class="n">_VT</span><span class="p">]],</span> <span class="nb">type</span><span class="p">[</span><span class="n">_VT</span><span class="p">]]:</span> <span class="o">...</span>
+<div class="viewcode-block" id="bitfield_factory.bitfield">
+<a class="viewcode-back" href="../../../library/model/bitfield.html#caterpillar.model.bitfield_factory.bitfield">[docs]</a>
+    <span class="nd">@dataclass_transform</span><span class="p">(</span>
+        <span class="n">kw_only_default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">field_specifiers</span><span class="o">=</span><span class="p">(</span><span class="n">dataclasses</span><span class="o">.</span><span class="n">field</span><span class="p">,</span> <span class="n">Invisible</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bitfield</span><span class="p">(</span>
+        <span class="n">ty</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">_VT</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">/</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">options</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">_OptionLike</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">field_options</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">_OptionLike</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">alignment</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">_VT</span><span class="p">]</span> <span class="o">|</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">type</span><span class="p">[</span><span class="n">_VT</span><span class="p">]],</span> <span class="nb">type</span><span class="p">[</span><span class="n">_VT</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Decorator or direct transformer for creating a ``Bitfield`` model.</span>
 
+<span class="sd">        This method can be used either as:</span>
+
+<span class="sd">        - A decorator: ``@bitfield(...)``</span>
+<span class="sd">        - A direct transformer: ``MyBitfield = bitfield(MyClass, ...)``</span>
+
+<span class="sd">        It enables defining compact bit-level layouts using standard class</span>
+<span class="sd">        syntax while preserving dataclass semantics and static type checking.</span>
+
+<span class="sd">        &gt;&gt;&gt; from caterpillar.py import bitfield, SetAlignment, uint16</span>
+<span class="sd">        &gt;&gt;&gt; @bitfield</span>
+<span class="sd">        ... class Packet:</span>
+<span class="sd">        ...     version   : 3</span>
+<span class="sd">        ...     type      : (5, SetAlignment(16))</span>
+<span class="sd">        ...     length    : 10</span>
+<span class="sd">        ...     _         : 0  # align to 16bits</span>
+<span class="sd">        ...     payload   : uint16</span>
+<span class="sd">        ...</span>
+<span class="sd">        &gt;&gt;&gt; # You can now pack/unpack Packet instances as compact binary bitfields</span>
+<span class="sd">        &gt;&gt;&gt; pkt = Packet(version=1, type=2, length=128, payload=0xABCD)</span>
+<span class="sd">        &gt;&gt;&gt; packed = pack(pkt)</span>
+<span class="sd">        &gt;&gt;&gt; unpacked = unpack(Packet, packed)</span>
+
+<span class="sd">        :param ty: The user-defined class to transform. If None, a decorator</span>
+<span class="sd">            function is returned</span>
+<span class="sd">        :type ty: type[_VT] | None, optional</span>
+<span class="sd">        :param order: Byte order used during serialization, defaults to None</span>
+<span class="sd">        :type order: _EndianLike | None, optional</span>
+<span class="sd">        :param arch: Architecture configuration inferred by fields,</span>
+<span class="sd">            defaults to None</span>
+<span class="sd">        :type arch: _ArchLike | None, optional</span>
+<span class="sd">        :param options: Additional options controlling bitfield behavior,</span>
+<span class="sd">            defaults to None</span>
+<span class="sd">        :type options: Iterable[_OptionLike] | None, optional</span>
+<span class="sd">        :param field_options: Default options applied to bitfield members,</span>
+<span class="sd">            defaults to None</span>
+<span class="sd">        :type field_options: Iterable[_OptionLike] | None, optional</span>
+<span class="sd">        :param alignment: Optional bit alignment constraint, defaults to None</span>
+<span class="sd">        :type alignment: int | None, optional</span>
+<span class="sd">        :return: The decorated Bitfield model class or a decorator function</span>
+<span class="sd">        :rtype: type[_VT] | Callable[[type[_VT]], type[_VT]]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">wrap</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">_VT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">_VT</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="n">bitfield_factory</span><span class="o">.</span><span class="n">make_bitfield</span><span class="p">(</span>
+                <span class="bp">cls</span><span class="p">,</span>
+                <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span>
+                <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span>
+                <span class="n">arch</span><span class="o">=</span><span class="n">arch</span><span class="p">,</span>
+                <span class="n">field_options</span><span class="o">=</span><span class="n">field_options</span><span class="p">,</span>
+                <span class="n">alignment</span><span class="o">=</span><span class="n">alignment</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">ty</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">bitfield_factory</span><span class="o">.</span><span class="n">make_bitfield</span><span class="p">(</span>
+                <span class="n">ty</span><span class="p">,</span>
+                <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span>
+                <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span>
+                <span class="n">arch</span><span class="o">=</span><span class="n">arch</span><span class="p">,</span>
+                <span class="n">field_options</span><span class="o">=</span><span class="n">field_options</span><span class="p">,</span>
+                <span class="n">alignment</span><span class="o">=</span><span class="n">alignment</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">wrap</span></div>
+</div>
+
+
+
+<span class="n">bitfield</span> <span class="o">=</span> <span class="n">bitfield_factory</span><span class="o">.</span><span class="n">bitfield</span>
 </pre></div>
 
                 </article>
@@ -1595,7 +1820,7 @@
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     <br/>
   </p>
 </div>

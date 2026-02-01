@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>4.3. Context &#8212; Caterpillar 2.7.0 documentation</title>
+    <title>4.3. Context &#8212; Caterpillar 2.8.0 documentation</title>
   
   
   
@@ -41,9 +41,9 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=dfec817d"></script>
-    <script src="../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/documentation_options.js?v=69ff2ef9"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
@@ -54,7 +54,7 @@
     <link rel="prev" title="4.2. Options / Flags" href="options.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.7.0" />
+  <meta name="docsearch:version" content="2.8.0" />
   </head>
   
   
@@ -116,7 +116,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.7.0</p>
+    <p class="title logo__title">Caterpillar 2.8.0</p>
   
 </a></div>
     
@@ -350,8 +350,11 @@
 <li class="toctree-l2"><a class="reference internal" href="fields/common.html">4.8.2. Common Structs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fields/compression.html">4.8.3. Compression Structs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fields/crypto.html">4.8.4. Cryptographic Structs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fields/net.html">4.8.5. Network Structs</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1"><a class="reference internal" href="hooks.html">4.9. Hooks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ext_types.html">4.10. Types (Extended Syntax)</a></li>
 </ul>
 </div>
 </nav></div>
@@ -418,7 +421,7 @@
 <h2><span class="section-number">4.3.1. </span>Context classes<a class="headerlink" href="#context-classes" title="Link to this heading">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="caterpillar.context.Context">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.context.</span></span><span class="sig-name descname"><span class="pre">Context</span></span><a class="reference internal" href="../_modules/caterpillar/context.html#Context"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.context.Context" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">caterpillar.context.</span></span><span class="sig-name descname"><span class="pre">Context</span></span><a class="reference internal" href="../_modules/caterpillar/context.html#Context"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.context.Context" title="Link to this definition">#</a></dt>
 <dd><p>Represents a context object with attribute-style access.</p>
 <p>Represents the primary container for context-aware operations during packing
 and unpacking. It manages attribute access, supports hierarchical
@@ -426,7 +429,7 @@ relationships, and tracks contextual state. Conforms to the
 <a class="reference internal" href="../reference/datamodel/protocols/contextlike.html#ContextLike" title="_ContextLike"><code class="xref py py-class docutils literal notranslate"><span class="pre">_ContextLike</span></code></a> protocol.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.context.Context.__context_getattr__">
-<span class="sig-name descname"><span class="pre">__context_getattr__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caterpillar/context.html#Context.__context_getattr__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.context.Context.__context_getattr__" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">__context_getattr__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="../_modules/caterpillar/context.html#Context.__context_getattr__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.context.Context.__context_getattr__" title="Link to this definition">#</a></dt>
 <dd><p>Retrieves an attribute from the context.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -442,20 +445,94 @@ relationships, and tracks contextual state. Conforms to the
 
 <dl class="py class">
 <dt class="sig sig-object py" id="caterpillar.context.ContextPath">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.context.</span></span><span class="sig-name descname"><span class="pre">ContextPath</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caterpillar/context.html#ContextPath"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.context.ContextPath" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">caterpillar.context.</span></span><span class="sig-name descname"><span class="pre">ContextPath</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caterpillar/context.html#ContextPath"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.context.ContextPath" title="Link to this definition">#</a></dt>
 <dd><p>Represents a lambda function for retrieving a value from a Context based on a specified path.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="caterpillar.context.ContextPath.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ContextLike</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">_T</span></span></span><a class="reference internal" href="../_modules/caterpillar/context.html#ContextPath.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.context.ContextPath.__call__" title="Link to this definition">#</a></dt>
+<dd><p>Calls the lambda function to retrieve a value from a Context.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>context</strong> – The Context from which to retrieve the value.</p></li>
+<li><p><strong>kwds</strong> – Additional keyword arguments.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The value retrieved from the Context based on the path.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caterpillar.context.ContextPath.__getattribute__">
+<span class="sig-name descname"><span class="pre">__getattribute__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'_field'</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#caterpillar.context.ContextPath" title="caterpillar.context.ContextPath"><span class="pre">ContextPath</span></a><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'Field[_IT,</span> <span class="pre">_OT]</span> <span class="pre">|</span> <span class="pre">None'</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/caterpillar/context.html#ContextPath.__getattribute__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.context.ContextPath.__getattribute__" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__getattribute__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'_parent'</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#caterpillar.context.ContextPath" title="caterpillar.context.ContextPath"><span class="pre">ContextPath</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ContextLike</span><span class="p"><span class="pre">]</span></span></span></span></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__getattribute__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'_obj'</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#caterpillar.context.ContextPath" title="caterpillar.context.ContextPath"><span class="pre">ContextPath</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ContextLike</span><span class="p"><span class="pre">]</span></span></span></span></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__getattribute__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'_offsets'</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#caterpillar.context.ContextPath" title="caterpillar.context.ContextPath"><span class="pre">ContextPath</span></a><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__getattribute__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'_io'</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#caterpillar.context.ContextPath" title="caterpillar.context.ContextPath"><span class="pre">ContextPath</span></a><span class="p"><span class="pre">[</span></span><span class="pre">IOBase</span><span class="p"><span class="pre">]</span></span></span></span></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__getattribute__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'_pos'</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#caterpillar.context.ContextPath" title="caterpillar.context.ContextPath"><span class="pre">ContextPath</span></a><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__getattribute__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'_index'</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#caterpillar.context.ContextPath" title="caterpillar.context.ContextPath"><span class="pre">ContextPath</span></a><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__getattribute__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'_path'</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#caterpillar.context.ContextPath" title="caterpillar.context.ContextPath"><span class="pre">ContextPath</span></a><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__getattribute__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'_is_seq'</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#caterpillar.context.ContextPath" title="caterpillar.context.ContextPath"><span class="pre">ContextPath</span></a><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span></span></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__getattribute__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'_root'</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#caterpillar.context.ContextPath" title="caterpillar.context.ContextPath"><span class="pre">ContextPath</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ContextLike</span><span class="p"><span class="pre">]</span></span></span></span></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__getattribute__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'_order'</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#caterpillar.context.ContextPath" title="caterpillar.context.ContextPath"><span class="pre">ContextPath</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_EndianLike</span><span class="p"><span class="pre">]</span></span></span></span></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__getattribute__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'_arch'</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#caterpillar.context.ContextPath" title="caterpillar.context.ContextPath"><span class="pre">ContextPath</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ArchLike</span><span class="p"><span class="pre">]</span></span></span></span></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__getattribute__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#caterpillar.context.ContextPath" title="caterpillar.context.ContextPath"><span class="pre">ContextPath</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_IT</span><span class="p"><span class="pre">]</span></span></span></span></dt>
+<dd><p>Gets an attribute from the ContextPath, creating a new instance if needed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>key</strong> – The attribute key.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A new ContextPath instance with an updated path.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caterpillar.context.ContextPath.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/caterpillar/context.html#ContextPath.__repr__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.context.ContextPath.__repr__" title="Link to this definition">#</a></dt>
+<dd><p>Returns a string representation of the ContextPath.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A string representation.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="caterpillar.context.ContextPath.parentctx">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">parentctx</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#caterpillar.context.ContextPath" title="caterpillar.context.ContextPath"><span class="pre">ContextPath</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ContextLike</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#caterpillar.context.ContextPath.parentctx" title="Link to this definition">#</a></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.8.0.</span></p>
+</div>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="caterpillar.context.ContextLength">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.context.</span></span><span class="sig-name descname"><span class="pre">ContextLength</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#caterpillar.context.ContextPath" title="caterpillar.context.ContextPath"><span class="pre">ContextPath</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caterpillar/context.html#ContextLength"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.context.ContextLength" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">caterpillar.context.</span></span><span class="sig-name descname"><span class="pre">ContextLength</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#caterpillar.context.ContextPath" title="caterpillar.context.ContextPath"><span class="pre">ContextPath</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Sized</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caterpillar/context.html#ContextLength"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.context.ContextLength" title="Link to this definition">#</a></dt>
 <dd><p>Encapsulates length information derived from the context, often used in
 size-dependent field evaluation.</p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="caterpillar.context.ConditionContext">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.context.</span></span><span class="sig-name descname"><span class="pre">ConditionContext</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">condition</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caterpillar/context.html#ConditionContext"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.context.ConditionContext" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">caterpillar.context.</span></span><span class="sig-name descname"><span class="pre">ConditionContext</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">condition</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ContextLambda</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caterpillar/context.html#ConditionContext"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.context.ConditionContext" title="Link to this definition">#</a></dt>
 <dd><p>Class implementation of an inline condition.</p>
 <p>Use this class to automatically apply a condition to multiple
 field definitions. Note that this class will only work if it
@@ -478,12 +555,66 @@ has access to the parent stack frame.</p>
 </dl>
 </dd></dl>
 
+<dl class="py class">
+<dt class="sig sig-object py" id="caterpillar.context.SetContextVar">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">caterpillar.context.</span></span><span class="sig-name descname"><span class="pre">SetContextVar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ContextLambda</span><span class="p"><span class="pre">[</span></span><span class="pre">_IT</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caterpillar/context.html#SetContextVar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.context.SetContextVar" title="Link to this definition">#</a></dt>
+<dd><p>Defines an action that sets a context variable during pack or unpack.</p>
+<p>The value assigned to the context key is computed dynamically using
+a user-provided callable evaluated at runtime.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<em>str</em>) – Name of the context variable to set</p></li>
+<li><p><strong>func</strong> (<em>callable</em>) – Callable used to compute the context value</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="caterpillar.context.SetContextVar.__action_pack__">
+<span class="sig-name descname"><span class="pre">__action_pack__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ContextLike</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/caterpillar/context.html#SetContextVar.__action_pack__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.context.SetContextVar.__action_pack__" title="Link to this definition">#</a></dt>
+<dd><p>Apply the context variable assignment during packing.</p>
+<p>The callable is evaluated and its result is stored in the
+context under the configured key.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>context</strong> (<em>object</em>) – Active packing context</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caterpillar.context.SetContextVar.__action_unpack__">
+<span class="sig-name descname"><span class="pre">__action_unpack__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ContextLike</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/caterpillar/context.html#SetContextVar.__action_unpack__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.context.SetContextVar.__action_unpack__" title="Link to this definition">#</a></dt>
+<dd><p>Apply the context variable assignment during unpacking.</p>
+<p>The callable is evaluated and its result is stored in the
+context under the configured key.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>context</strong> (<em>object</em>) – Active unpacking context</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 <section id="extra-options">
 <h2><span class="section-number">4.3.2. </span>Extra options<a class="headerlink" href="#extra-options" title="Link to this heading">#</a></h2>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caterpillar.context.O_CONTEXT_FACTORY">
-<span class="sig-prename descclassname"><span class="pre">context.</span></span><span class="sig-name descname"><span class="pre">O_CONTEXT_FACTORY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Flag(name='option.context_factory',</span> <span class="pre">value=&lt;class</span> <span class="pre">'caterpillar.context.Context'&gt;)</span></em><a class="headerlink" href="#caterpillar.context.O_CONTEXT_FACTORY" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">context.</span></span><span class="sig-name descname"><span class="pre">O_CONTEXT_FACTORY</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="options.html#caterpillar.options.Flag" title="caterpillar.options.Flag"><span class="pre">Flag</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ContextFactoryLike</span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Flag(name='option.context_factory',</span> <span class="pre">value=&lt;class</span> <span class="pre">'caterpillar.context.Context'&gt;)</span></span><a class="headerlink" href="#caterpillar.context.O_CONTEXT_FACTORY" title="Link to this definition">#</a></dt>
 <dd><p>Defines the default factory used to instantiate context objects during the
 packing and unpacking process. To use the C-extension <code class="code docutils literal notranslate"><span class="pre">Context</span></code>
 implementation for a 10% speed caveat, use:</p>
@@ -502,29 +633,47 @@ implementation for a 10% speed caveat, use:</p>
 </section>
 <section id="special-paths">
 <h2><span class="section-number">4.3.3. </span>Special paths<a class="headerlink" href="#special-paths" title="Link to this heading">#</a></h2>
-<dl class="py attribute">
+<dl class="py data">
 <dt class="sig sig-object py" id="caterpillar.context.this">
-<span class="sig-prename descclassname"><span class="pre">context.</span></span><span class="sig-name descname"><span class="pre">this</span></span><a class="headerlink" href="#caterpillar.context.this" title="Link to this definition">#</a></dt>
-<dd><p>Represents a lambda function for retrieving a value from a Context based on a specified path.</p>
+<span class="sig-prename descclassname"><span class="pre">caterpillar.context.</span></span><span class="sig-name descname"><span class="pre">this</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Final</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#caterpillar.context.ContextPath" title="caterpillar.context.ContextPath"><span class="pre">ContextPath</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ContextLike</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Path('_obj')</span></span><a class="headerlink" href="#caterpillar.context.this" title="Link to this definition">#</a></dt>
+<dd><p>Context path pointing to the current object in the evaluation context.</p>
+<p>This context path is used to reference the active object being processed when
+navigating or resolving nested structures using context paths.</p>
 </dd></dl>
 
-<dl class="py attribute">
+<dl class="py data">
 <dt class="sig sig-object py" id="caterpillar.context.ctx">
-<span class="sig-prename descclassname"><span class="pre">context.</span></span><span class="sig-name descname"><span class="pre">ctx</span></span><a class="headerlink" href="#caterpillar.context.ctx" title="Link to this definition">#</a></dt>
-<dd><p>Represents a lambda function for retrieving a value from a Context based on a specified path.</p>
+<span class="sig-prename descclassname"><span class="pre">caterpillar.context.</span></span><span class="sig-name descname"><span class="pre">ctx</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Final</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#caterpillar.context.ContextPath" title="caterpillar.context.ContextPath"><span class="pre">ContextPath</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ContextLike</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Path(None)</span></span><a class="headerlink" href="#caterpillar.context.ctx" title="Link to this definition">#</a></dt>
+<dd><p>Context path pointing to the current evaluation context.</p>
+<p>This context path allows access to the full context dictionary rather than a
+specific object within it.</p>
 </dd></dl>
 
-<dl class="py attribute">
+<dl class="py data">
 <dt class="sig sig-object py" id="caterpillar.context.parent">
-<span class="sig-prename descclassname"><span class="pre">context.</span></span><span class="sig-name descname"><span class="pre">parent</span></span><a class="headerlink" href="#caterpillar.context.parent" title="Link to this definition">#</a></dt>
-<dd><p>Represents a lambda function for retrieving a value from a Context based on a specified path.</p>
+<span class="sig-prename descclassname"><span class="pre">caterpillar.context.</span></span><span class="sig-name descname"><span class="pre">parent</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Final</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#caterpillar.context.ContextPath" title="caterpillar.context.ContextPath"><span class="pre">ContextPath</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ContextLike</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Path('_parent._obj')</span></span><a class="headerlink" href="#caterpillar.context.parent" title="Link to this definition">#</a></dt>
+<dd><p>Context path pointing to the parent object’s current object.</p>
+<p>This context path is used to reference the object belonging to the parent
+context level when navigating nested context structures.</p>
 </dd></dl>
 
-<dl class="py attribute">
+<dl class="py data">
+<dt class="sig sig-object py" id="caterpillar.context.parentctx">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.context.</span></span><span class="sig-name descname"><span class="pre">parentctx</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Final</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#caterpillar.context.ContextPath" title="caterpillar.context.ContextPath"><span class="pre">ContextPath</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ContextLike</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Path('_parent')</span></span><a class="headerlink" href="#caterpillar.context.parentctx" title="Link to this definition">#</a></dt>
+<dd><p>Context path pointing to the parent evaluation context.</p>
+<p>This context path allows access to the full parent context dictionary rather
+than only its object.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.8.0.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py data">
 <dt class="sig sig-object py" id="caterpillar.context.root">
-<span class="sig-prename descclassname"><span class="pre">context.</span></span><span class="sig-name descname"><span class="pre">root</span></span><a class="headerlink" href="#caterpillar.context.root" title="Link to this definition">#</a></dt>
-<dd><p>Represents a lambda function for retrieving a value from a Context based on a specified path.</p>
-<p>Provides access to the root-level context object.</p>
+<span class="sig-prename descclassname"><span class="pre">caterpillar.context.</span></span><span class="sig-name descname"><span class="pre">root</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Final</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#caterpillar.context.ContextPath" title="caterpillar.context.ContextPath"><span class="pre">ContextPath</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ContextLike</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Path('_root')</span></span><a class="headerlink" href="#caterpillar.context.root" title="Link to this definition">#</a></dt>
+<dd><p>Context path pointing to the root evaluation context.</p>
+<p>This context path is used to reference the top-level context in a nested
+context hierarchy.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">Added in version 2.6.0.</span></p>
 </div>
@@ -535,68 +684,86 @@ implementation for a 10% speed caveat, use:</p>
 <h2><span class="section-number">4.3.4. </span>Special Attributes<a class="headerlink" href="#special-attributes" title="Link to this heading">#</a></h2>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caterpillar.context.CTX_PARENT">
-<span class="sig-prename descclassname"><span class="pre">context.</span></span><span class="sig-name descname"><span class="pre">CTX_PARENT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'_parent'</span></em><a class="headerlink" href="#caterpillar.context.CTX_PARENT" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">context.</span></span><span class="sig-name descname"><span class="pre">CTX_PARENT</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'_parent'</span></span><a class="headerlink" href="#caterpillar.context.CTX_PARENT" title="Link to this definition">#</a></dt>
 <dd><p>Identifies the parent object within the context tree.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caterpillar.context.CTX_OBJECT">
-<span class="sig-prename descclassname"><span class="pre">context.</span></span><span class="sig-name descname"><span class="pre">CTX_OBJECT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'_obj'</span></em><a class="headerlink" href="#caterpillar.context.CTX_OBJECT" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">context.</span></span><span class="sig-name descname"><span class="pre">CTX_OBJECT</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'_obj'</span></span><a class="headerlink" href="#caterpillar.context.CTX_OBJECT" title="Link to this definition">#</a></dt>
 <dd><p>Refers to the current object associated with the context.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caterpillar.context.CTX_OFFSETS">
-<span class="sig-prename descclassname"><span class="pre">context.</span></span><span class="sig-name descname"><span class="pre">CTX_OFFSETS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'_offsets'</span></em><a class="headerlink" href="#caterpillar.context.CTX_OFFSETS" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">context.</span></span><span class="sig-name descname"><span class="pre">CTX_OFFSETS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'_offsets'</span></span><a class="headerlink" href="#caterpillar.context.CTX_OFFSETS" title="Link to this definition">#</a></dt>
 <dd><p>Stores offset information used during stream parsing or generation.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caterpillar.context.CTX_STREAM">
-<span class="sig-prename descclassname"><span class="pre">context.</span></span><span class="sig-name descname"><span class="pre">CTX_STREAM</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'_io'</span></em><a class="headerlink" href="#caterpillar.context.CTX_STREAM" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">context.</span></span><span class="sig-name descname"><span class="pre">CTX_STREAM</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'_io'</span></span><a class="headerlink" href="#caterpillar.context.CTX_STREAM" title="Link to this definition">#</a></dt>
 <dd><p>References the data stream associated with the packing or unpacking operation.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caterpillar.context.CTX_FIELD">
-<span class="sig-prename descclassname"><span class="pre">context.</span></span><span class="sig-name descname"><span class="pre">CTX_FIELD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'_field'</span></em><a class="headerlink" href="#caterpillar.context.CTX_FIELD" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">context.</span></span><span class="sig-name descname"><span class="pre">CTX_FIELD</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'_field'</span></span><a class="headerlink" href="#caterpillar.context.CTX_FIELD" title="Link to this definition">#</a></dt>
 <dd><p>Indicates the current field being processed within the structure.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caterpillar.context.CTX_VALUE">
-<span class="sig-prename descclassname"><span class="pre">context.</span></span><span class="sig-name descname"><span class="pre">CTX_VALUE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'_value'</span></em><a class="headerlink" href="#caterpillar.context.CTX_VALUE" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">context.</span></span><span class="sig-name descname"><span class="pre">CTX_VALUE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'_value'</span></span><a class="headerlink" href="#caterpillar.context.CTX_VALUE" title="Link to this definition">#</a></dt>
 <dd><p>Stores the value associated with the current context node.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caterpillar.context.CTX_POS">
-<span class="sig-prename descclassname"><span class="pre">context.</span></span><span class="sig-name descname"><span class="pre">CTX_POS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'_pos'</span></em><a class="headerlink" href="#caterpillar.context.CTX_POS" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">context.</span></span><span class="sig-name descname"><span class="pre">CTX_POS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'_pos'</span></span><a class="headerlink" href="#caterpillar.context.CTX_POS" title="Link to this definition">#</a></dt>
 <dd><p>Represents the current position within the stream or structure.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caterpillar.context.CTX_INDEX">
-<span class="sig-prename descclassname"><span class="pre">context.</span></span><span class="sig-name descname"><span class="pre">CTX_INDEX</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'_index'</span></em><a class="headerlink" href="#caterpillar.context.CTX_INDEX" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">context.</span></span><span class="sig-name descname"><span class="pre">CTX_INDEX</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'_index'</span></span><a class="headerlink" href="#caterpillar.context.CTX_INDEX" title="Link to this definition">#</a></dt>
 <dd><p>Maintains the index for sequence or array-based context elements.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caterpillar.context.CTX_PATH">
-<span class="sig-prename descclassname"><span class="pre">context.</span></span><span class="sig-name descname"><span class="pre">CTX_PATH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'_path'</span></em><a class="headerlink" href="#caterpillar.context.CTX_PATH" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">context.</span></span><span class="sig-name descname"><span class="pre">CTX_PATH</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'_path'</span></span><a class="headerlink" href="#caterpillar.context.CTX_PATH" title="Link to this definition">#</a></dt>
 <dd><p>Provides the full path to the current context object.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caterpillar.context.CTX_SEQ">
-<span class="sig-prename descclassname"><span class="pre">context.</span></span><span class="sig-name descname"><span class="pre">CTX_SEQ</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'_is_seq'</span></em><a class="headerlink" href="#caterpillar.context.CTX_SEQ" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">context.</span></span><span class="sig-name descname"><span class="pre">CTX_SEQ</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'_is_seq'</span></span><a class="headerlink" href="#caterpillar.context.CTX_SEQ" title="Link to this definition">#</a></dt>
 <dd><p>Holds a reference to the sequence object, if applicable.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caterpillar.context.CTX_ROOT">
-<span class="sig-prename descclassname"><span class="pre">context.</span></span><span class="sig-name descname"><span class="pre">CTX_ROOT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'_root'</span></em><a class="headerlink" href="#caterpillar.context.CTX_ROOT" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">context.</span></span><span class="sig-name descname"><span class="pre">CTX_ROOT</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'_root'</span></span><a class="headerlink" href="#caterpillar.context.CTX_ROOT" title="Link to this definition">#</a></dt>
 <dd><p>Points to the root of the entire context hierarchy.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.context.CTX_ORDER">
+<span class="sig-prename descclassname"><span class="pre">context.</span></span><span class="sig-name descname"><span class="pre">CTX_ORDER</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'_order'</span></span><a class="headerlink" href="#caterpillar.context.CTX_ORDER" title="Link to this definition">#</a></dt>
+<dd><p>Stores the currently used endianess (only in root context).</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.7.0.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caterpillar.context.CTX_ARCH">
+<span class="sig-prename descclassname"><span class="pre">context.</span></span><span class="sig-name descname"><span class="pre">CTX_ARCH</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'_arch'</span></span><a class="headerlink" href="#caterpillar.context.CTX_ARCH" title="Link to this definition">#</a></dt>
+<dd><p>Stores the currently used architecture (only in root context).</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.7.0.</span></p>
+</div>
 </dd></dl>
 
 </section>
@@ -604,13 +771,13 @@ implementation for a 10% speed caveat, use:</p>
 <h2><span class="section-number">4.3.5. </span>Expressions<a class="headerlink" href="#expressions" title="Link to this heading">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="caterpillar.context.ExprMixin">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.context.</span></span><span class="sig-name descname"><span class="pre">ExprMixin</span></span><a class="reference internal" href="../_modules/caterpillar/context.html#ExprMixin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.context.ExprMixin" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">caterpillar.context.</span></span><span class="sig-name descname"><span class="pre">ExprMixin</span></span><a class="reference internal" href="../_modules/caterpillar/context.html#ExprMixin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.context.ExprMixin" title="Link to this definition">#</a></dt>
 <dd><p>A mixin class providing methods for creating binary and unary expressions.</p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="caterpillar.context.BinaryExpression">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.context.</span></span><span class="sig-name descname"><span class="pre">BinaryExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operand</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">left</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caterpillar/context.html#BinaryExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.context.BinaryExpression" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">caterpillar.context.</span></span><span class="sig-name descname"><span class="pre">BinaryExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operand</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">left</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_ContextLambda</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_ContextLambda</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caterpillar/context.html#BinaryExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.context.BinaryExpression" title="Link to this definition">#</a></dt>
 <dd><p>Represents a binary expression.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -625,7 +792,7 @@ implementation for a 10% speed caveat, use:</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="caterpillar.context.UnaryExpression">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">caterpillar.context.</span></span><span class="sig-name descname"><span class="pre">UnaryExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caterpillar/context.html#UnaryExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.context.UnaryExpression" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">caterpillar.context.</span></span><span class="sig-name descname"><span class="pre">UnaryExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_ContextLambda</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caterpillar/context.html#UnaryExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.context.UnaryExpression" title="Link to this definition">#</a></dt>
 <dd><p>Represents a unary expression.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -693,9 +860,20 @@ implementation for a 10% speed caveat, use:</p>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.context.Context.__context_getattr__"><code class="docutils literal notranslate"><span class="pre">Context.__context_getattr__()</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.context.ContextPath"><code class="docutils literal notranslate"><span class="pre">ContextPath</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.context.ContextPath"><code class="docutils literal notranslate"><span class="pre">ContextPath</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.context.ContextPath.__call__"><code class="docutils literal notranslate"><span class="pre">ContextPath.__call__()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.context.ContextPath.__getattribute__"><code class="docutils literal notranslate"><span class="pre">ContextPath.__getattribute__()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.context.ContextPath.__repr__"><code class="docutils literal notranslate"><span class="pre">ContextPath.__repr__()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.context.ContextPath.parentctx"><code class="docutils literal notranslate"><span class="pre">ContextPath.parentctx</span></code></a></li>
+</ul>
+</li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.context.ContextLength"><code class="docutils literal notranslate"><span class="pre">ContextLength</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.context.ConditionContext"><code class="docutils literal notranslate"><span class="pre">ConditionContext</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.context.SetContextVar"><code class="docutils literal notranslate"><span class="pre">SetContextVar</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.context.SetContextVar.__action_pack__"><code class="docutils literal notranslate"><span class="pre">SetContextVar.__action_pack__()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.context.SetContextVar.__action_unpack__"><code class="docutils literal notranslate"><span class="pre">SetContextVar.__action_unpack__()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#extra-options">4.3.2. Extra options</a><ul class="nav section-nav flex-column">
@@ -703,10 +881,11 @@ implementation for a 10% speed caveat, use:</p>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#special-paths">4.3.3. Special paths</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.context.this"><code class="docutils literal notranslate"><span class="pre">context.this</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.context.ctx"><code class="docutils literal notranslate"><span class="pre">context.ctx</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.context.parent"><code class="docutils literal notranslate"><span class="pre">context.parent</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.context.root"><code class="docutils literal notranslate"><span class="pre">context.root</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.context.this"><code class="docutils literal notranslate"><span class="pre">this</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.context.ctx"><code class="docutils literal notranslate"><span class="pre">ctx</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.context.parent"><code class="docutils literal notranslate"><span class="pre">parent</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.context.parentctx"><code class="docutils literal notranslate"><span class="pre">parentctx</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.context.root"><code class="docutils literal notranslate"><span class="pre">root</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#special-attributes">4.3.4. Special Attributes</a><ul class="nav section-nav flex-column">
@@ -721,6 +900,8 @@ implementation for a 10% speed caveat, use:</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.context.CTX_PATH"><code class="docutils literal notranslate"><span class="pre">context.CTX_PATH</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.context.CTX_SEQ"><code class="docutils literal notranslate"><span class="pre">context.CTX_SEQ</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.context.CTX_ROOT"><code class="docutils literal notranslate"><span class="pre">context.CTX_ROOT</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.context.CTX_ORDER"><code class="docutils literal notranslate"><span class="pre">context.CTX_ORDER</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.context.CTX_ARCH"><code class="docutils literal notranslate"><span class="pre">context.CTX_ARCH</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#expressions">4.3.5. Expressions</a><ul class="nav section-nav flex-column">
@@ -775,7 +956,7 @@ implementation for a 10% speed caveat, use:</p>
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     <br/>
   </p>
 </div>
