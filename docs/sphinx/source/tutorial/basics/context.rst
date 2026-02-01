@@ -13,15 +13,30 @@ The context is useful when defining structs that depend on other fields' values.
 For example, you can reference the length of a string field and use it to define
 the length of another field dynamically.
 
-.. code-block:: python
-    :caption: Understanding the *context*
+.. tab-set::
+    :sync-group: syntax
 
-    @struct
-    class Format:
-        length: uint8
-        foo: CString(this.length)   # <-- just reference the length field
+    .. tab-item:: Default Syntax
+        :sync: default
 
+        .. code-block:: python
+            :caption: Understanding the *context*
 
+            @struct
+            class Format:
+                length: uint8
+                foo: CString(this.length)   # <-- just reference the length field
+
+    .. tab-item:: Extended Syntax (>=2.8.0)
+        :sync: extended
+
+        .. code-block:: python
+            :caption: Understanding the *context*
+
+            @struct
+            class Format:
+                length: uint8_t
+                foo: f[str, CString(this.length)]   # <-- just reference the length field
 
 Runtime Length of Objects
 ~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -17,7 +17,7 @@ Before proceeding, ensure you have the following tools installed:
 Assuming you are using `scikit-build <https://scikit-build-core.readthedocs.io/en/stable/getting_started.html)>`_ to write
 your extension, the following project structure applies:
 
-.. code-block:: txt
+.. code-block:: text
 
     example-extension
     ├── CMakeLists.txt

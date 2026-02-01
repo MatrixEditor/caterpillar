@@ -12,14 +12,34 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-from typing import Any
+# pyright: reportPrivateUsage=false, reportAny=false, reportExplicitAny=false
 from io import BytesIO
+from collections.abc import Collection
+from typing import Any, Generic
+from typing_extensions import Self, override, TypeVar
+
 from caterpillar.abc import (
     _StructLike,
     _GreedyType,
     _PrefixedType,
+    _IT,
+    _OT,
+    _EndianLike,
+    _ArchLike,
+    _ContextLike,
+    _ContextLambda,
+    _OptionLike,
+    _ContainsStruct,
+    _SwitchOptionsT,
+    _LengthT,
+    _StreamType,
 )
-from caterpillar.byteorder import ByteOrder, SysNative, system_arch
+from caterpillar.byteorder import (
+    O_DEFAULT_ARCH,
+    O_DEFAULT_ENDIAN,
+    LittleEndian,
+    system_arch,
+)
 from caterpillar.exception import (
     DynamicSizeError,
     StructException,
@@ -30,24 +50,26 @@ from caterpillar.exception import (
 from caterpillar.options import (
     GLOBAL_FIELD_FLAGS,
     F_DYNAMIC,
-    Flag,
 )
 from caterpillar.context import CTX_OFFSETS, CTX_STREAM, CTX_FIELD, CTX_VALUE, CTX_SEQ
 from caterpillar import registry
 from caterpillar.shared import getstruct, typeof
 
 
-def singleton(cls):
+_T = TypeVar("_T")
+
+
+def singleton(cls: type[_T]) -> _T:
     """Simple wrapper to enable singleton structs."""
     return cls()
 
 
 # Constant representing an invalid default value
-INVALID_DEFAULT = object()
-DEFAULT_OPTION = object()
+INVALID_DEFAULT: object = object()
+DEFAULT_OPTION: object = object()
 
 
-class Field:
+class Field(Generic[_IT, _OT]):
     """Represents a field in a data structure.
 
     :param struct: The structure or callable used to define the field's type.
@@ -64,28 +86,28 @@ class Field:
 
     def __init__(
         self,
-        struct,
-        order=None,
-        offset=-1,
-        flags=None,
-        amount=0,
-        options=None,
-        condition=True,
-        arch=None,
-        default=INVALID_DEFAULT,
-        bits=None,
+        struct: _StructLike[_IT, _OT] | _ContextLambda[_OT] | _ContainsStruct[_IT, _OT],
+        order: _EndianLike | None = None,
+        offset: _ContextLambda[int] | int = -1,
+        flags: set[_OptionLike] | None = None,
+        amount: _LengthT = 0,
+        options: _SwitchOptionsT | None = None,
+        condition: _ContextLambda[bool] | bool = True,
+        arch: _ArchLike | None = None,
+        default: object = INVALID_DEFAULT,
+        bits: _ContextLambda[int] | int | None = None,
     ) -> None:
         # Cached flags to optimize packing/unpacking performance
-        self._is_lambda = False
-        self._has_cond = False
-        self._cond_is_lambda = False
-        self._is_seq = False
-        self._keep_pos = True
-        self._has_offset = False
-        self._offset_is_lambda = False
-        self._amount_is_lambda = False
-        self._switch_is_lambda = False
-        self._switch_has_default = False
+        self._is_lambda: bool = False
+        self._has_cond: bool = False
+        self._cond_is_lambda: bool = False
+        self._is_seq: bool = False
+        self._keep_pos: bool = True
+        self._has_offset: bool = False
+        self._offset_is_lambda: bool = False
+        self._amount_is_lambda: bool = False
+        self._switch_is_lambda: bool = False
+        self._switch_has_default: bool = False
 
         # private variable initialization
         self.__struct = None
@@ -94,60 +116,67 @@ class Field:
         self.__offset = None
         self.__amount = None
         self.__options = None  # Historically named; represents switch mappings
+        self.__order = None
+        self.__arch = None
 
         # initialization via property setters
         self.struct = struct
         self.condition = condition
-        self.order = order or SysNative
+        self.order = order
         self.flags = set(flags or [])
-        self.bits = bits
-        self.arch = arch or system_arch
+        self.bits: _ContextLambda[int] | int | None = bits
+        self.arch = arch
         self.offset = offset
         self.amount = amount or None
         self.options = options
 
         # INVALID_DEFAULT indicates that no default was explicitly set;
         # allows None to be used as a valid default
-        self.default = default
+        self.default: object = default
 
     # -- Property Definitions (Input validation not enforced) --
 
     @property
-    def struct(self):
+    def struct(self) -> _StructLike[_IT, _OT] | _ContextLambda[_OT]:
         """
         The internal structure for this field.
         """
-        return self.__struct
+        return self.__struct  # pyright: ignore[reportReturnType]
 
+    # fmt: off
     @struct.setter
-    def struct(self, value):
-        self.__struct = getstruct(value, value)
+    def struct(
+        self,
+        value: _StructLike[_IT, _OT] | _ContextLambda[_OT] | _ContainsStruct[_IT, _OT],  # pyright: ignore[reportPropertyTypeMismatch]
+    ) -> None:
+        self.__struct = getstruct(value) or value
         # pre-computed state of this field
         self._is_lambda = callable(self.__struct)
+    # fmt: on
 
     @property
-    def condition(self):
+    def condition(self) -> _ContextLambda[bool] | bool:
         """
         The field's condition expression or value.
         """
-        return self.__condition
+        return self.__condition  # pyright: ignore[reportReturnType]
 
     @condition.setter
-    def condition(self, value):
+    def condition(self, value: _ContextLambda[bool] | bool):
         self.__condition = value
         self._has_cond = value not in (True, None)
         self._cond_is_lambda = callable(value)
 
     @property
-    def flags(self):
+    def flags(self) -> set[_OptionLike]:
         """The set of flags associated with this field."""
-        return self.__flags
+        return self.__flags  # pyright: ignore[reportReturnType]
 
     @flags.setter
-    def flags(self, value):
+    def flags(self, value: set[_OptionLike]) -> None:
         self.__flags = value
 
-    def add_flag(self, flag) -> None:
+    def add_flag(self, flag: _OptionLike) -> None:
         """
         Adds a flag to this field.
 
@@ -157,7 +186,7 @@ class Field:
         """
         self.flags.add(flag)
 
-    def has_flag(self, flag: Flag) -> bool:
+    def has_flag(self, flag: _OptionLike[Any]) -> bool:
         """Checks whether this field stores the given flag.
 
         :param flag: the flag to lookup
@@ -167,7 +196,7 @@ class Field:
         """
         return flag in self.flags or flag in GLOBAL_FIELD_FLAGS
 
-    def remove_flag(self, flag: Flag) -> None:
+    def remove_flag(self, flag: _OptionLike) -> None:
         """
         Removes a flag from this field.
 
@@ -178,42 +207,72 @@ class Field:
         self.flags.discard(flag)
 
     @property
-    def offset(self):
+    def offset(self) -> _ContextLambda[int] | int:
         """The field's offset."""
-        return self.__offset
+        return self.__offset  # pyright: ignore[reportReturnType]
 
     @offset.setter
-    def offset(self, value):
+    def offset(self, value: _ContextLambda[int] | int):
         self.__offset = value
         self._has_offset = value not in (-1, None)
         self._offset_is_lambda = callable(value)
         self._keep_pos = value in (-1, None)
 
     @property
-    def amount(self):
+    def amount(self) -> _LengthT | None:
         """The repetition count for this field."""
         return self.__amount
 
     @amount.setter
-    def amount(self, value):
+    def amount(self, value: _LengthT | None):
         self.__amount = value
         self._amount_is_lambda = callable(value)
         self._is_seq = (value not in (0, None)) or self._amount_is_lambda
 
     @property
-    def options(self):
+    def options(self) -> _SwitchOptionsT | None:
         """The switch-case options dictionary."""
         return self.__options
 
     @options.setter
-    def options(self, value):
+    def options(self, value: _SwitchOptionsT | None):
         self.__options = value
         self._switch_is_lambda = callable(value)
         self._switch_has_default = (
-            value and not self._switch_is_lambda and DEFAULT_OPTION in value
+            bool(value)
+            and not self._switch_is_lambda
+            and DEFAULT_OPTION in value  # pyright: ignore[reportOperatorIssue]
         )
 
-    def _verify_context_value(self, value, expected) -> None:
+    @property
+    def order(self) -> _EndianLike:
+        return self.__order or O_DEFAULT_ENDIAN.value or LittleEndian
+
+    @order.setter
+    def order(
+        self, value: _EndianLike | None  # pyright: ignore[reportPropertyTypeMismatch]
+    ) -> None:
+        self.__order: _EndianLike | None = value
+
+    def has_order(self) -> bool:
+        return bool(self.__order)
+
+    @property
+    def arch(self) -> _ArchLike:
+        return self.__arch or O_DEFAULT_ARCH.value or system_arch
+
+    @arch.setter
+    def arch(
+        self, value: _ArchLike | None  # pyright: ignore[reportPropertyTypeMismatch]
+    ) -> None:
+        self.__arch = value
+
+    def has_arch(self) -> bool:
+        return bool(self.__arch)
+
+    def _verify_context_value(
+        self, value: object, expected: type | tuple[type, ...]
+    ) -> None:
         """
         Verifies that a value is either of the expected type(s) or is a callable.
         Used to validate inputs for context-aware fields.
@@ -231,7 +290,7 @@ class Field:
 
     # --- Operator Overloads ---
 
-    def __or__(self, flag):  # add flags
+    def __or__(self, flag: _OptionLike) -> Self:  # add flags
         """
         Adds a flag using the '|' operator.
 
@@ -241,7 +300,7 @@ class Field:
         self.add_flag(flag)
         return self
 
-    def __xor__(self, flag):  # remove flags:
+    def __xor__(self, flag: _OptionLike) -> Self:  # remove flags:
         """
         Removes a flag using the '^' operator.
 
@@ -251,7 +310,7 @@ class Field:
         self.remove_flag(flag)
         return self
 
-    def __matmul__(self, offset):
+    def __matmul__(self, offset: _ContextLambda[int] | int) -> Self:
         """
         Sets the field's offset using the '@' operator.
 
@@ -262,7 +321,7 @@ class Field:
         self.offset = offset
         return self
 
-    def __getitem__(self, dim):
+    def __getitem__(self, dim: _LengthT) -> "Field[Collection[_IT], Collection[_OT]]":
         """
         Sets the number of elements using the indexing operator (e.g.,
         field[3]).
@@ -270,11 +329,13 @@ class Field:
         :param dim: Repetition count or dynamic type.
         :return: The updated Field instance.
         """
-        self._verify_context_value(dim, (_GreedyType, int, _PrefixedType))
+        self._verify_context_value(
+            dim, (_GreedyType, int, _PrefixedType, _ContextLambda)
+        )
         self.amount = dim
-        return self
+        return self  # pyright: ignore[reportReturnType]
 
-    def __rshift__(self, switch):
+    def __rshift__(self, switch: _SwitchOptionsT) -> Self:
         """
         Defines switch-case mappings using the '>>' operator.
 
@@ -285,7 +346,7 @@ class Field:
         self.options = switch
         return self
 
-    def __floordiv__(self, condition):
+    def __floordiv__(self, condition: _ContextLambda[bool] | bool) -> Self:
         """
         Sets the field's condition using the '//' operator.
 
@@ -296,7 +357,7 @@ class Field:
         self.condition = condition
         return self
 
-    def __rsub__(self, bits):
+    def __rsub__(self, bits: _ContextLambda[int] | int) -> Self:
         """
         Sets the number of bits for bit-packed fields using the reverse '-'
         operator.
@@ -308,7 +369,7 @@ class Field:
         self.bits = bits
         return self
 
-    def __set_byteorder__(self, order):
+    def __set_byteorder__(self, order: _EndianLike) -> Self:
         """
         Explicitly sets the byte order for this field.
 
@@ -318,7 +379,7 @@ class Field:
         self.order = order
         return self
 
-    def __type__(self):
+    def __type__(self) -> type:
         """
         Returns the resolved type of the field, typically from the struct.
 
@@ -326,12 +387,12 @@ class Field:
         """
         return self.get_type()
 
-    __ixor__ = __xor__
-    __ior__ = __or__
-    __ifloordiv__ = __floordiv__
-    __irshift__ = __rshift__
-    __imatmul__ = __matmul__
-    __isub__ = __rsub__
+    __ixor__ = __xor__  # pyright: ignore[reportUnannotatedClassAttribute]
+    __ior__ = __or__  # pyright: ignore[reportUnannotatedClassAttribute]
+    __ifloordiv__ = __floordiv__  # pyright: ignore[reportUnannotatedClassAttribute]
+    __irshift__ = __rshift__  # pyright: ignore[reportUnannotatedClassAttribute]
+    __imatmul__ = __matmul__  # pyright: ignore[reportUnannotatedClassAttribute]
+    __isub__ = __rsub__  # pyright: ignore[reportUnannotatedClassAttribute]
 
     def is_seq(self) -> bool:
         """Returns whether this field is sequential.
@@ -341,7 +402,7 @@ class Field:
         """
         return self._is_seq
 
-    def is_enabled(self, context) -> bool:
+    def is_enabled(self, context: _ContextLike) -> bool:
         """Evaluates the condition of this field.
 
         :param context: the context on which to operate
@@ -358,7 +419,7 @@ class Field:
         """Returns whether this field is linked to a condition"""
         return self._has_cond
 
-    def length(self, context):
+    def length(self, context: _ContextLike) -> _GreedyType | _PrefixedType | int:
         """Calculates the sequence length of this field.
 
         :param context: the context on which to operate
@@ -372,7 +433,7 @@ class Field:
         except Exception as exc:
             raise DynamicSizeError("Dynamic sized field!", context) from exc
 
-    def get_struct(self, value, context):
+    def get_struct(self, value: object, context: _ContextLike) -> _StructLike[_IT, _OT]:
         """Returns the struct from stored options.
 
         :param value: the unpacked or packed value
@@ -384,12 +445,12 @@ class Field:
         """
         # treat 'value' as the key of specified options
         if self._switch_is_lambda:
-            struct = self.options(value, context)
+            struct: _StructLike[_IT, _OT] = self.options(value, context)
         else:
             if value not in self.options and not self._switch_has_default:
                 raise OptionError(f"Option {value!r} not found!", context)
 
-            struct = self.options.get(value, None) or self.options.get(DEFAULT_OPTION)
+            struct = self.options.get(value) or self.options.get(DEFAULT_OPTION)
 
         if struct is None:
             # The struct must be non-null
@@ -397,13 +458,13 @@ class Field:
                 f"Could not find switch value for: {value!r}", context
             )
 
-        return getstruct(struct, struct)
+        return getstruct(struct) or struct  # pyright: ignore[reportUnknownVariableType]
 
-    def get_offset(self, context) -> int:
+    def get_offset(self, context: _ContextLike) -> int:
         """Returns the offset position of this field"""
         return self.offset(context) if self._offset_is_lambda else self.offset
 
-    def get_type(self):
+    def get_type(self) -> type:
         """Returns the annotation type for this field
 
         :return: the annotation type
@@ -415,19 +476,24 @@ class Field:
 
         # We construct a Union type hint as an alternative:
         if self._switch_is_lambda:
-            return Any
+            return object
 
-        return_type = Any
+        return_type = object
         for switch_type in self.options.values():
             return_type = return_type | typeof(switch_type)
 
-        return return_type
+        return return_type  # pyright: ignore[reportReturnType]
 
-    def get_name(self):
-        return getattr(self, "__name__", None)
+    def get_name(self) -> str:
+        """Returns the name of this field.
+
+        .. versionchanged:: 2.8.0
+            now always returns a string
+        """
+        return getattr(self, "__name__", "_")
 
     # IO related stuff
-    def __unpack__(self, context):
+    def __unpack__(self, context: _ContextLike) -> _OT:
         """Reads packed data from the given stream.
 
         This method returns nothing if this field is disabled and applies switch if
@@ -437,31 +503,31 @@ class Field:
         :type context: _ContextLike
         :return: the parsed data
         """
-        stream = context[CTX_STREAM]
+        stream: _StreamType = context[CTX_STREAM]
         if self._has_cond and not self.is_enabled(context):
             # Disabled fields or context lambdas won't pack any data
             return
-
+        # fmt: off
         # Using this inlined version of self.is_seq(), we reduce the amount of
         # calls made to the method and save A LOT of time.
         # pylint: disable-next=protected-access
         context[CTX_SEQ] = self._is_seq
         # pylint: disable-next=protected-access
-        keep_pos = self._keep_pos
+        keep_pos: bool = self._keep_pos
         if not self._is_lambda:  # REVISIT: maybe hardcode this
             if not keep_pos:
-                fallback = stream.tell()
+                fallback: int = stream.tell()
 
             if self._has_offset:
-                offset = self.offset(context) if self._offset_is_lambda else self.offset
-                stream.seek(offset)
+                offset: int = self.offset(context) if self._offset_is_lambda else self.offset
+                stream.seek(offset)  # pyright: ignore[reportUnusedCallResult]
 
             context[CTX_FIELD] = self
             # Switch is applicable AFTER we parsed the first value
             try:
                 value = self.struct.__unpack__(context)
                 if not keep_pos:
-                    stream.seek(fallback)
+                    stream.seek(fallback)  # pyright: ignore[reportUnusedCallResult]
             # pylint: disable-next=broad-exception-caught
             except Exception as exc:
                 if not isinstance(exc, StructException):
@@ -472,7 +538,7 @@ class Field:
                     raise exc
         else:
             # Context functions should be executed with top priority
-            value = self.struct(context)
+            value: _OT = self.struct(context)  # pyright: ignore[reportUnknownVariableType]
 
         # unpack using switch
         if self.options:
@@ -481,10 +547,10 @@ class Field:
             # position afterward.
             context[CTX_VALUE] = value
             value = struct.__unpack__(context)
-
+        # fmt; on
         return value
 
-    def __pack__(self, obj, context) -> None:
+    def __pack__(self, obj: _IT, context: _ContextLike) -> None:
         """Writes the given object to the provided stream.
 
         There are several options associated with this function. First, disabled
@@ -507,7 +573,7 @@ class Field:
             # Disabled fields or context lambdas won't pack any data
             return
 
-        stream = context[CTX_STREAM]
+        stream: _StreamType = context[CTX_STREAM]
         keep_pos = self._keep_pos
         has_offset = self._has_offset
         context[CTX_FIELD] = self
@@ -520,7 +586,9 @@ class Field:
             # TODO: implement F_OFFSET_OVERRIDE
             # We write the current field into a temporary memory buffer
             # and add it after all processing hasbeen finished.
-            offset = self.offset(context) if self._offset_is_lambda else self.offset
+            offset: int = (
+                self.offset(context) if self._offset_is_lambda else self.offset
+            )
             base_stream = stream
             stream = BytesIO()
             context[CTX_STREAM] = stream
@@ -544,14 +612,14 @@ class Field:
 
         if not has_offset and not keep_pos:
             # The position shouldn't be persisted reset the stream
-            stream.seek(fallback)
+            stream.seek(fallback)  # pyright: ignore[reportUnusedCallResult]
 
         if has_offset:
             # Place the stream into the internal offset map
             context._root[CTX_OFFSETS][offset] = stream.getbuffer()
             context[CTX_STREAM] = base_stream
 
-    def __size__(self, context) -> int:
+    def __size__(self, context: _ContextLike) -> int:
         """Calculates the size of this field.
 
         There are several situations to bear in mind when executing this function:
@@ -582,9 +650,9 @@ class Field:
         count = 1
         if context[CTX_SEQ]:
             count = self.length(context)
-            if isinstance(count, _GreedyType):
+            if isinstance(count, (_GreedyType, _PrefixedType)):
                 raise DynamicSizeError(
-                    "Greedy field does not have a fixed size!", context
+                    "Greedy or prefixed fields does not have a fixed size!", context
                 )
 
         struct = self.struct
@@ -603,6 +671,7 @@ class Field:
         return count * size
 
     # representation, maybe revisit
+    @override
     def __str__(self) -> str:
         name = self.get_name() or "<unnamed>"
         offset = f", offset={self.offset}" if self._has_offset else ""
@@ -612,16 +681,17 @@ class Field:
             f"options={bool(self.options)}{offset})"
         )
 
+    @override
     def __repr__(self) -> str:
         return self.__str__()
 
 
 # --- private type converter ---
 @registry.TypeConverter(_StructLike)
-def _type_converter(annotation, kwargs):
+def _type_converter(annotation: _StructLike[_IT, _OT], kwargs: Any) -> Field[_IT, _OT]:
     # REVISIT: more options ?
-    arch = kwargs.pop("arch", None)
-    order = kwargs.pop("order", None)
+    arch: _ArchLike | None = kwargs.pop("arch", None)
+    order: _EndianLike | None = kwargs.pop("order", None)
     return Field(annotation, order=order, arch=arch)
 
 
@@ -629,16 +699,19 @@ registry.annotation_registry.append(_type_converter)
 
 
 class _CallableTypeConverter(registry.TypeConverter):
-    def matches(self, annotation) -> bool:
+    @override
+    def matches(self, annotation: object) -> bool:
         # must be a callable but not a type
         return callable(annotation) and not isinstance(annotation, type)
 
-    def convert(self, annotation, kwargs):
-        arch = kwargs.pop("arch", None)
-        order = kwargs.pop("order", None)
+    @override
+    def convert(  # pyright: ignore[reportIncompatibleMethodOverride]
+        self, annotation: _ContextLambda[_OT], kwargs: Any
+    ) -> Field[None, _OT]:
+        arch: _ArchLike | None = kwargs.pop("arch", None)
+        order: _EndianLike | None = kwargs.pop("order", None)
         # callables are treates as context lambdas
         return Field(annotation, order=order, arch=arch)
 
 
 registry.annotation_registry.append(_CallableTypeConverter())
-

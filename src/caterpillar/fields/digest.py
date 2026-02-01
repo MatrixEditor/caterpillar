@@ -12,8 +12,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# pyright: reportPrivateUsage=false, reportExplicitAny=false
 import sys
 import hashlib
+from types import FrameType, TracebackType
+from typing import TYPE_CHECKING, Any, Callable, Generic, Protocol
+from typing_extensions import Literal, Self, override, TypeVar
 import warnings
 import zlib
 
@@ -21,10 +25,14 @@ from caterpillar.context import CTX_OBJECT, CTX_STREAM
 from caterpillar.exception import StructException, ValidationError
 from caterpillar.shared import Action
 from caterpillar.fields.hook import IOHook
+from caterpillar.abc import _ContextLambda, _ContextLike, _StructLike
 from ._base import Field
 from .common import Bytes, uint32
 
 DEFAULT_DIGEST_PATH = "digest"
+
+if TYPE_CHECKING:
+    from cryptography.hazmat.primitives import hashes, hmac
 
 
 class _DigestValue:
@@ -35,11 +43,19 @@ class _DigestValue:
     the context of cryptographic algorithms or other hash-like operations.
     """
 
+    @override
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}>"
 
 
-class Algorithm:
+_AlgoObjT = TypeVar("_AlgoObjT")
+_AlgoReturnT = TypeVar("_AlgoReturnT", default=bytes)
+_AlgoUpadeFunc = Callable[[_AlgoObjT, bytes, _ContextLike], _AlgoObjT | None]
+_AlgoFinishFunc = Callable[[_AlgoObjT, _ContextLike], _AlgoReturnT]
+_AlgoCreateFunc = _ContextLambda[_AlgoObjT]
+
+
+class Algorithm(Generic[_AlgoObjT, _AlgoReturnT]):
     """
     .. versionadded:: 2.4.0
 
@@ -77,14 +93,21 @@ class Algorithm:
     :type name: Optional[str]
     """
 
-    __slots__ = ("_create", "_update", "_digest", "name")
+    __slots__: tuple[str, ...] = ("_create", "_update", "_digest", "name")
 
-    def __init__(self, create=None, update=None, digest=None, name=None) -> None:
-        self._create = create
-        self._update = update
-        self._digest = digest
-        self.name = name
+    def __init__(
+        self,
+        create: _AlgoCreateFunc[_AlgoObjT] | None = None,
+        update: _AlgoUpadeFunc[_AlgoObjT] | None = None,
+        digest: _AlgoFinishFunc[_AlgoObjT, _AlgoReturnT] | None = None,
+        name: str | None = None,
+    ) -> None:
+        self._create: _AlgoCreateFunc[_AlgoObjT] | None = create
+        self._update: _AlgoUpadeFunc[_AlgoObjT] | None = update
+        self._digest: _AlgoFinishFunc[_AlgoObjT, _AlgoReturnT] | None = digest
+        self.name: str = name or "<algo>"
 
+    @override
     def __repr__(self) -> str:
         """
         Return a string representation of the Algorithm instance.
@@ -96,7 +119,7 @@ class Algorithm:
         """
         return f"<{self.__class__.__name__} name={self.name or '<not set>'!r}>"
 
-    def create(self, context):
+    def create(self, context: _ContextLike) -> _AlgoObjT:
         """
         Create an instance of the algorithm or checksum using the provided context.
 
@@ -113,7 +136,9 @@ class Algorithm:
 
         raise NotImplementedError("create() is not implemented for this algorithm")
 
-    def update(self, algo_obj, data: bytes, context):
+    def update(
+        self, algo_obj: _AlgoObjT, data: bytes, context: _ContextLike
+    ) -> _AlgoObjT | None:
         """
         Update the algorithm or checksum with the given data.
 
@@ -134,7 +159,7 @@ class Algorithm:
 
         raise NotImplementedError("update() is not implemented for this algorithm")
 
-    def digest(self, algo_obj, context) -> bytes:
+    def digest(self, algo_obj: _AlgoObjT, context: _ContextLike) -> _AlgoReturnT:
         """
         Compute the digest or checksum value from the algorithm instance.
 
@@ -154,7 +179,7 @@ class Algorithm:
         raise NotImplementedError("digest() is not implemented for this algorithm")
 
 
-class Digest:
+class Digest(Generic[_AlgoObjT, _AlgoReturnT]):
     """A class to handle the creation, updating, and verification of digests
     using a specified algorithm.
 
@@ -225,29 +250,36 @@ class Digest:
     :type path: Optional[str]
     """
 
-    def __init__(self, algorithm, struct, name=None, verify=False, path=None) -> None:
+    def __init__(
+        self,
+        algorithm: Algorithm[_AlgoObjT, _AlgoReturnT],
+        struct: _StructLike[_AlgoReturnT, _AlgoReturnT],
+        name: str | None = None,
+        verify: bool = False,
+        path: str | None = None,
+    ) -> None:
         if (sys.version_info.major, sys.version_info.minor) >= (3, 14):
             warnings.warn(
                 "Python3.14 breaks support for Digest fields. The hash must be calculated "
-                "manually until a fix has been released."
+                + "manually until a fix has been released."
             )
 
-        self.algo = algorithm
-        self.name = name or DEFAULT_DIGEST_PATH
+        self.algo: Algorithm[_AlgoObjT, _AlgoReturnT] = algorithm
+        self.name: str = name or DEFAULT_DIGEST_PATH
         if "." in self.name:
             raise ValueError(
                 "Digest name must not contain '.' character. Use path instead."
             )
 
         # IO will be initialized in self.begin
-        self._hook = IOHook(io=None, update=self.update)
-        self.struct = struct
-        self._digest = None
-        self._obj = None
-        self._verify = verify
-        self.path = path or f"{CTX_OBJECT}.{self.name}"
+        self._hook: IOHook = IOHook(io=None, update=self.update)
+        self.struct: _StructLike[_AlgoReturnT, _AlgoReturnT] = struct
+        self._digest: _AlgoReturnT | None = None
+        self._obj: _AlgoObjT = None  # pyright: ignore[reportAttributeAccessIssue]
+        self._verify: bool = verify
+        self.path: str = path or f"{CTX_OBJECT}.{self.name}"
 
-    def _get_annotations(self, frame):
+    def _get_annotations(self, frame: FrameType) -> dict[str, Any]:
         """
         Retrieve the annotations (i.e., field definitions) from the current frame's local variables.
 
@@ -261,18 +293,19 @@ class Digest:
             # This will not work on Python3.14+ but supresses errors
             if "__annotations__" not in frame.f_locals:
                 frame.f_locals["__annotations__"] = {}
-
-            return frame.f_locals["__annotations__"]
+            # fmt: off
+            return frame.f_locals["__annotations__"] # pyright: ignore[reportUnknownVariableType]
         except KeyError as exc:
             module = frame.f_locals.get("__module__")
             qualname = frame.f_locals.get("__qualname__")
             msg = f"Could not get annotations in {module} (context={qualname!r})"
             raise StructException(msg) from exc
 
+    @override
     def __repr__(self) -> str:
         return f"Digest(algo={self.algo!r}, verify={self._verify!r})"
 
-    def __enter__(self):
+    def __enter__(self) -> Self:
         """
         Install the start action for the digest field during struct definition.
 
@@ -306,7 +339,7 @@ class Digest:
         annotations[start_action_name] = Action(self.begin, self.begin)
         return self
 
-    def __exit__(self, *_) -> None:
+    def __exit__(self, exc_type: type, exc_value: Exception, traceback: TracebackType):
         """
         Install the end action for the digest field and finalize the struct field definitions.
 
@@ -331,7 +364,7 @@ class Digest:
         if self._verify:
             annotations[f"{self.name}_verify"] = Action(unpack=self.verfiy)
 
-    def begin(self, context) -> None:
+    def begin(self, context: _ContextLike) -> None:
         """
         Initialize the digest calculation at the beginning of packing/unpacking.
 
@@ -344,7 +377,7 @@ class Digest:
         self._hook.init(context)
         self._obj = self.algo.create(context)
 
-    def end_pack(self, context) -> None:
+    def end_pack(self, context: _ContextLike) -> None:
         """
         Finalize the digest calculation at the end of packing/unpacking.
 
@@ -357,7 +390,7 @@ class Digest:
         context.__context_setattr__(self.path or self.name, self._digest)
         self._hook.finish(context)
 
-    def end_unpack(self, context) -> None:
+    def end_unpack(self, context: _ContextLike) -> None:
         """
         Finalize the digest calculation at the end of unpacking.
 
@@ -369,7 +402,7 @@ class Digest:
         self._digest = self.algo.digest(self._obj, context)
         self._hook.finish(context)
 
-    def update(self, data: bytes, context) -> None:
+    def update(self, data: bytes, context: _ContextLike) -> None:
         """
         Update the checksum with new data during packing/unpacking.
 
@@ -382,7 +415,7 @@ class Digest:
         """
         self._obj = self.algo.update(self._obj, data, context) or self._obj
 
-    def verfiy(self, context) -> None:
+    def verfiy(self, context: _ContextLike) -> None:
         """
         Verify the checksum upon unpacking.
 
@@ -393,8 +426,9 @@ class Digest:
         :type context: _ContextLike
         :raises ValidationError: If the digest verification fails.
         """
+        # fmt: off
         # we assume self._verify is True
-        digest = context.__context_getattr__(self.path or self.name)
+        digest: _AlgoReturnT = context.__context_getattr__(self.path or self.name)  # pyright: ignore[reportAny]
         if digest != self._digest:
             digest_raw = digest.hex() if isinstance(digest, bytes) else digest
             expected_digest_raw = (
@@ -411,13 +445,13 @@ class Digest:
             )
 
 
-CTX_DIGEST_OBJ = "_digest_obj"
-CTX_DIGEST_HOOK = "_digest_hook"
-CTX_DIGEST_ALGO = "_digest_algo"
-CTX_DIGEST = "_digest"
+CTX_DIGEST_OBJ: Literal["_digest_obj"] = "_digest_obj"
+CTX_DIGEST_HOOK: Literal["_digest_hook"] = "_digest_hook"
+CTX_DIGEST_ALGO: Literal["_digest_algo"] = "_digest_algo"
+CTX_DIGEST: Literal["_digest"] = "_digest"
 
 
-class DigestFieldAction:
+class DigestFieldAction(Generic[_AlgoObjT, _AlgoReturnT]):
     """
     .. versionadded:: 2.4.5
 
@@ -438,25 +472,27 @@ class DigestFieldAction:
     :type algorithm: Algorithm
     """
 
-    def __init__(self, target: str, algorithm: Algorithm) -> None:
-        self.name = target
-        self.algo = algorithm
-        self._ctx_obj = f"{CTX_DIGEST_OBJ}__{target}"
-        self._ctx_hook = f"{CTX_DIGEST_HOOK}__{target}"
-        self._ctx_algo = f"{CTX_DIGEST_ALGO}__{target}"
+    def __init__(
+        self, target: str, algorithm: Algorithm[_AlgoObjT, _AlgoReturnT]
+    ) -> None:
+        self.name: str = target
+        self.algo: Algorithm[_AlgoObjT, _AlgoReturnT] = algorithm
+        self._ctx_obj: str = f"{CTX_DIGEST_OBJ}__{target}"
+        self._ctx_hook: str = f"{CTX_DIGEST_HOOK}__{target}"
+        self._ctx_algo: str = f"{CTX_DIGEST_ALGO}__{target}"
 
-    def update(self, data: bytes, context) -> None:
+    def update(self, data: bytes, context: _ContextLike) -> None:
         """
         Updates the digest object with new data.
 
         This method is registered with an IO hook so it gets triggered
         automatically during reads/writes to accumulate digest state.
         """
-        obj = context[self._ctx_obj]
+        obj: _AlgoObjT = context[self._ctx_obj]  # pyright: ignore[reportAny]
         new_obj = self.algo.update(obj, data, context)
         context[self._ctx_obj] = new_obj or obj
 
-    def begin(self, context) -> None:
+    def begin(self, context: _ContextLike) -> None:
         """
         Initializes the digest algorithm and attaches an IO hook to track data.
         """
@@ -467,11 +503,12 @@ class DigestFieldAction:
         hook.init(context)
         context[self._ctx_hook] = hook
 
+    # fmt: off
     # Both packing and unpacking will trigger the same logic
-    __action_pack__ = __action_unpack__ = begin
+    __action_pack__ = __action_unpack__ = begin  # pyright: ignore[reportUnannotatedClassAttribute]
 
 
-class DigestField:
+class DigestField(Generic[_AlgoReturnT]):
     """
     .. versionadded:: 2.4.5
 
@@ -500,43 +537,50 @@ class DigestField:
     :type verify: bool
     """
 
-    def __init__(self, target: str, struct, verify=False) -> None:
-        self.name = target
-        self.struct = struct
-        self.verify = verify
-        self._ctx_obj = f"{CTX_DIGEST_OBJ}__{target}"
-        self._ctx_hook = f"{CTX_DIGEST_HOOK}__{target}"
-        self._ctx_digest = f"{CTX_DIGEST}__{target}"
-        self._ctx_algo = f"{CTX_DIGEST_ALGO}__{target}"
+    def __init__(
+        self,
+        target: str,
+        struct: _StructLike[_AlgoReturnT, _AlgoReturnT],
+        verify: bool = False,
+    ) -> None:
+        self.name: str = target
+        self.struct: _StructLike[_AlgoReturnT, _AlgoReturnT] = struct
+        self.verify: bool = verify
+        self._ctx_obj: str = f"{CTX_DIGEST_OBJ}__{target}"
+        self._ctx_hook: str = f"{CTX_DIGEST_HOOK}__{target}"
+        self._ctx_digest: str = f"{CTX_DIGEST}__{target}"
+        self._ctx_algo: str = f"{CTX_DIGEST_ALGO}__{target}"
 
     def __type__(self) -> type:
         """Defines the Python type returned after unpacking (always bytes)."""
         return bytes
 
-    def __size__(self, context) -> int:
+    def __size__(self, context: _ContextLike) -> int:
         """Returns the size in bytes of the digest field."""
         return self.struct.__size__(context)
 
-    def __pack__(self, obj: None, context) -> None:
+    def __pack__(self, obj: None, context: _ContextLike) -> None:
         """
         Called during packing. Computes the digest over all previously packed data,
         stores it in the context, finalizes the IO hook, and packs the digest itself.
         """
-        digest = context[self._ctx_algo].digest(context[self._ctx_obj], context)
+        # fmt: off
+        digest: _AlgoReturnT = context[self._ctx_algo].digest(context[self._ctx_obj], context)  # pyright: ignore[reportAny]
         context.__context_setattr__(self.name, digest)
-        context[self._ctx_hook].finish(context)
+        context[self._ctx_hook].finish(context)  # pyright: ignore[reportAny]
         self.struct.__pack__(digest, context)
 
-    def __unpack__(self, context):
+    def __unpack__(self, context: _ContextLike) -> _AlgoReturnT:
         """
         Called during unpacking. Computes the digest over all preceding data, reads
         the stored digest, optionally verifies it, and returns the unpacked value.
 
         :raises ValidationError: If verification is enabled and the digest does not match.
         """
-        expected = context[self._ctx_algo].digest(context[self._ctx_obj], context)
+        # fmt: off
+        expected: _AlgoReturnT = context[self._ctx_algo].digest(context[self._ctx_obj], context)  # pyright: ignore[reportAny]
         context[self._ctx_digest] = expected
-        context[self._ctx_hook].finish(context)
+        context[self._ctx_hook].finish(context)  # pyright: ignore[reportAny]
 
         digest = self.struct.__unpack__(context)
         if self.verify and digest != expected:
@@ -545,7 +589,7 @@ class DigestField:
             raise ValidationError(
                 (
                     f"Failed to verify digest of {self.name!r} using "
-                    f"algorithm {context[self._ctx_algo].name or '<unnamed>'} \n"
+                    f"algorithm {context[self._ctx_algo].name or '<unnamed>'} \n"  # pyright: ignore[reportAny]
                     f" - Expected: {expected_raw!r} \n"
                     f" - Actual: {digest_raw!r}"
                 ),
@@ -555,7 +599,9 @@ class DigestField:
         return digest
 
     @staticmethod
-    def begin(target: str, algo):
+    def begin(
+        target: str, algo: Algorithm[_AlgoObjT, _AlgoReturnT]
+    ) -> "DigestFieldAction[_AlgoObjT, _AlgoReturnT]":
         """Factory method to create a DigestFieldAction used at the start of a struct
         to set up hashing for the named digest field.
 
@@ -569,8 +615,17 @@ class DigestField:
         return DigestFieldAction(target, algo)
 
 
+class _DigestFactory(Protocol[_AlgoObjT, _AlgoReturnT]):
+    def __call__(
+        self, name: str | None = None, verify: bool = False, path: str | None = None
+    ) -> Digest[_AlgoObjT, _AlgoReturnT]: ...
+
+
 # --- public algorithms ---
-def _hash_digest(algo, struct):
+def _hash_digest(
+    algo: Algorithm[_AlgoObjT, _AlgoReturnT],
+    struct: _StructLike[_AlgoReturnT, _AlgoReturnT],
+) -> _DigestFactory[_AlgoObjT, _AlgoReturnT]:
     """
     A utility function to create a `Digest` wrapper for a specific hash algorithm and struct.
     The wrapper initializes the digest calculation based on the algorithm provided.
@@ -584,26 +639,28 @@ def _hash_digest(algo, struct):
     """
 
     def _wrapper(
-        name=None,
-        verify=False,
-        path=None,
-    ) -> Digest:
+        name: str | None = None,
+        verify: bool = False,
+        path: str | None = None,
+    ) -> Digest[_AlgoObjT, _AlgoReturnT]:
         return Digest(algo, struct, name, verify, path)
 
     return _wrapper
 
 
-def _hash_digest_field(struct):
+def _hash_digest_field(
+    struct: _StructLike[_AlgoReturnT, _AlgoReturnT],
+) -> Callable[..., DigestField[_AlgoReturnT]]:
     def _wrapper(
         name: str,
-        verify=False,
-    ) -> DigestField:
+        verify: bool = False,
+    ) -> DigestField[_AlgoReturnT]:
         return DigestField(target=name, struct=struct, verify=verify)
 
     return _wrapper
 
 
-def _hashlib_algo(func):
+def _hashlib_algo(func: Callable[[], _AlgoObjT]) -> Algorithm[_AlgoObjT, _AlgoReturnT]:
     """
     Creates an `Algorithm` object from a hash function (e.g., hashlib.sha256).
 
@@ -612,10 +669,11 @@ def _hashlib_algo(func):
     :return: An `Algorithm` instance that can be used with a Digest.
     :rtype: Algorithm
     """
+    # fmt: off
     return Algorithm(
         create=lambda context: func(),
-        update=lambda hash_obj, data, context: hash_obj.update(data),
-        digest=lambda hash_obj, context: hash_obj.digest(),
+        update=lambda hash_obj, data, context: hash_obj.update(data),  # pyright: ignore[reportAttributeAccessIssue]
+        digest=lambda hash_obj, context: hash_obj.digest(),  # pyright: ignore[reportAttributeAccessIssue]
         name=func.__name__,
     )
 
@@ -641,7 +699,9 @@ Adler_Field = _hash_digest_field(uint32)
 try:
     from cryptography.hazmat.primitives import hashes
 
-    def _cryptography_hash_algo(cls):
+    def _cryptography_hash_algo(
+        cls: type[hashes.HashAlgorithm],
+    ) -> Algorithm[hashes.Hash, bytes]:
         """
         Creates an `Algorithm` from a cryptography `hashes.HashAlgorithm` class.
 
@@ -654,7 +714,7 @@ try:
             create=lambda context: hashes.Hash(cls()),
             update=lambda hash_obj, data, context: hash_obj.update(data),
             digest=lambda hash_obj, context: hash_obj.finalize(),
-            name=getattr(cls, "name"),
+            name=getattr(cls, "name", "<hash_algo>"),
         )
 
     Sha1_Algo = _cryptography_hash_algo(hashes.SHA1)
@@ -691,7 +751,7 @@ except ImportError:
     Sha3_512_Algo = _hashlib_algo(hashlib.sha3_512)
     Md5_Algo = _hashlib_algo(hashlib.md5)
 
-    Sha1 = _hash_digest(Sha1_Algo, Bytes(32))
+    Sha1 = _hash_digest(Sha1_Algo, Bytes(20))
     Sha2_224 = _hash_digest(Sha2_224_Algo, Bytes(28))
     Sha2_256 = _hash_digest(Sha2_256_Algo, Bytes(32))
     Sha2_384 = _hash_digest(Sha2_384_Algo, Bytes(48))
@@ -703,7 +763,7 @@ except ImportError:
     Md5 = _hash_digest(Md5_Algo, Bytes(16))
 
 
-Sha1_Field = _hash_digest_field(Bytes(32))
+Sha1_Field = _hash_digest_field(Bytes(20))
 Sha2_224_Field = _hash_digest_field(Bytes(28))
 Sha2_256_Field = _hash_digest_field(Bytes(32))
 Sha2_384_Field = _hash_digest_field(Bytes(48))
@@ -715,7 +775,7 @@ Sha3_512_Field = _hash_digest_field(Bytes(64))
 Md5_Field = _hash_digest_field(Bytes(16))
 
 
-class HMACAlgorithm(Algorithm):
+class HMACAlgorithm(Algorithm["hmac.HMAC"]):
     """
     HMAC (Hash-based Message Authentication Code) algorithm implementation.
 
@@ -724,14 +784,15 @@ class HMACAlgorithm(Algorithm):
 
     def __init__(
         self,
-        key,
-        algorithm,
+        key: bytes | _ContextLambda[bytes],
+        algorithm: "hashes.HashAlgorithm",
     ) -> None:
         super().__init__(name=f"hmac_{algorithm.name}")
-        self._key = key
-        self._algorithm = algorithm
+        self._key: bytes | _ContextLambda[bytes] = key
+        self._algorithm: "hashes.HashAlgorithm" = algorithm
 
-    def create(self, context):
+    @override
+    def create(self, context: _ContextLike) -> "hmac.HMAC":
         """
         Creates an HMAC object with the provided key and algorithm.
         """
@@ -740,36 +801,38 @@ class HMACAlgorithm(Algorithm):
         key = self._key(context) if callable(self._key) else self._key
         return hmac.HMAC(key, self._algorithm)
 
-    def update(self, algo_obj, data: bytes, context):
+    @override
+    def update(self, algo_obj: "hmac.HMAC", data: bytes, context: _ContextLike) -> None:
         """
         Updates the HMAC object with new data.
         """
         return algo_obj.update(data)
 
-    def digest(self, algo_obj, context):
+    @override
+    def digest(self, algo_obj: "hmac.HMAC", context: _ContextLike) -> bytes:
         """
         Finalizes the HMAC object and returns the computed digest.
         """
         return algo_obj.finalize()
 
 
-class HMAC(Digest):
+class HMAC(Digest["hmac.HMAC", bytes]):
     """
     HMAC Digest handler, used to create and verify HMACs based on a provided key and algorithm.
     """
 
     def __init__(
         self,
-        key,
-        algorithm,
-        name=None,
-        verify=False,
-        path=None,
+        key: bytes | _ContextLambda[bytes],
+        algorithm: "hashes.HashAlgorithm",
+        name: str | None = None,
+        verify: bool = False,
+        path: str | None = None,
     ) -> None:
         super().__init__(
             HMACAlgorithm(key, algorithm),
             Bytes(algorithm.digest_size),
-            name,
+            name or f"hmac-{algorithm.name}",
             verify,
             path,
         )

@@ -12,9 +12,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# pyright: reportPrivateUsage=false, reportExplicitAny=false
 from io import BytesIO
-from collections.abc import Iterable
+from collections.abc import Collection, Iterable
 from functools import partial
+from typing import Any, Callable, Generic
+from typing_extensions import Self, override
 
 from caterpillar.byteorder import byteorder
 from caterpillar.options import Flag
@@ -23,70 +26,87 @@ from caterpillar._common import unpack_seq, pack_seq, WithoutContextVar
 from caterpillar.shared import getstruct
 
 from ._base import Field
+from caterpillar.abc import (
+    _ContextLambda,
+    _ContextLike,
+    _StructLike,
+    _LengthT,
+    _IT,
+    _OT,
+    _OptionLike,
+    _EndianLike,
+    _SwitchLambda,
+    _ArgType,
+    _ContainsStruct
+)
 
 
-class FieldMixin:
+class ByteOrderMixin(Generic[_IT, _OT]):
+    def __set_byteorder__(self, order: _EndianLike) -> Field[_IT, _OT]:
+        """Returns a field with the given byteorder"""
+        return Field(self, order=order)  # pyright: ignore[reportArgumentType]
+
+
+class FieldMixin(ByteOrderMixin[_IT, _OT]):
     """A simple mixin to support operators used to create :class:`Field` instances."""
 
-    def __or__(self, flag: Flag):
+    def __or__(self, flag: _OptionLike) -> Field[_IT, _OT]:
         """Creates a field *with* the given flag."""
-        return Field(self, byteorder(self)) | flag
+        # fmt: off
+        return Field(self, byteorder(self)) | flag # pyright: ignore[reportArgumentType]
 
-    def __xor__(self, flag: Flag):
+    def __xor__(self, flag: Flag) -> Field[_IT, _OT]:
         """Creates a field *without* the given flag."""
-        return Field(self, byteorder(self)) ^ flag
+        # fmt: off
+        return Field(self, byteorder(self)) ^ flag # pyright: ignore[reportArgumentType]
 
-    def __matmul__(self, offset):
+    def __matmul__(self, offset: _ContextLambda[int] | int) -> Field[_IT, _OT]:
         """Creates a field that should start at the given offset."""
-        return Field(self, byteorder(self)) @ offset
+        # fmt: off
+        return Field(self, byteorder(self)) @ offset # pyright: ignore[reportArgumentType]
 
-    def __getitem__(self, dim):
+    def __getitem__(self, dim: _LengthT) -> Field[Collection[_IT], Collection[_OT]]:
         """Returns a sequenced field."""
-        return Field(self, byteorder(self))[dim]
+        # fmt: off
+        return Field(self, byteorder(self))[dim] # pyright: ignore[reportArgumentType]
 
-    def __rshift__(self, switch):
+    def __rshift__(
+        self, switch: _SwitchLambda | dict[str, _StructLike]
+    ) -> Field[_IT, _OT]:
         """Inserts switch options into the new field"""
-        return Field(self, byteorder(self)) >> switch
+        # fmt: off
+        return Field(self, byteorder(self)) >> switch # pyright: ignore[reportArgumentType]
 
-    def __floordiv__(self, condition):
+    def __floordiv__(self, condition: _ContextLambda[bool] | bool) -> Field[_IT, _OT]:
         """Returns a field with the given condition"""
-        return Field(self, byteorder(self)) // condition
+        # fmt: off
+        return Field(self, byteorder(self)) // condition # pyright: ignore[reportArgumentType]
 
-    def __set_byteorder__(self, order):
-        """Returns a field with the given byteorder"""
-        return Field(self, order=order)
-
-    def __rsub__(self, bits):
+    def __rsub__(self, bits: _ContextLambda[int] | int) -> Field[_IT, _OT]:
         """Returns a field with the given bit count"""
-        return Field(self, byteorder(self), bits=bits)
+        # fmt: off
+        return Field(self, byteorder(self), bits=bits) # pyright: ignore[reportArgumentType]
 
-    def __and__(self, other):
+    def __and__(self, other: "Chain | _StructLike") -> "Chain":
         """Returns a chain with the next element added at the end"""
+        # fmt: off
         if isinstance(other, Chain):
-            return other & self
-        return Chain(self, other)
+            return other & self  # pyright: ignore[reportOperatorIssue, reportUnknownVariableType]
+        return Chain(self, other)  # pyright: ignore[reportArgumentType]
 
 
-class FieldStruct(FieldMixin):
+class FieldStruct(FieldMixin[_IT, _OT]):
     """
     A mix-in class combining the behavior of _StructLike with additional
     functionality for packing and unpacking structured data.
     """
 
-    __slots__ = {
-        "__byteorder__": (
-            """
-            An internal field used to measure the byte order of this struct.
+    #!! Removed in 2.8.0
+    # __slots__: tuple[str, ...] = ("__byteorder__", "__bits__")
+    # __byteorder__: _EndianLike | None
+    # __bits__: int | _ContextLambda[int] | None
 
-            Note that this field will be used during processing only and not during
-            parsing or building data. In addition, the actual byte order should be
-            retrieved using the :class:`Field` instance within the context.
-            """
-        ),
-        "__bits__": "TBD",
-    }
-
-    def pack_single(self, obj, context) -> None:
+    def pack_single(self, obj: _IT, context: _ContextLike) -> None:
         """
         Abstract method to pack a single element.
 
@@ -98,7 +118,7 @@ class FieldStruct(FieldMixin):
         """
         raise NotImplementedError
 
-    def unpack_single(self, context):
+    def unpack_single(self, context: _ContextLike) -> _OT:
         """
         Abstract method to unpack a single element.
 
@@ -109,7 +129,7 @@ class FieldStruct(FieldMixin):
         """
         raise NotImplementedError
 
-    def pack_seq(self, seq, context) -> None:
+    def pack_seq(self, seq: Collection[_IT], context: _ContextLike) -> None:
         """
         Pack a sequence of elements using the provided context.
 
@@ -120,7 +140,7 @@ class FieldStruct(FieldMixin):
         """
         pack_seq(seq, context, self.pack_single)
 
-    def unpack_seq(self, context):
+    def unpack_seq(self, context: _ContextLike) -> Collection[_OT]:
         """
         Unpack a sequence of elements using the provided context.
 
@@ -130,7 +150,7 @@ class FieldStruct(FieldMixin):
         """
         return unpack_seq(context, self.unpack_single)
 
-    def __pack__(self, obj, context) -> None:
+    def __pack__(self, obj: _IT, context: _ContextLike) -> None:
         """
         Pack data based on whether the field is sequential or not.
 
@@ -139,9 +159,10 @@ class FieldStruct(FieldMixin):
         :param context: The current operation context.
         :type context: _ContextLike
         """
-        (self.pack_single if not context[CTX_SEQ] else self.pack_seq)(obj, context)
+        # fmt: off
+        (self.pack_single if not context[CTX_SEQ] else self.pack_seq)(obj, context)  # pyright: ignore[reportArgumentType]
 
-    def __unpack__(self, context):
+    def __unpack__(self, context: _ContextLike) -> _OT:
         """
         Unpack data based on whether the field is sequential or not.
 
@@ -149,8 +170,10 @@ class FieldStruct(FieldMixin):
         :type context: _ContextLike
         :return: The unpacked data.
         """
-        return (self.unpack_seq if context[CTX_SEQ] else self.unpack_single)(context)
+        # fmt: off
+        return (self.unpack_seq if context[CTX_SEQ] else self.unpack_single)(context)  # pyright: ignore[reportReturnType]
 
+    @override
     def __repr__(self) -> str:
         """
         String representation of the FieldStruct instance.
@@ -160,7 +183,7 @@ class FieldStruct(FieldMixin):
         return f"<{self.__class__.__name__}>"
 
 
-class Chain(FieldStruct):
+class Chain(FieldStruct[_IT, _OT]):
     """
     Represents a chain of structures where each structure in the chain is linked
     to the next one, forming a sequence.
@@ -175,17 +198,25 @@ class Chain(FieldStruct):
         - Packing travels from the tail to the head.
     """
 
-    __slots__ = ("_elements",)
+    __slots__: tuple[str, ...] = ("_elements",)
 
-    def __init__(self, initial, *structs) -> None:
+    def __init__(
+        self,
+        initial: _StructLike[_IT, bytes],
+        *structs: _StructLike[bytes, bytes],
+        tail: _StructLike[bytes, _OT] | None = None,
+    ) -> None:
+        # fmt: off
         # start -> next -> next -> next -> done | unpack
         #                                   Y
         # done <- previous <- previous <- start | pack
-        self._elements = [getstruct(initial, initial)]
-        self._elements += [x for x in map(lambda x: getstruct(x, x), structs) if x]
+        self._elements: list[_StructLike] = [getstruct(initial) or initial]  # pyright: ignore[reportAttributeAccessIssue]
+        self._elements += [x for x in map(lambda x: getstruct(x, x), structs) if x]  # pyright: ignore[reportAttributeAccessIssue]
+        if tail:
+            self._elements.append(tail)
 
     @property
-    def head(self):
+    def head(self) -> _StructLike[_IT, bytes]:
         """
         Get the head of the chain, i.e., the first structure.
 
@@ -195,7 +226,7 @@ class Chain(FieldStruct):
         return self._elements[0]
 
     @property
-    def tail(self):
+    def tail(self) -> _StructLike[bytes, _OT]:
         """
         Get the tail of the chain, i.e., the last structure.
 
@@ -205,7 +236,7 @@ class Chain(FieldStruct):
 
         return self._elements[-1]
 
-    def __size__(self, context) -> int:
+    def __size__(self, context: _ContextLike) -> int:
         """
         Calculate the size of the chain in bytes.
 
@@ -216,17 +247,17 @@ class Chain(FieldStruct):
         """
         return self.head.__size__(context)
 
-    def __type__(self) -> type:
+    def __type__(self) -> type | str | None:
         """
         Get the type of the tail structure in the chain.
 
         :return: The type of the tail structure.
         :rtype: type
         """
-
         return self.tail.__type__()
 
-    def __and__(self, other):
+    @override
+    def __and__(self, other: "Chain | _StructLike | _ContainsStruct") -> Self:
         """
         Concatenate another structure to the end of the chain.
 
@@ -235,10 +266,10 @@ class Chain(FieldStruct):
         :return: The updated chain.
         :rtype: Chain
         """
-        self._elements.append(getstruct(other, other))
+        self._elements.append(getstruct(other) or other)
         return self
 
-    def __rand__(self, other):
+    def __rand__(self, other: "Chain") -> Self:
         """
         Concatenate another structure to the beginning of the chain.
 
@@ -249,7 +280,8 @@ class Chain(FieldStruct):
         """
         return self.__and__(other)
 
-    def unpack_single(self, context):
+    @override
+    def unpack_single(self, context: _ContextLike) -> _OT:
         """
         Unpack a single data instance from the chain.
 
@@ -267,9 +299,10 @@ class Chain(FieldStruct):
             ):
                 data = struct.__unpack__(context)
 
-        return data
+        return data  # pyright: ignore[reportReturnType]
 
-    def pack_single(self, obj, context) -> None:
+    @override
+    def pack_single(self, obj: _IT, context: _ContextLike) -> None:
         """
         Pack a single data instance into the chain.
 
@@ -293,7 +326,7 @@ class Chain(FieldStruct):
                     obj = stream.getvalue()
 
 
-class Operator:
+class Operator(Generic[_IT, _OT]):
     """Defines a custom opearator (user-defined)
 
     It operates _infix_ between two statements and takes them as
@@ -324,21 +357,24 @@ class Operator:
     :type func: Callable[[Any, Any], _StructLike]
     """
 
-    def __init__(self, func) -> None:
-        self.func = func
+    def __init__(self, func: Callable[[Any, Any], _StructLike[_IT, _OT]]) -> None:
+        self.func: Callable[[Any, Any], _StructLike[_IT, _OT]] = func
 
-    def __truediv__(self, arg2):
-        return self.func(arg2)
+    def __truediv__(self, arg2: object) -> _StructLike[_IT, _OT]:
+        return self.func(arg2)  # pyright: ignore[reportCallIssue]
 
-    def __rtruediv__(self, arg1):
+    def __rtruediv__(self, arg1: object) -> "Operator[_IT, _OT]":
         return Operator(partial(self.func, arg1))
 
-    def __call__(self, arg1, arg2):
+    def __call__(self, arg1: object, arg2: object) -> _StructLike[_IT, _OT]:
         return self.func(arg1, arg2)
 
 
 # utility methods
-def get_args(args, context):
+def get_args(
+    args: _ArgType | list[_ArgType],
+    context: _ContextLike,
+) -> list[Any]:
     """
     Get arguments for an instance.
 
@@ -356,7 +392,7 @@ def get_args(args, context):
     return args
 
 
-def get_kwargs(kwargs: dict, context) -> dict:
+def get_kwargs(kwargs: dict[str, _ArgType], context: _ContextLike) -> dict[str, Any]:
     """
     Process a dictionary of keyword arguments, replacing callable values with their
     results.

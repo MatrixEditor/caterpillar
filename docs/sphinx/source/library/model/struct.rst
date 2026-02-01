@@ -44,3 +44,15 @@ Standard Interface
     .. versionchanged:: 2.5.0
 
         Now checks if the provided object implements the :class:`_SupportsSize` protocol
+
+Struct Mixins
+-------------
+
+.. autofunction:: caterpillar.model.Invisible
+
+.. autoclass:: caterpillar.model.StructDefMixin
+    :private-members: __struct__
+    :members:
+
+.. autoclass:: caterpillar.model.struct_factory
+    :members:

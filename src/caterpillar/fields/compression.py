@@ -12,9 +12,16 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-from typing import Protocol, runtime_checkable
+# pyright: reportPrivateUsage=false, reportAny=false, reportExplicitAny=false
+from typing import Any, Protocol, runtime_checkable
+from typing_extensions import override
 
-from caterpillar.abc import _StructLike
+from caterpillar.abc import (
+    _ContainsStruct,
+    _ContextLike,
+    _StructLike,
+    _LengthT,
+)
 from caterpillar.shared import getstruct, hasstruct
 from caterpillar.fields._mixin import get_kwargs
 from caterpillar.fields.common import Transformer, Bytes
@@ -30,7 +37,7 @@ class _Compressor(Protocol):
     Any class implementing this protocol must define these methods.
     """
 
-    def compress(self, data: bytes, **kwds) -> bytes:
+    def compress(self, data: bytes, **kwds: Any) -> bytes:
         """
         Compress the provided data.
 
@@ -40,9 +47,9 @@ class _Compressor(Protocol):
         :return: The compressed data.
         :rtype: bytes
         """
-        return b""
+        ...
 
-    def decompress(self, data: bytes, **kwds) -> bytes:
+    def decompress(self, data: bytes, **kwds: Any) -> bytes:
         """
         Decompress the provided data.
 
@@ -52,10 +59,10 @@ class _Compressor(Protocol):
         :return: The decompressed data.
         :rtype: bytes
         """
-        return b""
+        ...
 
 
-class Compressed(Transformer):
+class Compressed(Transformer[bytes, bytes, bytes, bytes]):
     """
     A transformer class for handling compression and decompression of data.
 
@@ -75,19 +82,20 @@ class Compressed(Transformer):
 
     def __init__(
         self,
-        compressor,
-        struct,
-        comp_kwargs=None,
-        decomp_kwargs=None,
+        compressor: _Compressor,
+        struct: _StructLike[bytes, bytes] | _ContainsStruct[bytes, bytes],
+        comp_kwargs: dict[str, Any] | None = None,
+        decomp_kwargs: dict[str, Any] | None = None,
     ) -> None:
         if hasstruct(struct):
             struct = getstruct(struct)
         super().__init__(struct)
-        self.compressor = compressor
-        self.comp_args = comp_kwargs or {}
-        self.decomp_args = decomp_kwargs or {}
+        self.compressor: _Compressor = compressor
+        self.comp_args: dict[str, Any] = comp_kwargs or {}
+        self.decomp_args: dict[str, Any] = decomp_kwargs or {}
 
-    def encode(self, obj: bytes, context) -> bytes:
+    @override
+    def encode(self, obj: bytes, context: _ContextLike) -> bytes:
         """
         Compress the input data using the provided compressor.
 
@@ -100,7 +108,8 @@ class Compressed(Transformer):
         """
         return self.compressor.compress(obj, **get_kwargs(self.comp_args, context))
 
-    def decode(self, parsed: bytes, context) -> bytes:
+    @override
+    def decode(self, parsed: bytes, context: _ContextLike) -> bytes:
         """
         Decompress the input data using the provided compressor.
 
@@ -116,11 +125,14 @@ class Compressed(Transformer):
         )
 
 
+_LengthTorStructT = _LengthT | _ContainsStruct[bytes, bytes] | _StructLike[bytes, bytes]
+
+
 def compressed(
-    lib,
-    obj,
-    comp_kwargs=None,
-    decomp_kwargs=None,
+    lib: _Compressor,
+    obj: _LengthTorStructT,
+    comp_kwargs: dict[str, Any] | None = None,
+    decomp_kwargs: dict[str, Any] | None = None,
 ) -> _StructLike:
     if callable(obj) or isinstance(obj, int) or obj is ...:
         obj = Bytes(obj)
@@ -128,9 +140,9 @@ def compressed(
 
 
 def ZLibCompressed(
-    obj,
-    comp_kwargs=None,
-    decomp_kwargs=None,
+    obj: _LengthTorStructT,
+    comp_kwargs: dict[str, Any] | None = None,
+    decomp_kwargs: dict[str, Any] | None = None,
 ):
     """
     Create a struct representing zlib compression.
@@ -144,9 +156,9 @@ def ZLibCompressed(
 
 
 def Bz2Compressed(
-    obj,
-    comp_kwargs=None,
-    decomp_kwargs=None,
+    obj: _LengthTorStructT,
+    comp_kwargs: dict[str, Any] | None = None,
+    decomp_kwargs: dict[str, Any] | None = None,
 ):
     """
     Create a struct representing bz2 compression.
@@ -160,9 +172,9 @@ def Bz2Compressed(
 
 
 def LZMACompressed(
-    obj,
-    comp_kwargs=None,
-    decomp_kwargs=None,
+    obj: _LengthTorStructT,
+    comp_kwargs: dict[str, Any] | None = None,
+    decomp_kwargs: dict[str, Any] | None = None,
 ):
     """
     Create a struct representing lzma compression.
@@ -176,15 +188,15 @@ def LZMACompressed(
 
 
 def LZOCompressed(
-    obj,
-    comp_kwargs=None,
-    decomp_kwargs=None,
+    obj: _LengthTorStructT,
+    comp_kwargs: dict[str, Any] | None = None,
+    decomp_kwargs: dict[str, Any] | None = None,
 ):
     """
     Create a struct representing LZO compression.
     """
     try:
-        # install package manuall with pip install lzallright
+        # install package manually with pip install lzallright
         import lzallright
 
         return compressed(lzallright.LZOCompressor(), obj, comp_kwargs, decomp_kwargs)

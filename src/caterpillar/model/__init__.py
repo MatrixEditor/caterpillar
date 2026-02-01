@@ -24,6 +24,9 @@ from ._struct import (
     pack_into,
     pack_file,
     sizeof,
+    Invisible,
+    StructDefMixin,
+    struct_factory,
 )
 from ._bitfield import (
     Bitfield,
@@ -39,6 +42,8 @@ from ._bitfield import (
     EnumFactory,
     CharFactory,
     DEFAULT_ALIGNMENT,
+    bitfield_factory,
+    BitfieldDefMixin,
 )
 from ._template import istemplate, template, TemplateTypeVar, derive
 
@@ -71,4 +76,9 @@ __all__ = [
     "EnumFactory",
     "CharFactory",
     "DEFAULT_ALIGNMENT",
+    "Invisible",
+    "StructDefMixin",
+    "struct_factory",
+    "bitfield_factory",
+    "BitfieldDefMixin",
 ]

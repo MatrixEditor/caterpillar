@@ -14,16 +14,16 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import warnings
 
-__version__ = "2.7.0"
-__release__ = "2.7"
+__version__ = "2.8.0"
+__release__ = "2.8"
 __author__ = "MatrixEditor"
 
 
 def native_support() -> bool:
     """Return True if native support is available."""
     try:
-        # pylint: disable-next=import-outside-toplevel
-        from caterpillar import _C
+        # fmt: off
+        from caterpillar import _C  # pyright: ignore[reportMissingModuleSource, reportUnusedImport]
 
         return True
     except ImportError:
@@ -33,4 +33,4 @@ def native_support() -> bool:
 # Explicitly report deprecation warnings
 warnings.filterwarnings("default", module="caterpillar")
 
-__all__ = ["__version__", "__author__", "native_support"]
+__all__ = ["__version__", "__author__", "__release__", "native_support"]

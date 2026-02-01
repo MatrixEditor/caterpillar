@@ -1,4 +1,4 @@
-# type: ignore
+from caterpillar.fields import pointer
 from caterpillar.py import (
     set_struct_flags,
     uintptr,
@@ -9,22 +9,16 @@ from caterpillar.py import (
     struct,
     x86
 )
-from caterpillar.fields.pointer import uintptr_fn
-
-try:
-    from rich import print
-except ImportError:
-    pass
+from caterpillar.shortcuts import f
 
 set_struct_flags(S_REPLACE_TYPES)
 
-
 @struct(kw_only=False, order=BigEndian)
 class Format:
-    address: uintptr * CString(...)
+    address: f[pointer[str], uintptr * CString(...)]
 
 
 data = b"\x00\x00\x00\x04Hello, World!\x00"
-obj = unpack(Format, data, _arch=x86)
+obj = unpack(Format, data, arch=x86)
 print(obj)
 print(obj.address.get())

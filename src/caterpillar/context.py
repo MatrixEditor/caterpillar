@@ -12,40 +12,84 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# pyright: reportPrivateUsage=false, reportExplicitAny=false, reportAny=false
 from __future__ import annotations
 
 import operator
 import sys
+import typing
 import warnings
 
-from typing import Callable, Any
-from typing_extensions import Self
-from types import FrameType
+from typing import Annotated, Callable, Any, Generic, Protocol, get_origin
+from typing_extensions import Final, Literal, Self, Sized, overload, override, TypeVar
+from types import FrameType, TracebackType
 from dataclasses import dataclass
 
 from caterpillar.exception import StructException
 from caterpillar.registry import to_struct
 from caterpillar.options import Flag
+from caterpillar.abc import (
+    _ContextLike,
+    _ContextLambda,
+    _IT,
+    _ContextFactoryLike,
+    _OT,
+    _StreamType,
+    _EndianLike,
+    _ArchLike,
+)
 
+if typing.TYPE_CHECKING:
+    from caterpillar.fields._base import Field
+
+###############################################################################
+# Default defined context items
+###############################################################################
 CTX_PARENT = "_parent"
+"""Identifies the parent object within the context tree."""
+
 CTX_OBJECT = "_obj"
+"""Refers to the current object associated with the context."""
+
 CTX_OFFSETS = "_offsets"
+"""Stores offset information used during stream parsing or generation."""
+
 CTX_STREAM = "_io"
+"""References the data stream associated with the packing or unpacking operation."""
+
 CTX_FIELD = "_field"
+"""Indicates the current field being processed within the structure."""
+
 CTX_VALUE = "_value"
+"""Stores the value associated with the current context node."""
+
 CTX_POS = "_pos"
+"""Represents the current position within the stream or structure."""
+
 CTX_INDEX = "_index"
+"""Maintains the index for sequence or array-based context elements."""
+
 CTX_PATH = "_path"
+"""Provides the full path to the current context object."""
+
 CTX_SEQ = "_is_seq"
-CTX_ARCH = "_arch"
+"""Holds a reference to the sequence object, if applicable."""
+
 CTX_ROOT = "_root"
+"""Points to the root of the entire context hierarchy."""
+
 CTX_ORDER = "_order"
+"""Stores the currently used endianess (only in root context)."""
+
+CTX_ARCH = "_arch"
+"""Stores the currently used architecture (only in root context)."""
 
 
-class Context(dict):
+class Context(dict[str, Any]):
     """Represents a context object with attribute-style access."""
 
-    def __setattr__(self, key: str, value) -> None:
+    @override
+    def __setattr__(self, key: str, value: Any, /) -> None:
         """
         Sets an attribute in the context.
 
@@ -54,7 +98,34 @@ class Context(dict):
         """
         self[key] = value
 
-    def __getattribute__(self, key: str):
+    @overload
+    def __getattribute__(self, key: Literal["_field"]) -> "Field[_IT, _OT] | None": ...
+    @overload
+    def __getattribute__(self, key: Literal["_parent"]) -> _ContextLike: ...
+    @overload
+    def __getattribute__(self, key: Literal["_obj"]) -> _ContextLike: ...
+    @overload
+    def __getattribute__(self, key: Literal["_offsets"]) -> dict[int, int]: ...
+    @overload
+    def __getattribute__(self, key: Literal["_io"]) -> _StreamType: ...
+    @overload
+    def __getattribute__(self, key: Literal["_pos"]) -> int: ...
+    @overload
+    def __getattribute__(self, key: Literal["_index"]) -> int: ...
+    @overload
+    def __getattribute__(self, key: Literal["_path"]) -> str: ...
+    @overload
+    def __getattribute__(self, key: Literal["_is_seq"]) -> bool: ...
+    @overload
+    def __getattribute__(self, key: Literal["_root"]) -> _ContextLike: ...
+    @overload
+    def __getattribute__(self, key: Literal["_order"]) -> _EndianLike: ...
+    @overload
+    def __getattribute__(self, key: Literal["_arch"]) -> _ArchLike: ...
+    @overload
+    def __getattribute__(self, key: str) -> Any: ...
+    @override
+    def __getattribute__(self, key: str) -> Any:
         """
         Retrieves an attribute from the context.
 
@@ -66,7 +137,7 @@ class Context(dict):
         except AttributeError:
             return self.__context_getattr__(key)
 
-    def __context_getattr__(self, path: str):
+    def __context_getattr__(self, path: str) -> Any:
         """
         Retrieves an attribute from the context.
 
@@ -74,7 +145,7 @@ class Context(dict):
         :return: The value associated with the key.
         """
         nodes = path.split(".")
-        obj = (
+        obj: Any = (
             self[nodes[0]]
             if nodes[0] in self
             else object.__getattribute__(self, nodes[0])
@@ -94,14 +165,55 @@ class Context(dict):
             setattr(obj, nodes[1], value)
 
     @property
-    def _root(self):
+    def _root(self) -> _ContextLike:
         return self.get("_root", self)
 
+    @overload
+    def __getitem__(self, key: Literal["_field"], /) -> "Field[_IT, _OT]": ...
+    @overload
+    def __getitem__(self, key: Literal["_order"], /) -> _EndianLike: ...
+    @overload
+    def __getitem__(self, key: Literal["_arch"], /) -> _ArchLike: ...
+    @overload
+    def __getitem__(self, key: Literal["_parent"], /) -> _ContextLike: ...
+    @overload
+    def __getitem__(self, key: Literal["_root"], /) -> _ContextLike: ...
+    @overload
+    def __getitem__(self, key: Literal["_io"], /) -> _StreamType: ...
+    @overload
+    def __getitem__(self, key: Literal["_offsets"], /) -> dict[int, int]: ...
+    @overload
+    def __getitem__(self, key: Literal["_index"], /) -> int: ...
+    @overload
+    def __getitem__(self, key: Literal["_path"], /) -> str: ...
+    @overload
+    def __getitem__(self, key: Literal["_is_seq"], /) -> bool: ...
+    @overload
+    def __getitem__(self, key: Literal["_pos"], /) -> int: ...
+    @overload
+    def __getitem__(self, key: str, /) -> Any: ...
+    @override
+    def __getitem__(self, key: str, /) -> Any:
+        return super().__getitem__(key)
 
-O_CONTEXT_FACTORY = Flag("option.context_factory", value=Context)
+
+O_CONTEXT_FACTORY: Flag[_ContextFactoryLike] = Flag(
+    "option.context_factory",
+    value=Context,
+)
+"""
+Defines the default factory used to instantiate context objects during the
+packing and unpacking process. To use the C-extension :code:`Context`
+implementation for a 10% speed caveat, use:
+
+>>> from caterpillar.context import O_CONTEXT_FACTORY
+>>> from caterpillar.c import c_Context
+>>> # that's all you have to do
+>>> O_CONTEXT_FACTORY.value = c_Context
+"""
 
 
-class SetContextVar:
+class SetContextVar(Generic[_IT]):
     """Defines an action that sets a context variable during pack or unpack.
 
     The value assigned to the context key is computed dynamically using
@@ -113,11 +225,11 @@ class SetContextVar:
     :type func: callable
     """
 
-    def __init__(self, key: str, func) -> None:
-        self.key = key
-        self.func = func
+    def __init__(self, key: str, func: _ContextLambda[_IT]) -> None:
+        self.key: str = key
+        self.func: _ContextLambda[_IT] = func
 
-    def __action_pack__(self, context) -> None:
+    def __action_pack__(self, context: _ContextLike) -> None:
         """Apply the context variable assignment during packing.
 
         The callable is evaluated and its result is stored in the
@@ -130,7 +242,7 @@ class SetContextVar:
         """
         context.__context_setattr__(self.key, self.func(context))
 
-    def __action_unpack__(self, context) -> None:
+    def __action_unpack__(self, context: _ContextLike) -> None:
         """Apply the context variable assignment during unpacking.
 
         The callable is evaluated and its result is stored in the
@@ -149,78 +261,78 @@ class ExprMixin:
     A mixin class providing methods for creating binary and unary expressions.
     """
 
-    def __add__(self, other):
+    def __add__(self, other: object) -> BinaryExpression:
         return BinaryExpression(operator.add, self, other)
 
-    def __sub__(self, other):
+    def __sub__(self, other: object) -> BinaryExpression:
         return BinaryExpression(operator.sub, self, other)
 
-    def __mul__(self, other):
+    def __mul__(self, other: object) -> BinaryExpression:
         return BinaryExpression(operator.mul, self, other)
 
-    def __floordiv__(self, other):
+    def __floordiv__(self, other: object) -> BinaryExpression:
         return BinaryExpression(operator.floordiv, self, other)
 
-    def __truediv__(self, other):
+    def __truediv__(self, other: object) -> BinaryExpression:
         return BinaryExpression(operator.truediv, self, other)
 
-    def __mod__(self, other):
+    def __mod__(self, other: object) -> BinaryExpression:
         return BinaryExpression(operator.mod, self, other)
 
-    def __pow__(self, other):
+    def __pow__(self, other: object) -> BinaryExpression:
         return BinaryExpression(operator.pow, self, other)
 
-    def __xor__(self, other):
+    def __xor__(self, other: object) -> BinaryExpression:
         return BinaryExpression(operator.xor, self, other)
 
-    def __and__(self, other):
+    def __and__(self, other: object) -> BinaryExpression:
         return BinaryExpression(operator.and_, self, other)
 
-    def __or__(self, other):
+    def __or__(self, other: object) -> BinaryExpression:
         return BinaryExpression(operator.or_, self, other)
 
-    def __rshift__(self, other):
+    def __rshift__(self, other: object) -> BinaryExpression:
         return BinaryExpression(operator.rshift, self, other)
 
-    def __lshift__(self, other):
+    def __lshift__(self, other: object) -> BinaryExpression:
         return BinaryExpression(operator.lshift, self, other)
 
-    __div__ = __truediv__
+    __div__ = __truediv__  # pyright: ignore[reportUnannotatedClassAttribute]
 
-    def __radd__(self, other):
+    def __radd__(self, other: object) -> BinaryExpression:
         return BinaryExpression(operator.add, other, self)
 
-    def __rsub__(self, other):
+    def __rsub__(self, other: object) -> BinaryExpression:
         return BinaryExpression(operator.sub, other, self)
 
-    def __rmul__(self, other):
+    def __rmul__(self, other: object) -> BinaryExpression:
         return BinaryExpression(operator.mul, other, self)
 
-    def __rfloordiv__(self, other):
+    def __rfloordiv__(self, other: object) -> BinaryExpression:
         return BinaryExpression(operator.floordiv, other, self)
 
-    def __rtruediv__(self, other):
+    def __rtruediv__(self, other: object) -> BinaryExpression:
         return BinaryExpression(operator.truediv, other, self)
 
-    def __rmod__(self, other):
+    def __rmod__(self, other: object) -> BinaryExpression:
         return BinaryExpression(operator.mod, other, self)
 
-    def __rpow__(self, other):
+    def __rpow__(self, other: object) -> BinaryExpression:
         return BinaryExpression(operator.pow, other, self)
 
-    def __rxor__(self, other):
+    def __rxor__(self, other: object) -> BinaryExpression:
         return BinaryExpression(operator.xor, other, self)
 
-    def __rand__(self, other):
+    def __rand__(self, other: object) -> BinaryExpression:
         return BinaryExpression(operator.and_, other, self)
 
-    def __ror__(self, other):
+    def __ror__(self, other: object) -> BinaryExpression:
         return BinaryExpression(operator.or_, other, self)
 
-    def __rrshift__(self, other):
+    def __rrshift__(self, other: object) -> BinaryExpression:
         return BinaryExpression(operator.rshift, other, self)
 
-    def __rlshift__(self, other):
+    def __rlshift__(self, other: object) -> BinaryExpression:
         return BinaryExpression(operator.lshift, other, self)
 
     def __neg__(self):
@@ -232,25 +344,31 @@ class ExprMixin:
     def __invert__(self):
         return UnaryExpression("invert", operator.not_, self)
 
-    def __contains__(self, other):
+    def __contains__(self, other: object) -> BinaryExpression:
         return BinaryExpression(operator.contains, self, other)
 
-    def __gt__(self, other):
+    def __gt__(self, other: object) -> BinaryExpression:
         return BinaryExpression(operator.gt, self, other)
 
-    def __ge__(self, other):
+    def __ge__(self, other: object) -> BinaryExpression:
         return BinaryExpression(operator.ge, self, other)
 
-    def __lt__(self, other):
+    def __lt__(self, other: object) -> BinaryExpression:
         return BinaryExpression(operator.lt, self, other)
 
-    def __le__(self, other):
+    def __le__(self, other: object) -> BinaryExpression:
         return BinaryExpression(operator.le, self, other)
 
-    def __eq__(self, other):
+    @override
+    def __eq__(  # pyright: ignore[reportIncompatibleMethodOverride]
+        self, other: object
+    ) -> BinaryExpression:
         return BinaryExpression(operator.eq, self, other)
 
-    def __ne__(self, other):
+    @override
+    def __ne__(  # pyright: ignore[reportIncompatibleMethodOverride]
+        self, other: object
+    ) -> BinaryExpression:
         return BinaryExpression(operator.ne, self, other)
 
 
@@ -278,15 +396,20 @@ class ConditionContext:
     :type condition: Union[_ContextLambda, bool]
     """
 
-    __slots__ = "func", "annotations", "namelist", "depth"
+    __slots__: tuple[str, str, str, str] = (
+        "func",
+        "annotations",
+        "namelist",
+        "depth",
+    )
 
-    def __init__(self, condition, depth=2):
-        self.func = condition
-        self.annotations = None
-        self.namelist = None
-        self.depth = depth
+    def __init__(self, condition: _ContextLambda[bool], depth: int = 2):
+        self.func: _ContextLambda[bool] = condition
+        self.annotations: dict[str, Any] = {}
+        self.namelist: list[str] = list()
+        self.depth: int = depth
 
-    def getframe(self, num: int, msg=None) -> FrameType:
+    def getframe(self, num: int, msg: str) -> FrameType:
         try:
             return sys._getframe(num)
         except AttributeError as exc:
@@ -296,7 +419,7 @@ class ConditionContext:
         if (sys.version_info.major, sys.version_info.minor) >= (3, 14):
             warnings.warn(
                 "Python3.14 breaks support for Contitional fields. Conditional "
-                "statements must be defined manually until a fix has been released."
+                + "statements must be defined manually until a fix has been released."
             )
         frame = self.getframe(self.depth, "Could not enter condition context!")
         # keep track of all annotations
@@ -312,24 +435,22 @@ class ConditionContext:
         self.namelist = list(self.annotations)
         return self
 
-    def __exit__(self, *_) -> None:
+    def __exit__(
+        self, exc_type: type, exc_value: Exception, traceback: TracebackType
+    ) -> None:
         # pylint: disable-next=import-outside-toplevel
         from caterpillar.fields import Field
 
         new_names = set(self.annotations) - set(self.namelist)
         for name in new_names:
             # modify newly created fields
-            field = self.annotations[name]
-            if isinstance(field, Field):
-                # field already defined/created -> check for condition
-                if field.has_condition():
-                    # the field's condition AND this one must be true
-                    field.condition = BinaryExpression(
-                        operator.and_, field.condition, self.func
-                    )
-                else:
-                    field //= self.func
-            else:
+            field: Field | Any = self.annotations[name]
+            is_annotated = get_origin(field) is Annotated
+            annotated_type = extra_options = None
+            if get_origin(field) is Annotated:
+                annotated_type, field, *extra_options = field
+
+            if not isinstance(field, Field):
                 # create a field (other attributes will be modified later)
 
                 # ISSUE #15: The annotation must be converted to a _StructLike
@@ -340,10 +461,27 @@ class ConditionContext:
                     struct_obj = Field(struct_obj)
 
                 struct_obj.condition = self.func
-                self.annotations[name] = struct_obj
+                field = struct_obj
 
-        self.annotations = None
-        self.namelist = None
+            # field already defined/created -> check for condition
+            if field.has_condition():
+                # the field's condition AND this one must be true
+                field.condition = BinaryExpression(
+                    operator.and_, field.condition, self.func
+                )
+            else:
+                field //= self.func  # pyright: ignore[reportUnknownVariableType]
+
+            # rebuild the annotated field
+            self.annotations[name] = (
+                # Python 3.10 does not allow *extra_options
+                Annotated[annotated_type, field, extra_options]
+                if is_annotated
+                else field
+            )
+
+        self.annotations = dict()
+        self.namelist = list()
 
 
 @dataclass(repr=False)
@@ -356,26 +494,28 @@ class BinaryExpression(ExprMixin):
     :param right: The right operand.
     """
 
-    operand: Callable[[Any, Any], Any]
-    left: Any
-    right: Any
+    operand: Callable[[Any, Any], bool]
+    left: Any | _ContextLambda[Any]
+    right: Any | _ContextLambda[Any]
 
-    def __call__(self, context: Context, **kwds):
-        lhs = self.left(context, **kwds) if callable(self.left) else self.left
-        rhs = self.right(context, **kwds) if callable(self.right) else self.right
+    def __call__(self, context: _ContextLike) -> bool:
+        lhs = self.left(context) if callable(self.left) else self.left
+        rhs = self.right(context) if callable(self.right) else self.right
         return self.operand(lhs, rhs)
 
+    @override
     def __repr__(self) -> str:
         return f"{self.operand.__name__}{{{self.left!r}, {self.right!r}}}"
 
     def __enter__(self):
-        # pylint: disable-next=attribute-defined-outside-init
-        self._cond = ConditionContext(self, depth=3)
-        self._cond.__enter__()
+        # fmt: off
+        self._cond: ConditionContext = ConditionContext(self, depth=3)  # pyright: ignore[reportUninitializedInstanceVariable]
+        self._cond.__enter__()  # pyright: ignore[reportUnusedCallResult]
         return self
+        # fmt: on
 
-    def __exit__(self, *_):
-        self._cond.__exit__(*_)
+    def __exit__(self, exc_type: type, exc_value: Exception, traceback: TracebackType):
+        self._cond.__exit__(exc_type, exc_value, traceback)
 
 
 @dataclass
@@ -390,42 +530,56 @@ class UnaryExpression:
 
     name: str
     operand: Callable[[Any], Any]
-    value: Any
+    value: Any | _ContextLambda[Any]
 
-    def __call__(self, context, **kwds):
-        value = self.value(context, **kwds) if callable(self.value) else self.value
+    def __call__(self, context: _ContextLike) -> Any:
+        value = self.value(context) if callable(self.value) else self.value
         return self.operand(value)
 
+    @override
     def __repr__(self) -> str:
         return f"{self.operand.__name__}{{{self.value!r}}}"
 
     def __enter__(self):
-        # pylint: disable-next=attribute-defined-outside-init
-        self._cond = ConditionContext(self, depth=3)
-        self._cond.__enter__()
+        # fmt: off
+        self._cond: ConditionContext = ConditionContext(self, depth=3)  # pyright: ignore[reportUninitializedInstanceVariable]
+        self._cond.__enter__()  # pyright: ignore[reportUnusedCallResult]
         return self
+        # fmt: on
 
-    def __exit__(self, *_):
-        self._cond.__exit__(*_)
+    def __exit__(self, exc_type: type, exc_value: Exception, traceback: TracebackType):
+        self._cond.__exit__(exc_type, exc_value, traceback)
 
 
-class ContextPath(ExprMixin):
+class _ContextPathOp(Protocol):
+    __name__: str
+
+    def __call__(self, *args: Any, **kwds: Any) -> Any: ...
+
+
+_T = TypeVar("_T")
+
+
+class ContextPath(Generic[_T], ExprMixin):
     """
     Represents a lambda function for retrieving a value from a Context based on a specified path.
     """
 
-    def __init__(self, path=None) -> None:
+    # internal set of operations to apply
+    _ops_: list[tuple[_ContextPathOp, list[Any], dict[str, Any]]]
+
+    def __init__(self, path: str | None = None) -> None:
         """
         Initializes a ContextPath instance with an optional path.
 
         :param path: The path to use when retrieving a value from a Context.
         """
-        self.path = path
-        self._ops_ = []
-        self.call_kwargs = None
-        self.getitem_args = None
+        self.path: str | None = path
+        self._ops_ = list()
+        self.call_kwargs: dict[str, Any] = dict()
+        self.getitem_args: list[Any] = list()
 
-    def __call__(self, context=None, **kwds):
+    def __call__(self, context: _ContextLike) -> _T:
         """
         Calls the lambda function to retrieve a value from a Context.
 
@@ -433,22 +587,61 @@ class ContextPath(ExprMixin):
         :param kwds: Additional keyword arguments.
         :return: The value retrieved from the Context based on the path.
         """
-        if context is None:
-            self._ops_.append((operator.call, (), kwds))
-            return self
+        # REVISIT: find a way to implement calls
+        # if context is None:
+        #     self._ops_.append((operator.call, [], kwds))
+        #     return self
+
+        if self.path is None:  # no path configured, just return the context itself
+            return context  # pyright: ignore[reportReturnType]
+
         value = context.__context_getattr__(self.path)
         for operation, args, kwargs in self._ops_:
             value = operation(value, *args, **kwargs)
         return value
 
-    def __getitem__(self, key) -> Self:
-        self._ops_.append((operator.getitem, (key,), {}))
+    def __getitem__(self, key: Any) -> Self:
+        self._ops_.append((operator.getitem, [key], {}))
         return self
 
     def __type__(self) -> type:
         return object
 
-    def __getattribute__(self, key: str) -> ContextPath:
+    # overloads to support the default paths
+    @overload
+    def __getattribute__(
+        self, key: Literal["_field"]
+    ) -> ContextPath["Field[_IT, _OT] | None"]: ...
+    @overload
+    def __getattribute__(
+        self, key: Literal["_parent"]
+    ) -> ContextPath[_ContextLike]: ...
+    @overload
+    def __getattribute__(self, key: Literal["_obj"]) -> ContextPath[_ContextLike]: ...
+    @overload
+    def __getattribute__(
+        self, key: Literal["_offsets"]
+    ) -> ContextPath[dict[int, int]]: ...
+    @overload
+    def __getattribute__(self, key: Literal["_io"]) -> ContextPath[_StreamType]: ...
+    @overload
+    def __getattribute__(self, key: Literal["_pos"]) -> ContextPath[int]: ...
+    @overload
+    def __getattribute__(self, key: Literal["_index"]) -> ContextPath[int]: ...
+    @overload
+    def __getattribute__(self, key: Literal["_path"]) -> ContextPath[str]: ...
+    @overload
+    def __getattribute__(self, key: Literal["_is_seq"]) -> ContextPath[bool]: ...
+    @overload
+    def __getattribute__(self, key: Literal["_root"]) -> ContextPath[_ContextLike]: ...
+    @overload
+    def __getattribute__(self, key: Literal["_order"]) -> ContextPath[_EndianLike]: ...
+    @overload
+    def __getattribute__(self, key: Literal["_arch"]) -> ContextPath[_ArchLike]: ...
+    @overload
+    def __getattribute__(self, key: str) -> ContextPath[_IT]: ...
+    @override
+    def __getattribute__(self, key: str) -> ContextPath[_IT]:
         """
         Gets an attribute from the ContextPath, creating a new instance if needed.
 
@@ -462,15 +655,16 @@ class ContextPath(ExprMixin):
                 return ContextPath(key)
             return ContextPath(".".join([self.path, key]))
 
+    @override
     def __repr__(self) -> str:
         """
         Returns a string representation of the ContextPath.
 
         :return: A string representation.
         """
-        extra = []
+        extra: list[str] = []
         for operation, args, kwargs in self._ops_:
-            data = []
+            data: list[str] = []
             if len(args) > 0:
                 data.append(*map(repr, args))
             if len(kwargs) > 0:
@@ -482,27 +676,36 @@ class ContextPath(ExprMixin):
 
         return f"Path({self.path!r}, {', '.join(extra)})"
 
+    @override
     def __str__(self) -> str:
         """
         Returns a string representation of the path.
 
         :return: A string representation of the path.
         """
-        return self.path
+        return self.path or ""
 
     @property
-    def parent(self) -> ContextPath:
+    def parent(self) -> ContextPath[_ContextLike]:
         path = f"{CTX_PARENT}.{CTX_OBJECT}"
         if not self.path:
             return ContextPath(path)
         return ContextPath(".".join([self.path, path]))
 
+    @property
+    def parentctx(self) -> ContextPath[_ContextLike]:
+        """
+        .. versionadded:: 2.8.0
+        """
+        path = CTX_PARENT if not self.path else f"{self.path}.{CTX_PARENT}"
+        return ContextPath(path)
+
 
 class ContextLength(ExprMixin):
-    def __init__(self, path: ContextPath) -> None:
-        self.path = path
+    def __init__(self, path: ContextPath[Sized]) -> None:
+        self.path: ContextPath[Sized] = path
 
-    def __call__(self, context=None, **kwds):
+    def __call__(self, context: _ContextLike) -> int:
         """
         Calls the lambda function to retrieve a value from a Context.
 
@@ -512,11 +715,47 @@ class ContextLength(ExprMixin):
         """
         return len(self.path(context))
 
+    @override
     def __repr__(self) -> str:
         return f"len({self.path!r})"
 
 
-this = ContextPath(CTX_OBJECT)
-ctx = ContextPath()
-parent = ContextPath(".".join([CTX_PARENT, CTX_OBJECT]))
-root = ContextPath(CTX_ROOT)
+# fmt: off
+this: Final[ContextPath[_ContextLike]] = ContextPath(CTX_OBJECT)
+"""Context path pointing to the current object in the evaluation context.
+
+This context path is used to reference the active object being processed when
+navigating or resolving nested structures using context paths.
+"""
+
+ctx: Final[ContextPath[_ContextLike]] = ContextPath()
+"""Context path pointing to the current evaluation context.
+
+This context path allows access to the full context dictionary rather than a
+specific object within it.
+"""
+
+parent: Final[ContextPath[_ContextLike]] = ContextPath(".".join([CTX_PARENT, CTX_OBJECT]))
+"""Context path pointing to the parent object's current object.
+
+This context path is used to reference the object belonging to the parent
+context level when navigating nested context structures.
+"""
+
+parentctx: Final[ContextPath[_ContextLike]] = ContextPath(CTX_PARENT)
+"""Context path pointing to the parent evaluation context.
+
+This context path allows access to the full parent context dictionary rather
+than only its object.
+
+.. versionadded:: 2.8.0
+"""
+
+root: Final[ContextPath[_ContextLike]] = ContextPath(CTX_ROOT)
+"""Context path pointing to the root evaluation context.
+
+This context path is used to reference the top-level context in a nested
+context hierarchy.
+
+.. versionadded:: 2.6.0
+"""

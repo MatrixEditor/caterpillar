@@ -12,9 +12,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# pyright: reportPrivateUsage=false, reportAny=false, reportExplicitAny=false
 import re
 
-from typing_extensions import Self, override
+from collections.abc import Iterable
+from typing import Annotated, Any, Generic, get_args, get_origin
+from typing_extensions import Self, override, TypeVar
 
 from caterpillar.context import (
     CTX_FIELD,
@@ -23,13 +26,7 @@ from caterpillar.context import (
     CTX_STREAM,
     CTX_SEQ,
     O_CONTEXT_FACTORY,
-)
-from caterpillar.byteorder import (
-    ByteOrder,
-    Arch,
-    LittleEndian,
-    SysNative,
-    system_arch,
+    Context,
 )
 from caterpillar.exception import StructException, ValidationError
 from caterpillar.options import (
@@ -37,7 +34,6 @@ from caterpillar.options import (
     S_DISCARD_UNNAMED,
     S_UNION,
     S_REPLACE_TYPES,
-    Flag,
 )
 from caterpillar.fields import (
     Field,
@@ -50,21 +46,38 @@ from caterpillar.shared import (
     ATTR_ACTION_PACK,
     ATTR_ACTION_UNPACK,
     Action,
-    ATTR_BYTEORDER,
 )
 from caterpillar import registry
+from caterpillar.abc import (
+    _StructLike,
+    _ContextLike,
+    _OptionLike,
+    _ContextLambda,
+    _EndianLike,
+    _ArchLike,
+    _StreamType,
+    _ActionLike,
+)
 
 
 class _Member:
-    def __init__(self, name, field, include=False, is_action=False):
-        self.name = name
-        self.field = field
-        self.include = include
-        self.is_action = is_action
-        self.action_unpack = getattr(field, ATTR_ACTION_UNPACK, None)
-        self.action_pack = getattr(field, ATTR_ACTION_PACK, None)
+    def __init__(
+        self,
+        name: str | None,
+        field: Field,
+        include: bool = False,
+        is_action: bool = False,
+    ):
+        # fmt: off
+        self.name: str = name or ""
+        self.field: Field = field
+        self.include: bool = include
+        self.is_action: bool = is_action
+        self.action_unpack: _ContextLambda[None] | None = getattr(field, ATTR_ACTION_UNPACK, None)
+        self.action_pack: _ContextLambda[None] | None = getattr(field, ATTR_ACTION_PACK, None)
 
-    def __repr__(self):
+    @override
+    def __repr__(self) -> str:
         if self.is_action:
             return f"Action({self.field})"
 
@@ -75,7 +88,14 @@ class _Member:
         return self.field == value or value == self.name
 
 
-class Sequence(FieldMixin):
+_SeqModelT = TypeVar("_SeqModelT", default=dict[str, Any])
+_SeqOT = TypeVar("_SeqOT", default=dict[str, Any])
+_SeqIT = TypeVar("_SeqIT", default=dict[str, Any])
+_ExtraOptionT = _EndianLike | _ArchLike | _OptionLike[Any]
+_AnnotationT = str | bytes | Field | type | _ActionLike | Any
+
+
+class Sequence(Generic[_SeqModelT, _SeqIT, _SeqOT], FieldMixin[_SeqIT, _SeqOT]):
     """Default implementation for a sequence of fields.
 
     The native Python type mapped to this struct class is :code:`dict`. To convert
@@ -86,7 +106,7 @@ class Sequence(FieldMixin):
     Sequence(fields=['a'])
     """
 
-    __slots__ = (
+    __slots__: tuple[str, ...] = (
         "model",
         "fields",
         "order",
@@ -99,26 +119,26 @@ class Sequence(FieldMixin):
 
     def __init__(
         self,
-        model,
-        order=None,
-        arch=None,
-        options=None,
-        field_options=None,
+        model: _SeqModelT,
+        order: _EndianLike | None = None,
+        arch: _ArchLike | None = None,
+        options: Iterable[_OptionLike] | None = None,
+        field_options: Iterable[_OptionLike] | None = None,
     ) -> None:
-        self.model = model
-        self.arch = arch
-        self.order = order or LittleEndian
-        self.options = set(options or [])
-        self.field_options = set(field_options or [])
+        self.model: _SeqModelT = model
+        self.arch: _ArchLike | None = arch
+        self.order: _EndianLike | None = order
+        self.options: set[_OptionLike] = set(options or [])
+        self.field_options: set[_OptionLike] = set(field_options or [])
 
         # these fields will be set or used while processing the model type
-        self._members = {}
-        self.fields = []
-        self.is_union = S_UNION in self.options
+        self._members: dict[str, Field] = {}
+        self.fields: list[_Member] = []
+        self.is_union: bool = S_UNION in self.options
         # Process all fields in the model
         self._process_model()
 
-    def __add__(self, sequence: "Sequence") -> Self:
+    def __add__(self, sequence: "Sequence[Any, Any, Any]") -> Self:
         # We will try to import all fields from the given sequence
         for member in sequence.fields:
             # Ignore duplicates here:
@@ -133,18 +153,18 @@ class Sequence(FieldMixin):
     def __sub__(self, sequence: "Sequence") -> Self:
         # By default, we are only removing existing fields.
         for member in sequence.fields:
-            self._members.pop(member.name, None)
+            _ = self._members.pop(member.name, None)
             if member.name in self.fields:
                 self.fields.remove(member)
         return self
 
-    __iadd__ = __add__
-    __isub__ = __sub__
+    __iadd__ = __add__  # pyright: ignore[reportUnannotatedClassAttribute]
+    __isub__ = __sub__  # pyright: ignore[reportUnannotatedClassAttribute]
 
     def __type__(self) -> type:
         return dict
 
-    def has_option(self, option: Flag) -> bool:
+    def has_option(self, option: _OptionLike[Any]) -> bool:
         """
         Check if the struct has a specific option.
 
@@ -153,7 +173,7 @@ class Sequence(FieldMixin):
         """
         return option in self.options
 
-    def _included(self, name: str, default, annotation) -> bool:
+    def _included(self, name: str, default: object, annotation: _AnnotationT) -> bool:
         """
         Check if a field with the given name should be included.
 
@@ -171,11 +191,13 @@ class Sequence(FieldMixin):
 
         return True
 
-    def _set_default(self, name: str, value) -> None:
+    def _set_default(self, name: str, value: object) -> None:
         pass
 
-    def _process_default(self, name, annotation, had_default=False):
-        default = getattr(self.model, name, INVALID_DEFAULT)
+    def _process_default(
+        self, name: str, annotation: _AnnotationT, had_default: bool = False
+    ) -> Any:
+        default: Any = getattr(self.model, name, INVALID_DEFAULT)
         # constant values that are not in the form of fields, structs or types should
         # be wrapped into constant values. For more information, see _process_field
         if isinstance(annotation, Field):
@@ -209,14 +231,20 @@ class Sequence(FieldMixin):
         """
         Process all fields in the model.
         """
-        removables = []
+        removables: list[str] = []
         annotations = self._prepare_fields()
         had_default = False
         for name, annotation in annotations.items():
+            annotated_type: type | None = None
+            extra_options: Iterable[_ExtraOptionT] = []
+            if get_origin(annotation) is Annotated:
+                annotated_type, annotation, *extra_options = get_args(annotation)
+
             if Action.is_action(annotation):
                 self.add_action(annotation)
                 removables.append(name)
                 continue
+
             # Process each field and its annotation. In addition, fields with a name in
             # the form of '_[0-9]*' will be removed (if enabled)
             default = self._process_default(name, annotation, had_default)
@@ -227,22 +255,47 @@ class Sequence(FieldMixin):
                 removables.append(name)
 
             field = self._process_field(name, annotation, default)
+            # a small hack to support 3.10
+            options = list(extra_options)
+            if len(options) == 1 and isinstance(options[0], Iterable):
+                # fmt: off
+                options: list[_ExtraOptionT] = options[0]  # pyright: ignore[reportAssignmentType]
+
+            for extra_option in options:
+                match extra_option:
+                    case _ArchLike():
+                        field.arch = extra_option
+                    case _EndianLike():
+                        field.order = extra_option
+                    case _OptionLike():
+                        field.add_flag(extra_option)
+                    case _:
+                        raise ValidationError(
+                            f"Could not add extra option: unsupported type ({type(extra_option)})"
+                        )
+
             # we call add_field to safely add the created field
             self.add_field(name, field, is_included)
             if self.has_option(S_REPLACE_TYPES):
                 # This way we re-annotate all fields in the current model
-                self._replace_type(name, field.get_type())
+                self._replace_type(name, annotated_type or field.get_type())
 
         for name in removables:
             self._remove_from_model(name)
 
-    def _prepare_fields(self):
-        return self.model
+    def _prepare_fields(self) -> dict[str, _AnnotationT]:
+        return self.model  # pyright: ignore[reportReturnType]
 
-    def _process_annotation(self, annotation, default, order: ByteOrder, arch: Arch):
-        return registry.to_struct(annotation, arch=arch, order=order)
+    def _process_annotation(
+        self,
+        annotation: _AnnotationT,
+        default: object,  # REVISIT: unused
+        order: _EndianLike | None,
+        arch: _ArchLike | None,
+    ) -> _StructLike:
+        return registry.to_struct(annotation)
 
-    def _process_field(self, name: str, annotation, default) -> Field:
+    def _process_field(self, name: str, annotation: object, default: object) -> Field:
         """
         Process a field in the model.
 
@@ -256,29 +309,34 @@ class Sequence(FieldMixin):
 
         # The order and arch of the field can be overridden by the annotation
         # and should not get applied if this seq does not define it.
-        order = getattr(annotation, ATTR_BYTEORDER, self.order)
+        order = self.order  #  or getattr(annotation, ATTR_BYTEORDER, None)
         arch = self.arch
-        result = self._process_annotation(annotation, default, order, arch)
+        result = self._process_annotation(annotation, default, order=order, arch=arch)
         if isinstance(result, Field):
             field = result
         else:
             struct = result
 
         if struct is not None:
-            field = Field(struct, order, arch=arch, default=default)
+            field = Field(struct, default=default)
 
         if field is None:
+            type_name = (
+                self.model.__name__
+                if isinstance(self.model, type)
+                else f"<{self.__class__.__name__}>"
+            )
             msg = (
-                f"Field '{self.model.__name__}.{name}' could not be created, because "
+                f"Field '{type_name}.{name}' could not be created, because "
                 "the placed annotation does not have a corresponding handler:\n "
                 f"type: {type(annotation)},\n annotation: {annotation!r}"
             )
             raise ValidationError(msg)
         field.default = default
-        if field.order is SysNative:
-            field.order = self.order or field.order
-        if field.arch is system_arch:
-            field.arch = self.arch or field.arch
+        if not field.has_order():
+            field.order = order
+        if not field.has_arch():
+            field.arch = arch
         field.flags.update(self.field_options)
         # field.flags.update({hash(x): x for x in self.field_options})
         return field
@@ -296,7 +354,7 @@ class Sequence(FieldMixin):
         if included:
             self._members[name] = field
 
-    def add_action(self, action) -> None:
+    def add_action(self, action: _ActionLike) -> None:
         """
         Add an action to the struct.
 
@@ -304,7 +362,7 @@ class Sequence(FieldMixin):
         """
         self.fields.append(_Member(None, action, is_action=True))
 
-    def del_field(self, name: str, field) -> None:
+    def del_field(self, name: str, field: Field) -> None:
         """
         Remomves a field from this struct.
 
@@ -312,20 +370,20 @@ class Sequence(FieldMixin):
         :param field: The field to remove.
         """
         self._members.pop(name, None)
-        self.fields.remove(field)
+        self.fields.remove(field)  # REVISIT: invalid type here
 
-    def get_members(self):
+    def get_members(self) -> dict[str, Field]:
         return self._members.copy()
 
-    def __size__(self, context) -> int:
+    def __size__(self, context: _ContextLike) -> int:
         """
         Get the size of the struct.
 
         :param context: The context of the struct.
         :return: The size of the struct.
         """
-        sizes = []
-        base_path = context[CTX_PATH]
+        sizes: list[int] = []
+        base_path: str = context[CTX_PATH]
         for member in self.fields:
             if member.is_action:
                 continue
@@ -335,17 +393,17 @@ class Sequence(FieldMixin):
 
         return max(sizes) if self.is_union else sum(sizes)
 
-    def unpack_one(self, context):
+    def unpack_one(self, context: _ContextLike) -> _SeqOT:
         # At first, we define the object context where the parsed values
         # will be stored
-        init_data = O_CONTEXT_FACTORY.value()
-        context[CTX_OBJECT] = O_CONTEXT_FACTORY.value(_parent=context)
-
-        base_path = context[CTX_PATH]
+        factory = O_CONTEXT_FACTORY.value or Context
+        init_data = factory()
+        context[CTX_OBJECT] = factory(_parent=context)
+        base_path: str = context[CTX_PATH]
+        stream: _StreamType = context[CTX_STREAM]
+        start = pos = max_size = 0
         if self.is_union:
-            stream = context[CTX_STREAM]
-            start = stream.tell()
-            max_size = 0
+            start: int = stream.tell()
 
         for member in self.fields:
             if member.is_action:
@@ -375,9 +433,9 @@ class Sequence(FieldMixin):
         if self.is_union:
             # Reset the stream position
             stream.seek(start + max_size)
-        return obj
+        return obj  # pyright: ignore[reportReturnType]
 
-    def __unpack__(self, context):
+    def __unpack__(self, context: _ContextLike) -> _SeqOT:
         """
         Unpack the struct from the stream.
 
@@ -385,9 +443,9 @@ class Sequence(FieldMixin):
         :param context: The context of the struct.
         :return: The unpacked object.
         """
-        base_path = context[CTX_PATH]
+        base_path: str = context[CTX_PATH]
         # REVISIT: the name 'this_context' is misleading here
-        this_context = O_CONTEXT_FACTORY.value(
+        this_context = (O_CONTEXT_FACTORY.value or Context)(
             _root=context._root,
             _parent=context,
             _io=context[CTX_STREAM],
@@ -396,13 +454,15 @@ class Sequence(FieldMixin):
         # See __pack__ for more information
         field = context.get("_field")
         if field and context[CTX_SEQ]:
-            return unpack_seq(context, self.unpack_one)
+            return unpack_seq(
+                context, self.unpack_one
+            )  # pyright: ignore[reportReturnType]
         return self.unpack_one(this_context)
 
-    def get_value(self, obj, name: str, field: Field):
+    def get_value(self, obj: _SeqIT, name: str, field: Field) -> Any | None:
         return obj.get(name, None)
 
-    def pack_one(self, obj, context) -> None:
+    def pack_one(self, obj: _SeqIT, context: _ContextLike) -> None:
         max_size = 0
         union_field = None
         base_path: str = context[CTX_PATH]
@@ -439,13 +499,13 @@ class Sequence(FieldMixin):
                     "Invalid union config: no fields declared!", context
                 )
 
-            name = union_field.__name__
+            name = union_field.get_name()
             context[CTX_PATH] = ".".join([base_path, "<value>"])
             # REVISIT: are constant values allowed here? + name validation?
             value = self.get_value(obj, name, union_field)
             union_field.__pack__(value, context)
 
-    def __pack__(self, obj, context) -> None:
+    def __pack__(self, obj: _SeqIT, context: _ContextLike) -> None:
         # As structs can be used in field definitions a field will call this struct
         # and could potentially be a sequence. Therefore, we have to check whether we
         # should unpack multiple objects.
@@ -453,7 +513,7 @@ class Sequence(FieldMixin):
         if field and context[CTX_SEQ]:
             pack_seq(obj, context, self.pack_one)
         else:
-            ctx = O_CONTEXT_FACTORY.value(
+            ctx = (O_CONTEXT_FACTORY.value or Context)(
                 _root=context._root,
                 _parent=context,
                 _io=context[CTX_STREAM],
@@ -462,18 +522,22 @@ class Sequence(FieldMixin):
             )
             self.pack_one(obj, ctx)
 
+    @override
     def __repr__(self) -> str:
         return f"{self.__class__.__qualname__}(fields={list(self._members)})"
 
+    @override
     def __str__(self) -> str:
         return self.__repr__()
 
 
 # --- private sequence tyoe converter ---
 @registry.TypeConverter(dict)
-def _type_converter(annotation, kwargs: dict):
-    arch = kwargs.pop("arch", None)
-    order = kwargs.pop("order", None)
+def _type_converter(
+    annotation: _SeqModelT, kwargs: dict[str, Any]
+) -> Sequence[_SeqModelT]:
+    arch: _ArchLike | None = kwargs.pop("arch", None)
+    order: _EndianLike | None = kwargs.pop("order", None)
     return Sequence(model=annotation, order=order, arch=arch)
 
 

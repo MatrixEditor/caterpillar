@@ -1,5 +1,40 @@
 # Changelog
 
+## [2.8.0] - Extended Syntax
+
+### Added
+
+- New concept: *extended* syntax featuring typing compliance; introduces shortcut `f` to annotate fields and `Invisible()` to hide fields from the constructor
+- `struct_factory.mixin` and `bitfield_factory.mixin` both provide default function wrappers for packing and unpacking data as well as typing fixes for operating on types directly.
+- New `parentctx` context path
+- Dynamic endian is now used by default (i. e. can be changed via order parameter in pack() or unpack())
+- New generic `Timestamp` class
+- A number of new test cases
+- New module: `caterpillar.types`: defines default types that can be used as annotations within struct definitions
+- `O_DEFAULT_ENDIAN` as a global option to set a global default byteorder
+- `O_DEFAULT_ARCH` same concept for arch-like objects
+- new 'strict' option to `Enum` struct
+- `ATTR_PACK` and `ATTR_UNPACK` to *caterpillar.shared*
+- `'order'` and `'arch'` options to pack() and unpack(), which temporarily change the global endianess or arch (compatible with Dynamic byteorder)
+
+### Changes
+
+- Merge all stub files with their corresponding Python files. All typing is now inline.
+- `padding` struct now has its own dedicated class
+- sizeof() now always returns an integer
+- ContextPath: dropped support for the call action
+- Field.get_name() now always returns a string
+- Rename `ssize` and `size` to `pssize` and `psize` in caterpillar.fields exports
+- options.get_flags() always returns a list
+
+### Fixes
+
+- IntFlag support for `Enum` structs
+- Fix incorrect Sha1 Digest length
+- Add missing global exports in `caterpillar.py`
+- Bitfield, Struct and Sequence now respect fields with already configured byteorder
+- Prefixed struct now does not require `as_field=True` when calling pack() or unpack()
+
 ## [2.7.0] - Dynamic Byteorder
 
 ###  Added

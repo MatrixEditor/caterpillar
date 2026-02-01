@@ -1,37 +1,42 @@
-# pyright: reportInvalidTypeForm=false, reportGeneralTypeIssues=false
-import pytest
 import enum
 
 from caterpillar.model import (
     Bitfield,
     bitfield,
-    NewGroup,
     EndGroup,
     SetAlignment,
     sizeof,
-    struct,
     unpack,
     CharFactory,
     pack,
+    Invisible
 )
 from caterpillar.options import (
-    B_GROUP_END,
-    B_GROUP_KEEP,
-    B_GROUP_NEW,
-    B_NO_AUTO_BOOL,
-    B_OVERWRITE_ALIGNMENT,
     S_REPLACE_TYPES,
 )
-from caterpillar.fields import uint16, uint24, uint32, Bytes, uint8
+from caterpillar.fields import uint16, Bytes, uint8
 from caterpillar.shared import getstruct
+from caterpillar.shortcuts import f
+from caterpillar.types import (
+    balign_t,
+    int1_t,
+    int2_t,
+    int3_t,
+    uint16_t,
+    uint24_t,
+    uint32_t,
+)
+
 
 def test_bitfield_syntax__standard():
     # Syntax no. 1
     @bitfield
     class FormatA:
-        a: 3 - uint16
+        a: f[int, 3 - uint16]
 
-    groups = FormatA.__struct__.groups
+    bfield = getstruct(FormatA)
+    assert isinstance(bfield, Bitfield)
+    groups = bfield.groups
     assert len(groups) == 1
     assert not groups[0].is_empty()
     # default alignment is 0x08 unless B_OVERWRITE_ALIGNMENT is set
@@ -43,11 +48,18 @@ def test_bitfield_syntax__align():
     # Syntax no. 1 + no. 2
     @bitfield
     class FormatA:
-        a: 3
-        _: 0
-        b: 4
+        a: f[int, 3]
+        # either specify manually (typing compliant)
+        # _: f[None, 0] = None
+        # or use the pre-defined type
+        _: balign_t = Invisible()
+        # or use syntax direclty (pyright will scream at you)
+        # _: 0
+        b: f[int, 4]
 
-    groups = FormatA.__struct__.groups
+    bfield = getstruct(FormatA)
+    assert isinstance(bfield, Bitfield)
+    groups = bfield.groups
     assert len(groups) == 2
 
     # The alignment syntax finalizes the first group and start a new one
@@ -62,9 +74,9 @@ def test_bitfield_syntax__struct():
     # syntax no. 3 (generic struct)
     @bitfield
     class FormatA:
-        a: uint16
-        b: uint32
-        c: uint24
+        a: uint16_t
+        b: uint32_t
+        c: uint24_t
 
     # just like a @struct definition
     assert sizeof(FormatA) == 2 + 4 + 3
@@ -74,11 +86,12 @@ def test_bitfield_syntax__field_factory():
     # syntax no. 4
     @bitfield
     class FormatA:
-        a: (uint16, int)  # this won't work
-        b: (5 - uint8, str)
+        a: f[int, (uint16, int)]  # this won't work
+        b: f[str, (5 - uint8, str)]
 
     struct = getstruct(FormatA)
     assert struct is not None
+    assert isinstance(struct, Bitfield)
 
     groups = struct.groups
     assert len(groups) == 2
@@ -100,19 +113,21 @@ def test_bitfield_syntax__extended():
     class FormatA:
         # Explanation:
         # 4bits converted to string
-        a1: (4, str)
+        a1: f[str, (4, str)]
         # 2bits converted to Enum
-        a2: (2, SimpleEnum)
+        a2: f[SimpleEnum | int, (2, SimpleEnum)]
         # alignment is 8 bits, finalize group and set alignment
         # to 16bits for next group
-        _: (0, SetAlignment(16))
+        _: f[None, (0, SetAlignment(16))] = Invisible()
         # 10bits entry for current group, then finalize group
-        b1: (10, EndGroup)
+        b1: f[int, (10, EndGroup)]
         # 12bits in new group
-        c1: 12
+        c1: f[int, 12]
 
     # We should see exactly three groups here
-    groups = FormatA.__struct__.groups
+    bfield = getstruct(FormatA)
+    assert isinstance(bfield, Bitfield)
+    groups = bfield.groups
     assert len(groups) == 3
     assert groups[0].bit_count == 8
     assert groups[1].bit_count == 16
@@ -130,10 +145,10 @@ def test_bitfield__replace_types():
 
     @bitfield(options={S_REPLACE_TYPES})
     class FormatA:
-        a1: (4, str)  # a1: str
-        a2: (2, SimpleEnum)  # a2: SimpleEnum
-        _: 0
-        b1: Bytes(6)  # b1: bytes
+        a1: f[str, (4, str)]  # a1: str
+        a2: f[SimpleEnum, (2, SimpleEnum)]  # a2: SimpleEnum
+        _: balign_t = Invisible()
+        b1: f[bytes, Bytes(6)]  # b1: bytes
 
     annotations = FormatA.__annotations__
     assert annotations["a1"] is str
@@ -150,10 +165,10 @@ def test_bitfield__unpack():
 
     @bitfield
     class FormatA:
-        a1: (4, CharFactory)  # a1: str
-        a2: (2, SimpleEnum)  # a2: SimpleEnum
-        _: 0
-        b1: Bytes(6)  # b1: bytes
+        a1: f[str, (4, CharFactory)]  # a1: str
+        a2: f[SimpleEnum, (2, SimpleEnum)]  # a2: SimpleEnum
+        _: balign_t = Invisible()
+        b1: f[bytes, Bytes(6)]  # b1: bytes
 
     # 0b00110100.to_bytes()
     data = b"4" + b"12" * 3
@@ -166,11 +181,11 @@ def test_bitfield__unpack():
 def test_bitfield__pack():
     @bitfield
     class FormatA:
-        a1: 1
-        a2: 2
-        a3: 3
-        _: 0
-        b1: uint16
+        a1: int1_t
+        a2: int2_t
+        a3: int3_t
+        _: balign_t = Invisible()
+        b1: uint16_t
 
     obj = FormatA(a1=True, a2=3, a3=5, b1=0xFF00)
     # 0b1_11_101_00.to_bytes()

@@ -18,6 +18,8 @@ Library
    registry
    shared
    fields/index.rst
+   hooks
+   ext_types
 
 
 .. _library-index-capi:
@@ -26,8 +28,11 @@ Library
 C Extension
 ***********
 
+*TBD*
+
 .. toctree::
    :maxdepth: 2
    :caption: C API Python Types
 
-   ctypes/int.rst
+
+.. ctypes/int.rst
