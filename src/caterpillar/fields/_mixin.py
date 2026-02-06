@@ -117,6 +117,7 @@ class PackMixin(Generic[_IT]):
 
 class UnpackMixin(Generic[_OT]):
     def __lshift__(self, data: Buffer | _StreamType) -> _OT:
+        # TODO: docs
         return self.from_bytes(data)
 
     def from_bytes(

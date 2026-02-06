@@ -1,6 +1,7 @@
 import pytest
 
 from caterpillar.py import (
+    f,
     struct,
     pack,
     unpack,
@@ -16,24 +17,22 @@ def test_fixed_offset_unpack():
 def test_dynamic_offset_unpack():
     @struct
     class Format:
-        offset: uint8
-        data: uint8 @ this.offset
+        offset: f[int, uint8]
+        data: f[int, uint8 @ this.offset]
 
     binary = b"\x04\x00\x00\x00\xAB"
     assert unpack(Format, binary) == Format(offset=4, data=0xAB)
 
-# offset packs do not seem to be working correctly
-# These tests show the current behavior
-
-def test_fixed_offset_pack():
+def test_fixed_offset_pack_invalid():
     atom = uint8 @ 4
-    assert pack(0x42, atom, as_field=True) == b"\x42"
+    # this behavior was fixed in #58
+    assert pack(0x42, atom, as_field=True) != b"\x42"
 
 def test_dynamic_offset_pack():
     @struct
     class Format:
-        offset: uint8
-        data: uint8 @ this.offset
+        offset: f[int, uint8]
+        data: f[int, uint8 @ this.offset]
 
     obj = Format(offset=4, data=0xAB)
-    assert pack(obj) == b"\x04\xab"
+    assert pack(obj) == b"\x04\x00\x00\x00\xab"

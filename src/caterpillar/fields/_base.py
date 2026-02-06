@@ -16,7 +16,7 @@
 from io import BytesIO
 from collections.abc import Collection
 from typing import Any, Generic
-from typing_extensions import Self, override, TypeVar
+from typing_extensions import Buffer, Self, override, TypeVar
 
 from caterpillar.abc import (
     _StructLike,
@@ -293,6 +293,10 @@ class Field(Generic[_IT, _OT]):
             )
 
     # --- Operator Overloads ---
+    def __lshift__(self, data: Buffer | _StreamType) -> _OT:
+        from caterpillar.model import unpack
+
+        return unpack(self, data)
 
     def __or__(self, flag: _OptionLike) -> Self:  # add flags
         """

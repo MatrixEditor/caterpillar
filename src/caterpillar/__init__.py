@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import warnings
 
-__version__ = "2.8.0"
+__version__ = "2.8.1rc"
 __release__ = "2.8"
 __author__ = "MatrixEditor"
 
