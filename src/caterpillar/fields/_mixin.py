@@ -12,20 +12,18 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# pyright: reportPrivateUsage=false, reportExplicitAny=false
+# pyright: reportPrivateUsage=false, reportExplicitAny=false, reportAny=false
 from io import BytesIO
 from collections.abc import Collection, Iterable
 from functools import partial
 from typing import Any, Callable, Generic
-from typing_extensions import Self, override
+from typing_extensions import Buffer, TypeVar, overload, override
 
 from caterpillar.byteorder import byteorder
 from caterpillar.options import Flag
 from caterpillar.context import CTX_SEQ, CTX_STREAM
 from caterpillar._common import unpack_seq, pack_seq, WithoutContextVar
 from caterpillar.shared import getstruct
-
-from ._base import Field
 from caterpillar.abc import (
     _ContextLambda,
     _ContextLike,
@@ -37,8 +35,156 @@ from caterpillar.abc import (
     _EndianLike,
     _SwitchLambda,
     _ArgType,
-    _ContainsStruct
+    _ArchLike,
+    _StreamType,
 )
+from ._base import Field
+
+class PackMixin(Generic[_IT]):
+    @overload
+    def to_bytes(
+        self,
+        obj: _IT,
+        *,
+        fp: _StreamType,
+        order: _EndianLike | None = None,
+        arch: _ArchLike | None = None,
+        use_tempfile: bool = False,
+        **kwargs: Any,
+    ) -> None: ...
+    @overload
+    def to_bytes(
+        self,
+        obj: _IT,
+        *,
+        fp: None = None,
+        order: _EndianLike | None = None,
+        arch: _ArchLike | None = None,
+        use_tempfile: bool = False,
+        **kwargs: Any,
+    ) -> bytes: ...
+    def to_bytes(
+        self,
+        obj: _IT,
+        *,
+        fp: _StreamType | None = None,
+        order: _EndianLike | None = None,
+        arch: _ArchLike | None = None,
+        use_tempfile: bool = False,
+        **kwargs: Any,
+    ) -> bytes | None:
+        """Serialize the instance into its binary representation.
+
+        If ``fp`` is provided, the binary data is written directly into the
+        given stream using ``pack_into``. Otherwise, the binary data is
+        returned as a ``bytes`` object using ``pack``.
+
+        :param fp: Writable stream to receive the serialized data. If None,
+            the serialized bytes are returned, defaults to None
+        :type fp: _StreamType | None, optional
+        :param order: Endianness override for serialization, defaults to None
+        :type order: _EndianLike | None, optional
+        :param arch: Architecture override for serialization, defaults to None
+        :type arch: _ArchLike | None, optional
+        :param use_tempfile: Whether to use a temporary file during packing,
+            defaults to False
+        :type use_tempfile: bool, optional
+        :return: Serialized bytes if ``fp`` is None, otherwise None
+        :rtype: bytes | None
+        """
+        # fmt: off
+        from caterpillar.model import pack_into, pack
+        if fp is not None:
+            pack_into(  # pyright: ignore[reportCallIssue]
+                obj,
+                fp,
+                self,  # pyright: ignore[reportArgumentType]
+                use_tempfile=use_tempfile,
+                order=order,
+                arch=arch,
+                **kwargs,
+            )
+        else:
+            return pack(  # pyright: ignore[reportCallIssue, reportUnknownVariableType]
+                obj,
+                self,  # pyright: ignore[reportArgumentType]
+                use_tempfile=use_tempfile,
+                order=order,
+                arch=arch,
+                **kwargs,
+            )
+
+
+class UnpackMixin(Generic[_OT]):
+    def __lshift__(self, data: Buffer | _StreamType) -> _OT:
+        return self.from_bytes(data)
+
+    def from_bytes(
+        self,
+        data: Buffer | _StreamType,
+        *,
+        order: _EndianLike | None = None,
+        arch: _ArchLike | None = None,
+        **kwargs: Any,
+    ) -> _OT:
+        """Construct an instance from raw binary data or a stream.
+
+        This is a convenience wrapper around the underlying ``unpack``
+        function, allowing models to be instantiated directly from bytes
+        without importing parsing utilities.
+
+        :param data: Raw bytes or a readable stream containing serialized data
+        :type data: Buffer | _StreamType
+        :param order: Endianness override for parsing, defaults to None
+        :type order: _EndianLike | None, optional
+        :param arch: Architecture override for parsing, defaults to None
+        :type arch: _ArchLike | None, optional
+        :return: Parsed model instance
+        :rtype: _ModelT
+        """
+        from caterpillar.model import unpack
+
+        return unpack(  # pyright: ignore[reportCallIssue, reportUnknownVariableType]
+            self,  # pyright: ignore[reportArgumentType]
+            data,
+            order=order,
+            arch=arch,
+            **kwargs,
+        )
+
+    def from_file(
+        self,
+        filename: str,
+        *,
+        order: _EndianLike | None = None,
+        arch: _ArchLike | None = None,
+        **kwargs: Any,
+    ) -> _OT:
+        """Construct an instance from a binary file on disk.
+
+        This is a convenience wrapper around ``unpack_file`` for reading and
+        parsing structured data directly from a file path.
+
+        :param filename: Path to the file containing serialized data
+        :type filename: str
+        :param order: Endianness override for parsing, defaults to None
+        :type order: _EndianLike | None, optional
+        :param arch: Architecture override for parsing, defaults to None
+        :type arch: _ArchLike | None, optional
+        :return: Parsed model instance
+        :rtype: _ModelT
+        """
+        from caterpillar.model import unpack_file
+
+        return (
+            unpack_file(  # pyright: ignore[reportCallIssue, reportUnknownVariableType]
+                self,  # pyright: ignore[reportArgumentType]
+                filename,
+                order=order,
+                arch=arch,
+                **kwargs,
+            )
+        )
 
 
 class ByteOrderMixin(Generic[_IT, _OT]):
@@ -87,7 +233,17 @@ class FieldMixin(ByteOrderMixin[_IT, _OT]):
         # fmt: off
         return Field(self, byteorder(self), bits=bits) # pyright: ignore[reportArgumentType]
 
-    def __and__(self, other: "Chain | _StructLike") -> "Chain":
+    @overload
+    def __and__(
+        self, other: "_StructLike[_ChainHeadT, _ChainTailT]"
+    ) -> "Chain[_IT, _ChainTailT]": ...
+    @overload
+    def __and__(
+        self, other: "Chain[_ChainHeadT, _ChainTailT]"
+    ) -> "Chain[_ChainHeadT, _OT]": ...
+    def __and__(
+        self, other: "Chain[_ChainHeadT, _ChainTailT] | _StructLike[_IT, _OT]"
+    ) -> "Chain":
         """Returns a chain with the next element added at the end"""
         # fmt: off
         if isinstance(other, Chain):
@@ -95,7 +251,7 @@ class FieldMixin(ByteOrderMixin[_IT, _OT]):
         return Chain(self, other)  # pyright: ignore[reportArgumentType]
 
 
-class FieldStruct(FieldMixin[_IT, _OT]):
+class FieldStruct(FieldMixin[_IT, _OT], PackMixin[_IT], UnpackMixin[_OT]):
     """
     A mix-in class combining the behavior of _StructLike with additional
     functionality for packing and unpacking structured data.
@@ -183,7 +339,11 @@ class FieldStruct(FieldMixin[_IT, _OT]):
         return f"<{self.__class__.__name__}>"
 
 
-class Chain(FieldStruct[_IT, _OT]):
+_ChainHeadT = TypeVar("_ChainHeadT", default=Any)
+_ChainTailT = TypeVar("_ChainTailT", default=Any)
+
+
+class Chain(FieldStruct[_ChainHeadT, _ChainTailT]):
     """
     Represents a chain of structures where each structure in the chain is linked
     to the next one, forming a sequence.
@@ -202,9 +362,9 @@ class Chain(FieldStruct[_IT, _OT]):
 
     def __init__(
         self,
-        initial: _StructLike[_IT, bytes],
-        *structs: _StructLike[bytes, bytes],
-        tail: _StructLike[bytes, _OT] | None = None,
+        initial: _StructLike[_ChainHeadT, Any],
+        *structs: _StructLike[Any, Any],
+        tail: _StructLike[bytes, _ChainTailT] | None = None,
     ) -> None:
         # fmt: off
         # start -> next -> next -> next -> done | unpack
@@ -216,7 +376,7 @@ class Chain(FieldStruct[_IT, _OT]):
             self._elements.append(tail)
 
     @property
-    def head(self) -> _StructLike[_IT, bytes]:
+    def head(self) -> _StructLike[_ChainHeadT, Any]:
         """
         Get the head of the chain, i.e., the first structure.
 
@@ -226,7 +386,7 @@ class Chain(FieldStruct[_IT, _OT]):
         return self._elements[0]
 
     @property
-    def tail(self) -> _StructLike[bytes, _OT]:
+    def tail(self) -> _StructLike[Any, _ChainTailT]:
         """
         Get the tail of the chain, i.e., the last structure.
 
@@ -257,7 +417,9 @@ class Chain(FieldStruct[_IT, _OT]):
         return self.tail.__type__()
 
     @override
-    def __and__(self, other: "Chain | _StructLike | _ContainsStruct") -> Self:
+    def __and__(  # pyright: ignore[reportIncompatibleMethodOverride]
+        self, other: _StructLike[_IT, _OT]
+    ) -> "Chain[_ChainHeadT, _OT]":
         """
         Concatenate another structure to the end of the chain.
 
@@ -266,10 +428,11 @@ class Chain(FieldStruct[_IT, _OT]):
         :return: The updated chain.
         :rtype: Chain
         """
-        self._elements.append(getstruct(other) or other)
-        return self
+        # fmt: off
+        self._elements.append(getstruct(other) or other)  # pyright: ignore[reportArgumentType]
+        return self  # pyright: ignore[reportReturnType]
 
-    def __rand__(self, other: "Chain") -> Self:
+    def __rand__(self, other: _StructLike[_IT, _OT]) -> "Chain[_ChainHeadT, _OT]":
         """
         Concatenate another structure to the beginning of the chain.
 
@@ -281,7 +444,7 @@ class Chain(FieldStruct[_IT, _OT]):
         return self.__and__(other)
 
     @override
-    def unpack_single(self, context: _ContextLike) -> _OT:
+    def unpack_single(self, context: _ContextLike) -> _ChainTailT:
         """
         Unpack a single data instance from the chain.
 
