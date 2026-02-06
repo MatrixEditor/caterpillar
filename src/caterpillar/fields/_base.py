@@ -214,9 +214,13 @@ class Field(Generic[_IT, _OT]):
     @offset.setter
     def offset(self, value: _ContextLambda[int] | int):
         self.__offset = value
-        self._has_offset = value not in (-1, None)
+        # _ContextLambda is ExprMixin so `__eq__` is overridden
+        # and `Tuple.__contains__` isn't correct. If value is an
+        # instance of _ContextLambda we may assume it is not
+        # -1 or None
+        self._has_offset = value not in (-1, None) or isinstance(value, _ContextLambda)
         self._offset_is_lambda = callable(value)
-        self._keep_pos = value in (-1, None)
+        self._keep_pos = value in (-1, None) and not isinstance(value, _ContextLambda)
 
     @property
     def amount(self) -> _LengthT | None:
