@@ -164,8 +164,8 @@ class Field(Generic[_IT, _OT]):
     @condition.setter
     def condition(self, value: _ContextLambda[bool] | bool):
         self.__condition = value
-        self._has_cond = value not in (True, None)
         self._cond_is_lambda = callable(value)
+        self._has_cond = self._cond_is_lambda or value not in (True, None)
 
     @property
     def flags(self) -> set[_OptionLike]:
@@ -218,9 +218,9 @@ class Field(Generic[_IT, _OT]):
         # and `Tuple.__contains__` isn't correct. If value is an
         # instance of _ContextLambda we may assume it is not
         # -1 or None
-        self._has_offset = value not in (-1, None) or isinstance(value, _ContextLambda)
         self._offset_is_lambda = callable(value)
-        self._keep_pos = value in (-1, None) and not isinstance(value, _ContextLambda)
+        self._has_offset = self._offset_is_lambda or value not in (-1, None)
+        self._keep_pos = not self._offset_is_lambda and value in (-1, None)
 
     @property
     def amount(self) -> _LengthT | None:
@@ -231,7 +231,7 @@ class Field(Generic[_IT, _OT]):
     def amount(self, value: _LengthT | None):
         self.__amount = value
         self._amount_is_lambda = callable(value)
-        self._is_seq = (value not in (0, None)) or self._amount_is_lambda
+        self._is_seq = self._amount_is_lambda or (value not in (0, None))
 
     @property
     def options(self) -> _SwitchOptionsT | None:
