@@ -73,7 +73,7 @@ ENUM_STRICT: Flag[None] = Flag("enum.strict")
 
 class PyStructFormattedField(FieldStruct[_IT, _IT]):
     """
-    A field class representing a binary format using format characters (e.g., 'i', 'x', etc.).
+    A field class representing a binary format using format characters (e.g., 'i', 'I', etc.).
 
     This class allows you to define fields for binary struct formats using format characters,
     which are often used in Python's `struct` module. Each field is associated with a format character

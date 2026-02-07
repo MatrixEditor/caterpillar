@@ -55,7 +55,7 @@ from caterpillar.abc import (
     _ActionLike,
     _ArchLike,
     _EndianLike,
-    _StreamType
+    _StreamType,
 )
 
 if TYPE_CHECKING:
@@ -318,7 +318,17 @@ def typeof(struct: _StructLike | _SupportsType | _ContainsStruct | object) -> ty
 
     return rtype if rtype and rtype != NotImplemented else object
 
+
 class PackMixin(Generic[_IT]):
+    """Mixin providing serialization helpers for packing objects into binary
+    representations.
+
+    This mixin exposes a unified ``to_bytes`` interface that can either return
+    serialized bytes directly or write them into a provided writable stream.
+
+    .. versionadded:: 2.8.1
+    """
+
     @overload
     def to_bytes(
         self,
@@ -357,6 +367,8 @@ class PackMixin(Generic[_IT]):
         given stream using ``pack_into``. Otherwise, the binary data is
         returned as a ``bytes`` object using ``pack``.
 
+        :param obj: Object instance to serialize
+        :type obj: _IT
         :param fp: Writable stream to receive the serialized data. If None,
             the serialized bytes are returned, defaults to None
         :type fp: _StreamType | None, optional
@@ -367,6 +379,8 @@ class PackMixin(Generic[_IT]):
         :param use_tempfile: Whether to use a temporary file during packing,
             defaults to False
         :type use_tempfile: bool, optional
+        :raises Exception: Propagates any exception raised by the underlying
+            packing implementation
         :return: Serialized bytes if ``fp`` is None, otherwise None
         :rtype: bytes | None
         """
@@ -394,8 +408,26 @@ class PackMixin(Generic[_IT]):
 
 
 class UnpackMixin(Generic[_OT]):
+    """Mixin providing deserialization helpers for constructing objects from
+    binary data sources.
+
+    This mixin supports unpacking from raw bytes, streams, or files, and also
+    defines a convenience left-shift operator for inline unpacking.
+
+    .. versionadded:: 2.8.1
+    """
+
     def __lshift__(self, data: Buffer | _StreamType) -> _OT:
-        # TODO: docs
+        """Unpack binary data using the left-shift operator.
+
+        This operator is a shorthand for calling :meth:`from_bytes`, enabling
+        concise inline unpacking from a bytes-like object or a readable stream.
+
+        :param data: Raw bytes or a readable stream containing serialized data
+        :type data: Buffer | _StreamType
+        :return: Parsed associated type instance
+        :rtype: _OT
+        """
         return self.from_bytes(data)
 
     def from_bytes(
@@ -409,8 +441,8 @@ class UnpackMixin(Generic[_OT]):
         """Construct an object from raw binary data or a stream.
 
         This is a convenience wrapper around the underlying ``unpack``
-        function, allowing associated types to be instantiated directly from bytes
-        without importing parsing utilities.
+        function, allowing associated types to be instantiated directly from
+        bytes without importing parsing utilities.
 
         :param data: Raw bytes or a readable stream containing serialized data
         :type data: Buffer | _StreamType
@@ -418,6 +450,8 @@ class UnpackMixin(Generic[_OT]):
         :type order: _EndianLike | None, optional
         :param arch: Architecture override for parsing, defaults to None
         :type arch: _ArchLike | None, optional
+        :raises Exception: Propagates any exception raised by the underlying
+            unpacking implementation
         :return: Parsed associated type instance
         :rtype: _OT
         """
@@ -450,6 +484,8 @@ class UnpackMixin(Generic[_OT]):
         :type order: _EndianLike | None, optional
         :param arch: Architecture override for parsing, defaults to None
         :type arch: _ArchLike | None, optional
+        :raises Exception: Propagates any exception raised by the underlying
+            file-unpacking implementation
         :return: Parsed associated type instance
         :rtype: _OT
         """

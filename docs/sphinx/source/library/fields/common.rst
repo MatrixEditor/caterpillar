@@ -13,6 +13,9 @@ Numeric Structs
     .. versionchanged:: 2.4.0
         :code:`FormatField` renamed to :code:`PyStructFormattedField`
 
+    .. versionchanged:: 2.8.1
+        Dropped support for format character ``'x'``. Use the :class:`Padding` type instead.
+
 .. data:: caterpillar.fields.uint8
 
     Unsigned 8-bit integer field. Range: ``0`` to ``255``.

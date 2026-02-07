@@ -46,6 +46,7 @@ imported the necessary components from *Caterpillar*:
     structdef
     extended_syntax
     parsing
+    inline_syntax
     configuration
     documentation
 

@@ -56,6 +56,7 @@ def pack(
     as_field: bool = False,
     order: _EndianLike | None = None,
     arch: _ArchLike | None = None,
+    fill: int | bytes | str | None = None,
     **kwargs: Any,
 ) -> bytes: ...
 @overload
@@ -69,6 +70,7 @@ def pack(
     as_field: bool = False,
     order: _EndianLike | None = None,
     arch: _ArchLike | None = None,
+    fill: int | bytes | str | None = None,
     **kwds: Any,
 ) -> bytes: ...
 @overload
@@ -81,6 +83,7 @@ def pack(
     as_field: bool = False,
     order: _EndianLike | None = None,
     arch: _ArchLike | None = None,
+    fill: int | bytes | str | None = None,
     **kwargs: Any,
 ) -> bytes: ...
 @overload
@@ -94,6 +97,7 @@ def pack(
     as_field: bool = False,
     order: _EndianLike | None = None,
     arch: _ArchLike | None = None,
+    fill: int | bytes | str | None = None,
     **kwargs: Any,
 ) -> bytes: ...
 def pack(
@@ -105,6 +109,7 @@ def pack(
     as_field: bool = False,
     order: _EndianLike | None = None,
     arch: _ArchLike | None = None,
+    fill: int | bytes | str | None = None,
     **kwargs: Any,
 ) -> bytes:
     """
@@ -112,9 +117,17 @@ def pack(
 
     :param obj: The object to pack.
     :param struct: The struct to use for packing.
-    :param kwds: Additional keyword arguments to pass to the pack function.
+    :param use_tempfile: Whether to use a temporary file for packing (experimental).
+    :param as_field: Whether to wrap the struct in a `Field` before packing.
+    :param fill: pattern to use when filling up space (only applied when fields with offsets are used)
+    :param arch: architecture to apply to the struct
+    :param order: byte order to apply
+    :param kwargs: Additional keyword arguments to pass to the context.
 
     :return: The packed bytes.
+
+    .. versionchanged:: 2.8.1
+        Added ``fill`` parameter.
     """
     buffer = BytesIO()
     pack_into(  # pyright: ignore[reportCallIssue]
@@ -125,6 +138,7 @@ def pack(
         arch=arch,
         use_tempfile=use_tempfile,
         as_field=as_field,
+        fill=fill,
         **kwargs,
     )
     return buffer.getvalue()
@@ -247,9 +261,15 @@ def pack_into(
     :param struct: The struct to use for packing. If not specified, will infer from `obj`.
     :param use_tempfile: Whether to use a temporary file for packing (experimental).
     :param as_field: Whether to wrap the struct in a `Field` before packing.
-    :param kwds: Additional keyword arguments to pass to the pack function.
+    :param fill: pattern to use when filling up space (only applied when fields with offsets are used)
+    :param arch: architecture to apply to the struct
+    :param order: byte order to apply
+    :param kwds: Additional keyword arguments to pass to the context.
 
     :raises TypeError: If no `struct` is specified and cannot be inferred from the object.
+
+    .. versionchanged:: 2.8.1
+        Added ``fill`` parameter.
     """
     # fmt: off
     offsets: OrderedDict[int, bytes] = OrderedDict()
@@ -356,6 +376,7 @@ def pack_file(
     as_field: bool = ...,
     order: _EndianLike | None = ...,
     arch: _ArchLike | None = ...,
+    fill: int | bytes | str | None = None,
     **kwds: Any,
 ) -> None: ...
 @overload
@@ -369,6 +390,7 @@ def pack_file(
     as_field: bool = ...,
     order: _EndianLike | None = ...,
     arch: _ArchLike | None = ...,
+    fill: int | bytes | str | None = None,
     **kwds: Any,
 ) -> None: ...
 @overload
@@ -382,6 +404,7 @@ def pack_file(
     as_field: bool = ...,
     order: _EndianLike | None = ...,
     arch: _ArchLike | None = ...,
+    fill: int | bytes | str | None = None,
     **kwds: Any,
 ) -> None: ...
 @overload
@@ -395,6 +418,7 @@ def pack_file(
     as_field: bool = ...,
     order: _EndianLike | None = ...,
     arch: _ArchLike | None = ...,
+    fill: int | bytes | str | None = None,
     **kwds: Any,
 ) -> None: ...
 @overload
@@ -408,6 +432,7 @@ def pack_file(
     as_field: bool = ...,
     order: _EndianLike | None = ...,
     arch: _ArchLike | None = ...,
+    fill: int | bytes | str | None = None,
     **kwds: Any,
 ) -> None: ...
 def pack_file(
@@ -420,6 +445,7 @@ def pack_file(
     as_field: bool = False,
     order: _EndianLike | None = None,
     arch: _ArchLike | None = None,
+    fill: int | bytes | str | None = None,
     **kwds: Any,
 ) -> None:
     """
@@ -428,9 +454,17 @@ def pack_file(
     :param obj: The object to pack.
     :param filename: The name of the file to write to.
     :param struct: The struct to use for packing.
-    :param kwds: Additional keyword arguments to pass to the pack function.
+    :param use_tempfile: Whether to use a temporary file for packing (experimental).
+    :param as_field: Whether to wrap the struct in a `Field` before packing.
+    :param fill: pattern to use when filling up space (only applied when fields with offsets are used)
+    :param arch: architecture to apply to the struct
+    :param order: byte order to apply
+    :param kwds: Additional keyword arguments to pass to the context.
 
     :return: None
+
+    .. versionchanged:: 2.8.1
+        Added ``fill`` parameter.
     """
     with open(filename, "w+b") as fp:
         pack_into(  # pyright: ignore[reportCallIssue]
@@ -441,6 +475,7 @@ def pack_file(
             as_field=as_field,
             order=order,
             arch=arch,
+            fill=fill,
             **kwds,
         )
 
