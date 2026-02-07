@@ -1,4 +1,4 @@
-# Copyright (C) MatrixEditor 2023-2025
+# Copyright (C) MatrixEditor 2023-2026
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 from io import BytesIO
 from collections.abc import Collection
 from typing import Any, Generic
-from typing_extensions import Self, override, TypeVar
+from typing_extensions import Buffer, Self, override, TypeVar
 
 from caterpillar.abc import (
     _StructLike,
@@ -53,7 +53,7 @@ from caterpillar.options import (
 )
 from caterpillar.context import CTX_OFFSETS, CTX_STREAM, CTX_FIELD, CTX_VALUE, CTX_SEQ
 from caterpillar import registry
-from caterpillar.shared import getstruct, typeof
+from caterpillar.shared import getstruct, typeof, PackMixin, UnpackMixin
 
 
 _T = TypeVar("_T")
@@ -69,7 +69,7 @@ INVALID_DEFAULT: object = object()
 DEFAULT_OPTION: object = object()
 
 
-class Field(Generic[_IT, _OT]):
+class Field(Generic[_IT, _OT], PackMixin[_IT], UnpackMixin[_OT]):
     """Represents a field in a data structure.
 
     :param struct: The structure or callable used to define the field's type.
@@ -164,8 +164,8 @@ class Field(Generic[_IT, _OT]):
     @condition.setter
     def condition(self, value: _ContextLambda[bool] | bool):
         self.__condition = value
-        self._has_cond = value not in (True, None)
         self._cond_is_lambda = callable(value)
+        self._has_cond = self._cond_is_lambda or value not in (True, None)
 
     @property
     def flags(self) -> set[_OptionLike]:
@@ -214,9 +214,13 @@ class Field(Generic[_IT, _OT]):
     @offset.setter
     def offset(self, value: _ContextLambda[int] | int):
         self.__offset = value
-        self._has_offset = value not in (-1, None)
+        # _ContextLambda is ExprMixin so `__eq__` is overridden
+        # and `Tuple.__contains__` isn't correct. If value is an
+        # instance of _ContextLambda we may assume it is not
+        # -1 or None
         self._offset_is_lambda = callable(value)
-        self._keep_pos = value in (-1, None)
+        self._has_offset = self._offset_is_lambda or value not in (-1, None)
+        self._keep_pos = not self._offset_is_lambda and value in (-1, None)
 
     @property
     def amount(self) -> _LengthT | None:
@@ -227,7 +231,7 @@ class Field(Generic[_IT, _OT]):
     def amount(self, value: _LengthT | None):
         self.__amount = value
         self._amount_is_lambda = callable(value)
-        self._is_seq = (value not in (0, None)) or self._amount_is_lambda
+        self._is_seq = self._amount_is_lambda or (value not in (0, None))
 
     @property
     def options(self) -> _SwitchOptionsT | None:
@@ -289,7 +293,6 @@ class Field(Generic[_IT, _OT]):
             )
 
     # --- Operator Overloads ---
-
     def __or__(self, flag: _OptionLike) -> Self:  # add flags
         """
         Adds a flag using the '|' operator.

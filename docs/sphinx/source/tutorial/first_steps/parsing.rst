@@ -37,3 +37,33 @@ RGB(r=1, g=2, b=3)
 Now that you've seen how to define, pack, and unpack data with structs in *Caterpillar*, you're
 almost ready to start working with more complex data structures. And remember,
 we've just scratched the surface—there's a lot more to explore!
+
+.. tip::
+
+    .. versionadded:: 2.8.1
+
+    You can use a special *mixin* class to add wrapper methods to your struct
+    class:
+
+    .. code-block:: python
+
+        @struct
+        class RGB(struct_factory.mixin):
+            ...
+
+    It will then be possible to use the type directly instead of importing
+    :func:`~caterpillar.model.pack` or :func:`~caterpillar.model.unpack`
+    every time.
+
+    >>> obj = RGB.from_bytes(b"\x01\x02\x03")
+    RGB(r=1, g=2, b=3)
+    >>> obj.to_bytes()
+    b"\x01\x02\x03"
+
+    The same applies to all common structs mentioned in the next chapter
+    and :class:`~caterpillar.fields.Field` objects.
+
+    >>> uint8[3].from_bytes(b"\x01\x02\x03")
+    [1,2,3]
+    >>> uint8[3].to_bytes([1,2,3])
+    b"\x01\x02\x03"

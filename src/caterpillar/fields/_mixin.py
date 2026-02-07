@@ -1,4 +1,4 @@
-# Copyright (C) MatrixEditor 2023-2025
+# Copyright (C) MatrixEditor 2023-2026
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -12,20 +12,18 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# pyright: reportPrivateUsage=false, reportExplicitAny=false
+# pyright: reportPrivateUsage=false, reportExplicitAny=false, reportAny=false
 from io import BytesIO
 from collections.abc import Collection, Iterable
 from functools import partial
 from typing import Any, Callable, Generic
-from typing_extensions import Self, override
+from typing_extensions import TypeVar, overload, override
 
 from caterpillar.byteorder import byteorder
 from caterpillar.options import Flag
 from caterpillar.context import CTX_SEQ, CTX_STREAM
 from caterpillar._common import unpack_seq, pack_seq, WithoutContextVar
-from caterpillar.shared import getstruct
-
-from ._base import Field
+from caterpillar.shared import PackMixin, UnpackMixin, getstruct
 from caterpillar.abc import (
     _ContextLambda,
     _ContextLike,
@@ -37,8 +35,8 @@ from caterpillar.abc import (
     _EndianLike,
     _SwitchLambda,
     _ArgType,
-    _ContainsStruct
 )
+from ._base import Field
 
 
 class ByteOrderMixin(Generic[_IT, _OT]):
@@ -87,7 +85,17 @@ class FieldMixin(ByteOrderMixin[_IT, _OT]):
         # fmt: off
         return Field(self, byteorder(self), bits=bits) # pyright: ignore[reportArgumentType]
 
-    def __and__(self, other: "Chain | _StructLike") -> "Chain":
+    @overload
+    def __and__(
+        self, other: "_StructLike[_ChainHeadT, _ChainTailT]"
+    ) -> "Chain[_IT, _ChainTailT]": ...
+    @overload
+    def __and__(
+        self, other: "Chain[_ChainHeadT, _ChainTailT]"
+    ) -> "Chain[_ChainHeadT, _OT]": ...
+    def __and__(
+        self, other: "Chain[_ChainHeadT, _ChainTailT] | _StructLike[_IT, _OT]"
+    ) -> "Chain":
         """Returns a chain with the next element added at the end"""
         # fmt: off
         if isinstance(other, Chain):
@@ -95,7 +103,7 @@ class FieldMixin(ByteOrderMixin[_IT, _OT]):
         return Chain(self, other)  # pyright: ignore[reportArgumentType]
 
 
-class FieldStruct(FieldMixin[_IT, _OT]):
+class FieldStruct(FieldMixin[_IT, _OT], PackMixin[_IT], UnpackMixin[_OT]):
     """
     A mix-in class combining the behavior of _StructLike with additional
     functionality for packing and unpacking structured data.
@@ -183,7 +191,11 @@ class FieldStruct(FieldMixin[_IT, _OT]):
         return f"<{self.__class__.__name__}>"
 
 
-class Chain(FieldStruct[_IT, _OT]):
+_ChainHeadT = TypeVar("_ChainHeadT", default=Any)
+_ChainTailT = TypeVar("_ChainTailT", default=Any)
+
+
+class Chain(FieldStruct[_ChainHeadT, _ChainTailT]):
     """
     Represents a chain of structures where each structure in the chain is linked
     to the next one, forming a sequence.
@@ -202,9 +214,9 @@ class Chain(FieldStruct[_IT, _OT]):
 
     def __init__(
         self,
-        initial: _StructLike[_IT, bytes],
-        *structs: _StructLike[bytes, bytes],
-        tail: _StructLike[bytes, _OT] | None = None,
+        initial: _StructLike[_ChainHeadT, Any],
+        *structs: _StructLike[Any, Any],
+        tail: _StructLike[bytes, _ChainTailT] | None = None,
     ) -> None:
         # fmt: off
         # start -> next -> next -> next -> done | unpack
@@ -216,7 +228,7 @@ class Chain(FieldStruct[_IT, _OT]):
             self._elements.append(tail)
 
     @property
-    def head(self) -> _StructLike[_IT, bytes]:
+    def head(self) -> _StructLike[_ChainHeadT, Any]:
         """
         Get the head of the chain, i.e., the first structure.
 
@@ -226,7 +238,7 @@ class Chain(FieldStruct[_IT, _OT]):
         return self._elements[0]
 
     @property
-    def tail(self) -> _StructLike[bytes, _OT]:
+    def tail(self) -> _StructLike[Any, _ChainTailT]:
         """
         Get the tail of the chain, i.e., the last structure.
 
@@ -257,7 +269,9 @@ class Chain(FieldStruct[_IT, _OT]):
         return self.tail.__type__()
 
     @override
-    def __and__(self, other: "Chain | _StructLike | _ContainsStruct") -> Self:
+    def __and__(  # pyright: ignore[reportIncompatibleMethodOverride]
+        self, other: _StructLike[_IT, _OT]
+    ) -> "Chain[_ChainHeadT, _OT]":
         """
         Concatenate another structure to the end of the chain.
 
@@ -266,10 +280,11 @@ class Chain(FieldStruct[_IT, _OT]):
         :return: The updated chain.
         :rtype: Chain
         """
-        self._elements.append(getstruct(other) or other)
-        return self
+        # fmt: off
+        self._elements.append(getstruct(other) or other)  # pyright: ignore[reportArgumentType]
+        return self  # pyright: ignore[reportReturnType]
 
-    def __rand__(self, other: "Chain") -> Self:
+    def __rand__(self, other: _StructLike[_IT, _OT]) -> "Chain[_ChainHeadT, _OT]":
         """
         Concatenate another structure to the beginning of the chain.
 
@@ -281,7 +296,7 @@ class Chain(FieldStruct[_IT, _OT]):
         return self.__and__(other)
 
     @override
-    def unpack_single(self, context: _ContextLike) -> _OT:
+    def unpack_single(self, context: _ContextLike) -> _ChainTailT:
         """
         Unpack a single data instance from the chain.
 

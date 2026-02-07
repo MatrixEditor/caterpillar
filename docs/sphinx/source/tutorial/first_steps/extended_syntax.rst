@@ -3,6 +3,8 @@
 Extended Syntax
 ===============
 
+.. versionadded:: 2.8.0
+
 The extended syntax introduces a declarative and type-checker-friendly way to
 define structs using ordinary Python classes. Instead of constructing structures
 through procedural builder calls, you describe the format directly through type

@@ -1,4 +1,4 @@
-# Copyright (C) MatrixEditor 2023-2025
+# Copyright (C) MatrixEditor 2023-2026
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ import typing
 import warnings
 
 from typing import Annotated, Callable, Any, Generic, Protocol, get_origin
-from typing_extensions import Final, Literal, Self, Sized, overload, override, TypeVar
+from typing_extensions import Buffer, Final, Literal, Self, Sized, overload, override, TypeVar
 from types import FrameType, TracebackType
 from dataclasses import dataclass
 
@@ -105,7 +105,7 @@ class Context(dict[str, Any]):
     @overload
     def __getattribute__(self, key: Literal["_obj"]) -> _ContextLike: ...
     @overload
-    def __getattribute__(self, key: Literal["_offsets"]) -> dict[int, int]: ...
+    def __getattribute__(self, key: Literal["_offsets"]) -> dict[int, Buffer]: ...
     @overload
     def __getattribute__(self, key: Literal["_io"]) -> _StreamType: ...
     @overload
@@ -181,7 +181,7 @@ class Context(dict[str, Any]):
     @overload
     def __getitem__(self, key: Literal["_io"], /) -> _StreamType: ...
     @overload
-    def __getitem__(self, key: Literal["_offsets"], /) -> dict[int, int]: ...
+    def __getitem__(self, key: Literal["_offsets"], /) -> dict[int, Buffer]: ...
     @overload
     def __getitem__(self, key: Literal["_index"], /) -> int: ...
     @overload
@@ -621,7 +621,7 @@ class ContextPath(Generic[_T], ExprMixin):
     @overload
     def __getattribute__(
         self, key: Literal["_offsets"]
-    ) -> ContextPath[dict[int, int]]: ...
+    ) -> ContextPath[dict[int, Buffer]]: ...
     @overload
     def __getattribute__(self, key: Literal["_io"]) -> ContextPath[_StreamType]: ...
     @overload

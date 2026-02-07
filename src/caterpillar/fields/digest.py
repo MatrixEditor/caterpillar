@@ -1,4 +1,4 @@
-# Copyright (C) MatrixEditor 2023-2025
+# Copyright (C) MatrixEditor 2023-2026
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -621,6 +621,12 @@ class _DigestFactory(Protocol[_AlgoObjT, _AlgoReturnT]):
     ) -> Digest[_AlgoObjT, _AlgoReturnT]: ...
 
 
+class _DigestFieldFactory(Protocol[_AlgoReturnT]):
+    def __call__(
+        self, name: str, verify: bool = False
+    ) -> DigestField[_AlgoReturnT]: ...
+
+
 # --- public algorithms ---
 def _hash_digest(
     algo: Algorithm[_AlgoObjT, _AlgoReturnT],
@@ -650,7 +656,7 @@ def _hash_digest(
 
 def _hash_digest_field(
     struct: _StructLike[_AlgoReturnT, _AlgoReturnT],
-) -> Callable[..., DigestField[_AlgoReturnT]]:
+) -> _DigestFieldFactory[_AlgoReturnT]:
     def _wrapper(
         name: str,
         verify: bool = False,

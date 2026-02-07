@@ -1,4 +1,4 @@
-# Copyright (C) MatrixEditor 2023-2025
+# Copyright (C) MatrixEditor 2023-2026
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -322,12 +322,24 @@ _LengthT = int | _PrefixedType | _GreedyType | _ContextLambda[int]
 
 @runtime_checkable
 class _SupportsType(Protocol):
-    def __type__(self) -> type | str | None: ...
+    """A protocol for objects that can expose an associated type."""
+
+    def __type__(self) -> type | str | None:
+        """Return the type specification associated with the object.
+
+        :return: A Python type, a string-based type reference, or None if
+            no explicit type is defined.
+        :rtype: type | str | None
+        """
+        ...
 
 
 class _ContainsStruct(Protocol[_IT_contra, _OT]):
-    """
-    An abstract base class indicating that a class contains a _StructLike object.
+    """Protocol indicating that an object contains a struct definition.
+
+    Objects implementing this protocol expose a ``__struct__`` attribute
+    referencing a :class:`_StructLike` instance, which defines how values
+    are packed, unpacked, and sized.
     """
 
     __struct__: _StructLike[_IT_contra, _OT]
@@ -348,35 +360,107 @@ _SwitchOptionsT = _SwitchLambda | dict[Any, Any]
 .. versionadded 2.8.0
 """
 
+
 @runtime_checkable
 class _SupportsBits(Protocol):
-    def __bits__(self) -> int: ...
+    """A protocol for objects that can report their bit-width.
+
+    This is typically used for bit-field-like structures where the number
+    of bits is required during packing or layout calculations.
+    """
+
+    def __bits__(self) -> int:
+        """Return the number of bits associated with this object.
+
+        :return: Bit width of the object.
+        :rtype: int
+        """
+        ...
 
 
 @runtime_checkable
 class _ContainsBits(Protocol):
+    """Protocol for objects that expose a static ``__bits__`` attribute.
+
+    This variant is used when the bit-width is known at definition time
+    rather than computed dynamically.
+    """
+
     __bits__: int
 
 
 @runtime_checkable
 class _ArchLike(Protocol):
+    """A protocol describing an architecture definition.
+
+    Architecture objects encapsulate platform-specific properties such as
+    pointer size and naming, and are used to influence packing and unpacking
+    behavior.
+    """
+
     name: str
     ptr_size: int
 
-    def __init__(self, name: str, ptr_size: int) -> None: ...
+    def __init__(self, name: str, ptr_size: int) -> None:
+        """Create a new architecture descriptor.
+
+        :param name: Human-readable name of the architecture.
+        :type name: str
+        :param ptr_size: Pointer size in bytes for the architecture.
+        :type ptr_size: int
+        """
+        ...
 
 
 class _SupportsSetEndian(Protocol[_OT_co]):
-    def __set_byteorder__(self, order: "_EndianLike") -> _OT_co: ...
+    """Protocol for objects whose byte order can be configured.
+
+    This protocol allows endian specifications to be applied dynamically,
+    typically by combining endian markers with struct or field definitions.
+    """
+
+    def __set_byteorder__(self, order: "_EndianLike") -> _OT_co:
+        """Apply the given byte order to the object.
+
+        :param order: Endianness specification to apply.
+        :type order: _EndianLike
+        :return: A new or modified instance with the specified byte order.
+        :rtype: _OT_co
+        """
+        ...
 
 
 @runtime_checkable
 class _EndianLike(Protocol):
+    """A protocol representing an endianness specification.
+
+    Endian-like objects define how multi-byte values are ordered in memory
+    and support combination with endian-configurable objects.
+    """
+
     name: Final[str]
 
     @property
-    def ch(self) -> str: ...
-    def __add__(self, other: _SupportsSetEndian[_OT]) -> _OT: ...
+    def ch(self) -> str:
+        """Return the single-character representation of the byte order.
+
+        Common examples include ``'<'`` for little-endian and ``'>'`` for
+        big-endian.
+
+        :return: Endianness character.
+        :rtype: str
+        """
+        ...
+
+    def __add__(self, other: _SupportsSetEndian[_OT]) -> _OT:
+        """Apply this endianness to another object.
+
+        :param other: An object that supports byte-order configuration.
+        :type other: _SupportsSetEndian[_OT]
+        :return: The resulting object with this endianness applied.
+        :rtype: _OT
+        """
+        ...
 
 
 _VT = TypeVar("_VT", default=NoneType)
@@ -384,21 +468,52 @@ _VT = TypeVar("_VT", default=NoneType)
 
 @runtime_checkable
 class _OptionLike(Protocol[_VT]):
+    """A protocol for name/value option pairs.
+
+    Option-like objects are commonly used for configuration flags or
+    optional parameters that may or may not carry a value.
+    """
+
     name: str
     value: _VT | None
 
 
 class _ArrayFactoryLike(Protocol[_IT]):
-    def __call__(self, __value: Iterable[_IT]) -> Collection[_IT]: ...
+    """A protocol for array or collection factory callables.
+
+    Implementations are responsible for converting an iterable of values
+    into a concrete collection type.
+    """
+
+    def __call__(self, __value: Iterable[_IT]) -> Collection[_IT]:
+        """Create a collection from the given iterable.
+
+        :param __value: Iterable of input values.
+        :type __value: Iterable[_IT]
+        :return: A collection containing the provided values.
+        :rtype: Collection[_IT]
+        """
+        ...
 
 
 class _ContextFactoryLike(Protocol):
+    """A protocol for context factory callables.
+
+    Context factories are responsible for producing new context instances
+    from keyword arguments.
+
+    .. versionadded:: 2.8.0
     """
 
-    .. versionadded 2.8.0
-    """
+    def __call__(self, **kwargs: Any) -> _ContextLike:
+        """Create a new context instance.
 
-    def __call__(self, **kwargs: Any) -> _ContextLike: ...
+        :param kwargs: Initial context variables.
+        :type kwargs: Any
+        :return: A newly constructed context-like object.
+        :rtype: _ContextLike
+        """
+        ...
 
 
 __all__ = [
