@@ -53,7 +53,7 @@ from caterpillar.options import (
 )
 from caterpillar.context import CTX_OFFSETS, CTX_STREAM, CTX_FIELD, CTX_VALUE, CTX_SEQ
 from caterpillar import registry
-from caterpillar.shared import getstruct, typeof
+from caterpillar.shared import getstruct, typeof, PackMixin, UnpackMixin
 
 
 _T = TypeVar("_T")
@@ -69,7 +69,7 @@ INVALID_DEFAULT: object = object()
 DEFAULT_OPTION: object = object()
 
 
-class Field(Generic[_IT, _OT]):
+class Field(Generic[_IT, _OT], PackMixin[_IT], UnpackMixin[_OT]):
     """Represents a field in a data structure.
 
     :param struct: The structure or callable used to define the field's type.
@@ -293,11 +293,6 @@ class Field(Generic[_IT, _OT]):
             )
 
     # --- Operator Overloads ---
-    def __lshift__(self, data: Buffer | _StreamType) -> _OT:
-        from caterpillar.model import unpack
-
-        return unpack(self, data)
-
     def __or__(self, flag: _OptionLike) -> Self:  # add flags
         """
         Adds a flag using the '|' operator.
