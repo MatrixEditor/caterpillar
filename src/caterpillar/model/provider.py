@@ -1,4 +1,4 @@
-# Copyright (C) MatrixEditor 2023-2025
+# Copyright (C) MatrixEditor 2023-2026
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -330,7 +330,7 @@ def pack_into(
                     if start < offset:
                         pad_length = offset - start
                         if pad_length % len(fill_pat) != 0:
-                            raise ValueError("invalid pattern length")
+                            raise ValueError(f"invalid pattern length. Fill pattern does not fit into {pad_length} bytes")
 
                         count: int = pad_length // len(fill_pat)
                         buffer.write(fill_pat * count)
