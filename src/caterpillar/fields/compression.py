@@ -133,7 +133,7 @@ def compressed(
     obj: _LengthTorStructT,
     comp_kwargs: dict[str, Any] | None = None,
     decomp_kwargs: dict[str, Any] | None = None,
-) -> _StructLike:
+) -> _StructLike[bytes, bytes]:
     if callable(obj) or isinstance(obj, int) or obj is ...:
         obj = Bytes(obj)
     return Compressed(lib, obj, comp_kwargs, decomp_kwargs)
@@ -143,7 +143,7 @@ def ZLibCompressed(
     obj: _LengthTorStructT,
     comp_kwargs: dict[str, Any] | None = None,
     decomp_kwargs: dict[str, Any] | None = None,
-):
+) -> _StructLike[bytes, bytes]:
     """
     Create a struct representing zlib compression.
     """
@@ -159,7 +159,7 @@ def Bz2Compressed(
     obj: _LengthTorStructT,
     comp_kwargs: dict[str, Any] | None = None,
     decomp_kwargs: dict[str, Any] | None = None,
-):
+) -> _StructLike[bytes, bytes]:
     """
     Create a struct representing bz2 compression.
     """
@@ -175,7 +175,7 @@ def LZMACompressed(
     obj: _LengthTorStructT,
     comp_kwargs: dict[str, Any] | None = None,
     decomp_kwargs: dict[str, Any] | None = None,
-):
+) -> _StructLike[bytes, bytes]:
     """
     Create a struct representing lzma compression.
     """
@@ -191,7 +191,7 @@ def LZOCompressed(
     obj: _LengthTorStructT,
     comp_kwargs: dict[str, Any] | None = None,
     decomp_kwargs: dict[str, Any] | None = None,
-):
+) -> _StructLike[bytes, bytes]:
     """
     Create a struct representing LZO compression.
     """
