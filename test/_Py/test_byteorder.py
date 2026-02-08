@@ -203,4 +203,3 @@ def test_dyn_byteorder_action():
     assert data.hex() == "1234bc9a7856"
 
 
-test_dyn_byteorder_action()

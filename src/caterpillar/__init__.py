@@ -1,4 +1,4 @@
-# Copyright (C) MatrixEditor 2023-2025
+# Copyright (C) MatrixEditor 2023-2026
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import warnings
 
-__version__ = "2.8.0"
+__version__ = "2.8.1rc"
 __release__ = "2.8"
 __author__ = "MatrixEditor"
 

@@ -1,4 +1,4 @@
-# Copyright (C) MatrixEditor 2023-2025
+# Copyright (C) MatrixEditor 2023-2026
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -73,7 +73,7 @@ ENUM_STRICT: Flag[None] = Flag("enum.strict")
 
 class PyStructFormattedField(FieldStruct[_IT, _IT]):
     """
-    A field class representing a binary format using format characters (e.g., 'i', 'x', etc.).
+    A field class representing a binary format using format characters (e.g., 'i', 'I', etc.).
 
     This class allows you to define fields for binary struct formats using format characters,
     which are often used in Python's `struct` module. Each field is associated with a format character
@@ -85,22 +85,22 @@ class PyStructFormattedField(FieldStruct[_IT, _IT]):
     >>> field.__repr__()
     "<int32>"
 
-    :param ch: The format character (e.g., 'i', 'x', 'f') that defines how the field is packed and unpacked.
+    :param ch: The format character (e.g., 'i', 'I', 'f') that defines how the field is packed and unpacked.
     :param type_: The Python type that corresponds to the format character.
     """
 
-    __slots__: dict[str, str] = {
-        "text": """The format char (e.g. 'x', 'i', ...)""",
-        "ty": """The returned Python type""",
-        "_is_padding": """Internal field that indicates this struct is padding""",
-    }
+    __slots__: tuple[str, ...] = ("text", "ty")
 
     def __init__(self, ch: str, type_: type) -> None:
         self.text: str = ch
         self.ty: type[_IT] = type_
         self.__bits__: int = PyStruct.calcsize(self.text) * 8
-        self._is_padding: bool = self.text == "x"
         self.__byteorder__: _EndianLike | None = None
+        if self.text == "x":
+            warnings.warn(
+                "Python struct's padding is not supported anymore (since 2.8.1). Use the Padding class instead.",
+                DeprecationWarning,
+            )
 
     def __fmt__(self) -> str:
         """
@@ -118,9 +118,6 @@ class PyStructFormattedField(FieldStruct[_IT, _IT]):
 
         :return: A string representation.
         """
-        if self._is_padding:
-            return "<padding>"
-
         return f"<{self.ty.__name__}{self.__bits__}>"
 
     def __type__(self) -> type:
@@ -152,7 +149,7 @@ class PyStructFormattedField(FieldStruct[_IT, _IT]):
         :param obj: The value to pack (can be of the type defined by the format character).
         :param context: The context that provides the stream and field-specific information.
         """
-        if obj is None and not self._is_padding:
+        if obj is None:
             return  # Skip packing if the value is None and the field is not padding
 
         field = context.get(CTX_FIELD)
@@ -162,8 +159,7 @@ class PyStructFormattedField(FieldStruct[_IT, _IT]):
             else (self.__byteorder__ or O_DEFAULT_ENDIAN.value or LittleEndian).ch
         )
         fmt = f"{order_ch}{self.text}"
-        data = PyStruct.pack(fmt) if self._is_padding else PyStruct.pack(fmt, obj)
-        context[CTX_STREAM].write(data)
+        context[CTX_STREAM].write(PyStruct.pack(fmt, obj))
 
     @override
     def pack_seq(self, seq: Collection[_IT], context: _ContextLike) -> None:
@@ -218,7 +214,14 @@ class PyStructFormattedField(FieldStruct[_IT, _IT]):
         )
         fmt = f"{order_ch}{self.text}"
         size = self.__bits__ // 8
-        (value,) = PyStruct.unpack(fmt, context[CTX_STREAM].read(size))
+        data = context[CTX_STREAM].read(size)
+        if len(data) != size:
+            raise ValidationError(
+                f"unpack of {self.ty.__name__}{self.__bits__} requires {size} bytes."
+                + f"Got {len(data)}",
+                context,
+            )
+        (value,) = PyStruct.unpack(fmt, data)
         return value
 
     @override
@@ -240,16 +243,14 @@ class PyStructFormattedField(FieldStruct[_IT, _IT]):
 
         fmt = f"{field.order.ch}{length}{self.text}"
         size = (self.__bits__ // 8) * length
-        return list(PyStruct.unpack(fmt, context[CTX_STREAM].read(size)))
-
-    def is_padding(self) -> bool:
-        """
-        Check if the field represents padding.
-
-        :return: True if the field is padding (i.e., 'x' format character), False otherwise.
-        :rtype: bool
-        """
-        return self._is_padding
+        data = context[CTX_STREAM].read(size)
+        if len(data) != size:
+            raise ValidationError(
+                f"unpack of {self.ty.__name__}{self.__bits__}[{length}] requires {size} bytes."
+                + f"Got {len(data)}",
+                context,
+            )
+        return list(PyStruct.unpack(fmt, data))
 
 
 # Instances of FormatField with specific format specifiers

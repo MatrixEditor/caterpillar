@@ -1,4 +1,4 @@
-# Copyright (C) MatrixEditor 2023-2025
+# Copyright (C) MatrixEditor 2023-2026
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# pyright: reportPrivateUsage=false
+# pyright: reportPrivateUsage=false, reportAny=false, reportExplicitAny=false
 """
 Module containing shared constants and utility functions for managing
 and processing structs.
@@ -42,8 +42,8 @@ In this case, the action will be executed before parsing any subsequent fields
 and won't be stored as part of the struct model.
 """
 
-from typing import TYPE_CHECKING, overload
-from typing_extensions import Final, Literal, override, TypeIs
+from typing import TYPE_CHECKING, overload, Generic, Any
+from typing_extensions import Final, Literal, override, TypeIs, Buffer
 
 from caterpillar.abc import (
     _ContextLambda,
@@ -53,6 +53,9 @@ from caterpillar.abc import (
     _SupportsType,
     _ContainsStruct,
     _ActionLike,
+    _ArchLike,
+    _EndianLike,
+    _StreamType,
 )
 
 if TYPE_CHECKING:
@@ -309,8 +312,191 @@ def typeof(struct: _StructLike | _SupportsType | _ContainsStruct | object) -> ty
     # this function must return a type
     rtype = object
     try:
-        rtype = __type__()  # pyright: ignore[reportAny]
+        rtype = __type__()
     except NotImplementedError:
         pass
 
     return rtype if rtype and rtype != NotImplemented else object
+
+
+class PackMixin(Generic[_IT]):
+    """Mixin providing serialization helpers for packing objects into binary
+    representations.
+
+    This mixin exposes a unified ``to_bytes`` interface that can either return
+    serialized bytes directly or write them into a provided writable stream.
+
+    .. versionadded:: 2.8.1
+    """
+
+    @overload
+    def to_bytes(
+        self,
+        obj: _IT,
+        *,
+        fp: _StreamType,
+        order: _EndianLike | None = None,
+        arch: _ArchLike | None = None,
+        use_tempfile: bool = False,
+        **kwargs: Any,
+    ) -> None: ...
+    @overload
+    def to_bytes(
+        self,
+        obj: _IT,
+        *,
+        fp: None = None,
+        order: _EndianLike | None = None,
+        arch: _ArchLike | None = None,
+        use_tempfile: bool = False,
+        **kwargs: Any,
+    ) -> bytes: ...
+    def to_bytes(
+        self,
+        obj: _IT,
+        *,
+        fp: _StreamType | None = None,
+        order: _EndianLike | None = None,
+        arch: _ArchLike | None = None,
+        use_tempfile: bool = False,
+        **kwargs: Any,
+    ) -> bytes | None:
+        """Serialize the object into its binary representation.
+
+        If ``fp`` is provided, the binary data is written directly into the
+        given stream using ``pack_into``. Otherwise, the binary data is
+        returned as a ``bytes`` object using ``pack``.
+
+        :param obj: Object instance to serialize
+        :type obj: _IT
+        :param fp: Writable stream to receive the serialized data. If None,
+            the serialized bytes are returned, defaults to None
+        :type fp: _StreamType | None, optional
+        :param order: Endianness override for serialization, defaults to None
+        :type order: _EndianLike | None, optional
+        :param arch: Architecture override for serialization, defaults to None
+        :type arch: _ArchLike | None, optional
+        :param use_tempfile: Whether to use a temporary file during packing,
+            defaults to False
+        :type use_tempfile: bool, optional
+        :raises Exception: Propagates any exception raised by the underlying
+            packing implementation
+        :return: Serialized bytes if ``fp`` is None, otherwise None
+        :rtype: bytes | None
+        """
+        # fmt: off
+        from caterpillar.model import pack_into, pack
+        if fp is not None:
+            pack_into(  # pyright: ignore[reportCallIssue]
+                obj,
+                fp,
+                self,  # pyright: ignore[reportArgumentType]
+                use_tempfile=use_tempfile,
+                order=order,
+                arch=arch,
+                **kwargs,
+            )
+        else:
+            return pack(  # pyright: ignore[reportCallIssue, reportUnknownVariableType]
+                obj,
+                self,  # pyright: ignore[reportArgumentType]
+                use_tempfile=use_tempfile,
+                order=order,
+                arch=arch,
+                **kwargs,
+            )
+
+
+class UnpackMixin(Generic[_OT]):
+    """Mixin providing deserialization helpers for constructing objects from
+    binary data sources.
+
+    This mixin supports unpacking from raw bytes, streams, or files, and also
+    defines a convenience left-shift operator for inline unpacking.
+
+    .. versionadded:: 2.8.1
+    """
+
+    def __lshift__(self, data: Buffer | _StreamType) -> _OT:
+        """Unpack binary data using the left-shift operator.
+
+        This operator is a shorthand for calling :meth:`from_bytes`, enabling
+        concise inline unpacking from a bytes-like object or a readable stream.
+
+        :param data: Raw bytes or a readable stream containing serialized data
+        :type data: Buffer | _StreamType
+        :return: Parsed associated type instance
+        :rtype: _OT
+        """
+        return self.from_bytes(data)
+
+    def from_bytes(
+        self,
+        data: Buffer | _StreamType,
+        *,
+        order: _EndianLike | None = None,
+        arch: _ArchLike | None = None,
+        **kwargs: Any,
+    ) -> _OT:
+        """Construct an object from raw binary data or a stream.
+
+        This is a convenience wrapper around the underlying ``unpack``
+        function, allowing associated types to be instantiated directly from
+        bytes without importing parsing utilities.
+
+        :param data: Raw bytes or a readable stream containing serialized data
+        :type data: Buffer | _StreamType
+        :param order: Endianness override for parsing, defaults to None
+        :type order: _EndianLike | None, optional
+        :param arch: Architecture override for parsing, defaults to None
+        :type arch: _ArchLike | None, optional
+        :raises Exception: Propagates any exception raised by the underlying
+            unpacking implementation
+        :return: Parsed associated type instance
+        :rtype: _OT
+        """
+        from caterpillar.model import unpack
+
+        return unpack(  # pyright: ignore[reportCallIssue, reportUnknownVariableType]
+            self,  # pyright: ignore[reportArgumentType]
+            data,
+            order=order,
+            arch=arch,
+            **kwargs,
+        )
+
+    def from_file(
+        self,
+        filename: str,
+        *,
+        order: _EndianLike | None = None,
+        arch: _ArchLike | None = None,
+        **kwargs: Any,
+    ) -> _OT:
+        """Construct an instance from a binary file on disk.
+
+        This is a convenience wrapper around ``unpack_file`` for reading and
+        parsing structured data directly from a file path.
+
+        :param filename: Path to the file containing serialized data
+        :type filename: str
+        :param order: Endianness override for parsing, defaults to None
+        :type order: _EndianLike | None, optional
+        :param arch: Architecture override for parsing, defaults to None
+        :type arch: _ArchLike | None, optional
+        :raises Exception: Propagates any exception raised by the underlying
+            file-unpacking implementation
+        :return: Parsed associated type instance
+        :rtype: _OT
+        """
+        from caterpillar.model import unpack_file
+
+        return (
+            unpack_file(  # pyright: ignore[reportCallIssue, reportUnknownVariableType]
+                self,  # pyright: ignore[reportArgumentType]
+                filename,
+                order=order,
+                arch=arch,
+                **kwargs,
+            )
+        )

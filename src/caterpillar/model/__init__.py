@@ -1,4 +1,4 @@
-# Copyright (C) MatrixEditor 2023-2025
+# Copyright (C) MatrixEditor 2023-2026
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,12 +18,6 @@ from ._struct import (
     struct,
     UnionHook,
     union,
-    unpack,
-    unpack_file,
-    pack,
-    pack_into,
-    pack_file,
-    sizeof,
     Invisible,
     StructDefMixin,
     struct_factory,
@@ -46,6 +40,14 @@ from ._bitfield import (
     BitfieldDefMixin,
 )
 from ._template import istemplate, template, TemplateTypeVar, derive
+from .provider import (
+    unpack,
+    unpack_file,
+    pack,
+    pack_into,
+    pack_file,
+    sizeof,
+)
 
 __all__ = [
     "Sequence",
