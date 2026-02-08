@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>caterpillar.fields.common &#8212; Caterpillar 2.8.0 documentation</title>
+    <title>caterpillar.fields.common &#8212; Caterpillar 2.8.1rc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=69ff2ef9"></script>
+    <script src="../../../_static/documentation_options.js?v=27899d92"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -51,7 +51,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.8.0" />
+  <meta name="docsearch:version" content="2.8.1rc" />
   </head>
   
   
@@ -113,7 +113,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.8.0</p>
+    <p class="title logo__title">Caterpillar 2.8.1rc</p>
   
 </a></div>
     
@@ -376,7 +376,7 @@
                 <article class="bd-article">
                   
   <h1>Source code for caterpillar.fields.common</h1><div class="highlight"><pre>
-<span></span><span class="c1"># Copyright (C) MatrixEditor 2023-2025</span>
+<span></span><span class="c1"># Copyright (C) MatrixEditor 2023-2026</span>
 <span class="c1">#</span>
 <span class="c1"># This program is free software: you can redistribute it and/or modify</span>
 <span class="c1"># it under the terms of the GNU General Public License as published by</span>
@@ -453,7 +453,7 @@
 <a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.PyStructFormattedField">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">PyStructFormattedField</span><span class="p">(</span><span class="n">FieldStruct</span><span class="p">[</span><span class="n">_IT</span><span class="p">,</span> <span class="n">_IT</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A field class representing a binary format using format characters (e.g., &#39;i&#39;, &#39;x&#39;, etc.).</span>
+<span class="sd">    A field class representing a binary format using format characters (e.g., &#39;i&#39;, &#39;I&#39;, etc.).</span>
 
 <span class="sd">    This class allows you to define fields for binary struct formats using format characters,</span>
 <span class="sd">    which are often used in Python&#39;s `struct` module. Each field is associated with a format character</span>
@@ -465,22 +465,22 @@
 <span class="sd">    &gt;&gt;&gt; field.__repr__()</span>
 <span class="sd">    &quot;&lt;int32&gt;&quot;</span>
 
-<span class="sd">    :param ch: The format character (e.g., &#39;i&#39;, &#39;x&#39;, &#39;f&#39;) that defines how the field is packed and unpacked.</span>
+<span class="sd">    :param ch: The format character (e.g., &#39;i&#39;, &#39;I&#39;, &#39;f&#39;) that defines how the field is packed and unpacked.</span>
 <span class="sd">    :param type_: The Python type that corresponds to the format character.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="vm">__slots__</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;The format char (e.g. &#39;x&#39;, &#39;i&#39;, ...)&quot;&quot;&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;ty&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;The returned Python type&quot;&quot;&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;_is_padding&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;Internal field that indicates this struct is padding&quot;&quot;&quot;</span><span class="p">,</span>
-    <span class="p">}</span>
+    <span class="vm">__slots__</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="s2">&quot;ty&quot;</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ch</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">type_</span><span class="p">:</span> <span class="nb">type</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">ch</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ty</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">_IT</span><span class="p">]</span> <span class="o">=</span> <span class="n">type_</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__bits__</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PyStruct</span><span class="o">.</span><span class="n">calcsize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="p">)</span> <span class="o">*</span> <span class="mi">8</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_is_padding</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">text</span> <span class="o">==</span> <span class="s2">&quot;x&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__byteorder__</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">text</span> <span class="o">==</span> <span class="s2">&quot;x&quot;</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;Python struct&#39;s padding is not supported anymore (since 2.8.1). Use the Padding class instead.&quot;</span><span class="p">,</span>
+                <span class="ne">DeprecationWarning</span><span class="p">,</span>
+            <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__fmt__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -498,9 +498,6 @@
 
 <span class="sd">        :return: A string representation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_padding</span><span class="p">:</span>
-            <span class="k">return</span> <span class="s2">&quot;&lt;padding&gt;&quot;</span>
-
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ty</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}{</span><span class="bp">self</span><span class="o">.</span><span class="n">__bits__</span><span class="si">}</span><span class="s2">&gt;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__type__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
@@ -534,7 +531,7 @@
 <span class="sd">        :param obj: The value to pack (can be of the type defined by the format character).</span>
 <span class="sd">        :param context: The context that provides the stream and field-specific information.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">obj</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_padding</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">obj</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span>  <span class="c1"># Skip packing if the value is None and the field is not padding</span>
 
         <span class="n">field</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">CTX_FIELD</span><span class="p">)</span>
@@ -544,8 +541,7 @@
             <span class="k">else</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__byteorder__</span> <span class="ow">or</span> <span class="n">O_DEFAULT_ENDIAN</span><span class="o">.</span><span class="n">value</span> <span class="ow">or</span> <span class="n">LittleEndian</span><span class="p">)</span><span class="o">.</span><span class="n">ch</span>
         <span class="p">)</span>
         <span class="n">fmt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">order_ch</span><span class="si">}{</span><span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">PyStruct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_padding</span> <span class="k">else</span> <span class="n">PyStruct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">fmt</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
-        <span class="n">context</span><span class="p">[</span><span class="n">CTX_STREAM</span><span class="p">]</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+        <span class="n">context</span><span class="p">[</span><span class="n">CTX_STREAM</span><span class="p">]</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">PyStruct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">fmt</span><span class="p">,</span> <span class="n">obj</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="PyStructFormattedField.pack_seq">
@@ -606,7 +602,14 @@
         <span class="p">)</span>
         <span class="n">fmt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">order_ch</span><span class="si">}{</span><span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__bits__</span> <span class="o">//</span> <span class="mi">8</span>
-        <span class="p">(</span><span class="n">value</span><span class="p">,)</span> <span class="o">=</span> <span class="n">PyStruct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">fmt</span><span class="p">,</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_STREAM</span><span class="p">]</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">size</span><span class="p">))</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_STREAM</span><span class="p">]</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">!=</span> <span class="n">size</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;unpack of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ty</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}{</span><span class="bp">self</span><span class="o">.</span><span class="n">__bits__</span><span class="si">}</span><span class="s2"> requires </span><span class="si">{</span><span class="n">size</span><span class="si">}</span><span class="s2"> bytes.&quot;</span>
+                <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;Got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">context</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">(</span><span class="n">value</span><span class="p">,)</span> <span class="o">=</span> <span class="n">PyStruct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">fmt</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">value</span></div>
 
 
@@ -631,19 +634,14 @@
 
         <span class="n">fmt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">field</span><span class="o">.</span><span class="n">order</span><span class="o">.</span><span class="n">ch</span><span class="si">}{</span><span class="n">length</span><span class="si">}{</span><span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="n">size</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__bits__</span> <span class="o">//</span> <span class="mi">8</span><span class="p">)</span> <span class="o">*</span> <span class="n">length</span>
-        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">PyStruct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">fmt</span><span class="p">,</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_STREAM</span><span class="p">]</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">size</span><span class="p">)))</span></div>
-
-
-<div class="viewcode-block" id="PyStructFormattedField.is_padding">
-<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.PyStructFormattedField.is_padding">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">is_padding</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Check if the field represents padding.</span>
-
-<span class="sd">        :return: True if the field is padding (i.e., &#39;x&#39; format character), False otherwise.</span>
-<span class="sd">        :rtype: bool</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_padding</span></div>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_STREAM</span><span class="p">]</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">!=</span> <span class="n">size</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;unpack of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ty</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}{</span><span class="bp">self</span><span class="o">.</span><span class="n">__bits__</span><span class="si">}</span><span class="s2">[</span><span class="si">{</span><span class="n">length</span><span class="si">}</span><span class="s2">] requires </span><span class="si">{</span><span class="n">size</span><span class="si">}</span><span class="s2"> bytes.&quot;</span>
+                <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;Got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">context</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">PyStruct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">fmt</span><span class="p">,</span> <span class="n">data</span><span class="p">))</span></div>
 </div>
 
 

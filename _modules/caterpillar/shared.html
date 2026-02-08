@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>caterpillar.shared &#8212; Caterpillar 2.8.0 documentation</title>
+    <title>caterpillar.shared &#8212; Caterpillar 2.8.1rc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=69ff2ef9"></script>
+    <script src="../../_static/documentation_options.js?v=27899d92"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -51,7 +51,7 @@
     <link rel="search" title="Search" href="../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.8.0" />
+  <meta name="docsearch:version" content="2.8.1rc" />
   </head>
   
   
@@ -113,7 +113,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.8.0</p>
+    <p class="title logo__title">Caterpillar 2.8.1rc</p>
   
 </a></div>
     
@@ -376,7 +376,7 @@
                 <article class="bd-article">
                   
   <h1>Source code for caterpillar.shared</h1><div class="highlight"><pre>
-<span></span><span class="c1"># Copyright (C) MatrixEditor 2023-2025</span>
+<span></span><span class="c1"># Copyright (C) MatrixEditor 2023-2026</span>
 <span class="c1">#</span>
 <span class="c1"># This program is free software: you can redistribute it and/or modify</span>
 <span class="c1"># it under the terms of the GNU General Public License as published by</span>
@@ -390,7 +390,7 @@
 <span class="c1">#</span>
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
-<span class="c1"># pyright: reportPrivateUsage=false</span>
+<span class="c1"># pyright: reportPrivateUsage=false, reportAny=false, reportExplicitAny=false</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Module containing shared constants and utility functions for managing</span>
 <span class="sd">and processing structs.</span>
@@ -420,8 +420,8 @@
 <span class="sd">and won&#39;t be stored as part of the struct model.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">overload</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Final</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">override</span><span class="p">,</span> <span class="n">TypeIs</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">overload</span><span class="p">,</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">Any</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Final</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">override</span><span class="p">,</span> <span class="n">TypeIs</span><span class="p">,</span> <span class="n">Buffer</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.abc</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">_ContextLambda</span><span class="p">,</span>
@@ -431,6 +431,9 @@
     <span class="n">_SupportsType</span><span class="p">,</span>
     <span class="n">_ContainsStruct</span><span class="p">,</span>
     <span class="n">_ActionLike</span><span class="p">,</span>
+    <span class="n">_ArchLike</span><span class="p">,</span>
+    <span class="n">_EndianLike</span><span class="p">,</span>
+    <span class="n">_StreamType</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
@@ -704,11 +707,209 @@
     <span class="c1"># this function must return a type</span>
     <span class="n">rtype</span> <span class="o">=</span> <span class="nb">object</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">rtype</span> <span class="o">=</span> <span class="n">__type__</span><span class="p">()</span>  <span class="c1"># pyright: ignore[reportAny]</span>
+        <span class="n">rtype</span> <span class="o">=</span> <span class="n">__type__</span><span class="p">()</span>
     <span class="k">except</span> <span class="ne">NotImplementedError</span><span class="p">:</span>
         <span class="k">pass</span>
 
     <span class="k">return</span> <span class="n">rtype</span> <span class="k">if</span> <span class="n">rtype</span> <span class="ow">and</span> <span class="n">rtype</span> <span class="o">!=</span> <span class="bp">NotImplemented</span> <span class="k">else</span> <span class="nb">object</span></div>
+
+
+
+<div class="viewcode-block" id="PackMixin">
+<a class="viewcode-back" href="../../library/shared.html#caterpillar.shared.PackMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PackMixin</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">_IT</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mixin providing serialization helpers for packing objects into binary</span>
+<span class="sd">    representations.</span>
+
+<span class="sd">    This mixin exposes a unified ``to_bytes`` interface that can either return</span>
+<span class="sd">    serialized bytes directly or write them into a provided writable stream.</span>
+
+<span class="sd">    .. versionadded:: 2.8.1</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@overload</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_bytes</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">obj</span><span class="p">:</span> <span class="n">_IT</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">fp</span><span class="p">:</span> <span class="n">_StreamType</span><span class="p">,</span>
+        <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">use_tempfile</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
+    <span class="nd">@overload</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_bytes</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">obj</span><span class="p">:</span> <span class="n">_IT</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">fp</span><span class="p">:</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">use_tempfile</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span> <span class="o">...</span>
+<div class="viewcode-block" id="PackMixin.to_bytes">
+<a class="viewcode-back" href="../../library/shared.html#caterpillar.shared.PackMixin.to_bytes">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_bytes</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">obj</span><span class="p">:</span> <span class="n">_IT</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">fp</span><span class="p">:</span> <span class="n">_StreamType</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">use_tempfile</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Serialize the object into its binary representation.</span>
+
+<span class="sd">        If ``fp`` is provided, the binary data is written directly into the</span>
+<span class="sd">        given stream using ``pack_into``. Otherwise, the binary data is</span>
+<span class="sd">        returned as a ``bytes`` object using ``pack``.</span>
+
+<span class="sd">        :param obj: Object instance to serialize</span>
+<span class="sd">        :type obj: _IT</span>
+<span class="sd">        :param fp: Writable stream to receive the serialized data. If None,</span>
+<span class="sd">            the serialized bytes are returned, defaults to None</span>
+<span class="sd">        :type fp: _StreamType | None, optional</span>
+<span class="sd">        :param order: Endianness override for serialization, defaults to None</span>
+<span class="sd">        :type order: _EndianLike | None, optional</span>
+<span class="sd">        :param arch: Architecture override for serialization, defaults to None</span>
+<span class="sd">        :type arch: _ArchLike | None, optional</span>
+<span class="sd">        :param use_tempfile: Whether to use a temporary file during packing,</span>
+<span class="sd">            defaults to False</span>
+<span class="sd">        :type use_tempfile: bool, optional</span>
+<span class="sd">        :raises Exception: Propagates any exception raised by the underlying</span>
+<span class="sd">            packing implementation</span>
+<span class="sd">        :return: Serialized bytes if ``fp`` is None, otherwise None</span>
+<span class="sd">        :rtype: bytes | None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># fmt: off</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.model</span><span class="w"> </span><span class="kn">import</span> <span class="n">pack_into</span><span class="p">,</span> <span class="n">pack</span>
+        <span class="k">if</span> <span class="n">fp</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">pack_into</span><span class="p">(</span>  <span class="c1"># pyright: ignore[reportCallIssue]</span>
+                <span class="n">obj</span><span class="p">,</span>
+                <span class="n">fp</span><span class="p">,</span>
+                <span class="bp">self</span><span class="p">,</span>  <span class="c1"># pyright: ignore[reportArgumentType]</span>
+                <span class="n">use_tempfile</span><span class="o">=</span><span class="n">use_tempfile</span><span class="p">,</span>
+                <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span>
+                <span class="n">arch</span><span class="o">=</span><span class="n">arch</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">pack</span><span class="p">(</span>  <span class="c1"># pyright: ignore[reportCallIssue, reportUnknownVariableType]</span>
+                <span class="n">obj</span><span class="p">,</span>
+                <span class="bp">self</span><span class="p">,</span>  <span class="c1"># pyright: ignore[reportArgumentType]</span>
+                <span class="n">use_tempfile</span><span class="o">=</span><span class="n">use_tempfile</span><span class="p">,</span>
+                <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span>
+                <span class="n">arch</span><span class="o">=</span><span class="n">arch</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+            <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="UnpackMixin">
+<a class="viewcode-back" href="../../library/shared.html#caterpillar.shared.UnpackMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">UnpackMixin</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">_OT</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mixin providing deserialization helpers for constructing objects from</span>
+<span class="sd">    binary data sources.</span>
+
+<span class="sd">    This mixin supports unpacking from raw bytes, streams, or files, and also</span>
+<span class="sd">    defines a convenience left-shift operator for inline unpacking.</span>
+
+<span class="sd">    .. versionadded:: 2.8.1</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__lshift__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Buffer</span> <span class="o">|</span> <span class="n">_StreamType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_OT</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Unpack binary data using the left-shift operator.</span>
+
+<span class="sd">        This operator is a shorthand for calling :meth:`from_bytes`, enabling</span>
+<span class="sd">        concise inline unpacking from a bytes-like object or a readable stream.</span>
+
+<span class="sd">        :param data: Raw bytes or a readable stream containing serialized data</span>
+<span class="sd">        :type data: Buffer | _StreamType</span>
+<span class="sd">        :return: Parsed associated type instance</span>
+<span class="sd">        :rtype: _OT</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+<div class="viewcode-block" id="UnpackMixin.from_bytes">
+<a class="viewcode-back" href="../../library/shared.html#caterpillar.shared.UnpackMixin.from_bytes">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_bytes</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">Buffer</span> <span class="o">|</span> <span class="n">_StreamType</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_OT</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct an object from raw binary data or a stream.</span>
+
+<span class="sd">        This is a convenience wrapper around the underlying ``unpack``</span>
+<span class="sd">        function, allowing associated types to be instantiated directly from</span>
+<span class="sd">        bytes without importing parsing utilities.</span>
+
+<span class="sd">        :param data: Raw bytes or a readable stream containing serialized data</span>
+<span class="sd">        :type data: Buffer | _StreamType</span>
+<span class="sd">        :param order: Endianness override for parsing, defaults to None</span>
+<span class="sd">        :type order: _EndianLike | None, optional</span>
+<span class="sd">        :param arch: Architecture override for parsing, defaults to None</span>
+<span class="sd">        :type arch: _ArchLike | None, optional</span>
+<span class="sd">        :raises Exception: Propagates any exception raised by the underlying</span>
+<span class="sd">            unpacking implementation</span>
+<span class="sd">        :return: Parsed associated type instance</span>
+<span class="sd">        :rtype: _OT</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.model</span><span class="w"> </span><span class="kn">import</span> <span class="n">unpack</span>
+
+        <span class="k">return</span> <span class="n">unpack</span><span class="p">(</span>  <span class="c1"># pyright: ignore[reportCallIssue, reportUnknownVariableType]</span>
+            <span class="bp">self</span><span class="p">,</span>  <span class="c1"># pyright: ignore[reportArgumentType]</span>
+            <span class="n">data</span><span class="p">,</span>
+            <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span>
+            <span class="n">arch</span><span class="o">=</span><span class="n">arch</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="UnpackMixin.from_file">
+<a class="viewcode-back" href="../../library/shared.html#caterpillar.shared.UnpackMixin.from_file">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_file</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_OT</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct an instance from a binary file on disk.</span>
+
+<span class="sd">        This is a convenience wrapper around ``unpack_file`` for reading and</span>
+<span class="sd">        parsing structured data directly from a file path.</span>
+
+<span class="sd">        :param filename: Path to the file containing serialized data</span>
+<span class="sd">        :type filename: str</span>
+<span class="sd">        :param order: Endianness override for parsing, defaults to None</span>
+<span class="sd">        :type order: _EndianLike | None, optional</span>
+<span class="sd">        :param arch: Architecture override for parsing, defaults to None</span>
+<span class="sd">        :type arch: _ArchLike | None, optional</span>
+<span class="sd">        :raises Exception: Propagates any exception raised by the underlying</span>
+<span class="sd">            file-unpacking implementation</span>
+<span class="sd">        :return: Parsed associated type instance</span>
+<span class="sd">        :rtype: _OT</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.model</span><span class="w"> </span><span class="kn">import</span> <span class="n">unpack_file</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">unpack_file</span><span class="p">(</span>  <span class="c1"># pyright: ignore[reportCallIssue, reportUnknownVariableType]</span>
+                <span class="bp">self</span><span class="p">,</span>  <span class="c1"># pyright: ignore[reportArgumentType]</span>
+                <span class="n">filename</span><span class="p">,</span>
+                <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span>
+                <span class="n">arch</span><span class="o">=</span><span class="n">arch</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span></div>
+</div>
 
 </pre></div>
 

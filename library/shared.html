@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>4.7. Shared Concepts &#8212; Caterpillar 2.8.0 documentation</title>
+    <title>4.7. Shared Concepts &#8212; Caterpillar 2.8.1rc documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=69ff2ef9"></script>
+    <script src="../_static/documentation_options.js?v=27899d92"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -54,7 +54,7 @@
     <link rel="prev" title="4.6. Annotation Registry" href="registry.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.8.0" />
+  <meta name="docsearch:version" content="2.8.1rc" />
   </head>
   
   
@@ -116,7 +116,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.8.0</p>
+    <p class="title logo__title">Caterpillar 2.8.1rc</p>
   
 </a></div>
     
@@ -674,6 +674,119 @@ returning <cite>object</cite>.</p>
 </dl>
 </dd></dl>
 
+<dl class="py class">
+<dt class="sig sig-object py" id="caterpillar.shared.PackMixin">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">caterpillar.shared.</span></span><span class="sig-name descname"><span class="pre">PackMixin</span></span><a class="reference internal" href="../_modules/caterpillar/shared.html#PackMixin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.shared.PackMixin" title="Link to this definition">#</a></dt>
+<dd><p>Mixin providing serialization helpers for packing objects into binary
+representations.</p>
+<p>This mixin exposes a unified <code class="docutils literal notranslate"><span class="pre">to_bytes</span></code> interface that can either return
+serialized bytes directly or write them into a provided writable stream.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.8.1.</span></p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="caterpillar.shared.PackMixin.to_bytes">
+<span class="sig-name descname"><span class="pre">to_bytes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_IT</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">fp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">IOBase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_EndianLike</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ArchLike</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_tempfile</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/caterpillar/shared.html#PackMixin.to_bytes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.shared.PackMixin.to_bytes" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">to_bytes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_IT</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">fp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_EndianLike</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ArchLike</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_tempfile</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span></dt>
+<dd><p>Serialize the object into its binary representation.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">fp</span></code> is provided, the binary data is written directly into the
+given stream using <code class="docutils literal notranslate"><span class="pre">pack_into</span></code>. Otherwise, the binary data is
+returned as a <code class="docutils literal notranslate"><span class="pre">bytes</span></code> object using <code class="docutils literal notranslate"><span class="pre">pack</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obj</strong> (<em>_IT</em>) – Object instance to serialize</p></li>
+<li><p><strong>fp</strong> (<em>_StreamType</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Writable stream to receive the serialized data. If None,
+the serialized bytes are returned, defaults to None</p></li>
+<li><p><strong>order</strong> (<em>_EndianLike</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Endianness override for serialization, defaults to None</p></li>
+<li><p><strong>arch</strong> (<em>_ArchLike</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Architecture override for serialization, defaults to None</p></li>
+<li><p><strong>use_tempfile</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to use a temporary file during packing,
+defaults to False</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Exception</strong> – Propagates any exception raised by the underlying
+packing implementation</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Serialized bytes if <code class="docutils literal notranslate"><span class="pre">fp</span></code> is None, otherwise None</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bytes | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="caterpillar.shared.UnpackMixin">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">caterpillar.shared.</span></span><span class="sig-name descname"><span class="pre">UnpackMixin</span></span><a class="reference internal" href="../_modules/caterpillar/shared.html#UnpackMixin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.shared.UnpackMixin" title="Link to this definition">#</a></dt>
+<dd><p>Mixin providing deserialization helpers for constructing objects from
+binary data sources.</p>
+<p>This mixin supports unpacking from raw bytes, streams, or files, and also
+defines a convenience left-shift operator for inline unpacking.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.8.1.</span></p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="caterpillar.shared.UnpackMixin.from_bytes">
+<span class="sig-name descname"><span class="pre">from_bytes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Buffer</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">IOBase</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_EndianLike</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ArchLike</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">_OT</span></span></span><a class="reference internal" href="../_modules/caterpillar/shared.html#UnpackMixin.from_bytes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.shared.UnpackMixin.from_bytes" title="Link to this definition">#</a></dt>
+<dd><p>Construct an object from raw binary data or a stream.</p>
+<p>This is a convenience wrapper around the underlying <code class="docutils literal notranslate"><span class="pre">unpack</span></code>
+function, allowing associated types to be instantiated directly from
+bytes without importing parsing utilities.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>Buffer</em><em> | </em><em>_StreamType</em>) – Raw bytes or a readable stream containing serialized data</p></li>
+<li><p><strong>order</strong> (<em>_EndianLike</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Endianness override for parsing, defaults to None</p></li>
+<li><p><strong>arch</strong> (<em>_ArchLike</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Architecture override for parsing, defaults to None</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Exception</strong> – Propagates any exception raised by the underlying
+unpacking implementation</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Parsed associated type instance</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>_OT</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caterpillar.shared.UnpackMixin.from_file">
+<span class="sig-name descname"><span class="pre">from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_EndianLike</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ArchLike</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">_OT</span></span></span><a class="reference internal" href="../_modules/caterpillar/shared.html#UnpackMixin.from_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.shared.UnpackMixin.from_file" title="Link to this definition">#</a></dt>
+<dd><p>Construct an instance from a binary file on disk.</p>
+<p>This is a convenience wrapper around <code class="docutils literal notranslate"><span class="pre">unpack_file</span></code> for reading and
+parsing structured data directly from a file path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em>) – Path to the file containing serialized data</p></li>
+<li><p><strong>order</strong> (<em>_EndianLike</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Endianness override for parsing, defaults to None</p></li>
+<li><p><strong>arch</strong> (<em>_ArchLike</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Architecture override for parsing, defaults to None</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Exception</strong> – Propagates any exception raised by the underlying
+file-unpacking implementation</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Parsed associated type instance</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>_OT</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 
 
@@ -743,6 +856,15 @@ returning <cite>object</cite>.</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.shared.hasstruct"><code class="docutils literal notranslate"><span class="pre">hasstruct()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.shared.getstruct"><code class="docutils literal notranslate"><span class="pre">getstruct()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.shared.typeof"><code class="docutils literal notranslate"><span class="pre">typeof()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.shared.PackMixin"><code class="docutils literal notranslate"><span class="pre">PackMixin</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.shared.PackMixin.to_bytes"><code class="docutils literal notranslate"><span class="pre">PackMixin.to_bytes()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.shared.UnpackMixin"><code class="docutils literal notranslate"><span class="pre">UnpackMixin</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.shared.UnpackMixin.from_bytes"><code class="docutils literal notranslate"><span class="pre">UnpackMixin.from_bytes()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.shared.UnpackMixin.from_file"><code class="docutils literal notranslate"><span class="pre">UnpackMixin.from_file()</span></code></a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 
