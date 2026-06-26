@@ -132,17 +132,24 @@ class Pointer(FieldStruct[int, pointer[_PtrValueT]]):
             if self.model is None:
                 return self._create(value, start, None, context)
 
-            offset: int = self._to_offset(value, start, context)
+
             model_obj = None
-            if offset != 0:
-                # using an if-statement here reduces time overhead
-                # of this branch
+            # a null pointer (value == 0) is never dereferenced; this also
+            # keeps relative pointers null when their base offset is non-zero
+            if value != 0:
+                offset: int = self._to_offset(value, start, context)
                 fallback: int = stream.tell()
                 try:
                     stream.seek(offset)
+                except (OSError, ValueError) as exc:
+                    raise StructException(
+                        "Could not seek to pointer target!", context
+                    ) from exc
+                try:
                     model_obj = self.model.__unpack__(context)
                 except StructException as exc:
-                    if context[CTX_FIELD].has_flag(PTR_STRICT):
+                    field = context.get(CTX_FIELD)
+                    if field is not None and field.has_flag(PTR_STRICT):
                         raise DelegationError(
                             "Could not parse model!", context
                         ) from exc
@@ -316,7 +323,8 @@ class RelativePointer(Pointer[_PtrValueT]):
         :param context: The context for creation.
         :return: The created relative pointer object.
         """
-        ptr = super()._create(value, start, model_obj, context)
+        ptr: relative_pointer[_PtrValueT] = relative_pointer(value)
+        setattr(ptr, "obj", model_obj)
         setattr(ptr, "base", start)
         return ptr
 
