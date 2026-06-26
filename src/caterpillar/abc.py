@@ -38,7 +38,7 @@ _StreamFactory = Callable[[], _StreamType]
 _GreedyType = EllipsisType
 
 
-@runtime_checkable
+
 class _ContextLike(Protocol):
     """
     A protocol for context-like objects that provides methods and attributes

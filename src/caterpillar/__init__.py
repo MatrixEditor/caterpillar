@@ -26,7 +26,7 @@ def native_support() -> bool:
         from caterpillar import _C  # pyright: ignore[reportMissingModuleSource, reportUnusedImport]
 
         return True
-    except ImportError:
+    except Exception:
         return False
 
 
