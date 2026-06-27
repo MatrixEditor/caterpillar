@@ -73,7 +73,7 @@ class Struct(Sequence[type[_ModelT], _ModelT, _ModelT]):
     # An internal field that maps the field names of all class attributes to their
     # corresponding struct fields.
 
-    __slots__: tuple[str, ...] = ("kw_only", "_union_hook")
+    __slots__: tuple[str, ...] = ("kw_only", "_union_hook", "_hidden_field_names")
 
     def __init__(
         self,
@@ -86,6 +86,9 @@ class Struct(Sequence[type[_ModelT], _ModelT, _ModelT]):
         hook_cls: type["UnionHook[_ModelT]"] | None = None,
     ) -> None:
         self.kw_only: bool = kw_only
+        # Cache of init=False field names (e.g. via Invisible); computed lazily
+        # on first unpack and invalidated whenever the model layout changes.
+        self._hidden_field_names: frozenset[str] | None = None
         options = set(options or [])
         options.update(
             GLOBAL_UNION_OPTIONS if S_UNION in options else GLOBAL_STRUCT_OPTIONS
@@ -127,7 +130,11 @@ class Struct(Sequence[type[_ModelT], _ModelT, _ModelT]):
                 # Importing all fields instead of the entire struct.
                 # The default behavior on importing structs is implemented
                 # by the Sequence class.
-                self += candidate.__struct__  # pyright: ignore[reportOperatorIssue]
+                self._import_members(
+                    candidate.__struct__,  # pyright: ignore[reportArgumentType]
+                    replace=True,
+                    clone=True,
+                )
 
         eval_str: bool = self.has_option(S_EVAL_ANNOTATIONS)
         # The why is described in detail here: https://docs.python.org/3/howto/annotations.html
@@ -148,10 +155,12 @@ class Struct(Sequence[type[_ModelT], _ModelT, _ModelT]):
 
     @override
     def _replace_type(self, name: str, type_: type) -> None:
+        self._hidden_field_names = None
         self.model.__annotations__[name] = type_
 
     @override
     def _remove_from_model(self, name: str) -> None:
+        self._hidden_field_names = None
         self.model.__annotations__.pop(name)
         default = getattr(self.model, name, None)
         # Invisible adds a dataclass.Field to the class definition. We have
@@ -160,13 +169,46 @@ class Struct(Sequence[type[_ModelT], _ModelT, _ModelT]):
             # mitigation for: TypeError: 'XXX' is a field but has no type annotation
             delattr(self.model, name)
 
+    def _compute_hidden_field_names(self) -> frozenset[str]:
+        names = frozenset(
+            name
+            for name, f in getattr(self.model, "__dataclass_fields__", {}).items()
+            if not f.init
+        )
+        self._hidden_field_names = names
+        return names
+
     @override
     def unpack_one(self, context: _ContextLike) -> _ModelT:
-        return self.model(**super().unpack_one(context))
+        data = super().unpack_one(context)
+        # Fields declared with init=False (e.g. via Invisible) are part of the
+        # struct layout but are not parameters of the generated __init__. Their
+        # parsed values must be assigned after construction instead of being
+        # forwarded as constructor keyword arguments.
+        hidden = self._hidden_field_names
+        if hidden is None:
+            hidden = self._compute_hidden_field_names()
+        if not hidden:
+            return self.model(**data)
+        init_kwargs = {k: v for k, v in data.items() if k not in hidden}
+        obj = self.model(**init_kwargs)
+        for name in hidden:
+            if name in data:
+                setattr(obj, name, data[name])
+        return obj
 
     @override
     def get_value(self, obj: _ModelT, name: str, field: Field) -> Any | None:
-        return getattr(obj, name, None)
+        value = getattr(obj, name, INVALID_DEFAULT)
+        if value is INVALID_DEFAULT:
+            if field is not None and field.default is not INVALID_DEFAULT:
+                return field.default
+            if field is not None and field._has_cond:
+                return None
+            raise AttributeError(
+                f"{type(obj).__name__!r} object has no attribute {name!r} required for packing"
+            )
+        return value
 
 
 # --- private type converter ---
@@ -417,7 +459,8 @@ class struct_factory:
     a regular class definition into a fully configured ``Struct`` model. The
     resulting class gains dataclass semantics and structure metadata.
 
-    .. admonition::
+    .. admonition:: Static typing
+
         The use of ``@dataclass_transform`` ensures that static type checkers
         understand the transformation and correctly interpret field specifiers
         such as ``dataclasses.field`` and :func:`Invisible`.
