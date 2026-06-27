@@ -520,8 +520,8 @@ class Padding(ByteOrderMixin[None, None]):
         Consume the padding from the stream and validate it.
 
         The method reads a block of data from the stream.  If a parent
-        field specifies a length, that many bytes are read; otherwise
-        the entire stream is consumed.  When ``strict`` is enabled,
+        field specifies a length, that many fill-pattern repeats are
+        read; otherwise the entire stream is consumed.  When ``strict`` is enabled,
         the read data is validated against the expected padding pattern.
 
         :param context: Context containing the stream and optional field
@@ -532,7 +532,7 @@ class Padding(ByteOrderMixin[None, None]):
             length of the data is not a multiple of the padding length
             or the data does not match the pattern.
         :raises TypeError: If the field length is provided but is not an
-            integer.
+            integer or the greedy sentinel.
         """
         field: Field | None = context.get(CTX_FIELD)
         stream: _StreamType = context[CTX_STREAM]
@@ -542,14 +542,14 @@ class Padding(ByteOrderMixin[None, None]):
             data = stream.read(fill_length)
         else:
             amount = field.length(context)
-            if amount is _GreedyType:
+            if amount is Ellipsis:
                 data = stream.read()
             else:
                 if not isinstance(amount, int):
                     raise TypeError(
                         "Invalid length type - prefixed length is not supported"
                     )
-                data = stream.read(amount)
+                data = stream.read(amount * fill_length)
         if self.strict:
             if len(data) % fill_length != 0:
                 raise ValidationError(
@@ -2213,6 +2213,7 @@ class Uuid(FieldStruct[UUID, UUID]):
         data = context[CTX_STREAM].read(16)
         return UUID(bytes_le=data) if is_le else UUID(bytes=data)
 
+
 class AsLengthRef:
     """
     A special field for automatically determining the length of a field
@@ -2383,4 +2384,3 @@ class Timestamp(
         tz = self.tz if self.tz is not None else datetime.timezone.utc
         dt = datetime.datetime.fromtimestamp(float(parsed), tz)
         return dt if self.tz is not None else dt.replace(tzinfo=None)
-
