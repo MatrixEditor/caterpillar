@@ -76,7 +76,7 @@ class Field(Generic[_IT, _OT], PackMixin[_IT], UnpackMixin[_OT]):
     :param order: Byte order for the field (default: SysNative).
     :param offset: Field offset or callable (default: -1, meaning no explicit offset).
     :param flags: Optional set of flags associated with the field.
-    :param amount: The number of elements if this field is a sequence (default: 0).
+    :param amount: The number of elements if this field is a sequence.
     :param options: A dictionary representing a switch-case mapping.
     :param condition: A boolean or callable determining whether the field is active.
     :param arch: Architecture specification (default: system_arch).
@@ -90,7 +90,7 @@ class Field(Generic[_IT, _OT], PackMixin[_IT], UnpackMixin[_OT]):
         order: _EndianLike | None = None,
         offset: _ContextLambda[int] | int = -1,
         flags: set[_OptionLike] | None = None,
-        amount: _LengthT = 0,
+        amount: _LengthT | None = None,
         options: _SwitchOptionsT | None = None,
         condition: _ContextLambda[bool] | bool = True,
         arch: _ArchLike | None = None,
@@ -127,7 +127,7 @@ class Field(Generic[_IT, _OT], PackMixin[_IT], UnpackMixin[_OT]):
         self.bits: _ContextLambda[int] | int | None = bits
         self.arch = arch
         self.offset = offset
-        self.amount = amount or None
+        self.amount = amount
         self.options = options
 
         # INVALID_DEFAULT indicates that no default was explicitly set;
@@ -231,7 +231,7 @@ class Field(Generic[_IT, _OT], PackMixin[_IT], UnpackMixin[_OT]):
     def amount(self, value: _LengthT | None):
         self.__amount = value
         self._amount_is_lambda = callable(value)
-        self._is_seq = self._amount_is_lambda or (value not in (0, None))
+        self._is_seq = self._amount_is_lambda or value is not None
 
     @property
     def options(self) -> _SwitchOptionsT | None:
@@ -277,7 +277,7 @@ class Field(Generic[_IT, _OT], PackMixin[_IT], UnpackMixin[_OT]):
         self.__arch = value
 
     def has_arch(self) -> bool:
-        return bool(self.__arch)
+        return self.__arch is not None
 
     def _verify_context_value(
         self, value: object, expected: type | tuple[type, ...]

@@ -70,6 +70,7 @@ warnings.filterwarnings("default", category=DeprecationWarning, module=__name__)
 
 ENUM_STRICT: Flag[None] = Flag("enum.strict")
 
+_NATIVE_ONLY_FORMATS: Final[frozenset[str]] = frozenset({"n", "N", "P"})
 
 class PyStructFormattedField(FieldStruct[_IT, _IT]):
     """
@@ -114,6 +115,9 @@ class PyStructFormattedField(FieldStruct[_IT, _IT]):
         return self.text
 
     def _cached(self, order_ch: str, count: int | None = None) -> PyStruct.Struct:
+        if self.text in _NATIVE_ONLY_FORMATS:
+            order_ch = "@"
+
         fmt = f"{order_ch}{'' if count is None else count}{self.text}"
         struct_ = self._cache.get(fmt)
         if struct_ is None:

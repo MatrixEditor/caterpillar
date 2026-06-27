@@ -87,19 +87,19 @@ class FieldMixin(ByteOrderMixin[_IT, _OT]):
 
     @overload
     def __and__(
-        self, other: "_StructLike[_ChainHeadT, _ChainTailT]"
+        self, other: "_StructLike[_OT, _ChainTailT]"
     ) -> "Chain[_IT, _ChainTailT]": ...
     @overload
     def __and__(
-        self, other: "Chain[_ChainHeadT, _ChainTailT]"
-    ) -> "Chain[_ChainHeadT, _OT]": ...
+        self, other: "Chain[_OT, _ChainTailT]"
+    ) -> "Chain[_IT, _ChainTailT]": ...
     def __and__(
-        self, other: "Chain[_ChainHeadT, _ChainTailT] | _StructLike[_IT, _OT]"
+        self, other: "Chain[_OT, _ChainTailT] | _StructLike[_OT, _ChainTailT]"
     ) -> "Chain":
-        """Returns a chain with the next element added at the end"""
+        """Returns a chain joining this structure before the next element or chain."""
         # fmt: off
         if isinstance(other, Chain):
-            return other & self  # pyright: ignore[reportOperatorIssue, reportUnknownVariableType]
+            return other.__rand__(self)  # pyright: ignore[reportArgumentType]
         return Chain(self, other)  # pyright: ignore[reportArgumentType]
 
 
@@ -284,7 +284,9 @@ class Chain(FieldStruct[_ChainHeadT, _ChainTailT]):
         self._elements.append(getstruct(other) or other)  # pyright: ignore[reportArgumentType]
         return self  # pyright: ignore[reportReturnType]
 
-    def __rand__(self, other: _StructLike[_IT, _OT]) -> "Chain[_ChainHeadT, _OT]":
+    def __rand__(
+        self, other: _StructLike[_IT, _ChainHeadT]
+    ) -> "Chain[_IT, _ChainTailT]":
         """
         Concatenate another structure to the beginning of the chain.
 
@@ -293,7 +295,9 @@ class Chain(FieldStruct[_ChainHeadT, _ChainTailT]):
         :return: The updated chain.
         :rtype: Chain
         """
-        return self.__and__(other)
+        # fmt: off
+        self._elements.insert(0, getstruct(other, other))  # pyright: ignore[reportArgumentType]
+        return self  # pyright: ignore[reportReturnType]
 
     @override
     def unpack_single(self, context: _ContextLike) -> _ChainTailT:
