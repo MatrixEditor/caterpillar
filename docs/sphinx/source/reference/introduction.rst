@@ -94,8 +94,8 @@ demonstrated in the following example from `examples/formats/caf`:
 How does this even work?
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-*Caterpillar* utilizes Python's annotations to build its model from processing class definitions. With the use
-of Python 3.12, there are no conflicts in using annotations for defining fields.
+*Caterpillar* utilizes Python's annotations to build its model from processing class definitions. On supported
+Python versions, annotations can describe both the binary layout and the user-facing type information.
 
 .. code-block:: python
 
@@ -118,15 +118,26 @@ Extended syntax:
 Pros & Cons
 -----------
 
-*TODO*
+The main advantage of Caterpillar is that binary layouts are ordinary Python
+objects. A format definition can use normal imports, inheritance, default
+values, context expressions, and dynamic field selection while still supporting
+packing, unpacking, size calculation, and type replacement from the same model.
+
+The trade-off is that the model is evaluated at import time. Annotation
+evaluation, global options, and context-dependent fields should therefore be
+used deliberately. Highly dynamic layouts can also be impossible to measure
+with :func:`~caterpillar.model.sizeof` unless enough context is available to
+make their size static.
 
 Comparison
 ----------
 
-*TODO: add links*
+The snippets below compare Caterpillar with several common binary parsing
+libraries. They are intended as a readability and API-shape comparison rather
+than a universal benchmark:
 
 Here, we present a comparison of Caterpillar with Construct and Kaitai using the struct
-from the initial benchmark in the `construct-docs`_ repository as a base.Since Kaitai's
+from the initial benchmark in the `construct-docs`_ repository as a base. Since Kaitai's
 generated code can only parse a format and not build it, the comparison is focused on
 Construct. The files used in the benchmark are provided below:
 

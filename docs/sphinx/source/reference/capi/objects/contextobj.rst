@@ -33,29 +33,38 @@ Context Objects
 
 .. c:function:: PyObject *CpContext_GetDict(PyObject *context)
 
-    *TBD*
+    Returns a new reference to the dictionary backing ``context``. A native
+    context is implemented as a dictionary object with additional protocol
+    helpers.
 
 
 .. c:function:: PyObject *CpContext_GetRoot(PyObject *context)
 
-    *TBD*
+    Returns a new reference to ``context["_root"]`` when present; otherwise
+    returns a new reference to ``context`` itself.
 
 
 .. c:function:: PyObject *CpContext_GenericGetAttr(PyObject *context, PyObject *path)
 
-    *TBD*
+    Resolves a dotted context path. The first path node is read from the context
+    mapping when possible, then remaining nodes are resolved with normal Python
+    attribute access. Returns a new reference or ``NULL`` on error.
 
 
 .. c:function:: PyObject *CpContext_GenericGetAttrString(PyObject *context, const char *path)
 
-    *TBD*
+    String variant of :c:func:`CpContext_GenericGetAttr`.
 
 
 .. c:function:: int CpContext_GenericSetAttr(PyObject *context, PyObject *path, PyObject *value)
 
-    *TBD*
+    Sets a context path. Single-node paths are written into the context mapping.
+    Dotted paths resolve the parent path first and then assign the final
+    attribute on the resolved object. Returns ``0`` on success and ``-1`` on
+    failure.
 
 
 .. c:function:: int CpContext_GenericSetAttrString(PyObject *context, const char *path, PyObject *value)
 
-    *TBD*
+    String variant of :c:func:`CpContext_GenericSetAttr`.
+4

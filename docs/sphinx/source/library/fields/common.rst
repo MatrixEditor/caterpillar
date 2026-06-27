@@ -16,6 +16,10 @@ Numeric Structs
     .. versionchanged:: 2.8.1
         Dropped support for format character ``'x'``. Use the :class:`Padding` type instead.
 
+Formatted fields use Python's :mod:`struct` module internally. Static single
+values and arrays require exact reads during unpacking; short streams raise
+:class:`~caterpillar.exception.ValidationError`.
+
 .. data:: caterpillar.fields.uint8
 
     Unsigned 8-bit integer field. Range: ``0`` to ``255``.
@@ -38,7 +42,17 @@ Numeric Structs
 
 .. data:: caterpillar.fields.uint16
 
-    Signed 16-bit integer field.
+    Unsigned 16-bit integer field. Range: ``0`` to ``65535``.
+
+    Usage Example:
+        >>> pack(65535, uint16)
+        b"\\xff\\xff"
+        >>> unpack(uint16, b"\\xff\\xff")
+        65535
+
+.. data:: caterpillar.fields.int16
+
+    Signed 16-bit integer field. Range: ``-32768`` to ``32767``.
 
     Usage Example:
         >>> pack(1024, int16)
@@ -46,15 +60,13 @@ Numeric Structs
         >>> unpack(int16, b"\\x00\\x04")
         1024
 
-.. data:: caterpillar.fields.int16
+.. data:: caterpillar.fields.uint24
 
-    Unsigned 16-bit integer field.
+    Unsigned 24-bit integer field implemented by :class:`UInt`.
 
-    Usage Example:
-        >>> pack(65535, uint16)
-        b"\\xff\\xff"
-        >>> unpack(uint16, b"\\xff\\xff")
-        65535
+.. data:: caterpillar.fields.int24
+
+    Signed 24-bit integer field implemented by :class:`Int`.
 
 .. data:: caterpillar.fields.uint32
 
@@ -94,32 +106,21 @@ Numeric Structs
         >>> pack(-1, int64)
         b"\\xff\\xff\\xff\\xff\\xff\\xff\\xff\\xff"
         >>> unpack(int64, b"\\xff\\xff\\xff\\xff\\xff\\xff\\xff\\xff")
+        -1
 
-.. data:: caterpillar.fields.size_t
+.. data:: caterpillar.fields.psize
 
     Unsigned platform-dependent size field. Size depends on the native architecture (32-bit or 64-bit).
+    The typing alias is available as :data:`caterpillar.types.size_t`.
 
-    Usage Example:
-        >>> pack(42, size)
-        b"..."
-        >>> unpack(size, b"...")
-        42
-
-    .. versionchanged:: 2.8.0
-        renamed from ``size_t`` to `psize`
-
-.. data:: caterpillar.fields.ssize_t
+.. data:: caterpillar.fields.pssize
 
     Signed platform-dependent size field. Size depends on the native architecture (32-bit or 64-bit).
-
-    Usage Example:
-        >>> pack(42, ssize)
-        b"..."
-        >>> unpack(ssize, b"...")
-        42
+    The typing alias is available as :data:`caterpillar.types.ssize_t`.
 
     .. versionchanged:: 2.8.0
-        renamed from ``ssize_t`` to `pssize`
+        The field instances were renamed from ``size_t`` / ``ssize_t`` to
+        ``psize`` / ``pssize`` to avoid colliding with the typing aliases.
 
 .. data:: caterpillar.fields.float16
 
@@ -163,13 +164,14 @@ Numeric Structs
 
 .. data:: caterpillar.fields.char
 
-    Represents exactly one byte and maps it to a Python ``str`` of length 1.
+    Represents exactly one byte using Python's ``struct`` ``"c"`` format.
+    Values packed with this field must be one-byte ``bytes`` objects.
 
     Usage Example:
-        >>> pack("A", char)
+        >>> pack(b"A", char)
         b"A"
         >>> unpack(char, b"A")
-        'A'
+        b'A'
 
 .. data:: caterpillar.fields.boolean
 
@@ -214,6 +216,12 @@ Pointers
 Bytes, Strings
 --------------
 
+Fixed-size :class:`Memory`, :class:`Bytes`, :class:`String`, and
+:class:`CString` instances read exactly the configured byte length. If the
+stream ends early, unpacking raises
+:class:`~caterpillar.exception.ValidationError`. Greedy forms continue to read
+until EOF or, for :class:`CString`, until the padding byte is encountered.
+
 .. autoclass:: caterpillar.fields.Memory
     :members:
 
@@ -234,6 +242,21 @@ Bytes, Strings
 
 .. autoclass:: caterpillar.fields.CString
     :members:
+
+    Fixed-length C strings are measured in encoded bytes, not Python
+    characters. During packing, the encoded byte sequence must fit in the
+    configured length and is padded with the configured single-byte padding
+    value. During unpacking, exactly that many bytes are read and trailing
+    padding bytes are stripped before decoding.
+
+    .. code-block:: python
+
+        >>> pack("ä", CString(2, encoding="utf-8"), as_field=True)
+        b'\\xc3\\xa4'
+        >>> pack("ä", CString(1, encoding="utf-8"), as_field=True)
+        Traceback (most recent call last):
+        ...
+        ValidationError: String 'ä' is too long for the fixed length of 1 bytes. Got 2 bytes.
 
 .. autoclass:: caterpillar.fields.ConstString
     :members:
@@ -263,9 +286,17 @@ Special Structs
 .. autoclass:: caterpillar.fields.Aligned
     :members:
 
+    ``alignment`` is expressed in bytes and must resolve to a positive power of
+    two. Padding is calculated from the current stream position, so an already
+    aligned position adds zero bytes.
+
     .. versionadded:: 2.4.0
 
 .. autofunction:: caterpillar.fields.align
+
+    Returns a context lambda that computes the padding needed to reach the next
+    multiple of ``alignment`` from the current stream position. ``alignment``
+    follows the same positive-power-of-two rule as :class:`Aligned`.
 
     .. versionadded:: 2.4.0
 

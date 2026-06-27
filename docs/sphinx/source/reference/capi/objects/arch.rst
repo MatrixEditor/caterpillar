@@ -13,7 +13,9 @@ Arch Objects
 
 .. c:type:: CpArchObject
 
-    *TODO*
+    Native architecture object. It stores a Python ``name`` and an integer
+    pointer size in bits. Pointer atoms use this value to choose the matching
+    pointer-width integer field.
 
 
 .. c:function:: int CpArch_CheckExact(PyObject *op)
@@ -36,7 +38,9 @@ Endian Objects
 
 .. c:type:: CpEndianObject
 
-    *TODO*
+    Native byte-order object. It stores a Python ``name`` and a single format
+    character compatible with Python's :mod:`struct` module, for example
+    ``'<'``, ``'>'`` or ``'='``.
 
 .. c:function:: int CpEndian_IsLittleEndian(CpEndianObject *endian, _modulestate *mod)
 

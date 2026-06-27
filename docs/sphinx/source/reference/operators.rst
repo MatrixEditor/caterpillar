@@ -4,12 +4,10 @@
 Operators
 *********
 
-*TODO: describe all supported operators*
-
 *Caterpillar* supports various operators for :class:`~caterpillar.model.Sequence`,
 :class:`~caterpillar.model.Struct`, :class:`Field`, and custom struct implementations
 [1]_. This section provides an overview of the operators that can be used with
-structs, including special context operations.
+structs, fields, sequences, and context paths.
 
 Struct operators
 ----------------
@@ -178,19 +176,35 @@ functionality as well.
 .. function:: sequence.__add__(self, sequence)
               sequence.__iadd__(self, sequence)
 
-    Called to *import* all fields from the given sequence into this instance. Note that the
-    fields will be added to the *end* of the current field list.
+    Called to *import* all fields from the given sequence into this instance. This mutates the
+    left-hand sequence and adds non-duplicate fields to the *end* of the current field list.
 
     >>> seq = Sequence({"a": uint8}) + Sequence({"b": uint8})
 
 .. function:: sequence.__sub__(self, sequence)
               sequence.__isub__(self, sequence)
 
-    Invoked to remove all fields in this sequence that are also stored in the given
-    sequence. This operation does not alter the used model but only affects the
-    internal model representation.
+    Invoked to remove all fields in this sequence with names that are also stored in the given
+    sequence. This mutates the left-hand sequence. The original model object is not rewritten;
+    only the processed internal representation is changed.
 
     >>> seq = Sequence({"a": uint8, "b": uint8}) - Sequence({"b": uint8})
+
+.. function:: sequence.merged(self, *sequences)
+
+    Returns a new :class:`~caterpillar.model.Sequence` containing cloned field wrappers
+    from this sequence and all provided sequences. Unlike ``+``, this does not
+    mutate any operand. Duplicate field names from later sequences replace
+    earlier ones in-place in the returned sequence.
+
+    >>> seq = Sequence({"a": uint8}).merged(Sequence({"b": uint8}))
+
+.. function:: sequence.without(self, *sequences)
+
+    Returns a new :class:`~caterpillar.model.Sequence` with fields removed by
+    name, leaving the original sequence unchanged.
+
+    >>> seq = Sequence({"a": uint8, "b": uint8}).without(Sequence({"b": uint8}))
 
 Context specific operations
 ---------------------------
@@ -214,29 +228,31 @@ Path('foo.bar.baz')
 
 To enable list-like access and function calls, there are special methods:
 
-.. function:: path.__call__(self, **kwargs)
+.. function:: path.__call__(self, context)
 
-    Calling the path without the context instance results in a special state. The path
-    stores the keyword arguments given in the call and executes them after retrieving
-    the value from the context.
+    Resolves the path against the provided context. ``ctx`` returns the context
+    itself, while ``this`` starts at the current object stored under ``_obj``.
 
-    >>> path = this.foo.bar(x=19)
-    Path('_obj.foo.bar', call(x=10))
+    >>> path = this.foo.bar
+    >>> path(context)
+    # equivalent to context.__context_getattr__("_obj.foo.bar")
 
 
 .. function:: path.__getitem__(self, key)
 
-    This method has the same effect on the path, as it stores the key argument and executes the
-    :meth:`!__getitem__` method on the retrieved value afterward.
+    Stores a trailing ``__getitem__`` operation that is executed after the base
+    path is resolved.
 
     >>> path = this.foo.bar(x=19)[10]
     Path('_obj.foo.bar', call(x=19), getitem(10))
 
 
-.. admonition::: Developer's note
+.. admonition:: Developer's note
 
-    The current implementation of :class:`ContextPath` does not allow function calls or list-like
-    access between path elements. These special states can only be applied at the end of a path.
+    The current implementation of :class:`ContextPath` stores path nodes eagerly
+    and optimizes resolution for the default :class:`~caterpillar.context.Context`.
+    Item access is applied only after resolving the full path; function-call
+    operations are not part of the public path syntax.
 
 
 .. [1] Custom implementations must extend :class:`FieldMixin` class to be able to use special operators.

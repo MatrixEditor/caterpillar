@@ -44,7 +44,7 @@ Prefixed
 --------
 
 In addition to greedy parsing, this library supports prefixed packing and unpacking as well. With *prefixed*, we refer
-to the length of an array of elements that should be parsed. In this library, the :code:`slice` class is to achieve a
+to the length of an array of elements that should be parsed. In this library, a :code:`slice` is used to express a
 prefix option.
 
 >>> field = CString[uint32::]
@@ -57,7 +57,8 @@ Context
 
 The context is another core element of this framework, utilized to store all relevant variables needed during the
 process of packing or unpacking objects. The top-level :meth:`~caterpillar.model.unpack` and :meth:`~caterpillar.model.pack` methods are designed to
-create the context themselves with some pre-defined (internal) fields.
+create the root context themselves with predefined internal fields. Additional
+keyword arguments passed to these helpers are copied into that root context.
 
 .. admonition:: Implementation Note
 
@@ -123,7 +124,8 @@ instance directly. All custom attributes are stored in the dictionary representa
 .. attribute:: CTX_POS
     :value: "_pos"
 
-    Currently undefined.
+    Tracks the current logical position for operations that need an explicit
+    position counter. Stream-based alignment uses the active stream position.
 
 .. attribute:: CTX_OFFSETS
     :value: "_offsets"
@@ -139,14 +141,36 @@ instance directly. All custom attributes are stored in the dictionary representa
     Special attribute set to specify the root context. If this attribute is not present, the current ``Context`` instance
     will be returned.
 
+.. attribute:: CTX_SEQ
+    :value: "_is_seq"
+
+    Indicates whether the current operation is processing a sequence/array
+    element. Prefix handling temporarily disables this marker while writing or
+    reading the prefix itself.
+
+.. attribute:: CTX_ORDER
+    :value: "_order"
+
+    Root-context byte order used by dynamic byte-order aware structs.
+
+.. attribute:: CTX_ARCH
+    :value: "_arch"
+
+    Root-context architecture used by architecture-dependent structs such as
+    pointers.
 
 Context path
 ------------
 
 The path of a context is a specialized form of a :ref:`context_lambda` and supports lazy evaluation of most
-operators (conditional ones excluded). Once called, they try to retrieve the requested value from within
-the given :class:`Context` instance. Below is a list of default paths designed to provide a relatively easy
-way to access the context variables.
+operators (conditional ones excluded). A :class:`~caterpillar.context.ContextPath`
+stores the path nodes once and resolves them when called with a
+:class:`Context` instance. The default :class:`Context` implementation uses this
+tokenized path directly to avoid repeatedly splitting path strings on hot
+packing and unpacking paths.
+
+Below is a list of default paths designed to provide a relatively easy way to
+access the context variables.
 
 .. attribute:: ctx
     :value: ""
@@ -163,6 +187,17 @@ way to access the context variables.
     :value: "_parent._obj"
 
     A shortcut to access the object context of the parent context.
+
+.. attribute:: parentctx
+    :value: "_parent"
+
+    A shortcut to access the full parent context rather than only the parent
+    object.
+
+.. attribute:: root
+    :value: "_root"
+
+    A shortcut to access the root context.
 
 
 

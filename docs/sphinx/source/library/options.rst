@@ -85,14 +85,14 @@ Sequence Options
    .. code-block:: python
       :caption: Sequence with an unnamed field
 
-      >>> schema = Seq({
+      >>> schema = Sequence({
       ...     "a": uint8,
       ...     "_": padding[10]
       ... }, options={opt.S_DISCARD_UNNAMED})
       >>> data = b"\xFF" + bytes(10)
       >>> unpack(schema, data)
       {'a': 255}
-      >>> pack(_, schema)
+      >>> pack({"a": 255}, schema)
       b'\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
 
 .. data:: caterpillar.options.S_DISCARD_CONST
@@ -167,10 +167,15 @@ Struct Options
           b: String(10)
           c: Uuid
 
-      # Enable type replacement globally
+      # Enable type replacement globally before defining documented structs:
       opt.set_struct_flags(opt.S_REPLACE_TYPES)
-      # Or apply it directly:
+
+      # Or apply it directly to a single struct:
       @struct(options={opt.S_REPLACE_TYPES})
+      class DocumentedFormat:
+          a: uint8
+          b: String(10)
+          c: Uuid
 
    Comparison of annotations:
 
@@ -336,4 +341,3 @@ Interface
 .. autofunction:: caterpillar.options.has_flag
 
 .. autofunction:: caterpillar.options.get_flag
-
