@@ -55,7 +55,7 @@ from caterpillar.fields import (
     Pass,
     INVALID_DEFAULT,
 )
-from caterpillar.exception import StructException
+from caterpillar.exception import StructException, ValidationError
 from caterpillar.context import (
     CTX_FIELD,
     CTX_PATH,
@@ -246,7 +246,12 @@ def issigned(obj: object) -> bool:
     :return: :code:`True` if the field is marked as signed, :code:`False` otherwise.
     :rtype: bool
     """
-    return bool(getattr(obj, ATTR_SIGNED, None))
+    signed = getattr(obj, ATTR_SIGNED, None)
+    if signed is None:
+        signed = getattr(obj, "signed", None)
+    if signed is None:
+        signed = getattr(obj, "text", "") in "bhiqnl"
+    return bool(signed)
 
 
 _VT = TypeVar("_VT", default=int)
@@ -396,6 +401,8 @@ class BitfieldEntry:
     :type factory: type or BitfieldValueFactory or None
     :param action: Optional action object for special handling (e.g., alignment or padding).
     :type action: Any
+    :param signed: Whether this entry stores a signed integer.
+    :type signed: bool
     """
 
     __slots__: tuple[str, ...] = (
@@ -405,6 +412,7 @@ class BitfieldEntry:
         "factory",
         "action",
         "low_mask",
+        "signed",
     )
 
     def __init__(
@@ -414,6 +422,7 @@ class BitfieldEntry:
         name: str,
         factory: BitfieldValueFactory | type[BitfieldValueFactory] | None = None,
         action: _ActionLike | None = None,
+        signed: bool = False,
     ) -> None:
         # fmt: off
         self.bit: int = bit
@@ -426,6 +435,7 @@ class BitfieldEntry:
             self.factory = factory
         self.action: _ActionLike | None = action
         self.low_mask: int = (1 << self.width) - 1
+        self.signed: bool = signed
 
     @staticmethod
     def new_action(action: _ActionLike) -> "BitfieldEntry":
@@ -794,7 +804,11 @@ class Bitfield(Struct[_VT]):
             )
 
         entry = BitfieldEntry(
-            self._bit_pos, width, name, factory or BitfieldValueFactory(typeof(field))
+            self._bit_pos,
+            width,
+            name,
+            factory or BitfieldValueFactory(typeof(field)),
+            signed=issigned(field.struct),
         )
         if not self._process_options(options, entry):
             group = self._current_group
@@ -1060,7 +1074,8 @@ class Bitfield(Struct[_VT]):
                     value = (raw_value >> entry.shift(group.bit_count)) & entry.low_mask
                     if entry.factory:
                         value = entry.factory.from_int(value)
-
+                    if entry.signed and value >= 1 << (entry.width - 1):
+                        value -= 1 << entry.width
                     init_data[entry.name] = value
 
         return self.model(**init_data)  # pyright: ignore[reportCallIssue]
@@ -1105,7 +1120,21 @@ class Bitfield(Struct[_VT]):
                     if entry.factory:
                         entry_value = entry.factory.to_int(entry_value)
 
-                    # silently ignore invalid values
+                    if entry.signed:
+                        limit = 1 << (entry.width - 1)
+                        if entry_value < -limit or entry_value >= limit:
+                            raise ValidationError(
+                                f"Signed bitfield value {entry_value!r} does not fit "
+                                + f"in {entry.width} bits",
+                                context,
+                            )
+                    elif entry_value < 0 or entry_value > entry.low_mask:
+                        raise ValidationError(
+                            f"Bitfield value {entry_value!r} does not fit "
+                            + f"in {entry.width} bits",
+                            context,
+                        )
+
                     value |= (entry_value & entry.low_mask) << entry.shift(
                         group.bit_count
                     )

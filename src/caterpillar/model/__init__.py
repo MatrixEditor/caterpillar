@@ -12,7 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-from ._base import Sequence
+from ._base import RemoveField, Sequence
 from ._struct import (
     Struct,
     struct,
@@ -51,6 +51,7 @@ from .provider import (
 
 __all__ = [
     "Sequence",
+    "RemoveField",
     "Struct",
     "struct",
     "UnionHook",
