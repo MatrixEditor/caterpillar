@@ -13,8 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from typing import Any, Final, Generic, TypeVar
-from typing_extensions import override
+from typing import Any, Final, Generic
+from typing_extensions import override, TypeVar
 
 from caterpillar.byteorder import Arch
 from caterpillar.exception import DelegationError, StructException
@@ -29,7 +29,7 @@ from .common import uint16, uint24, uint32, uint64, uint8
 from .common import int16, int32, int64, int24, int8
 from .common import UInt, Int
 
-_PtrValueT = TypeVar("_PtrValueT")
+_PtrValueT = TypeVar("_PtrValueT", default=None)
 
 
 PTR_STRICT: Flag[None] = Flag("pointer.strict-mode")
@@ -68,7 +68,7 @@ class Pointer(FieldStruct[int, pointer[_PtrValueT]]):
     def __init__(
         self,
         struct: _StructLike[int, int] | _ContextLambda[_StructLike[int, int]],
-        model: _StructLike[_PtrValueT, _PtrValueT] | None = None,
+        model: _StructLike[_PtrValueT, _PtrValueT] | type[_PtrValueT] | None = None,
     ) -> None:
         self.struct: _StructLike[int, int] | _ContextLambda[_StructLike[int, int]] = (
             struct
@@ -170,7 +170,30 @@ class Pointer(FieldStruct[int, pointer[_PtrValueT]]):
             struct = self.struct(context)  # pyright: ignore[reportCallIssue]
 
         with WithoutContextVar(context, CTX_SEQ, False):
-            struct.__pack__(int(obj), context)
+            value = int(obj)
+            model_obj = None
+            if self.model is not None and value != 0:
+                model_obj = getattr(obj, "obj", None)
+                if model_obj is not None:
+                    stream: _StreamType = context[CTX_STREAM]  # pyright: ignore[reportAny]
+                    start = stream.tell()
+
+            struct.__pack__(value, context)
+            if model_obj is None:
+                return
+
+            fallback = stream.tell()
+            offset = self._to_offset(value, start, context)
+            try:
+                stream.seek(offset)
+            except (OSError, ValueError) as exc:
+                raise StructException(
+                    "Could not seek to pointer target!", context
+                ) from exc
+            try:
+                self.model.__pack__(model_obj, context)
+            finally:
+                stream.seek(fallback)
 
     def _to_offset(self, value: int, start: int, context: _ContextLike) -> int:
         """
@@ -232,7 +255,10 @@ def uintptr_fn(context: _ContextLike) -> _StructLike[int, int]:
     :return: The struct to use.
     :rtype: _StructLike
     """
-    arch: Arch = context._root.get(CTX_ARCH, context[CTX_FIELD].arch)
+    field = context[CTX_FIELD]
+    arch: Arch = (
+        field.arch if field.has_arch() else context._root.get(CTX_ARCH, field.arch)
+    )
     return UNSIGNED_POINTER_TYS.get(arch.ptr_size, UInt(arch.ptr_size))
 
 
@@ -245,7 +271,10 @@ def intptr_fn(context: _ContextLike) -> _StructLike[int, int]:
     :return: The struct to use.
     :rtype: _StructLike
     """
-    arch: Arch = context._root.get(CTX_ARCH, context[CTX_FIELD].arch)
+    field = context[CTX_FIELD]
+    arch: Arch = (
+        field.arch if field.has_arch() else context._root.get(CTX_ARCH, field.arch)
+    )
     return SIGNED_POINTER_TYS.get(arch.ptr_size, Int(arch.ptr_size))
 
 

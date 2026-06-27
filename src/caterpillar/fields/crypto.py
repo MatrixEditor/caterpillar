@@ -165,7 +165,10 @@ class Encrypted(Memory):
         :return: An instance of the specified type.
         :rtype: Any
         """
-        if isinstance(field, type_) or not field:
+        if not field:
+            return field
+
+        if not isinstance(field, type) and isinstance(field, type_):
             return field
 
         if isinstance(args, dict):
