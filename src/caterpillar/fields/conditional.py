@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # pyright: reportPrivateUsage=false
 from types import TracebackType
-from typing import Any
+from typing import Annotated, Any, get_args, get_origin
 from typing_extensions import override, Self
 
 from caterpillar.context import ConditionContext
@@ -168,6 +168,12 @@ class ElseIf(ConditionContext):
         for name in set(annotations) & set(self.namelist):
             new_field = annotations[name]
             field: _StructLike = self.annotations[name]  # pyright: ignore[reportAny]
+            is_annotated = get_origin(field) is Annotated
+            if is_annotated:
+                # annotated_type = field.__origin__
+                # field, *extra_options = field.__metadata__
+                _, field, *_ = get_args(field)
+
             if field is not new_field:
                 # We can assume that the old field is already an instance
                 # of Field, otherwise it would have been defined outside

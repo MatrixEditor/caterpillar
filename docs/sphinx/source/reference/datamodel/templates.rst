@@ -50,16 +50,26 @@ variable name from the current module (if :code:`name=...`). In summary, every t
 :meth:`~caterpillar.model.derive` is called, a new class will be created if not already
 defined.
 
-The current implementation will place template information about the current class using
-a special class attribute: :attr:`~class.__template__`.
+The current implementation materializes the class annotations with
+``inspect.get_annotations()`` while the temporary template variables are still
+available. This keeps templates compatible with Python versions that defer
+annotation evaluation. Template information is then stored on the class using a
+special class attribute: :attr:`~class.__template__`.
 
-To support sub-classes of templates, we can declare a derived class as partial:
+To support sub-classes of templates, derive a partial template:
 
 .. code-block:: python
 
     >>> Format32 = derive(FormatTemplate, A=uint32, partial=True)
 
 Again, the resulting class is **not** a struct, but another template class.
+Provided replacements are stored in the new template metadata, while missing
+required variables must still be supplied by a later non-partial
+:func:`~caterpillar.model.derive` call.
+
+The ``name`` parameter controls the generated class name. Passing ``name=...``
+asks Caterpillar to infer the assignment target when possible; otherwise an
+anonymous deterministic name is generated from the replacements.
 
 .. admonition:: Developer's note
 

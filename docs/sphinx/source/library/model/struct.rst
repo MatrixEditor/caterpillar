@@ -48,6 +48,10 @@ Standard Interface
 Struct Mixins
 -------------
 
+.. autoclass:: caterpillar.model.RemoveField
+
+    .. versionadded:: 2.8.2
+
 .. autofunction:: caterpillar.model.Invisible
 
 .. autoclass:: caterpillar.model.StructDefMixin

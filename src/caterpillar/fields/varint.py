@@ -16,7 +16,11 @@ from __future__ import annotations
 import typing
 from typing_extensions import override
 
-from caterpillar.exception import InvalidValueError, DynamicSizeError, StreamError
+from caterpillar.exception import (
+    InvalidValueError,
+    DynamicSizeError,
+    StreamError,
+)
 from caterpillar.byteorder import (
     O_DEFAULT_ENDIAN,
     LittleEndian,
@@ -128,7 +132,13 @@ class VarInt(FieldStruct[int, int]):
         data: list[int] = []
         _, lb = self.bit_config(context)
         shift = 0
-        is_little: bool = context[CTX_FIELD].order.ch == LITTLE_ENDIAN_FMT
+        field: "Field" = context.get(CTX_FIELD)
+        order: _EndianLike = (
+            field.order
+            if field
+            else (self.__byteorder__ or O_DEFAULT_ENDIAN.value or LittleEndian)
+        )
+        is_little: bool = order.ch == LITTLE_ENDIAN_FMT
 
         while True:
             # Note tha unpack operation here to retrieve one byte only
@@ -148,6 +158,7 @@ class VarInt(FieldStruct[int, int]):
         # b'\xa0\xb0\xc0\xd0' BE : [0xA0, 0xB0, 0xC0, 0xD0] << reverse that
         if not is_little:
             data.reverse()
+
         value = 0
         for number in data:
             value |= number << shift

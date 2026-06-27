@@ -1,5 +1,7 @@
 import enum
 
+import pytest
+
 from caterpillar.model import (
     Bitfield,
     bitfield,
@@ -15,6 +17,7 @@ from caterpillar.options import (
     S_REPLACE_TYPES,
 )
 from caterpillar.fields import uint16, Bytes, uint8
+from caterpillar.py import BigEndian, LittleEndian, ValidationError, int8
 from caterpillar.shared import getstruct
 from caterpillar.shortcuts import f
 from caterpillar.types import (
@@ -190,3 +193,114 @@ def test_bitfield__pack():
     obj = FormatA(a1=True, a2=3, a3=5, b1=0xFF00)
     # 0b1_11_101_00.to_bytes()
     assert pack(obj) == b"\xf4" + b"\x00\xff"
+
+
+# --------------------------------------------------------------------------- #
+# cross-byte packing and byte order
+# --------------------------------------------------------------------------- #
+def test_big_endian_bitfield_packs_msb_first():
+    @bitfield(order=BigEndian)
+    class Cross:
+        a: f[int, 5]
+        b: f[int, 7]
+
+    obj = Cross(0b10101, 0b1100110)
+
+    assert sizeof(Cross) == 2
+    assert pack(obj) == bytes.fromhex("ae60")
+    assert unpack(Cross, bytes.fromhex("ae60")) == obj
+
+
+def test_little_endian_bitfield_reverses_storage_bytes_not_field_order():
+    @bitfield(order=LittleEndian)
+    class Cross:
+        a: f[int, 5]
+        b: f[int, 7]
+
+    obj = Cross(0b10101, 0b1100110)
+
+    assert sizeof(Cross) == 2
+    assert pack(obj) == bytes.fromhex("60ae")
+    assert unpack(Cross, bytes.fromhex("60ae")) == obj
+
+
+# --------------------------------------------------------------------------- #
+# alignment and trailing bits
+# --------------------------------------------------------------------------- #
+def test_trailing_bits_are_zero_padded():
+    @bitfield(order=BigEndian)
+    class Partial:
+        value: f[int, 3]
+
+    assert sizeof(Partial) == 1
+    assert pack(Partial(0b101)) == b"\xa0"
+    assert unpack(Partial, b"\xa0") == Partial(0b101)
+
+
+def test_alignment_for_sixteen_bit_group():
+    @bitfield(order=BigEndian)
+    class Aligned:
+        a: f[int, 3]
+        _: f[None, (0, SetAlignment(16))] = Invisible()
+        b: f[int, 10]
+
+    obj = Aligned(a=0b101, b=0x2AA)
+
+    assert [group.bit_count for group in getstruct(Aligned).groups] == [8, 16]
+    assert sizeof(Aligned) == 3
+    assert pack(obj) == bytes.fromhex("a0aa80")
+    assert unpack(Aligned, bytes.fromhex("a0aa80")) == obj
+
+
+def test_end_group_starts_new_aligned_byte_group():
+    @bitfield(order=BigEndian)
+    class Groups:
+        a: f[int, (4, EndGroup)]
+        b: f[int, 4]
+
+    obj = Groups(0xA, 0xB)
+
+    assert [group.bit_count for group in getstruct(Groups).groups] == [8, 8]
+    assert pack(obj) == bytes.fromhex("a0b0")
+    assert unpack(Groups, bytes.fromhex("a0b0")) == obj
+
+
+# --------------------------------------------------------------------------- #
+# factories
+# --------------------------------------------------------------------------- #
+def test_bitfield_enum_and_char_factories():
+    class Mode(enum.IntEnum):
+        ZERO = 0
+        ONE = 1
+        TWO = 2
+
+    @bitfield(order=BigEndian)
+    class Factories:
+        ch: f[str, (8, CharFactory)]
+        mode: f[Mode, (2, Mode)]
+
+    obj = Factories("A", Mode.TWO)
+    parsed = unpack(Factories, bytes.fromhex("4180"))
+
+    assert pack(obj) == bytes.fromhex("4180")
+    assert parsed == obj
+    assert parsed.mode is Mode.TWO
+    assert parsed.ch == "A"
+
+
+def test_signed_bitfield_unpack_sign_extends_from_declared_width():
+    @bitfield(order=BigEndian)
+    class Signed:
+        value: f[int, 3 - int8]
+
+    assert unpack(Signed, b"\xe0") == Signed(-1)
+    assert pack(Signed(-1)) == b"\xe0"
+
+
+def test_over_wide_value_raises():
+    @bitfield(order=BigEndian)
+    class Narrow:
+        value: f[int, 3]
+
+    with pytest.raises((OverflowError, ValueError, ValidationError)):
+        pack(Narrow(0b1000))

@@ -27,6 +27,7 @@ from caterpillar.context import (
     CTX_SEQ,
     O_CONTEXT_FACTORY,
     Context,
+    CTX_ROOT,
 )
 from caterpillar.exception import StructException, ValidationError
 from caterpillar.options import (
@@ -75,6 +76,16 @@ class _Member:
         self.is_action: bool = is_action
         self.action_unpack: _ContextLambda[None] | None = getattr(field, ATTR_ACTION_UNPACK, None)
         self.action_pack: _ContextLambda[None] | None = getattr(field, ATTR_ACTION_PACK, None)
+        self.path_suffix: str = f".{self.name}"
+
+    def clone(self) -> "_Member":
+        field: Field = self.field if self.is_action else _clone_field(self.field)
+        return _Member(
+            self.name,
+            field,
+            include=self.include,
+            is_action=self.is_action,
+        )
 
     @override
     def __repr__(self) -> str:
@@ -86,6 +97,29 @@ class _Member:
     @override
     def __eq__(self, value: object, /) -> bool:
         return self.field == value or value == self.name
+
+
+class RemoveField:
+    """Marker annotation used by struct subclasses to remove inherited fields."""
+
+
+def _clone_field(field: Field) -> Field:
+    cloned = Field(
+        field.struct,
+        order=field.order if field.has_order() else None,
+        offset=field.offset,
+        flags=set(field.flags),
+        amount=field.amount,
+        options=field.options,
+        condition=field.condition,
+        arch=field.arch if field.has_arch() else None,
+        default=field.default,
+        bits=field.bits,
+    )
+    name = getattr(field, "__name__", None)
+    if name is not None:
+        setattr(cloned, "__name__", name)
+    return cloned
 
 
 _SeqModelT = TypeVar("_SeqModelT", default=dict[str, Any])
@@ -138,16 +172,38 @@ class Sequence(Generic[_SeqModelT, _SeqIT, _SeqOT], FieldMixin[_SeqIT, _SeqOT]):
         # Process all fields in the model
         self._process_model()
 
+    def _insert_member(self, member: _Member, replace: bool = False) -> None:
+        if member.is_action:
+            self.fields.append(member)
+            return
+
+        for i, existing in enumerate(self.fields):
+            if not existing.is_action and existing.name == member.name:
+                if replace:
+                    self.fields[i] = member
+                    if member.include:
+                        self._members[member.name] = member.field
+                    else:
+                        _ = self._members.pop(member.name, None)
+                return
+
+        self.fields.append(member)
+        if member.include:
+            self._members[member.name] = member.field
+
+    def _import_members(
+        self,
+        sequence: "Sequence[Any, Any, Any]",
+        *,
+        replace: bool = False,
+        clone: bool = False,
+    ) -> None:
+        for member in sequence.fields:
+            self._insert_member(member.clone() if clone else member, replace=replace)
+
     def __add__(self, sequence: "Sequence[Any, Any, Any]") -> Self:
         # We will try to import all fields from the given sequence
-        for member in sequence.fields:
-            # Ignore duplicates here:
-            if member.name in self.fields:
-                continue
-
-            self.fields.append(member)
-            if member.include and not member.is_action:
-                self._members[member.name] = member.field
+        self._import_members(sequence)
         return self
 
     def __sub__(self, sequence: "Sequence") -> Self:
@@ -160,6 +216,43 @@ class Sequence(Generic[_SeqModelT, _SeqIT, _SeqOT], FieldMixin[_SeqIT, _SeqOT]):
 
     __iadd__ = __add__  # pyright: ignore[reportUnannotatedClassAttribute]
     __isub__ = __sub__  # pyright: ignore[reportUnannotatedClassAttribute]
+
+    def _new_empty(self) -> "Sequence[Any, Any, Any]":
+        return Sequence(
+            {},
+            order=self.order,
+            arch=self.arch,
+            options=set(self.options),
+            field_options=set(self.field_options),
+        )
+
+    def merged(
+        self, *sequences: "Sequence[Any, Any, Any]"
+    ) -> "Sequence[Any, Any, Any]":
+        result = self._new_empty()
+        result._import_members(self, clone=True)
+        for sequence in sequences:
+            result._import_members(sequence, replace=True, clone=True)
+        result.model = {
+            member.name: member.field
+            for member in result.fields
+            if member.include and not member.is_action
+        }
+        return result
+
+    def without(
+        self, *sequences: "Sequence[Any, Any, Any]"
+    ) -> "Sequence[Any, Any, Any]":
+        result = self._new_empty()
+        result._import_members(self, clone=True)
+        for sequence in sequences:
+            result -= sequence
+        result.model = {
+            member.name: member.field
+            for member in result.fields
+            if member.include and not member.is_action
+        }
+        return result
 
     def __type__(self) -> type:
         return dict
@@ -233,12 +326,27 @@ class Sequence(Generic[_SeqModelT, _SeqIT, _SeqOT], FieldMixin[_SeqIT, _SeqOT]):
         """
         removables: list[str] = []
         annotations = self._prepare_fields()
-        had_default = False
+        had_default = any(
+            member.include
+            and not member.is_action
+            and member.field.default != INVALID_DEFAULT
+            for member in self.fields
+        )
         for name, annotation in annotations.items():
             annotated_type: type | None = None
             extra_options: Iterable[_ExtraOptionT] = []
             if get_origin(annotation) is Annotated:
                 annotated_type, annotation, *extra_options = get_args(annotation)
+
+            if annotation is RemoveField or isinstance(annotation, RemoveField):
+                _ = self._members.pop(name, None)
+                self.fields = [
+                    member
+                    for member in self.fields
+                    if member.is_action or member.name != name
+                ]
+                removables.append(name)
+                continue
 
             if Action.is_action(annotation):
                 self.add_action(annotation)
@@ -382,30 +490,40 @@ class Sequence(Generic[_SeqModelT, _SeqIT, _SeqOT], FieldMixin[_SeqIT, _SeqOT]):
         :param context: The context of the struct.
         :return: The size of the struct.
         """
-        sizes: list[int] = []
         base_path: str = context[CTX_PATH]
+        total = 0
+        max_size = 0
         for member in self.fields:
             if member.is_action:
                 continue
             field = member.field
             context[CTX_PATH] = f"{base_path}.{member.name}"
-            sizes.append(field.__size__(context))
+            size = field.__size__(context)
+            if self.is_union:
+                if size > max_size:
+                    max_size = size
+            else:
+                total += size
 
-        return max(sizes) if self.is_union else sum(sizes)
+        context[CTX_PATH] = base_path
+        return max_size if self.is_union else total
 
     def unpack_one(self, context: _ContextLike) -> _SeqOT:
         # At first, we define the object context where the parsed values
         # will be stored
         factory = O_CONTEXT_FACTORY.value or Context
+        fields = self.fields
+        ctx_path = CTX_PATH
+        ctx_object = CTX_OBJECT
         init_data = factory()
-        context[CTX_OBJECT] = factory(_parent=context)
-        base_path: str = context[CTX_PATH]
+        context[ctx_object] = factory(_parent=context)
+        base_path: str = context[ctx_path]
         stream: _StreamType = context[CTX_STREAM]
         start = pos = max_size = 0
         if self.is_union:
             start: int = stream.tell()
 
-        for member in self.fields:
+        for member in fields:
             if member.is_action:
                 if member.action_unpack:
                     member.action_unpack(context)
@@ -417,10 +535,10 @@ class Sequence(Generic[_SeqModelT, _SeqIT, _SeqOT], FieldMixin[_SeqIT, _SeqOT]):
             # REVISIT: make this a real attribute
             name = member.name
             # The context path has to be changed accordingly
-            context[CTX_PATH] = f"{base_path}.{name}"
+            context[ctx_path] = base_path + member.path_suffix
             result = member.field.__unpack__(context)
             # the object's data shouldn't include removed fields
-            context[CTX_OBJECT][name] = result
+            context[ctx_object][name] = result
             if member.include:
                 init_data[name] = result
 
@@ -433,6 +551,7 @@ class Sequence(Generic[_SeqModelT, _SeqIT, _SeqOT], FieldMixin[_SeqIT, _SeqOT]):
         if self.is_union:
             # Reset the stream position
             stream.seek(start + max_size)
+        context[ctx_path] = base_path
         return obj  # pyright: ignore[reportReturnType]
 
     def __unpack__(self, context: _ContextLike) -> _SeqOT:
@@ -446,7 +565,7 @@ class Sequence(Generic[_SeqModelT, _SeqIT, _SeqOT], FieldMixin[_SeqIT, _SeqOT]):
         base_path: str = context[CTX_PATH]
         # REVISIT: the name 'this_context' is misleading here
         this_context = (O_CONTEXT_FACTORY.value or Context)(
-            _root=context._root,
+            _root=context.get(CTX_ROOT, context),
             _parent=context,
             _io=context[CTX_STREAM],
             _path=base_path,
@@ -454,20 +573,27 @@ class Sequence(Generic[_SeqModelT, _SeqIT, _SeqOT], FieldMixin[_SeqIT, _SeqOT]):
         # See __pack__ for more information
         field = context.get("_field")
         if field and context[CTX_SEQ]:
-            return unpack_seq(
-                context, self.unpack_one
-            )  # pyright: ignore[reportReturnType]
+            return unpack_seq(context, self.unpack_one)  # pyright: ignore[reportReturnType]
         return self.unpack_one(this_context)
 
     def get_value(self, obj: _SeqIT, name: str, field: Field) -> Any | None:
-        return obj.get(name, None)
+        value = obj.get(name, INVALID_DEFAULT)
+        if value is INVALID_DEFAULT:
+            if field is not None and field.default is not INVALID_DEFAULT:
+                return field.default
+            if field is not None and field._has_cond:
+                return None
+            raise KeyError(f"missing required key {name!r} for packing")
+        return value
 
     def pack_one(self, obj: _SeqIT, context: _ContextLike) -> None:
         max_size = 0
         union_field = None
+        fields = self.fields
         base_path: str = context[CTX_PATH]
+        ctx_path = CTX_PATH
 
-        for member in self.fields:
+        for member in fields:
             if member.is_action:
                 if member.action_pack:
                     member.action_pack(context)
@@ -484,7 +610,7 @@ class Sequence(Generic[_SeqModelT, _SeqIT, _SeqOT], FieldMixin[_SeqIT, _SeqOT]):
                     union_field = field
             else:
                 # Default behaviour: let the field write its content to the stream.
-                context[CTX_PATH] = f"{base_path}.{name}"
+                context[ctx_path] = base_path + member.path_suffix
                 if member.include:
                     value = self.get_value(obj, name, field)
                 else:
@@ -500,10 +626,11 @@ class Sequence(Generic[_SeqModelT, _SeqIT, _SeqOT], FieldMixin[_SeqIT, _SeqOT]):
                 )
 
             name = union_field.get_name()
-            context[CTX_PATH] = ".".join([base_path, "<value>"])
+            context[ctx_path] = ".".join([base_path, "<value>"])
             # REVISIT: are constant values allowed here? + name validation?
             value = self.get_value(obj, name, union_field)
             union_field.__pack__(value, context)
+        context[ctx_path] = base_path
 
     def __pack__(self, obj: _SeqIT, context: _ContextLike) -> None:
         # As structs can be used in field definitions a field will call this struct
@@ -514,7 +641,7 @@ class Sequence(Generic[_SeqModelT, _SeqIT, _SeqOT], FieldMixin[_SeqIT, _SeqOT]):
             pack_seq(obj, context, self.pack_one)
         else:
             ctx = (O_CONTEXT_FACTORY.value or Context)(
-                _root=context._root,
+                _root=context.get(CTX_ROOT, context),
                 _parent=context,
                 _io=context[CTX_STREAM],
                 _path=context[CTX_PATH],

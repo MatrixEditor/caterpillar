@@ -250,24 +250,25 @@ Processing Rules
 Based on the previously defined syntax, some processing constraints were derived:
 
 - Rule 1.:
-    - Default alignment is 1 byte (8 bits).
+    - Default alignment is :data:`~caterpillar.model.DEFAULT_ALIGNMENT` bits
+      (8 bits).
     - Zero (``0``) bits are prohibited.
     - If followed by a (2) declaration, the remaining bits in the current byte are padded.
     - If a ``<field>`` is provided:
-        - typeof(``<field>``) is used to infer the factory.
-        - :func:`~caterpillar.model.getbits` and :func:`~cateprillar.model.sizeof` determine the field's alignment.
-    - If a custom alignment is configured in the Bitfield constructor, inferred alignment is ignored unless the field includes the :attr:`~cateprillar.options.B_OVERWRITE_ALIGNMENT` option.
-    - If the :attr:`~cateprillar.options.B_GROUP_END` option is set, the current group is finalized and a new one is started.
+        - :func:`~caterpillar.shared.typeof` is used to infer the factory.
+        - :func:`~caterpillar.model.getbits` and :func:`~caterpillar.model.sizeof` determine the field's alignment.
+    - If a custom alignment is configured in the Bitfield constructor, inferred alignment is ignored unless the field includes the :data:`~caterpillar.options.B_OVERWRITE_ALIGNMENT` option.
+    - If the :data:`~caterpillar.options.B_GROUP_END` option is set, the current group is finalized and a new one is started.
 
 - Rule 2.:
     - This rule forces alignment to the next byte boundary.
     - The field is ignored during final class generation (name is discarded).
-    - The current group is finalized unless the bitfield is configured with :attr:`~caterpillar.options.B_GROUP_KEEP`
+    - The current group is finalized unless the bitfield is configured with :data:`~caterpillar.options.B_GROUP_KEEP`.
 
 - Rule 3.:
     - Equivalent to struct-like class field definitions.
     - Automatically implies a rule 2 alignment.
-    - Always finalizes the current group regardless of :attr:`~caterpillar.options.B_GROUP_KEEP`.
+    - Always finalizes the current group regardless of :data:`~caterpillar.options.B_GROUP_KEEP`.
 
 - Rule 4.:
     - Extension of (1).
@@ -280,7 +281,38 @@ Based on the previously defined syntax, some processing constraints were derived
     - Builds upon (4) with support for options.
     - Options can be passed as a list or single element.
     - Supported Options:
-        - :attr:`~caterpillar.model.NewGroup`: Aligns the current group, starts a new one, and adds the entry to it.
-        - :attr:`~caterpillar.model.EndGroup`: Adds the entry to the current group, then aligns it.
-        - :class:`SetAlignment`: Changes the current working alignment.
+        - :data:`~caterpillar.model.NewGroup`: Aligns the current group, starts a new one, and adds the entry to it.
+        - :data:`~caterpillar.model.EndGroup`: Adds the entry to the current group, then aligns it.
+        - :class:`~caterpillar.model.SetAlignment`: Changes the current working alignment in bits.
     - Note: Option order affects behavior and must be considered carefully.
+
+Helper functions and alignment
+------------------------------
+
+.. function:: getbits(obj)
+    :no-index:
+
+    Returns the bit width declared by ``obj.__bits__``. ``__bits__`` may be an
+    integer attribute or a zero-argument callable.
+
+.. function:: issigned(obj)
+    :no-index:
+
+    Returns whether ``obj`` declares signed integer semantics with
+    ``__signed__``.
+
+.. data:: DEFAULT_ALIGNMENT
+
+    Default bitfield group alignment in bits. The current default is ``8``.
+
+.. class:: SetAlignment(new_alignment)
+
+    Updates the current working bit alignment for subsequent bitfield entries
+    or groups. ``new_alignment`` is expressed in bits.
+
+    Use :meth:`SetAlignment.flag` when an option must be attached to a field
+    with the normal field flag syntax:
+
+    .. code-block:: python
+
+        field = 5 - uint32 | SetAlignment.flag(32)

@@ -59,7 +59,7 @@ from caterpillar.byteorder import (
     LittleEndian,
 )
 from caterpillar import registry
-from caterpillar._common import WithoutContextVar
+from caterpillar._common import WithoutContextVar, read_exact
 from caterpillar.shared import getstruct, typeof
 
 from ._base import Field, INVALID_DEFAULT, singleton
@@ -70,6 +70,7 @@ warnings.filterwarnings("default", category=DeprecationWarning, module=__name__)
 
 ENUM_STRICT: Flag[None] = Flag("enum.strict")
 
+_NATIVE_ONLY_FORMATS: Final[frozenset[str]] = frozenset({"n", "N", "P"})
 
 class PyStructFormattedField(FieldStruct[_IT, _IT]):
     """
@@ -89,11 +90,13 @@ class PyStructFormattedField(FieldStruct[_IT, _IT]):
     :param type_: The Python type that corresponds to the format character.
     """
 
-    __slots__: tuple[str, ...] = ("text", "ty")
+    __slots__: tuple[str, ...] = ("text", "ty", "_cache")
 
     def __init__(self, ch: str, type_: type) -> None:
         self.text: str = ch
         self.ty: type[_IT] = type_
+        # tiny hack to reduce some PyStruct.Struct instantiations
+        self._cache: dict[str, PyStruct.Struct] = {}
         self.__bits__: int = PyStruct.calcsize(self.text) * 8
         self.__byteorder__: _EndianLike | None = None
         if self.text == "x":
@@ -110,6 +113,17 @@ class PyStructFormattedField(FieldStruct[_IT, _IT]):
         :rtype: str
         """
         return self.text
+
+    def _cached(self, order_ch: str, count: int | None = None) -> PyStruct.Struct:
+        if self.text in _NATIVE_ONLY_FORMATS:
+            order_ch = "@"
+
+        fmt = f"{order_ch}{'' if count is None else count}{self.text}"
+        struct_ = self._cache.get(fmt)
+        if struct_ is None:
+            struct_ = PyStruct.Struct(fmt)
+            self._cache[fmt] = struct_
+        return struct_
 
     @override
     def __repr__(self) -> str:
@@ -158,8 +172,7 @@ class PyStructFormattedField(FieldStruct[_IT, _IT]):
             if field
             else (self.__byteorder__ or O_DEFAULT_ENDIAN.value or LittleEndian).ch
         )
-        fmt = f"{order_ch}{self.text}"
-        context[CTX_STREAM].write(PyStruct.pack(fmt, obj))
+        context[CTX_STREAM].write(self._cached(order_ch).pack(obj))
 
     @override
     def pack_seq(self, seq: Collection[_IT], context: _ContextLike) -> None:
@@ -180,7 +193,7 @@ class PyStructFormattedField(FieldStruct[_IT, _IT]):
             # just pack directly
             # WE LOSE SIZE CHECKING HERE!
             ch = (self.__byteorder__ or O_DEFAULT_ENDIAN.value or LittleEndian).ch
-            fmt = f"{ch}{target_length}{self.text}"
+            struct_ = self._cached(ch, target_length)
         else:
             length = field.length(context)
             if type(length) is _PrefixedType:
@@ -194,9 +207,9 @@ class PyStructFormattedField(FieldStruct[_IT, _IT]):
                         + f"{target_length} elements were provided!"
                     )
 
-            fmt = f"{field.order.ch}{target_length}{self.text}"
+            struct_ = self._cached(field.order.ch, target_length)
 
-        context[CTX_STREAM].write(PyStruct.pack(fmt, *seq))
+        context[CTX_STREAM].write(struct_.pack(*seq))
 
     @override
     def unpack_single(self, context: _ContextLike):
@@ -212,8 +225,8 @@ class PyStructFormattedField(FieldStruct[_IT, _IT]):
             if field
             else (self.__byteorder__ or O_DEFAULT_ENDIAN.value or LittleEndian).ch
         )
-        fmt = f"{order_ch}{self.text}"
-        size = self.__bits__ // 8
+        struct_ = self._cached(order_ch)
+        size = struct_.size
         data = context[CTX_STREAM].read(size)
         if len(data) != size:
             raise ValidationError(
@@ -221,7 +234,7 @@ class PyStructFormattedField(FieldStruct[_IT, _IT]):
                 + f"Got {len(data)}",
                 context,
             )
-        (value,) = PyStruct.unpack(fmt, data)
+        (value,) = struct_.unpack(data)
         return value
 
     @override
@@ -241,8 +254,8 @@ class PyStructFormattedField(FieldStruct[_IT, _IT]):
         if length is Ellipsis:
             return super().unpack_seq(context)
 
-        fmt = f"{field.order.ch}{length}{self.text}"
-        size = (self.__bits__ // 8) * length
+        struct_ = self._cached(field.order.ch, length)
+        size = struct_.size
         data = context[CTX_STREAM].read(size)
         if len(data) != size:
             raise ValidationError(
@@ -250,20 +263,21 @@ class PyStructFormattedField(FieldStruct[_IT, _IT]):
                 + f"Got {len(data)}",
                 context,
             )
-        return list(PyStruct.unpack(fmt, data))
+        return list(struct_.unpack(data))
 
 
 # Instances of FormatField with specific format specifiers
-char: Final[PyStructFormattedField[str]] = PyStructFormattedField("c", str)
+char: Final[PyStructFormattedField[bytes]] = PyStructFormattedField("c", type_=bytes)
 """Single byte character field.
 
-Represents exactly one byte and maps it to a Python ``str`` of length 1.
+Represents exactly one byte using Python's ``struct`` ``"c"`` format. Values
+packed with this field must be one-byte ``bytes`` objects.
 
 Usage Example:
-  >>> pack("A", char)
+  >>> pack(b"A", char)
   b"A"
   >>> unpack(char, b"A")
-  'A'
+  b'A'
 """
 
 boolean: Final[PyStructFormattedField[bool]] = PyStructFormattedField("?", bool)
@@ -368,13 +382,13 @@ pssize: Final[PyStructFormattedField[int]] = PyStructFormattedField("n", int)
 Size depends on the native architecture (32-bit or 64-bit).
 
 Usage Example:
-  >>> pack(42, ssize)
+  >>> pack(42, pssize)
   b"..."
-  >>> unpack(ssize, b"...")
+  >>> unpack(pssize, b"...")
   42
 
 .. versionchanged:: 2.8.0
-    renaned from ``size_t`` to `pssize`
+    renamed from ``ssize_t`` to ``pssize``
 """
 
 psize: Final[PyStructFormattedField[int]] = PyStructFormattedField("N", int)
@@ -383,13 +397,13 @@ psize: Final[PyStructFormattedField[int]] = PyStructFormattedField("N", int)
 Size depends on the native architecture (32-bit or 64-bit).
 
 Usage Example:
-  >>> pack(42, size)
+  >>> pack(42, psize)
   b"..."
-  >>> unpack(size, b"...")
+  >>> unpack(psize, b"...")
   42
 
 .. versionchanged:: 2.8.0
-    renaned from ``size_t`` to `psize`
+    renamed from ``size_t`` to ``psize``
 """
 
 float16: Final[PyStructFormattedField[float]] = PyStructFormattedField("e", float)
@@ -479,6 +493,8 @@ class Padding(ByteOrderMixin[None, None]):
                 self.fill: bytes = bytes([fill])
             case Buffer():
                 self.fill = bytes(fill)
+        if not self.fill:
+            raise ValueError("fill pattern must be at least one byte")
 
     def __size__(self, context: _ContextLike) -> int:
         """
@@ -507,8 +523,8 @@ class Padding(ByteOrderMixin[None, None]):
         Consume the padding from the stream and validate it.
 
         The method reads a block of data from the stream.  If a parent
-        field specifies a length, that many bytes are read; otherwise
-        the entire stream is consumed.  When ``strict`` is enabled,
+        field specifies a length, that many fill-pattern repeats are
+        read; otherwise the entire stream is consumed.  When ``strict`` is enabled,
         the read data is validated against the expected padding pattern.
 
         :param context: Context containing the stream and optional field
@@ -519,7 +535,7 @@ class Padding(ByteOrderMixin[None, None]):
             length of the data is not a multiple of the padding length
             or the data does not match the pattern.
         :raises TypeError: If the field length is provided but is not an
-            integer.
+            integer or the greedy sentinel.
         """
         field: Field | None = context.get(CTX_FIELD)
         stream: _StreamType = context[CTX_STREAM]
@@ -529,14 +545,14 @@ class Padding(ByteOrderMixin[None, None]):
             data = stream.read(fill_length)
         else:
             amount = field.length(context)
-            if amount is _GreedyType:
+            if amount is Ellipsis:
                 data = stream.read()
             else:
                 if not isinstance(amount, int):
                     raise TypeError(
                         "Invalid length type - prefixed length is not supported"
                     )
-                data = stream.read(amount)
+                data = stream.read(amount * fill_length)
         if self.strict:
             if len(data) % fill_length != 0:
                 raise ValidationError(
@@ -645,7 +661,9 @@ class Transformer(
         return self.struct.__size__(context)
 
     def encode(
-        self, obj: _IT, context: _ContextLike  # pyright: ignore[reportUnusedParameter]
+        self,
+        obj: _IT,
+        context: _ContextLike,  # pyright: ignore[reportUnusedParameter]
     ) -> _IT_transformed:
         """
         Encode data using the wrapped _StructLike object.
@@ -850,10 +868,7 @@ class Enum(Generic[_EnumT, _IT], Transformer[_EnumT, _IT, _EnumT | _IT, _IT]):
         if not isinstance(obj, _EnumType):
             field: Field = context.get(CTX_FIELD)
             if (field and field.has_flag(ENUM_STRICT)) or self.strict:
-                if field.has_flag(ENUM_STRICT):
-                    raise ValidationError(
-                        f"Expected enum type, got {type(obj)}", context
-                    )
+                raise ValidationError(f"Expected enum type, got {type(obj)}", context)
             return obj  # pyright: ignore[reportReturnType]
 
         return obj.value
@@ -961,10 +976,11 @@ class Memory(Generic[_MemoryIT, _MemoryOT], FieldStruct[_MemoryIT, _MemoryOT]):
                    - Ellipsis (`...`), indicating the length is unspecified and the entire stream should be read.
     """
 
-    __slots__: tuple[str, ...] = ("length",)
+    __slots__: tuple[str, ...] = ("length", "_length_is_lambda")
 
     def __init__(self, length: _ContextLambda[int] | int | _GreedyType) -> None:
         self.length: _ContextLambda[int] | int | _GreedyType = length
+        self._length_is_lambda: bool = callable(length)
 
     def __type__(self) -> type[memoryview]:
         """
@@ -984,9 +1000,7 @@ class Memory(Generic[_MemoryIT, _MemoryOT], FieldStruct[_MemoryIT, _MemoryOT]):
         :param context: The current context.
         :return: The size of the field in bytes, or `Ellipsis` if the length is unspecified.
         """
-        return (
-            self.length(context) if callable(self.length) else self.length
-        )  # pyright: ignore[reportReturnType]
+        return self.length(context) if self._length_is_lambda else self.length
 
     @override
     def pack_single(self, obj: _MemoryIT, context: _ContextLike) -> None:
@@ -1041,9 +1055,10 @@ class Memory(Generic[_MemoryIT, _MemoryOT], FieldStruct[_MemoryIT, _MemoryOT]):
         """
         stream: _StreamType = context[CTX_STREAM]
         size: int | _GreedyType = self.__size__(context)
-        # fmt: off
-        return memoryview(stream.read(size) if size is not Ellipsis else stream.read())  # pyright: ignore[reportReturnType, reportUnnecessaryComparison]
-        # fmt: on
+        if size is Ellipsis:
+            return memoryview(stream.read())
+
+        return memoryview(read_exact(context, size, "Memory field"))  # pyright: ignore[reportReturnType]
 
 
 class Bytes(Memory[bytes, bytes]):
@@ -1135,20 +1150,17 @@ class CString(FieldStruct[str, str]):
     """
     C-style strings (null-terminated or padded).
 
-    This class is designed for handling strings that are padded to a
-    fixed length, typically with zero-padding or any custom padding
-    character. It is useful for encoding and decoding data that follows
-    the C-style string conventions, where strings are often represented
-    by a fixed length, and padding (e.g., null bytes) is used to fill
-    the remaining space.
+    This class handles greedy null-terminated strings and fixed-length strings
+    padded with a single byte. Fixed lengths are measured after encoding, so
+    multibyte characters consume multiple bytes of the configured capacity.
 
     Example usage:
 
-    >>> cstring = CString(10, encoding='utf-8') # encoding is optional
-    >>> pack(cstring, "Hello, World!")
-    b"Hello, World\\x00"
-    >>> unpack(cstring, b"Hello, World\\x00")
-    'Hello, World!'
+    >>> cstring = CString(6, encoding="utf-8") # encoding is optional
+    >>> pack("Hello", cstring, as_field=True)
+    b"Hello\\x00"
+    >>> unpack(cstring, b"Hello\\x00", as_field=True)
+    'Hello'
 
     This class also supports direct getitem access to create a list:
 
@@ -1164,7 +1176,13 @@ class CString(FieldStruct[str, str]):
                 defaults to `0` (null byte).
     """
 
-    __slots__: tuple[str, ...] = ("encoding", "pad", "_raw_pad", "_encoding_is_lambda")
+    __slots__: tuple[str, ...] = (
+        "encoding",
+        "pad",
+        "_raw_pad",
+        "_encoding_is_lambda",
+        "_length_is_lambda",
+    )
 
     def __init__(
         self,
@@ -1178,10 +1196,13 @@ class CString(FieldStruct[str, str]):
         :param length: The fixed length or a context lambda to determine the length dynamically.
         :param encoding: The encoding to use for string encoding/decoding (default is UTF-8).
         """
-        self.length: int | _ContextLambda[int] | _GreedyType = length or ...
+        self.length: int | _ContextLambda[int] | _GreedyType = (
+            ... if length is None else length
+        )
         self.encoding: str | _ContextLambda[str] = encoding or "utf-8"
         self.pad: int = 0
         self._encoding_is_lambda: bool = callable(self.encoding)
+        self._length_is_lambda: bool = callable(self.length)
         if isinstance(pad, str):
             if len(pad) != 1:
                 raise ValueError(
@@ -1210,7 +1231,7 @@ class CString(FieldStruct[str, str]):
         :return: The length of the field in bytes.
         """
         # fmt: off
-        return self.length(context) if callable(self.length) else self.length  # pyright: ignore[reportReturnType]
+        return self.length(context) if self._length_is_lambda else self.length  # pyright: ignore[reportReturnType]
 
     def __type__(self) -> type:
         """
@@ -1239,10 +1260,12 @@ class CString(FieldStruct[str, str]):
         stream: _StreamType = context[CTX_STREAM]
         if self.length is not Ellipsis:
             length = self.__size__(context)
-            obj_length = len(obj)
+            obj_length = len(encoded)
             if obj_length > length:
                 raise ValidationError(
                     f"String {obj!r} is too long for the fixed length of {length} bytes."
+                    f" Got {obj_length} bytes.",
+                    context,
                 )
             stream.write(encoded)
             stream.write(self._raw_pad * (length - obj_length))
@@ -1269,12 +1292,27 @@ class CString(FieldStruct[str, str]):
         if self.length is Ellipsis:
             # Parse actual C-String
             stream = context[CTX_STREAM]
-            data = bytearray()
-            while True:
-                value = stream.read(1)
-                if not value or value[0] == self._raw_pad[0]:
-                    break
-                data.extend(value)
+            if getattr(stream, "seekable", lambda: False)():
+                data = bytearray()
+                while True:
+                    chunk = stream.read(256)
+                    if not chunk:
+                        break
+                    index = chunk.find(self._raw_pad)
+                    if index >= 0:
+                        data.extend(chunk[:index])
+                        extra = len(chunk) - index - 1
+                        if extra:
+                            stream.seek(-extra, 1)
+                        break
+                    data.extend(chunk)
+            else:
+                data = bytearray()
+                while True:
+                    value = stream.read(1)
+                    if not value or value[0] == self._raw_pad[0]:
+                        break
+                    data.extend(value)
             value = bytes(data)
         else:
             length = self.__size__(context)
@@ -1325,10 +1363,12 @@ class ConstString(Const[str]):
         if not isinstance(value, str):
             raise TypeError("value must be a string")
 
-        struct = String(len(value), encoding)
+        enc = encoding or "utf-8"
+        nbytes = len(value.encode(enc)) if isinstance(enc, str) else len(value)
+        struct = String(nbytes, encoding)
         super().__init__(value, struct)
         # REVISIT: rework bitfield
-        self.__bits__ = len(value) * 8
+        self.__bits__: int = nbytes * 8
 
 
 @registry.TypeConverter(str)
@@ -1658,13 +1698,25 @@ class Prefixed(Generic[_PrefixIOT], FieldStruct[_PrefixIOT, _PrefixIOT]):
         """
         size = self.prefix.__unpack__(context)
         data = context[CTX_STREAM].read(size)
+        if len(data) != size:
+            raise ValidationError(
+                f"Prefixed announced {size} bytes but only {len(data)} were available",
+                context,
+            )
+
         obj = data
         if self.struct is not None:
+            inner = BytesIO(data)
             with (
-                WithoutContextVar(context, CTX_STREAM, BytesIO(data)),
+                WithoutContextVar(context, CTX_STREAM, inner),
                 WithoutContextVar(context, CTX_SEQ, False),
             ):
                 obj = self.struct.__unpack__(context)
+            if inner.tell() != size:
+                raise ValidationError(
+                    f"Prefixed inner struct consumed {inner.tell()} of {size} bytes",
+                    context,
+                )
         elif self.encoding:
             obj = data.decode(self.encoding)
         return obj
@@ -1681,12 +1733,31 @@ class Int(FieldStruct[int, int]):
     :param signed: Whether the integer is signed (default is True).
     """
 
-    __slots__: tuple[str, ...] = ("signed", "size")
+    __slots__: tuple[str, ...] = (
+        "signed",
+        "size",
+        "mask",
+        "sign_bit",
+        "min_value",
+        "max_value",
+    )
 
     def __init__(self, bits: int, signed: bool = True) -> None:
+        if not isinstance(bits, int):
+            raise TypeError(f"bits must be an integer - got {bits!r}")
+        if bits <= 0:
+            raise ValueError(f"bits must be greater than zero - got {bits!r}")
         self.signed: bool = signed
         self.__bits__: int = bits
-        self.size: int = self.__bits__ // 8
+        self.size: int = (self.__bits__ + 7) // 8
+        self.mask: int = (1 << self.__bits__) - 1
+        self.sign_bit: int = 1 << (self.__bits__ - 1)
+        if signed:
+            self.min_value: int = -self.sign_bit
+            self.max_value: int = self.sign_bit - 1
+        else:
+            self.min_value = 0
+            self.max_value = self.mask
         self.__byteorder__: _EndianLike | None = None
 
     @override
@@ -1733,11 +1804,16 @@ class Int(FieldStruct[int, int]):
             if field
             else (self.__byteorder__ or O_DEFAULT_ENDIAN.value or LittleEndian).ch
         ) == LITTLE_ENDIAN_FMT
+        if obj < self.min_value or obj > self.max_value:
+            raise OverflowError(
+                f"int too big to convert: {obj!r} does not fit in {self.__bits__} bits"
+            )
+        value = obj & self.mask
         context[CTX_STREAM].write(
-            obj.to_bytes(
+            value.to_bytes(
                 length=self.size,
                 byteorder="little" if is_little else "big",
-                signed=self.signed,
+                signed=False,
             )
         )
 
@@ -1760,11 +1836,15 @@ class Int(FieldStruct[int, int]):
             else (self.__byteorder__ or O_DEFAULT_ENDIAN.value or LittleEndian).ch
         ) == LITTLE_ENDIAN_FMT
 
-        return int.from_bytes(
-            context[CTX_STREAM].read(self.size),
+        value = int.from_bytes(
+            read_exact(context, self.size, f"{type(self).__name__}{self.__bits__}"),
             "little" if is_little else "big",
-            signed=self.signed,
+            signed=False,
         )
+        value &= self.mask
+        if self.signed and value & self.sign_bit:
+            value -= self.mask + 1
+        return value
 
 
 class UInt(Int):
@@ -1834,6 +1914,8 @@ class Aligned(FieldStruct[_IT, _OT]):
 
         self.struct: _StructLike[_IT, _OT] = struct
         self.alignment: int | _ContextLambda[int] = alignment
+        if not callable(alignment):
+            _validate_alignment(alignment)
         self._after: bool = after
         self._before: bool = before
         if filler is None:
@@ -1844,9 +1926,7 @@ class Aligned(FieldStruct[_IT, _OT]):
             else:
                 self._filler = filler
 
-        if not isinstance(
-            self._filler, int
-        ):  # pyright: ignore[reportUnnecessaryIsInstance]
+        if not isinstance(self._filler, int) or not 0 <= self._filler <= 255:
             raise ValueError(f"Filler must be a single byte - got {filler!r}")
 
     def __type__(self):
@@ -1871,7 +1951,8 @@ class Aligned(FieldStruct[_IT, _OT]):
             )
 
         struct_size = self.struct.__size__(context)
-        return struct_size + (self.alignment - (struct_size % self.alignment))
+        _validate_alignment(self.alignment)
+        return struct_size + _align_padding(struct_size, self.alignment)
 
     def unpack_alignment(self, context: _ContextLike) -> None:
         """
@@ -1881,15 +1962,11 @@ class Aligned(FieldStruct[_IT, _OT]):
         :raises ValueError: If the padding does not match the expected value.
         """
         value = self.alignment(context) if callable(self.alignment) else self.alignment
-        if not isinstance(value, int):  # pyright: ignore[reportUnnecessaryIsInstance]
-            raise ValueError(f"Alignment must be an integer - got {value!r}")
-
-        if value % 2 != 0:
-            raise ValueError(f"Alignment must be a power of 2 - got {value!r}")
+        _validate_alignment(value)
 
         stream = context[CTX_STREAM]
         pos = stream.tell()
-        size = value - (pos % value)
+        size = _align_padding(pos, value)
         data = stream.read(size)
         if data.count(self._filler) != size:
             raise ValueError(
@@ -1922,8 +1999,9 @@ class Aligned(FieldStruct[_IT, _OT]):
         :param context: The current context.
         """
         value = self.alignment(context) if callable(self.alignment) else self.alignment
+        _validate_alignment(value)
         stream = context[CTX_STREAM]
-        size = value - (stream.tell() % value)
+        size = _align_padding(stream.tell(), value)
         stream.write(bytes([self._filler] * size))
 
     @override
@@ -1969,9 +2047,21 @@ def align(alignment: int | _ContextLambda[int]) -> _ContextLambda[int]:
     def _get_aligned_size(context: _ContextLike):
         pos = context[CTX_STREAM].tell()
         value: int = alignment(context) if callable(alignment) else alignment
-        return value - (pos % value)
+        _validate_alignment(value)
+        return _align_padding(pos, value)
 
     return _get_aligned_size
+
+
+def _validate_alignment(value: int) -> None:
+    if not isinstance(value, int):  # pyright: ignore[reportUnnecessaryIsInstance]
+        raise ValueError(f"Alignment must be an integer - got {value!r}")
+    if value <= 0 or value & (value - 1):
+        raise ValueError(f"Alignment must be a power of 2 - got {value!r}")
+
+
+def _align_padding(pos: int, alignment: int) -> int:
+    return (-pos) % alignment
 
 
 class Lazy(FieldStruct[_IT, _OT]):
@@ -2132,7 +2222,11 @@ class Uuid(FieldStruct[UUID, UUID]):
         :param obj: The `UUID` object to pack.
         :param context: The current context, which includes the stream and byte order.
         """
-        is_le = context[CTX_FIELD].order.ch == LITTLE_ENDIAN_FMT
+        if not isinstance(obj, UUID):
+            obj = UUID(obj)
+        field = context.get(CTX_FIELD)
+        order = field.order if field else (O_DEFAULT_ENDIAN.value or LittleEndian)
+        is_le = order.ch == LITTLE_ENDIAN_FMT
         context[CTX_STREAM].write(obj.bytes_le if is_le else obj.bytes)
 
     @override
@@ -2147,7 +2241,9 @@ class Uuid(FieldStruct[UUID, UUID]):
         :return: The unpacked `UUID` object.
         :rtype: UUID
         """
-        is_le = context[CTX_FIELD].order.ch == LITTLE_ENDIAN_FMT
+        field = context.get(CTX_FIELD)
+        order = field.order if field else (O_DEFAULT_ENDIAN.value or LittleEndian)
+        is_le = order.ch == LITTLE_ENDIAN_FMT
         data = context[CTX_STREAM].read(16)
         return UUID(bytes_le=data) if is_le else UUID(bytes=data)
 
@@ -2207,13 +2303,34 @@ class AsLengthRef:
             return 0
         return self.struct.__bits__()  # pyright: ignore[reportAttributeAccessIssue]
 
+    def _target_field(self, context: _ContextLike) -> Field | None:
+        *parts, target_name = self.target.removeprefix("_obj.").split(".")
+        obj = context.__context_getattr__(".".join(["_obj"] + list(parts)))
+        struct = getstruct(obj, None)
+        members = getattr(struct, "_members", None)
+        if not members:
+            return None
+        return members.get(target_name)
+
+    def _target_length(self, target_obj: Any, context: _ContextLike) -> int:
+        if isinstance(target_obj, str):
+            field = self._target_field(context)
+            target_struct = getattr(field, "struct", None) if field else None
+            if isinstance(target_struct, String):
+                encoding = target_struct.encoding
+                if callable(encoding):
+                    encoding = encoding(context)
+
+                return len(target_obj.encode(encoding))
+        return len(target_obj)
+
     def __pack__(self, obj: None, context: _ContextLike):
         # object is optional
         if self.struct is None:
             raise ValueError("struct is not defined")
 
         target_obj = context.__context_getattr__(self.target)
-        length: int = len(target_obj)
+        length: int = self._target_length(target_obj, context)
         context.__context_setattr__(self.name, length)
         self.struct.__pack__(length, context)
 
@@ -2299,6 +2416,8 @@ class Timestamp(
         :return: Unix timestamp representation of the datetime
         :rtype: _TimestampT
         """
+        if obj.tzinfo is None:
+            obj = obj.replace(tzinfo=datetime.timezone.utc)
         ts = obj.timestamp()
         # fmt: off
         return ts if self.floating_point else int(ts)  # pyright: ignore[reportReturnType]
@@ -2317,4 +2436,6 @@ class Timestamp(
         :return: Reconstructed datetime object
         :rtype: datetime.datetime
         """
-        return datetime.datetime.fromtimestamp(float(parsed), self.tz)
+        tz = self.tz if self.tz is not None else datetime.timezone.utc
+        dt = datetime.datetime.fromtimestamp(float(parsed), tz)
+        return dt if self.tz is not None else dt.replace(tzinfo=None)

@@ -20,7 +20,7 @@ import sys
 import typing
 import warnings
 
-from typing import Annotated, Callable, Any, Generic, Protocol, get_origin
+from typing import Annotated, Callable, Any, Generic, Protocol, get_args, get_origin
 from typing_extensions import Buffer, Final, Literal, Self, Sized, overload, override, TypeVar
 from types import FrameType, TracebackType
 from dataclasses import dataclass
@@ -145,6 +145,15 @@ class Context(dict[str, Any]):
         :return: The value associated with the key.
         """
         nodes = path.split(".")
+        return self.__context_getattr_tokens__(nodes)
+
+    def __context_getattr_tokens__(self, nodes: tuple[str, ...] | list[str]) -> Any:
+        """
+        Retrieves an attribute from pre-tokenized context path nodes.
+
+        :param nodes: The path nodes to resolve.
+        :return: The value associated with the path.
+        """
         obj: Any = (
             self[nodes[0]]
             if nodes[0] in self
@@ -192,9 +201,7 @@ class Context(dict[str, Any]):
     def __getitem__(self, key: Literal["_pos"], /) -> int: ...
     @overload
     def __getitem__(self, key: str, /) -> Any: ...
-    @override
-    def __getitem__(self, key: str, /) -> Any:
-        return super().__getitem__(key)
+    __getitem__ = dict.__getitem__
 
 
 O_CONTEXT_FACTORY: Flag[_ContextFactoryLike] = Flag(
@@ -204,7 +211,7 @@ O_CONTEXT_FACTORY: Flag[_ContextFactoryLike] = Flag(
 """
 Defines the default factory used to instantiate context objects during the
 packing and unpacking process. To use the C-extension :code:`Context`
-implementation for a 10% speed caveat, use:
+implementation for lower context access overhead,, use:
 
 >>> from caterpillar.context import O_CONTEXT_FACTORY
 >>> from caterpillar.c import c_Context
@@ -342,7 +349,7 @@ class ExprMixin:
         return UnaryExpression("pos", operator.pos, self)
 
     def __invert__(self):
-        return UnaryExpression("invert", operator.not_, self)
+        return UnaryExpression("invert", operator.invert, self)
 
     def __contains__(self, other: object) -> BinaryExpression:
         return BinaryExpression(operator.contains, self, other)
@@ -447,8 +454,10 @@ class ConditionContext:
             field: Field | Any = self.annotations[name]
             is_annotated = get_origin(field) is Annotated
             annotated_type = extra_options = None
-            if get_origin(field) is Annotated:
-                annotated_type, field, *extra_options = field
+            if is_annotated:
+                # annotated_type = field.__origin__
+                # field, *extra_options = field.__metadata__
+                annotated_type, field, *extra_options = get_args(field)
 
             if not isinstance(field, Field):
                 # create a field (other attributes will be modified later)
@@ -498,9 +507,13 @@ class BinaryExpression(ExprMixin):
     left: Any | _ContextLambda[Any]
     right: Any | _ContextLambda[Any]
 
+    def __post_init__(self) -> None:
+        self._left_is_lambda: bool = callable(self.left)
+        self._right_is_lambda: bool = callable(self.right)
+
     def __call__(self, context: _ContextLike) -> bool:
-        lhs = self.left(context) if callable(self.left) else self.left
-        rhs = self.right(context) if callable(self.right) else self.right
+        lhs = self.left(context) if self._left_is_lambda else self.left
+        rhs = self.right(context) if self._right_is_lambda else self.right
         return self.operand(lhs, rhs)
 
     @override
@@ -532,8 +545,11 @@ class UnaryExpression:
     operand: Callable[[Any], Any]
     value: Any | _ContextLambda[Any]
 
+    def __post_init__(self) -> None:
+        self._value_is_lambda: bool = callable(self.value)
+
     def __call__(self, context: _ContextLike) -> Any:
-        value = self.value(context) if callable(self.value) else self.value
+        value = self.value(context) if self._value_is_lambda else self.value
         return self.operand(value)
 
     @override
@@ -575,6 +591,7 @@ class ContextPath(Generic[_T], ExprMixin):
         :param path: The path to use when retrieving a value from a Context.
         """
         self.path: str | None = path
+        self._tokens: tuple[str, ...] = tuple(path.split(".")) if path else ()
         self._ops_ = list()
         self.call_kwargs: dict[str, Any] = dict()
         self.getitem_args: list[Any] = list()
@@ -592,17 +609,24 @@ class ContextPath(Generic[_T], ExprMixin):
         #     self._ops_.append((operator.call, [], kwds))
         #     return self
 
-        if self.path is None:  # no path configured, just return the context itself
+        if not self._tokens:  # no path configured, just return the context itself
             return context  # pyright: ignore[reportReturnType]
 
-        value = context.__context_getattr__(self.path)
+        if type(context) is Context:
+            value = context.__context_getattr_tokens__(self._tokens)
+        else:
+            value = context.__context_getattr__(self.path or "")
         for operation, args, kwargs in self._ops_:
             value = operation(value, *args, **kwargs)
         return value
 
     def __getitem__(self, key: Any) -> Self:
-        self._ops_.append((operator.getitem, [key], {}))
-        return self
+        path = ContextPath(self.path)
+        path._ops_ = [(op, list(args), dict(kwargs)) for op, args, kwargs in self._ops_]
+        path._ops_.append((operator.getitem, [key], {}))
+        path.call_kwargs = dict(self.call_kwargs)
+        path.getitem_args = list(self.getitem_args)
+        return path  # pyright: ignore[reportReturnType]
 
     def __type__(self) -> type:
         return object

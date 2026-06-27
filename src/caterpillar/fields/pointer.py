@@ -13,8 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from typing import Any, Final, Generic, TypeVar
-from typing_extensions import override
+from typing import Any, Final, Generic
+from typing_extensions import override, TypeVar
 
 from caterpillar.byteorder import Arch
 from caterpillar.exception import DelegationError, StructException
@@ -29,7 +29,7 @@ from .common import uint16, uint24, uint32, uint64, uint8
 from .common import int16, int32, int64, int24, int8
 from .common import UInt, Int
 
-_PtrValueT = TypeVar("_PtrValueT")
+_PtrValueT = TypeVar("_PtrValueT", default=None)
 
 
 PTR_STRICT: Flag[None] = Flag("pointer.strict-mode")
@@ -54,8 +54,9 @@ class pointer(Generic[_PtrValueT], int):
     def get(self):
         return self.obj
 
+_PtrT = TypeVar('_PtrT', default=pointer)
 
-class Pointer(FieldStruct[int, pointer[_PtrValueT]]):
+class Pointer(Generic[_PtrT, _PtrValueT], FieldStruct[int, _PtrT]):
     """
     A struct that represents a pointer to another struct within the stream.
 
@@ -68,7 +69,7 @@ class Pointer(FieldStruct[int, pointer[_PtrValueT]]):
     def __init__(
         self,
         struct: _StructLike[int, int] | _ContextLambda[_StructLike[int, int]],
-        model: _StructLike[_PtrValueT, _PtrValueT] | None = None,
+        model: _StructLike[_PtrValueT, _PtrValueT] | type[_PtrValueT] | None = None,
     ) -> None:
         self.struct: _StructLike[int, int] | _ContextLambda[_StructLike[int, int]] = (
             struct
@@ -87,7 +88,7 @@ class Pointer(FieldStruct[int, pointer[_PtrValueT]]):
         """
         return self.__class__(self.struct, model)  # pyright: ignore[reportReturnType]
 
-    def __type__(self):
+    def __type__(self) -> type[_PtrT]:
         """
         Get the type associated with the Pointer.
 
@@ -110,7 +111,7 @@ class Pointer(FieldStruct[int, pointer[_PtrValueT]]):
         return struct.__size__(context)
 
     @override
-    def unpack_single(self, context: _ContextLike) -> pointer[_PtrValueT]:
+    def unpack_single(self, context: _ContextLike) -> _PtrT:
         """
         Unpack a single value using the Pointer struct.
 
@@ -132,17 +133,24 @@ class Pointer(FieldStruct[int, pointer[_PtrValueT]]):
             if self.model is None:
                 return self._create(value, start, None, context)
 
-            offset: int = self._to_offset(value, start, context)
+
             model_obj = None
-            if offset != 0:
-                # using an if-statement here reduces time overhead
-                # of this branch
+            # a null pointer (value == 0) is never dereferenced; this also
+            # keeps relative pointers null when their base offset is non-zero
+            if value != 0:
+                offset: int = self._to_offset(value, start, context)
                 fallback: int = stream.tell()
                 try:
                     stream.seek(offset)
+                except (OSError, ValueError) as exc:
+                    raise StructException(
+                        "Could not seek to pointer target!", context
+                    ) from exc
+                try:
                     model_obj = self.model.__unpack__(context)
                 except StructException as exc:
-                    if context[CTX_FIELD].has_flag(PTR_STRICT):
+                    field = context.get(CTX_FIELD)
+                    if field is not None and field.has_flag(PTR_STRICT):
                         raise DelegationError(
                             "Could not parse model!", context
                         ) from exc
@@ -163,7 +171,30 @@ class Pointer(FieldStruct[int, pointer[_PtrValueT]]):
             struct = self.struct(context)  # pyright: ignore[reportCallIssue]
 
         with WithoutContextVar(context, CTX_SEQ, False):
-            struct.__pack__(int(obj), context)
+            value = int(obj)
+            model_obj = None
+            if self.model is not None and value != 0:
+                model_obj = getattr(obj, "obj", None)
+                if model_obj is not None:
+                    stream: _StreamType = context[CTX_STREAM]  # pyright: ignore[reportAny]
+                    start = stream.tell()
+
+            struct.__pack__(value, context)
+            if model_obj is None:
+                return
+
+            fallback = stream.tell()
+            offset = self._to_offset(value, start, context)
+            try:
+                stream.seek(offset)
+            except (OSError, ValueError) as exc:
+                raise StructException(
+                    "Could not seek to pointer target!", context
+                ) from exc
+            try:
+                self.model.__pack__(model_obj, context)
+            finally:
+                stream.seek(fallback)
 
     def _to_offset(self, value: int, start: int, context: _ContextLike) -> int:
         """
@@ -225,7 +256,10 @@ def uintptr_fn(context: _ContextLike) -> _StructLike[int, int]:
     :return: The struct to use.
     :rtype: _StructLike
     """
-    arch: Arch = context._root.get(CTX_ARCH, context[CTX_FIELD].arch)
+    field = context[CTX_FIELD]
+    arch: Arch = (
+        field.arch if field.has_arch() else context._root.get(CTX_ARCH, field.arch)
+    )
     return UNSIGNED_POINTER_TYS.get(arch.ptr_size, UInt(arch.ptr_size))
 
 
@@ -238,7 +272,10 @@ def intptr_fn(context: _ContextLike) -> _StructLike[int, int]:
     :return: The struct to use.
     :rtype: _StructLike
     """
-    arch: Arch = context._root.get(CTX_ARCH, context[CTX_FIELD].arch)
+    field = context[CTX_FIELD]
+    arch: Arch = (
+        field.arch if field.has_arch() else context._root.get(CTX_ARCH, field.arch)
+    )
     return SIGNED_POINTER_TYS.get(arch.ptr_size, Int(arch.ptr_size))
 
 
@@ -268,7 +305,7 @@ class relative_pointer(pointer[_PtrValueT]):
         return self + self.base
 
 
-class RelativePointer(Pointer[_PtrValueT]):
+class RelativePointer(Pointer[relative_pointer[_PtrValueT], _PtrValueT]):
     """
     A struct that represents a relative pointer to another struct within the stream.
     """
@@ -316,7 +353,8 @@ class RelativePointer(Pointer[_PtrValueT]):
         :param context: The context for creation.
         :return: The created relative pointer object.
         """
-        ptr = super()._create(value, start, model_obj, context)
+        ptr: relative_pointer[_PtrValueT] = relative_pointer(value)
+        setattr(ptr, "obj", model_obj)
         setattr(ptr, "base", start)
         return ptr
 

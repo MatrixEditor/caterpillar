@@ -15,8 +15,8 @@
 # pyright: reportPrivateUsage=false, reportAny=false, reportExplicitAny=false
 from io import BytesIO
 from collections.abc import Collection
-from typing import Any, Generic
-from typing_extensions import Buffer, Self, override, TypeVar
+from typing import Any, Generic, get_origin
+from typing_extensions import Self, override, TypeVar
 
 from caterpillar.abc import (
     _StructLike,
@@ -76,7 +76,7 @@ class Field(Generic[_IT, _OT], PackMixin[_IT], UnpackMixin[_OT]):
     :param order: Byte order for the field (default: SysNative).
     :param offset: Field offset or callable (default: -1, meaning no explicit offset).
     :param flags: Optional set of flags associated with the field.
-    :param amount: The number of elements if this field is a sequence (default: 0).
+    :param amount: The number of elements if this field is a sequence.
     :param options: A dictionary representing a switch-case mapping.
     :param condition: A boolean or callable determining whether the field is active.
     :param arch: Architecture specification (default: system_arch).
@@ -90,7 +90,7 @@ class Field(Generic[_IT, _OT], PackMixin[_IT], UnpackMixin[_OT]):
         order: _EndianLike | None = None,
         offset: _ContextLambda[int] | int = -1,
         flags: set[_OptionLike] | None = None,
-        amount: _LengthT = 0,
+        amount: _LengthT | None = None,
         options: _SwitchOptionsT | None = None,
         condition: _ContextLambda[bool] | bool = True,
         arch: _ArchLike | None = None,
@@ -127,7 +127,7 @@ class Field(Generic[_IT, _OT], PackMixin[_IT], UnpackMixin[_OT]):
         self.bits: _ContextLambda[int] | int | None = bits
         self.arch = arch
         self.offset = offset
-        self.amount = amount or None
+        self.amount = amount
         self.options = options
 
         # INVALID_DEFAULT indicates that no default was explicitly set;
@@ -231,7 +231,7 @@ class Field(Generic[_IT, _OT], PackMixin[_IT], UnpackMixin[_OT]):
     def amount(self, value: _LengthT | None):
         self.__amount = value
         self._amount_is_lambda = callable(value)
-        self._is_seq = self._amount_is_lambda or (value not in (0, None))
+        self._is_seq = self._amount_is_lambda or value is not None
 
     @property
     def options(self) -> _SwitchOptionsT | None:
@@ -240,12 +240,15 @@ class Field(Generic[_IT, _OT], PackMixin[_IT], UnpackMixin[_OT]):
 
     @options.setter
     def options(self, value: _SwitchOptionsT | None):
+        if value is not None and not callable(value):
+            value = {
+                key: (getstruct(struct) or struct) for key, struct in value.items()
+            }
+
         self.__options = value
         self._switch_is_lambda = callable(value)
         self._switch_has_default = (
-            bool(value)
-            and not self._switch_is_lambda
-            and DEFAULT_OPTION in value  # pyright: ignore[reportOperatorIssue]
+            bool(value) and not self._switch_is_lambda and DEFAULT_OPTION in value  # pyright: ignore[reportOperatorIssue]
         )
 
     @property
@@ -254,7 +257,8 @@ class Field(Generic[_IT, _OT], PackMixin[_IT], UnpackMixin[_OT]):
 
     @order.setter
     def order(
-        self, value: _EndianLike | None  # pyright: ignore[reportPropertyTypeMismatch]
+        self,
+        value: _EndianLike | None,  # pyright: ignore[reportPropertyTypeMismatch]
     ) -> None:
         self.__order: _EndianLike | None = value
 
@@ -267,12 +271,13 @@ class Field(Generic[_IT, _OT], PackMixin[_IT], UnpackMixin[_OT]):
 
     @arch.setter
     def arch(
-        self, value: _ArchLike | None  # pyright: ignore[reportPropertyTypeMismatch]
+        self,
+        value: _ArchLike | None,  # pyright: ignore[reportPropertyTypeMismatch]
     ) -> None:
         self.__arch = value
 
     def has_arch(self) -> bool:
-        return bool(self.__arch)
+        return self.__arch is not None
 
     def _verify_context_value(
         self, value: object, expected: type | tuple[type, ...]
@@ -461,7 +466,7 @@ class Field(Generic[_IT, _OT], PackMixin[_IT], UnpackMixin[_OT]):
                 f"Could not find switch value for: {value!r}", context
             )
 
-        return getstruct(struct) or struct  # pyright: ignore[reportUnknownVariableType]
+        return getstruct(struct) or struct if self._switch_is_lambda else struct
 
     def get_offset(self, context: _ContextLike) -> int:
         """Returns the offset position of this field"""
@@ -704,8 +709,9 @@ registry.annotation_registry.append(_type_converter)
 class _CallableTypeConverter(registry.TypeConverter):
     @override
     def matches(self, annotation: object) -> bool:
-        # must be a callable but not a type
-        return callable(annotation) and not isinstance(annotation, type)
+        if not callable(annotation) or isinstance(annotation, type):
+            return False
+        return not isinstance(get_origin(annotation), type)
 
     @override
     def convert(  # pyright: ignore[reportIncompatibleMethodOverride]

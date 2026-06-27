@@ -20,12 +20,14 @@ from typing import Final
 from typing_extensions import override
 
 from caterpillar.abc import _ContextLike  # pyright: ignore[reportPrivateUsage]
-from .common import Transformer, uint32, UInt, Bytes
+from .common import Transformer, Bytes
 from ._base import singleton
 
 
 @singleton
-class IPv4Address(Transformer[ipaddress.IPv4Address, int, ipaddress.IPv4Address, int]):
+class IPv4Address(
+    Transformer[ipaddress.IPv4Address| str | int, bytes, ipaddress.IPv4Address, bytes]
+):
     """
     A transformer for encoding and decoding IPv4 addresses.
     """
@@ -36,7 +38,7 @@ class IPv4Address(Transformer[ipaddress.IPv4Address, int, ipaddress.IPv4Address,
         """
         Initialize the IPv4Address transformer.
         """
-        super().__init__(uint32)
+        super().__init__(Bytes(4))
 
     @override
     def __type__(self) -> type:
@@ -49,7 +51,7 @@ class IPv4Address(Transformer[ipaddress.IPv4Address, int, ipaddress.IPv4Address,
         return ipaddress.IPv4Address
 
     @override
-    def encode(self, obj: ipaddress.IPv4Address, context: _ContextLike) -> int:
+    def encode(self, obj: ipaddress.IPv4Address| str | int, context: _ContextLike) -> bytes:
         """
         Encode an IPv4Address object.
 
@@ -57,10 +59,12 @@ class IPv4Address(Transformer[ipaddress.IPv4Address, int, ipaddress.IPv4Address,
         :param _ContextLike context: The context for encoding.
         :return: The encoded value.
         """
-        return obj._ip
+        if not isinstance(obj, ipaddress.IPv4Address):
+            obj = ipaddress.IPv4Address(obj)
+        return obj.packed
 
     @override
-    def decode(self, parsed: int, context: _ContextLike) -> ipaddress.IPv4Address:
+    def decode(self, parsed: bytes, context: _ContextLike) -> ipaddress.IPv4Address:
         """
         Decode an encoded IPv4 address.
 
@@ -72,7 +76,9 @@ class IPv4Address(Transformer[ipaddress.IPv4Address, int, ipaddress.IPv4Address,
 
 
 @singleton
-class IPv6Address(Transformer[ipaddress.IPv6Address, int, ipaddress.IPv6Address, int]):
+class IPv6Address(
+    Transformer[ipaddress.IPv6Address | str | int, bytes, ipaddress.IPv6Address, bytes]
+):
     """
     A transformer for encoding and decoding IPv6 addresses.
     """
@@ -83,7 +89,7 @@ class IPv6Address(Transformer[ipaddress.IPv6Address, int, ipaddress.IPv6Address,
         """
         Initialize the IPv6Address transformer.
         """
-        super().__init__(UInt(ipaddress.IPV6LENGTH))
+        super().__init__(Bytes(ipaddress.IPV6LENGTH // 8))
 
     @override
     def __type__(self) -> type:
@@ -96,7 +102,7 @@ class IPv6Address(Transformer[ipaddress.IPv6Address, int, ipaddress.IPv6Address,
         return ipaddress.IPv6Address
 
     @override
-    def encode(self, obj: ipaddress.IPv6Address, context: _ContextLike) -> int:
+    def encode(self, obj: ipaddress.IPv6Address | str | int, context: _ContextLike) -> bytes:
         """
         Encode an IPv6Address object.
 
@@ -104,10 +110,12 @@ class IPv6Address(Transformer[ipaddress.IPv6Address, int, ipaddress.IPv6Address,
         :param _ContextLike context: The context for encoding.
         :return: The encoded value.
         """
-        return obj._ip
+        if not isinstance(obj, ipaddress.IPv6Address):
+            obj = ipaddress.IPv6Address(obj)
+        return obj.packed
 
     @override
-    def decode(self, parsed: int, context: _ContextLike) -> ipaddress.IPv6Address:
+    def decode(self, parsed: bytes, context: _ContextLike) -> ipaddress.IPv6Address:
         """
         Decode an encoded IPv6 address.
 
@@ -118,14 +126,14 @@ class IPv6Address(Transformer[ipaddress.IPv6Address, int, ipaddress.IPv6Address,
         return ipaddress.IPv6Address(parsed)
 
 
-class MACAddress(Transformer[str | bytes, bytes, bytes, bytes]):
+class MACAddress(Transformer[str | bytes, bytes, str, bytes]):
     """
     A transformer for encoding and decoding MAC addresses.
 
     :param Optional[str] sep: The separator to use in the MAC address representation.
     """
 
-    DELIMITERS: re.Pattern[bytes] = re.compile(rb"[:-]")
+    DELIMITERS: re.Pattern[bytes] = re.compile(rb"[-:.]")
 
     def __init__(self, sep: str | None = None, encoding: str | None = None) -> None:
         """
@@ -151,10 +159,14 @@ class MACAddress(Transformer[str | bytes, bytes, bytes, bytes]):
 
         # replace unnecessary characters
         mac = re.sub(MACAddress.DELIMITERS, b"", obj)
+        # a raw six-byte address is already in wire form; only hex-text
+        # representations (12 hex digits) need to be unhexlified.
+        if len(mac) == 6:
+            return mac
         return binascii.unhexlify(mac)
 
     @override
-    def decode(self, parsed: bytes, context: _ContextLike) -> bytes:
+    def decode(self, parsed: bytes, context: _ContextLike) -> str:
         """
         Decode an encoded MAC address.
 
@@ -162,7 +174,7 @@ class MACAddress(Transformer[str | bytes, bytes, bytes, bytes]):
         :param _ContextLike context: The context for decoding.
         :return: The decoded MAC address.
         """
-        return binascii.b2a_hex(parsed, self.sep)
+        return binascii.b2a_hex(parsed, self.sep).decode()
 
 
 #: shortcut for default MAC address format

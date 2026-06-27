@@ -32,10 +32,10 @@ which are passed to **all** fields in the current model. For more information on
 classes are not specified as an enum class, please refer to :ref:`byteorder`.
 
 Inheritance in sequences is intricate, as a :class:`~caterpillar.model.Sequence` is constructed from a dictionary
-of elements. We can attempt to simulate a chain of extended *base sequences* using the
-concatenation of two sequences. The :meth:`~sequence.__add__` method will *import* all fields
-from the other specified sequence. The only disadvantage is the placement required by the
-operator. For instance:
+of elements and has no Python type hierarchy. The legacy ``+`` and ``-`` operators mutate the
+left-hand sequence by importing or removing fields in its internal representation. They are kept
+for compatibility and can be useful for one-off transformations, but they are not safe base-sequence
+composition helpers. For instance:
 
 .. code-block:: python
 
@@ -53,9 +53,29 @@ which is not the intended order. The correct order should be :code:`['magic', 'a
 This can be achieved by using the :code:`BaseFormat` instance as the first operand.
 
 .. warning::
-    This will alter the *BaseFormat* sequence, making it unusable elsewhere as the *base* for
-    all sub-sequences. Therefore, it is not recommended to use inheritance within sequences.
-    The :class:`~caterpillar.model.Struct` class resolves this issue with ease.
+    Using ``BaseFormat + Extension`` will alter the *BaseFormat* sequence, making it unusable
+    elsewhere as the unchanged base for other formats. Prefer ``merged`` and ``without`` for
+    reusable sequence composition, or use :class:`~caterpillar.model.Struct` when the format
+    naturally follows a type hierarchy.
+
+For non-mutating composition, use :meth:`~caterpillar.model.Sequence.merged`
+and :meth:`~caterpillar.model.Sequence.without`. These helpers clone imported
+field wrappers and leave the original sequences unchanged:
+
+.. code-block:: python
+
+    >>> BaseFormat = Sequence({"magic": b"MAGIC", "a": uint8})
+    >>> Extension = Sequence({"b": uint32})
+    >>> Format = BaseFormat.merged(Extension)
+    >>> list(BaseFormat.get_members())
+    ['magic', 'a']
+    >>> list(Format.get_members())
+    ['magic', 'a', 'b']
+
+``merged`` starts with a clone of the receiver and imports clones from each
+additional sequence. Duplicate field names from later sequences replace earlier
+ones in-place in the returned layout. ``without`` starts with a clone of the
+receiver and removes fields by name, again leaving all source sequences intact.
 
 Nesting sequences is allowed by default and can be achieved by incorporating another
 :class:`~caterpillar.model.Sequence` into the model. It is important to note that *nesting* is distinct from

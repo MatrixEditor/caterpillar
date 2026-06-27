@@ -245,8 +245,9 @@ class Action:
         :return: True if the object has either a `__action_pack__` or `__action_unpack__` attribute, indicating it is an action.
         :rtype: bool
         """
-        return any(
-            getattr(obj, attr, None) for attr in (ATTR_ACTION_PACK, ATTR_ACTION_UNPACK)
+        return bool(
+            getattr(obj, ATTR_ACTION_PACK, None)
+            or getattr(obj, ATTR_ACTION_UNPACK, None)
         )
 
 
@@ -491,12 +492,10 @@ class UnpackMixin(Generic[_OT]):
         """
         from caterpillar.model import unpack_file
 
-        return (
-            unpack_file(  # pyright: ignore[reportCallIssue, reportUnknownVariableType]
-                self,  # pyright: ignore[reportArgumentType]
-                filename,
-                order=order,
-                arch=arch,
-                **kwargs,
-            )
+        return unpack_file(  # pyright: ignore[reportCallIssue, reportUnknownVariableType]
+            self,  # pyright: ignore[reportArgumentType]
+            filename,
+            order=order,
+            arch=arch,
+            **kwargs,
         )

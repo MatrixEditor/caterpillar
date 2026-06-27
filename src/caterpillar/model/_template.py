@@ -200,6 +200,7 @@ def template(
     # the class will get special attributes that identify it as
     # a template class
     def create_template_class(cls: type[_TemplateModelT]) -> type[_TemplateModelT]:
+        cls.__annotations__ = inspect.get_annotations(cls)
         for name in disposable:
             # Only temporary template vars will be removed
             delattr(module, name)

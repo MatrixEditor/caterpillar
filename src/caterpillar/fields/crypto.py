@@ -165,7 +165,10 @@ class Encrypted(Memory):
         :return: An instance of the specified type.
         :rtype: Any
         """
-        if isinstance(field, type_) or not field:
+        if not field:
+            return field
+
+        if not isinstance(field, type) and isinstance(field, type_):
             return field
 
         if isinstance(args, dict):
@@ -281,12 +284,18 @@ class KeyCipher(Bytes):
                 )
 
         self.key_length = len(self.key)
+        if self.key_length == 0:
+            raise InvalidValueError("Key must not be empty", context)
 
     def process(self, obj: bytes, context: _ContextLike) -> bytes:
         length = len(obj)
         data = bytearray(length)
         if self.key_fn:
-            self.set_key(self.key_fn(context), context)
+            # Resolving the lazy key must not discard key_fn itself, otherwise
+            # the cipher would reuse a stale key on every subsequent operation.
+            key_fn = self.key_fn
+            self.set_key(key_fn(context), context)
+            self.key_fn = key_fn
 
         self._do_process(obj, data)
         return bytes(data)
@@ -296,7 +305,7 @@ class KeyCipher(Bytes):
 
     @override
     def pack_single(self, obj: bytes, context: _ContextLike) -> None:
-        context[CTX_STREAM].write(self.process(obj, context))
+        super().pack_single(self.process(obj, context), context)
 
     @override
     def unpack_single(self, context: _ContextLike) -> bytes:

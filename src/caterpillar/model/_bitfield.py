@@ -55,7 +55,7 @@ from caterpillar.fields import (
     Pass,
     INVALID_DEFAULT,
 )
-from caterpillar.exception import StructException
+from caterpillar.exception import StructException, ValidationError
 from caterpillar.context import (
     CTX_FIELD,
     CTX_PATH,
@@ -246,7 +246,12 @@ def issigned(obj: object) -> bool:
     :return: :code:`True` if the field is marked as signed, :code:`False` otherwise.
     :rtype: bool
     """
-    return bool(getattr(obj, ATTR_SIGNED, None))
+    signed = getattr(obj, ATTR_SIGNED, None)
+    if signed is None:
+        signed = getattr(obj, "signed", None)
+    if signed is None:
+        signed = getattr(obj, "text", "") in "bhiqnl"
+    return bool(signed)
 
 
 _VT = TypeVar("_VT", default=int)
@@ -396,6 +401,8 @@ class BitfieldEntry:
     :type factory: type or BitfieldValueFactory or None
     :param action: Optional action object for special handling (e.g., alignment or padding).
     :type action: Any
+    :param signed: Whether this entry stores a signed integer.
+    :type signed: bool
     """
 
     __slots__: tuple[str, ...] = (
@@ -405,6 +412,7 @@ class BitfieldEntry:
         "factory",
         "action",
         "low_mask",
+        "signed",
     )
 
     def __init__(
@@ -414,6 +422,7 @@ class BitfieldEntry:
         name: str,
         factory: BitfieldValueFactory | type[BitfieldValueFactory] | None = None,
         action: _ActionLike | None = None,
+        signed: bool = False,
     ) -> None:
         # fmt: off
         self.bit: int = bit
@@ -426,6 +435,7 @@ class BitfieldEntry:
             self.factory = factory
         self.action: _ActionLike | None = action
         self.low_mask: int = (1 << self.width) - 1
+        self.signed: bool = signed
 
     @staticmethod
     def new_action(action: _ActionLike) -> "BitfieldEntry":
@@ -630,6 +640,7 @@ class Bitfield(Struct[_VT]):
         self._current_group: BitfieldGroup = BitfieldGroup(self._current_alignment)
         self._bit_pos: int = 0
         self.groups: list[BitfieldGroup] = [self._current_group]
+        self._entry_index: dict[str, BitfieldEntry] = {}
         super().__init__(
             model=model,
             order=order,
@@ -643,7 +654,14 @@ class Bitfield(Struct[_VT]):
 
         self.groups = [group for group in self.groups if not group.is_empty()]
         self.groups[-1].align_to(self._current_alignment)
-        # REVISIT: should be enable modification after processing?
+        self._entry_index = {
+            entry.name: entry
+            for group in self.groups
+            if not group.is_field()
+            for entry in group.entries
+            if not entry.is_action()
+        }
+        # REVISIT: should we enable modification after processing?
         del self._bit_pos
         del self._current_alignment
         del self._current_group
@@ -666,6 +684,7 @@ class Bitfield(Struct[_VT]):
             )
 
         self.groups.extend(sequence.groups)
+        self._entry_index.update(sequence._entry_index)
         return super(Struct, self).__add__(sequence)
 
     def _process_align(
@@ -768,9 +787,7 @@ class Bitfield(Struct[_VT]):
             # we don't need to check for NewGroup and EndGroup options here as no
             # bits are specified and the field gets its own group.
             for option in options or []:
-                self._process_alignment_option(
-                    option
-                )  # pyright: ignore[reportUnusedCallResult]
+                self._process_alignment_option(option)  # pyright: ignore[reportUnusedCallResult]
 
             # bits not present -> treat defintion as simple field, which means we finalize
             # the current group, create a new FIELD GROUP and another new one after that
@@ -787,7 +804,11 @@ class Bitfield(Struct[_VT]):
             )
 
         entry = BitfieldEntry(
-            self._bit_pos, width, name, factory or BitfieldValueFactory(typeof(field))
+            self._bit_pos,
+            width,
+            name,
+            factory or BitfieldValueFactory(typeof(field)),
+            signed=issigned(field.struct),
         )
         if not self._process_options(options, entry):
             group = self._current_group
@@ -991,7 +1012,7 @@ class Bitfield(Struct[_VT]):
         :rtype: int
         """
         # size is different as our model includes correct padding
-        return sum(map(lambda g: g.get_size(context), self.groups))
+        return sum(group.get_size(context) for group in self.groups)
 
     def __bits__(self) -> int:
         """
@@ -1000,7 +1021,7 @@ class Bitfield(Struct[_VT]):
         :return: Total bit count.
         :rtype: int
         """
-        return sum(map(lambda g: g.get_bits(), self.groups))
+        return sum(group.get_bits() for group in self.groups)
 
     @override
     def unpack_one(self, context: _ContextLike) -> _VT:
@@ -1009,6 +1030,7 @@ class Bitfield(Struct[_VT]):
 
         field: Field | None = context.get(CTX_FIELD)
         base_path: str = context[CTX_PATH]
+        members = self._members
         # REVISIT
         order: _EndianLike = (
             field.order
@@ -1024,7 +1046,7 @@ class Bitfield(Struct[_VT]):
                 context[CTX_PATH] = f"{base_path}.{name}"
                 value = field.__unpack__(context)
                 context[CTX_OBJECT][name] = value
-                if name in self._members:
+                if name in members:
                     init_data[name] = value
 
             else:
@@ -1046,13 +1068,14 @@ class Bitfield(Struct[_VT]):
                             func(context)
                             continue
 
-                    if entry.name not in self._members:
+                    if entry.name not in members:
                         continue
 
                     value = (raw_value >> entry.shift(group.bit_count)) & entry.low_mask
                     if entry.factory:
                         value = entry.factory.from_int(value)
-
+                    if entry.signed and value >= 1 << (entry.width - 1):
+                        value -= 1 << entry.width
                     init_data[entry.name] = value
 
         return self.model(**init_data)  # pyright: ignore[reportCallIssue]
@@ -1061,6 +1084,7 @@ class Bitfield(Struct[_VT]):
     def pack_one(self, obj: _VT, context: _ContextLike) -> None:
         base_path = context[CTX_PATH]
         field: Field | None = context.get(CTX_FIELD)
+        members = self._members
         # REVISIT
         order: _EndianLike = (
             field.order
@@ -1073,7 +1097,7 @@ class Bitfield(Struct[_VT]):
                 field = group.get_field()
                 name = field.get_name()
                 context[CTX_PATH] = f"{base_path}.{name}"
-                if name in self._members:
+                if name in members:
                     value = self.get_value(obj, name, field)
                 else:
                     value = field.default if field.default != INVALID_DEFAULT else None
@@ -1089,14 +1113,28 @@ class Bitfield(Struct[_VT]):
                             func(context)
                         continue
 
-                    if entry.name not in self._members:
+                    if entry.name not in members:
                         continue
 
                     entry_value = self.get_value(obj, entry.name, None)
                     if entry.factory:
                         entry_value = entry.factory.to_int(entry_value)
 
-                    # silently ignore invalid values
+                    if entry.signed:
+                        limit = 1 << (entry.width - 1)
+                        if entry_value < -limit or entry_value >= limit:
+                            raise ValidationError(
+                                f"Signed bitfield value {entry_value!r} does not fit "
+                                + f"in {entry.width} bits",
+                                context,
+                            )
+                    elif entry_value < 0 or entry_value > entry.low_mask:
+                        raise ValidationError(
+                            f"Bitfield value {entry_value!r} does not fit "
+                            + f"in {entry.width} bits",
+                            context,
+                        )
+
                     value |= (entry_value & entry.low_mask) << entry.shift(
                         group.bit_count
                     )
@@ -1110,7 +1148,10 @@ class Bitfield(Struct[_VT]):
         return super().add_action(action)
 
     def get_entry(self, name: str) -> BitfieldEntry | None:
-        # fmt: off
+        entry = self._entry_index.get(name)
+        if entry is not None:
+            return entry
+
         for group in self.groups:
             if group.is_field():
                 continue
@@ -1133,6 +1174,7 @@ class BitfieldDefMixin(StructDefMixin):
     # fmt: off
     __struct__: ClassVar[Bitfield[Self]]  # pyright: ignore[reportIncompatibleVariableOverride]
     """Reference to the bitfield model"""
+
 
 class bitfield_factory:
     """Factory for transforming plain classes into ``Bitfield`` models.

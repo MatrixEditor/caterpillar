@@ -235,6 +235,7 @@ __all__ = [
     "MODE_UNPACK",
     "typeof",
     "Sequence",
+    "RemoveField",
     "Struct",
     "struct",
     "UnionHook",

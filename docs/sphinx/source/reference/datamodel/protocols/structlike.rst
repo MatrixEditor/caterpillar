@@ -40,7 +40,7 @@ Special Methods for Struct-Like objects
 
 .. method:: object.__unpack__(self, context)
 
-    Called to desersialize objects from an input stream (the stream is stored in the given context).
+    Called to deserialize objects from an input stream (the stream is stored in the given context).
     The result of :meth:`~object.__unpack__` is not going to be ignored.
 
     Every implementation is tasked with the decision of whether to support the deserialization
@@ -74,7 +74,7 @@ Special Methods for Struct-Like objects
         therefore, not mandatory as per the library's specifications.
 
     The following example demonstrates the use of the `sphinx-autodoc`_ extension to document
-    struct classes with the :code:`S_REPLACE_TYPE` option enabled. Only documented members
+    struct classes with the :code:`S_REPLACE_TYPES` option enabled. Only documented members
     are displayed.
 
     .. code-block:: rst
