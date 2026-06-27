@@ -170,14 +170,14 @@ An *unnamed* field must follow the convention:
 This allows you to include padding or other non-essential fields without polluting
 the output. For example:
 
->>> schema = Seq({
+>>> schema = Sequence({
 ...     "a": uint8,
 ...     "_": padding[10]
 ... }, options={opt.S_DISCARD_UNNAMED})
 >>> data = b"\xff" + bytes(10)
 >>> unpack(schema, data)
 {'a': 255}
->>> pack(_, schema)
+>>> pack({"a": 255}, schema)
 b'\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
 """
 
