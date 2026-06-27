@@ -115,16 +115,22 @@ Default Options
 
     .. versionadded:: 2.5.0
 
-    Alias for the :attr:`B_GROUP_NEW` flag, used to indicate that a new bitfield group should be started.
+    Alias for the :attr:`B_GROUP_END` flag, used to indicate that the current bitfield group should be finalized.
 
 
 .. py:attribute:: NewGroup
 
-    Alias for the :attr:`B_GROUP_END` flag, used to indicate that the current bitfield group should be finalized.
+    Alias for the :attr:`B_GROUP_NEW` flag, used to indicate that a new bitfield group should be started.
 
 
 .. autoclass:: SetAlignment
     :members:
+
+
+.. py:attribute:: DEFAULT_ALIGNMENT
+
+    Default bitfield group alignment in bits. The current default is ``8``.
+
 
 Bitfield Mixins
 ---------------

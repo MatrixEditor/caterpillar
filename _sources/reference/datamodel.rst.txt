@@ -13,11 +13,11 @@ objects. There are three possible types of structs:
 * *Sequences*:
     These structs operate independently of fields, making them field-agnostic. As
     such, they do not need to be attached to a :class:`~caterpillar.fields.Field` instance. Typically,
-    they are are combined with specific requirements, which will be discussed later
+    they are combined with specific requirements, which will be discussed later
     on.
 
 * *Primitive Structs*:
-    All defined primitive structs depent on being linked to a :class:`~caterpillar.fields.Field`
+    All defined primitive structs depend on being linked to a :class:`~caterpillar.fields.Field`
     instance. They are designed to incorporate all attributes that can be set
     on a field.
 
@@ -32,6 +32,7 @@ objects. There are three possible types of structs:
 .. toctree::
     :caption: Standard Data Model
 
+    datamodel/operations
     datamodel/standard
 
 

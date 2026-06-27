@@ -28,7 +28,9 @@ Library
 C Extension
 ***********
 
-*TBD*
+The optional C extension mirrors selected Python APIs for lower overhead in
+hot parsing paths. The Python package remains the reference implementation;
+native types are documented in the :ref:`reference-index` C API section.
 
 .. toctree::
    :maxdepth: 2

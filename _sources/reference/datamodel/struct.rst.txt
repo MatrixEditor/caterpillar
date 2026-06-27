@@ -82,6 +82,35 @@ resolution order of Python:
     >>> list(Format.__struct__.get_members())
     ['magic', 'a', 'b', 'c']
 
+Inherited fields are copied into the derived structure as new field wrappers.
+Mutating derived field metadata, for example changing byte order on
+``Format.__struct__``, will not mutate the base structure. If several base
+classes provide the same field name, Python MRO precedence decides which field
+is imported. Fields declared directly on the child class override inherited
+fields in-place, keeping the binary layout position stable.
+
+Byte order and architecture configured on the child structure apply to fields
+declared by the child. Inherited field wrappers keep their own explicit or
+base-derived configuration unless the child overrides the field declaration.
+
+If a base field has a default value and the child adds required fields, the
+child fields are made keyword-only so the binary field order can remain
+unchanged while still satisfying dataclass constructor rules.
+
+Inherited fields can be removed from the derived binary layout explicitly with
+:class:`~caterpillar.model.RemoveField`:
+
+.. code-block:: python
+
+    >>> @struct
+    ... class Child(BaseFormat):
+    ...     magic: RemoveField()
+    ...     b: uint32
+    ...
+
+This removes ``magic`` from ``Child`` only; ``BaseFormat`` remains unchanged.
+
+
 .. admonition:: Programmers Note
 
     As the :class:`~caterpillar.model.Struct` class is a direct subclass of :class:`~caterpillar.model.Sequence`, nesting is supported
