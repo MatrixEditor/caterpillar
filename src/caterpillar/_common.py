@@ -38,7 +38,12 @@ from caterpillar.context import (
     O_CONTEXT_FACTORY,
     Context,
 )
-from caterpillar.exception import Stop, StructException, InvalidValueError
+from caterpillar.exception import (
+    Stop,
+    StructException,
+    InvalidValueError,
+    ValidationError,
+)
 from caterpillar.options import O_ARRAY_FACTORY
 
 if TYPE_CHECKING:
@@ -202,3 +207,13 @@ def iseof(stream: _StreamType) -> bool:
     eof = not stream.read(1)
     stream.seek(pos)  # pyright: ignore[reportUnusedCallResult]
     return eof
+
+
+def read_exact(context: _ContextLike, size: int, label: str) -> bytes:
+    data: bytes = context[CTX_STREAM].read(size)
+    if len(data) != size:
+        raise ValidationError(
+            f"{label} requires {size} bytes. Got {len(data)}",
+            context,
+        )
+    return data

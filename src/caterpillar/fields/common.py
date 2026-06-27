@@ -59,7 +59,7 @@ from caterpillar.byteorder import (
     LittleEndian,
 )
 from caterpillar import registry
-from caterpillar._common import WithoutContextVar
+from caterpillar._common import WithoutContextVar, read_exact
 from caterpillar.shared import getstruct, typeof
 
 from ._base import Field, INVALID_DEFAULT, singleton
@@ -1727,12 +1727,31 @@ class Int(FieldStruct[int, int]):
     :param signed: Whether the integer is signed (default is True).
     """
 
-    __slots__: tuple[str, ...] = ("signed", "size")
+    __slots__: tuple[str, ...] = (
+        "signed",
+        "size",
+        "mask",
+        "sign_bit",
+        "min_value",
+        "max_value",
+    )
 
     def __init__(self, bits: int, signed: bool = True) -> None:
+        if not isinstance(bits, int):
+            raise TypeError(f"bits must be an integer - got {bits!r}")
+        if bits <= 0:
+            raise ValueError(f"bits must be greater than zero - got {bits!r}")
         self.signed: bool = signed
         self.__bits__: int = bits
-        self.size: int = self.__bits__ // 8
+        self.size: int = (self.__bits__ + 7) // 8
+        self.mask: int = (1 << self.__bits__) - 1
+        self.sign_bit: int = 1 << (self.__bits__ - 1)
+        if signed:
+            self.min_value: int = -self.sign_bit
+            self.max_value: int = self.sign_bit - 1
+        else:
+            self.min_value = 0
+            self.max_value = self.mask
         self.__byteorder__: _EndianLike | None = None
 
     @override
@@ -1779,11 +1798,16 @@ class Int(FieldStruct[int, int]):
             if field
             else (self.__byteorder__ or O_DEFAULT_ENDIAN.value or LittleEndian).ch
         ) == LITTLE_ENDIAN_FMT
+        if obj < self.min_value or obj > self.max_value:
+            raise OverflowError(
+                f"int too big to convert: {obj!r} does not fit in {self.__bits__} bits"
+            )
+        value = obj & self.mask
         context[CTX_STREAM].write(
-            obj.to_bytes(
+            value.to_bytes(
                 length=self.size,
                 byteorder="little" if is_little else "big",
-                signed=self.signed,
+                signed=False,
             )
         )
 
@@ -1806,11 +1830,15 @@ class Int(FieldStruct[int, int]):
             else (self.__byteorder__ or O_DEFAULT_ENDIAN.value or LittleEndian).ch
         ) == LITTLE_ENDIAN_FMT
 
-        return int.from_bytes(
-            context[CTX_STREAM].read(self.size),
+        value = int.from_bytes(
+            read_exact(context, self.size, f"{type(self).__name__}{self.__bits__}"),
             "little" if is_little else "big",
-            signed=self.signed,
+            signed=False,
         )
+        value &= self.mask
+        if self.signed and value & self.sign_bit:
+            value -= self.mask + 1
+        return value
 
 
 class UInt(Int):
@@ -2269,13 +2297,34 @@ class AsLengthRef:
             return 0
         return self.struct.__bits__()  # pyright: ignore[reportAttributeAccessIssue]
 
+    def _target_field(self, context: _ContextLike) -> Field | None:
+        *parts, target_name = self.target.removeprefix("_obj.").split(".")
+        obj = context.__context_getattr__(".".join(["_obj"] + list(parts)))
+        struct = getstruct(obj, None)
+        members = getattr(struct, "_members", None)
+        if not members:
+            return None
+        return members.get(target_name)
+
+    def _target_length(self, target_obj: Any, context: _ContextLike) -> int:
+        if isinstance(target_obj, str):
+            field = self._target_field(context)
+            target_struct = getattr(field, "struct", None) if field else None
+            if isinstance(target_struct, String):
+                encoding = target_struct.encoding
+                if callable(encoding):
+                    encoding = encoding(context)
+
+                return len(target_obj.encode(encoding))
+        return len(target_obj)
+
     def __pack__(self, obj: None, context: _ContextLike):
         # object is optional
         if self.struct is None:
             raise ValueError("struct is not defined")
 
         target_obj = context.__context_getattr__(self.target)
-        length: int = len(target_obj)
+        length: int = self._target_length(target_obj, context)
         context.__context_setattr__(self.name, length)
         self.struct.__pack__(length, context)
 
