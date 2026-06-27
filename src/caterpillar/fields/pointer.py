@@ -54,8 +54,9 @@ class pointer(Generic[_PtrValueT], int):
     def get(self):
         return self.obj
 
+_PtrT = TypeVar('_PtrT', default=pointer)
 
-class Pointer(FieldStruct[int, pointer[_PtrValueT]]):
+class Pointer(Generic[_PtrT, _PtrValueT], FieldStruct[int, _PtrT]):
     """
     A struct that represents a pointer to another struct within the stream.
 
@@ -87,7 +88,7 @@ class Pointer(FieldStruct[int, pointer[_PtrValueT]]):
         """
         return self.__class__(self.struct, model)  # pyright: ignore[reportReturnType]
 
-    def __type__(self):
+    def __type__(self) -> type[_PtrT]:
         """
         Get the type associated with the Pointer.
 
@@ -110,7 +111,7 @@ class Pointer(FieldStruct[int, pointer[_PtrValueT]]):
         return struct.__size__(context)
 
     @override
-    def unpack_single(self, context: _ContextLike) -> pointer[_PtrValueT]:
+    def unpack_single(self, context: _ContextLike) -> _PtrT:
         """
         Unpack a single value using the Pointer struct.
 
@@ -304,7 +305,7 @@ class relative_pointer(pointer[_PtrValueT]):
         return self + self.base
 
 
-class RelativePointer(Pointer[_PtrValueT]):
+class RelativePointer(Pointer[relative_pointer[_PtrValueT], _PtrValueT]):
     """
     A struct that represents a relative pointer to another struct within the stream.
     """

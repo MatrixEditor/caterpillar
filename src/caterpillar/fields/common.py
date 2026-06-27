@@ -256,7 +256,6 @@ class PyStructFormattedField(FieldStruct[_IT, _IT]):
 
         struct_ = self._cached(field.order.ch, length)
         size = struct_.size
-        size = (self.__bits__ // 8) * length
         data = context[CTX_STREAM].read(size)
         if len(data) != size:
             raise ValidationError(
@@ -268,7 +267,7 @@ class PyStructFormattedField(FieldStruct[_IT, _IT]):
 
 
 # Instances of FormatField with specific format specifiers
-char: Final[PyStructFormattedField[str]] = PyStructFormattedField("c", str)
+char: Final[PyStructFormattedField[bytes]] = PyStructFormattedField("c", type_=bytes)
 """Single byte character field.
 
 Represents exactly one byte using Python's ``struct`` ``"c"`` format. Values
@@ -1056,9 +1055,10 @@ class Memory(Generic[_MemoryIT, _MemoryOT], FieldStruct[_MemoryIT, _MemoryOT]):
         """
         stream: _StreamType = context[CTX_STREAM]
         size: int | _GreedyType = self.__size__(context)
-        # fmt: off
-        return memoryview(stream.read(size) if size is not Ellipsis else stream.read())  # pyright: ignore[reportReturnType, reportUnnecessaryComparison]
-        # fmt: on
+        if size is Ellipsis:
+            return memoryview(stream.read())
+
+        return memoryview(read_exact(context, size, "Memory field"))  # pyright: ignore[reportReturnType]
 
 
 class Bytes(Memory[bytes, bytes]):
@@ -1260,10 +1260,12 @@ class CString(FieldStruct[str, str]):
         stream: _StreamType = context[CTX_STREAM]
         if self.length is not Ellipsis:
             length = self.__size__(context)
-            obj_length = len(obj)
+            obj_length = len(encoded)
             if obj_length > length:
                 raise ValidationError(
                     f"String {obj!r} is too long for the fixed length of {length} bytes."
+                    f" Got {obj_length} bytes.",
+                    context,
                 )
             stream.write(encoded)
             stream.write(self._raw_pad * (length - obj_length))

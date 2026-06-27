@@ -20,7 +20,7 @@ import sys
 import typing
 import warnings
 
-from typing import Annotated, Callable, Any, Generic, Protocol, get_origin
+from typing import Annotated, Callable, Any, Generic, Protocol, get_args, get_origin
 from typing_extensions import Buffer, Final, Literal, Self, Sized, overload, override, TypeVar
 from types import FrameType, TracebackType
 from dataclasses import dataclass
@@ -454,8 +454,10 @@ class ConditionContext:
             field: Field | Any = self.annotations[name]
             is_annotated = get_origin(field) is Annotated
             annotated_type = extra_options = None
-            if get_origin(field) is Annotated:
-                annotated_type, field, *extra_options = field
+            if is_annotated:
+                # annotated_type = field.__origin__
+                # field, *extra_options = field.__metadata__
+                annotated_type, field, *extra_options = get_args(field)
 
             if not isinstance(field, Field):
                 # create a field (other attributes will be modified later)

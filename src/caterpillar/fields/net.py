@@ -26,7 +26,7 @@ from ._base import singleton
 
 @singleton
 class IPv4Address(
-    Transformer[ipaddress.IPv4Address, bytes, ipaddress.IPv4Address, bytes]
+    Transformer[ipaddress.IPv4Address| str | int, bytes, ipaddress.IPv4Address, bytes]
 ):
     """
     A transformer for encoding and decoding IPv4 addresses.
@@ -51,7 +51,7 @@ class IPv4Address(
         return ipaddress.IPv4Address
 
     @override
-    def encode(self, obj: ipaddress.IPv4Address, context: _ContextLike) -> bytes:
+    def encode(self, obj: ipaddress.IPv4Address| str | int, context: _ContextLike) -> bytes:
         """
         Encode an IPv4Address object.
 
@@ -77,7 +77,7 @@ class IPv4Address(
 
 @singleton
 class IPv6Address(
-    Transformer[ipaddress.IPv6Address, bytes, ipaddress.IPv6Address, bytes]
+    Transformer[ipaddress.IPv6Address | str | int, bytes, ipaddress.IPv6Address, bytes]
 ):
     """
     A transformer for encoding and decoding IPv6 addresses.
@@ -102,7 +102,7 @@ class IPv6Address(
         return ipaddress.IPv6Address
 
     @override
-    def encode(self, obj: ipaddress.IPv6Address, context: _ContextLike) -> bytes:
+    def encode(self, obj: ipaddress.IPv6Address | str | int, context: _ContextLike) -> bytes:
         """
         Encode an IPv6Address object.
 
@@ -126,7 +126,7 @@ class IPv6Address(
         return ipaddress.IPv6Address(parsed)
 
 
-class MACAddress(Transformer[str | bytes, bytes, bytes, bytes]):
+class MACAddress(Transformer[str | bytes, bytes, str, bytes]):
     """
     A transformer for encoding and decoding MAC addresses.
 
@@ -166,7 +166,7 @@ class MACAddress(Transformer[str | bytes, bytes, bytes, bytes]):
         return binascii.unhexlify(mac)
 
     @override
-    def decode(self, parsed: bytes, context: _ContextLike) -> bytes:
+    def decode(self, parsed: bytes, context: _ContextLike) -> str:
         """
         Decode an encoded MAC address.
 
@@ -174,7 +174,7 @@ class MACAddress(Transformer[str | bytes, bytes, bytes, bytes]):
         :param _ContextLike context: The context for decoding.
         :return: The decoded MAC address.
         """
-        return binascii.b2a_hex(parsed, self.sep)
+        return binascii.b2a_hex(parsed, self.sep).decode()
 
 
 #: shortcut for default MAC address format
