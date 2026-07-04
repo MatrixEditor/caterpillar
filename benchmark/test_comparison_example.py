@@ -18,11 +18,18 @@ import pytest
 import caterpillar
 from caterpillar.context import O_CONTEXT_FACTORY
 
-from examples.comparison import comparison_1_caterpillar as caterpillar_default
+try:
+    from examples.comparison import comparison_1_caterpillar as caterpillar_default
+except ImportError:
+    caterpillar_default = None
+
 
 pytestmark = pytest.mark.benchmark
 NATIVE_ONLY = pytest.mark.skipif(
     not caterpillar.native_support(), reason="native extension unavailable"
+)
+HAVE_EXAMPLES = pytest.mark.skipif(
+    caterpillar_default is None, reason="examples unavailable"
 )
 
 ROUNDS = 10
@@ -43,10 +50,9 @@ def _make_default_items(count: int):
     ]
 
 
-DEFAULT_ITEMS = _make_default_items(ITEM_COUNT)
-COMPARISON_RAW = caterpillar_default.pack(
-    DEFAULT_ITEMS, caterpillar_default.Format
-)
+if caterpillar_default is not None:
+    DEFAULT_ITEMS = _make_default_items(ITEM_COUNT)
+    COMPARISON_RAW = caterpillar_default.pack(DEFAULT_ITEMS, caterpillar_default.Format)
 
 
 def _bench(benchmark, fn, validate=None):
@@ -86,26 +92,25 @@ def _assert_hachoir_count(fields):
     assert fields[0].value == ITEM_COUNT
 
 
+@HAVE_EXAMPLES
 def test_bench_caterpillar_unpack(benchmark):
     _bench(
         benchmark,
-        lambda: caterpillar_default.unpack(
-            caterpillar_default.Format, COMPARISON_RAW
-        ),
+        lambda: caterpillar_default.unpack(caterpillar_default.Format, COMPARISON_RAW),
         _assert_caterpillar_items,
     )
 
 
+@HAVE_EXAMPLES
 def test_bench_caterpillar_pack(benchmark):
     _bench(
         benchmark,
-        lambda: caterpillar_default.pack(
-            DEFAULT_ITEMS, caterpillar_default.Format
-        ),
+        lambda: caterpillar_default.pack(DEFAULT_ITEMS, caterpillar_default.Format),
         _assert_raw,
     )
 
 
+@HAVE_EXAMPLES
 @NATIVE_ONLY
 def test_bench_caterpillar_c_context_default_unpack(benchmark):
     from caterpillar.c import c_Context
@@ -124,6 +129,7 @@ def test_bench_caterpillar_c_context_default_unpack(benchmark):
         O_CONTEXT_FACTORY.value = old_factory
 
 
+@HAVE_EXAMPLES
 @NATIVE_ONLY
 def test_bench_caterpillar_c_context_default_pack(benchmark):
     from caterpillar.c import c_Context
@@ -133,15 +139,14 @@ def test_bench_caterpillar_c_context_default_pack(benchmark):
     try:
         _bench(
             benchmark,
-            lambda: caterpillar_default.pack(
-                DEFAULT_ITEMS, caterpillar_default.Format
-            ),
+            lambda: caterpillar_default.pack(DEFAULT_ITEMS, caterpillar_default.Format),
             _assert_raw,
         )
     finally:
         O_CONTEXT_FACTORY.value = old_factory
 
 
+@HAVE_EXAMPLES
 @NATIVE_ONLY
 def test_bench_caterpillar_c_classes_unpack(benchmark):
     from examples.comparison import comparison_1_caterpillar_c as caterpillar_c
@@ -153,6 +158,7 @@ def test_bench_caterpillar_c_classes_unpack(benchmark):
     )
 
 
+@HAVE_EXAMPLES
 @NATIVE_ONLY
 def test_bench_caterpillar_c_classes_pack(benchmark):
     from examples.comparison import comparison_1_caterpillar_c as caterpillar_c
@@ -176,6 +182,7 @@ def test_bench_caterpillar_c_classes_pack(benchmark):
     )
 
 
+@HAVE_EXAMPLES
 @NATIVE_ONLY
 def test_bench_caterpillar_c_context_unpack(benchmark):
     from caterpillar.c import c_Context
@@ -193,6 +200,7 @@ def test_bench_caterpillar_c_context_unpack(benchmark):
         O_CONTEXT_FACTORY.value = old_factory
 
 
+@HAVE_EXAMPLES
 @NATIVE_ONLY
 def test_bench_caterpillar_c_context_pack(benchmark):
     from caterpillar.c import c_Context
@@ -222,6 +230,7 @@ def test_bench_caterpillar_c_context_pack(benchmark):
         O_CONTEXT_FACTORY.value = old_factory
 
 
+@HAVE_EXAMPLES
 def test_bench_construct_parse(benchmark):
     construct_comparison = pytest.importorskip(
         "examples.comparison.comparison_1_construct"
@@ -234,6 +243,7 @@ def test_bench_construct_parse(benchmark):
     )
 
 
+@HAVE_EXAMPLES
 def test_bench_construct_build(benchmark):
     construct_comparison = pytest.importorskip(
         "examples.comparison.comparison_1_construct"
@@ -247,6 +257,7 @@ def test_bench_construct_build(benchmark):
     )
 
 
+@HAVE_EXAMPLES
 def test_bench_construct_compiled_parse(benchmark):
     construct_comparison = pytest.importorskip(
         "examples.comparison.comparison_1_construct"
@@ -259,6 +270,7 @@ def test_bench_construct_compiled_parse(benchmark):
     )
 
 
+@HAVE_EXAMPLES
 def test_bench_construct_compiled_build(benchmark):
     construct_comparison = pytest.importorskip(
         "examples.comparison.comparison_1_construct"
@@ -272,10 +284,9 @@ def test_bench_construct_compiled_build(benchmark):
     )
 
 
+@HAVE_EXAMPLES
 def test_bench_kaitai_parse(benchmark):
-    kaitai_comparison = pytest.importorskip(
-        "examples.comparison.comparison_1_kaitai"
-    )
+    kaitai_comparison = pytest.importorskip("examples.comparison.comparison_1_kaitai")
 
     _bench(
         benchmark,
@@ -284,23 +295,21 @@ def test_bench_kaitai_parse(benchmark):
     )
 
 
+@HAVE_EXAMPLES
 def test_bench_hachoir_parse(benchmark):
-    hachoir_comparison = pytest.importorskip(
-        "examples.comparison.comparison_1_hachoir"
-    )
+    hachoir_comparison = pytest.importorskip("examples.comparison.comparison_1_hachoir")
     hachoir_stream = pytest.importorskip("hachoir.stream")
 
     _bench(
         benchmark,
         lambda: list(
-            hachoir_comparison.Format(
-                hachoir_stream.StringInputStream(COMPARISON_RAW)
-            )
+            hachoir_comparison.Format(hachoir_stream.StringInputStream(COMPARISON_RAW))
         ),
         _assert_hachoir_count,
     )
 
 
+@HAVE_EXAMPLES
 def test_bench_mrcrowbar_parse(benchmark):
     mrcrowbar_comparison = pytest.importorskip(
         "examples.comparison.comparison_1_mrcrowbar"
@@ -313,6 +322,7 @@ def test_bench_mrcrowbar_parse(benchmark):
     )
 
 
+@HAVE_EXAMPLES
 def test_bench_mrcrowbar_build(benchmark):
     mrcrowbar_comparison = pytest.importorskip(
         "examples.comparison.comparison_1_mrcrowbar"
