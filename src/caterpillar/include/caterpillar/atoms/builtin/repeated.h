@@ -68,6 +68,7 @@ CpRepeatedAtom_SetAtom(PyObject* pObj, PyObject* pAtom)
   CpRepeatedAtomObject* self = _Cp_CAST(CpRepeatedAtomObject*, pObj);
   if (!pAtom) {
     PyErr_SetString(PyExc_ValueError, "Atom cannot be null");
+    return -1;
   }
 
   Py_XSETREF(self->m_atom, Py_NewRef(pAtom));
@@ -80,6 +81,7 @@ CpRepeatedAtom_SetLength(PyObject* pObj, PyObject* pLength)
   CpRepeatedAtomObject* self = _Cp_CAST(CpRepeatedAtomObject*, pObj);
   if (!pLength) {
     PyErr_SetString(PyExc_ValueError, "Length cannot be null");
+    return -1;
   }
 
   Py_XSETREF(self->m_length, Py_NewRef(pLength));

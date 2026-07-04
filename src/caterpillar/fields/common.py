@@ -72,6 +72,7 @@ ENUM_STRICT: Flag[None] = Flag("enum.strict")
 
 _NATIVE_ONLY_FORMATS: Final[frozenset[str]] = frozenset({"n", "N", "P"})
 
+
 class PyStructFormattedField(FieldStruct[_IT, _IT]):
     """
     A field class representing a binary format using format characters (e.g., 'i', 'I', etc.).
@@ -186,10 +187,9 @@ class PyStructFormattedField(FieldStruct[_IT, _IT]):
         """
         field = context.get(CTX_FIELD)
         target_length = len(seq)
-        if target_length == 0:
-            return  # nothing to do
-
         if not field:
+            if target_length == 0:
+                return  # nothing to do
             # just pack directly
             # WE LOSE SIZE CHECKING HERE!
             ch = (self.__byteorder__ or O_DEFAULT_ENDIAN.value or LittleEndian).ch
@@ -198,8 +198,10 @@ class PyStructFormattedField(FieldStruct[_IT, _IT]):
             length = field.length(context)
             if type(length) is _PrefixedType:
                 context[CTX_SEQ] = False
-                length.start.__pack__(len(seq), context)
-                context[CTX_SEQ] = True
+                try:
+                    length.start.__pack__(len(seq), context)
+                finally:
+                    context[CTX_SEQ] = True
             elif length is not Ellipsis:
                 if length != target_length:
                     raise ValueError(
@@ -207,6 +209,8 @@ class PyStructFormattedField(FieldStruct[_IT, _IT]):
                         + f"{target_length} elements were provided!"
                     )
 
+            if target_length == 0:
+                return  # nothing to do
             struct_ = self._cached(field.order.ch, target_length)
 
         context[CTX_STREAM].write(struct_.pack(*seq))
@@ -248,6 +252,20 @@ class PyStructFormattedField(FieldStruct[_IT, _IT]):
         # only possible when a Field has been configured
         field = context[CTX_FIELD]
         length = field.length(context)
+        if type(length) is _PrefixedType:
+            context[CTX_SEQ] = False
+            field.amount = 1
+            try:
+                new_length = length.start.__unpack__(context)
+            finally:
+                field.amount = length
+                context[CTX_SEQ] = True
+            length = new_length
+            if not isinstance(length, int):
+                raise InvalidValueError(
+                    f"Prefix struct returned non-integer: {length!r}", context
+                )
+
         if length == 0:
             return []  # maybe add factory
 
@@ -1058,7 +1076,9 @@ class Memory(Generic[_MemoryIT, _MemoryOT], FieldStruct[_MemoryIT, _MemoryOT]):
         if size is Ellipsis:
             return memoryview(stream.read())
 
-        return memoryview(read_exact(context, size, "Memory field"))  # pyright: ignore[reportReturnType]
+        return memoryview(
+            read_exact(context, size, "Memory field")
+        )  # pyright: ignore[reportReturnType]
 
 
 class Bytes(Memory[bytes, bytes]):
@@ -1316,7 +1336,7 @@ class CString(FieldStruct[str, str]):
             value = bytes(data)
         else:
             length = self.__size__(context)
-            value: bytes = context[CTX_STREAM].read(length)
+            value = read_exact(context, length, "CString")
 
         encoding: str = self.encoding(context) if self._encoding_is_lambda else self.encoding   # pyright: ignore[reportCallIssue, reportAssignmentType]
         return value.rstrip(self._raw_pad).decode(encoding)
@@ -2093,7 +2113,7 @@ class Lazy(FieldStruct[_IT, _OT]):
                    when the field is accessed.
     """
 
-    def __init__(self, struct: Callable[[], _StructLike[_IT, _OT]]) -> None:
+    def __init__(self, struct: Callable[[], _StructLike[_IT, _OT] | type]) -> None:
         if not callable(struct):
             raise TypeError(f"struct must be a callable - got {struct!r}")
 
@@ -2109,7 +2129,8 @@ class Lazy(FieldStruct[_IT, _OT]):
         :return: The underlying struct.
         :rtype: _StructLike
         """
-        return self.struct_fn()
+        struct = self.struct_fn()
+        return getstruct(struct, struct)  # pyright: ignore[reportReturnType]
 
     def __bits__(self) -> int:
         """
@@ -2439,3 +2460,235 @@ class Timestamp(
         tz = self.tz if self.tz is not None else datetime.timezone.utc
         dt = datetime.datetime.fromtimestamp(float(parsed), tz)
         return dt if self.tz is not None else dt.replace(tzinfo=None)
+
+
+def _normalize_fill(fill: Any) -> bytes:
+    match fill:
+        case int():
+            if not 0 <= fill <= 255:
+                raise ValueError(f"Fill byte must be in range 0-255 - got {fill!r}")
+            value = bytes([fill])
+        case Buffer():
+            value = bytes(fill)
+        case _:
+            raise TypeError(
+                f"Fill must be a bytes-like object or integer - got {fill!r}"
+            )
+    if not value:
+        raise ValueError("fill pattern must be at least one byte")
+    return value
+
+
+class Padded(FieldStruct[_IT, _OT]):
+    """
+    A wrapper that adds explicit padding bytes before or after a target struct.
+
+    Padding lengths are byte counts and may be static integers or context
+    lambdas. Multi-byte fill patterns are repeated and truncated to exactly the
+    requested byte length.
+    """
+
+    __slots__: tuple[str, ...] = (
+        "struct",
+        "before",
+        "after",
+        "_before_fill",
+        "_after_fill",
+        "_before_strict",
+        "_after_strict",
+    )
+
+    def __init__(
+        self,
+        struct: _StructLike[_IT, _OT] | type,
+        *,
+        before: int | _ContextLambda[int] = 0,
+        after: int | _ContextLambda[int] = 0,
+        fill: Buffer | int = 0x00,
+        strict: bool = False,
+    ) -> None:
+        self.struct: _StructLike[_IT, _OT] = (
+            getstruct(struct) or struct
+        )  # pyright: ignore[reportAttributeAccessIssue]
+        self.before: int | _ContextLambda[int] = before
+        self.after: int | _ContextLambda[int] = after
+        fill_bytes = _normalize_fill(fill)
+        self._before_fill: bytes = fill_bytes
+        self._after_fill: bytes = fill_bytes
+        self._before_strict: bool = strict
+        self._after_strict: bool = strict
+
+    @classmethod
+    def new(
+        cls,
+        struct: _StructLike[_IT, _OT] | type,
+        *,
+        before: int | _ContextLambda[int] = 0,
+        after: int | _ContextLambda[int] = 0,
+        before_fill: bytes,
+        after_fill: bytes,
+        before_strict: bool,
+        after_strict: bool,
+    ) -> Self:
+        obj = cls(struct, before=before, after=after)
+        obj._before_fill = before_fill
+        obj._after_fill = after_fill
+        obj._before_strict = before_strict
+        obj._after_strict = after_strict
+        return obj
+
+    def __type__(self) -> type | str | None:
+        return self.struct.__type__()
+
+    def __size__(self, context: _ContextLike) -> int:
+        if callable(self.before) or callable(self.after):
+            raise DynamicSizeError(
+                "Padded fields with dynamic padding don't have a fixed size"
+            )
+        before = self._resolve_length(self.before, context)
+        after = self._resolve_length(self.after, context)
+        return before + self.struct.__size__(context) + after
+
+    def _fill_bytes(self, fill: bytes, length: int) -> bytes:
+        if length == 0:
+            return b""
+        return (fill * ((length + len(fill) - 1) // len(fill)))[:length]
+
+    def _resolve_length(
+        self, length: int | _ContextLambda[int], context: _ContextLike
+    ) -> int:
+        value = length(context) if callable(length) else length
+        if not isinstance(value, int):
+            raise ValueError(
+                f"Padding length must resolve to an integer - got {value!r}"
+            )
+        if value < 0:
+            raise ValueError(f"Padding length must be non-negative - got {value!r}")
+        return value
+
+    def _read_padding(
+        self, length: int, fill: bytes, strict: bool, context: _ContextLike
+    ) -> None:
+        data = read_exact(context, length, "Padded")
+        expected = self._fill_bytes(fill, length)
+        if strict and data != expected:
+            raise ValidationError(
+                "Parsed padding does not match fill pattern:\n"
+                + f"- parsed: {data.hex()}h\n"
+                + f"- fill  : {expected.hex()}h",
+                context,
+            )
+
+    def _write_padding(self, length: int, fill: bytes, context: _ContextLike) -> None:
+        context[CTX_STREAM].write(self._fill_bytes(fill, length))
+
+    @override
+    def unpack_single(self, context: _ContextLike) -> _OT:
+        before = self._resolve_length(self.before, context)
+        self._read_padding(before, self._before_fill, self._before_strict, context)
+        obj = self.struct.__unpack__(context)
+        after = self._resolve_length(self.after, context)
+        self._read_padding(after, self._after_fill, self._after_strict, context)
+        return obj
+
+    @override
+    def pack_single(self, obj: _IT, context: _ContextLike) -> None:
+        before = self._resolve_length(self.before, context)
+        self._write_padding(before, self._before_fill, context)
+        self.struct.__pack__(obj, context)
+        after = self._resolve_length(self.after, context)
+        self._write_padding(after, self._after_fill, context)
+
+
+class _PadSpec:
+    __slots__: tuple[str, ...] = ("length", "fill", "strict", "side")
+
+    def __init__(
+        self,
+        side: str,
+        length: int | _ContextLambda[int],
+        *,
+        fill: Buffer | int = 0x00,
+        strict: bool = False,
+    ) -> None:
+        self.side: str = side
+        self.length: int | _ContextLambda[int] = length
+        self.fill: bytes = _normalize_fill(fill)
+        self.strict: bool = strict
+
+    def __call__(self, struct: _StructLike[_IT, _OT] | type) -> Padded[_IT, _OT]:
+        target = getstruct(struct) or struct
+        if isinstance(target, Padded):
+            return self._merge(target)
+
+        if self.side == "before":
+            return Padded.new(
+                target,  # pyright: ignore[reportArgumentType]
+                before=self.length,
+                before_fill=self.fill,
+                after_fill=b"\x00",
+                before_strict=self.strict,
+                after_strict=False,
+            )
+        return Padded.new(
+            target,  # pyright: ignore[reportArgumentType]
+            after=self.length,
+            before_fill=b"\x00",
+            after_fill=self.fill,
+            before_strict=False,
+            after_strict=self.strict,
+        )
+
+    def _merge(self, struct: Padded[_IT, _OT]) -> Padded[_IT, _OT]:
+        if self.side == "before":
+            return Padded.new(
+                struct.struct,
+                before=self.length,
+                after=struct.after,
+                before_fill=self.fill,
+                after_fill=struct._after_fill,
+                before_strict=self.strict,
+                after_strict=struct._after_strict,
+            )
+        return Padded.new(
+            struct.struct,
+            before=struct.before,
+            after=self.length,
+            before_fill=struct._before_fill,
+            after_fill=self.fill,
+            before_strict=struct._before_strict,
+            after_strict=self.strict,
+        )
+
+    def __rtruediv__(self, struct: _StructLike[_IT, _OT] | type) -> Padded[_IT, _OT]:
+        return self(struct)
+
+
+def PrePad(
+    length: int | _ContextLambda[int],
+    *,
+    fill: Buffer | int = 0x00,
+    strict: bool = False,
+) -> _PadSpec:
+    """
+    Return a compact padding spec that adds bytes before a target struct.
+
+    The returned object can be called directly with a struct or used with the
+    slash syntax, e.g. ``PrePad(2)(uint8)`` or ``uint8 / PrePad(2)``.
+    """
+    return _PadSpec("before", length, fill=fill, strict=strict)
+
+
+def PostPad(
+    length: int | _ContextLambda[int],
+    *,
+    fill: Buffer | int = 0x00,
+    strict: bool = False,
+) -> _PadSpec:
+    """
+    Return a compact padding spec that adds bytes after a target struct.
+
+    The returned object can be called directly with a struct or used with the
+    slash syntax, e.g. ``PostPad(2)(uint8)`` or ``uint8 / PostPad(2)``.
+    """
+    return _PadSpec("after", length, fill=fill, strict=strict)

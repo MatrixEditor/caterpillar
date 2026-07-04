@@ -229,6 +229,8 @@ class Field(Generic[_IT, _OT], PackMixin[_IT], UnpackMixin[_OT]):
 
     @amount.setter
     def amount(self, value: _LengthT | None):
+        if isinstance(value, int) and value < 0:
+            raise ValueError(f"Sequence length must be non-negative - got {value!r}")
         self.__amount = value
         self._amount_is_lambda = callable(value)
         self._is_seq = self._amount_is_lambda or value is not None
@@ -248,7 +250,9 @@ class Field(Generic[_IT, _OT], PackMixin[_IT], UnpackMixin[_OT]):
         self.__options = value
         self._switch_is_lambda = callable(value)
         self._switch_has_default = (
-            bool(value) and not self._switch_is_lambda and DEFAULT_OPTION in value  # pyright: ignore[reportOperatorIssue]
+            bool(value)
+            and not self._switch_is_lambda
+            and DEFAULT_OPTION in value  # pyright: ignore[reportOperatorIssue]
         )
 
     @property
@@ -511,6 +515,26 @@ class Field(Generic[_IT, _OT], PackMixin[_IT], UnpackMixin[_OT]):
         :type context: _ContextLike
         :return: the parsed data
         """
+        # fast path for default structs
+        if (
+            not self._has_cond
+            and not self._is_lambda
+            and self._keep_pos
+            and not self._has_offset
+            and self.__options is None
+        ):
+            context[CTX_SEQ] = self._is_seq
+            context[CTX_FIELD] = self
+            try:
+                return self.__struct.__unpack__(context)
+            except Exception as exc:
+                if not isinstance(exc, StructException):
+                    exc = StructException(str(exc), context)
+                value = self.default
+                if value is INVALID_DEFAULT or isinstance(exc, ValidationError):
+                    raise exc
+                return value
+
         stream: _StreamType = context[CTX_STREAM]
         if self._has_cond and not self.is_enabled(context):
             # Disabled fields or context lambdas won't pack any data

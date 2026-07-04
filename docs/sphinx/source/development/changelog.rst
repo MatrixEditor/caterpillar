@@ -6,6 +6,67 @@ Changelog
 
 *More entries will be added in the future.*
 
+.. _changelog_2.9.0:
+
+[2.9.0] - Python 3.14 Compatibility and Generic Templates
+=========================================================
+
+Added
+-----
+
+- Python 3.14-compatible conditional field metadata: ``with If(condition) as
+  when:``, ``f[..., when]``, ``Start(when)`` / ``End(when)``, explicit
+  ``ElseIf(previous, condition)`` chains, and ``Else(previous)`` fallback
+  branches.
+- ``Branch``, ``When``, and ``Otherwise`` for conditional variants of one
+  attribute, including branch-local ``f[...]`` options such as byte order.
+- Python generic templates based on normal ``typing.TypeVar`` and ``Generic``
+  classes. Templates now support direct ``Template[uint8]`` specialization,
+  partial specialization, specialization caching, and runtime ``__origin__`` /
+  ``__args__`` metadata.
+- ``field_of()`` for carrying generic template field metadata through
+  ``f[...]``, including sequence length, offset, switch options, byte order, bit
+  width, and conditions.
+- ``Padded``, ``PrePad``, and ``PostPad`` wrappers for explicit before/after
+  padding, dynamic padding lengths, repeated fill patterns, strict validation,
+  and slash syntax such as ``uint8 / PrePad(1) / PostPad(2)``.
+- A ``pytest-benchmark`` benchmark suite covering the ``examples/comparison`` workload.
+
+Changes
+-------
+
+- ``derive()`` now handles generic templates, returns already materialized
+  struct classes unchanged when no type arguments are supplied, supports keyword
+  defaults in legacy templates, and evaluates deferred annotations while legacy
+  template variables are still available.
+- Native C atoms (``Repeated``, ``Conditional``, ``AtOffset``, and ``Switch``)
+  now accept Python struct classes and other ``__struct__`` containers,
+  improving Python/C interoperability and ``c_Context`` coverage.
+- ``PyStructFormattedField`` now handles prefixed sequence unpacking and
+  validates empty sequence packing after processing fixed or prefixed lengths.
+- ``Lazy`` now resolves objects that expose ``__struct__``, allowing lazy
+  factories to return decorated model classes or struct containers.
+
+Fixes
+-----
+
+- ``Field`` rejects negative sequence lengths at definition time and uses a
+  faster no-option unpack path while preserving default fallback and exception
+  wrapping behavior.
+- ``Compressed`` copies compression and decompression keyword arguments before
+  resolving context lambdas, preventing cross-call mutation.
+- Fixed-length ``CString`` unpacking now performs exact reads and rejects
+  truncated input.
+- Padding validation now covers strict greedy fill patterns and rejects
+  unsupported prefixed padding lengths.
+- C extension fixes include safer reference handling and error propagation,
+  length-info forwarding to ``__pack_many__`` / ``__unpack_many__``, ``__bits__``
+  lookup on Python atoms, repeated atom unpack detection, ``AtOffset.keep_pos``
+  behavior, switch type aggregation, arch/endian rich comparison errors, and
+  writable offset/whence setters.
+
+
+
 .. _changelog_2.8.0:
 
 [2.8.0] - Extended Syntax

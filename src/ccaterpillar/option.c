@@ -15,6 +15,7 @@ cp_option_new(PyTypeObject* type, PyObject* args, PyObject* kw)
   }
 
   if ((self->name = PyUnicode_FromString(""), !self->name)) {
+    Py_DECREF(self);
     return NULL;
   }
 
@@ -45,14 +46,21 @@ static PyObject*
 cp_option_richcmp(CpOptionObject* self, PyObject* other, int op)
 {
   static const char* _NameAttr = "name";
-  if (!PyObject_IsInstance(other, (PyObject*)&CpOption_Type)) {
+  int is_instance = PyObject_IsInstance(other, (PyObject*)&CpOption_Type);
+  if (is_instance < 0) {
+    return NULL;
+  }
+  if (!is_instance) {
     // check if name is equal to this object's name
     if (PyObject_HasAttrString(other, _NameAttr)) {
       PyObject* otherName = PyObject_GetAttrString(other, _NameAttr);
+      PyObject* result = NULL;
       if (!otherName) {
         return NULL;
       }
-      return PyObject_RichCompare(self->name, otherName, op);
+      result = PyObject_RichCompare(self->name, otherName, op);
+      Py_DECREF(otherName);
+      return result;
     }
     return Py_NewRef(Py_False);
   }

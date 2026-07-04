@@ -106,7 +106,9 @@ class Compressed(Transformer[bytes, bytes, bytes, bytes]):
         :return: The compressed data.
         :rtype: bytes
         """
-        return self.compressor.compress(obj, **get_kwargs(self.comp_args, context))
+        return self.compressor.compress(
+            obj, **get_kwargs(self.comp_args.copy(), context)
+        )
 
     @override
     def decode(self, parsed: bytes, context: _ContextLike) -> bytes:
@@ -121,7 +123,7 @@ class Compressed(Transformer[bytes, bytes, bytes, bytes]):
         :rtype: bytes
         """
         return self.compressor.decompress(
-            parsed, **get_kwargs(self.decomp_args, context)
+            parsed, **get_kwargs(self.decomp_args.copy(), context)
         )
 
 

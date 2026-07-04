@@ -39,13 +39,19 @@ cp_conditionalatom_init(CpConditionalAtomObject* self,
                         PyObject* kw)
 {
   static char* kwlist[] = { "atom", "condition", NULL };
-  PyObject *atom = NULL, *condition = NULL;
+  PyObject *atom = NULL, *condition = NULL, *nAtom = NULL;
   if (!PyArg_ParseTupleAndKeywords(args, kw, "OO", kwlist, &atom, &condition)) {
     return -1;
   }
-  _Cp_SetObj(self->m_atom, atom);
+  _Cp_AssignCheck(nAtom, Cp_GetStruct(atom), error);
+  Py_XSETREF(self->m_atom, nAtom);
+  nAtom = NULL;
   _Cp_SetObj(self->m_condition, condition);
   return 0;
+
+error:
+  Py_XDECREF(nAtom);
+  return -1;
 }
 
 _CpEndian_ImplSetByteorder(CpConditionalAtomObject,
@@ -75,7 +81,7 @@ cp_conditionalatom_eval_with_context(PyObject* self,
     return NULL;
   }
 
-  return result ? Py_True : Py_False;
+  return PyBool_FromLong(result);
 }
 
 /*Public API*/
@@ -137,7 +143,7 @@ CpConditionalAtom_Unpack(PyObject* pAtom, PyObject* pContext)
   return enabled
            ? CpAtom_Unpack(_Cp_CAST(CpConditionalAtomObject*, pAtom)->m_atom,
                            pContext)
-           : Py_None;
+           : Py_NewRef(Py_None);
 }
 
 /*CpAPI*/

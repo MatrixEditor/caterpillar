@@ -124,10 +124,10 @@ assert data_le != data_be
 ```
 
 > [!NOTE]
-> Python 3.14 breaks `with` statements in class definitions since `__annotations__` are added at the end
-> of a class definition. Therefore, `Digest` and conditional statements **ARE NOT SUPPORTED** using the `with` syntax in Python 3.14+.
-> As of version `2.4.5` the `Digest` class has a counterpart (`DigestField`), which can be used to manually specify a digest without
-> the need of a `ẁith` statement.
+> Python 3.14 changes when class-body `__annotations__` are available. Digest context managers still need the explicit
+> `DigestField` form on Python 3.14+, but conditional `with` blocks are supported through explicit metadata:
+> `with If(condition) as when:` plus `f[..., when]` for one field or `Start(when)` / `End(when)` for a block.
+> For conditional variants of one attribute, use `Branch(When(...), Otherwise(...))`.
 
 This library offers extensive functionality beyond basic struct handling. For further details
 on its powerful features, explore the official [documentation](https://matrixeditor.github.io/caterpillar/),

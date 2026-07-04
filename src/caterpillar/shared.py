@@ -142,6 +142,24 @@ ATTR_ACTION_UNPACK: Final[str] = "__action_unpack__"
 .. versionadded:: 2.4.0
 """
 
+ATTR_CONDITIONAL: Final[str] = "__conditional__"
+"""Attribute indicating a conditional object.
+
+.. versionadded:: 2.9.0
+"""
+
+ATTR_CONDITIONAL_START: Final[str] = "__conditional_start__"
+"""Attribute indicating the start of a conditional block.
+
+.. versionadded:: 2.9.0
+"""
+
+ATTR_CONDITIONAL_END: Final[str] = "__conditional_end__"
+"""Attribute indicating then end of a conditional block.
+
+.. versionadded:: 2.9.0
+"""
+
 
 def constval(value: _OT) -> "_ContextLambda[_OT]":
     """Returns a lambda that returns a constant value when invoked.
@@ -259,6 +277,18 @@ def hasstruct(obj: object) -> TypeIs[_ContainsStruct]:
     :return: True if the object has a structure attribute, else False.
     """
     return hasattr(obj.__class__ if not isinstance(obj, type) else obj, ATTR_STRUCT)
+
+
+def iscond(obj: object) -> bool:
+    return getattr(obj, ATTR_CONDITIONAL, False) is True
+
+
+def iscondstart(obj: object) -> bool:
+    return getattr(obj, ATTR_CONDITIONAL_START, False) is True
+
+
+def iscondend(obj: object) -> bool:
+    return getattr(obj, ATTR_CONDITIONAL_END, False) is True
 
 
 @overload
@@ -492,10 +522,12 @@ class UnpackMixin(Generic[_OT]):
         """
         from caterpillar.model import unpack_file
 
-        return unpack_file(  # pyright: ignore[reportCallIssue, reportUnknownVariableType]
-            self,  # pyright: ignore[reportArgumentType]
-            filename,
-            order=order,
-            arch=arch,
-            **kwargs,
+        return (
+            unpack_file(  # pyright: ignore[reportCallIssue, reportUnknownVariableType]
+                self,  # pyright: ignore[reportArgumentType]
+                filename,
+                order=order,
+                arch=arch,
+                **kwargs,
+            )
         )

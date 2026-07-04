@@ -21,7 +21,16 @@ import typing
 import warnings
 
 from typing import Annotated, Callable, Any, Generic, Protocol, get_args, get_origin
-from typing_extensions import Buffer, Final, Literal, Self, Sized, overload, override, TypeVar
+from typing_extensions import (
+    Buffer,
+    Final,
+    Literal,
+    Self,
+    Sized,
+    overload,
+    override,
+    TypeVar,
+)
 from types import FrameType, TracebackType
 from dataclasses import dataclass
 
@@ -38,6 +47,7 @@ from caterpillar.abc import (
     _EndianLike,
     _ArchLike,
 )
+from caterpillar.shared import iscond
 
 if typing.TYPE_CHECKING:
     from caterpillar.fields._base import Field
@@ -201,6 +211,7 @@ class Context(dict[str, Any]):
     def __getitem__(self, key: Literal["_pos"], /) -> int: ...
     @overload
     def __getitem__(self, key: str, /) -> Any: ...
+
     __getitem__ = dict.__getitem__
 
 
@@ -403,15 +414,15 @@ class ConditionContext:
     :type condition: Union[_ContextLambda, bool]
     """
 
-    __slots__: tuple[str, str, str, str] = (
+    __slots__: tuple[str, ...] = (
         "func",
         "annotations",
         "namelist",
         "depth",
     )
 
-    def __init__(self, condition: _ContextLambda[bool], depth: int = 2):
-        self.func: _ContextLambda[bool] = condition
+    def __init__(self, condition: _ContextLambda[bool] | bool, depth: int = 2):
+        self.func: _ContextLambda[bool] | bool = condition
         self.annotations: dict[str, Any] = {}
         self.namelist: list[str] = list()
         self.depth: int = depth
@@ -453,11 +464,15 @@ class ConditionContext:
             # modify newly created fields
             field: Field | Any = self.annotations[name]
             is_annotated = get_origin(field) is Annotated
-            annotated_type = extra_options = None
+            annotated_type = None
+            extra_options = ()
             if is_annotated:
                 # annotated_type = field.__origin__
                 # field, *extra_options = field.__metadata__
-                annotated_type, field, *extra_options = get_args(field)
+                args = get_args(field)
+                if any(iscond(metadata) for metadata in args[1:]):
+                    continue
+                annotated_type, field, *extra_options = args
 
             if not isinstance(field, Field):
                 # create a field (other attributes will be modified later)
@@ -484,7 +499,7 @@ class ConditionContext:
             # rebuild the annotated field
             self.annotations[name] = (
                 # Python 3.10 does not allow *extra_options
-                Annotated[annotated_type, field, extra_options]
+                Annotated[(annotated_type, field, *extra_options)]
                 if is_annotated
                 else field
             )

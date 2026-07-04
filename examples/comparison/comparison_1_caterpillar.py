@@ -36,7 +36,7 @@ class Item:
     #
     # Time goes down from 0.0119 to 0.0099 for unpacking
     # and from 0.0094 to 0.0082 for packing
-    name2: f[bytes, Prefixed(uint8, encoding="utf-8")]
+    name2: f[str, Prefixed(uint8, encoding="utf-8")]
 
     if typing.TYPE_CHECKING:
 

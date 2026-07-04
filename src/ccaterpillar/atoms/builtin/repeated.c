@@ -18,12 +18,16 @@ cp_repeatedatom_new(PyTypeObject* type, PyObject* args, PyObject* kw)
   CpBuiltinAtom_ATOM(self).ob_unpack_many = NULL;
   CpBuiltinAtom_ATOM(self).ob_type = CpRepeatedAtom_TypeOf;
   CpBuiltinAtom_ATOM(self).ob_size = CpRepeatedAtom_Size;
+  self->m_atom = NULL;
+  self->m_length = NULL;
   return _Cp_CAST(PyObject*, self);
 }
 
 static void
 cp_repeatedatom_dealloc(CpRepeatedAtomObject* self)
 {
+  Py_CLEAR(self->m_atom);
+  Py_CLEAR(self->m_length);
   Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
@@ -31,15 +35,21 @@ static int
 cp_repeatedatom_init(CpRepeatedAtomObject* self, PyObject* args, PyObject* kw)
 {
   static char* kwlist[] = { "atom", "length", NULL };
-  PyObject *atom = NULL, *length = NULL;
+  PyObject *atom = NULL, *length = NULL, *nAtom = NULL;
 
   if (!PyArg_ParseTupleAndKeywords(args, kw, "OO", kwlist, &atom, &length)) {
     return -1;
   }
-  _Cp_SetObj(self->m_atom, atom);
+  _Cp_AssignCheck(nAtom, Cp_GetStruct(atom), error);
+  Py_XSETREF(self->m_atom, nAtom);
+  nAtom = NULL;
   _Cp_SetObj(self->m_length, length);
 
   return 0;
+
+error:
+  Py_XDECREF(nAtom);
+  return -1;
 }
 
 static PyObject*
@@ -236,11 +246,7 @@ success:
 PyObject*
 CpRepeatedAtom_Bits(PyObject* pAtom)
 {
-  PyObject *nResult = NULL, *nLength = NULL, *nAtomBits = NULL,
-           *nBitsSize = PyLong_FromLong(8);
-  if (!nBitsSize) {
-    goto error;
-  }
+  PyObject *nResult = NULL, *nLength = NULL, *nAtomBits = NULL;
   _Cp_AssignCheck(nLength, CpRepeatedAtom_GetLength(pAtom, NULL), error);
   if (!PyNumber_Check(nLength)) {
     PyErr_SetString(PyExc_ValueError, "length is not a number!");
@@ -251,10 +257,6 @@ CpRepeatedAtom_Bits(PyObject* pAtom)
                   CpAtom_BitsOf(_Cp_CAST(CpRepeatedAtomObject*, pAtom)->m_atom),
                   error);
   _Cp_AssignCheck(nResult, PyNumber_Multiply(nLength, nAtomBits), error);
-  Py_XSETREF(nResult, PyNumber_Multiply(nResult, nBitsSize));
-  if (!nResult) {
-    goto error;
-  }
   goto success;
 
 error:
@@ -263,7 +265,6 @@ error:
 success:
   Py_XDECREF(nLength);
   Py_XDECREF(nAtomBits);
-  Py_XDECREF(nBitsSize);
   return nResult;
 }
 
@@ -349,6 +350,7 @@ CpRepeatedAtom_Pack(PyObject* pAtom, PyObject* pObj, PyObject* pContext)
                                nRaisedException, PyExc_NotImplementedError))) {
       // Make sure this method continues to pack the given object
       PyErr_Clear();
+      result = 0;
     } else {
       if (result < 0 && nRaisedException) {
         // This call steals a reference to exc, which must be a valid exception.
@@ -381,8 +383,7 @@ CpRepeatedAtom_Pack(PyObject* pAtom, PyObject* pObj, PyObject* pContext)
     goto error;
 
   // _parent
-  if (CpContext_SETITEM(
-        nSeqContext, state->str__context_parent, Py_NewRef(pContext)) < 0)
+  if (CpContext_SETITEM(nSeqContext, state->str__context_parent, pContext) < 0)
     goto error;
 
   // _io
@@ -391,9 +392,11 @@ CpRepeatedAtom_Pack(PyObject* pAtom, PyObject* pObj, PyObject* pContext)
   }
 
   // _length
-  if (CpContext_SETITEM(nSeqContext,
-                        state->str__context_length,
-                        CpLengthInfo_LengthAsLong(nLengthInfo)) < 0)
+  Py_XSETREF(nTmpObj, CpLengthInfo_LengthAsLong(nLengthInfo));
+  if (!nTmpObj) {
+    goto error;
+  }
+  if (CpContext_SETITEM(nSeqContext, state->str__context_length, nTmpObj) < 0)
     goto error;
 
   // _field
@@ -478,7 +481,7 @@ CpRepeatedAtom_Unpack(PyObject* pAtom, PyObject* pContext)
   bool hasUnpackMany = false;
   CpRepeatedAtomObject* self = _Cp_CAST(CpRepeatedAtomObject*, pAtom);
 
-  hasUnpackMany = CpAtom_HasPackMany(self->m_atom);
+  hasUnpackMany = CpAtom_HasUnpackMany(self->m_atom);
   _Cp_AssignCheck(nLength, CpRepeatedAtom_GetLength(pAtom, pContext), error);
   _Cp_AssignCheck(nLengthInfo, CpLengthInfo_New(0, false), error);
   if (_CpUnpack_EvalLength(
@@ -503,6 +506,8 @@ CpRepeatedAtom_Unpack(PyObject* pAtom, PyObject* pContext)
         PyErr_SetRaisedException(nRaisedException);
         nRaisedException = NULL;
       }
+      nResult = nTmpObj;
+      nTmpObj = NULL;
       goto success;
     }
   }
@@ -516,16 +521,23 @@ CpRepeatedAtom_Unpack(PyObject* pAtom, PyObject* pContext)
     nBasePath, CpContext_ITEM(pContext, state->str__context_path), error);
 
   // _root
-  CpContext_SETITEM(
-    nSeqContext, state->str__context_root, CpContext_GetRoot(pContext));
+  Py_XSETREF(nTmpObj, CpContext_GetRoot(pContext));
+  if (!nTmpObj ||
+      CpContext_SETITEM(nSeqContext, state->str__context_root, nTmpObj) < 0) {
+    goto error;
+  }
   // _parent
-  CpContext_SETITEM(nSeqContext, state->str__context_parent, pContext);
+  if (CpContext_SETITEM(nSeqContext, state->str__context_parent, pContext) < 0)
+    goto error;
   // _length
-  CpContext_SETITEM(nSeqContext, state->str__context_length, nLength);
+  if (CpContext_SETITEM(nSeqContext, state->str__context_length, nLength) < 0)
+    goto error;
   // _obj
-  CpContext_COPYITEM(nSeqContext, pContext, state->str__context_obj);
+  if (CpContext_COPYITEM(nSeqContext, pContext, state->str__context_obj) < 0)
+    PyErr_Clear();
   // _is_seq
-  CpContext_SETITEM(nSeqContext, state->str__context_is_seq, Py_False);
+  if (CpContext_SETITEM(nSeqContext, state->str__context_is_seq, Py_False) < 0)
+    goto error;
   // _field
   if (CpContext_COPYITEM(nSeqContext, pContext, state->str__context_field) <
       0) {
@@ -533,9 +545,11 @@ CpRepeatedAtom_Unpack(PyObject* pAtom, PyObject* pContext)
     PyErr_Clear();
   }
   // _io
-  CpContext_COPYITEM(nSeqContext, pContext, state->str__context_io);
+  if (CpContext_COPYITEM(nSeqContext, pContext, state->str__context_io) < 0)
+    goto error;
   // _lst
-  CpContext_SETITEM(nSeqContext, state->str__context_list, nSeq);
+  if (CpContext_SETITEM(nSeqContext, state->str__context_list, nSeq) < 0)
+    goto error;
 
   while (CpLengthInfo_IsGreedy(nLengthInfo) ||
          index < CpLengthInfo_Length(nLengthInfo)) {
@@ -590,7 +604,7 @@ success:
   Py_XDECREF(nTmpIndex);
   Py_XDECREF(nTmpObj);
   Py_XDECREF(nRaisedException);
-  // Py_XDECREF(nSeq); // new ref is stored in nResult
+  Py_XDECREF(nSeq);
   return nResult;
 }
 

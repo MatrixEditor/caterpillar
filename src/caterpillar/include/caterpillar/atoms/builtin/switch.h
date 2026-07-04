@@ -71,6 +71,7 @@ CpSwitchAtom_SetCases(PyObject* pObj, PyObject* pCases)
   CpSwitchAtomObject* self = _Cp_CAST(CpSwitchAtomObject*, pObj);
   if (!pCases) {
     PyErr_SetString(PyExc_ValueError, "Cases cannot be null");
+    return -1;
   }
 
   Py_XSETREF(self->m_cases, Py_NewRef(pCases));
@@ -84,6 +85,7 @@ CpSwitchAtom_SetAtom(PyObject* pObj, PyObject* pAtom)
   CpSwitchAtomObject* self = _Cp_CAST(CpSwitchAtomObject*, pObj);
   if (!pAtom) {
     PyErr_SetString(PyExc_ValueError, "Atom cannot be null");
+    return -1;
   }
 
   Py_XSETREF(self->m_atom, Py_NewRef(pAtom));

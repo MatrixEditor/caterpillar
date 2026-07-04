@@ -73,17 +73,20 @@ _import_caterpillar(void)
   PyObject* c_api = PyObject_GetAttrString(caterpillar, "_C_API");
   if (c_api == NULL) {
     PyErr_SetString(PyExc_AttributeError, "_C_API not found");
+    Py_DECREF(caterpillar);
     return -1;
   }
 
   if (!PyCapsule_CheckExact(c_api)) {
     PyErr_SetString(PyExc_TypeError, "_C_API is not a capsule");
     Py_DECREF(c_api);
+    Py_DECREF(caterpillar);
     return -1;
   }
 
   Cp_API = (void**)PyCapsule_GetPointer(c_api, NULL);
   Py_DECREF(c_api);
+  Py_DECREF(caterpillar);
   if (Cp_API == NULL) {
     PyErr_SetString(PyExc_AttributeError, "_C_API is NULL pointer");
     return -1;

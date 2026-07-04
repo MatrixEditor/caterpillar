@@ -7,12 +7,15 @@
 static int
 cp_context_init(CpContextObject* self, PyObject* args, PyObject* kw)
 {
-  return PyDict_Type.tp_init((PyObject*)&self->m_dict, args, kw) < 0;
+  return PyDict_Type.tp_init((PyObject*)&self->m_dict, args, kw);
 }
 
 static int
 cp_context__setattr__(CpContextObject* self, char* name, PyObject* value)
 {
+  if (!value) {
+    return PyDict_DelItemString((PyObject*)&self->m_dict, name);
+  }
   return PyDict_SetItemString((PyObject*)&self->m_dict, name, value);
 }
 
@@ -106,7 +109,6 @@ PyObject*
 CpContext_GenericGetAttr(PyObject* context, PyObject* path)
 {
   _modulestate* state = get_global_module_state();
-  PyObject* str = PyObject_Repr(path);
   // Names starting with 'n' contain a NEW reference to a
   // Python object, whereas variables starting with 'b'
   // store a borrowed reference.
@@ -265,8 +267,7 @@ CpContext_GenericSetAttr(PyObject* pContext, PyObject* pPath, PyObject* pValue)
 
   // if length is one, set the attribute directly
   if (PyList_Size(nElemets) == 1) {
-    if (PyObject_SetItem(
-          pContext, pPath, pValue ? pValue : Py_NewRef(Py_None)) < 0)
+    if (PyObject_SetItem(pContext, pPath, pValue ? pValue : Py_None) < 0)
       goto error;
   } else {
     bNewPath = PyList_GetItem(nElemets, 0);
@@ -281,8 +282,7 @@ CpContext_GenericSetAttr(PyObject* pContext, PyObject* pPath, PyObject* pValue)
     if (!bTarget)
       goto error;
 
-    if (PyObject_SetAttr(nObj, bTarget, pValue ? pValue : Py_NewRef(Py_None)) <
-        0)
+    if (PyObject_SetAttr(nObj, bTarget, pValue ? pValue : Py_None) < 0)
       goto error;
   }
   goto success;

@@ -39,14 +39,20 @@ static int
 cp_switchatom_init(CpSwitchAtomObject* self, PyObject* args, PyObject* kw)
 {
   static char* kwlist[] = { "atom", "cases", NULL };
-  PyObject *atom = NULL, *cases = NULL;
+  PyObject *atom = NULL, *cases = NULL, *nAtom = NULL;
   if (!PyArg_ParseTupleAndKeywords(args, kw, "OO", kwlist, &atom, &cases)) {
     return -1;
   }
-  _Cp_SetObj(self->m_atom, atom);
+  _Cp_AssignCheck(nAtom, Cp_GetStruct(atom), error);
+  Py_XSETREF(self->m_atom, nAtom);
+  nAtom = NULL;
   _Cp_SetObj(self->m_cases, cases);
-  self->s_callable = PyCallable_Check(atom);
+  self->s_callable = PyCallable_Check(self->m_atom);
   return 0;
+
+error:
+  Py_XDECREF(nAtom);
+  return -1;
 }
 
 _CpEndian_ImplSetByteorder(CpSwitchAtomObject, switchatom, self->m_atom);
@@ -207,6 +213,9 @@ CpSwitchAtom_TypeOf(PyObject* pAtom)
     }
 
     Py_XSETREF(nResult, PyNumber_Or(nResult, nTmpAtomType));
+    if (!nResult) {
+      goto error;
+    }
   }
   goto success;
 
@@ -216,6 +225,8 @@ error:
 success:
   Py_XDECREF(nAtomType);
   Py_XDECREF(nCasesValues);
+  Py_XDECREF(nTmpAtomType);
+  Py_XDECREF(nTmpAtom);
   return nResult;
 }
 
