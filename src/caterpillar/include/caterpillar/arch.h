@@ -210,10 +210,10 @@ CpEndian_SetEndian(PyObject* op, CpEndianObject* endian)
     return NULL;
   }
   PyObject* ret = PyObject_CallOneArg(attr, (PyObject*)endian);
+  Py_DECREF(attr);
   if (!ret) {
     return NULL;
   }
-  Py_DECREF(attr);
   return ret;
 }
 

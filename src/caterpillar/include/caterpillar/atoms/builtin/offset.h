@@ -78,21 +78,40 @@ CpOffsetAtom_WhenceAsLong(PyObject* pObj)
 static inline int
 CpOffsetAtom_SetAtom(PyObject* pObj, PyObject* pAtom)
 {
-  _Cp_CAST(CpOffsetAtomObject*, pObj)->m_atom = Py_NewRef(pAtom);
+  CpOffsetAtomObject* self = _Cp_CAST(CpOffsetAtomObject*, pObj);
+  if (!pAtom) {
+    PyErr_SetString(PyExc_ValueError, "Atom cannot be null");
+    return -1;
+  }
+
+  Py_XSETREF(self->m_atom, Py_NewRef(pAtom));
   return 0;
 }
 
 static inline int
 CpOffsetAtom_SetOffset(PyObject* pObj, PyObject* pOffset)
 {
-  _Cp_CAST(CpOffsetAtomObject*, pObj)->m_offset = Py_NewRef(pOffset);
+  CpOffsetAtomObject* self = _Cp_CAST(CpOffsetAtomObject*, pObj);
+  if (!pOffset) {
+    PyErr_SetString(PyExc_ValueError, "Offset cannot be null");
+    return -1;
+  }
+
+  Py_XSETREF(self->m_offset, Py_NewRef(pOffset));
+  self->s_is_number = PyNumber_Check(self->m_offset);
   return 0;
 }
 
 static inline int
 CpOffsetAtom_SetWhence(PyObject* pObj, PyObject* pWhence)
 {
-  _Cp_CAST(CpOffsetAtomObject*, pObj)->m_whence = Py_NewRef(pWhence);
+  CpOffsetAtomObject* self = _Cp_CAST(CpOffsetAtomObject*, pObj);
+  if (!pWhence) {
+    PyErr_SetString(PyExc_ValueError, "Whence cannot be null");
+    return -1;
+  }
+
+  Py_XSETREF(self->m_whence, Py_NewRef(pWhence));
   return 0;
 }
 

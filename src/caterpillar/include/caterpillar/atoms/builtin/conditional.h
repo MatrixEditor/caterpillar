@@ -64,6 +64,7 @@ CpConditionalAtom_SetAtom(PyObject* pObj, PyObject* pAtom)
   CpConditionalAtomObject* self = _Cp_CAST(CpConditionalAtomObject*, pObj);
   if (!pAtom) {
     PyErr_SetString(PyExc_ValueError, "Atom cannot be null");
+    return -1;
   }
 
   Py_XSETREF(self->m_atom, Py_NewRef(pAtom));
@@ -76,6 +77,7 @@ CpConditionalAtom_SetCondition(PyObject* pObj, PyObject* pCondition)
   CpConditionalAtomObject* self = _Cp_CAST(CpConditionalAtomObject*, pObj);
   if (!pCondition) {
     PyErr_SetString(PyExc_ValueError, "Condition cannot be null");
+    return -1;
   }
 
   Py_XSETREF(self->m_condition, Py_NewRef(pCondition));

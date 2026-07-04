@@ -40,25 +40,31 @@ static int
 cp_offsetatom_init(CpOffsetAtomObject* self, PyObject* args, PyObject* kw)
 {
   static char* kwlist[] = { "atom", "offset", "whence", "keep_pos", NULL };
-  PyObject *bAtom = NULL, *bOffset = NULL;
+  PyObject *bAtom = NULL, *bOffset = NULL, *nAtom = NULL, *nWhence = NULL;
   int whence = PY_SEEK_SET, keepPos = false;
   if (!PyArg_ParseTupleAndKeywords(
         args, kw, "OO|ip", kwlist, &bAtom, &bOffset, &whence, &keepPos)) {
     return -1;
   }
-  _Cp_SetObj(self->m_atom, bAtom);
+  _Cp_AssignCheck(nAtom, Cp_GetStruct(bAtom), error);
+  Py_XSETREF(self->m_atom, nAtom);
+  nAtom = NULL;
   _Cp_SetObj(self->m_offset, bOffset);
   if (whence < PY_SEEK_SET || whence > PY_SEEK_END) {
     PyErr_SetString(PyExc_ValueError, "invalid whence");
     goto error;
   }
 
-  _Cp_AssignCheck(self->m_whence, PyLong_FromLong(whence), error);
+  _Cp_AssignCheck(nWhence, PyLong_FromLong(whence), error);
+  Py_XSETREF(self->m_whence, nWhence);
+  nWhence = NULL;
   self->s_keep_pos = keepPos;
   self->s_is_number = PyNumber_Check(self->m_offset);
   return 0;
 
 error:
+  Py_XDECREF(nAtom);
+  Py_XDECREF(nWhence);
   return -1;
 }
 
@@ -140,6 +146,7 @@ error:
   Py_CLEAR(nResult);
 
 success:
+  Py_XDECREF(nOffset);
   return nResult;
 }
 
@@ -148,7 +155,10 @@ int
 CpOffsetAtom_Pack(PyObject* pAtom, PyObject* pObj, PyObject* pContext)
 {
   PyObject *nFallbackOffset = NULL, *nTmp = NULL, *nIO = NULL, *nTmpIO = NULL,
-           *nOffset = NULL, *nRoot = NULL, *nOffsets = NULL, *nBuffer = NULL;
+           *nOffset = NULL, *nRoot = NULL, *nOffsets = NULL, *nBuffer = NULL,
+           *nTargetOffset = NULL, *nSeekSet = NULL, *nKeepOffset = NULL,
+           *nBufferLen = NULL;
+  Py_ssize_t bufferLen = 0;
   int result = 0;
   CpOffsetAtomObject* self = _Cp_CAST(CpOffsetAtomObject*, pAtom);
   _modulestate* state = get_global_module_state();
@@ -157,8 +167,8 @@ CpOffsetAtom_Pack(PyObject* pAtom, PyObject* pObj, PyObject* pContext)
   _Cp_AssignCheck(nFallbackOffset, CpContextIO_Tell(pContext), error);
   _Cp_AssignCheck(nOffset, CpOffsetAtom_EvalOffset(pAtom, pContext), error);
   _Cp_AssignCheck(
-    nTmp, CpContextIO_Seek(pContext, nOffset, self->m_whence), error);
-  Py_CLEAR(nTmp);
+    nTargetOffset, CpContextIO_Seek(pContext, nOffset, self->m_whence), error);
+  _Cp_AssignCheck(nSeekSet, PyLong_FromLong(PY_SEEK_SET), error);
 
   _Cp_AssignCheck(nIO, CpContext_IO(pContext, state), error);
   _Cp_AssignCheck(nTmpIO, CpObject_CreateNoArgs(CpBytesIO_Type), error);
@@ -174,20 +184,33 @@ CpOffsetAtom_Pack(PyObject* pAtom, PyObject* pObj, PyObject* pContext)
 
   // finally, seek back
   _Cp_AssignCheck(
-    nTmp, CpContextIO_Seek(pContext, nFallbackOffset, self->m_whence), error);
-  Py_CLEAR(nTmp);
-
-  _Cp_AssignCheck(nRoot, CpContext_GetRoot(pContext), error);
+    nRoot, CpContext_GetRoot(pContext), error);
   _Cp_AssignCheck(
     nOffsets, CpContext_ITEM(nRoot, state->str__context_offsets), error);
   _Cp_AssignCheck(
     nBuffer, PyObject_CallMethodNoArgs(nTmpIO, state->str__io_getvalue), error);
 
-  if (PyObject_SetItem(nOffsets, nOffset, nBuffer) < 0) {
+  if (PyObject_SetItem(nOffsets, nTargetOffset, nBuffer) < 0) {
     goto error;
   }
   if (CpContext_SETIO(pContext, state, nIO) < 0) {
     goto error;
+  }
+
+  if (self->s_keep_pos) {
+    bufferLen = PyObject_Length(nBuffer);
+    if (bufferLen < 0) {
+      goto error;
+    }
+    _Cp_AssignCheck(nBufferLen, PyLong_FromSsize_t(bufferLen), error);
+    _Cp_AssignCheck(nKeepOffset,
+                    PyNumber_Add(nTargetOffset, nBufferLen),
+                    error);
+    _Cp_AssignCheck(
+      nTmp, CpContextIO_Seek(pContext, nKeepOffset, nSeekSet), error);
+  } else {
+    _Cp_AssignCheck(
+      nTmp, CpContextIO_Seek(pContext, nFallbackOffset, nSeekSet), error);
   }
   goto success;
 
@@ -203,6 +226,10 @@ success:
   Py_XDECREF(nRoot);
   Py_XDECREF(nOffsets);
   Py_XDECREF(nBuffer);
+  Py_XDECREF(nTargetOffset);
+  Py_XDECREF(nSeekSet);
+  Py_XDECREF(nKeepOffset);
+  Py_XDECREF(nBufferLen);
   return result;
 }
 
@@ -211,18 +238,21 @@ PyObject*
 CpOffsetAtom_Unpack(PyObject* pAtom, PyObject* pContext)
 {
   PyObject *nResult = NULL, *nOffset = NULL, *nTmp = NULL,
-           *nFallbackOffset = NULL;
+           *nFallbackOffset = NULL, *nSeekSet = NULL;
   CpOffsetAtomObject* self = _Cp_CAST(CpOffsetAtomObject*, pAtom);
 
   _Cp_AssignCheck(nFallbackOffset, CpContextIO_Tell(pContext), error);
   _Cp_AssignCheck(nOffset, CpOffsetAtom_EvalOffset(pAtom, pContext), error);
+  _Cp_AssignCheck(nSeekSet, PyLong_FromLong(PY_SEEK_SET), error);
   _Cp_AssignCheck(
     nTmp, CpContextIO_Seek(pContext, nOffset, self->m_whence), error);
   Py_CLEAR(nTmp);
 
   _Cp_AssignCheck(nResult, CpAtom_Unpack(self->m_atom, pContext), error);
-  _Cp_AssignCheck(
-    nTmp, CpContextIO_Seek(pContext, nFallbackOffset, self->m_whence), error);
+  if (!self->s_keep_pos) {
+    _Cp_AssignCheck(
+      nTmp, CpContextIO_Seek(pContext, nFallbackOffset, nSeekSet), error);
+  }
   goto success;
 
 error:
@@ -232,6 +262,7 @@ success:
   Py_XDECREF(nTmp);
   Py_XDECREF(nOffset);
   Py_XDECREF(nFallbackOffset);
+  Py_XDECREF(nSeekSet);
   return nResult;
 }
 
@@ -244,6 +275,7 @@ CpOffsetAtom_TypeOf(PyObject* pAtom)
 
 /*type*/
 static PyMemberDef CpOffsetAtom_Members[] = {
+  { "atom", T_OBJECT, offsetof(CpOffsetAtomObject, m_atom), READONLY },
   { "offset", T_OBJECT, offsetof(CpOffsetAtomObject, m_offset), 0 },
   { "whence", T_OBJECT, offsetof(CpOffsetAtomObject, m_whence), 0 },
   { "is_number", T_BOOL, offsetof(CpOffsetAtomObject, s_is_number), READONLY },

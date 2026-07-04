@@ -26,6 +26,7 @@ Cp_FactoryNew(PyObject* pFactoryReference)
   } else {
     nResult = PyObject_CallNoArgs(nFactory);
   }
+  Py_XDECREF(nFactory);
   return nResult;
 }
 
@@ -126,6 +127,7 @@ shared__mod_clear(PyObject* m, _modulestate* state)
   Py_CLEAR(Cp_ArrayFactory);
   Py_CLEAR(Cp_ContextFactory);
   Py_CLEAR(Cp_DefaultOption);
+  Py_CLEAR(CpBytesIO_Type);
 }
 
 int
@@ -163,6 +165,7 @@ shared__mod_init(PyObject* m, _modulestate* state)
   return 0;
 
 err:
+  Py_XDECREF(nTmpMod);
   return -1;
 
 #undef _IMPORT_ATTR

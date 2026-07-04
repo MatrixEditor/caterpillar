@@ -138,14 +138,14 @@ static PyObject*
 cp_atom_type(CpAtomObject* self)
 {
   return self->ob_type ? self->ob_type(_Cp_CAST(PyObject*, self))
-                       : Py_NotImplemented;
+                       : Py_NewRef(Py_NotImplemented);
 }
 
 static PyObject*
 cp_atom_bits(CpAtomObject* self)
 {
   return self->ob_bits ? self->ob_bits(_Cp_CAST(PyObject*, self))
-                       : Py_NotImplemented;
+                       : Py_NewRef(Py_NotImplemented);
 }
 
 static PyObject*
@@ -239,9 +239,10 @@ CpAtom_PackMany(PyObject* pAtom,
   if (CpAtom_Check(pAtom)) {
     func = _Cp_CAST(CpAtomObject*, pAtom)->ob_pack_many;
     if (!func) {
-      PyErr_Format(PyExc_NotImplementedError,
-                   "The atom of type '%s' cannot be packed (missing __pack__)",
-                   Py_TYPE(pAtom)->tp_name);
+      PyErr_Format(
+        PyExc_NotImplementedError,
+        "The atom of type '%s' cannot be packed (missing __pack_many__)",
+        Py_TYPE(pAtom)->tp_name);
       return -1;
     }
     return func(pAtom, pObj, pContext, pLengthInfo);
@@ -249,7 +250,7 @@ CpAtom_PackMany(PyObject* pAtom,
 
   state = get_global_module_state();
   nResult = PyObject_CallMethodObjArgs(
-    pAtom, state->str__pack_many, pObj, pContext, NULL);
+    pAtom, state->str__pack_many, pObj, pContext, pLengthInfo, NULL);
   if (!nResult) {
     return -1;
   }
@@ -303,7 +304,7 @@ CpAtom_UnpackMany(PyObject* pAtom, PyObject* pContext, PyObject* pLengthInfo)
   } else {
     state = get_global_module_state();
     nResult = PyObject_CallMethodObjArgs(
-      pAtom, state->str__unpack_many, pContext, NULL);
+      pAtom, state->str__unpack_many, pContext, pLengthInfo, NULL);
   }
   return nResult;
 }
@@ -313,7 +314,7 @@ PyObject*
 CpAtom_BitsOf(PyObject* pAtom)
 {
   _modulestate* state = NULL;
-  PyObject* nResult = NULL;
+  PyObject *nResult = NULL, *nBits = NULL;
   bitsfunc func = NULL;
 
   if (CpAtom_Check(pAtom)) {
@@ -327,9 +328,18 @@ CpAtom_BitsOf(PyObject* pAtom)
     nResult = func(pAtom);
   } else {
     state = get_global_module_state();
-    nResult = PyObject_CallMethodObjArgs(pAtom, state->str__bits, NULL);
+    _Cp_AssignCheck(nBits, PyObject_GetAttr(pAtom, state->str__bits), error);
+    if (PyCallable_Check(nBits)) {
+      nResult = PyObject_CallNoArgs(nBits);
+      Py_DECREF(nBits);
+    } else {
+      nResult = nBits;
+    }
   }
   return nResult;
+
+error:
+  return NULL;
 }
 
 /*CpAPI*/

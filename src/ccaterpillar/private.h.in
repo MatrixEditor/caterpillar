@@ -44,7 +44,6 @@
   Py_INCREF(value);                                                            \
   if (PyModule_AddObject(m, name, (PyObject*)(value)) < 0) {                   \
     Py_DECREF(value);                                                          \
-    Py_DECREF(m);                                                              \
     PyErr_SetString(PyExc_RuntimeError, "unable to add '" name "' to module"); \
     return (ret);                                                              \
   }
@@ -92,7 +91,11 @@
     if (!ret) {                                                                \
       return NULL;                                                             \
     }                                                                          \
-    _Cp_SetObj(field, ret);                                                    \
+    if (ret == field) {                                                        \
+      Py_DECREF(ret);                                                          \
+    } else {                                                                   \
+      Py_XSETREF(field, ret);                                                  \
+    }                                                                          \
     return Py_NewRef((PyObject*)self);                                         \
   }
 

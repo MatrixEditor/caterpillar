@@ -74,11 +74,14 @@ CpContext_GetDict(PyObject* obj)
 static inline int
 CpContext_COPYITEM(PyObject* pContext, PyObject* pSrc, PyObject* pKey)
 {
+  int result = 0;
   PyObject* nValue = CpContext_ITEM(pSrc, pKey);
   if (!nValue) {
     return -1;
   }
-  return CpContext_SETITEM(pContext, pKey, nValue);
+  result = CpContext_SETITEM(pContext, pKey, nValue);
+  Py_DECREF(nValue);
+  return result;
 }
 
 #define CpContext_IO(context, state)                                           \

@@ -41,7 +41,7 @@ PyModuleDef CpModule = {
 PyMODINIT_FUNC
 PyInit__C(void)
 {
-  PyObject *m = NULL, *c_api = NULL, *nDict = NULL;
+  PyObject *m = NULL, *c_api = NULL;
   _modulestate* state = NULL;
 
   m = PyState_FindModule(&CpModule);
@@ -77,13 +77,10 @@ PyInit__C(void)
     goto err;
   }
 
-  if ((nDict = PyDict_New(), !nDict)) {
+  if (PyModule_AddObject(m, "_C_API", c_api) < 0) {
     goto err;
   }
-
-  if (PyDict_SetItemString(nDict, "_C_API", c_api) < 0) {
-    goto err;
-  }
+  c_api = NULL;
   goto success;
 
 err:
@@ -93,7 +90,6 @@ err:
   Py_XSETREF(m, NULL);
 
 success:
-  Py_XDECREF(nDict);
   Py_XDECREF(c_api);
   return m;
 

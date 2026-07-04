@@ -16,6 +16,7 @@ cp_arch_new(PyTypeObject* type, PyObject* args, PyObject* kw)
 
   self->name = PyUnicode_FromString("");
   if (!self->name) {
+    Py_DECREF(self);
     return NULL;
   }
   self->pointer_size = 0;
@@ -59,7 +60,11 @@ cp_arch_repr(CpArchObject* self)
 static PyObject*
 cp_arch_richcmp(CpArchObject* self, PyObject* other, int op)
 {
-  if (!PyObject_IsInstance(other, (PyObject*)&CpArch_Type)) {
+  int is_instance = PyObject_IsInstance(other, (PyObject*)&CpArch_Type);
+  if (is_instance < 0) {
+    return NULL;
+  }
+  if (!is_instance) {
     Py_RETURN_NOTIMPLEMENTED;
   }
   return PyObject_RichCompare(self->name, ((CpArchObject*)other)->name, op);
@@ -135,6 +140,7 @@ cp_endian_new(PyTypeObject* type, PyObject* args, PyObject* kw)
 
   self->name = PyUnicode_FromString("");
   if (!self->name) {
+    Py_DECREF(self);
     return NULL;
   }
   self->id = 0;
@@ -189,7 +195,11 @@ cp_endian_repr(CpEndianObject* self)
 static PyObject*
 cp_endian_richcmp(CpEndianObject* self, PyObject* other, int op)
 {
-  if (!PyObject_IsInstance(other, (PyObject*)&CpEndian_Type)) {
+  int is_instance = PyObject_IsInstance(other, (PyObject*)&CpEndian_Type);
+  if (is_instance < 0) {
+    return NULL;
+  }
+  if (!is_instance) {
     Py_RETURN_NOTIMPLEMENTED;
   }
 

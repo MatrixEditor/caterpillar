@@ -64,6 +64,7 @@ PyTypeObject CpLengthInfo_Type = {
   .tp_new = (newfunc)cp_lengthinfo_new,
   .tp_init = (initproc)cp_lengthinfo_init,
   .tp_repr = (reprfunc)cp_lengthinfo_repr,
+  .tp_members = CpLengthInfo_Members,
   .tp_doc = NULL,
 };
 
