@@ -1,17 +1,19 @@
-# type: ignore
+# dtype: ignore
+from typing import TypeVar, Generic
+
 from caterpillar.py import (
+    f,
+    field_of,
     struct,
     set_struct_flags,
     S_REPLACE_TYPES,
     uint8,
-    uint16,
-    TemplateTypeVar,
     template,
     derive,
     pack,
     this,
 )
-from caterpillar.types import uint8_t
+from caterpillar.types import uint16_t, uint8_t
 
 set_struct_flags(S_REPLACE_TYPES)
 
@@ -24,15 +26,18 @@ class BaseFormat:
     f1: uint8_t
 
 
-A = TemplateTypeVar("A")
-B = TemplateTypeVar("B")
+A = TypeVar("A")
+B = TypeVar("B")
 
 
-@template(A, B)
-class FormatTemplate(BaseFormat):
+@template
+class FormatTemplate(Generic[A, B], BaseFormat):
     """Template class doc-comment"""
 
-    f2: A[this.f1]
+    # Use the field_of method to apply special operators on a type var
+    # --> these will be applied to the field later on
+
+    f2: f[list[A], field_of(A)[this.f1]]
     """Template field doc-comment"""
 
     #: inline template field comment
@@ -40,17 +45,19 @@ class FormatTemplate(BaseFormat):
 
 
 #: anonymous generated partial template
-Format8 = derive(FormatTemplate, uint8, partial=True)
+# Format8 = derive(FormatTemplate, uint8, partial=True)
+# or direct approach
+Format8 = FormatTemplate[uint8_t, B]
 
 
 @struct
-class Format(derive(Format8, B=uint8)):
+class Format(Format8[uint8_t]):
     #: inline comment
     f4: uint8_t
 
 
-#: inline data comment
-Format16 = derive(FormatTemplate, uint16, uint16, name=...)
+# Direct specialization via [] is also possible
+Format16 = FormatTemplate[uint16_t, uint16_t]
 
 if __name__ == "__main__":
     # Format(f1: int, f2: List, f3: int, f4: int)
