@@ -58,6 +58,9 @@ from .common import (
     align,
     Lazy,
     ENUM_STRICT,
+    Padded,
+    PostPad,
+    PrePad,
 )
 from .varint import VarInt, VARINT_LSB, vint
 from .compression import (
@@ -266,4 +269,7 @@ __all__ = [
     "void_ptr",
     "Xor",
     "ZLibCompressed",
+    "Padded",
+    "PostPad",
+    "PrePad",
 ]

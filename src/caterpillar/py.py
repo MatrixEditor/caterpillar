@@ -415,4 +415,7 @@ __all__ = [
     "x86",
     "Xor",
     "ZLibCompressed",
+    "Padded",
+    "PostPad",
+    "PrePad",
 ]
