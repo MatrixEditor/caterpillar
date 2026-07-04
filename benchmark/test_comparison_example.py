@@ -20,11 +20,13 @@ from caterpillar.context import O_CONTEXT_FACTORY
 
 try:
     from examples.comparison import comparison_1_caterpillar as caterpillar_default
+
+    pytestmark = pytest.mark.benchmark
+
 except ImportError:
     caterpillar_default = None
 
 
-pytestmark = pytest.mark.benchmark
 NATIVE_ONLY = pytest.mark.skipif(
     not caterpillar.native_support(), reason="native extension unavailable"
 )
