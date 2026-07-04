@@ -67,4 +67,3 @@ Context Objects
 .. c:function:: int CpContext_GenericSetAttrString(PyObject *context, const char *path, PyObject *value)
 
     String variant of :c:func:`CpContext_GenericSetAttr`.
-4

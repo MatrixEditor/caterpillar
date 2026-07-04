@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>3.2.2.5. Templates &#8212; Caterpillar 2.8.2 documentation</title>
+    <title>3.2.2.5. Templates &#8212; Caterpillar 2.9.0 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
 
-    <script src="../../_static/documentation_options.js?v=fa7f208a"></script>
+    <script src="../../_static/documentation_options.js?v=182a64a0"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -55,7 +55,7 @@
     <link rel="prev" title="3.2.2.4. Bit-field" href="bitfield.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.8.2" />
+  <meta name="docsearch:version" content="2.9.0" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -123,7 +123,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.8.2</p>
+    <p class="title logo__title">Caterpillar 2.9.0</p>
   
 </a></div>
     
@@ -468,74 +468,172 @@
                   
   <section id="templates">
 <span id="ref-templates"></span><h1><span class="section-number">3.2.2.5. </span>Templates<a class="headerlink" href="#templates" title="Link to this heading">#</a></h1>
-<p>A specialized form of structs are <em>templates</em>, which are basically generic Python classes. Think of them
-as blueprints for your final classes/structs that contain placeholders for actual types. As in C++, a
-template needs type arguments, in this case we will name them <a class="reference internal" href="../../library/model/template.html#caterpillar.model.TemplateTypeVar" title="caterpillar.model.TemplateTypeVar"><code class="xref py py-class docutils literal notranslate"><span class="pre">TemplateTypeVar</span></code></a>.</p>
-<p>Actually, there are two different types of type variables:</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 2.9.0: </span>Added support for Python’s builtin <code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar`</span></code></p>
+</div>
+<p>Templates are generic model classes that become concrete struct classes after
+specialization. A template class stores template metadata on <code class="docutils literal notranslate"><span class="pre">__template__</span></code>
+and does not store <code class="docutils literal notranslate"><span class="pre">__struct__</span></code> until it is specialized.</p>
+<p>Caterpillar supports two template systems:</p>
 <ul class="simple">
-<li><dl class="simple">
-<dt>Required:</dt><dd><p>These variables are <strong>required</strong> when creating a new struct based on the template and they
-can be used as positional arguments within the type derivation.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>Positional:</dt><dd><p>These arguments are usable only as keyword arguments and are may be optional if a default value
-is supplied.</p>
-</dd>
-</dl>
-</li>
+<li><p>Python generic templates, the preferred API for new code.</p></li>
+<li><p>Legacy <code class="docutils literal notranslate"><span class="pre">TemplateTypeVar</span></code> templates, kept for compatibility.</p></li>
 </ul>
-<p>These template type variables can be created using simple variable definitions:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">A</span> <span class="o">=</span> <span class="n">TemplateTypeVar</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">)</span>
+<section id="python-generic-templates">
+<h2>Python Generic Templates<a class="headerlink" href="#python-generic-templates" title="Link to this heading">#</a></h2>
+<p>Generic templates use normal Python <code class="docutils literal notranslate"><span class="pre">TypeVar</span></code> objects and <code class="docutils literal notranslate"><span class="pre">Generic</span></code> bases.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">TypeVar</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.py</span><span class="w"> </span><span class="kn">import</span> <span class="n">template</span><span class="p">,</span> <span class="n">uint8</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>
+
+
+<span class="nd">@template</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Box</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">T</span><span class="p">]):</span>
+    <span class="n">value</span><span class="p">:</span> <span class="n">T</span>
+
+
+<span class="n">ByteBox</span> <span class="o">=</span> <span class="n">Box</span><span class="p">[</span><span class="n">uint8</span><span class="p">]</span>
 </pre></div>
 </div>
-<div class="admonition important">
-<p class="admonition-title">Important</p>
-<p>A template class is <strong>not</strong> a struct definition. It specifies a blueprint for the final class.</p>
-</div>
-<p>A template class is defined like a struct, union or bitfield class, but without being a
-dataclass nor storing a struct instance.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@template</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">)</span>
-<span class="gp">... </span><span class="k">class</span><span class="w"> </span><span class="nc">FormatTemplate</span><span class="p">:</span>
-<span class="gp">... </span>    <span class="n">foo</span><span class="p">:</span> <span class="n">A</span>
-<span class="gp">... </span>    <span class="n">bar</span><span class="p">:</span> <span class="n">B</span>
-<span class="gp">... </span>    <span class="n">baz</span><span class="p">:</span> <span class="n">uint32</span>
-<span class="gp">...</span>
+<p><code class="docutils literal notranslate"><span class="pre">Box</span></code> is a template. <code class="docutils literal notranslate"><span class="pre">Box[uint8]</span></code> is a concrete struct class. Caterpillar
+installs <code class="docutils literal notranslate"><span class="pre">__class_getitem__</span></code> on the template class and materializes the
+specialization when it is subscripted.</p>
+<p>Specialization performs two different substitutions:</p>
+<ul class="simple">
+<li><p>In normal Python type positions, Caterpillar field objects are replaced with
+their Python value type using <code class="docutils literal notranslate"><span class="pre">typeof()</span></code>.</p></li>
+<li><p>In field metadata positions, Caterpillar keeps the actual field object and
+builds a <code class="docutils literal notranslate"><span class="pre">Field</span></code> from it.</p></li>
+</ul>
+<p>For example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@template</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Box</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">T</span><span class="p">]):</span>
+    <span class="n">value</span><span class="p">:</span> <span class="n">T</span>
+
+
+<span class="n">ByteBox</span> <span class="o">=</span> <span class="n">Box</span><span class="p">[</span><span class="n">uint8</span><span class="p">]</span>
 </pre></div>
 </div>
-<p>The defined class then can be used to create new classes based on the provided class
-structure. For instance,</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Format</span> <span class="o">=</span> <span class="n">derive</span><span class="p">(</span><span class="n">FormatTemplate</span><span class="p">,</span> <span class="n">A</span><span class="o">=</span><span class="n">uint32</span><span class="p">,</span> <span class="n">B</span><span class="o">=</span><span class="n">uint8</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">Format</span>
-<span class="go">&lt;class &#39;__main__.__4BE4F2562B65393CFormatTemplate&#39;&gt;</span>
+<p><code class="docutils literal notranslate"><span class="pre">value:</span> <span class="pre">T</span></code> is converted to a <code class="docutils literal notranslate"><span class="pre">Field(uint8)</span></code> before the generated class is
+passed to <a class="reference internal" href="../../library/model/struct.html#caterpillar.model.Struct" title="caterpillar.model.Struct"><code class="xref py py-class docutils literal notranslate"><span class="pre">Struct</span></code></a>.</p>
+<p><strong>Layout Metadata With</strong> <code class="docutils literal notranslate"><span class="pre">f[]</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">f[]</span></code> is Caterpillar’s public spelling for <code class="docutils literal notranslate"><span class="pre">typing.Annotated[]</span></code>. Use it
+when the Python value type and the binary layout metadata must both be present.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">TypeVar</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.py</span><span class="w"> </span><span class="kn">import</span> <span class="n">f</span><span class="p">,</span> <span class="n">field_of</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">uint8</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>
+
+
+<span class="nd">@template</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Vector</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">T</span><span class="p">]):</span>
+    <span class="n">values</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">field_of</span><span class="p">(</span><span class="n">T</span><span class="p">)[</span><span class="mi">2</span><span class="p">]]</span>
+
+
+<span class="n">ByteVector</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">[</span><span class="n">uint8</span><span class="p">]</span>
 </pre></div>
 </div>
-<p>will return an anonymous class (in this case). Normally, <em>caterpillar</em> tries to infer the
-variable name from the current module (if <code class="code docutils literal notranslate"><span class="pre">name=...</span></code>). In summary, every time
-<a class="reference internal" href="../../library/model/template.html#caterpillar.model.derive" title="caterpillar.model.derive"><code class="xref py py-meth docutils literal notranslate"><span class="pre">derive()</span></code></a> is called, a new class will be created if not already
-defined.</p>
-<p>The current implementation materializes the class annotations with
-<code class="docutils literal notranslate"><span class="pre">inspect.get_annotations()</span></code> while the temporary template variables are still
-available. This keeps templates compatible with Python versions that defer
-annotation evaluation. Template information is then stored on the class using a
-special class attribute: <a class="reference internal" href="protocols/structlike.html#class.__template__" title="class.__template__"><code class="xref py py-attr docutils literal notranslate"><span class="pre">__template__</span></code></a>.</p>
-<p>To support sub-classes of templates, derive a partial template:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Format32</span> <span class="o">=</span> <span class="n">derive</span><span class="p">(</span><span class="n">FormatTemplate</span><span class="p">,</span> <span class="n">A</span><span class="o">=</span><span class="n">uint32</span><span class="p">,</span> <span class="n">partial</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<p>In this example, the Python-facing type becomes <code class="docutils literal notranslate"><span class="pre">list[int]</span></code> while the binary
+layout metadata becomes a two-element <code class="docutils literal notranslate"><span class="pre">Field(uint8)</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">field_of(T)</span></code> supports the same layout operators as
+<a class="reference internal" href="../../library/model/template.html#caterpillar.model.TemplateTypeVar" title="caterpillar.model.TemplateTypeVar"><code class="xref py py-class docutils literal notranslate"><span class="pre">TemplateTypeVar</span></code></a>: sequence length, offset, switch
+options, byte order, bit width, and condition. Generic specializations are cached
+on the template origin. Repeating the same specialization returns the same class:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">assert</span> <span class="n">Box</span><span class="p">[</span><span class="n">uint8</span><span class="p">]</span> <span class="ow">is</span> <span class="n">Box</span><span class="p">[</span><span class="n">uint8</span><span class="p">]</span>
 </pre></div>
 </div>
-<p>Again, the resulting class is <strong>not</strong> a struct, but another template class.
-Provided replacements are stored in the new template metadata, while missing
-required variables must still be supplied by a later non-partial
-<a class="reference internal" href="../../library/model/template.html#caterpillar.model.derive" title="caterpillar.model.derive"><code class="xref py py-func docutils literal notranslate"><span class="pre">derive()</span></code></a> call.</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">name</span></code> parameter controls the generated class name. Passing <code class="docutils literal notranslate"><span class="pre">name=...</span></code>
-asks Caterpillar to infer the assignment target when possible; otherwise an
-anonymous deterministic name is generated from the replacements.</p>
+<p>Generated classes store Caterpillar-owned metadata:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">__origin__</span></code></dt><dd><p>The template class that produced the specialization.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">__args__</span></code></dt><dd><p>The concrete specialization arguments.</p>
+</dd>
+</dl>
+<p>Because <code class="docutils literal notranslate"><span class="pre">Box[uint8]</span></code> returns a real class at runtime, it is not a
+<code class="docutils literal notranslate"><span class="pre">typing</span></code> generic alias after materialization. Use the metadata above instead
+of <code class="docutils literal notranslate"><span class="pre">typing.get_origin()</span></code> and <code class="docutils literal notranslate"><span class="pre">typing.get_args()</span></code> for runtime inspection.</p>
+</section>
+<section id="partial-generic-templates">
+<h2>Partial Generic Templates<a class="headerlink" href="#partial-generic-templates" title="Link to this heading">#</a></h2>
+<p>If a specialization still contains unresolved type variables, Caterpillar keeps
+the result as a template.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">TypeVar</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.py</span><span class="w"> </span><span class="kn">import</span> <span class="n">template</span><span class="p">,</span> <span class="n">uint8</span><span class="p">,</span> <span class="n">uint16</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>
+<span class="n">U</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;U&quot;</span><span class="p">)</span>
+
+
+<span class="nd">@template</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Pair</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">T</span><span class="p">,</span> <span class="n">U</span><span class="p">]):</span>
+    <span class="n">left</span><span class="p">:</span> <span class="n">T</span>
+    <span class="n">right</span><span class="p">:</span> <span class="n">U</span>
+
+
+<span class="n">BytePair</span> <span class="o">=</span> <span class="n">Pair</span><span class="p">[</span><span class="n">uint8</span><span class="p">,</span> <span class="n">U</span><span class="p">]</span>
+<span class="n">ByteWordPair</span> <span class="o">=</span> <span class="n">BytePair</span><span class="p">[</span><span class="n">uint16</span><span class="p">]</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">BytePair</span></code> is a template. <code class="docutils literal notranslate"><span class="pre">ByteWordPair</span></code> is a concrete struct class.</p>
+</section>
+<section id="legacy-template-variables">
+<h2>Legacy Template Variables<a class="headerlink" href="#legacy-template-variables" title="Link to this heading">#</a></h2>
+<p>Legacy templates use <a class="reference internal" href="../../library/model/template.html#caterpillar.model.TemplateTypeVar" title="caterpillar.model.TemplateTypeVar"><code class="xref py py-class docutils literal notranslate"><span class="pre">TemplateTypeVar</span></code></a> or string
+names in the decorator.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.py</span><span class="w"> </span><span class="kn">import</span> <span class="n">TemplateTypeVar</span><span class="p">,</span> <span class="n">derive</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">uint8</span><span class="p">,</span> <span class="n">uint16</span>
+
+<span class="n">A</span> <span class="o">=</span> <span class="n">TemplateTypeVar</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">)</span>
+
+
+<span class="nd">@template</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">FormatTemplate</span><span class="p">:</span>
+    <span class="n">foo</span><span class="p">:</span> <span class="n">A</span>
+    <span class="n">bar</span><span class="p">:</span> <span class="n">B</span>
+
+
+<span class="n">Format</span> <span class="o">=</span> <span class="n">derive</span><span class="p">(</span><span class="n">FormatTemplate</span><span class="p">,</span> <span class="n">uint8</span><span class="p">,</span> <span class="n">uint16</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Legacy templates classify parameters as required or keyword-only defaults:</p>
+<ul class="simple">
+<li><p>Required parameters are passed positionally or by keyword to
+<a class="reference internal" href="../../library/model/template.html#caterpillar.model.derive" title="caterpillar.model.derive"><code class="xref py py-func docutils literal notranslate"><span class="pre">derive()</span></code></a>.</p></li>
+<li><p>Keyword defaults are declared in <code class="docutils literal notranslate"><span class="pre">&#64;template(T=uint8)</span></code> and may be omitted
+from <code class="docutils literal notranslate"><span class="pre">derive()</span></code>.</p></li>
+</ul>
+<p>The legacy decorator temporarily injects missing template names into the caller
+module while annotations are evaluated. This keeps legacy templates compatible
+with deferred annotation evaluation.</p>
+</section>
+<section id="derive">
+<h2><code class="docutils literal notranslate"><span class="pre">derive()</span></code><a class="headerlink" href="#derive" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">derive()</span></code> remains available for both template systems.</p>
+<p>For legacy templates, <code class="docutils literal notranslate"><span class="pre">derive()</span></code> is the primary specialization API. For
+generic templates, direct subscript syntax is preferred, but <code class="docutils literal notranslate"><span class="pre">derive()</span></code> can be
+used when a name or union option must be supplied explicitly.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">NamedByteBox</span> <span class="o">=</span> <span class="n">derive</span><span class="p">(</span><span class="n">Box</span><span class="p">,</span> <span class="n">uint8</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;NamedByteBox&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Passing an already materialized struct class to <code class="docutils literal notranslate"><span class="pre">derive()</span></code> without additional
+arguments returns that class unchanged.</p>
+</section>
+<section id="type-checking">
+<h2>Type Checking<a class="headerlink" href="#type-checking" title="Link to this heading">#</a></h2>
+<p>Static type checkers see generic templates as ordinary Python generic classes.
+At runtime, Caterpillar replaces template arguments with concrete binary
+layouts. If a project needs precise static typing for field atoms such as
+<code class="docutils literal notranslate"><span class="pre">uint8</span></code>, expose typing-only aliases to their Python value types while keeping
+the runtime field objects unchanged.</p>
 <div class="admonition-developer-s-note admonition">
 <p class="admonition-title">Developer’s note</p>
-<p>By now, a template won’t copy existing field documentation comments. Therefore, you
-can’t display inherited members using sphinx.</p>
+<p>Template specialization is performed once when a concrete class is created.
+Pack and unpack operations use the normal <code class="docutils literal notranslate"><span class="pre">Struct</span></code> and <code class="docutils literal notranslate"><span class="pre">Field</span></code> paths.</p>
 </div>
+</section>
 </section>
 
 
@@ -576,6 +674,22 @@ can’t display inherited members using sphinx.</p>
                 <dialog id="pst-secondary-sidebar-modal"></dialog>
                 <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#python-generic-templates">Python Generic Templates</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#partial-generic-templates">Partial Generic Templates</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#legacy-template-variables">Legacy Template Variables</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#derive"><code class="docutils literal notranslate"><span class="pre">derive()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#type-checking">Type Checking</a></li>
+</ul>
+  </nav></div>
 
   <div class="sidebar-secondary-item">
 

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>2.3.9. Templates &#8212; Caterpillar 2.8.2 documentation</title>
+    <title>2.3.9. Templates &#8212; Caterpillar 2.9.0 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
 
-    <script src="../../_static/documentation_options.js?v=fa7f208a"></script>
+    <script src="../../_static/documentation_options.js?v=182a64a0"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -55,7 +55,7 @@
     <link rel="prev" title="2.3.8. Unions" href="union.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.8.2" />
+  <meta name="docsearch:version" content="2.9.0" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -123,7 +123,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.8.2</p>
+    <p class="title logo__title">Caterpillar 2.9.0</p>
   
 </a></div>
     
@@ -463,69 +463,182 @@
                   
   <section id="templates">
 <span id="tutorial-templates"></span><h1><span class="section-number">2.3.9. </span>Templates<a class="headerlink" href="#templates" title="Link to this heading">#</a></h1>
-<p>Yes, you read that correctly: <em>Caterpillar</em> supports class templates, similar
-to the concept in C++. Templates allow you to create generic structures that
-can be tailored with specific types when they are derived.</p>
-<p>If you’d like more details about the design decisions and limitations regarding
-templates, refer to the <a class="reference internal" href="../../reference/datamodel/templates.html#ref-templates"><span class="std std-ref">Templates</span></a> section in the data model description.</p>
-<section id="defining-a-template">
-<h2><span class="section-number">2.3.9.1. </span>Defining a Template<a class="headerlink" href="#defining-a-template" title="Link to this heading">#</a></h2>
-<p>You can define templates using a special syntax. First, you create <strong>template type variables</strong>,
-and then you use them within your class definition. These templates can be instantiated
-later with specific types or values.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 2.9.0: </span>Added support for Python’s <code class="xref py py-class docutils literal notranslate"><span class="pre">Generic</span></code> and <code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code> types.</p>
+</div>
+<p>Templates are blueprints for binary structures. They let you describe a layout
+once and specialize it with different Caterpillar field types later.</p>
+<p>The preferred form uses Python generics. Legacy <code class="docutils literal notranslate"><span class="pre">TemplateTypeVar</span></code> templates
+are still supported and are covered at the end of this page.</p>
+<p>If you’d like the implementation details, see <a class="reference internal" href="../../reference/datamodel/templates.html#ref-templates"><span class="std std-ref">Templates</span></a>.</p>
+<section id="generic-templates">
+<h2><span class="section-number">2.3.9.1. </span>Generic Templates<a class="headerlink" href="#generic-templates" title="Link to this heading">#</a></h2>
+<p>Define a template as a normal generic Python class and decorate it with
+<code class="docutils literal notranslate"><span class="pre">&#64;template</span></code>. A plain type variable annotation is enough.</p>
 <div class="literal-block-wrapper docutils container" id="id1">
-<div class="code-block-caption"><span class="caption-text">A simple template definition</span><a class="headerlink" href="#id1" title="Link to this code">#</a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="n">TemplateTypeVar</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">)</span>
+<div class="code-block-caption"><span class="caption-text">A generic scalar template</span><a class="headerlink" href="#id1" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">TypeVar</span>
 
-<span class="nd">@template</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">)</span>       <span class="c1"># &lt;-- either strings or global variables</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">FormatTemplate</span><span class="p">:</span>
-    <span class="n">foo</span><span class="p">:</span> <span class="n">A</span><span class="p">[</span><span class="n">uint8</span><span class="p">::]</span>     <span class="c1"># &lt;-- prefixed generic array</span>
-    <span class="n">bar</span><span class="p">:</span> <span class="n">B</span>              <span class="c1"># &lt;-- this won&#39;t throw an exception, because</span>
-                        <span class="c1"># &#39;B&#39; is created temporarily.</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.py</span><span class="w"> </span><span class="kn">import</span> <span class="n">pack</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">uint8</span><span class="p">,</span> <span class="n">uint16</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>
+
+
+<span class="nd">@template</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Box</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">T</span><span class="p">]):</span>
+    <span class="n">value</span><span class="p">:</span> <span class="n">T</span>
+
+
+<span class="n">ByteBox</span> <span class="o">=</span> <span class="n">Box</span><span class="p">[</span><span class="n">uint8</span><span class="p">]</span>
+<span class="n">WordBox</span> <span class="o">=</span> <span class="n">Box</span><span class="p">[</span><span class="n">uint16</span><span class="p">]</span>
+
+<span class="k">assert</span> <span class="n">pack</span><span class="p">(</span><span class="n">ByteBox</span><span class="p">(</span><span class="mi">7</span><span class="p">))</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x07</span><span class="s2">&quot;</span>
+<span class="k">assert</span> <span class="n">pack</span><span class="p">(</span><span class="n">WordBox</span><span class="p">(</span><span class="mh">0x0203</span><span class="p">))</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x03\x02</span><span class="s2">&quot;</span>
 </pre></div>
 </div>
 </div>
-<ul class="simple">
-<li><p><code class="code docutils literal notranslate"><span class="pre">A</span></code> is a <strong>template type variable</strong> of an unknown generic type</p></li>
-<li><p>The class <code class="code docutils literal notranslate"><span class="pre">FormatTemplate</span></code> uses <code class="code docutils literal notranslate"><span class="pre">A</span></code> and:code: <cite>B</cite> as type parameters, but these types will be defined when the template is derived into a specific class.</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">A[uint8::]</span></code> creates a <strong>generic array</strong> prefixed with the type <code class="code docutils literal notranslate"><span class="pre">uint8</span></code>.</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">B</span></code> is used as a type in the field <code class="code docutils literal notranslate"><span class="pre">bar</span></code>. This type will be specified when the template is instantiated, and the library ensures no exceptions are thrown because <code class="code docutils literal notranslate"><span class="pre">B</span></code> is set dynamically during class definition.</p></li>
-</ul>
+<p><code class="docutils literal notranslate"><span class="pre">Box</span></code> is not a struct by itself. <code class="docutils literal notranslate"><span class="pre">Box[uint8]</span></code> materializes a concrete
+struct class and caches it, so repeated uses of the same specialization return
+the same class.</p>
 </section>
-<section id="deriving-a-template">
-<h2><span class="section-number">2.3.9.2. </span>Deriving a Template<a class="headerlink" href="#deriving-a-template" title="Link to this heading">#</a></h2>
-<p>Once you have defined a template, you can create specific classes (known as
-<strong>derivations</strong>) by providing the template with concrete types. This allows
-you to reuse the logic from the template with different type combinations,
-e.g. creating specialized structs.</p>
+<section id="multiple-type-variables">
+<h2><span class="section-number">2.3.9.2. </span>Multiple Type Variables<a class="headerlink" href="#multiple-type-variables" title="Link to this heading">#</a></h2>
+<p>Templates can use more than one type variable. The order in <code class="docutils literal notranslate"><span class="pre">Generic[...]</span></code>
+defines the positional specialization order.</p>
 <div class="literal-block-wrapper docutils container" id="id2">
-<div class="code-block-caption"><span class="caption-text">Creating template derivations</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">Format32</span><span class="p">(</span><span class="n">derive</span><span class="p">(</span><span class="n">FormatTemplate</span><span class="p">,</span> <span class="n">A</span><span class="o">=</span><span class="n">uint32</span><span class="p">,</span> <span class="n">B</span><span class="o">=</span><span class="n">uint32</span><span class="p">)):</span> <span class="c1"># &lt;- Derived Struct</span>
-    <span class="n">baz</span><span class="p">:</span> <span class="n">uint32</span>
+<div class="code-block-caption"><span class="caption-text">Multiple template parameters</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">TypeVar</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.py</span><span class="w"> </span><span class="kn">import</span> <span class="n">BigEndian</span><span class="p">,</span> <span class="n">pack</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">uint8</span><span class="p">,</span> <span class="n">uint16</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>
+<span class="n">U</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;U&quot;</span><span class="p">)</span>
+
+
+<span class="nd">@template</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Pair</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">T</span><span class="p">,</span> <span class="n">U</span><span class="p">]):</span>
+    <span class="n">left</span><span class="p">:</span> <span class="n">T</span>
+    <span class="n">right</span><span class="p">:</span> <span class="n">U</span>
+
+
+<span class="n">ByteWordPair</span> <span class="o">=</span> <span class="n">Pair</span><span class="p">[</span><span class="n">uint8</span><span class="p">,</span> <span class="n">uint16</span><span class="p">]</span>
+<span class="n">obj</span> <span class="o">=</span> <span class="n">ByteWordPair</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mh">0x0203</span><span class="p">)</span>
+
+<span class="k">assert</span> <span class="n">pack</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x01\x02\x03</span><span class="s2">&quot;</span>
 </pre></div>
 </div>
 </div>
-<p><em>Sub-templates</em> or partial templates allow you to create smaller, more focused templates based on an
-existing template. When you derive a sub-template, only some of the template
-parameters are provided initially, and others are deferred.</p>
+</section>
+<section id="fields-with-layout-metadata">
+<h2><span class="section-number">2.3.9.3. </span>Fields With Layout Metadata<a class="headerlink" href="#fields-with-layout-metadata" title="Link to this heading">#</a></h2>
+<p>Use direct <code class="docutils literal notranslate"><span class="pre">T</span></code> annotations for simple scalar fields. When a field needs
+Caterpillar-specific layout metadata, keep the Python type in the first
+position of <code class="docutils literal notranslate"><span class="pre">f[]</span></code> and put the template field marker in the metadata position.</p>
 <div class="literal-block-wrapper docutils container" id="id3">
-<div class="code-block-caption"><span class="caption-text">Creating a sub-template</span><a class="headerlink" href="#id3" title="Link to this code">#</a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># template sub-classes are allowed as well</span>
-<span class="n">FormatSubTemplate</span> <span class="o">=</span> <span class="n">derive</span><span class="p">(</span><span class="n">FormatTemplate</span><span class="p">,</span> <span class="n">A</span><span class="o">=</span><span class="n">uint8</span><span class="p">,</span> <span class="n">partial</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="c1"># &lt;- Derived Template</span>
+<div class="code-block-caption"><span class="caption-text">Repeated template field</span><a class="headerlink" href="#id3" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">TypeVar</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.py</span><span class="w"> </span><span class="kn">import</span> <span class="n">f</span><span class="p">,</span> <span class="n">field_of</span><span class="p">,</span> <span class="n">pack</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">uint8</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>
+
+
+<span class="nd">@template</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Vector</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">T</span><span class="p">]):</span>
+    <span class="n">values</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">field_of</span><span class="p">(</span><span class="n">T</span><span class="p">)[</span><span class="mi">2</span><span class="p">]]</span>
+
+
+<span class="n">ByteVector</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">[</span><span class="n">uint8</span><span class="p">]</span>
+
+<span class="k">assert</span> <span class="n">pack</span><span class="p">(</span><span class="n">ByteVector</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]))</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x03\x04</span><span class="s2">&quot;</span>
 </pre></div>
 </div>
 </div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>While you can pass <strong>keyword arguments</strong> to define template parameters, you can also use
-<strong>positional arguments</strong> if the original template decorator defines them in that way.</p>
+<p><code class="docutils literal notranslate"><span class="pre">field_of(T)</span></code> supports the same layout operators as normal fields, including
+sequence length, offset, switch mappings, byte order, bit width, and condition
+markers. For example, <code class="docutils literal notranslate"><span class="pre">field_of(T)[2]</span></code> becomes a two-element field after
+specialization.</p>
+</section>
+<section id="partial-templates">
+<h2><span class="section-number">2.3.9.4. </span>Partial Templates<a class="headerlink" href="#partial-templates" title="Link to this heading">#</a></h2>
+<p>A specialization that still contains unresolved type variables remains a
+template. This is useful for fixing only part of a layout.</p>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">Partial generic specialization</span><a class="headerlink" href="#id4" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">TypeVar</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.py</span><span class="w"> </span><span class="kn">import</span> <span class="n">BigEndian</span><span class="p">,</span> <span class="n">pack</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">uint8</span><span class="p">,</span> <span class="n">uint16</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>
+<span class="n">U</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;U&quot;</span><span class="p">)</span>
+
+
+<span class="nd">@template</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Pair</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">T</span><span class="p">,</span> <span class="n">U</span><span class="p">]):</span>
+    <span class="n">left</span><span class="p">:</span> <span class="n">T</span>
+    <span class="n">right</span><span class="p">:</span> <span class="n">U</span>
+
+
+<span class="n">BytePair</span> <span class="o">=</span> <span class="n">Pair</span><span class="p">[</span><span class="n">uint8</span><span class="p">,</span> <span class="n">U</span><span class="p">]</span>
+<span class="n">ByteWordPair</span> <span class="o">=</span> <span class="n">BytePair</span><span class="p">[</span><span class="n">uint16</span><span class="p">]</span>
+
+<span class="k">assert</span> <span class="n">pack</span><span class="p">(</span><span class="n">ByteWordPair</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mh">0x0203</span><span class="p">),</span> <span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x01\x02\x03</span><span class="s2">&quot;</span>
+</pre></div>
 </div>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>Currently, there are some <strong>limitations</strong> with the template type variables, and <strong>extended support</strong>
-for this feature will be part of future enhancements in this project.</p>
 </div>
+</section>
+<section id="subclassing-specializations">
+<h2><span class="section-number">2.3.9.5. </span>Subclassing Specializations<a class="headerlink" href="#subclassing-specializations" title="Link to this heading">#</a></h2>
+<p>Template specializations are normal struct classes and can be used as bases for
+other structs.</p>
+<div class="literal-block-wrapper docutils container" id="id5">
+<div class="code-block-caption"><span class="caption-text">Extending a specialization</span><a class="headerlink" href="#id5" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">TypeVar</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.py</span><span class="w"> </span><span class="kn">import</span> <span class="n">BigEndian</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">pack</span><span class="p">,</span> <span class="n">struct</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">uint8</span><span class="p">,</span> <span class="n">uint16</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>
+
+
+<span class="nd">@template</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Box</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">T</span><span class="p">]):</span>
+    <span class="n">value</span><span class="p">:</span> <span class="n">T</span>
+
+
+<span class="nd">@struct</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Packet</span><span class="p">(</span><span class="n">Box</span><span class="p">[</span><span class="n">uint8</span><span class="p">]):</span>
+    <span class="n">tail</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">uint16</span><span class="p">]</span>
+
+
+<span class="k">assert</span> <span class="n">pack</span><span class="p">(</span><span class="n">Packet</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mh">0x0203</span><span class="p">),</span> <span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x01\x02\x03</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="legacy-templates">
+<h2><span class="section-number">2.3.9.6. </span>Legacy Templates<a class="headerlink" href="#legacy-templates" title="Link to this heading">#</a></h2>
+<p>The older <code class="docutils literal notranslate"><span class="pre">TemplateTypeVar</span></code> style is still supported. Use it when maintaining
+existing code that already depends on <code class="docutils literal notranslate"><span class="pre">derive()</span></code>.</p>
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-text">Legacy template definition</span><a class="headerlink" href="#id6" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.py</span><span class="w"> </span><span class="kn">import</span> <span class="n">TemplateTypeVar</span><span class="p">,</span> <span class="n">derive</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">uint8</span><span class="p">,</span> <span class="n">uint16</span>
+
+<span class="n">A</span> <span class="o">=</span> <span class="n">TemplateTypeVar</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">)</span>
+
+
+<span class="nd">@template</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">FormatTemplate</span><span class="p">:</span>
+    <span class="n">foo</span><span class="p">:</span> <span class="n">A</span>
+    <span class="n">bar</span><span class="p">:</span> <span class="n">B</span>
+
+
+<span class="n">Format</span> <span class="o">=</span> <span class="n">derive</span><span class="p">(</span><span class="n">FormatTemplate</span><span class="p">,</span> <span class="n">uint8</span><span class="p">,</span> <span class="n">uint16</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">derive()</span></code> remains available as an explicit escape hatch for generic
+templates as well, but direct subscript syntax is the preferred form for new
+code.</p>
 </section>
 </section>
 
@@ -576,8 +689,12 @@ for this feature will be part of future enhancements in this project.</p>
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#defining-a-template">2.3.9.1. Defining a Template</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#deriving-a-template">2.3.9.2. Deriving a Template</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#generic-templates">2.3.9.1. Generic Templates</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#multiple-type-variables">2.3.9.2. Multiple Type Variables</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#fields-with-layout-metadata">2.3.9.3. Fields With Layout Metadata</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#partial-templates">2.3.9.4. Partial Templates</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#subclassing-specializations">2.3.9.5. Subclassing Specializations</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#legacy-templates">2.3.9.6. Legacy Templates</a></li>
 </ul>
   </nav></div>
 

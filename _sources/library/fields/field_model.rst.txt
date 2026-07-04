@@ -30,9 +30,32 @@ Chains and Conditionals
     :members:
     :special-members:
 
+.. autoclass:: caterpillar.fields.ConditionalChain
+    :members:
+    :special-members:
+
 .. autoclass:: caterpillar.fields.If
     :members:
 
 .. autoclass:: caterpillar.fields.ElseIf
     :members:
 
+.. autodata:: caterpillar.fields.Else
+
+.. autoclass:: caterpillar.fields.Start
+    :members:
+
+    .. versionadded:: 2.9.0
+
+.. autoclass:: caterpillar.fields.End
+    :members:
+
+.. autoclass:: caterpillar.fields.Branch
+    :members:
+    :special-members:
+
+.. autoclass:: caterpillar.fields.When
+    :members:
+
+.. autoclass:: caterpillar.fields.Otherwise
+    :members:

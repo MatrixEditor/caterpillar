@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>2.3.5. Conditional Fields &#8212; Caterpillar 2.8.2 documentation</title>
+    <title>2.3.5. Conditional Fields &#8212; Caterpillar 2.9.0 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
 
-    <script src="../../_static/documentation_options.js?v=fa7f208a"></script>
+    <script src="../../_static/documentation_options.js?v=182a64a0"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -55,7 +55,7 @@
     <link rel="prev" title="2.3.4. Chaining" href="chaining.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.8.2" />
+  <meta name="docsearch:version" content="2.9.0" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -123,7 +123,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.8.2</p>
+    <p class="title logo__title">Caterpillar 2.9.0</p>
   
 </a></div>
     
@@ -463,135 +463,195 @@
                   
   <section id="conditional-fields">
 <span id="tutorial-advanced-conditionals"></span><h1><span class="section-number">2.3.5. </span>Conditional Fields<a class="headerlink" href="#conditional-fields" title="Link to this heading">#</a></h1>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>This feature is not supported in Python 3.14+.</p>
+<p><em>Conditional fields</em> allow a struct layout to include or skip fields based on
+values that are already available in the parse context. They are useful for
+versioned formats, tagged unions, optional trailer data, and protocol flags.</p>
+<p>Python 3.14 changed when class annotations become visible during class-body
+execution. Because of that, Caterpillar supports two conditional styles:</p>
+<ul class="simple">
+<li><p>Python &lt;= 3.13 can use the older implicit <code class="docutils literal notranslate"><span class="pre">with</span></code> syntax.</p></li>
+<li><p>Python &gt;= 3.14 should use explicit conditional metadata. The
+<code class="docutils literal notranslate"><span class="pre">f[...,</span> <span class="pre">when]</span></code> and <code class="docutils literal notranslate"><span class="pre">Start(when)</span></code> / <code class="docutils literal notranslate"><span class="pre">End(when)</span></code> forms are accepted by
+static type checkers because the condition markers live in <code class="docutils literal notranslate"><span class="pre">Annotated</span></code>
+metadata.</p></li>
+</ul>
+<p>For one field, the compact explicit form is to bind the condition with
+<code class="docutils literal notranslate"><span class="pre">with</span> <span class="pre">If(condition)</span> <span class="pre">as</span> <span class="pre">when:</span></code> and add <code class="docutils literal notranslate"><span class="pre">when</span></code> to the field metadata.</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">Compact conditional field</span><a class="headerlink" href="#id1" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Packet</span><span class="p">:</span>
+    <span class="n">flag</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">uint8</span><span class="p">]</span>
+
+    <span class="k">with</span> <span class="n">If</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">flag</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="k">as</span> <span class="n">when</span><span class="p">:</span>
+        <span class="n">value</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">uint8</span><span class="p">,</span> <span class="n">when</span><span class="p">]</span>
+
+    <span class="n">trailer</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">uint8</span><span class="p">]</span>
+</pre></div>
 </div>
-<p><em>Conditional fields</em> allow you to define fields in a struct that are included
-or excluded based on certain conditions. This feature is especially useful when
-working with versioned formats or optional fields that depend on runtime
-conditions. You can easily achieve this using context-based lambdas, which are
-built into the library.</p>
-<section id="how-it-works">
-<h2><span class="section-number">2.3.5.1. </span>How it works<a class="headerlink" href="#how-it-works" title="Link to this heading">#</a></h2>
-<p>By using the <cite>with</cite> keyword in combination with conditional expressions, you can
-bind certain fields to a specific condition. This allows you to include or exclude
-fields dynamically, depending on the value of other fields or context.</p>
-<p>Here’s an example demonstrating how to use conditional fields for versioned structs:</p>
+</div>
+<p>When <code class="docutils literal notranslate"><span class="pre">flag</span></code> is not <code class="docutils literal notranslate"><span class="pre">1</span></code>, <code class="docutils literal notranslate"><span class="pre">value</span></code> consumes no bytes and unpacks as <code class="docutils literal notranslate"><span class="pre">None</span></code>.
+When packing, disabled fields write no bytes.</p>
+<p><code class="docutils literal notranslate"><span class="pre">value:</span> <span class="pre">when[f[int,</span> <span class="pre">uint8]]</span></code> spelling is also supported, but some
+static type checkers reject it because <code class="docutils literal notranslate"><span class="pre">when</span></code> is a runtime value. Prefer
+<code class="docutils literal notranslate"><span class="pre">f[...,</span> <span class="pre">when]</span></code> for new code.</p>
+<section id="python-3-14-changes">
+<h2><span class="section-number">2.3.5.1. </span>Python 3.14+ Changes<a class="headerlink" href="#python-3-14-changes" title="Link to this heading">#</a></h2>
+<p>Python3.14+ support introduces inline markers make a complete <code class="docutils literal notranslate"><span class="pre">with</span></code> block
+conditional without adding extra class fields. Add <code class="docutils literal notranslate"><span class="pre">Start(when)</span></code> to the first
+real field and <code class="docutils literal notranslate"><span class="pre">End(when)</span></code> to the last real field.</p>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">Type-checker-friendly inline marker block</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Packet</span><span class="p">:</span>
+    <span class="n">flag</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">uint8</span><span class="p">]</span>
+
+    <span class="k">with</span> <span class="n">If</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">flag</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="k">as</span> <span class="n">when</span><span class="p">:</span>
+        <span class="n">first</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">uint8</span><span class="p">,</span> <span class="n">Start</span><span class="p">(</span><span class="n">when</span><span class="p">)]</span>
+        <span class="n">second</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">uint16</span><span class="p">]</span>
+        <span class="n">third</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">uint8</span><span class="p">,</span> <span class="n">End</span><span class="p">(</span><span class="n">when</span><span class="p">)]</span>
+
+    <span class="n">trailer</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">uint8</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<p>When <code class="docutils literal notranslate"><span class="pre">flag</span></code> is not <code class="docutils literal notranslate"><span class="pre">1</span></code>, all three fields consume no bytes and unpack as
+<code class="docutils literal notranslate"><span class="pre">None</span></code>. The <code class="docutils literal notranslate"><span class="pre">when</span></code> alias is removed from the final struct class.</p>
+<p>Invisible marker-field spelling is also available:</p>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">Compatibility marker fields</span><a class="headerlink" href="#id3" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Packet</span><span class="p">:</span>
+    <span class="n">flag</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">uint8</span><span class="p">]</span>
+
+    <span class="k">with</span> <span class="n">If</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">flag</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="k">as</span> <span class="n">when</span><span class="p">:</span>
+        <span class="n">_</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">when</span><span class="p">]</span> <span class="o">=</span> <span class="n">Invisible</span><span class="p">()</span>
+        <span class="n">value</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">uint8</span><span class="p">]</span>
+        <span class="n">_end</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">End</span><span class="p">(</span><span class="n">when</span><span class="p">)]</span> <span class="o">=</span> <span class="n">Invisible</span><span class="p">()</span>
+
+    <span class="n">trailer</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">uint8</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<p>Marker blocks follow these rules:</p>
+<ul class="simple">
+<li><p>Every <code class="docutils literal notranslate"><span class="pre">Start(when)</span></code> block must end with <code class="docutils literal notranslate"><span class="pre">End(when)</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">End</span></code> must close the currently active marker.</p></li>
+<li><p>Use a unique alias for each Python 3.14 marker block.</p></li>
+<li><p>A marker block must contain at least one real field.</p></li>
+<li><p>Do not define the same field name in multiple marker branches. Use
+<a class="reference internal" href="../../library/fields/field_model.html#caterpillar.fields.Branch" title="caterpillar.fields.Branch"><code class="xref py py-class docutils literal notranslate"><span class="pre">Branch</span></code></a> for same-field conditional variants.</p></li>
+</ul>
+</section>
+<section id="multiple-branches">
+<h2><span class="section-number">2.3.5.2. </span>Multiple Branches<a class="headerlink" href="#multiple-branches" title="Link to this heading">#</a></h2>
+<p>Use <code class="docutils literal notranslate"><span class="pre">ElseIf(previous,</span> <span class="pre">condition)</span></code> and <code class="docutils literal notranslate"><span class="pre">Else(previous)</span></code> to build explicit
+branch chains on Python 3.14+. Each branch receives the marker returned by the
+previous branch.</p>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">If / else-if / else marker chain</span><a class="headerlink" href="#id4" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Packet</span><span class="p">:</span>
+    <span class="n">tag</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">uint8</span><span class="p">]</span>
+
+    <span class="k">with</span> <span class="n">If</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="k">as</span> <span class="n">first</span><span class="p">:</span>
+        <span class="n">small</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">uint8</span><span class="p">,</span> <span class="n">first</span><span class="p">]</span>
+
+    <span class="k">with</span> <span class="n">ElseIf</span><span class="p">(</span><span class="n">first</span><span class="p">,</span> <span class="n">this</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span> <span class="k">as</span> <span class="n">second</span><span class="p">:</span>
+        <span class="n">medium</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">uint16</span><span class="p">,</span> <span class="n">second</span><span class="p">]</span>
+
+    <span class="k">with</span> <span class="n">Else</span><span class="p">(</span><span class="n">second</span><span class="p">)</span> <span class="k">as</span> <span class="n">fallback</span><span class="p">:</span>
+        <span class="n">raw</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">uint8</span><span class="p">,</span> <span class="n">fallback</span><span class="p">]</span>
+
+    <span class="n">trailer</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">uint8</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">ElseIf(first,</span> <span class="pre">condition)</span></code> is active only when all previous branch conditions
+are false and its own condition is true. <code class="docutils literal notranslate"><span class="pre">Else(second)</span></code> is active only when all
+previous branch conditions are false. <code class="docutils literal notranslate"><span class="pre">ElseIf</span></code> cannot be added after <code class="docutils literal notranslate"><span class="pre">Else</span></code>.</p>
+</section>
+<section id="same-field-branches">
+<h2><span class="section-number">2.3.5.3. </span>Same-Field Branches<a class="headerlink" href="#same-field-branches" title="Link to this heading">#</a></h2>
+<p>When multiple conditions should populate the same attribute, use <code class="docutils literal notranslate"><span class="pre">Branch</span></code> with
+<code class="docutils literal notranslate"><span class="pre">When</span></code> and optional <code class="docutils literal notranslate"><span class="pre">Otherwise</span></code> arms. This is the right spelling for tagged
+fields whose binary type changes with a discriminator.</p>
+<div class="literal-block-wrapper docutils container" id="id5">
+<div class="code-block-caption"><span class="caption-text">Same attribute, different field types</span><a class="headerlink" href="#id5" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Packet</span><span class="p">:</span>
+    <span class="n">tag</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">uint8</span><span class="p">]</span>
+    <span class="n">value</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span>
+        <span class="nb">int</span><span class="p">,</span>
+        <span class="n">Branch</span><span class="p">(</span>
+            <span class="n">When</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="n">uint8</span><span class="p">),</span>
+            <span class="n">When</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> <span class="n">uint16</span><span class="p">),</span>
+            <span class="n">Otherwise</span><span class="p">(</span><span class="n">uint8</span><span class="p">),</span>
+        <span class="p">),</span>
+    <span class="p">]</span>
+    <span class="n">trailer</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">uint8</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<p>Branch arms can carry normal field options by using <code class="docutils literal notranslate"><span class="pre">f[...]</span></code> inside the arm:</p>
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-text">Branch arm with local options</span><a class="headerlink" href="#id6" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">LittleEndian</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Packet</span><span class="p">:</span>
+    <span class="n">tag</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">uint8</span><span class="p">]</span>
+    <span class="n">value</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span>
+        <span class="nb">int</span><span class="p">,</span>
+        <span class="n">Branch</span><span class="p">(</span>
+            <span class="n">When</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="n">f</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">uint16</span><span class="p">,</span> <span class="n">BigEndian</span><span class="p">]),</span>
+            <span class="n">Otherwise</span><span class="p">(</span><span class="n">uint16</span><span class="p">),</span>
+        <span class="p">),</span>
+    <span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<p>In this example, <code class="docutils literal notranslate"><span class="pre">value</span></code> is big-endian only when <code class="docutils literal notranslate"><span class="pre">tag</span> <span class="pre">==</span> <span class="pre">1</span></code>. The fallback arm
+uses the struct’s surrounding byte order.</p>
+</section>
+<section id="legacy-syntax-on-python-3-13">
+<h2><span class="section-number">2.3.5.4. </span>Legacy Syntax on Python &lt;= 3.13<a class="headerlink" href="#legacy-syntax-on-python-3-13" title="Link to this heading">#</a></h2>
+<p>Before Python 3.14, Caterpillar can still use the implicit class-body syntax.</p>
 <div class="sd-tab-set docutils">
 <input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
 <label class="sd-tab-label" data-sync-group="syntax" data-sync-id="default" for="sd-tab-item-0">
 Default Syntax</label><div class="sd-tab-content docutils">
-<div class="literal-block-wrapper docutils container" id="id1">
-<div class="code-block-caption"><span class="caption-text">Conditional fields (e.g. for versioned structs)</span><a class="headerlink" href="#id1" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
     <span class="n">version</span><span class="p">:</span> <span class="n">uint32</span>
-    <span class="c1"># all following fields will be bound to the condition</span>
+
     <span class="k">with</span> <span class="n">this</span><span class="o">.</span><span class="n">version</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="n">header</span><span class="p">:</span> <span class="n">uint8</span>
+        <span class="n">length</span><span class="p">:</span> <span class="n">uint8</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">Bytes</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">length</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">ElseIf</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">version</span> <span class="o">==</span> <span class="mi">2</span><span class="p">):</span>
+        <span class="n">name</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span>
 </pre></div>
-</div>
 </div>
 </div>
 <input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
 <label class="sd-tab-label" data-sync-group="syntax" data-sync-id="extended" for="sd-tab-item-1">
 Extended Syntax (&gt;=2.8.0)</label><div class="sd-tab-content docutils">
-<div class="literal-block-wrapper docutils container" id="id2">
-<div class="code-block-caption"><span class="caption-text">Conditional fields (e.g. for versioned structs)</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
     <span class="n">version</span><span class="p">:</span> <span class="n">uint32_t</span>
-    <span class="c1"># all following fields will be bound to the condition</span>
-    <span class="k">with</span> <span class="n">this</span><span class="o">.</span><span class="n">version</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="n">header</span><span class="p">:</span> <span class="n">uint8_t</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="key-concepts">
-<h2><span class="section-number">2.3.5.2. </span>Key Concepts<a class="headerlink" href="#key-concepts" title="Link to this heading">#</a></h2>
-<ol class="arabic simple">
-<li><p><strong>`with` and Conditionals</strong>:
-The <code class="code docutils literal notranslate"><span class="pre">with</span></code> keyword is used to define a block of fields that should only be
-included if the condition evaluates to <code class="code docutils literal notranslate"><span class="pre">True</span></code>. In the example above, the
-fields inside <code class="code docutils literal notranslate"><span class="pre">with</span> <span class="pre">this.version</span> <span class="pre">==</span> <span class="pre">1</span></code> are included only when the <code class="code docutils literal notranslate"><span class="pre">version</span></code>
-field has a value of <code class="code docutils literal notranslate"><span class="pre">1</span></code>.</p></li>
-<li><p><strong>`ElseIf` for Multiple Conditions</strong>:
-For multiple conditions, use <code class="code docutils literal notranslate"><span class="pre">ElseIf</span></code> rather than <code class="code docutils literal notranslate"><span class="pre">Else</span></code>. The <code class="code docutils literal notranslate"><span class="pre">ElseIf</span></code>
-construct ensures that the next condition is checked only if the previous
-one was false. This is safer and more predictable than using a generic
-<code class="code docutils literal notranslate"><span class="pre">Else</span></code> clause, which could introduce unintended side effects by executing
-under unanticipated conditions.</p></li>
-</ol>
-<section id="example-versioned-struct">
-<h3>Example: Versioned Struct<a class="headerlink" href="#example-versioned-struct" title="Link to this heading">#</a></h3>
-<p>Conditional fields are particularly useful when dealing with versioned structs,
-where the structure of the data may change based on the version number or other
-factors. For example:</p>
-<div class="sd-tab-set docutils">
-<input checked="checked" id="sd-tab-item-2" name="sd-tab-set-1" type="radio">
-<label class="sd-tab-label" data-sync-group="syntax" data-sync-id="default" for="sd-tab-item-2">
-Default Syntax</label><div class="sd-tab-content docutils">
-<div class="literal-block-wrapper docutils container" id="id3">
-<div class="code-block-caption"><span class="caption-text">Conditional fields (e.g. for versioned structs)</span><a class="headerlink" href="#id3" title="Link to this code">#</a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
-    <span class="n">version</span><span class="p">:</span> <span class="n">uint32</span>
-    <span class="c1"># all following fields will be bound to the condition</span>
-    <span class="k">with</span> <span class="n">this</span><span class="o">.</span><span class="n">version</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="n">length</span><span class="p">:</span> <span class="n">uint8</span>
-        <span class="n">extra</span><span class="p">:</span> <span class="n">uint8</span>
-        <span class="n">data</span><span class="p">:</span> <span class="n">Bytes</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">length</span><span class="p">)</span>
-    <span class="c1"># Use else-if over &#39;Else&#39; alone</span>
-    <span class="k">with</span> <span class="n">ElseIf</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">version</span> <span class="o">==</span> <span class="mi">2</span><span class="p">):</span>
-        <span class="n">name</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span>
-        <span class="n">data</span><span class="p">:</span> <span class="n">Prefixed</span><span class="p">(</span><span class="n">uint8</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<input id="sd-tab-item-3" name="sd-tab-set-1" type="radio">
-<label class="sd-tab-label" data-sync-group="syntax" data-sync-id="extended" for="sd-tab-item-3">
-Extended Syntax (&gt;=2.8.0)</label><div class="sd-tab-content docutils">
-<div class="literal-block-wrapper docutils container" id="id4">
-<div class="code-block-caption"><span class="caption-text">Conditional fields (e.g. for versioned structs)</span><a class="headerlink" href="#id4" title="Link to this code">#</a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
-    <span class="n">version</span><span class="p">:</span> <span class="n">uint32_t</span>
-    <span class="c1"># all following fields will be bound to the condition</span>
+
     <span class="k">with</span> <span class="n">this</span><span class="o">.</span><span class="n">version</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">length</span><span class="p">:</span> <span class="n">uint8_t</span>
-        <span class="n">extra</span><span class="p">:</span> <span class="n">uint8_t</span>
         <span class="n">data</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">Bytes</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">length</span><span class="p">)]</span>
-    <span class="c1"># Use else-if over &#39;Else&#39; alone</span>
+
     <span class="k">with</span> <span class="n">ElseIf</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">version</span> <span class="o">==</span> <span class="mi">2</span><span class="p">):</span>
         <span class="n">name</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">CString</span><span class="p">(</span><span class="mi">16</span><span class="p">)]</span>
-        <span class="n">data</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">Prefixed</span><span class="p">(</span><span class="n">uint8</span><span class="p">)]</span>
 </pre></div>
 </div>
 </div>
 </div>
-</div>
-</section>
-</section>
-<section id="best-practices">
-<h2><span class="section-number">2.3.5.3. </span>Best Practices<a class="headerlink" href="#best-practices" title="Link to this heading">#</a></h2>
-<ul class="simple">
-<li><p><strong>Avoid Using `Else`</strong>:
-It is <strong>strongly recommended</strong> to <strong>avoid</strong> using <code class="code docutils literal notranslate"><span class="pre">Else</span></code> for conditional field
-inclusion, as it can introduce unintended behavior if not properly managed.
-Instead, always use <code class="code docutils literal notranslate"><span class="pre">ElseIf</span></code> with an inverted condition to ensure more
-predictable and controlled struct parsing.</p></li>
-</ul>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>When using conditional fields, it’s essential to remember that the struct’s
-layout can change dynamically depending on the conditions. This flexibility
-makes it possible to define complex, version-dependent data structures.</p>
-</div>
+<p>On Python 3.14+, implicit <code class="docutils literal notranslate"><span class="pre">with</span> <span class="pre">If(condition):</span></code>, <code class="docutils literal notranslate"><span class="pre">with</span> <span class="pre">ElseIf(condition):</span></code>,
+and <code class="docutils literal notranslate"><span class="pre">with</span> <span class="pre">Else:</span></code> blocks raise a clear exception. Use the explicit marker
+syntax shown above.</p>
 </section>
 </section>
 
@@ -642,12 +702,10 @@ makes it possible to define complex, version-dependent data structures.</p>
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-it-works">2.3.5.1. How it works</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-concepts">2.3.5.2. Key Concepts</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#example-versioned-struct">Example: Versioned Struct</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#best-practices">2.3.5.3. Best Practices</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#python-3-14-changes">2.3.5.1. Python 3.14+ Changes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#multiple-branches">2.3.5.2. Multiple Branches</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#same-field-branches">2.3.5.3. Same-Field Branches</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#legacy-syntax-on-python-3-13">2.3.5.4. Legacy Syntax on Python &lt;= 3.13</a></li>
 </ul>
   </nav></div>
 

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>caterpillar.shared &#8212; Caterpillar 2.8.2 documentation</title>
+    <title>caterpillar.shared &#8212; Caterpillar 2.9.0 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
 
-    <script src="../../_static/documentation_options.js?v=fa7f208a"></script>
+    <script src="../../_static/documentation_options.js?v=182a64a0"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,7 +52,7 @@
     <link rel="search" title="Search" href="../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.8.2" />
+  <meta name="docsearch:version" content="2.9.0" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -120,7 +120,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.8.2</p>
+    <p class="title logo__title">Caterpillar 2.9.0</p>
   
 </a></div>
     
@@ -539,6 +539,24 @@
 <span class="sd">.. versionadded:: 2.4.0</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
+<span class="n">ATTR_CONDITIONAL</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;__conditional__&quot;</span>
+<span class="sd">&quot;&quot;&quot;Attribute indicating a conditional object.</span>
+
+<span class="sd">.. versionadded:: 2.9.0</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">ATTR_CONDITIONAL_START</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;__conditional_start__&quot;</span>
+<span class="sd">&quot;&quot;&quot;Attribute indicating the start of a conditional block.</span>
+
+<span class="sd">.. versionadded:: 2.9.0</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">ATTR_CONDITIONAL_END</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;__conditional_end__&quot;</span>
+<span class="sd">&quot;&quot;&quot;Attribute indicating then end of a conditional block.</span>
+
+<span class="sd">.. versionadded:: 2.9.0</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
 
 <div class="viewcode-block" id="constval">
 <a class="viewcode-back" href="../../library/shared.html#caterpillar.shared.constval">[docs]</a>
@@ -668,6 +686,18 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="vm">__class__</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="k">else</span> <span class="n">obj</span><span class="p">,</span> <span class="n">ATTR_STRUCT</span><span class="p">)</span></div>
 
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">iscond</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">ATTR_CONDITIONAL</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">iscondstart</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">ATTR_CONDITIONAL_START</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">iscondend</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">ATTR_CONDITIONAL_END</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span>
 
 
 <span class="nd">@overload</span>
@@ -920,12 +950,14 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.model</span><span class="w"> </span><span class="kn">import</span> <span class="n">unpack_file</span>
 
-        <span class="k">return</span> <span class="n">unpack_file</span><span class="p">(</span>  <span class="c1"># pyright: ignore[reportCallIssue, reportUnknownVariableType]</span>
-            <span class="bp">self</span><span class="p">,</span>  <span class="c1"># pyright: ignore[reportArgumentType]</span>
-            <span class="n">filename</span><span class="p">,</span>
-            <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span>
-            <span class="n">arch</span><span class="o">=</span><span class="n">arch</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">unpack_file</span><span class="p">(</span>  <span class="c1"># pyright: ignore[reportCallIssue, reportUnknownVariableType]</span>
+                <span class="bp">self</span><span class="p">,</span>  <span class="c1"># pyright: ignore[reportArgumentType]</span>
+                <span class="n">filename</span><span class="p">,</span>
+                <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span>
+                <span class="n">arch</span><span class="o">=</span><span class="n">arch</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+            <span class="p">)</span>
         <span class="p">)</span></div>
 </div>
 

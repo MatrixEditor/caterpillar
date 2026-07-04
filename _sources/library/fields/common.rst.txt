@@ -278,6 +278,23 @@ Special Structs
     .. versionchanged:: 2.8.0
         Added support for customizable padding objects.
 
+.. autoclass:: caterpillar.fields.Padded
+    :members:
+
+    Wraps another struct and adds explicit padding bytes before and/or after
+    it while returning the wrapped struct's value.
+
+    .. versionadded:: 2.9.0
+
+.. autofunction:: caterpillar.fields.PrePad
+
+    .. versionadded:: 2.9.0
+
+.. autofunction:: caterpillar.fields.PostPad
+
+    .. versionadded:: 2.9.0
+
+
 .. autodata:: caterpillar.fields.Pass
 
     See source code for details

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>4.8.1. Field Model &#8212; Caterpillar 2.8.2 documentation</title>
+    <title>4.8.1. Field Model &#8212; Caterpillar 2.9.0 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
 
-    <script src="../../_static/documentation_options.js?v=fa7f208a"></script>
+    <script src="../../_static/documentation_options.js?v=182a64a0"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -55,7 +55,7 @@
     <link rel="prev" title="4.8. Fields" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.8.2" />
+  <meta name="docsearch:version" content="2.9.0" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -123,7 +123,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.8.2</p>
+    <p class="title logo__title">Caterpillar 2.9.0</p>
   
 </a></div>
     
@@ -1006,11 +1006,38 @@ to the next one, forming a sequence.</p>
 </dd></dl>
 
 <dl class="py class">
+<dt class="sig sig-object py" id="caterpillar.fields.ConditionalChain">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">caterpillar.fields.</span></span><span class="sig-name descname"><span class="pre">ConditionalChain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">struct</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_StructLike</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">condition</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ContextLambda</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/conditional.html#ConditionalChain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.ConditionalChain" title="Link to this definition">#</a></dt>
+<dd><p>Simplistic conditional chain that represents if-else statements.</p>
+<p>Using this class we can introduce conditional statements into our
+class definition. While this class can’t be used in class definitions,
+it may be used outside of them.</p>
+<p>For conditional statements in class definitions, see
+<a class="reference internal" href="#caterpillar.fields.If" title="caterpillar.fields.conditional.If"><code class="xref py py-class docutils literal notranslate"><span class="pre">If</span></code></a>,
+<a class="reference internal" href="#caterpillar.fields.ElseIf" title="caterpillar.fields.conditional.ElseIf"><code class="xref py py-class docutils literal notranslate"><span class="pre">ElseIf</span></code></a> or
+<code class="xref py py-class docutils literal notranslate"><span class="pre">Else</span></code>.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="caterpillar.fields.ConditionalChain.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">struct</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_StructLike</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">condition</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ContextLambda</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/conditional.html#ConditionalChain.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.ConditionalChain.__init__" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caterpillar.fields.ConditionalChain.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/conditional.html#ConditionalChain.__repr__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.ConditionalChain.__repr__" title="Link to this definition">#</a></dt>
+<dd><p>Return repr(self).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="caterpillar.fields.If">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">caterpillar.fields.</span></span><span class="sig-name descname"><span class="pre">If</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">condition</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ContextLambda</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/conditional.html#If"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.If" title="Link to this definition">#</a></dt>
 <dd><p>If-statement implementation for class definitions.</p>
 <div class="versionchanged">
-<p><span class="versionmodified changed">Changed in version 2.4.5: </span>Python 3.14 is <strong>not</strong> supported.</p>
+<p><span class="versionmodified changed">Changed in version 2.9.0: </span>Python 3.14+ requires explicit conditional annotations using either
+<code class="docutils literal notranslate"><span class="pre">with</span> <span class="pre">If(condition)</span> <span class="pre">as</span> <span class="pre">when:</span></code> with <code class="docutils literal notranslate"><span class="pre">field:</span> <span class="pre">f[type,</span> <span class="pre">field,</span> <span class="pre">when]</span></code> for
+one field, inline <code class="docutils literal notranslate"><span class="pre">Start(when)</span></code> / <code class="docutils literal notranslate"><span class="pre">End(when)</span></code> metadata for a block,
+<code class="docutils literal notranslate"><span class="pre">field:</span> <span class="pre">when[...]</span></code>, or explicit invisible marker fields.</p>
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
@@ -1018,6 +1045,26 @@ to the next one, forming a sequence.</p>
 
     <span class="k">with</span> <span class="n">If</span><span class="p">(</span><span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="n">GLOBAL_CONSTANT</span> <span class="o">==</span> <span class="mi">33</span><span class="p">):</span>
         <span class="n">b</span><span class="p">:</span> <span class="n">uint8</span>
+</pre></div>
+</div>
+<p>Python 3.14+ supports type-checker-friendly per-field metadata:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
+    <span class="n">a</span><span class="p">:</span> <span class="n">uint32</span>
+
+    <span class="k">with</span> <span class="n">If</span><span class="p">(</span><span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="n">GLOBAL_CONSTANT</span> <span class="o">==</span> <span class="mi">33</span><span class="p">)</span> <span class="k">as</span> <span class="n">when</span><span class="p">:</span>
+        <span class="n">b</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">uint8</span><span class="p">,</span> <span class="n">when</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>It also supports inline block markers:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
+    <span class="n">a</span><span class="p">:</span> <span class="n">uint32</span>
+
+    <span class="k">with</span> <span class="n">If</span><span class="p">(</span><span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="n">GLOBAL_CONSTANT</span> <span class="o">==</span> <span class="mi">33</span><span class="p">)</span> <span class="k">as</span> <span class="n">when</span><span class="p">:</span>
+        <span class="n">b</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">uint8</span><span class="p">,</span> <span class="n">Start</span><span class="p">(</span><span class="n">when</span><span class="p">)]</span>
+        <span class="n">c</span><span class="p">:</span> <span class="n">uint8</span>
+        <span class="n">d</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">uint8</span><span class="p">,</span> <span class="n">End</span><span class="p">(</span><span class="n">when</span><span class="p">)]</span>
 </pre></div>
 </div>
 <p>Note that this class will alter the used fields and cover multiple
@@ -1031,11 +1078,9 @@ to display the condition as well.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="caterpillar.fields.ElseIf">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">caterpillar.fields.</span></span><span class="sig-name descname"><span class="pre">ElseIf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">condition</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ContextLambda</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/conditional.html#ElseIf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.ElseIf" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">caterpillar.fields.</span></span><span class="sig-name descname"><span class="pre">ElseIf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../context.html#caterpillar.context.ConditionContext" title="caterpillar.context.ConditionContext"><span class="pre">ConditionContext</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_ContextLambda</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/conditional.html#ElseIf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.ElseIf" title="Link to this definition">#</a></dt>
 <dd><p>ElseIf-statement implementation for class definitions.</p>
-<div class="versionchanged">
-<p><span class="versionmodified changed">Changed in version 2.4.3: </span>Python 3.14 is <strong>not</strong> supported.</p>
-</div>
+<p>Python &lt;= 3.13 supports the legacy implicit form:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
     <span class="n">a</span><span class="p">:</span> <span class="n">uint32</span>
@@ -1046,6 +1091,129 @@ to display the condition as well.</p>
     <span class="k">with</span> <span class="n">ElseIf</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">a</span> <span class="o">==</span> <span class="mi">34</span><span class="p">):</span>
         <span class="o">...</span>
 </pre></div>
+</div>
+<p>Python 3.14+ requires the explicit marker form:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
+    <span class="n">a</span><span class="p">:</span> <span class="n">uint32</span>
+
+    <span class="k">with</span> <span class="n">If</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">a</span> <span class="o">==</span> <span class="mi">32</span><span class="p">)</span> <span class="k">as</span> <span class="n">first</span><span class="p">:</span>
+        <span class="n">one</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">uint8</span><span class="p">,</span> <span class="n">first</span><span class="p">]</span>
+
+    <span class="k">with</span> <span class="n">ElseIf</span><span class="p">(</span><span class="n">first</span><span class="p">,</span> <span class="n">this</span><span class="o">.</span><span class="n">a</span> <span class="o">==</span> <span class="mi">34</span><span class="p">)</span> <span class="k">as</span> <span class="n">second</span><span class="p">:</span>
+        <span class="n">two</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">uint8</span><span class="p">,</span> <span class="n">second</span><span class="p">]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="caterpillar.fields.Else">
+<span class="sig-prename descclassname"><span class="pre">caterpillar.fields.</span></span><span class="sig-name descname"><span class="pre">Else</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;caterpillar.fields.conditional._Else</span> <span class="pre">object&gt;</span></span><a class="headerlink" href="#caterpillar.fields.Else" title="Link to this definition">#</a></dt>
+<dd><p>Else marker factory.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 2.9.0: </span>Python &lt;= 3.13 supports <code class="docutils literal notranslate"><span class="pre">with</span> <span class="pre">Else:</span></code> for legacy condition blocks. Python
+3.14+ requires <code class="docutils literal notranslate"><span class="pre">with</span> <span class="pre">Else(previous)</span> <span class="pre">as</span> <span class="pre">when:</span></code> with <code class="docutils literal notranslate"><span class="pre">f[...,</span> <span class="pre">when]</span></code> for
+one field or <code class="docutils literal notranslate"><span class="pre">Start(when)</span></code> / <code class="docutils literal notranslate"><span class="pre">End(when)</span></code> metadata for a block.</p>
+</div>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="caterpillar.fields.Start">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">caterpillar.fields.</span></span><span class="sig-name descname"><span class="pre">Start</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">marker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ConditionalAnnotation</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../context.html#caterpillar.context.ConditionContext" title="caterpillar.context.ConditionContext"><span class="pre">ConditionContext</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#caterpillar.fields.Start" title="caterpillar.fields.conditional.Start"><span class="pre">Start</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#caterpillar.fields.End" title="caterpillar.fields.conditional.End"><span class="pre">End</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/conditional.html#Start"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Start" title="Link to this definition">#</a></dt>
+<dd><p>Start marker for an inline explicit conditional block.</p>
+<p>Use this as metadata on the first real field in a Python 3.14+ conditional
+block:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">If</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">flag</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="k">as</span> <span class="n">when</span><span class="p">:</span>
+    <span class="n">first</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">uint8</span><span class="p">,</span> <span class="n">Start</span><span class="p">(</span><span class="n">when</span><span class="p">)]</span>
+    <span class="n">second</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">uint8</span><span class="p">]</span>
+    <span class="n">last</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">uint8</span><span class="p">,</span> <span class="n">End</span><span class="p">(</span><span class="n">when</span><span class="p">)]</span>
+</pre></div>
+</div>
+<p>Unlike the older invisible marker-field spelling, this does not add a
+synthetic field to the class body.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.9.0.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="caterpillar.fields.End">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">caterpillar.fields.</span></span><span class="sig-name descname"><span class="pre">End</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">marker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ConditionalAnnotation</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../context.html#caterpillar.context.ConditionContext" title="caterpillar.context.ConditionContext"><span class="pre">ConditionContext</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#caterpillar.fields.Start" title="caterpillar.fields.conditional.Start"><span class="pre">Start</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#caterpillar.fields.End" title="caterpillar.fields.conditional.End"><span class="pre">End</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/conditional.html#End"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.End" title="Link to this definition">#</a></dt>
+<dd><p>End marker for an explicit conditional block.</p>
+<p>Use this as metadata on the last real field in a Python 3.14+ inline marker
+block:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">If</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">flag</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="k">as</span> <span class="n">when</span><span class="p">:</span>
+    <span class="n">first</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">uint8</span><span class="p">,</span> <span class="n">Start</span><span class="p">(</span><span class="n">when</span><span class="p">)]</span>
+    <span class="n">second</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">uint8</span><span class="p">]</span>
+    <span class="n">last</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">uint8</span><span class="p">,</span> <span class="n">End</span><span class="p">(</span><span class="n">when</span><span class="p">)]</span>
+</pre></div>
+</div>
+<p>The older invisible marker-field spelling is still supported:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">If</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">flag</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="k">as</span> <span class="n">when</span><span class="p">:</span>
+    <span class="n">_</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">when</span><span class="p">]</span> <span class="o">=</span> <span class="n">Invisible</span><span class="p">()</span>
+    <span class="n">value</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">uint8</span><span class="p">]</span>
+    <span class="n">_end</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">End</span><span class="p">(</span><span class="n">when</span><span class="p">)]</span> <span class="o">=</span> <span class="n">Invisible</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Invisible marker fields are removed from the final struct model.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="caterpillar.fields.Branch">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">caterpillar.fields.</span></span><span class="sig-name descname"><span class="pre">Branch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">arms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#caterpillar.fields.When" title="caterpillar.fields.conditional.When"><span class="pre">When</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#caterpillar.fields.Otherwise" title="caterpillar.fields.conditional.Otherwise"><span class="pre">Otherwise</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/conditional.html#Branch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Branch" title="Link to this definition">#</a></dt>
+<dd><p>Conditional field chain for one attribute.</p>
+<p>Use this when several conditions should decode or encode the same Python
+attribute with different field definitions.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Packet</span><span class="p">:</span>
+    <span class="n">tag</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">uint8</span><span class="p">]</span>
+    <span class="n">value</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span>
+        <span class="nb">int</span><span class="p">,</span>
+        <span class="n">Branch</span><span class="p">(</span>
+            <span class="n">When</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="n">uint8</span><span class="p">),</span>
+            <span class="n">When</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> <span class="n">uint16</span><span class="p">),</span>
+            <span class="n">Otherwise</span><span class="p">(</span><span class="n">uint8</span><span class="p">),</span>
+        <span class="p">),</span>
+    <span class="p">]</span>
+</pre></div>
+</div>
+<p>Arm annotations can use <code class="docutils literal notranslate"><span class="pre">f[...]</span></code> to carry local options such as byte order.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.9.0.</span></p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="caterpillar.fields.Branch.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">arms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#caterpillar.fields.When" title="caterpillar.fields.conditional.When"><span class="pre">When</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#caterpillar.fields.Otherwise" title="caterpillar.fields.conditional.Otherwise"><span class="pre">Otherwise</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/conditional.html#Branch.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Branch.__init__" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="caterpillar.fields.When">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">caterpillar.fields.</span></span><span class="sig-name descname"><span class="pre">When</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">condition</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ContextLambda</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">type</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_SupportsActionPack</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_SupportsActionUnpack</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_StructLike</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/conditional.html#When"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.When" title="Link to this definition">#</a></dt>
+<dd><p>One conditional arm for <a class="reference internal" href="#caterpillar.fields.Branch" title="caterpillar.fields.Branch"><code class="xref py py-class docutils literal notranslate"><span class="pre">Branch</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>condition</strong> – Context expression controlling this arm.</p></li>
+<li><p><strong>annotation</strong> – Field annotation or struct selected when the condition
+evaluates to true.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.9.0.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="caterpillar.fields.Otherwise">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">caterpillar.fields.</span></span><span class="sig-name descname"><span class="pre">Otherwise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">annotation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">type</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_SupportsActionPack</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_SupportsActionUnpack</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_StructLike</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/conditional.html#Otherwise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Otherwise" title="Link to this definition">#</a></dt>
+<dd><p>Fallback arm for <a class="reference internal" href="#caterpillar.fields.Branch" title="caterpillar.fields.Branch"><code class="xref py py-class docutils literal notranslate"><span class="pre">Branch</span></code></a>.</p>
+<p>The fallback arm is selected when no earlier <a class="reference internal" href="#caterpillar.fields.When" title="caterpillar.fields.When"><code class="xref py py-class docutils literal notranslate"><span class="pre">When</span></code></a> condition matched.
+A branch can contain at most one fallback arm, and it must appear last.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.9.0.</span></p>
 </div>
 </dd></dl>
 
@@ -1153,8 +1321,22 @@ to display the condition as well.</p>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Chain.pack_single"><code class="docutils literal notranslate"><span class="pre">Chain.pack_single()</span></code></a></li>
 </ul>
 </li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.ConditionalChain"><code class="docutils literal notranslate"><span class="pre">ConditionalChain</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.ConditionalChain.__init__"><code class="docutils literal notranslate"><span class="pre">ConditionalChain.__init__()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.ConditionalChain.__repr__"><code class="docutils literal notranslate"><span class="pre">ConditionalChain.__repr__()</span></code></a></li>
+</ul>
+</li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.If"><code class="docutils literal notranslate"><span class="pre">If</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.ElseIf"><code class="docutils literal notranslate"><span class="pre">ElseIf</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Else"><code class="docutils literal notranslate"><span class="pre">Else</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Start"><code class="docutils literal notranslate"><span class="pre">Start</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.End"><code class="docutils literal notranslate"><span class="pre">End</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Branch"><code class="docutils literal notranslate"><span class="pre">Branch</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Branch.__init__"><code class="docutils literal notranslate"><span class="pre">Branch.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.When"><code class="docutils literal notranslate"><span class="pre">When</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Otherwise"><code class="docutils literal notranslate"><span class="pre">Otherwise</span></code></a></li>
 </ul>
 </li>
 </ul>

@@ -3,75 +3,195 @@
 Templates
 =========
 
-A specialized form of structs are *templates*, which are basically generic Python classes. Think of them
-as blueprints for your final classes/structs that contain placeholders for actual types. As in C++, a
-template needs type arguments, in this case we will name them :class:`~caterpillar.model.TemplateTypeVar`.
+.. versionchanged:: 2.9.0
+    Added support for Python's builtin :class:`TypeVar``
 
-Actually, there are two different types of type variables:
+Templates are generic model classes that become concrete struct classes after
+specialization. A template class stores template metadata on ``__template__``
+and does not store ``__struct__`` until it is specialized.
 
-* Required:
-    These variables are **required** when creating a new struct based on the template and they
-    can be used as positional arguments within the type derivation.
+Caterpillar supports two template systems:
 
-* Positional:
-    These arguments are usable only as keyword arguments and are may be optional if a default value
-    is supplied.
+* Python generic templates, the preferred API for new code.
+* Legacy ``TemplateTypeVar`` templates, kept for compatibility.
 
-These template type variables can be created using simple variable definitions:
+Python Generic Templates
+------------------------
 
->>> A = TemplateTypeVar("A")
-
-.. important::
-    A template class is **not** a struct definition. It specifies a blueprint for the final class.
-
-A template class is defined like a struct, union or bitfield class, but without being a
-dataclass nor storing a struct instance.
+Generic templates use normal Python ``TypeVar`` objects and ``Generic`` bases.
 
 .. code-block:: python
 
-    >>> @template(A, "B")
-    ... class FormatTemplate:
-    ...     foo: A
-    ...     bar: B
-    ...     baz: uint32
-    ...
+    from typing import Generic, TypeVar
 
-The defined class then can be used to create new classes based on the provided class
-structure. For instance,
+    from caterpillar.py import template, uint8
 
-.. code-block:: python
+    T = TypeVar("T")
 
-    >>> Format = derive(FormatTemplate, A=uint32, B=uint8)
-    >>> Format
-    <class '__main__.__4BE4F2562B65393CFormatTemplate'>
 
-will return an anonymous class (in this case). Normally, *caterpillar* tries to infer the
-variable name from the current module (if :code:`name=...`). In summary, every time
-:meth:`~caterpillar.model.derive` is called, a new class will be created if not already
-defined.
+    @template
+    class Box(Generic[T]):
+        value: T
 
-The current implementation materializes the class annotations with
-``inspect.get_annotations()`` while the temporary template variables are still
-available. This keeps templates compatible with Python versions that defer
-annotation evaluation. Template information is then stored on the class using a
-special class attribute: :attr:`~class.__template__`.
 
-To support sub-classes of templates, derive a partial template:
+    ByteBox = Box[uint8]
+
+``Box`` is a template. ``Box[uint8]`` is a concrete struct class. Caterpillar
+installs ``__class_getitem__`` on the template class and materializes the
+specialization when it is subscripted.
+
+Specialization performs two different substitutions:
+
+* In normal Python type positions, Caterpillar field objects are replaced with
+  their Python value type using ``typeof()``.
+* In field metadata positions, Caterpillar keeps the actual field object and
+  builds a ``Field`` from it.
+
+For example:
 
 .. code-block:: python
 
-    >>> Format32 = derive(FormatTemplate, A=uint32, partial=True)
+    @template
+    class Box(Generic[T]):
+        value: T
 
-Again, the resulting class is **not** a struct, but another template class.
-Provided replacements are stored in the new template metadata, while missing
-required variables must still be supplied by a later non-partial
-:func:`~caterpillar.model.derive` call.
 
-The ``name`` parameter controls the generated class name. Passing ``name=...``
-asks Caterpillar to infer the assignment target when possible; otherwise an
-anonymous deterministic name is generated from the replacements.
+    ByteBox = Box[uint8]
+
+``value: T`` is converted to a ``Field(uint8)`` before the generated class is
+passed to :class:`~caterpillar.model.Struct`.
+
+
+**Layout Metadata With** ``f[]``
+
+``f[]`` is Caterpillar's public spelling for ``typing.Annotated[]``. Use it
+when the Python value type and the binary layout metadata must both be present.
+
+.. code-block:: python
+
+    from typing import Generic, TypeVar
+
+    from caterpillar.py import f, field_of, template, uint8
+
+    T = TypeVar("T")
+
+
+    @template
+    class Vector(Generic[T]):
+        values: f[list[T], field_of(T)[2]]
+
+
+    ByteVector = Vector[uint8]
+
+In this example, the Python-facing type becomes ``list[int]`` while the binary
+layout metadata becomes a two-element ``Field(uint8)``.
+
+``field_of(T)`` supports the same layout operators as
+:class:`~caterpillar.model.TemplateTypeVar`: sequence length, offset, switch
+options, byte order, bit width, and condition. Generic specializations are cached
+on the template origin. Repeating the same specialization returns the same class:
+
+.. code-block:: python
+
+    assert Box[uint8] is Box[uint8]
+
+Generated classes store Caterpillar-owned metadata:
+
+``__origin__``
+    The template class that produced the specialization.
+
+``__args__``
+    The concrete specialization arguments.
+
+Because ``Box[uint8]`` returns a real class at runtime, it is not a
+``typing`` generic alias after materialization. Use the metadata above instead
+of ``typing.get_origin()`` and ``typing.get_args()`` for runtime inspection.
+
+Partial Generic Templates
+-------------------------
+
+If a specialization still contains unresolved type variables, Caterpillar keeps
+the result as a template.
+
+.. code-block:: python
+
+    from typing import Generic, TypeVar
+
+    from caterpillar.py import template, uint8, uint16
+
+    T = TypeVar("T")
+    U = TypeVar("U")
+
+
+    @template
+    class Pair(Generic[T, U]):
+        left: T
+        right: U
+
+
+    BytePair = Pair[uint8, U]
+    ByteWordPair = BytePair[uint16]
+
+``BytePair`` is a template. ``ByteWordPair`` is a concrete struct class.
+
+Legacy Template Variables
+-------------------------
+
+Legacy templates use :class:`~caterpillar.model.TemplateTypeVar` or string
+names in the decorator.
+
+.. code-block:: python
+
+    from caterpillar.py import TemplateTypeVar, derive, template, uint8, uint16
+
+    A = TemplateTypeVar("A")
+
+
+    @template(A, "B")
+    class FormatTemplate:
+        foo: A
+        bar: B
+
+
+    Format = derive(FormatTemplate, uint8, uint16)
+
+Legacy templates classify parameters as required or keyword-only defaults:
+
+* Required parameters are passed positionally or by keyword to
+  :func:`~caterpillar.model.derive`.
+* Keyword defaults are declared in ``@template(T=uint8)`` and may be omitted
+  from ``derive()``.
+
+The legacy decorator temporarily injects missing template names into the caller
+module while annotations are evaluated. This keeps legacy templates compatible
+with deferred annotation evaluation.
+
+``derive()``
+------------
+
+``derive()`` remains available for both template systems.
+
+For legacy templates, ``derive()`` is the primary specialization API. For
+generic templates, direct subscript syntax is preferred, but ``derive()`` can be
+used when a name or union option must be supplied explicitly.
+
+.. code-block:: python
+
+    NamedByteBox = derive(Box, uint8, name="NamedByteBox")
+
+Passing an already materialized struct class to ``derive()`` without additional
+arguments returns that class unchanged.
+
+Type Checking
+-------------
+
+Static type checkers see generic templates as ordinary Python generic classes.
+At runtime, Caterpillar replaces template arguments with concrete binary
+layouts. If a project needs precise static typing for field atoms such as
+``uint8``, expose typing-only aliases to their Python value types while keeping
+the runtime field objects unchanged.
 
 .. admonition:: Developer's note
 
-    By now, a template won't copy existing field documentation comments. Therefore, you
-    can't display inherited members using sphinx.
+    Template specialization is performed once when a concrete class is created.
+    Pack and unpack operations use the normal ``Struct`` and ``Field`` paths.

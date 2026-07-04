@@ -12,6 +12,9 @@ Templates
 .. autofunction:: caterpillar.model.istemplate
 
 
+.. autofunction:: caterpillar.model.field_of
+
+
 .. autofunction:: caterpillar.model.template
 
 
