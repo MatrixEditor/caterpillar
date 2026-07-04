@@ -27,11 +27,10 @@ from typing import (
     Callable,
     Generic,
     TypeVar,
-    dataclass_transform,
     get_args,
     get_origin,
 )
-from typing_extensions import overload, override
+from typing_extensions import overload, override, dataclass_transform
 
 from caterpillar.fields import Field, INVALID_DEFAULT
 from caterpillar.model import Invisible, Struct

@@ -418,4 +418,9 @@ __all__ = [
     "Padded",
     "PostPad",
     "PrePad",
+    "Branch",
+    "When",
+    "Start",
+    "End",
+    "Otherwise",
 ]

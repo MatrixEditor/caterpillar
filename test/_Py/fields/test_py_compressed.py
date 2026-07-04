@@ -5,7 +5,7 @@ import zlib
 
 import pytest
 
-from caterpillar.py import Bytes, pack, unpack
+from caterpillar.py import Bytes, pack, root, unpack
 from caterpillar.fields.compression import (
     Bz2Compressed,
     Compressed,
@@ -72,3 +72,23 @@ def test_compression_kwargs_are_passed_to_algorithm():
     assert unpack(store, stored) == payload
     assert unpack(shrink, shrunk) == payload
 
+
+class PrefixCodec:
+    def compress(self, data: bytes, *, prefix: bytes) -> bytes:
+        return prefix + data
+
+    def decompress(self, data: bytes, *, prefix: bytes) -> bytes:
+        assert data.startswith(prefix)
+        return data[len(prefix) :]
+
+
+def test_context_lambda_kwargs_are_recomputed_per_op():
+    field = Compressed(
+        PrefixCodec(),
+        Bytes(...),
+        comp_kwargs={"prefix": root.prefix},
+        decomp_kwargs={"prefix": root.prefix},
+    )
+
+    assert pack(b"a", field, prefix=b"x") == b"xa"
+    assert pack(b"a", field, prefix=b"y") == b"ya"

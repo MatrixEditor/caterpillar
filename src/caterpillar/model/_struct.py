@@ -29,7 +29,8 @@ from typing_extensions import (
     Buffer,
 )
 
-from caterpillar.shared import getstruct, hasstruct, ATTR_STRUCT
+from caterpillar.fields.conditional import apply_conditional_markers
+from caterpillar.shared import getstruct, hasstruct, ATTR_STRUCT, iscond
 from caterpillar.exception import InvalidValueError
 from caterpillar.options import (
     S_EVAL_ANNOTATIONS,
@@ -138,7 +139,19 @@ class Struct(Sequence[type[_ModelT], _ModelT, _ModelT]):
 
         eval_str: bool = self.has_option(S_EVAL_ANNOTATIONS)
         # The why is described in detail here: https://docs.python.org/3/howto/annotations.html
-        return inspect.get_annotations(self.model, eval_str=eval_str)
+        annotations = inspect.get_annotations(self.model, eval_str=eval_str)
+        annotations, marker_names = apply_conditional_markers(self.model, annotations)
+        if marker_names:
+            self.model.__annotations__ = annotations
+            for name in marker_names:
+                default = getattr(self.model, name, None)
+                if isinstance(default, dc.Field):
+                    delattr(self.model, name)
+
+        for name, value in list(vars(self.model).items()):
+            if iscond(value):
+                delattr(self.model, name)
+        return annotations
 
     @override
     def _set_default(self, name: str, value: Any) -> None:

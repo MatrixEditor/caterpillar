@@ -85,7 +85,17 @@ from .pointer import (
     RelativePointer,
     uintptr_fn,
 )
-from .conditional import ConditionalChain, If, Else, ElseIf
+from .conditional import (
+    ConditionalChain,
+    If,
+    Else,
+    ElseIf,
+    When,
+    Branch,
+    End,
+    Start,
+    Otherwise,
+)
 from .hook import IOHook
 from .digest import (
     Digest,
@@ -272,4 +282,9 @@ __all__ = [
     "Padded",
     "PostPad",
     "PrePad",
+    "Branch",
+    "When",
+    "Start",
+    "End",
+    "Otherwise",
 ]

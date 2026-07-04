@@ -16,13 +16,7 @@
 from collections.abc import Iterable, Collection
 from io import IOBase
 from types import EllipsisType, NoneType
-from typing import (
-    Any,
-    Callable,
-    Protocol,
-    runtime_checkable,
-    TYPE_CHECKING
-)
+from typing import Any, Callable, Protocol, runtime_checkable, TYPE_CHECKING
 from typing_extensions import Buffer, Final, Literal, TypeVar, overload, override
 
 
@@ -574,6 +568,9 @@ class _ContextFactoryLike(Protocol):
         ...
 
 
+_AnnotationT = str | bytes | type | _ActionLike | _StructLike | Any
+
+
 __all__ = [
     "_ContextLike",
     "_ContextLambda",
@@ -595,4 +592,5 @@ __all__ = [
     "_ActionLike",
     "_SwitchOptionsT",
     "_LengthT",
+    "_AnnotationT",
 ]
