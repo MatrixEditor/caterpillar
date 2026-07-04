@@ -184,7 +184,7 @@ class Start:
     __slots__: tuple[str, ...] = ("marker", "condition", "branch_conditions", "is_last")
 
     __conditional__: bool = True
-    __contitional_start__: bool = True
+    __conditional_start__: bool = True
 
     def __init__(self, marker: "_MarkerT") -> None:
         condition = getattr(marker, "condition", getattr(marker, "func", None))

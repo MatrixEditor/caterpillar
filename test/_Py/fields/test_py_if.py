@@ -25,8 +25,6 @@ from caterpillar.py import (
     unpack,
 )
 
-# NOTE: All >=3.14 syntax examples can be used on older versions too
-
 
 # <3.14  SYNTAX:
 def define_optional_byte():
@@ -87,7 +85,10 @@ def define_inline_optional_byte():
     return OptionalByte
 
 
-@pytest.mark.xfail(reason="If cannot access class __annotations__ on Python 3.14;")
+@pytest.mark.skipif(
+    sys.version_info >= (3, 14),
+    reason="Implicit 'with If(condition):' blocks are not supported on 3.14",
+)
 def test_if_unpacks_true_branch():
     OptionalByte = define_optional_byte()
 
@@ -98,7 +99,10 @@ def test_if_unpacks_true_branch():
     assert decoded.trailer == 0xFF
 
 
-@pytest.mark.xfail(reason="If cannot access class __annotations__ on Python 3.14;")
+@pytest.mark.skipif(
+    sys.version_info >= (3, 14),
+    reason="Implicit 'with If(condition):' blocks are not supported on 3.14",
+)
 def test_if_false_branch_consumes_no_bytes():
     OptionalByte = define_optional_byte()
 
@@ -109,7 +113,10 @@ def test_if_false_branch_consumes_no_bytes():
     assert decoded.trailer == 0xFF
 
 
-@pytest.mark.xfail(reason="If cannot access class __annotations__ on Python 3.14;")
+@pytest.mark.skipif(
+    sys.version_info >= (3, 14),
+    reason="Implicit 'with If(condition):' blocks are not supported on 3.14",
+)
 def test_if_pack_false_branch_writes_nothing():
     OptionalByte = define_optional_byte()
 
