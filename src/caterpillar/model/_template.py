@@ -125,7 +125,10 @@ class TemplateTypeVar:
 
 
 class TemplateFieldRef:
-    """Field metadata for Python ``TypeVar`` based templates."""
+    """Field metadata for Python ``TypeVar`` based templates.
+
+    .. versionadded:: 2.9.0
+    """
 
     param: TypeVar
     field_kwds: dict[str, Any]
@@ -181,7 +184,7 @@ class TemplateFieldRef:
 def field_of(param: Any) -> TemplateFieldRef:
     """Create layout metadata for a Python ``TypeVar`` template field.
 
-    ..versionadded:: 2.9.0
+    .. versionadded:: 2.9.0
     """
     return TemplateFieldRef(param)
 

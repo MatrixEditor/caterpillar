@@ -452,6 +452,8 @@ class When:
     :param condition: Context expression controlling this arm.
     :param annotation: Field annotation or struct selected when the condition
         evaluates to true.
+
+    .. versionadded:: 2.9.0
     """
 
     __slots__: tuple[str, ...] = ("condition", "annotation")
@@ -468,6 +470,8 @@ class Otherwise:
 
     The fallback arm is selected when no earlier :class:`When` condition matched.
     A branch can contain at most one fallback arm, and it must appear last.
+
+    .. versionadded:: 2.9.0
     """
 
     __slots__: tuple[str, ...] = ("annotation",)
@@ -497,6 +501,8 @@ class Branch:
             ]
 
     Arm annotations can use ``f[...]`` to carry local options such as byte order.
+
+    .. versionadded:: 2.9.0
     """
 
     __slots__: tuple[str, ...] = ("chain",)
@@ -587,7 +593,7 @@ class Branch:
 class If(ConditionContext):
     """If-statement implementation for class definitions.
 
-    .. versionchanged:: 2.4.5
+    .. versionchanged:: 2.9.0
 
         Python 3.14+ requires explicit conditional annotations using either
         ``with If(condition) as when:`` with ``field: f[type, field, when]`` for
@@ -910,9 +916,10 @@ class _ElseBranch(ConditionContext):
 class _Else:
     """Else marker factory.
 
-    Python <= 3.13 supports ``with Else:`` for legacy condition blocks. Python
-    3.14+ requires ``with Else(previous) as when:`` with ``f[..., when]`` for
-    one field or ``Start(when)`` / ``End(when)`` metadata for a block.
+    .. versionchanged:: 2.9.0
+        Python <= 3.13 supports ``with Else:`` for legacy condition blocks. Python
+        3.14+ requires ``with Else(previous) as when:`` with ``f[..., when]`` for
+        one field or ``Start(when)`` / ``End(when)`` metadata for a block.
     """
 
     __slots__: tuple[str, ...] = ("_legacy",)
