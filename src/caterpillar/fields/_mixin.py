@@ -33,7 +33,7 @@ from caterpillar.abc import (
     _OT,
     _OptionLike,
     _EndianLike,
-    _SwitchLambda,
+    _SwitchOptionsT,
     _ArgType,
 )
 from ._base import Field
@@ -53,7 +53,7 @@ class FieldMixin(ByteOrderMixin[_IT, _OT]):
         # fmt: off
         return Field(self, byteorder(self)) | flag # pyright: ignore[reportArgumentType]
 
-    def __xor__(self, flag: Flag) -> Field[_IT, _OT]:
+    def __xor__(self, flag: _OptionLike) -> Field[_IT, _OT]:
         """Creates a field *without* the given flag."""
         # fmt: off
         return Field(self, byteorder(self)) ^ flag # pyright: ignore[reportArgumentType]
@@ -69,7 +69,7 @@ class FieldMixin(ByteOrderMixin[_IT, _OT]):
         return Field(self, byteorder(self))[dim] # pyright: ignore[reportArgumentType]
 
     def __rshift__(
-        self, switch: _SwitchLambda | dict[str, _StructLike]
+        self, switch: _SwitchOptionsT
     ) -> Field[_IT, _OT]:
         """Inserts switch options into the new field"""
         # fmt: off
@@ -91,10 +91,14 @@ class FieldMixin(ByteOrderMixin[_IT, _OT]):
     ) -> "Chain[_IT, _ChainTailT]": ...
     @overload
     def __and__(
+        self, other: "type[_ChainTailT]"
+    ) -> "Chain[_IT, _ChainTailT]": ...
+    @overload
+    def __and__(
         self, other: "Chain[_OT, _ChainTailT]"
     ) -> "Chain[_IT, _ChainTailT]": ...
     def __and__(
-        self, other: "Chain[_OT, _ChainTailT] | _StructLike[_OT, _ChainTailT]"
+        self, other: "Chain[_OT, _ChainTailT] | _StructLike[_OT, _ChainTailT] | type[_OT]"
     ) -> "Chain":
         """Returns a chain joining this structure before the next element or chain."""
         # fmt: off
