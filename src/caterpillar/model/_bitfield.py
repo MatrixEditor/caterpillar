@@ -1077,6 +1077,7 @@ class Bitfield(Struct[_VT]):
                     if entry.signed and value >= 1 << (entry.width - 1):
                         value -= 1 << entry.width
                     init_data[entry.name] = value
+                    context[CTX_OBJECT][entry.name] = value
 
         return self.model(**init_data)  # pyright: ignore[reportCallIssue]
 
