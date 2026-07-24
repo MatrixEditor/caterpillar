@@ -1642,11 +1642,11 @@ class Prefixed(Generic[_PrefixIOT], FieldStruct[_PrefixIOT, _PrefixIOT]):
     def __init__(
         self,
         prefix: _StructLike[int, int],
-        struct: _StructLike[_PrefixIOT, _PrefixIOT] | None = None,
+        struct: _StructLike[_PrefixIOT, _PrefixIOT] | type[_PrefixIOT] | None = None,
         encoding: str | None = None,
     ):
         self.prefix: _StructLike[int, int] = prefix
-        self.struct: _StructLike[_PrefixIOT, _PrefixIOT] | None = struct
+        self.struct: _StructLike[_PrefixIOT, _PrefixIOT] | None = getstruct(struct, struct)
         self.encoding: str | None = encoding
         # Support str as second argument
         if isinstance(struct, str):

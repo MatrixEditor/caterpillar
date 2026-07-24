@@ -143,6 +143,8 @@ class _ContextLike(Protocol):
     @overload
     def __getitem__(self, key: Literal["_parent"], /) -> "_ContextLike": ...
     @overload
+    def __getitem__(self, key: Literal["_obj"], /) -> "_ContextLike": ...
+    @overload
     def __getitem__(self, key: Literal["_root"], /) -> "_ContextLike": ...
     @overload
     def __getitem__(self, key: Literal["_io"], /) -> _StreamType: ...
@@ -569,7 +571,6 @@ class _ContextFactoryLike(Protocol):
 
 
 _AnnotationT = str | bytes | type | _ActionLike | _StructLike | Any
-
 
 __all__ = [
     "_ContextLike",

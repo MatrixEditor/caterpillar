@@ -322,6 +322,7 @@ class StructDefMixin:
     - ``cls.from_bytes(...)`` for constructing instances from raw binary data.
     - ``cls.from_file(...)`` for constructing instances from files.
     - ``obj.to_bytes(...)`` for serializing instances back into binary form.
+    - ``__bytes__()`` for direct to-bytes conversion with ``bytes(...)``
 
     The primary purpose of this mixin is to improve ergonomics and satisfy
     static type checkers by exposing these behaviors directly on the model
@@ -463,6 +464,10 @@ class StructDefMixin:
                 arch=arch,
                 **kwargs,
             )
+
+    def __bytes__(self) -> bytes:
+        """Helper for direct bytes(...) conversion"""
+        return self.to_bytes()
 
 
 class struct_factory:
