@@ -6,6 +6,16 @@ Changelog
 
 *More entries will be added in the future.*
 
+.. _changelog_2.9.1:
+
+[2.9.1] - Bitfield and Prefixed update
+======================================
+
+- ``Prefixed`` now supports struct types directly
+- ``StructDefMixin`` now includes direct to-bytes conversion with ``bytes(...)``
+- Fixed a bug in ``@bitfield`` where parsed bit-width fields are not populated to the current context
+- Corrected some type hints in ``FieldMixin`` and ``_ContextLike``
+
 .. _changelog_2.9.0:
 
 [2.9.0] - Python 3.14 Compatibility and Generic Templates
