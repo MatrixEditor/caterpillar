@@ -13,12 +13,20 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # pyright: reportExplicitAny=false, reportAny=false
-from collections.abc import Iterable, Collection
+from collections.abc import Callable, Collection, Iterable
 from io import IOBase
 from types import EllipsisType, NoneType
-from typing import Any, Callable, Protocol, runtime_checkable, TYPE_CHECKING
-from typing_extensions import Buffer, Final, Literal, TypeVar, overload, override
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Final,
+    Literal,
+    Protocol,
+    runtime_checkable,
+    TypeAlias,
+)
 
+from typing_extensions import Buffer, TypeVar, overload, override
 
 if TYPE_CHECKING:
     from caterpillar.py import Field
@@ -539,7 +547,7 @@ class _ArrayFactoryLike(Protocol[_IT]):
     into a concrete collection type.
     """
 
-    def __call__(self, __value: Iterable[_IT]) -> Collection[_IT]:
+    def __call__(self, /, __value: Iterable[_IT]) -> Collection[_IT]:
         """Create a collection from the given iterable.
 
         :param __value: Iterable of input values.
@@ -572,26 +580,69 @@ class _ContextFactoryLike(Protocol):
 
 _AnnotationT = str | bytes | type | _ActionLike | _StructLike | Any
 
+ContextLike: TypeAlias = _ContextLike
+ContextLambda: TypeAlias = _ContextLambda[_OT]
+SupportsActionUnpack: TypeAlias = _SupportsActionUnpack
+SupportsActionPack: TypeAlias = _SupportsActionPack
+ActionLike: TypeAlias = _ActionLike
+SupportsPack: TypeAlias = _SupportsPack[_IT]
+SupportsUnpack: TypeAlias = _SupportsUnpack[_OT]
+SupportsSize: TypeAlias = _SupportsSize
+StructLike: TypeAlias = _StructLike[_IT, _OT]
+SupportsType: TypeAlias = _SupportsType
+ContainsStruct: TypeAlias = _ContainsStruct[_IT, _OT]
+SwitchLambda: TypeAlias = _SwitchLambda
+SupportsBits: TypeAlias = _SupportsBits
+ContainsBits: TypeAlias = _ContainsBits
+ArchLike: TypeAlias = _ArchLike
+SupportsSetEndian: TypeAlias = _SupportsSetEndian[_IT]
+EndianLike: TypeAlias = _EndianLike
+OptionLike: TypeAlias = _OptionLike[_IT]
+ArrayFactoryLike: TypeAlias = _ArrayFactoryLike[_IT]
+ContextFactoryLike: TypeAlias = _ContextFactoryLike
+
 __all__ = [
-    "_ContextLike",
-    "_ContextLambda",
-    "_SupportsActionUnpack",
-    "_SupportsActionPack",
-    "_SupportsPack",
-    "_SupportsUnpack",
-    "_SupportsSize",
-    "_StructLike",
-    "_SupportsType",
-    "_ContainsStruct",
-    "_SwitchLambda",
-    "_SupportsBits",
-    "_ContainsBits",
-    "_ArrayFactoryLike",
-    "_OptionLike",
-    "_ArchLike",
-    "_ContextFactoryLike",
+    "ActionLike",
+    "ArchLike",
+    "ArrayFactoryLike",
+    "ContainsBits",
+    "ContainsStruct",
+    "ContextFactoryLike",
+    "ContextLambda",
+    "ContextLike",
+    "EndianLike",
+    "OptionLike",
+    "StructLike",
+    "SupportsActionPack",
+    "SupportsActionUnpack",
+    "SupportsBits",
+    "SupportsPack",
+    "SupportsSetEndian",
+    "SupportsSize",
+    "SupportsType",
+    "SupportsUnpack",
+    "SwitchLambda",
     "_ActionLike",
-    "_SwitchOptionsT",
-    "_LengthT",
     "_AnnotationT",
+    "_ArchLike",
+    "_ArrayFactoryLike",
+    "_ContainsBits",
+    "_ContainsStruct",
+    "_ContextFactoryLike",
+    "_ContextLambda",
+    "_ContextLike",
+    "_EndianLike",
+    "_LengthT",
+    "_OptionLike",
+    "_StructLike",
+    "_SupportsActionPack",
+    "_SupportsActionUnpack",
+    "_SupportsBits",
+    "_SupportsPack",
+    "_SupportsSetEndian",
+    "_SupportsSize",
+    "_SupportsType",
+    "_SupportsUnpack",
+    "_SwitchLambda",
+    "_SwitchOptionsT",
 ]
