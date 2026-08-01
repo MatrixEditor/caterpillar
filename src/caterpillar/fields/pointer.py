@@ -18,7 +18,7 @@ from typing import Any, Final, Generic
 from typing_extensions import TypeVar, override
 
 from caterpillar._common import WithoutContextVar
-from caterpillar.abc import _IT, _ContextLambda, _ContextLike, _StreamType, _StructLike
+from caterpillar.abc import _IT, ContextLambda, ContextLike, StructLike, _StreamType
 from caterpillar.byteorder import Arch
 from caterpillar.context import CTX_ARCH, CTX_FIELD, CTX_SEQ, CTX_STREAM
 from caterpillar.exception import DelegationError, StructException
@@ -47,7 +47,7 @@ _PtrValueT = TypeVar("_PtrValueT", default=None)
 PTR_STRICT: Flag[None] = Flag("pointer.strict-mode")
 
 
-class pointer(Generic[_PtrValueT], int):
+class pointer(int, Generic[_PtrValueT]):
     """
     A custom integer subclass representing a pointer to another struct within the stream.
 
@@ -70,7 +70,7 @@ class pointer(Generic[_PtrValueT], int):
 _PtrT = TypeVar("_PtrT", default=pointer)
 
 
-class Pointer(Generic[_PtrT, _PtrValueT], FieldStruct[int, _PtrT]):
+class Pointer(FieldStruct[int, _PtrT], Generic[_PtrT, _PtrValueT]):
     """
     A struct that represents a pointer to another struct within the stream.
 
@@ -82,17 +82,15 @@ class Pointer(Generic[_PtrT, _PtrValueT], FieldStruct[int, _PtrT]):
 
     def __init__(
         self,
-        struct: _StructLike[int, int] | _ContextLambda[_StructLike[int, int]],
-        model: _StructLike[_PtrValueT, _PtrValueT] | type[_PtrValueT] | None = None,
+        struct: StructLike[int, int] | ContextLambda[StructLike[int, int]],
+        model: StructLike[_PtrValueT, _PtrValueT] | type[_PtrValueT] | None = None,
     ) -> None:
-        self.struct: _StructLike[int, int] | _ContextLambda[_StructLike[int, int]] = (
-            struct
-        )
-        self.model: _StructLike[_PtrValueT, _PtrValueT] | None = (
+        self.struct: StructLike[int, int] | ContextLambda[StructLike[int, int]] = struct
+        self.model: StructLike[_PtrValueT, _PtrValueT] | None = (
             getstruct(model, model) if model is not None else None
         )
 
-    def __mul__(self, model: _StructLike[_IT, _IT]) -> "Pointer[_IT]":
+    def __mul__(self, model: StructLike[_IT, _IT]) -> "Pointer[_IT]":
         """
         Create a new Pointer with a specified model.
 
@@ -111,7 +109,7 @@ class Pointer(Generic[_PtrT, _PtrValueT], FieldStruct[int, _PtrT]):
         """
         return pointer
 
-    def __size__(self, context: _ContextLike) -> int:
+    def __size__(self, context: ContextLike) -> int:
         """
         Get the size of the Pointer struct.
 
@@ -125,7 +123,7 @@ class Pointer(Generic[_PtrT, _PtrValueT], FieldStruct[int, _PtrT]):
         return struct.__size__(context)
 
     @override
-    def unpack_single(self, context: _ContextLike) -> _PtrT:
+    def unpack_single(self, context: ContextLike) -> _PtrT:
         """
         Unpack a single value using the Pointer struct.
 
@@ -139,10 +137,13 @@ class Pointer(Generic[_PtrT, _PtrValueT], FieldStruct[int, _PtrT]):
 
         stream: _StreamType = context[CTX_STREAM]  # pyright: ignore[reportAny]
         start = stream.tell()
+        outer_field = context.get(CTX_FIELD)
         with WithoutContextVar(context, CTX_SEQ, False):
             value: int = struct.__unpack__(context)
             # cleanup before further parsing
             value: int = self._clean(value, context)
+            context[CTX_FIELD] = outer_field
+            context[CTX_SEQ] = False
 
             if self.model is None:
                 return self._create(value, start, None, context)
@@ -163,16 +164,16 @@ class Pointer(Generic[_PtrT, _PtrValueT], FieldStruct[int, _PtrT]):
                 try:
                     model_obj = self.model.__unpack__(context)
                 except StructException as exc:
-                    field = context.get(CTX_FIELD)
-                    if field is not None and field.has_flag(PTR_STRICT):
+                    if outer_field is not None and outer_field.has_flag(PTR_STRICT):
                         raise DelegationError(
                             "Could not parse model!", context
                         ) from exc
-                stream.seek(fallback)
+                finally:
+                    stream.seek(fallback)
         return self._create(value, start, model_obj, context)
 
     @override
-    def pack_single(self, obj: int, context: _ContextLike) -> None:
+    def pack_single(self, obj: int, context: ContextLike) -> None:
         """
         Pack a single value using the Pointer struct.
 
@@ -184,6 +185,7 @@ class Pointer(Generic[_PtrT, _PtrValueT], FieldStruct[int, _PtrT]):
         if callable(struct):
             struct = self.struct(context)  # pyright: ignore[reportCallIssue]
 
+        outer_field = context.get(CTX_FIELD)
         with WithoutContextVar(context, CTX_SEQ, False):
             value = int(obj)
             model_obj = None
@@ -194,6 +196,8 @@ class Pointer(Generic[_PtrT, _PtrValueT], FieldStruct[int, _PtrT]):
                     start = stream.tell()
 
             struct.__pack__(value, context)
+            context[CTX_FIELD] = outer_field
+            context[CTX_SEQ] = False
             if model_obj is None:
                 return
 
@@ -210,7 +214,7 @@ class Pointer(Generic[_PtrT, _PtrValueT], FieldStruct[int, _PtrT]):
             finally:
                 stream.seek(fallback)
 
-    def _to_offset(self, value: int, start: int, context: _ContextLike) -> int:
+    def _to_offset(self, value: int, start: int, context: ContextLike) -> int:
         """
         Convert the pointer value to an offset.
 
@@ -222,7 +226,7 @@ class Pointer(Generic[_PtrT, _PtrValueT], FieldStruct[int, _PtrT]):
         """
         return value
 
-    def _clean(self, value: int, context: _ContextLike) -> int:
+    def _clean(self, value: int, context: ContextLike) -> int:
         """
         Clean the pointer value.
 
@@ -237,7 +241,7 @@ class Pointer(Generic[_PtrT, _PtrValueT], FieldStruct[int, _PtrT]):
         value: int,
         start: int,
         model_obj: _PtrValueT | None,
-        context: _ContextLike,
+        context: ContextLike,
     ) -> pointer[_PtrValueT]:
         """
         Create a new pointer object.
@@ -253,22 +257,22 @@ class Pointer(Generic[_PtrT, _PtrValueT], FieldStruct[int, _PtrT]):
         return ptr
 
 
-UNSIGNED_POINTER_TYS: dict[int, _StructLike[int, int]] = {
+UNSIGNED_POINTER_TYS: dict[int, StructLike[int, int]] = {
     x.__bits__: x for x in [uint8, uint16, uint24, uint32, uint64]
 }
-SIGNED_POINTER_TYS: dict[int, _StructLike[int, int]] = {
+SIGNED_POINTER_TYS: dict[int, StructLike[int, int]] = {
     x.__bits__: x for x in [int8, int16, int24, int32, int64]
 }
 
 
-def uintptr_fn(context: _ContextLike) -> _StructLike[int, int]:
+def uintptr_fn(context: ContextLike) -> StructLike[int, int]:
     """
     Generator function to decide which struct to use as the pointer type based
     on the current architecture.
 
-    :param _ContextLike context: The input context.
+    :param ContextLike context: The input context.
     :return: The struct to use.
-    :rtype: _StructLike
+    :rtype: StructLike
     """
     field = context[CTX_FIELD]
     arch: Arch = (
@@ -277,14 +281,14 @@ def uintptr_fn(context: _ContextLike) -> _StructLike[int, int]:
     return UNSIGNED_POINTER_TYS.get(arch.ptr_size, UInt(arch.ptr_size))
 
 
-def intptr_fn(context: _ContextLike) -> _StructLike[int, int]:
+def intptr_fn(context: ContextLike) -> StructLike[int, int]:
     """
     Generator function to decide which struct to use as the pointer type based
     on the current architecture.
 
-    :param _ContextLike context: The input context.
+    :param ContextLike context: The input context.
     :return: The struct to use.
-    :rtype: _StructLike
+    :rtype: StructLike
     """
     field = context[CTX_FIELD]
     arch: Arch = (
@@ -338,7 +342,7 @@ class RelativePointer(Pointer[relative_pointer[_PtrValueT], _PtrValueT]):
         return relative_pointer
 
     @override
-    def _to_offset(self, value: int, start: int, context: _ContextLike) -> int:
+    def _to_offset(self, value: int, start: int, context: ContextLike) -> int:
         """
         Convert the relative pointer value to an offset.
 
@@ -356,7 +360,7 @@ class RelativePointer(Pointer[relative_pointer[_PtrValueT], _PtrValueT]):
         value: int,
         start: int,
         model_obj: _PtrValueT | None,
-        context: _ContextLike,
+        context: ContextLike,
     ) -> pointer[_PtrValueT]:
         """
         Create a new relative pointer object.

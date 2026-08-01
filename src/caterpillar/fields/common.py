@@ -16,17 +16,16 @@
 import datetime
 import struct as PyStruct
 import warnings
-from collections.abc import Collection
+from collections.abc import Callable, Collection
 from enum import Enum as _EnumType
 from functools import cached_property
 from io import BytesIO
 from types import NoneType
-from typing import Any, Callable, Generic
+from typing import Any, Final, Generic
 from uuid import UUID
 
 from typing_extensions import (
     Buffer,
-    Final,
     Self,
     SupportsFloat,
     SupportsIndex,
@@ -1680,11 +1679,16 @@ class Prefixed(Generic[_PrefixIOT], FieldStruct[_PrefixIOT, _PrefixIOT]):
         :param obj: The object to pack (should be a byte sequence).
         :param context: The current context.
         """
-        # fmt: off
+        outer_field = context.get(CTX_FIELD)
+        outer_seq = context[CTX_SEQ]
         if self.struct is not None:
             data = BytesIO()
-            with WithoutContextVar(context, CTX_STREAM, data):
-                self.struct.__pack__(obj, context)
+            try:
+                with WithoutContextVar(context, CTX_STREAM, data):
+                    self.struct.__pack__(obj, context)
+            finally:
+                context[CTX_FIELD] = outer_field
+                context[CTX_SEQ] = outer_seq
 
             context[CTX_SEQ] = False
             obj = data.getvalue()  # pyright: ignore[reportAssignmentType]
@@ -1693,7 +1697,14 @@ class Prefixed(Generic[_PrefixIOT], FieldStruct[_PrefixIOT, _PrefixIOT]):
             # fmt: off
             obj = obj.encode(self.encoding)  # pyright: ignore[reportAttributeAccessIssue, reportUnknownMemberType]
 
-        self.prefix.__pack__(len(obj), context)  # pyright: ignore[reportArgumentType]
+        if type(self.prefix) is PyStructFormattedField:
+            self.prefix.pack_single(len(obj), context)
+        else:
+            try:
+                self.prefix.__pack__(len(obj), context)  # pyright: ignore[reportArgumentType]
+            finally:
+                context[CTX_FIELD] = outer_field
+                context[CTX_SEQ] = outer_seq
         context[CTX_STREAM].write(obj)
 
     @override
@@ -1708,7 +1719,16 @@ class Prefixed(Generic[_PrefixIOT], FieldStruct[_PrefixIOT, _PrefixIOT]):
         :param context: The current context.
         :return: The unpacked object, which is either raw bytes or the data structure.
         """
-        size = self.prefix.__unpack__(context)
+        outer_field = context.get(CTX_FIELD)
+        outer_seq = context[CTX_SEQ]
+        if type(self.prefix) is PyStructFormattedField:
+            size = self.prefix.unpack_single(context)
+        else:
+            try:
+                size = self.prefix.__unpack__(context)
+            finally:
+                context[CTX_FIELD] = outer_field
+                context[CTX_SEQ] = outer_seq
         data = context[CTX_STREAM].read(size)
         if len(data) != size:
             raise ValidationError(
@@ -1719,11 +1739,15 @@ class Prefixed(Generic[_PrefixIOT], FieldStruct[_PrefixIOT, _PrefixIOT]):
         obj = data
         if self.struct is not None:
             inner = BytesIO(data)
-            with (
-                WithoutContextVar(context, CTX_STREAM, inner),
-                WithoutContextVar(context, CTX_SEQ, False),
-            ):
-                obj = self.struct.__unpack__(context)
+            try:
+                with (
+                    WithoutContextVar(context, CTX_STREAM, inner),
+                    WithoutContextVar(context, CTX_SEQ, False),
+                ):
+                    obj = self.struct.__unpack__(context)
+            finally:
+                context[CTX_FIELD] = outer_field
+                context[CTX_SEQ] = outer_seq
             if inner.tell() != size:
                 raise ValidationError(
                     f"Prefixed inner struct consumed {inner.tell()} of {size} bytes",

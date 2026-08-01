@@ -37,7 +37,7 @@ from caterpillar.abc import (
     _LengthT,
     _OptionLike,
     _StreamType,
-    _StructLike,
+    _StructLike, EndianLike,
 )
 from caterpillar.exception import InvalidValueError
 from caterpillar.fields import INVALID_DEFAULT, Field
@@ -109,6 +109,11 @@ class Struct(Sequence[type[_ModelT], _ModelT, _ModelT]):
         )
 
         setattr(self.model, "__class_getitem__", _struct_getitem(self))
+        setattr(
+            self.model,
+            "__set_byteorder__",
+            classmethod(_struct_set_byteorder(self)),
+        )
         if self.is_union:
             # install a hook
             self._union_hook: UnionHook[_ModelT] = (hook_cls or UnionHook)(self)
@@ -271,6 +276,17 @@ def _struct_getitem(
     return class_getitem
 
 
+def _struct_set_byteorder(
+    model: Struct[_ModelT],
+) -> Callable[[type[_ModelT], _EndianLike], Field[_ModelT, _ModelT]]:
+    def set_byteorder(
+        cls: type[_ModelT], order: _EndianLike
+    ) -> Field[_ModelT, _ModelT]:
+        return Field(model, order=order)
+
+    return set_byteorder
+
+
 # TODO: docs
 def Invisible(*, init: bool = False, default: Any = None) -> Any:
     """Create a dataclass field that is hidden from the generated constructor.
@@ -347,6 +363,10 @@ class StructDefMixin:
         :rtype: Field[Collection[_ModelT], Collection[_ModelT]]
         """
         return getstruct(cls)[dim]
+
+    @classmethod
+    def __set_byteorder__(cls, order: EndianLike) -> Field[Self, Self]:
+        return Field(cls, order=order)
 
     @classmethod
     def from_bytes(

@@ -573,6 +573,10 @@ class Field(Generic[_IT, _OT], PackMixin[_IT], UnpackMixin[_OT]):
             # The "keep_position" flag is not applicable here. Configure a field to keep the
             # position afterward.
             context[CTX_VALUE] = value
+            # A discriminator may itself be a Field and replace the active
+            # field context. The selected target is still embedded by self.
+            context[CTX_FIELD] = self
+            context[CTX_SEQ] = self._is_seq
             value = struct.__unpack__(context)
         # fmt; on
         return value
@@ -634,6 +638,8 @@ class Field(Generic[_IT, _OT], PackMixin[_IT], UnpackMixin[_OT]):
                 # support for non-context lambdas with switch statements
                 self.struct.__pack__(value, context)
             if self.options is not None:
+                context[CTX_FIELD] = self
+                context[CTX_SEQ] = self._is_seq
                 struct = self.get_struct(value, context)
                 struct.__pack__(obj, context)
 

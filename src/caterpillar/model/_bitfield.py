@@ -35,7 +35,7 @@ from caterpillar.abc import (
     _OptionLike,
     _StructLike,
 )
-from caterpillar.byteorder import LITTLE_ENDIAN_FMT, O_DEFAULT_ENDIAN, LittleEndian
+from caterpillar.byteorder import LITTLE_ENDIAN_FMT, O_DEFAULT_ENDIAN, LittleEndian, Inherit
 from caterpillar.context import (
     CTX_FIELD,
     CTX_OBJECT,
@@ -1014,6 +1014,11 @@ class Bitfield(Struct[_VT]):
 
     @override
     def unpack_one(self, context: _ContextLike) -> _VT:
+        # Resolves order=Inherit against the enclosing struct (no-op for
+        # bitfields using a fixed/unset byte order); see Sequence._resolve_order.
+        if self.order is Inherit:
+            _ = self._resolve_order(context)
+
         init_data = (O_CONTEXT_FACTORY.value or Context)()
         context[CTX_OBJECT] = (O_CONTEXT_FACTORY.value or Context)(_parent=context)
 
@@ -1072,6 +1077,11 @@ class Bitfield(Struct[_VT]):
 
     @override
     def pack_one(self, obj: _VT, context: _ContextLike) -> None:
+        # Resolves order=Inherit against the enclosing struct (no-op for
+        # bitfields using a fixed/unset byte order); see Sequence._resolve_order.
+        if self.order is Inherit:
+            _ = self._resolve_order(context)
+
         base_path = context[CTX_PATH]
         field: Field | None = context.get(CTX_FIELD)
         members = self._members

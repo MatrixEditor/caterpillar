@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # pyright: reportPrivateUsage=false, reportAny=false, reportExplicitAny=false
+from caterpillar.byteorder import Inherit
 import re
 from collections.abc import Iterable
 from typing import Annotated, Any, Generic, get_args, get_origin
@@ -39,7 +40,7 @@ from caterpillar.context import (
     CTX_SEQ,
     CTX_STREAM,
     O_CONTEXT_FACTORY,
-    Context,
+    Context, CTX_PARENT, CTX_ORDER,
 )
 from caterpillar.exception import StructException, ValidationError
 from caterpillar.fields import INVALID_DEFAULT, Const, Field, FieldMixin
@@ -499,9 +500,33 @@ class Sequence(Generic[_SeqModelT, _SeqIT, _SeqOT], FieldMixin[_SeqIT, _SeqOT]):
         context[CTX_PATH] = base_path
         return max_size if self.is_union else total
 
+    def _resolve_order(self, context: _ContextLike) -> _EndianLike | None:
+        if self.order is not Inherit:
+            return None
+
+        parent = context.get(CTX_PARENT)
+        field = parent.get(CTX_FIELD) if parent is not None else None
+        resolved = None
+        if field is not None and field.has_order() and field.order is not Inherit:
+            # The field embedding this struct already carries a concrete,
+            # explicitly-resolved byte order
+            resolved = field.order
+        elif parent is not None:
+            # The enclosing struct is itself inheriting its order (chain of
+            # Inherit structs) - reuse whatever it already resolved for
+            # itself.
+            resolved = parent.get(CTX_ORDER)
+
+        if resolved is not None:
+            context[CTX_ORDER] = resolved
+        return resolved
+
     def unpack_one(self, context: _ContextLike) -> _SeqOT:
         # At first, we define the object context where the parsed values
         # will be stored
+        if self.order is Inherit:
+            _ = self._resolve_order(context)
+
         factory = O_CONTEXT_FACTORY.value or Context
         fields = self.fields
         ctx_path = CTX_PATH
@@ -578,6 +603,9 @@ class Sequence(Generic[_SeqModelT, _SeqIT, _SeqOT], FieldMixin[_SeqIT, _SeqOT]):
         return value
 
     def pack_one(self, obj: _SeqIT, context: _ContextLike) -> None:
+        if self.order is Inherit:
+            _ = self._resolve_order(context)
+
         max_size = 0
         union_field = None
         fields = self.fields
