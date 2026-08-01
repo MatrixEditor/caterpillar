@@ -21,15 +21,29 @@ import typing
 import warnings
 from dataclasses import dataclass
 from types import FrameType, TracebackType
-from typing import (Annotated, Any, Callable, Generic, Protocol, get_args,
-                    get_origin)
+from typing import Annotated, Any, Callable, Generic, Protocol, get_args, get_origin
 
-from typing_extensions import (Buffer, Final, Literal, Self, Sized, TypeVar,
-                               overload, override)
+from typing_extensions import (
+    Buffer,
+    Final,
+    Literal,
+    Self,
+    Sized,
+    TypeVar,
+    overload,
+    override,
+)
 
-from caterpillar.abc import (_IT, _OT, _ArchLike, _ContextFactoryLike,
-                             _ContextLambda, _ContextLike, _EndianLike,
-                             _StreamType)
+from caterpillar.abc import (
+    _IT,
+    _OT,
+    _ArchLike,
+    _ContextFactoryLike,
+    _ContextLambda,
+    _ContextLike,
+    _EndianLike,
+    _StreamType,
+)
 from caterpillar.exception import StructException
 from caterpillar.options import Flag
 from caterpillar.registry import to_struct
@@ -712,10 +726,18 @@ class ContextPath(Generic[_T], ExprMixin):
 
     @property
     def parent(self) -> ContextPath[_ContextLike]:
-        path = f"{CTX_PARENT}.{CTX_OBJECT}"
-        if not self.path:
-            return ContextPath(path)
-        return ContextPath(".".join([self.path, path]))
+        """
+        .. versionchanged:: 2.9.2
+            Always resolves to the parent context object instead the parent context.
+        """
+        if not self.path or self.path == CTX_OBJECT:
+            return ContextPath(f"{CTX_PARENT}.{CTX_OBJECT}")
+
+        context_path = self.path
+        if self.path.endswith(f".{CTX_OBJECT}"):
+            context_path = self.path[: -len(CTX_OBJECT)].rstrip(".")
+
+        return ContextPath(f"{context_path}.{CTX_PARENT}.{CTX_OBJECT}")
 
     @property
     def parentctx(self) -> ContextPath[_ContextLike]:
