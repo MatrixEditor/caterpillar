@@ -25,6 +25,7 @@ from .byteorder import (
     RISC_V64,
     BigEndian,
     Dynamic,
+    Inherit,
     LittleEndian,
     PowerPC,
     PowerPC64,
@@ -32,13 +33,10 @@ from .byteorder import (
     x86_64,
 )
 from .context import ContextLength as lenof
-from .context import ContextPath
-from .context import ctx
+from .context import ContextPath, ctx, parent, this
 from .context import ctx as C
-from .context import parent
 from .context import parent as P
 from .context import root as G
-from .context import this
 from .fields import Field as F
 from .model import Sequence as Seq
 from .model import (
@@ -61,38 +59,39 @@ __all__ = [
     "AMD64",
     "ARM",
     "ARM64",
-    "BigEndian",
-    "LittleEndian",
-    "PowerPC",
-    "PowerPC64",
     "RISC_V",
     "RISC_V64",
-    "x86",
-    "x86_64",
+    "BigEndian",
+    "C",
+    "ContextPath",
+    "Dynamic",
+    "F",
+    "G",
+    "Inherit",
+    "LittleEndian",
+    "P",
+    "PowerPC",
+    "PowerPC64",
+    "Seq",
     "bitfield",
+    "ctx",
+    "f",
+    "getstruct",
+    "hasstruct",
+    "lenof",
+    "opt",
     "pack",
     "pack_file",
     "pack_into",
+    "parent",
+    "sizeof",
     "struct",
+    "this",
+    "to_struct",
+    "typeof",
     "union",
     "unpack",
     "unpack_file",
-    "sizeof",
-    "Seq",
-    "typeof",
-    "getstruct",
-    "hasstruct",
-    "ContextPath",
-    "ctx",
-    "parent",
-    "this",
-    "lenof",
-    "to_struct",
-    "F",
-    "opt",
-    "C",
-    "P",
-    "G",
-    "Dynamic",
-    "f",
+    "x86",
+    "x86_64",
 ]
