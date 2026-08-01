@@ -15,70 +15,30 @@
 # pyright: reportPrivateUsage=false
 import dataclasses
 import enum
-
 from collections.abc import Iterable
 from typing import Any, Callable, Final, Generic, Literal
-from typing_extensions import (
-    ClassVar,
-    Self,
-    dataclass_transform,
-    overload,
-    override,
-    TypeVar,
-)
-from caterpillar.fields.common import Int
-from caterpillar.shared import (
-    ATTR_ACTION_PACK,
-    ATTR_ACTION_UNPACK,
-    typeof,
-    ATTR_BITS,
-    ATTR_SIGNED,
-)
-from caterpillar.byteorder import (
-    LITTLE_ENDIAN_FMT,
-    O_DEFAULT_ENDIAN,
-    LittleEndian,
-)
-from caterpillar.options import (
-    B_GROUP_NEW,
-    GLOBAL_BITFIELD_FLAGS,
-    GLOBAL_STRUCT_OPTIONS,
-    GLOBAL_UNION_OPTIONS,
-    B_OVERWRITE_ALIGNMENT,
-    B_GROUP_END,
-    B_GROUP_KEEP,
-    B_NO_AUTO_BOOL,
-    Flag,
-)
-from caterpillar.fields import (
-    Field,
-    Pass,
-    INVALID_DEFAULT,
-)
+
+from typing_extensions import (ClassVar, Self, TypeVar, dataclass_transform,
+                               overload, override)
+
+from caterpillar.abc import (_ActionLike, _ArchLike, _ContextLike, _EndianLike,
+                             _OptionLike, _StructLike)
+from caterpillar.byteorder import (LITTLE_ENDIAN_FMT, O_DEFAULT_ENDIAN,
+                                   LittleEndian)
+from caterpillar.context import (CTX_FIELD, CTX_OBJECT, CTX_PATH, CTX_STREAM,
+                                 O_CONTEXT_FACTORY, Context)
 from caterpillar.exception import StructException, ValidationError
-from caterpillar.context import (
-    CTX_FIELD,
-    CTX_PATH,
-    O_CONTEXT_FACTORY,
-    CTX_OBJECT,
-    CTX_STREAM,
-    Context,
-)
-from caterpillar.abc import (
-    _StructLike,
-    _ActionLike,
-    _ContextLike,
-    _OptionLike,
-    _ArchLike,
-    _EndianLike,
-)
-from ._struct import (
-    Struct,
-    StructDefMixin,
-    sizeof,
-    Invisible,
-)
+from caterpillar.fields import INVALID_DEFAULT, Field, Pass
+from caterpillar.fields.common import Int
+from caterpillar.options import (B_GROUP_END, B_GROUP_KEEP, B_GROUP_NEW,
+                                 B_NO_AUTO_BOOL, B_OVERWRITE_ALIGNMENT,
+                                 GLOBAL_BITFIELD_FLAGS, GLOBAL_STRUCT_OPTIONS,
+                                 GLOBAL_UNION_OPTIONS, Flag)
+from caterpillar.shared import (ATTR_ACTION_PACK, ATTR_ACTION_UNPACK,
+                                ATTR_BITS, ATTR_SIGNED, typeof)
+
 from ._base import Sequence
+from ._struct import Invisible, Struct, StructDefMixin, sizeof
 
 _AnnotationT = int | tuple[int, ...] | Any  # pyright: ignore[reportExplicitAny]
 _ModelT = TypeVar("_ModelT")

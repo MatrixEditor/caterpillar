@@ -13,37 +13,23 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # pyright: reportAny=false, reportExplicitAny=false, reportPrivateUsage=false
-from tempfile import TemporaryFile
-from io import BytesIO, IOBase
 from collections import OrderedDict
+from io import BytesIO, IOBase
 from shutil import copyfileobj
+from tempfile import TemporaryFile
 from typing import Any
-from typing_extensions import (
-    overload,
-    Buffer,
-)
 
-from caterpillar.byteorder import (
-    O_DEFAULT_ARCH,
-    O_DEFAULT_ENDIAN,
-    LittleEndian,
-    system_arch,
-)
-from caterpillar.shared import ATTR_PACK, getstruct, hasstruct
-from caterpillar.context import O_CONTEXT_FACTORY, CTX_STREAM, Context
+from typing_extensions import Buffer, overload
+
+from caterpillar.abc import (_IT, _OT, _ArchLike, _ContainsStruct, _EndianLike,
+                             _StreamType, _SupportsPack, _SupportsSize,
+                             _SupportsUnpack)
+from caterpillar.byteorder import (O_DEFAULT_ARCH, O_DEFAULT_ENDIAN,
+                                   LittleEndian, system_arch)
+from caterpillar.context import CTX_STREAM, O_CONTEXT_FACTORY, Context
 from caterpillar.exception import DynamicSizeError
-from caterpillar.shared import MODE_PACK, MODE_UNPACK
-from caterpillar.abc import (
-    _ContainsStruct,
-    _OT,
-    _IT,
-    _SupportsPack,
-    _StreamType,
-    _SupportsUnpack,
-    _SupportsSize,
-    _EndianLike,
-    _ArchLike,
-)
+from caterpillar.shared import (ATTR_PACK, MODE_PACK, MODE_UNPACK, getstruct,
+                                hasstruct)
 
 
 @overload

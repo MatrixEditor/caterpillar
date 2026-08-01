@@ -1,4 +1,5 @@
 import pytest
+
 import caterpillar
 
 if caterpillar.native_support():

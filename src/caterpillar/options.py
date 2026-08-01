@@ -15,9 +15,10 @@
 # pyright: reportPrivateUsage=false
 from dataclasses import dataclass
 from typing import Generic
+
 from typing_extensions import Final, override
 
-from caterpillar.abc import _OptionLike, _VT, _ArrayFactoryLike
+from caterpillar.abc import _VT, _ArrayFactoryLike, _OptionLike
 
 
 @dataclass(init=False, eq=False)

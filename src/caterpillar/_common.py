@@ -13,37 +13,18 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # pyright: reportPrivateUsage=false, reportExplicitAny=false, reportCallIssue=false
-from collections.abc import Collection
 import itertools
-
+from collections.abc import Collection
 from types import TracebackType
 from typing import TYPE_CHECKING, Any, Callable
 
-from caterpillar.abc import (
-    _PrefixedType,
-    _ContextLike,
-    _OT,
-    _IT,
-    _StreamType,
-    _LengthT,
-    _SupportsPack,
-)
-from caterpillar.context import (
-    CTX_PATH,
-    CTX_FIELD,
-    CTX_INDEX,
-    CTX_OBJECT,
-    CTX_STREAM,
-    CTX_SEQ,
-    O_CONTEXT_FACTORY,
-    Context,
-)
-from caterpillar.exception import (
-    Stop,
-    StructException,
-    InvalidValueError,
-    ValidationError,
-)
+from caterpillar.abc import (_IT, _OT, _ContextLike, _LengthT, _PrefixedType,
+                             _StreamType, _SupportsPack)
+from caterpillar.context import (CTX_FIELD, CTX_INDEX, CTX_OBJECT, CTX_PATH,
+                                 CTX_SEQ, CTX_STREAM, O_CONTEXT_FACTORY,
+                                 Context)
+from caterpillar.exception import (InvalidValueError, Stop, StructException,
+                                   ValidationError)
 from caterpillar.options import O_ARRAY_FACTORY
 
 if TYPE_CHECKING:

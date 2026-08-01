@@ -42,21 +42,13 @@ In this case, the action will be executed before parsing any subsequent fields
 and won't be stored as part of the struct model.
 """
 
-from typing import TYPE_CHECKING, overload, Generic, Any
-from typing_extensions import Final, Literal, override, TypeIs, Buffer
+from typing import TYPE_CHECKING, Any, Generic, overload
 
-from caterpillar.abc import (
-    _ContextLambda,
-    _StructLike,
-    _IT,
-    _OT,
-    _SupportsType,
-    _ContainsStruct,
-    _ActionLike,
-    _ArchLike,
-    _EndianLike,
-    _StreamType,
-)
+from typing_extensions import Buffer, Final, Literal, TypeIs, override
+
+from caterpillar.abc import (_IT, _OT, _ActionLike, _ArchLike, _ContainsStruct,
+                             _ContextLambda, _EndianLike, _StreamType,
+                             _StructLike, _SupportsType)
 
 if TYPE_CHECKING:
     from caterpillar.fields import FieldStruct
@@ -416,7 +408,7 @@ class PackMixin(Generic[_IT]):
         :rtype: bytes | None
         """
         # fmt: off
-        from caterpillar.model import pack_into, pack
+        from caterpillar.model import pack, pack_into
         if fp is not None:
             pack_into(  # pyright: ignore[reportCallIssue]
                 obj,
@@ -522,12 +514,10 @@ class UnpackMixin(Generic[_OT]):
         """
         from caterpillar.model import unpack_file
 
-        return (
-            unpack_file(  # pyright: ignore[reportCallIssue, reportUnknownVariableType]
-                self,  # pyright: ignore[reportArgumentType]
-                filename,
-                order=order,
-                arch=arch,
-                **kwargs,
-            )
+        return unpack_file(  # pyright: ignore[reportCallIssue, reportUnknownVariableType]
+            self,  # pyright: ignore[reportArgumentType]
+            filename,
+            order=order,
+            arch=arch,
+            **kwargs,
         )

@@ -3,27 +3,10 @@ import sys
 
 import pytest
 
-from caterpillar.py import (
-    BigEndian,
-    Branch,
-    Else,
-    ElseIf,
-    End,
-    If,
-    Invisible,
-    LittleEndian,
-    Start,
-    StructException,
-    When,
-    Otherwise,
-    f,
-    pack,
-    struct,
-    this,
-    uint8,
-    uint16,
-    unpack,
-)
+from caterpillar.py import (BigEndian, Branch, Else, ElseIf, End, If,
+                            Invisible, LittleEndian, Otherwise, Start,
+                            StructException, When, f, pack, struct, this,
+                            uint8, uint16, unpack)
 
 
 # <3.14  SYNTAX:

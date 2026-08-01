@@ -1,20 +1,7 @@
 import sys
 
-from caterpillar.py import (
-    Arch,
-    Field,
-    f,
-    intptr,
-    pack,
-    sizeof,
-    struct,
-    system_arch,
-    uint8,
-    unpack,
-    uintptr,
-    x86,
-    x86_64,
-)
+from caterpillar.py import (Arch, Field, f, intptr, pack, sizeof, struct,
+                            system_arch, uint8, uintptr, unpack, x86, x86_64)
 
 
 # --------------------------------------------------------------------------- #

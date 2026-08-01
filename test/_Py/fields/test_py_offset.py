@@ -1,13 +1,6 @@
 import pytest
 
-from caterpillar.py import (
-    f,
-    struct,
-    pack,
-    unpack,
-    uint8,
-    this,
-)
+from caterpillar.py import f, pack, struct, this, uint8, unpack
 
 
 def test_fixed_offset_unpack():

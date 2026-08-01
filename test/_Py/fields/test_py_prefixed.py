@@ -2,16 +2,8 @@ import struct as pystruct
 
 import pytest
 
-from caterpillar.py import (
-    BigEndian,
-    Bytes,
-    Prefixed,
-    ValidationError,
-    pack,
-    uint8,
-    uint16,
-    unpack,
-)
+from caterpillar.py import (BigEndian, Bytes, Prefixed, ValidationError, pack,
+                            uint8, uint16, unpack)
 
 
 def test_prefixed_pack_unpack():

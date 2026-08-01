@@ -1,61 +1,19 @@
 # pyright: reportPrivateUsage=false
 import pytest
 
-from caterpillar.py import (
-    BinaryExpression,
-    Bitfield,
-    Chain,
-    Compressed,
-    ConditionalChain,
-    ConstBytes,
-    ConstString,
-    ContextLength,
-    ContextPath,
-    DigestField,
-    DigestFieldAction,
-    Encrypted,
-    Enum,
-    Field,
-    IPv4Address,
-    IPv6Address,
-    Int,
-    KeyCipher,
-    Lazy,
-    MACAddress,
-    Pointer,
-    PyStructFormattedField,
-    RelativePointer,
-    Sequence,
-    Struct,
-    SysNative,
-    Const,
-    Dynamic,
-    Transformer,
-    UInt,
-    Flag,
-    UnaryExpression,
-    VarInt,
-    system_arch,
-    Context,
-    String,
-    Bytes,
-    Memory,
-    Computed,
-    Pass,
-    CString,
-    Prefixed,
-    Uuid,
-    Aligned,
-)
-from caterpillar.abc import (
-    _StructLike,
-    _OptionLike,
-    _EndianLike,
-    _ArchLike,
-    _ContextLike,
-    _ContextLambda,
-    _ActionLike,
-)
+from caterpillar.abc import (_ActionLike, _ArchLike, _ContextLambda,
+                             _ContextLike, _EndianLike, _OptionLike,
+                             _StructLike)
+from caterpillar.py import (Aligned, BinaryExpression, Bitfield, Bytes, Chain,
+                            Compressed, Computed, ConditionalChain, Const,
+                            ConstBytes, ConstString, Context, ContextLength,
+                            ContextPath, CString, DigestField,
+                            DigestFieldAction, Dynamic, Encrypted, Enum, Field,
+                            Flag, Int, IPv4Address, IPv6Address, KeyCipher,
+                            Lazy, MACAddress, Memory, Pass, Pointer, Prefixed,
+                            PyStructFormattedField, RelativePointer, Sequence,
+                            String, Struct, SysNative, Transformer, UInt,
+                            UnaryExpression, Uuid, VarInt, system_arch)
 
 
 # === PROTOCOL COMPLIANCE ===
@@ -119,6 +77,6 @@ from caterpillar.abc import (
     ],
 )
 def test_py_protocol(obj: type, proto_ty: type) -> None:
-    assert isinstance(
-        obj, proto_ty
-    ), f"Class {obj.__name__} does not conform to the {proto_ty.__name__} protocol"
+    assert isinstance(obj, proto_ty), (
+        f"Class {obj.__name__} does not conform to the {proto_ty.__name__} protocol"
+    )

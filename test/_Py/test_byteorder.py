@@ -1,23 +1,9 @@
-from caterpillar.py import (
-    Invisible,
-    struct,
-    pack,
-    uint64,
-    unpack,
-    uint16,
-    uint32,
-    Dynamic,
-    DynByteOrder,
-    BigEndian,
-    LittleEndian,
-    CTX_ORDER,
-    ctx,
-    this,
-    f,
-)
-from caterpillar.types import uint16_t, uint32_t, uint64_t, uint8_t
-from caterpillar.context import SetContextVar
 from caterpillar.abc import _ContextLike  # pyright: ignore[reportPrivateUsage]
+from caterpillar.context import SetContextVar
+from caterpillar.py import (CTX_ORDER, BigEndian, Dynamic, DynByteOrder,
+                            Invisible, LittleEndian, ctx, f, pack, struct,
+                            this, uint16, uint32, uint64, unpack)
+from caterpillar.types import uint8_t, uint16_t, uint32_t, uint64_t
 
 
 def test_byteorder_pack_explicit():
@@ -201,5 +187,3 @@ def test_dyn_byteorder_action():
     obj = Format(a=0x1234, b=0x56789ABC)
     data = pack(obj)
     assert data.hex() == "1234bc9a7856"
-
-

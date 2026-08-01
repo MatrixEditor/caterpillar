@@ -1,17 +1,12 @@
-from io import BytesIO
-
 import lzma
 import zlib
+from io import BytesIO
 
 import pytest
 
+from caterpillar.fields.compression import (Bz2Compressed, Compressed,
+                                            LZMACompressed, ZLibCompressed)
 from caterpillar.py import Bytes, pack, root, unpack
-from caterpillar.fields.compression import (
-    Bz2Compressed,
-    Compressed,
-    LZMACompressed,
-    ZLibCompressed,
-)
 
 
 @pytest.mark.parametrize("payload", [b"", b"hello hello hello", bytes(range(256))])

@@ -19,34 +19,20 @@ import operator
 import sys
 import typing
 import warnings
-
-from typing import Annotated, Callable, Any, Generic, Protocol, get_args, get_origin
-from typing_extensions import (
-    Buffer,
-    Final,
-    Literal,
-    Self,
-    Sized,
-    overload,
-    override,
-    TypeVar,
-)
-from types import FrameType, TracebackType
 from dataclasses import dataclass
+from types import FrameType, TracebackType
+from typing import (Annotated, Any, Callable, Generic, Protocol, get_args,
+                    get_origin)
 
+from typing_extensions import (Buffer, Final, Literal, Self, Sized, TypeVar,
+                               overload, override)
+
+from caterpillar.abc import (_IT, _OT, _ArchLike, _ContextFactoryLike,
+                             _ContextLambda, _ContextLike, _EndianLike,
+                             _StreamType)
 from caterpillar.exception import StructException
-from caterpillar.registry import to_struct
 from caterpillar.options import Flag
-from caterpillar.abc import (
-    _ContextLike,
-    _ContextLambda,
-    _IT,
-    _ContextFactoryLike,
-    _OT,
-    _StreamType,
-    _EndianLike,
-    _ArchLike,
-)
+from caterpillar.registry import to_struct
 from caterpillar.shared import iscond
 
 if typing.TYPE_CHECKING:

@@ -7,9 +7,8 @@ pytest.importorskip("cryptography")
 from cryptography.hazmat.primitives import padding
 from cryptography.hazmat.primitives.ciphers import algorithms, modes
 
-from caterpillar.py import ValidationError, pack, root, unpack
 from caterpillar.fields.crypto import Encrypted
-
+from caterpillar.py import ValidationError, pack, root, unpack
 
 AES_KEY = b"\x00" * 16
 AES_WRONG_KEY = b"\xff" * 16

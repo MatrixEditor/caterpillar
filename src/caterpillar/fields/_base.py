@@ -13,48 +13,26 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # pyright: reportPrivateUsage=false, reportAny=false, reportExplicitAny=false
-from io import BytesIO
 from collections.abc import Collection
+from io import BytesIO
 from typing import Any, Generic, get_origin
-from typing_extensions import Self, override, TypeVar
 
-from caterpillar.abc import (
-    _StructLike,
-    _GreedyType,
-    _PrefixedType,
-    _IT,
-    _OT,
-    _EndianLike,
-    _ArchLike,
-    _ContextLike,
-    _ContextLambda,
-    _OptionLike,
-    _ContainsStruct,
-    _SwitchOptionsT,
-    _LengthT,
-    _StreamType,
-)
-from caterpillar.byteorder import (
-    O_DEFAULT_ARCH,
-    O_DEFAULT_ENDIAN,
-    LittleEndian,
-    system_arch,
-)
-from caterpillar.exception import (
-    DynamicSizeError,
-    StructException,
-    OptionError,
-    ValidationError,
-    InvalidValueError,
-)
-from caterpillar.options import (
-    GLOBAL_FIELD_FLAGS,
-    F_DYNAMIC,
-)
-from caterpillar.context import CTX_OFFSETS, CTX_STREAM, CTX_FIELD, CTX_VALUE, CTX_SEQ
+from typing_extensions import Self, TypeVar, override
+
 from caterpillar import registry
-from caterpillar.shared import getstruct, typeof, PackMixin, UnpackMixin
-
+from caterpillar.abc import (_IT, _OT, _ArchLike, _ContainsStruct,
+                             _ContextLambda, _ContextLike, _EndianLike,
+                             _GreedyType, _LengthT, _OptionLike, _PrefixedType,
+                             _StreamType, _StructLike, _SwitchOptionsT)
+from caterpillar.byteorder import (O_DEFAULT_ARCH, O_DEFAULT_ENDIAN,
+                                   LittleEndian, system_arch)
+from caterpillar.context import (CTX_FIELD, CTX_OFFSETS, CTX_SEQ, CTX_STREAM,
+                                 CTX_VALUE)
+from caterpillar.exception import (DynamicSizeError, InvalidValueError,
+                                   OptionError, StructException,
+                                   ValidationError)
+from caterpillar.options import F_DYNAMIC, GLOBAL_FIELD_FLAGS
+from caterpillar.shared import PackMixin, UnpackMixin, getstruct, typeof
 
 _T = TypeVar("_T")
 
@@ -250,9 +228,7 @@ class Field(Generic[_IT, _OT], PackMixin[_IT], UnpackMixin[_OT]):
         self.__options = value
         self._switch_is_lambda = callable(value)
         self._switch_has_default = (
-            bool(value)
-            and not self._switch_is_lambda
-            and DEFAULT_OPTION in value  # pyright: ignore[reportOperatorIssue]
+            bool(value) and not self._switch_is_lambda and DEFAULT_OPTION in value  # pyright: ignore[reportOperatorIssue]
         )
 
     @property

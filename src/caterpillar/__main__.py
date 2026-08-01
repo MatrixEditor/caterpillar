@@ -13,8 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # pyright: reportUnusedCallResult=false, reportAny=false
-import os
 import argparse
+import os
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--include-dir", action="store_true")

@@ -1,6 +1,7 @@
 import pytest
 
-from caterpillar.py import BigEndian, Int, LittleEndian, ValidationError, pack, unpack
+from caterpillar.py import (BigEndian, Int, LittleEndian, ValidationError,
+                            pack, unpack)
 
 
 # --------------------------------------------------------------------------- #

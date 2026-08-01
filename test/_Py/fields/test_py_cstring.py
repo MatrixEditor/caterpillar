@@ -2,7 +2,7 @@ import io
 
 import pytest
 
-from caterpillar.py import CString, pack, unpack, ValidationError
+from caterpillar.py import CString, ValidationError, pack, unpack
 
 
 def test_fixed_cstring():

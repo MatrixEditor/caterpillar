@@ -14,20 +14,21 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from typing import Any, Final, Generic
-from typing_extensions import override, TypeVar
 
-from caterpillar.byteorder import Arch
-from caterpillar.exception import DelegationError, StructException
-from caterpillar.context import CTX_STREAM, CTX_FIELD, CTX_ARCH, CTX_SEQ
-from caterpillar.options import Flag
+from typing_extensions import TypeVar, override
+
 from caterpillar._common import WithoutContextVar
+from caterpillar.abc import (_IT, _ContextLambda, _ContextLike, _StreamType,
+                             _StructLike)
+from caterpillar.byteorder import Arch
+from caterpillar.context import CTX_ARCH, CTX_FIELD, CTX_SEQ, CTX_STREAM
+from caterpillar.exception import DelegationError, StructException
+from caterpillar.options import Flag
 from caterpillar.shared import getstruct
-from caterpillar.abc import _ContextLambda, _ContextLike, _StructLike, _StreamType, _IT
 
 from ._mixin import FieldStruct
-from .common import uint16, uint24, uint32, uint64, uint8
-from .common import int16, int32, int64, int24, int8
-from .common import UInt, Int
+from .common import (Int, UInt, int8, int16, int24, int32, int64, uint8,
+                     uint16, uint24, uint32, uint64)
 
 _PtrValueT = TypeVar("_PtrValueT", default=None)
 
@@ -54,7 +55,9 @@ class pointer(Generic[_PtrValueT], int):
     def get(self):
         return self.obj
 
-_PtrT = TypeVar('_PtrT', default=pointer)
+
+_PtrT = TypeVar("_PtrT", default=pointer)
+
 
 class Pointer(Generic[_PtrT, _PtrValueT], FieldStruct[int, _PtrT]):
     """

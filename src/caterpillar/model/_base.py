@@ -14,51 +14,24 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # pyright: reportPrivateUsage=false, reportAny=false, reportExplicitAny=false
 import re
-
 from collections.abc import Iterable
 from typing import Annotated, Any, Generic, get_args, get_origin
-from typing_extensions import Self, override, TypeVar
 
-from caterpillar.context import (
-    CTX_FIELD,
-    CTX_PATH,
-    CTX_OBJECT,
-    CTX_STREAM,
-    CTX_SEQ,
-    O_CONTEXT_FACTORY,
-    Context,
-    CTX_ROOT,
-)
-from caterpillar.exception import StructException, ValidationError
-from caterpillar.options import (
-    S_DISCARD_CONST,
-    S_DISCARD_UNNAMED,
-    S_UNION,
-    S_REPLACE_TYPES,
-)
-from caterpillar.fields import (
-    Field,
-    INVALID_DEFAULT,
-    FieldMixin,
-    Const,
-)
-from caterpillar._common import unpack_seq, pack_seq
-from caterpillar.shared import (
-    ATTR_ACTION_PACK,
-    ATTR_ACTION_UNPACK,
-    Action,
-)
+from typing_extensions import Self, TypeVar, override
+
 from caterpillar import registry
-from caterpillar.abc import (
-    _StructLike,
-    _ContextLike,
-    _OptionLike,
-    _ContextLambda,
-    _EndianLike,
-    _ArchLike,
-    _StreamType,
-    _ActionLike,
-)
+from caterpillar._common import pack_seq, unpack_seq
+from caterpillar.abc import (_ActionLike, _ArchLike, _ContextLambda,
+                             _ContextLike, _EndianLike, _OptionLike,
+                             _StreamType, _StructLike)
+from caterpillar.context import (CTX_FIELD, CTX_OBJECT, CTX_PATH, CTX_ROOT,
+                                 CTX_SEQ, CTX_STREAM, O_CONTEXT_FACTORY,
+                                 Context)
+from caterpillar.exception import StructException, ValidationError
+from caterpillar.fields import INVALID_DEFAULT, Const, Field, FieldMixin
+from caterpillar.options import (S_DISCARD_CONST, S_DISCARD_UNNAMED,
+                                 S_REPLACE_TYPES, S_UNION)
+from caterpillar.shared import ATTR_ACTION_PACK, ATTR_ACTION_UNPACK, Action
 
 
 class _Member:

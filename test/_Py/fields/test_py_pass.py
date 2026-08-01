@@ -1,9 +1,4 @@
-from caterpillar.py import (
-    struct,
-    unpack,
-    pack,
-    Pass,
-)
+from caterpillar.py import Pass, pack, struct, unpack
 from caterpillar.types import pass_t
 
 

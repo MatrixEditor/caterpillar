@@ -13,47 +13,29 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # pyright: reportAny=false, reportExplicitAny=false, reportPrivateUsage=false
-import inspect
 import dataclasses as dc
-
-from io import BytesIO
+import inspect
 from collections.abc import Collection, Iterable
-from typing import Any, Callable, Generic, Literal, ParamSpec, TypeVar
+from io import BytesIO
 from types import TracebackType
-from typing_extensions import (
-    ClassVar,
-    Self,
-    dataclass_transform,
-    override,
-    overload,
-    Buffer,
-)
+from typing import Any, Callable, Generic, Literal, ParamSpec, TypeVar
 
-from caterpillar.fields.conditional import apply_conditional_markers
-from caterpillar.shared import getstruct, hasstruct, ATTR_STRUCT, iscond
-from caterpillar.exception import InvalidValueError
-from caterpillar.options import (
-    S_EVAL_ANNOTATIONS,
-    S_UNION,
-    S_ADD_BYTES,
-    S_SLOTS,
-    GLOBAL_STRUCT_OPTIONS,
-    GLOBAL_UNION_OPTIONS,
-)
-from caterpillar.fields import Field, INVALID_DEFAULT
+from typing_extensions import (Buffer, ClassVar, Self, dataclass_transform,
+                               overload, override)
+
 from caterpillar import registry
-from caterpillar.abc import (
-    _StreamType,
-    _ContextLike,
-    _StructLike,
-    _OptionLike,
-    _EndianLike,
-    _ArchLike,
-    _LengthT,
-)
-from .provider import unpack, pack, unpack_file, pack_into, sizeof
-from ._base import Sequence
+from caterpillar.abc import (_ArchLike, _ContextLike, _EndianLike, _LengthT,
+                             _OptionLike, _StreamType, _StructLike)
+from caterpillar.exception import InvalidValueError
+from caterpillar.fields import INVALID_DEFAULT, Field
+from caterpillar.fields.conditional import apply_conditional_markers
+from caterpillar.options import (GLOBAL_STRUCT_OPTIONS, GLOBAL_UNION_OPTIONS,
+                                 S_ADD_BYTES, S_EVAL_ANNOTATIONS, S_SLOTS,
+                                 S_UNION)
+from caterpillar.shared import ATTR_STRUCT, getstruct, hasstruct, iscond
 
+from ._base import Sequence
+from .provider import pack, pack_into, sizeof, unpack, unpack_file
 
 _ModelT = TypeVar("_ModelT")
 

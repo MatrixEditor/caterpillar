@@ -16,15 +16,8 @@
 from collections.abc import Callable, Collection, Iterable
 from io import IOBase
 from types import EllipsisType, NoneType
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Final,
-    Literal,
-    Protocol,
-    runtime_checkable,
-    TypeAlias,
-)
+from typing import (TYPE_CHECKING, Any, Final, Literal, Protocol, TypeAlias,
+                    runtime_checkable)
 
 from typing_extensions import Buffer, TypeVar, overload, override
 

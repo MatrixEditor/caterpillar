@@ -1,14 +1,7 @@
 import pytest
 
-from caterpillar.py import (
-    DynamicSizeError,
-    Memory,
-    pack,
-    root,
-    sizeof,
-    unpack,
-    ValidationError,
-)
+from caterpillar.py import (DynamicSizeError, Memory, ValidationError, pack,
+                            root, sizeof, unpack)
 
 
 def test_py_memory_unpack():

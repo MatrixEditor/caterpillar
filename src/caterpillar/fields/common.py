@@ -16,53 +16,31 @@
 import datetime
 import struct as PyStruct
 import warnings
-
-from io import BytesIO
-from typing import Any, Callable, Generic
-from typing_extensions import (
-    Buffer,
-    Final,
-    Self,
-    SupportsFloat,
-    SupportsIndex,
-    override,
-    TypeVar,
-)
-from types import NoneType
-from functools import cached_property
-from enum import Enum as _EnumType
-from uuid import UUID
 from collections.abc import Collection
+from enum import Enum as _EnumType
+from functools import cached_property
+from io import BytesIO
+from types import NoneType
+from typing import Any, Callable, Generic
+from uuid import UUID
 
-from caterpillar.abc import (
-    _StructLike,
-    _StreamType,
-    _ContextLike,
-    _PrefixedType,
-    _ContextLambda,
-    _IT,
-    _OT,
-    _LengthT,
-    _EndianLike,
-    _GreedyType,
-)
-from caterpillar.exception import (
-    ValidationError,
-    InvalidValueError,
-    DynamicSizeError,
-)
-from caterpillar.context import CTX_FIELD, CTX_STREAM, CTX_SEQ
-from caterpillar.options import Flag, GLOBAL_FIELD_FLAGS
-from caterpillar.byteorder import (
-    LITTLE_ENDIAN_FMT,
-    O_DEFAULT_ENDIAN,
-    LittleEndian,
-)
+from typing_extensions import (Buffer, Final, Self, SupportsFloat,
+                               SupportsIndex, TypeVar, override)
+
 from caterpillar import registry
 from caterpillar._common import WithoutContextVar, read_exact
+from caterpillar.abc import (_IT, _OT, _ContextLambda, _ContextLike,
+                             _EndianLike, _GreedyType, _LengthT, _PrefixedType,
+                             _StreamType, _StructLike)
+from caterpillar.byteorder import (LITTLE_ENDIAN_FMT, O_DEFAULT_ENDIAN,
+                                   LittleEndian)
+from caterpillar.context import CTX_FIELD, CTX_SEQ, CTX_STREAM
+from caterpillar.exception import (DynamicSizeError, InvalidValueError,
+                                   ValidationError)
+from caterpillar.options import GLOBAL_FIELD_FLAGS, Flag
 from caterpillar.shared import getstruct, typeof
 
-from ._base import Field, INVALID_DEFAULT, singleton
+from ._base import INVALID_DEFAULT, Field, singleton
 from ._mixin import ByteOrderMixin, FieldStruct
 
 # Explicitly report deprecation warnings
@@ -1076,9 +1054,7 @@ class Memory(Generic[_MemoryIT, _MemoryOT], FieldStruct[_MemoryIT, _MemoryOT]):
         if size is Ellipsis:
             return memoryview(stream.read())
 
-        return memoryview(
-            read_exact(context, size, "Memory field")
-        )  # pyright: ignore[reportReturnType]
+        return memoryview(read_exact(context, size, "Memory field"))  # pyright: ignore[reportReturnType]
 
 
 class Bytes(Memory[bytes, bytes]):
@@ -1646,7 +1622,9 @@ class Prefixed(Generic[_PrefixIOT], FieldStruct[_PrefixIOT, _PrefixIOT]):
         encoding: str | None = None,
     ):
         self.prefix: _StructLike[int, int] = prefix
-        self.struct: _StructLike[_PrefixIOT, _PrefixIOT] | None = getstruct(struct, struct)
+        self.struct: _StructLike[_PrefixIOT, _PrefixIOT] | None = getstruct(
+            struct, struct
+        )
         self.encoding: str | None = encoding
         # Support str as second argument
         if isinstance(struct, str):
@@ -2507,9 +2485,7 @@ class Padded(FieldStruct[_IT, _OT]):
         fill: Buffer | int = 0x00,
         strict: bool = False,
     ) -> None:
-        self.struct: _StructLike[_IT, _OT] = (
-            getstruct(struct) or struct
-        )  # pyright: ignore[reportAttributeAccessIssue]
+        self.struct: _StructLike[_IT, _OT] = getstruct(struct) or struct  # pyright: ignore[reportAttributeAccessIssue]
         self.before: int | _ContextLambda[int] = before
         self.after: int | _ContextLambda[int] = after
         fill_bytes = _normalize_fill(fill)

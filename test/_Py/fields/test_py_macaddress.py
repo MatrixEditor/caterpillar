@@ -4,7 +4,6 @@ import pytest
 
 from caterpillar.py import MACAddress, ValidationError, pack, unpack
 
-
 RAW = b"\xaa\xbb\xcc\xdd\xee\xff"
 
 

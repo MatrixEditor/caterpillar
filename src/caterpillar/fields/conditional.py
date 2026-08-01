@@ -16,24 +16,19 @@
 # pyright: reportAny=false
 import operator
 import sys
-
 from types import TracebackType
 from typing import Annotated, Any, get_args, get_origin
-from typing_extensions import Final, override, Self
 
-from caterpillar.context import BinaryExpression, ConditionContext, UnaryExpression
+from typing_extensions import Final, Self, override
+
+from caterpillar.abc import (_AnnotationT, _ArchLike, _ContextLambda,
+                             _ContextLike, _EndianLike, _OptionLike,
+                             _StructLike)
+from caterpillar.context import (BinaryExpression, ConditionContext,
+                                 UnaryExpression)
 from caterpillar.exception import StructException, ValidationError
 from caterpillar.registry import to_struct
-from caterpillar.shared import iscond, iscondend, iscondstart, typeof, constval
-from caterpillar.abc import (
-    _ArchLike,
-    _ContextLambda,
-    _ContextLike,
-    _EndianLike,
-    _OptionLike,
-    _StructLike,
-    _AnnotationT,
-)
+from caterpillar.shared import constval, iscond, iscondend, iscondstart, typeof
 
 from ._base import Field
 

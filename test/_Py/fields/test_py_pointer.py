@@ -2,7 +2,8 @@ import io
 
 import pytest
 
-from caterpillar.py import Pointer, StructException, pack, pointer, struct, uint8, unpack
+from caterpillar.py import (Pointer, StructException, pack, pointer, struct,
+                            uint8, unpack)
 
 
 @struct

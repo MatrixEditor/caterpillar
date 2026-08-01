@@ -1,10 +1,5 @@
-from caterpillar.options import (
-    Flag,
-    configure,
-    GLOBAL_STRUCT_OPTIONS,
-    get_flag,
-    get_flags,
-)
+from caterpillar.options import (GLOBAL_STRUCT_OPTIONS, Flag, configure,
+                                 get_flag, get_flags)
 from caterpillar.py import Context
 
 

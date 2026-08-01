@@ -13,29 +13,22 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # pyright: reportPrivateUsage=false, reportExplicitAny=false, reportAny=false
-from io import BytesIO
 from collections.abc import Collection, Iterable
 from functools import partial
+from io import BytesIO
 from typing import Any, Callable, Generic
+
 from typing_extensions import TypeVar, overload, override
 
+from caterpillar._common import WithoutContextVar, pack_seq, unpack_seq
+from caterpillar.abc import (_IT, _OT, _ArgType, _ContextLambda, _ContextLike,
+                             _EndianLike, _LengthT, _OptionLike, _StructLike,
+                             _SwitchOptionsT)
 from caterpillar.byteorder import byteorder
-from caterpillar.options import Flag
 from caterpillar.context import CTX_SEQ, CTX_STREAM
-from caterpillar._common import unpack_seq, pack_seq, WithoutContextVar
+from caterpillar.options import Flag
 from caterpillar.shared import PackMixin, UnpackMixin, getstruct
-from caterpillar.abc import (
-    _ContextLambda,
-    _ContextLike,
-    _StructLike,
-    _LengthT,
-    _IT,
-    _OT,
-    _OptionLike,
-    _EndianLike,
-    _SwitchOptionsT,
-    _ArgType,
-)
+
 from ._base import Field
 
 
@@ -68,9 +61,7 @@ class FieldMixin(ByteOrderMixin[_IT, _OT]):
         # fmt: off
         return Field(self, byteorder(self))[dim] # pyright: ignore[reportArgumentType]
 
-    def __rshift__(
-        self, switch: _SwitchOptionsT
-    ) -> Field[_IT, _OT]:
+    def __rshift__(self, switch: _SwitchOptionsT) -> Field[_IT, _OT]:
         """Inserts switch options into the new field"""
         # fmt: off
         return Field(self, byteorder(self)) >> switch # pyright: ignore[reportArgumentType]
@@ -90,15 +81,14 @@ class FieldMixin(ByteOrderMixin[_IT, _OT]):
         self, other: "_StructLike[_OT, _ChainTailT]"
     ) -> "Chain[_IT, _ChainTailT]": ...
     @overload
-    def __and__(
-        self, other: "type[_ChainTailT]"
-    ) -> "Chain[_IT, _ChainTailT]": ...
+    def __and__(self, other: "type[_ChainTailT]") -> "Chain[_IT, _ChainTailT]": ...
     @overload
     def __and__(
         self, other: "Chain[_OT, _ChainTailT]"
     ) -> "Chain[_IT, _ChainTailT]": ...
     def __and__(
-        self, other: "Chain[_OT, _ChainTailT] | _StructLike[_OT, _ChainTailT] | type[_OT]"
+        self,
+        other: "Chain[_OT, _ChainTailT] | _StructLike[_OT, _ChainTailT] | type[_OT]",
     ) -> "Chain":
         """Returns a chain joining this structure before the next element or chain."""
         # fmt: off

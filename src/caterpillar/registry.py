@@ -43,6 +43,7 @@ Example Usage:
 """
 
 from typing import Any, Callable
+
 from typing_extensions import override
 
 from caterpillar.abc import _StructLike

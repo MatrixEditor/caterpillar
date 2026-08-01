@@ -1,10 +1,10 @@
 import pytest
-import caterpillar
 
+import caterpillar
 
 if caterpillar.native_support():
     from caterpillar._C import Repeated
-    from caterpillar.py import uint8, pack, unpack, Bytes, sizeof, typeof
+    from caterpillar.py import Bytes, pack, sizeof, typeof, uint8, unpack
 
     def testc_repeated_init():
         atom = Repeated(uint8, 3)

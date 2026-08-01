@@ -1,9 +1,10 @@
 import pytest
+
 import caterpillar
 
 if caterpillar.native_support():
     from caterpillar._C import Conditional
-    from caterpillar.py import ctx, pack, unpack, Bytes, sizeof
+    from caterpillar.py import Bytes, ctx, pack, sizeof, unpack
 
     def testc_conditional_init():
         # simple declarative switch parsing
