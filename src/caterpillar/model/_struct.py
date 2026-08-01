@@ -20,18 +20,36 @@ from io import BytesIO
 from types import TracebackType
 from typing import Any, Callable, Generic, Literal, ParamSpec, TypeVar
 
-from typing_extensions import (Buffer, ClassVar, Self, dataclass_transform,
-                               overload, override)
+from typing_extensions import (
+    Buffer,
+    ClassVar,
+    Self,
+    dataclass_transform,
+    overload,
+    override,
+)
 
 from caterpillar import registry
-from caterpillar.abc import (_ArchLike, _ContextLike, _EndianLike, _LengthT,
-                             _OptionLike, _StreamType, _StructLike)
+from caterpillar.abc import (
+    _ArchLike,
+    _ContextLike,
+    _EndianLike,
+    _LengthT,
+    _OptionLike,
+    _StreamType,
+    _StructLike,
+)
 from caterpillar.exception import InvalidValueError
 from caterpillar.fields import INVALID_DEFAULT, Field
 from caterpillar.fields.conditional import apply_conditional_markers
-from caterpillar.options import (GLOBAL_STRUCT_OPTIONS, GLOBAL_UNION_OPTIONS,
-                                 S_ADD_BYTES, S_EVAL_ANNOTATIONS, S_SLOTS,
-                                 S_UNION)
+from caterpillar.options import (
+    GLOBAL_STRUCT_OPTIONS,
+    GLOBAL_UNION_OPTIONS,
+    S_ADD_BYTES,
+    S_EVAL_ANNOTATIONS,
+    S_SLOTS,
+    S_UNION,
+)
 from caterpillar.shared import ATTR_STRUCT, getstruct, hasstruct, iscond
 
 from ._base import Sequence

@@ -15,9 +15,22 @@
 from typing import Annotated as f
 
 from . import options as opt
-from .byteorder import (AARCH64, AMD, AMD64, ARM, ARM64, RISC_V, RISC_V64,
-                        BigEndian, Dynamic, LittleEndian, PowerPC, PowerPC64,
-                        x86, x86_64)
+from .byteorder import (
+    AARCH64,
+    AMD,
+    AMD64,
+    ARM,
+    ARM64,
+    RISC_V,
+    RISC_V64,
+    BigEndian,
+    Dynamic,
+    LittleEndian,
+    PowerPC,
+    PowerPC64,
+    x86,
+    x86_64,
+)
 from .context import ContextLength as lenof
 from .context import ContextPath
 from .context import ctx
@@ -28,8 +41,17 @@ from .context import root as G
 from .context import this
 from .fields import Field as F
 from .model import Sequence as Seq
-from .model import (bitfield, pack, pack_file, pack_into, sizeof, struct,
-                    union, unpack, unpack_file)
+from .model import (
+    bitfield,
+    pack,
+    pack_file,
+    pack_into,
+    sizeof,
+    struct,
+    union,
+    unpack,
+    unpack_file,
+)
 from .registry import to_struct
 from .shared import getstruct, hasstruct, typeof
 

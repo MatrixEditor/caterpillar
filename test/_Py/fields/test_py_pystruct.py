@@ -2,10 +2,30 @@ import struct as pystruct
 
 import pytest
 
-from caterpillar.py import (BigEndian, Context, LittleEndian, SysNative,
-                            boolean, char, float16, float32, float64, int8,
-                            int16, int32, int64, pack, psize, pssize, uint8,
-                            uint16, uint32, uint64, unpack, void_ptr)
+from caterpillar.py import (
+    BigEndian,
+    Context,
+    LittleEndian,
+    SysNative,
+    boolean,
+    char,
+    float16,
+    float32,
+    float64,
+    int8,
+    int16,
+    int32,
+    int64,
+    pack,
+    psize,
+    pssize,
+    uint8,
+    uint16,
+    uint32,
+    uint64,
+    unpack,
+    void_ptr,
+)
 
 
 def test_integer_formats_sizes_and_endianness():

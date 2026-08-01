@@ -20,8 +20,14 @@ from typing import TYPE_CHECKING, Any, Protocol, runtime_checkable
 
 from typing_extensions import override
 
-from caterpillar.abc import (_IT, _ArgType, _ContextLambda, _ContextLike,
-                             _GreedyType, _StructLike)
+from caterpillar.abc import (
+    _IT,
+    _ArgType,
+    _ContextLambda,
+    _ContextLike,
+    _GreedyType,
+    _StructLike,
+)
 from caterpillar.context import CTX_STREAM
 from caterpillar.exception import InvalidValueError, UnsupportedOperation
 
@@ -29,8 +35,11 @@ from ._mixin import get_args, get_kwargs
 from .common import Bytes, Memory
 
 if TYPE_CHECKING:
-    from cryptography.hazmat.primitives.ciphers import (CipherAlgorithm,
-                                                        CipherContext, modes)
+    from cryptography.hazmat.primitives.ciphers import (
+        CipherAlgorithm,
+        CipherContext,
+        modes,
+    )
     from cryptography.hazmat.primitives.padding import PaddingContext
 
 

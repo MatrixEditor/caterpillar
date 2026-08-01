@@ -1,7 +1,17 @@
 from typing_extensions import Generic, TypeVar
 
-from caterpillar.py import (BigEndian, derive, f, field_of, pack, struct,
-                            template, uint8, uint16, unpack)
+from caterpillar.py import (
+    BigEndian,
+    derive,
+    f,
+    field_of,
+    pack,
+    struct,
+    template,
+    uint8,
+    uint16,
+    unpack,
+)
 from caterpillar.types import uint8_t
 
 

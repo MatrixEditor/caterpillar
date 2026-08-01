@@ -17,8 +17,7 @@ from typing import Any, Protocol, runtime_checkable
 
 from typing_extensions import override
 
-from caterpillar.abc import (_ContainsStruct, _ContextLike, _LengthT,
-                             _StructLike)
+from caterpillar.abc import _ContainsStruct, _ContextLike, _LengthT, _StructLike
 from caterpillar.fields._mixin import get_kwargs
 from caterpillar.fields.common import Bytes, Transformer
 from caterpillar.shared import getstruct, hasstruct

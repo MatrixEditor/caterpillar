@@ -46,9 +46,18 @@ from typing import TYPE_CHECKING, Any, Generic, overload
 
 from typing_extensions import Buffer, Final, Literal, TypeIs, override
 
-from caterpillar.abc import (_IT, _OT, _ActionLike, _ArchLike, _ContainsStruct,
-                             _ContextLambda, _EndianLike, _StreamType,
-                             _StructLike, _SupportsType)
+from caterpillar.abc import (
+    _IT,
+    _OT,
+    _ActionLike,
+    _ArchLike,
+    _ContainsStruct,
+    _ContextLambda,
+    _EndianLike,
+    _StreamType,
+    _StructLike,
+    _SupportsType,
+)
 
 if TYPE_CHECKING:
     from caterpillar.fields import FieldStruct

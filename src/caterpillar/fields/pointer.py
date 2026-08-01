@@ -18,8 +18,7 @@ from typing import Any, Final, Generic
 from typing_extensions import TypeVar, override
 
 from caterpillar._common import WithoutContextVar
-from caterpillar.abc import (_IT, _ContextLambda, _ContextLike, _StreamType,
-                             _StructLike)
+from caterpillar.abc import _IT, _ContextLambda, _ContextLike, _StreamType, _StructLike
 from caterpillar.byteorder import Arch
 from caterpillar.context import CTX_ARCH, CTX_FIELD, CTX_SEQ, CTX_STREAM
 from caterpillar.exception import DelegationError, StructException
@@ -27,8 +26,20 @@ from caterpillar.options import Flag
 from caterpillar.shared import getstruct
 
 from ._mixin import FieldStruct
-from .common import (Int, UInt, int8, int16, int24, int32, int64, uint8,
-                     uint16, uint24, uint32, uint64)
+from .common import (
+    Int,
+    UInt,
+    int8,
+    int16,
+    int24,
+    int32,
+    int64,
+    uint8,
+    uint16,
+    uint24,
+    uint32,
+    uint64,
+)
 
 _PtrValueT = TypeVar("_PtrValueT", default=None)
 

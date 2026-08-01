@@ -2,8 +2,7 @@ import io
 
 import pytest
 
-from caterpillar.py import (Bytes, ValidationError, f, pack, struct, this,
-                            unpack)
+from caterpillar.py import Bytes, ValidationError, f, pack, struct, this, unpack
 from caterpillar.types import uint8_t
 
 

@@ -1,5 +1,4 @@
-from caterpillar.py import (CTX_STREAM, Bytes, Chain, Context, FieldStruct,
-                            pack, unpack)
+from caterpillar.py import CTX_STREAM, Bytes, Chain, Context, FieldStruct, pack, unpack
 
 
 class SuffixTransform(FieldStruct[bytes, bytes]):

@@ -3,14 +3,30 @@ import enum
 import pytest
 
 from caterpillar.fields import Bytes, uint8, uint16
-from caterpillar.model import (Bitfield, CharFactory, EndGroup, Invisible,
-                               SetAlignment, bitfield, pack, sizeof, unpack)
+from caterpillar.model import (
+    Bitfield,
+    CharFactory,
+    EndGroup,
+    Invisible,
+    SetAlignment,
+    bitfield,
+    pack,
+    sizeof,
+    unpack,
+)
 from caterpillar.options import S_REPLACE_TYPES
 from caterpillar.py import BigEndian, LittleEndian, ValidationError, int8
 from caterpillar.shared import getstruct
 from caterpillar.shortcuts import f
-from caterpillar.types import (balign_t, int1_t, int2_t, int3_t, uint16_t,
-                               uint24_t, uint32_t)
+from caterpillar.types import (
+    balign_t,
+    int1_t,
+    int2_t,
+    int3_t,
+    uint16_t,
+    uint24_t,
+    uint32_t,
+)
 
 
 def test_bitfield_syntax__standard():

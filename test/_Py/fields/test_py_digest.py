@@ -4,8 +4,15 @@ import typing
 import pytest
 
 from caterpillar.exception import ValidationError
-from caterpillar.fields.digest import (DigestField, Md5, Md5_Algo, Md5_Field,
-                                       Sha2_256, Sha2_256_Algo, Sha2_256_Field)
+from caterpillar.fields.digest import (
+    DigestField,
+    Md5,
+    Md5_Algo,
+    Md5_Field,
+    Sha2_256,
+    Sha2_256_Algo,
+    Sha2_256_Field,
+)
 from caterpillar.py import Bytes, Struct, pack, struct, unpack
 from caterpillar.shared import ATTR_ACTION_PACK, getstruct
 from caterpillar.shortcuts import f

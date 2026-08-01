@@ -2,8 +2,18 @@ import io
 
 import pytest
 
-from caterpillar.py import (Aligned, Bytes, f, pack, struct, this, uint8,
-                            uint16, uint32, unpack)
+from caterpillar.py import (
+    Aligned,
+    Bytes,
+    f,
+    pack,
+    struct,
+    this,
+    uint8,
+    uint16,
+    uint32,
+    unpack,
+)
 from caterpillar.types import uint8_t
 
 

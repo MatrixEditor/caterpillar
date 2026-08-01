@@ -7,8 +7,7 @@ import argparse
 import dataclasses
 import pathlib
 
-from caterpillar_api import (CP_FUNC_API, CP_SRC, CP_TYPE_API, CP_TYPES,
-                             cp_api_functions)
+from caterpillar_api import CP_FUNC_API, CP_SRC, CP_TYPE_API, CP_TYPES, cp_api_functions
 from typing_extensions import override
 
 

@@ -16,10 +16,31 @@ import ipaddress
 import uuid
 from datetime import datetime
 
-from .fields.common import (CString, Pass, Timestamp, Uuid, boolean, char,
-                            double, float16, float32, float64, int8, int16,
-                            int24, int32, int64, psize, pssize, uint8, uint16,
-                            uint24, uint32, uint64, void_ptr)
+from .fields.common import (
+    CString,
+    Pass,
+    Timestamp,
+    Uuid,
+    boolean,
+    char,
+    double,
+    float16,
+    float32,
+    float64,
+    int8,
+    int16,
+    int24,
+    int32,
+    int64,
+    psize,
+    pssize,
+    uint8,
+    uint16,
+    uint24,
+    uint32,
+    uint64,
+    void_ptr,
+)
 from .fields.net import MAC, IPv4Address, IPv6Address
 from .fields.varint import vint
 from .shortcuts import f

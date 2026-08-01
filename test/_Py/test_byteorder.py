@@ -1,8 +1,22 @@
 from caterpillar.abc import _ContextLike  # pyright: ignore[reportPrivateUsage]
 from caterpillar.context import SetContextVar
-from caterpillar.py import (CTX_ORDER, BigEndian, Dynamic, DynByteOrder,
-                            Invisible, LittleEndian, ctx, f, pack, struct,
-                            this, uint16, uint32, uint64, unpack)
+from caterpillar.py import (
+    CTX_ORDER,
+    BigEndian,
+    Dynamic,
+    DynByteOrder,
+    Invisible,
+    LittleEndian,
+    ctx,
+    f,
+    pack,
+    struct,
+    this,
+    uint16,
+    uint32,
+    uint64,
+    unpack,
+)
 from caterpillar.types import uint8_t, uint16_t, uint32_t, uint64_t
 
 

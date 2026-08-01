@@ -13,26 +13,25 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # pyright: reportPrivateUsage=false, reportExplicitAny=false, reportAny=false
-from __future__ import annotations
-
 import operator
 import sys
 import typing
 import warnings
+from collections.abc import Callable, Sized
 from dataclasses import dataclass
 from types import FrameType, TracebackType
-from typing import Annotated, Any, Callable, Generic, Protocol, get_args, get_origin
-
-from typing_extensions import (
-    Buffer,
+from typing import (
+    Annotated,
+    Any,
     Final,
+    Generic,
     Literal,
-    Self,
-    Sized,
-    TypeVar,
-    overload,
-    override,
+    Protocol,
+    get_args,
+    get_origin,
 )
+
+from typing_extensions import Buffer, Self, TypeVar, overload, override
 
 from caterpillar.abc import (
     _IT,

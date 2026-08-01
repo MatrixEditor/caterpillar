@@ -2,9 +2,24 @@ import io
 
 import pytest
 
-from caterpillar.py import (DynamicSizeError, Padded, Padding, PostPad, PrePad,
-                            ValidationError, constval, f, pack, padding,
-                            sizeof, struct, this, uint8, uint16, unpack)
+from caterpillar.py import (
+    DynamicSizeError,
+    Padded,
+    Padding,
+    PostPad,
+    PrePad,
+    ValidationError,
+    constval,
+    f,
+    pack,
+    padding,
+    sizeof,
+    struct,
+    this,
+    uint8,
+    uint16,
+    unpack,
+)
 from caterpillar.types import uint8_t
 
 

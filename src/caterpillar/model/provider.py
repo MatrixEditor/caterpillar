@@ -21,15 +21,26 @@ from typing import Any
 
 from typing_extensions import Buffer, overload
 
-from caterpillar.abc import (_IT, _OT, _ArchLike, _ContainsStruct, _EndianLike,
-                             _StreamType, _SupportsPack, _SupportsSize,
-                             _SupportsUnpack)
-from caterpillar.byteorder import (O_DEFAULT_ARCH, O_DEFAULT_ENDIAN,
-                                   LittleEndian, system_arch)
+from caterpillar.abc import (
+    _IT,
+    _OT,
+    _ArchLike,
+    _ContainsStruct,
+    _EndianLike,
+    _StreamType,
+    _SupportsPack,
+    _SupportsSize,
+    _SupportsUnpack,
+)
+from caterpillar.byteorder import (
+    O_DEFAULT_ARCH,
+    O_DEFAULT_ENDIAN,
+    LittleEndian,
+    system_arch,
+)
 from caterpillar.context import CTX_STREAM, O_CONTEXT_FACTORY, Context
 from caterpillar.exception import DynamicSizeError
-from caterpillar.shared import (ATTR_PACK, MODE_PACK, MODE_UNPACK, getstruct,
-                                hasstruct)
+from caterpillar.shared import ATTR_PACK, MODE_PACK, MODE_UNPACK, getstruct, hasstruct
 
 
 @overload

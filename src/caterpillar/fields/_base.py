@@ -20,17 +20,36 @@ from typing import Any, Generic, get_origin
 from typing_extensions import Self, TypeVar, override
 
 from caterpillar import registry
-from caterpillar.abc import (_IT, _OT, _ArchLike, _ContainsStruct,
-                             _ContextLambda, _ContextLike, _EndianLike,
-                             _GreedyType, _LengthT, _OptionLike, _PrefixedType,
-                             _StreamType, _StructLike, _SwitchOptionsT)
-from caterpillar.byteorder import (O_DEFAULT_ARCH, O_DEFAULT_ENDIAN,
-                                   LittleEndian, system_arch)
-from caterpillar.context import (CTX_FIELD, CTX_OFFSETS, CTX_SEQ, CTX_STREAM,
-                                 CTX_VALUE)
-from caterpillar.exception import (DynamicSizeError, InvalidValueError,
-                                   OptionError, StructException,
-                                   ValidationError)
+from caterpillar.abc import (
+    _IT,
+    _OT,
+    _ArchLike,
+    _ContainsStruct,
+    _ContextLambda,
+    _ContextLike,
+    _EndianLike,
+    _GreedyType,
+    _LengthT,
+    _OptionLike,
+    _PrefixedType,
+    _StreamType,
+    _StructLike,
+    _SwitchOptionsT,
+)
+from caterpillar.byteorder import (
+    O_DEFAULT_ARCH,
+    O_DEFAULT_ENDIAN,
+    LittleEndian,
+    system_arch,
+)
+from caterpillar.context import CTX_FIELD, CTX_OFFSETS, CTX_SEQ, CTX_STREAM, CTX_VALUE
+from caterpillar.exception import (
+    DynamicSizeError,
+    InvalidValueError,
+    OptionError,
+    StructException,
+    ValidationError,
+)
 from caterpillar.options import F_DYNAMIC, GLOBAL_FIELD_FLAGS
 from caterpillar.shared import PackMixin, UnpackMixin, getstruct, typeof
 

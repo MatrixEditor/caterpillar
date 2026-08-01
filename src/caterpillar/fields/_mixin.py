@@ -21,9 +21,18 @@ from typing import Any, Callable, Generic
 from typing_extensions import TypeVar, overload, override
 
 from caterpillar._common import WithoutContextVar, pack_seq, unpack_seq
-from caterpillar.abc import (_IT, _OT, _ArgType, _ContextLambda, _ContextLike,
-                             _EndianLike, _LengthT, _OptionLike, _StructLike,
-                             _SwitchOptionsT)
+from caterpillar.abc import (
+    _IT,
+    _OT,
+    _ArgType,
+    _ContextLambda,
+    _ContextLike,
+    _EndianLike,
+    _LengthT,
+    _OptionLike,
+    _StructLike,
+    _SwitchOptionsT,
+)
 from caterpillar.byteorder import byteorder
 from caterpillar.context import CTX_SEQ, CTX_STREAM
 from caterpillar.options import Flag

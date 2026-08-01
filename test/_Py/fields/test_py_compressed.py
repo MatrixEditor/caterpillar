@@ -4,8 +4,12 @@ from io import BytesIO
 
 import pytest
 
-from caterpillar.fields.compression import (Bz2Compressed, Compressed,
-                                            LZMACompressed, ZLibCompressed)
+from caterpillar.fields.compression import (
+    Bz2Compressed,
+    Compressed,
+    LZMACompressed,
+    ZLibCompressed,
+)
 from caterpillar.py import Bytes, pack, root, unpack
 
 

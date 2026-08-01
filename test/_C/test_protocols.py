@@ -4,11 +4,25 @@ import pytest
 import caterpillar
 
 if caterpillar.native_support():
-    from caterpillar.abc import (_ArchLike, _ContextLike, _EndianLike,
-                                 _OptionLike, _StructLike)
-    from caterpillar.c import (AtOffset, Atom, BuiltinAtom, Conditional,
-                               Repeated, Switch, c_Arch, c_Context, c_Endian,
-                               c_Option)
+    from caterpillar.abc import (
+        _ArchLike,
+        _ContextLike,
+        _EndianLike,
+        _OptionLike,
+        _StructLike,
+    )
+    from caterpillar.c import (
+        AtOffset,
+        Atom,
+        BuiltinAtom,
+        Conditional,
+        Repeated,
+        Switch,
+        c_Arch,
+        c_Context,
+        c_Endian,
+        c_Option,
+    )
 
     # === PROTOCOL COMPLIANCE ===
     # All tests below should verify the protocol compliance of all classes

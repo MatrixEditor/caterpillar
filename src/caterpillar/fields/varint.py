@@ -19,11 +19,9 @@ import typing
 from typing_extensions import override
 
 from caterpillar.abc import _ContextLike, _EndianLike, _StreamType
-from caterpillar.byteorder import (LITTLE_ENDIAN_FMT, O_DEFAULT_ENDIAN,
-                                   LittleEndian)
+from caterpillar.byteorder import LITTLE_ENDIAN_FMT, O_DEFAULT_ENDIAN, LittleEndian
 from caterpillar.context import CTX_FIELD, CTX_STREAM
-from caterpillar.exception import (DynamicSizeError, InvalidValueError,
-                                   StreamError)
+from caterpillar.exception import DynamicSizeError, InvalidValueError, StreamError
 from caterpillar.options import Flag
 
 from ._mixin import FieldStruct

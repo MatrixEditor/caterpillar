@@ -24,19 +24,33 @@ from types import NoneType
 from typing import Any, Callable, Generic
 from uuid import UUID
 
-from typing_extensions import (Buffer, Final, Self, SupportsFloat,
-                               SupportsIndex, TypeVar, override)
+from typing_extensions import (
+    Buffer,
+    Final,
+    Self,
+    SupportsFloat,
+    SupportsIndex,
+    TypeVar,
+    override,
+)
 
 from caterpillar import registry
 from caterpillar._common import WithoutContextVar, read_exact
-from caterpillar.abc import (_IT, _OT, _ContextLambda, _ContextLike,
-                             _EndianLike, _GreedyType, _LengthT, _PrefixedType,
-                             _StreamType, _StructLike)
-from caterpillar.byteorder import (LITTLE_ENDIAN_FMT, O_DEFAULT_ENDIAN,
-                                   LittleEndian)
+from caterpillar.abc import (
+    _IT,
+    _OT,
+    _ContextLambda,
+    _ContextLike,
+    _EndianLike,
+    _GreedyType,
+    _LengthT,
+    _PrefixedType,
+    _StreamType,
+    _StructLike,
+)
+from caterpillar.byteorder import LITTLE_ENDIAN_FMT, O_DEFAULT_ENDIAN, LittleEndian
 from caterpillar.context import CTX_FIELD, CTX_SEQ, CTX_STREAM
-from caterpillar.exception import (DynamicSizeError, InvalidValueError,
-                                   ValidationError)
+from caterpillar.exception import DynamicSizeError, InvalidValueError, ValidationError
 from caterpillar.options import GLOBAL_FIELD_FLAGS, Flag
 from caterpillar.shared import getstruct, typeof
 

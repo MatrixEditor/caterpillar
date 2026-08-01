@@ -23,8 +23,14 @@ from typing import Final
 
 from typing_extensions import override
 
-from caterpillar.abc import (_OT, ArchLike, ContextLambda, ContextLike,
-                             EndianLike, SupportsSetEndian)
+from caterpillar.abc import (
+    _OT,
+    ArchLike,
+    ContextLambda,
+    ContextLike,
+    EndianLike,
+    SupportsSetEndian,
+)
 from caterpillar.context import CTX_ORDER
 from caterpillar.options import Flag
 from caterpillar.shared import ATTR_BYTEORDER

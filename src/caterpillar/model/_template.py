@@ -20,13 +20,19 @@ import sys
 import types
 from hashlib import md5
 from types import ModuleType
-from typing import (Annotated, Any, Callable, Generic, TypeVar, get_args,
-                    get_origin)
+from typing import Annotated, Any, Callable, Generic, TypeVar, get_args, get_origin
 
 from typing_extensions import dataclass_transform, overload, override
 
-from caterpillar.abc import (_ArchLike, _ContextLambda, _EndianLike,
-                             _GreedyType, _LengthT, _StructLike, _SwitchLambda)
+from caterpillar.abc import (
+    _ArchLike,
+    _ContextLambda,
+    _EndianLike,
+    _GreedyType,
+    _LengthT,
+    _StructLike,
+    _SwitchLambda,
+)
 from caterpillar.fields import INVALID_DEFAULT, Field
 from caterpillar.model import Invisible, Struct
 from caterpillar.options import S_UNION

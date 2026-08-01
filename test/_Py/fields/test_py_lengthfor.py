@@ -2,8 +2,19 @@ import struct as pystruct
 
 import pytest
 
-from caterpillar.py import (AsLengthRef, BigEndian, Bytes, String, f, pack,
-                            struct, this, uint8, uint16, unpack)
+from caterpillar.py import (
+    AsLengthRef,
+    BigEndian,
+    Bytes,
+    String,
+    f,
+    pack,
+    struct,
+    this,
+    uint8,
+    uint16,
+    unpack,
+)
 
 
 # --------------------------------------------------------------------------- #

@@ -19,9 +19,17 @@ from typing import Any, Generic
 from typing_extensions import Self, override
 
 from caterpillar import native_support
-from caterpillar.abc import (_IT, _OT, _ContextLambda, _ContextLike,
-                             _EndianLike, _LengthT, _StructLike,
-                             _SupportsSetEndian, _SwitchOptionsT)
+from caterpillar.abc import (
+    _IT,
+    _OT,
+    _ContextLambda,
+    _ContextLike,
+    _EndianLike,
+    _LengthT,
+    _StructLike,
+    _SupportsSetEndian,
+    _SwitchOptionsT,
+)
 
 if native_support():
     BIG_ENDIAN: c_Endian

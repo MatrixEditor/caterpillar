@@ -2,8 +2,7 @@ import enum
 
 import pytest
 
-from caterpillar.py import (Enum, InvalidValueError, ValidationError, pack,
-                            uint8, unpack)
+from caterpillar.py import Enum, InvalidValueError, ValidationError, pack, uint8, unpack
 
 
 class Color(enum.Enum):
