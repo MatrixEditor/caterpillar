@@ -62,7 +62,10 @@ class WithoutContextVar:
         self.context[self.name] = self.value
 
     def __exit__(
-        self, exc_type: type, exc_value: Exception, traceback: TracebackType
+        self,
+        exc_type: type | None,
+        exc_value: Exception | None,
+        traceback: TracebackType | None,
     ) -> None:
         self.context[self.name] = self.old_value
         # We have to apply the right field as instance of the Field class
