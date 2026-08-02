@@ -68,6 +68,21 @@ def singleton(cls: type[_T]) -> _T:
 INVALID_DEFAULT: object = object()
 DEFAULT_OPTION: object = object()
 
+# Constant representing a default value that caterpillar must not use as a
+# concrete value.
+IGNORED_DEFAULT: object = object()
+
+
+def has_default(value: object) -> bool:
+    """
+    Check whether *value* is a concrete, usable default value.
+
+    :param value: The value to check, typically a :attr:`Field.default`.
+    :return: True if *value* can be safely used as a fallback/packing value.
+    """
+    return value is not INVALID_DEFAULT and value is not IGNORED_DEFAULT
+
+
 
 class Field(Generic[_IT, _OT], PackMixin[_IT], UnpackMixin[_OT]):
     """Represents a field in a data structure.
@@ -531,7 +546,7 @@ class Field(Generic[_IT, _OT], PackMixin[_IT], UnpackMixin[_OT]):
                 if not isinstance(exc, StructException):
                     exc = StructException(str(exc), context)
                 value = self.default
-                if value is INVALID_DEFAULT or isinstance(exc, ValidationError):
+                if not has_default(value) or isinstance(exc, ValidationError):
                     raise exc
                 return value
 
@@ -566,7 +581,7 @@ class Field(Generic[_IT, _OT], PackMixin[_IT], UnpackMixin[_OT]):
                     exc = StructException(str(exc), context)
                 # Any exception leads to a default value if configured
                 value = self.default
-                if value is INVALID_DEFAULT or isinstance(exc, ValidationError):
+                if not has_default(value) or isinstance(exc, ValidationError):
                     raise exc
         else:
             # Context functions should be executed with top priority

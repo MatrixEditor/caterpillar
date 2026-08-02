@@ -62,7 +62,7 @@ from caterpillar import registry
 from caterpillar._common import WithoutContextVar, read_exact
 from caterpillar.shared import getstruct, typeof
 
-from ._base import Field, INVALID_DEFAULT, singleton
+from ._base import Field, INVALID_DEFAULT, singleton, has_default
 from ._mixin import ByteOrderMixin, FieldStruct
 
 # Explicitly report deprecation warnings
@@ -925,7 +925,7 @@ class Enum(Generic[_EnumT, _IT], Transformer[_EnumT, _IT, _EnumT | _IT, _IT]):
         default = self.default
         field = context.get(CTX_FIELD)
         if default is INVALID_DEFAULT and field:
-            default = field.default
+            default = field.default if has_default(default) else INVALID_DEFAULT
 
         if default is INVALID_DEFAULT:
             if (field and field.has_flag(ENUM_STRICT)) or self.strict:
