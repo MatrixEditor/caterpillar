@@ -18,7 +18,7 @@ from typing import Generic
 
 from typing_extensions import Final, override
 
-from caterpillar.abc import _VT, _ArrayFactoryLike, _OptionLike
+from caterpillar.abc import _VT, _ArrayFactoryLike, _OptionLike, EndianLike
 
 
 @dataclass(init=False, eq=False)
@@ -225,6 +225,7 @@ are evaluated before analysis.
 S_UNION: Final[Flag] = Flag("struct.union")
 S_ADD_BYTES: Final[Flag] = Flag("struct.bytes_method")
 S_DISCARD_CONST: Final[Flag] = Flag("struct.discard_const")
+O_DEFAULT_STRUCT_ENDIAN: Final[Flag[EndianLike]] = Flag("struct.default_endian")
 
 # for fields
 F_KEEP_POSITION: Final[Flag] = Flag("field.keep_position")

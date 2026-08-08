@@ -40,7 +40,9 @@ from caterpillar.context import (
     CTX_SEQ,
     CTX_STREAM,
     O_CONTEXT_FACTORY,
-    Context, CTX_PARENT, CTX_ORDER,
+    Context,
+    CTX_PARENT,
+    CTX_ORDER,
 )
 from caterpillar.exception import StructException, ValidationError
 from caterpillar.fields import INVALID_DEFAULT, Const, Field, FieldMixin
@@ -49,6 +51,7 @@ from caterpillar.options import (
     S_DISCARD_UNNAMED,
     S_REPLACE_TYPES,
     S_UNION,
+    O_DEFAULT_STRUCT_ENDIAN,
 )
 from caterpillar.shared import ATTR_ACTION_PACK, ATTR_ACTION_UNPACK, Action
 
@@ -501,21 +504,30 @@ class Sequence(Generic[_SeqModelT, _SeqIT, _SeqOT], FieldMixin[_SeqIT, _SeqOT]):
         return max_size if self.is_union else total
 
     def _resolve_order(self, context: _ContextLike) -> _EndianLike | None:
-        if self.order is not Inherit:
-            return None
-
-        parent = context.get(CTX_PARENT)
-        field = parent.get(CTX_FIELD) if parent is not None else None
         resolved = None
-        if field is not None and field.has_order() and field.order is not Inherit:
-            # The field embedding this struct already carries a concrete,
-            # explicitly-resolved byte order
-            resolved = field.order
-        elif parent is not None:
-            # The enclosing struct is itself inheriting its order (chain of
-            # Inherit structs) - reuse whatever it already resolved for
-            # itself.
-            resolved = parent.get(CTX_ORDER)
+        if self.order is not Inherit:
+            resolved = O_DEFAULT_STRUCT_ENDIAN.value
+            if resolved is None:
+                return None
+
+            # allow Inherit as well as BigEndian and LittleEndian default order
+            if resolved is Inherit:
+                # will be resolved in the next if-branch
+                resolved = None
+
+        if resolved is None:
+            parent = context.get(CTX_PARENT)
+            field = parent.get(CTX_FIELD) if parent is not None else None
+            resolved = None
+            if field is not None and field.has_order() and field.order is not Inherit:
+                # The field embedding this struct already carries a concrete,
+                # explicitly-resolved byte order
+                resolved = field.order
+            elif parent is not None:
+                # The enclosing struct is itself inheriting its order (chain of
+                # Inherit structs) - reuse whatever it already resolved for
+                # itself.
+                resolved = parent.get(CTX_ORDER)
 
         if resolved is not None:
             context[CTX_ORDER] = resolved
@@ -524,7 +536,9 @@ class Sequence(Generic[_SeqModelT, _SeqIT, _SeqOT], FieldMixin[_SeqIT, _SeqOT]):
     def unpack_one(self, context: _ContextLike) -> _SeqOT:
         # At first, we define the object context where the parsed values
         # will be stored
-        if self.order is Inherit:
+        if self.order is Inherit or (
+            self.order is None and O_DEFAULT_STRUCT_ENDIAN.value is not None
+        ):
             _ = self._resolve_order(context)
 
         factory = O_CONTEXT_FACTORY.value or Context
@@ -589,7 +603,9 @@ class Sequence(Generic[_SeqModelT, _SeqIT, _SeqOT], FieldMixin[_SeqIT, _SeqOT]):
         # See __pack__ for more information
         field = context.get("_field")
         if field and context[CTX_SEQ]:
-            return unpack_seq(context, self.unpack_one)  # pyright: ignore[reportReturnType]
+            return unpack_seq(
+                context, self.unpack_one
+            )  # pyright: ignore[reportReturnType]
         return self.unpack_one(this_context)
 
     def get_value(self, obj: _SeqIT, name: str, field: Field) -> Any | None:
@@ -603,7 +619,9 @@ class Sequence(Generic[_SeqModelT, _SeqIT, _SeqOT], FieldMixin[_SeqIT, _SeqOT]):
         return value
 
     def pack_one(self, obj: _SeqIT, context: _ContextLike) -> None:
-        if self.order is Inherit:
+        if self.order is Inherit or (
+            self.order is None and O_DEFAULT_STRUCT_ENDIAN.value is not None
+        ):
             _ = self._resolve_order(context)
 
         max_size = 0
