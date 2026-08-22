@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>2.3.9. Templates &#8212; Caterpillar 2.9.1 documentation</title>
+    <title>2.3.10. Templates &#8212; Caterpillar 2.9.1 documentation</title>
   
   
   
@@ -52,7 +52,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="3. Reference" href="../../reference/index.html" />
-    <link rel="prev" title="2.3.8. Unions" href="union.html" />
+    <link rel="prev" title="2.3.9. Unnamed" href="unnamed.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="2.9.1" />
@@ -396,7 +396,8 @@
 <li class="toctree-l2"><a class="reference internal" href="actions.html">2.3.6. Actions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bitfield.html">2.3.7. Bitfields</a></li>
 <li class="toctree-l2"><a class="reference internal" href="union.html">2.3.8. Unions</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">2.3.9. Templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="unnamed.html">2.3.9. Unnamed</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">2.3.10. Templates</a></li>
 </ul>
 </details></li>
 </ul>
@@ -445,7 +446,7 @@
     
     <li class="breadcrumb-item"><a href="index.html" class="nav-link"><span class="section-number">2.3. </span>Advanced Concepts</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">2.3.9. </span>Templates</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">2.3.10. </span>Templates</span></li>
   </ul>
 </nav>
 </div>
@@ -463,7 +464,7 @@
                 <article class="bd-article">
                   
   <section id="templates">
-<span id="tutorial-templates"></span><h1><span class="section-number">2.3.9. </span>Templates<a class="headerlink" href="#templates" title="Link to this heading">#</a></h1>
+<span id="tutorial-templates"></span><h1><span class="section-number">2.3.10. </span>Templates<a class="headerlink" href="#templates" title="Link to this heading">#</a></h1>
 <div class="versionchanged">
 <p><span class="versionmodified changed">Changed in version 2.9.0: </span>Added support for Python’s <code class="xref py py-class docutils literal notranslate"><span class="pre">Generic</span></code> and <code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code> types.</p>
 </div>
@@ -473,7 +474,7 @@ once and specialize it with different Caterpillar field types later.</p>
 are still supported and are covered at the end of this page.</p>
 <p>If you’d like the implementation details, see <a class="reference internal" href="../../reference/datamodel/templates.html#ref-templates"><span class="std std-ref">Templates</span></a>.</p>
 <section id="generic-templates">
-<h2><span class="section-number">2.3.9.1. </span>Generic Templates<a class="headerlink" href="#generic-templates" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">2.3.10.1. </span>Generic Templates<a class="headerlink" href="#generic-templates" title="Link to this heading">#</a></h2>
 <p>Define a template as a normal generic Python class and decorate it with
 <code class="docutils literal notranslate"><span class="pre">&#64;template</span></code>. A plain type variable annotation is enough.</p>
 <div class="literal-block-wrapper docutils container" id="id1">
@@ -503,7 +504,7 @@ struct class and caches it, so repeated uses of the same specialization return
 the same class.</p>
 </section>
 <section id="multiple-type-variables">
-<h2><span class="section-number">2.3.9.2. </span>Multiple Type Variables<a class="headerlink" href="#multiple-type-variables" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">2.3.10.2. </span>Multiple Type Variables<a class="headerlink" href="#multiple-type-variables" title="Link to this heading">#</a></h2>
 <p>Templates can use more than one type variable. The order in <code class="docutils literal notranslate"><span class="pre">Generic[...]</span></code>
 defines the positional specialization order.</p>
 <div class="literal-block-wrapper docutils container" id="id2">
@@ -531,7 +532,7 @@ defines the positional specialization order.</p>
 </div>
 </section>
 <section id="fields-with-layout-metadata">
-<h2><span class="section-number">2.3.9.3. </span>Fields With Layout Metadata<a class="headerlink" href="#fields-with-layout-metadata" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">2.3.10.3. </span>Fields With Layout Metadata<a class="headerlink" href="#fields-with-layout-metadata" title="Link to this heading">#</a></h2>
 <p>Use direct <code class="docutils literal notranslate"><span class="pre">T</span></code> annotations for simple scalar fields. When a field needs
 Caterpillar-specific layout metadata, keep the Python type in the first
 position of <code class="docutils literal notranslate"><span class="pre">f[]</span></code> and put the template field marker in the metadata position.</p>
@@ -561,7 +562,7 @@ markers. For example, <code class="docutils literal notranslate"><span class="pr
 specialization.</p>
 </section>
 <section id="partial-templates">
-<h2><span class="section-number">2.3.9.4. </span>Partial Templates<a class="headerlink" href="#partial-templates" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">2.3.10.4. </span>Partial Templates<a class="headerlink" href="#partial-templates" title="Link to this heading">#</a></h2>
 <p>A specialization that still contains unresolved type variables remains a
 template. This is useful for fixing only part of a layout.</p>
 <div class="literal-block-wrapper docutils container" id="id4">
@@ -589,7 +590,7 @@ template. This is useful for fixing only part of a layout.</p>
 </div>
 </section>
 <section id="subclassing-specializations">
-<h2><span class="section-number">2.3.9.5. </span>Subclassing Specializations<a class="headerlink" href="#subclassing-specializations" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">2.3.10.5. </span>Subclassing Specializations<a class="headerlink" href="#subclassing-specializations" title="Link to this heading">#</a></h2>
 <p>Template specializations are normal struct classes and can be used as bases for
 other structs.</p>
 <div class="literal-block-wrapper docutils container" id="id5">
@@ -617,7 +618,7 @@ other structs.</p>
 </div>
 </section>
 <section id="legacy-templates">
-<h2><span class="section-number">2.3.9.6. </span>Legacy Templates<a class="headerlink" href="#legacy-templates" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">2.3.10.6. </span>Legacy Templates<a class="headerlink" href="#legacy-templates" title="Link to this heading">#</a></h2>
 <p>The older <code class="docutils literal notranslate"><span class="pre">TemplateTypeVar</span></code> style is still supported. Use it when maintaining
 existing code that already depends on <code class="docutils literal notranslate"><span class="pre">derive()</span></code>.</p>
 <div class="literal-block-wrapper docutils container" id="id6">
@@ -654,12 +655,12 @@ code.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="union.html"
+       href="unnamed.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title"><span class="section-number">2.3.8. </span>Unions</p>
+        <p class="prev-next-title"><span class="section-number">2.3.9. </span>Unnamed</p>
       </div>
     </a>
     <a class="right-next"
@@ -690,12 +691,12 @@ code.</p>
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#generic-templates">2.3.9.1. Generic Templates</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#multiple-type-variables">2.3.9.2. Multiple Type Variables</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#fields-with-layout-metadata">2.3.9.3. Fields With Layout Metadata</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#partial-templates">2.3.9.4. Partial Templates</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#subclassing-specializations">2.3.9.5. Subclassing Specializations</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#legacy-templates">2.3.9.6. Legacy Templates</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#generic-templates">2.3.10.1. Generic Templates</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#multiple-type-variables">2.3.10.2. Multiple Type Variables</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#fields-with-layout-metadata">2.3.10.3. Fields With Layout Metadata</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#partial-templates">2.3.10.4. Partial Templates</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#subclassing-specializations">2.3.10.5. Subclassing Specializations</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#legacy-templates">2.3.10.6. Legacy Templates</a></li>
 </ul>
   </nav></div>
 

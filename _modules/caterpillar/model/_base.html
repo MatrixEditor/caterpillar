@@ -412,6 +412,8 @@
 <span class="c1"># pyright: reportPrivateUsage=false, reportAny=false, reportExplicitAny=false</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.byteorder</span><span class="w"> </span><span class="kn">import</span> <span class="n">Inherit</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dc</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterable</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Annotated</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">get_args</span><span class="p">,</span> <span class="n">get_origin</span>
 
@@ -452,6 +454,7 @@
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.shared</span><span class="w"> </span><span class="kn">import</span> <span class="n">ATTR_ACTION_PACK</span><span class="p">,</span> <span class="n">ATTR_ACTION_UNPACK</span><span class="p">,</span> <span class="n">Action</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.fields._base</span><span class="w"> </span><span class="kn">import</span> <span class="n">has_default</span><span class="p">,</span> <span class="n">IGNORED_DEFAULT</span>
 
 <span class="k">class</span><span class="w"> </span><span class="nc">_Member</span><span class="p">:</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -676,15 +679,10 @@
 <span class="sd">        :param default: The default value of the field.</span>
 <span class="sd">        :return: True if the field should be included, else False.</span>
 <span class="sd">        """</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_option</span><span class="p">(</span><span class="n">S_DISCARD_UNNAMED</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">"^_[0-9]*$"</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_option</span><span class="p">(</span><span class="n">S_DISCARD_UNNAMED</span><span class="p">)</span> <span class="ow">and</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">"^_[0-9]*$"</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_option</span><span class="p">(</span><span class="n">S_DISCARD_CONST</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">default</span> <span class="o">!=</span> <span class="n">INVALID_DEFAULT</span><span class="p">:</span>
-                <span class="k">return</span> <span class="kc">False</span>
-
-        <span class="k">return</span> <span class="kc">True</span></div>
+        <span class="k">return</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">has_option</span><span class="p">(</span><span class="n">S_DISCARD_CONST</span><span class="p">)</span> <span class="ow">and</span> <span class="n">has_default</span><span class="p">(</span><span class="n">default</span><span class="p">))</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_set_default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -694,6 +692,7 @@
         <span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">annotation</span><span class="p">:</span> <span class="n">_AnnotationT</span><span class="p">,</span> <span class="n">had_default</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
         <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">INVALID_DEFAULT</span><span class="p">)</span>
+        <span class="n">raw_default</span> <span class="o">=</span> <span class="n">default</span>
         <span class="c1"># constant values that are not in the form of fields, structs or types should</span>
         <span class="c1"># be wrapped into constant values. For more information, see _process_field</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">annotation</span><span class="p">,</span> <span class="n">Field</span><span class="p">):</span>
@@ -712,6 +711,15 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_union</span><span class="p">:</span>
             <span class="c1"># Unions will get none as default value for all fields</span>
             <span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">default</span> <span class="ow">is</span> <span class="n">raw_default</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">raw_default</span><span class="p">,</span> <span class="n">dc</span><span class="o">.</span><span class="n">Field</span><span class="p">):</span>
+            <span class="c1"># The class attribute is still an untouched dataclasses.field(...)</span>
+            <span class="k">return</span> <span class="p">(</span>
+                <span class="n">IGNORED_DEFAULT</span>
+                <span class="k">if</span> <span class="n">raw_default</span><span class="o">.</span><span class="n">default</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">dc</span><span class="o">.</span><span class="n">MISSING</span>
+                <span class="ow">or</span> <span class="n">raw_default</span><span class="o">.</span><span class="n">default_factory</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">dc</span><span class="o">.</span><span class="n">MISSING</span>
+                <span class="k">else</span> <span class="n">INVALID_DEFAULT</span>
+            <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">default</span> <span class="o">!=</span> <span class="n">INVALID_DEFAULT</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_set_default</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span>
@@ -1086,7 +1094,7 @@
                 <span class="p">)</span>
 
             <span class="n">name</span> <span class="o">=</span> <span class="n">union_field</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span>
-            <span class="n">context</span><span class="p">[</span><span class="n">ctx_path</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"."</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">base_path</span><span class="p">,</span> <span class="s2">"&lt;value&gt;"</span><span class="p">])</span>
+            <span class="n">context</span><span class="p">[</span><span class="n">ctx_path</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">base_path</span><span class="si">}</span><span class="s2">.&lt;value&gt;"</span>
             <span class="c1"># REVISIT: are constant values allowed here? + name validation?</span>
             <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">union_field</span><span class="p">)</span>
             <span class="n">union_field</span><span class="o">.</span><span class="n">__pack__</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>

@@ -450,7 +450,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.options</span><span class="w"> </span><span class="kn">import</span> <span class="n">GLOBAL_FIELD_FLAGS</span><span class="p">,</span> <span class="n">Flag</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.shared</span><span class="w"> </span><span class="kn">import</span> <span class="n">ATTR_BYTEORDER</span><span class="p">,</span> <span class="n">getstruct</span><span class="p">,</span> <span class="n">typeof</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">._base</span><span class="w"> </span><span class="kn">import</span> <span class="n">INVALID_DEFAULT</span><span class="p">,</span> <span class="n">Field</span><span class="p">,</span> <span class="n">singleton</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">._base</span><span class="w"> </span><span class="kn">import</span> <span class="n">Field</span><span class="p">,</span> <span class="n">INVALID_DEFAULT</span><span class="p">,</span> <span class="n">singleton</span><span class="p">,</span> <span class="n">has_default</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">._mixin</span><span class="w"> </span><span class="kn">import</span> <span class="n">ByteOrderMixin</span><span class="p">,</span> <span class="n">FieldStruct</span>
 
 <span class="c1"># Explicitly report deprecation warnings</span>
@@ -1370,7 +1370,7 @@
         <span class="n">default</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default</span>
         <span class="n">field</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">CTX_FIELD</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">default</span> <span class="ow">is</span> <span class="n">INVALID_DEFAULT</span> <span class="ow">and</span> <span class="n">field</span><span class="p">:</span>
-            <span class="n">default</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">default</span>
+            <span class="n">default</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">default</span> <span class="k">if</span> <span class="n">has_default</span><span class="p">(</span><span class="n">default</span><span class="p">)</span> <span class="k">else</span> <span class="n">INVALID_DEFAULT</span>
 
         <span class="k">if</span> <span class="n">default</span> <span class="ow">is</span> <span class="n">INVALID_DEFAULT</span><span class="p">:</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">field</span> <span class="ow">and</span> <span class="n">field</span><span class="o">.</span><span class="n">has_flag</span><span class="p">(</span><span class="n">ENUM_STRICT</span><span class="p">))</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">strict</span><span class="p">:</span>
