@@ -1,7 +1,7 @@
 import pytest
 
-from caterpillar.py import ConstBytes, Invisible, f, struct, unpack, pack, Const, uint8
 from caterpillar.exception import ValidationError
+from caterpillar.py import Const, ConstBytes, Invisible, f, pack, struct, uint8, unpack
 
 
 def test_const_pack():

@@ -3,18 +3,12 @@ Custom script to generate the public Caterpillar API.
 =====================================================
 """
 
-import pathlib
 import argparse
 import dataclasses
-from typing_extensions import override
+import pathlib
 
-from caterpillar_api import (
-    CP_FUNC_API,
-    CP_TYPE_API,
-    cp_api_functions,
-    CP_SRC,
-    CP_TYPES,
-)
+from caterpillar_api import CP_FUNC_API, CP_SRC, CP_TYPE_API, CP_TYPES, cp_api_functions
+from typing_extensions import override
 
 
 # Base class for all API objects (functions or types)
@@ -50,7 +44,7 @@ class APIType(APIObj):
         if self.type.startswith("Py"):
             return f"extern {self.type} {self.name};"
 
-        extra_def = f"#define {self.name.replace('_Type', '')}_NAME \"{self.type}\""
+        extra_def = f'#define {self.name.replace("_Type", "")}_NAME "{self.type}"'
         return f"extern PyTypeObject {self.name};\n{extra_def}"
 
     @override

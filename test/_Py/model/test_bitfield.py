@@ -2,21 +2,19 @@ import enum
 
 import pytest
 
+from caterpillar.fields import Bytes, uint8, uint16
 from caterpillar.model import (
     Bitfield,
-    bitfield,
+    CharFactory,
     EndGroup,
+    Invisible,
     SetAlignment,
+    bitfield,
+    pack,
     sizeof,
     unpack,
-    CharFactory,
-    pack,
-    Invisible
 )
-from caterpillar.options import (
-    S_REPLACE_TYPES,
-)
-from caterpillar.fields import uint16, Bytes, uint8
+from caterpillar.options import S_REPLACE_TYPES
 from caterpillar.py import BigEndian, LittleEndian, ValidationError, int8
 from caterpillar.shared import getstruct
 from caterpillar.shortcuts import f

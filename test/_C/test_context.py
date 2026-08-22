@@ -1,5 +1,6 @@
 # pylint: disable=unused-import, no-name-in-module
 import pytest
+
 import caterpillar
 
 if caterpillar.native_support():

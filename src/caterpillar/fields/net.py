@@ -12,21 +12,22 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-import ipaddress
 import binascii
+import ipaddress
 import re
-
 from typing import Final
+
 from typing_extensions import override
 
 from caterpillar.abc import _ContextLike  # pyright: ignore[reportPrivateUsage]
-from .common import Transformer, Bytes
+
 from ._base import singleton
+from .common import Bytes, Transformer
 
 
 @singleton
 class IPv4Address(
-    Transformer[ipaddress.IPv4Address| str | int, bytes, ipaddress.IPv4Address, bytes]
+    Transformer[ipaddress.IPv4Address | str | int, bytes, ipaddress.IPv4Address, bytes]
 ):
     """
     A transformer for encoding and decoding IPv4 addresses.
@@ -51,7 +52,9 @@ class IPv4Address(
         return ipaddress.IPv4Address
 
     @override
-    def encode(self, obj: ipaddress.IPv4Address| str | int, context: _ContextLike) -> bytes:
+    def encode(
+        self, obj: ipaddress.IPv4Address | str | int, context: _ContextLike
+    ) -> bytes:
         """
         Encode an IPv4Address object.
 
@@ -102,7 +105,9 @@ class IPv6Address(
         return ipaddress.IPv6Address
 
     @override
-    def encode(self, obj: ipaddress.IPv6Address | str | int, context: _ContextLike) -> bytes:
+    def encode(
+        self, obj: ipaddress.IPv6Address | str | int, context: _ContextLike
+    ) -> bytes:
         """
         Encode an IPv6Address object.
 

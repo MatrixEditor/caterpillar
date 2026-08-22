@@ -13,19 +13,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # pyright: reportPrivateUsage=false, reportExplicitAny=false
-import sys
 import hashlib
-from types import FrameType, TracebackType
-from typing import TYPE_CHECKING, Any, Callable, Generic, Protocol
-from typing_extensions import Literal, Self, override, TypeVar
+import sys
 import warnings
 import zlib
+from types import FrameType, TracebackType
+from typing import TYPE_CHECKING, Any, Callable, Generic, Protocol
 
+from typing_extensions import Literal, Self, TypeVar, override
+
+from caterpillar.abc import _ContextLambda, _ContextLike, _StructLike
 from caterpillar.context import CTX_OBJECT, CTX_STREAM
 from caterpillar.exception import StructException, ValidationError
-from caterpillar.shared import Action
 from caterpillar.fields.hook import IOHook
-from caterpillar.abc import _ContextLambda, _ContextLike, _StructLike
+from caterpillar.shared import Action
+
 from ._base import Field
 from .common import Bytes, uint32
 

@@ -13,27 +13,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from __future__ import annotations
+
 import typing
+
 from typing_extensions import override
 
-from caterpillar.exception import (
-    InvalidValueError,
-    DynamicSizeError,
-    StreamError,
-)
-from caterpillar.byteorder import (
-    O_DEFAULT_ENDIAN,
-    LittleEndian,
-    LITTLE_ENDIAN_FMT,
-)
-from caterpillar.context import CTX_FIELD, CTX_STREAM
-from caterpillar.options import Flag
 from caterpillar.abc import _ContextLike, _EndianLike, _StreamType
+from caterpillar.byteorder import LITTLE_ENDIAN_FMT
+from caterpillar.context import CTX_FIELD, CTX_STREAM
+from caterpillar.exception import DynamicSizeError, InvalidValueError, StreamError
+from caterpillar.options import Flag
 
 from ._mixin import FieldStruct
-
-if typing.TYPE_CHECKING:
-    from caterpillar.fields import Field
+from .common import resolve_order
 
 
 VARINT_LSB = Flag("varint.lsb")
@@ -92,13 +84,7 @@ class VarInt(FieldStruct[int, int]):
             raise InvalidValueError("Invalid negative value for VarInt encoding!")
 
         stream: _StreamType = context[CTX_STREAM]
-        field: "Field" = context.get(CTX_FIELD)
-        order: _EndianLike = (
-            field.order
-            if field
-            else (self.__byteorder__ or O_DEFAULT_ENDIAN.value or LittleEndian)
-        )
-        is_little: bool = order.ch == LITTLE_ENDIAN_FMT
+        is_little = resolve_order(context, self).ch == LITTLE_ENDIAN_FMT
 
         hb, lb = self.bit_config(context)
         # This implementation is using LittleEndian. Later we can use reverse to
@@ -132,13 +118,7 @@ class VarInt(FieldStruct[int, int]):
         data: list[int] = []
         _, lb = self.bit_config(context)
         shift = 0
-        field: "Field" = context.get(CTX_FIELD)
-        order: _EndianLike = (
-            field.order
-            if field
-            else (self.__byteorder__ or O_DEFAULT_ENDIAN.value or LittleEndian)
-        )
-        is_little: bool = order.ch == LITTLE_ENDIAN_FMT
+        is_little = resolve_order(context, self).ch == LITTLE_ENDIAN_FMT
 
         while True:
             # Note tha unpack operation here to retrieve one byte only

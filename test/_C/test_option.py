@@ -1,9 +1,10 @@
 import pytest
+
 import caterpillar
 
 if caterpillar.native_support():
     from caterpillar.c import c_Option
-    from caterpillar.py import Flag, Field
+    from caterpillar.py import Field, Flag
 
     def testc_option_init():
         option = c_Option("name")

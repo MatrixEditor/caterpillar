@@ -1,10 +1,12 @@
-import pytest
-import caterpillar
 import io
+
+import pytest
+
+import caterpillar
 
 if caterpillar.native_support():
     from caterpillar._C import AtOffset
-    from caterpillar.py import Bytes, pack, unpack, sizeof, ctx
+    from caterpillar.py import Bytes, ctx, pack, sizeof, unpack
 
     # Offset initialization can be either done manually or by
     # using the '@' (matmul) operator on subclasses of BuiltinAtom.

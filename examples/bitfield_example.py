@@ -6,7 +6,7 @@ from caterpillar.py import (
     int8,
     unpack,
     pack,
-    Invisible
+    Invisible,
 )
 from caterpillar.shortcuts import f
 from caterpillar.types import balign_t, int1_t, int3_t
@@ -14,11 +14,12 @@ from caterpillar.types import balign_t, int1_t, int3_t
 
 @bitfield
 class Format:
-    b1: int1_t                    # inferred uint8 type with a width of one bit
-    _: balign_t = Invisible()     # start new uint8 with 7 unused bits
+    b1: int1_t  # inferred uint8 type with a width of one bit
+    _: balign_t = Invisible()  # start new uint8 with 7 unused bits
     b2: f[str, (2, CharFactory)]  # wraps parsed int to char (string)
-    b3: f[int, 3 - int8] = 1      # default value is applied -> REVISIT: necessary?
-    _1: int3_t                    # unnamed padding to the rest of the byte
+    b3: f[int, 3 - int8] = 1  # default value is applied -> REVISIT: necessary?
+    _1: int3_t  # unnamed padding to the rest of the byte
+
 
 s = getstruct(Format)
 assert isinstance(s, Bitfield)

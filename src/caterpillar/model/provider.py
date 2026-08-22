@@ -13,37 +13,35 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # pyright: reportAny=false, reportExplicitAny=false, reportPrivateUsage=false
-from tempfile import TemporaryFile
-from io import BytesIO, IOBase
 from collections import OrderedDict
+from io import BytesIO, IOBase
 from shutil import copyfileobj
+from tempfile import TemporaryFile
 from typing import Any
-from typing_extensions import (
-    overload,
-    Buffer,
-)
 
+from typing_extensions import Buffer, overload
+
+from caterpillar.abc import (
+    _IT,
+    _OT,
+    ArchLike,
+    _ContainsStruct,
+    EndianLike,
+    _StreamType,
+    _SupportsPack,
+    _SupportsSize,
+    _SupportsUnpack,
+)
 from caterpillar.byteorder import (
     O_DEFAULT_ARCH,
     O_DEFAULT_ENDIAN,
     LittleEndian,
     system_arch,
 )
-from caterpillar.shared import ATTR_PACK, getstruct, hasstruct
-from caterpillar.context import O_CONTEXT_FACTORY, CTX_STREAM, Context
+from caterpillar.context import CTX_STREAM, O_CONTEXT_FACTORY, Context
 from caterpillar.exception import DynamicSizeError
-from caterpillar.shared import MODE_PACK, MODE_UNPACK
-from caterpillar.abc import (
-    _ContainsStruct,
-    _OT,
-    _IT,
-    _SupportsPack,
-    _StreamType,
-    _SupportsUnpack,
-    _SupportsSize,
-    _EndianLike,
-    _ArchLike,
-)
+from caterpillar.options import O_DEFAULT_STRUCT_ENDIAN
+from caterpillar.shared import ATTR_PACK, MODE_PACK, MODE_UNPACK, getstruct, hasstruct
 
 
 @overload
@@ -54,9 +52,10 @@ def pack(
     *,
     use_tempfile: bool = False,
     as_field: bool = False,
-    order: _EndianLike | None = None,
-    arch: _ArchLike | None = None,
+    order: EndianLike | None = None,
+    arch: ArchLike | None = None,
     fill: int | bytes | str | None = None,
+    default_struct_order: EndianLike | None = None,
     **kwargs: Any,
 ) -> bytes: ...
 @overload
@@ -68,9 +67,10 @@ def pack(
     *,
     use_tempfile: bool = False,
     as_field: bool = False,
-    order: _EndianLike | None = None,
-    arch: _ArchLike | None = None,
+    order: EndianLike | None = None,
+    arch: ArchLike | None = None,
     fill: int | bytes | str | None = None,
+    default_struct_order: EndianLike | None = None,
     **kwds: Any,
 ) -> bytes: ...
 @overload
@@ -81,9 +81,10 @@ def pack(
     *,
     use_tempfile: bool = False,
     as_field: bool = False,
-    order: _EndianLike | None = None,
-    arch: _ArchLike | None = None,
+    order: EndianLike | None = None,
+    arch: ArchLike | None = None,
     fill: int | bytes | str | None = None,
+    default_struct_order: EndianLike | None = None,
     **kwargs: Any,
 ) -> bytes: ...
 @overload
@@ -95,9 +96,10 @@ def pack(
     *,
     use_tempfile: bool = False,
     as_field: bool = False,
-    order: _EndianLike | None = None,
-    arch: _ArchLike | None = None,
+    order: EndianLike | None = None,
+    arch: ArchLike | None = None,
     fill: int | bytes | str | None = None,
+    default_struct_order: EndianLike | None = None,
     **kwargs: Any,
 ) -> bytes: ...
 def pack(
@@ -107,9 +109,10 @@ def pack(
     *,
     use_tempfile: bool = False,
     as_field: bool = False,
-    order: _EndianLike | None = None,
-    arch: _ArchLike | None = None,
+    order: EndianLike | None = None,
+    arch: ArchLike | None = None,
     fill: int | bytes | str | None = None,
+    default_struct_order: EndianLike | None = None,
     **kwargs: Any,
 ) -> bytes:
     """
@@ -139,6 +142,7 @@ def pack(
         use_tempfile=use_tempfile,
         as_field=as_field,
         fill=fill,
+        default_struct_order=default_struct_order,
         **kwargs,
     )
     return buffer.getvalue()
@@ -153,9 +157,10 @@ def pack_into(
     *,
     use_tempfile: bool = ...,
     as_field: bool = ...,
-    order: _EndianLike | None = ...,
-    arch: _ArchLike | None = None,
+    order: EndianLike | None = ...,
+    arch: ArchLike | None = None,
     fill: int | bytes | str | None = None,
+    default_struct_order: EndianLike | None = None,
     **kwds: Any,
 ) -> None: ...
 @overload
@@ -167,9 +172,10 @@ def pack_into(
     *,
     use_tempfile: bool = ...,
     as_field: bool = ...,
-    order: _EndianLike | None = ...,
-    arch: _ArchLike | None = None,
+    order: EndianLike | None = ...,
+    arch: ArchLike | None = None,
     fill: int | bytes | str | None = None,
+    default_struct_order: EndianLike | None = None,
     **kwds: Any,
 ) -> None: ...
 @overload
@@ -181,9 +187,10 @@ def pack_into(
     *,
     use_tempfile: bool = ...,
     as_field: bool = ...,
-    order: _EndianLike | None = ...,
-    arch: _ArchLike | None = None,
+    order: EndianLike | None = ...,
+    arch: ArchLike | None = None,
     fill: int | bytes | str | None = None,
+    default_struct_order: EndianLike | None = None,
     **kwds: Any,
 ) -> None: ...
 @overload
@@ -195,9 +202,10 @@ def pack_into(
     *,
     use_tempfile: bool = ...,
     as_field: bool = ...,
-    order: _EndianLike | None = ...,
-    arch: _ArchLike | None = None,
+    order: EndianLike | None = ...,
+    arch: ArchLike | None = None,
     fill: int | bytes | str | None = None,
+    default_struct_order: EndianLike | None = None,
     **kwds: Any,
 ) -> None: ...
 @overload
@@ -209,9 +217,10 @@ def pack_into(
     *,
     use_tempfile: bool = ...,
     as_field: bool = ...,
-    order: _EndianLike | None = ...,
-    arch: _ArchLike | None = None,
+    order: EndianLike | None = ...,
+    arch: ArchLike | None = None,
     fill: int | bytes | str | None = None,
+    default_struct_order: EndianLike | None = None,
     **kwds: Any,
 ) -> None: ...
 def pack_into(
@@ -222,9 +231,10 @@ def pack_into(
     *,
     use_tempfile: bool = False,
     as_field: bool = False,
-    order: _EndianLike | None = None,
-    arch: _ArchLike | None = None,
+    order: EndianLike | None = None,
+    arch: ArchLike | None = None,
     fill: int | bytes | str | None = None,
+    default_struct_order: EndianLike | None = None,
     **kwds: Any,
 ) -> None:
     """
@@ -305,10 +315,14 @@ def pack_into(
 
     prev_order = O_DEFAULT_ENDIAN.value
     prev_arch = O_DEFAULT_ARCH.value
+    prev_sorder = O_DEFAULT_STRUCT_ENDIAN.value
     if order:
         O_DEFAULT_ENDIAN.value = order
     if arch:
-        O_DEFAULT_ARCH.value = prev_arch
+        O_DEFAULT_ARCH.value = arch
+    if default_struct_order:
+        O_DEFAULT_STRUCT_ENDIAN.value = default_struct_order
+
     try:
         start: int = 0
         fill_pat: bytes = b"\x00"
@@ -363,6 +377,7 @@ def pack_into(
     finally:
         O_DEFAULT_ENDIAN.value = prev_order
         O_DEFAULT_ARCH.value = prev_arch
+        O_DEFAULT_STRUCT_ENDIAN.value = prev_sorder
 
 
 @overload
@@ -374,9 +389,10 @@ def pack_file(
     *,
     use_tempfile: bool = ...,
     as_field: bool = ...,
-    order: _EndianLike | None = ...,
-    arch: _ArchLike | None = ...,
+    order: EndianLike | None = ...,
+    arch: ArchLike | None = ...,
     fill: int | bytes | str | None = None,
+    default_struct_order: EndianLike | None = None,
     **kwds: Any,
 ) -> None: ...
 @overload
@@ -388,9 +404,10 @@ def pack_file(
     *,
     use_tempfile: bool = ...,
     as_field: bool = ...,
-    order: _EndianLike | None = ...,
-    arch: _ArchLike | None = ...,
+    order: EndianLike | None = ...,
+    arch: ArchLike | None = ...,
     fill: int | bytes | str | None = None,
+    default_struct_order: EndianLike | None = None,
     **kwds: Any,
 ) -> None: ...
 @overload
@@ -402,9 +419,10 @@ def pack_file(
     *,
     use_tempfile: bool = ...,
     as_field: bool = ...,
-    order: _EndianLike | None = ...,
-    arch: _ArchLike | None = ...,
+    order: EndianLike | None = ...,
+    arch: ArchLike | None = ...,
     fill: int | bytes | str | None = None,
+    default_struct_order: EndianLike | None = None,
     **kwds: Any,
 ) -> None: ...
 @overload
@@ -416,9 +434,10 @@ def pack_file(
     *,
     use_tempfile: bool = ...,
     as_field: bool = ...,
-    order: _EndianLike | None = ...,
-    arch: _ArchLike | None = ...,
+    order: EndianLike | None = ...,
+    arch: ArchLike | None = ...,
     fill: int | bytes | str | None = None,
+    default_struct_order: EndianLike | None = None,
     **kwds: Any,
 ) -> None: ...
 @overload
@@ -430,9 +449,10 @@ def pack_file(
     *,
     use_tempfile: bool = ...,
     as_field: bool = ...,
-    order: _EndianLike | None = ...,
-    arch: _ArchLike | None = ...,
+    order: EndianLike | None = ...,
+    arch: ArchLike | None = ...,
     fill: int | bytes | str | None = None,
+    default_struct_order: EndianLike | None = None,
     **kwds: Any,
 ) -> None: ...
 def pack_file(
@@ -443,9 +463,10 @@ def pack_file(
     *,
     use_tempfile: bool = False,
     as_field: bool = False,
-    order: _EndianLike | None = None,
-    arch: _ArchLike | None = None,
+    order: EndianLike | None = None,
+    arch: ArchLike | None = None,
     fill: int | bytes | str | None = None,
+    default_struct_order: EndianLike | None = None,
     **kwds: Any,
 ) -> None:
     """
@@ -476,6 +497,7 @@ def pack_file(
             order=order,
             arch=arch,
             fill=fill,
+            default_struct_order=default_struct_order,
             **kwds,
         )
 
@@ -487,8 +509,9 @@ def unpack(
     /,
     *,
     as_field: bool = False,
-    order: _EndianLike | None = None,
-    arch: _ArchLike | None = None,
+    order: EndianLike | None = None,
+    arch: ArchLike | None = None,
+    default_struct_order: EndianLike | None = None,
     **kwds: Any,
 ) -> _OT: ...
 @overload
@@ -498,8 +521,9 @@ def unpack(
     /,
     *,
     as_field: bool = False,
-    order: _EndianLike | None = None,
-    arch: _ArchLike | None = None,
+    order: EndianLike | None = None,
+    arch: ArchLike | None = None,
+    default_struct_order: EndianLike | None = None,
     **kwds: Any,
 ) -> _OT: ...
 @overload
@@ -509,8 +533,9 @@ def unpack(
     /,
     *,
     as_field: bool = False,
-    order: _EndianLike | None = None,
-    arch: _ArchLike | None = None,
+    order: EndianLike | None = None,
+    arch: ArchLike | None = None,
+    default_struct_order: EndianLike | None = None,
     **kwds: Any,
 ) -> _OT: ...
 def unpack(
@@ -518,8 +543,9 @@ def unpack(
     buffer: Buffer | _StreamType,
     /,
     as_field: bool = False,
-    order: _EndianLike | None = None,
-    arch: _ArchLike | None = None,
+    order: EndianLike | None = None,
+    arch: ArchLike | None = None,
+    default_struct_order: EndianLike | None = None,
     **kwds: Any,
 ) -> _OT:
     """
@@ -572,16 +598,20 @@ def unpack(
 
     prev_order = O_DEFAULT_ENDIAN.value
     prev_arch = O_DEFAULT_ARCH.value
+    prev_sorder = O_DEFAULT_STRUCT_ENDIAN.value
     if order:
         O_DEFAULT_ENDIAN.value = order
     if arch:
         O_DEFAULT_ARCH.value = arch
+    if default_struct_order:
+        O_DEFAULT_STRUCT_ENDIAN.value = default_struct_order
 
     try:
         return struct.__unpack__(context)
     finally:
         O_DEFAULT_ARCH.value = prev_arch
         O_DEFAULT_ENDIAN.value = prev_order
+        O_DEFAULT_STRUCT_ENDIAN.value = prev_sorder
 
 
 @overload
@@ -591,8 +621,9 @@ def unpack_file(
     /,
     *,
     as_field: bool = False,
-    order: _EndianLike | None = None,
-    arch: _ArchLike | None = None,
+    order: EndianLike | None = None,
+    arch: ArchLike | None = None,
+    default_struct_order: EndianLike | None = None,
     **kwds: Any,
 ) -> _OT: ...
 @overload
@@ -602,8 +633,9 @@ def unpack_file(
     /,
     *,
     as_field: bool = False,
-    order: _EndianLike | None = None,
-    arch: _ArchLike | None = None,
+    order: EndianLike | None = None,
+    arch: ArchLike | None = None,
+    default_struct_order: EndianLike | None = None,
     **kwds: Any,
 ) -> _OT: ...
 @overload
@@ -613,8 +645,9 @@ def unpack_file(
     /,
     *,
     as_field: bool = False,
-    order: _EndianLike | None = None,
-    arch: _ArchLike | None = None,
+    order: EndianLike | None = None,
+    arch: ArchLike | None = None,
+    default_struct_order: EndianLike | None = None,
     **kwds: Any,
 ) -> _OT: ...
 def unpack_file(
@@ -623,8 +656,9 @@ def unpack_file(
     /,
     *,
     as_field: bool = False,
-    order: _EndianLike | None = None,
-    arch: _ArchLike | None = None,
+    order: EndianLike | None = None,
+    arch: ArchLike | None = None,
+    default_struct_order: EndianLike | None = None,
     **kwds: Any,
 ):
     """
@@ -637,7 +671,15 @@ def unpack_file(
     :return: The unpacked object.
     """
     with open(filename, "rb") as fp:
-        return unpack(struct, fp, as_field=as_field, arch=arch, order=order, **kwds)
+        return unpack(
+            struct,
+            fp,
+            as_field=as_field,
+            arch=arch,
+            order=order,
+            default_struct_order=default_struct_order,
+            **kwds,
+        )
 
 
 @overload

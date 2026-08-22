@@ -13,35 +13,34 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # pyright: reportPrivateUsage=false, reportExplicitAny=false, reportCallIssue=false
-from collections.abc import Collection
 import itertools
-
+from collections.abc import Collection
 from types import TracebackType
 from typing import TYPE_CHECKING, Any, Callable
 
 from caterpillar.abc import (
-    _PrefixedType,
-    _ContextLike,
-    _OT,
     _IT,
-    _StreamType,
+    _OT,
+    _ContextLike,
     _LengthT,
+    _PrefixedType,
+    _StreamType,
     _SupportsPack,
 )
 from caterpillar.context import (
-    CTX_PATH,
     CTX_FIELD,
     CTX_INDEX,
     CTX_OBJECT,
-    CTX_STREAM,
+    CTX_PATH,
     CTX_SEQ,
+    CTX_STREAM,
     O_CONTEXT_FACTORY,
     Context,
 )
 from caterpillar.exception import (
+    InvalidValueError,
     Stop,
     StructException,
-    InvalidValueError,
     ValidationError,
 )
 from caterpillar.options import O_ARRAY_FACTORY
@@ -56,7 +55,7 @@ class WithoutContextVar:
         self.old_value: Any = context[name]
         self.value: Any = value
         self.name: str = name
-        self.field: "Field[Any, Any] | None" = context.get(CTX_FIELD)
+        self.field: Field[Any, Any] | None = context.get(CTX_FIELD)
 
     def __enter__(self) -> None:
         self.context[self.name] = self.value

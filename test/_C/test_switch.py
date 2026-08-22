@@ -1,14 +1,14 @@
-import pytest
-import caterpillar
 import enum
 
-from caterpillar.shared import typeof
+import pytest
 
+import caterpillar
+from caterpillar.shared import typeof
 
 if caterpillar.native_support():
     from caterpillar._C import Switch
-    from caterpillar.py import Bytes, String, ctx, pack, unpack
     from caterpillar.exception import ValidationError
+    from caterpillar.py import Bytes, String, ctx, pack, unpack
 
     def testc_switch_init():
         # simple declarative switch parsing
@@ -61,6 +61,6 @@ if caterpillar.native_support():
             {
                 b"a": String(1),
                 b"b": String(2),
-            }
+            },
         )
         assert typeof(atom) == object | str

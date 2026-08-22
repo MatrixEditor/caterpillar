@@ -14,38 +14,29 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-import sys
-import inspect
-import types
 import dataclasses
-
+import inspect
+import sys
+import types
 from hashlib import md5
 from types import ModuleType
-from typing import (
-    Annotated,
-    Any,
-    Callable,
-    Generic,
-    TypeVar,
-    get_args,
-    get_origin,
-)
-from typing_extensions import overload, override, dataclass_transform
+from typing import Annotated, Any, Callable, Generic, TypeVar, get_args, get_origin
 
-from caterpillar.fields import Field, INVALID_DEFAULT
+from typing_extensions import dataclass_transform, overload, override
+
+from caterpillar.abc import (
+    _ArchLike,
+    _ContextLambda,
+    _EndianLike,
+    _GreedyType,
+    _LengthT,
+    _StructLike,
+    _SwitchLambda,
+)
+from caterpillar.fields import INVALID_DEFAULT, Field
 from caterpillar.model import Invisible, Struct
 from caterpillar.options import S_UNION
 from caterpillar.shared import ATTR_TEMPLATE, hasstruct, typeof
-from caterpillar.abc import (
-    _LengthT,
-    _StructLike,
-    _ContextLambda,
-    _GreedyType,
-    _SwitchLambda,
-    _EndianLike,
-    _ArchLike,
-)
-
 
 _TYPEVAR_TYPE: type[TypeVar] = type(TypeVar("_CaterpillarTemplateTypeVar"))
 

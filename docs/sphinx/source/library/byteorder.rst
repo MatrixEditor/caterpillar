@@ -33,6 +33,8 @@ Standard Byteorder Instances
 
 .. autodata:: caterpillar.byteorder.Dynamic
 
+.. autodata:: caterpillar.byteorder.Inherit
+
 .. autodata:: caterpillar.byteorder.LITTLE_ENDIAN_FMT
 
 .. autodata:: caterpillar.byteorder.O_DEFAULT_ENDIAN

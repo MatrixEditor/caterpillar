@@ -17,28 +17,28 @@
 
 from collections.abc import Iterable
 from typing import TYPE_CHECKING, Any, Protocol, runtime_checkable
+
 from typing_extensions import override
 
-from caterpillar.exception import UnsupportedOperation
-from caterpillar.exception import InvalidValueError
-from caterpillar.context import CTX_STREAM
 from caterpillar.abc import (
+    _IT,
+    _ArgType,
     _ContextLambda,
     _ContextLike,
     _GreedyType,
     _StructLike,
-    _IT,
-    _ArgType,
 )
+from caterpillar.context import CTX_STREAM
+from caterpillar.exception import InvalidValueError, UnsupportedOperation
 
-from .common import Memory, Bytes
 from ._mixin import get_args, get_kwargs
+from .common import Bytes, Memory
 
 if TYPE_CHECKING:
     from cryptography.hazmat.primitives.ciphers import (
-        modes,
         CipherAlgorithm,
         CipherContext,
+        modes,
     )
     from cryptography.hazmat.primitives.padding import PaddingContext
 

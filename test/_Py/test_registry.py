@@ -1,10 +1,10 @@
 import pytest
 
 from caterpillar import registry
-from caterpillar.exception import ValidationError
-from caterpillar.fields import uint16, uint32, Bytes, Const, Field
-from caterpillar.model import getbits, struct
 from caterpillar.byteorder import BigEndian
+from caterpillar.exception import ValidationError
+from caterpillar.fields import Bytes, Const, Field, uint16, uint32
+from caterpillar.model import getbits, struct
 
 
 def test_registry_invalid_add():

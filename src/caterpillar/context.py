@@ -13,40 +13,39 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # pyright: reportPrivateUsage=false, reportExplicitAny=false, reportAny=false
-from __future__ import annotations
-
 import operator
 import sys
 import typing
 import warnings
-
-from typing import Annotated, Callable, Any, Generic, Protocol, get_args, get_origin
-from typing_extensions import (
-    Buffer,
-    Final,
-    Literal,
-    Self,
-    Sized,
-    overload,
-    override,
-    TypeVar,
-)
-from types import FrameType, TracebackType
+from collections.abc import Callable, Sized
 from dataclasses import dataclass
-
-from caterpillar.exception import StructException
-from caterpillar.registry import to_struct
-from caterpillar.options import Flag
-from caterpillar.abc import (
-    _ContextLike,
-    _ContextLambda,
-    _IT,
-    _ContextFactoryLike,
-    _OT,
-    _StreamType,
-    _EndianLike,
-    _ArchLike,
+from types import FrameType, TracebackType
+from typing import (
+    Annotated,
+    Any,
+    Final,
+    Generic,
+    Literal,
+    Protocol,
+    get_args,
+    get_origin,
 )
+
+from typing_extensions import Buffer, Self, TypeVar, overload, override
+
+from caterpillar.abc import (
+    _IT,
+    _OT,
+    _ArchLike,
+    _ContextFactoryLike,
+    _ContextLambda,
+    _ContextLike,
+    _EndianLike,
+    _StreamType,
+)
+from caterpillar.exception import StructException
+from caterpillar.options import Flag
+from caterpillar.registry import to_struct
 from caterpillar.shared import iscond
 
 if typing.TYPE_CHECKING:
@@ -279,78 +278,78 @@ class ExprMixin:
     A mixin class providing methods for creating binary and unary expressions.
     """
 
-    def __add__(self, other: object) -> BinaryExpression:
+    def __add__(self, other: object) -> "BinaryExpression":
         return BinaryExpression(operator.add, self, other)
 
-    def __sub__(self, other: object) -> BinaryExpression:
+    def __sub__(self, other: object) -> "BinaryExpression":
         return BinaryExpression(operator.sub, self, other)
 
-    def __mul__(self, other: object) -> BinaryExpression:
+    def __mul__(self, other: object) -> "BinaryExpression":
         return BinaryExpression(operator.mul, self, other)
 
-    def __floordiv__(self, other: object) -> BinaryExpression:
+    def __floordiv__(self, other: object) -> "BinaryExpression":
         return BinaryExpression(operator.floordiv, self, other)
 
-    def __truediv__(self, other: object) -> BinaryExpression:
+    def __truediv__(self, other: object) -> "BinaryExpression":
         return BinaryExpression(operator.truediv, self, other)
 
-    def __mod__(self, other: object) -> BinaryExpression:
+    def __mod__(self, other: object) -> "BinaryExpression":
         return BinaryExpression(operator.mod, self, other)
 
-    def __pow__(self, other: object) -> BinaryExpression:
+    def __pow__(self, other: object) -> "BinaryExpression":
         return BinaryExpression(operator.pow, self, other)
 
-    def __xor__(self, other: object) -> BinaryExpression:
+    def __xor__(self, other: object) -> "BinaryExpression":
         return BinaryExpression(operator.xor, self, other)
 
-    def __and__(self, other: object) -> BinaryExpression:
+    def __and__(self, other: object) -> "BinaryExpression":
         return BinaryExpression(operator.and_, self, other)
 
-    def __or__(self, other: object) -> BinaryExpression:
+    def __or__(self, other: object) -> "BinaryExpression":
         return BinaryExpression(operator.or_, self, other)
 
-    def __rshift__(self, other: object) -> BinaryExpression:
+    def __rshift__(self, other: object) -> "BinaryExpression":
         return BinaryExpression(operator.rshift, self, other)
 
-    def __lshift__(self, other: object) -> BinaryExpression:
+    def __lshift__(self, other: object) -> "BinaryExpression":
         return BinaryExpression(operator.lshift, self, other)
 
     __div__ = __truediv__  # pyright: ignore[reportUnannotatedClassAttribute]
 
-    def __radd__(self, other: object) -> BinaryExpression:
+    def __radd__(self, other: object) -> "BinaryExpression":
         return BinaryExpression(operator.add, other, self)
 
-    def __rsub__(self, other: object) -> BinaryExpression:
+    def __rsub__(self, other: object) -> "BinaryExpression":
         return BinaryExpression(operator.sub, other, self)
 
-    def __rmul__(self, other: object) -> BinaryExpression:
+    def __rmul__(self, other: object) -> "BinaryExpression":
         return BinaryExpression(operator.mul, other, self)
 
-    def __rfloordiv__(self, other: object) -> BinaryExpression:
+    def __rfloordiv__(self, other: object) -> "BinaryExpression":
         return BinaryExpression(operator.floordiv, other, self)
 
-    def __rtruediv__(self, other: object) -> BinaryExpression:
+    def __rtruediv__(self, other: object) -> "BinaryExpression":
         return BinaryExpression(operator.truediv, other, self)
 
-    def __rmod__(self, other: object) -> BinaryExpression:
+    def __rmod__(self, other: object) -> "BinaryExpression":
         return BinaryExpression(operator.mod, other, self)
 
-    def __rpow__(self, other: object) -> BinaryExpression:
+    def __rpow__(self, other: object) -> "BinaryExpression":
         return BinaryExpression(operator.pow, other, self)
 
-    def __rxor__(self, other: object) -> BinaryExpression:
+    def __rxor__(self, other: object) -> "BinaryExpression":
         return BinaryExpression(operator.xor, other, self)
 
-    def __rand__(self, other: object) -> BinaryExpression:
+    def __rand__(self, other: object) -> "BinaryExpression":
         return BinaryExpression(operator.and_, other, self)
 
-    def __ror__(self, other: object) -> BinaryExpression:
+    def __ror__(self, other: object) -> "BinaryExpression":
         return BinaryExpression(operator.or_, other, self)
 
-    def __rrshift__(self, other: object) -> BinaryExpression:
+    def __rrshift__(self, other: object) -> "BinaryExpression":
         return BinaryExpression(operator.rshift, other, self)
 
-    def __rlshift__(self, other: object) -> BinaryExpression:
+    def __rlshift__(self, other: object) -> "BinaryExpression":
         return BinaryExpression(operator.lshift, other, self)
 
     def __neg__(self):
@@ -362,31 +361,31 @@ class ExprMixin:
     def __invert__(self):
         return UnaryExpression("invert", operator.invert, self)
 
-    def __contains__(self, other: object) -> BinaryExpression:
+    def __contains__(self, other: object) -> "BinaryExpression":
         return BinaryExpression(operator.contains, self, other)
 
-    def __gt__(self, other: object) -> BinaryExpression:
+    def __gt__(self, other: object) -> "BinaryExpression":
         return BinaryExpression(operator.gt, self, other)
 
-    def __ge__(self, other: object) -> BinaryExpression:
+    def __ge__(self, other: object) -> "BinaryExpression":
         return BinaryExpression(operator.ge, self, other)
 
-    def __lt__(self, other: object) -> BinaryExpression:
+    def __lt__(self, other: object) -> "BinaryExpression":
         return BinaryExpression(operator.lt, self, other)
 
-    def __le__(self, other: object) -> BinaryExpression:
+    def __le__(self, other: object) -> "BinaryExpression":
         return BinaryExpression(operator.le, self, other)
 
     @override
     def __eq__(  # pyright: ignore[reportIncompatibleMethodOverride]
         self, other: object
-    ) -> BinaryExpression:
+    ) -> "BinaryExpression":
         return BinaryExpression(operator.eq, self, other)
 
     @override
     def __ne__(  # pyright: ignore[reportIncompatibleMethodOverride]
         self, other: object
-    ) -> BinaryExpression:
+    ) -> "BinaryExpression":
         return BinaryExpression(operator.ne, self, other)
 
 
@@ -415,10 +414,10 @@ class ConditionContext:
     """
 
     __slots__: tuple[str, ...] = (
-        "func",
         "annotations",
-        "namelist",
         "depth",
+        "func",
+        "namelist",
     )
 
     def __init__(self, condition: _ContextLambda[bool] | bool, depth: int = 2):
@@ -650,37 +649,41 @@ class ContextPath(Generic[_T], ExprMixin):
     @overload
     def __getattribute__(
         self, key: Literal["_field"]
-    ) -> ContextPath["Field[_IT, _OT] | None"]: ...
+    ) -> "ContextPath[Field[_IT, _OT] | None]": ...
     @overload
     def __getattribute__(
         self, key: Literal["_parent"]
-    ) -> ContextPath[_ContextLike]: ...
+    ) -> "ContextPath[_ContextLike]": ...
     @overload
-    def __getattribute__(self, key: Literal["_obj"]) -> ContextPath[_ContextLike]: ...
+    def __getattribute__(self, key: Literal["_obj"]) -> "ContextPath[_ContextLike]": ...
     @overload
     def __getattribute__(
         self, key: Literal["_offsets"]
-    ) -> ContextPath[dict[int, Buffer]]: ...
+    ) -> "ContextPath[dict[int, Buffer]]": ...
     @overload
-    def __getattribute__(self, key: Literal["_io"]) -> ContextPath[_StreamType]: ...
+    def __getattribute__(self, key: Literal["_io"]) -> "ContextPath[_StreamType]": ...
     @overload
-    def __getattribute__(self, key: Literal["_pos"]) -> ContextPath[int]: ...
+    def __getattribute__(self, key: Literal["_pos"]) -> "ContextPath[int]": ...
     @overload
-    def __getattribute__(self, key: Literal["_index"]) -> ContextPath[int]: ...
+    def __getattribute__(self, key: Literal["_index"]) -> "ContextPath[int]": ...
     @overload
-    def __getattribute__(self, key: Literal["_path"]) -> ContextPath[str]: ...
+    def __getattribute__(self, key: Literal["_path"]) -> "ContextPath[str]": ...
     @overload
-    def __getattribute__(self, key: Literal["_is_seq"]) -> ContextPath[bool]: ...
+    def __getattribute__(self, key: Literal["_is_seq"]) -> "ContextPath[bool]": ...
     @overload
-    def __getattribute__(self, key: Literal["_root"]) -> ContextPath[_ContextLike]: ...
+    def __getattribute__(
+        self, key: Literal["_root"]
+    ) -> "ContextPath[_ContextLike]": ...
     @overload
-    def __getattribute__(self, key: Literal["_order"]) -> ContextPath[_EndianLike]: ...
+    def __getattribute__(
+        self, key: Literal["_order"]
+    ) -> "ContextPath[_EndianLike]": ...
     @overload
-    def __getattribute__(self, key: Literal["_arch"]) -> ContextPath[_ArchLike]: ...
+    def __getattribute__(self, key: Literal["_arch"]) -> "ContextPath[_ArchLike]": ...
     @overload
-    def __getattribute__(self, key: str) -> ContextPath[_IT]: ...
+    def __getattribute__(self, key: str) -> "ContextPath[_IT]": ...
     @override
-    def __getattribute__(self, key: str) -> ContextPath[_IT]:
+    def __getattribute__(self, key: str) -> "ContextPath[_IT]":
         """
         Gets an attribute from the ContextPath, creating a new instance if needed.
 
@@ -725,14 +728,22 @@ class ContextPath(Generic[_T], ExprMixin):
         return self.path or ""
 
     @property
-    def parent(self) -> ContextPath[_ContextLike]:
-        path = f"{CTX_PARENT}.{CTX_OBJECT}"
-        if not self.path:
-            return ContextPath(path)
-        return ContextPath(".".join([self.path, path]))
+    def parent(self) -> "ContextPath[_ContextLike]":
+        """
+        .. versionchanged:: 2.9.2
+            Always resolves to the parent context object instead the parent context.
+        """
+        if not self.path or self.path == CTX_OBJECT:
+            return ContextPath(f"{CTX_PARENT}.{CTX_OBJECT}")
+
+        context_path = self.path
+        if self.path.endswith(f".{CTX_OBJECT}"):
+            context_path = self.path[: -len(CTX_OBJECT)].rstrip(".")
+
+        return ContextPath(f"{context_path}.{CTX_PARENT}.{CTX_OBJECT}")
 
     @property
-    def parentctx(self) -> ContextPath[_ContextLike]:
+    def parentctx(self) -> "ContextPath[_ContextLike]":
         """
         .. versionadded:: 2.8.0
         """

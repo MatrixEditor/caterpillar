@@ -15,22 +15,23 @@
 # pyright: reportExplicitAny=false, reportAny=false, reportPrivateUsage=false
 from collections.abc import Collection
 from typing import Any, Generic
-from typing_extensions import override, Self
+
+from typing_extensions import Self, override
+
+from caterpillar import native_support
 from caterpillar.abc import (
-    _OT,
     _IT,
-    _EndianLike,
-    _SupportsSetEndian,
+    _OT,
+    _ContextLambda,
     _ContextLike,
+    _EndianLike,
     _LengthT,
     _StructLike,
-    _ContextLambda,
+    _SupportsSetEndian,
     _SwitchOptionsT,
 )
-from caterpillar import native_support
 
 if native_support():
-
     BIG_ENDIAN: c_Endian
     HOST_ARCH: c_Arch
     LITTLE_ENDIAN: c_Endian

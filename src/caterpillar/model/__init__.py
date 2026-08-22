@@ -13,48 +13,41 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from ._base import RemoveField, Sequence
-from ._struct import (
-    Struct,
-    struct,
-    UnionHook,
-    union,
-    Invisible,
-    StructDefMixin,
-    struct_factory,
-)
 from ._bitfield import (
+    DEFAULT_ALIGNMENT,
     Bitfield,
-    bitfield,
+    BitfieldDefMixin,
     BitfieldEntry,
     BitfieldGroup,
     BitfieldValueFactory,
-    issigned,
-    getbits,
-    NewGroup,
-    EndGroup,
-    SetAlignment,
-    EnumFactory,
     CharFactory,
-    DEFAULT_ALIGNMENT,
+    EndGroup,
+    EnumFactory,
+    NewGroup,
+    SetAlignment,
+    bitfield,
     bitfield_factory,
-    BitfieldDefMixin,
+    getbits,
+    issigned,
+)
+from ._struct import (
+    Invisible,
+    Struct,
+    StructDefMixin,
+    UnionHook,
+    struct,
+    struct_factory,
+    union,
 )
 from ._template import (
-    istemplate,
-    template,
+    TemplateFieldRef,
     TemplateTypeVar,
     derive,
     field_of,
-    TemplateFieldRef,
+    istemplate,
+    template,
 )
-from .provider import (
-    unpack,
-    unpack_file,
-    pack,
-    pack_into,
-    pack_file,
-    sizeof,
-)
+from .provider import pack, pack_file, pack_into, sizeof, unpack, unpack_file
 
 __all__ = [
     "bitfield_factory",

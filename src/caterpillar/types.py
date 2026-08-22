@@ -12,37 +12,37 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-from datetime import datetime
 import ipaddress
 import uuid
+from datetime import datetime
 
 from .fields.common import (
+    CString,
+    Pass,
+    Timestamp,
+    Uuid,
     boolean,
     char,
-    uint8,
-    uint16,
-    uint24,
-    uint32,
-    uint64,
+    double,
+    float16,
+    float32,
+    float64,
     int8,
     int16,
     int24,
     int32,
     int64,
-    float16,
-    float32,
-    float64,
-    double,
     psize,
     pssize,
-    Uuid,
-    Pass,
-    CString,
-    Timestamp,
+    uint8,
+    uint16,
+    uint24,
+    uint32,
+    uint64,
     void_ptr,
 )
-from .fields.varint import vint
 from .fields.net import MAC, IPv4Address, IPv6Address
+from .fields.varint import vint
 from .shortcuts import f
 
 bool1_t = f[bool, 1]
