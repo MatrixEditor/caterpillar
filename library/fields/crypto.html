@@ -469,7 +469,7 @@ hash algorithms or checksums like SHA256 or CRC32.</p>
 </div>
 <p>Example usage with CRC32:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">CRC32</span> <span class="o">=</span> <span class="n">Algorithm</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">create</span><span class="o">=</span><span class="k">lambda</span> <span class="n">context</span><span class="p">:</span> <span class="n">zlib</span><span class="o">.</span><span class="n">crc32</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;&quot;</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="n">create</span><span class="o">=</span><span class="k">lambda</span> <span class="n">context</span><span class="p">:</span> <span class="n">zlib</span><span class="o">.</span><span class="n">crc32</span><span class="p">(</span><span class="sa">b</span><span class="s2">""</span><span class="p">),</span>
 <span class="gp">... </span>    <span class="n">update</span><span class="o">=</span><span class="k">lambda</span> <span class="n">crc_value</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">crc32</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">crc_value</span><span class="p">),</span>
 <span class="gp">... </span>    <span class="n">digest</span><span class="o">=</span><span class="k">lambda</span> <span class="n">crc_value</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">crc_value</span><span class="p">,</span>
 <span class="gp">... </span><span class="p">)</span>
@@ -576,7 +576,7 @@ of digests during serialization (packing) and deserialization (unpacking).</p>
 <p>Example usage:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@struct</span>
 <span class="gp">... </span><span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
-<span class="gp">... </span>    <span class="k">with</span> <span class="n">Digest</span><span class="p">(</span><span class="n">SHA256</span><span class="p">,</span> <span class="n">Bytes</span><span class="p">(</span><span class="mi">32</span><span class="p">),</span> <span class="s2">&quot;sha256&quot;</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">with</span> <span class="n">Digest</span><span class="p">(</span><span class="n">SHA256</span><span class="p">,</span> <span class="n">Bytes</span><span class="p">(</span><span class="mi">32</span><span class="p">),</span> <span class="s2">"sha256"</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="gp">... </span>        <span class="n">user_data</span><span class="p">:</span> <span class="n">Bytes</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
 <span class="gp">...</span>
 </pre></div>
@@ -588,29 +588,29 @@ field. The <cite>Digest</cite> class automatically calculates the SHA256 checksu
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Format</span><span class="o">.</span><span class="n">__struct__</span><span class="o">.</span><span class="n">fields</span>
 <span class="go">[</span>
 <span class="go">    Action(Digest.begin),</span>
-<span class="go">    Field(&#39;user_data&#39;, struct=&lt;Bytes&gt;),</span>
+<span class="go">    Field('user_data', struct=&lt;Bytes&gt;),</span>
 <span class="go">    Action(Digest.end),</span>
-<span class="go">    Field(&#39;sha256&#39;, struct=&lt;Bytes&gt;),</span>
+<span class="go">    Field('sha256', struct=&lt;Bytes&gt;),</span>
 <span class="go">    Action(Digest.verify)</span>
 <span class="go">]</span>
 </pre></div>
 </div>
 <p>The <cite>Action</cite> objects install hooks into the current stream for digest calculation
 and validation. When packing an object, the digest will be updated automatically:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span> <span class="o">=</span> <span class="n">Format</span><span class="p">(</span><span class="n">user_data</span><span class="o">=</span><span class="sa">b</span><span class="s2">&quot;helloworld&quot;</span> <span class="o">*</span> <span class="mi">10</span><span class="p">)</span>
-<span class="go">Format(user_data=b&quot;helloworld&quot;, sha256=&lt;_DigestValue&gt;)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span> <span class="o">=</span> <span class="n">Format</span><span class="p">(</span><span class="n">user_data</span><span class="o">=</span><span class="sa">b</span><span class="s2">"helloworld"</span> <span class="o">*</span> <span class="mi">10</span><span class="p">)</span>
+<span class="go">Format(user_data=b"helloworld", sha256=&lt;_DigestValue&gt;)</span>
 </pre></div>
 </div>
 <p>On packing, the digest is calculated and included in the serialized output:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">Format</span><span class="p">)</span>
-<span class="go">b&quot;hello world\xb9M&#39;\xb9&quot; ...</span>
+<span class="go">b"hello world\xb9M'\xb9" ...</span>
 </pre></div>
 </div>
 <p>If verification is enabled, unpacking will check the validity of the digest:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">Format</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;invalid data with sha256&quot;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">Format</span><span class="p">,</span> <span class="sa">b</span><span class="s2">"invalid data with sha256"</span><span class="p">)</span>
 <span class="gt">Traceback (most recent call last):</span>
 <span class="c">...</span>
-<span class="gr">caterpillar.exception.ValidationError</span>: <span class="n">Failed to verify digest of &#39;sha256&#39;!</span>
+<span class="gr">caterpillar.exception.ValidationError</span>: <span class="n">Failed to verify digest of 'sha256'!</span>
 <span class="x">- Expected: &lt;expected_digest_value&gt;</span>
 <span class="x">- Actual: &lt;actual_digest_value&gt;</span>
 <span class="x">Context-Path: &lt;root&gt;.sha256</span>
@@ -713,9 +713,9 @@ If verification fails, a <cite>ValidationError</cite> is raised.</p>
 <p>Example Usage:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
-    <span class="n">_hash_begin</span><span class="p">:</span> <span class="n">DigestField</span><span class="o">.</span><span class="n">begin</span><span class="p">(</span><span class="s2">&quot;hash&quot;</span><span class="p">,</span> <span class="n">Sha2_256_Algo</span><span class="p">)</span>
+    <span class="n">_hash_begin</span><span class="p">:</span> <span class="n">DigestField</span><span class="o">.</span><span class="n">begin</span><span class="p">(</span><span class="s2">"hash"</span><span class="p">,</span> <span class="n">Sha2_256_Algo</span><span class="p">)</span>
     <span class="n">user_data</span><span class="p">:</span> <span class="n">Bytes</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
-    <span class="nb">hash</span><span class="p">:</span> <span class="n">Sha2_256_Field</span><span class="p">(</span><span class="s2">&quot;hash&quot;</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="nb">hash</span><span class="p">:</span> <span class="n">Sha2_256_Field</span><span class="p">(</span><span class="s2">"hash"</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">=</span> <span class="kc">None</span>
 </pre></div>
 </div>
 <dl class="field-list simple">

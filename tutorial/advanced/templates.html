@@ -482,7 +482,7 @@ are still supported and are covered at the end of this page.</p>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.py</span><span class="w"> </span><span class="kn">import</span> <span class="n">pack</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">uint8</span><span class="p">,</span> <span class="n">uint16</span>
 
-<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"T"</span><span class="p">)</span>
 
 
 <span class="nd">@template</span>
@@ -493,8 +493,8 @@ are still supported and are covered at the end of this page.</p>
 <span class="n">ByteBox</span> <span class="o">=</span> <span class="n">Box</span><span class="p">[</span><span class="n">uint8</span><span class="p">]</span>
 <span class="n">WordBox</span> <span class="o">=</span> <span class="n">Box</span><span class="p">[</span><span class="n">uint16</span><span class="p">]</span>
 
-<span class="k">assert</span> <span class="n">pack</span><span class="p">(</span><span class="n">ByteBox</span><span class="p">(</span><span class="mi">7</span><span class="p">))</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x07</span><span class="s2">&quot;</span>
-<span class="k">assert</span> <span class="n">pack</span><span class="p">(</span><span class="n">WordBox</span><span class="p">(</span><span class="mh">0x0203</span><span class="p">))</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x03\x02</span><span class="s2">&quot;</span>
+<span class="k">assert</span> <span class="n">pack</span><span class="p">(</span><span class="n">ByteBox</span><span class="p">(</span><span class="mi">7</span><span class="p">))</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">"</span><span class="se">\x07</span><span class="s2">"</span>
+<span class="k">assert</span> <span class="n">pack</span><span class="p">(</span><span class="n">WordBox</span><span class="p">(</span><span class="mh">0x0203</span><span class="p">))</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">"</span><span class="se">\x03\x02</span><span class="s2">"</span>
 </pre></div>
 </div>
 </div>
@@ -512,8 +512,8 @@ defines the positional specialization order.</p>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.py</span><span class="w"> </span><span class="kn">import</span> <span class="n">BigEndian</span><span class="p">,</span> <span class="n">pack</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">uint8</span><span class="p">,</span> <span class="n">uint16</span>
 
-<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>
-<span class="n">U</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;U&quot;</span><span class="p">)</span>
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"T"</span><span class="p">)</span>
+<span class="n">U</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"U"</span><span class="p">)</span>
 
 
 <span class="nd">@template</span>
@@ -525,7 +525,7 @@ defines the positional specialization order.</p>
 <span class="n">ByteWordPair</span> <span class="o">=</span> <span class="n">Pair</span><span class="p">[</span><span class="n">uint8</span><span class="p">,</span> <span class="n">uint16</span><span class="p">]</span>
 <span class="n">obj</span> <span class="o">=</span> <span class="n">ByteWordPair</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mh">0x0203</span><span class="p">)</span>
 
-<span class="k">assert</span> <span class="n">pack</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x01\x02\x03</span><span class="s2">&quot;</span>
+<span class="k">assert</span> <span class="n">pack</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">"</span><span class="se">\x01\x02\x03</span><span class="s2">"</span>
 </pre></div>
 </div>
 </div>
@@ -541,7 +541,7 @@ position of <code class="docutils literal notranslate"><span class="pre">f[]</sp
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.py</span><span class="w"> </span><span class="kn">import</span> <span class="n">f</span><span class="p">,</span> <span class="n">field_of</span><span class="p">,</span> <span class="n">pack</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">uint8</span>
 
-<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"T"</span><span class="p">)</span>
 
 
 <span class="nd">@template</span>
@@ -551,7 +551,7 @@ position of <code class="docutils literal notranslate"><span class="pre">f[]</sp
 
 <span class="n">ByteVector</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">[</span><span class="n">uint8</span><span class="p">]</span>
 
-<span class="k">assert</span> <span class="n">pack</span><span class="p">(</span><span class="n">ByteVector</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]))</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x03\x04</span><span class="s2">&quot;</span>
+<span class="k">assert</span> <span class="n">pack</span><span class="p">(</span><span class="n">ByteVector</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]))</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">"</span><span class="se">\x03\x04</span><span class="s2">"</span>
 </pre></div>
 </div>
 </div>
@@ -570,8 +570,8 @@ template. This is useful for fixing only part of a layout.</p>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.py</span><span class="w"> </span><span class="kn">import</span> <span class="n">BigEndian</span><span class="p">,</span> <span class="n">pack</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">uint8</span><span class="p">,</span> <span class="n">uint16</span>
 
-<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>
-<span class="n">U</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;U&quot;</span><span class="p">)</span>
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"T"</span><span class="p">)</span>
+<span class="n">U</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"U"</span><span class="p">)</span>
 
 
 <span class="nd">@template</span>
@@ -583,7 +583,7 @@ template. This is useful for fixing only part of a layout.</p>
 <span class="n">BytePair</span> <span class="o">=</span> <span class="n">Pair</span><span class="p">[</span><span class="n">uint8</span><span class="p">,</span> <span class="n">U</span><span class="p">]</span>
 <span class="n">ByteWordPair</span> <span class="o">=</span> <span class="n">BytePair</span><span class="p">[</span><span class="n">uint16</span><span class="p">]</span>
 
-<span class="k">assert</span> <span class="n">pack</span><span class="p">(</span><span class="n">ByteWordPair</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mh">0x0203</span><span class="p">),</span> <span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x01\x02\x03</span><span class="s2">&quot;</span>
+<span class="k">assert</span> <span class="n">pack</span><span class="p">(</span><span class="n">ByteWordPair</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mh">0x0203</span><span class="p">),</span> <span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">"</span><span class="se">\x01\x02\x03</span><span class="s2">"</span>
 </pre></div>
 </div>
 </div>
@@ -598,7 +598,7 @@ other structs.</p>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.py</span><span class="w"> </span><span class="kn">import</span> <span class="n">BigEndian</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">pack</span><span class="p">,</span> <span class="n">struct</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">uint8</span><span class="p">,</span> <span class="n">uint16</span>
 
-<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"T"</span><span class="p">)</span>
 
 
 <span class="nd">@template</span>
@@ -611,7 +611,7 @@ other structs.</p>
     <span class="n">tail</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">uint16</span><span class="p">]</span>
 
 
-<span class="k">assert</span> <span class="n">pack</span><span class="p">(</span><span class="n">Packet</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mh">0x0203</span><span class="p">),</span> <span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x01\x02\x03</span><span class="s2">&quot;</span>
+<span class="k">assert</span> <span class="n">pack</span><span class="p">(</span><span class="n">Packet</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mh">0x0203</span><span class="p">),</span> <span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">"</span><span class="se">\x01\x02\x03</span><span class="s2">"</span>
 </pre></div>
 </div>
 </div>
@@ -624,10 +624,10 @@ existing code that already depends on <code class="docutils literal notranslate"
 <div class="code-block-caption"><span class="caption-text">Legacy template definition</span><a class="headerlink" href="#id6" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.py</span><span class="w"> </span><span class="kn">import</span> <span class="n">TemplateTypeVar</span><span class="p">,</span> <span class="n">derive</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">uint8</span><span class="p">,</span> <span class="n">uint16</span>
 
-<span class="n">A</span> <span class="o">=</span> <span class="n">TemplateTypeVar</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">)</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">TemplateTypeVar</span><span class="p">(</span><span class="s2">"A"</span><span class="p">)</span>
 
 
-<span class="nd">@template</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">)</span>
+<span class="nd">@template</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="s2">"B"</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">FormatTemplate</span><span class="p">:</span>
     <span class="n">foo</span><span class="p">:</span> <span class="n">A</span>
     <span class="n">bar</span><span class="p">:</span> <span class="n">B</span>

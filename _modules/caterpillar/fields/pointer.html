@@ -411,35 +411,47 @@
 <span class="c1"># along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Final</span><span class="p">,</span> <span class="n">Generic</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">override</span><span class="p">,</span> <span class="n">TypeVar</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.byteorder</span><span class="w"> </span><span class="kn">import</span> <span class="n">Arch</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.exception</span><span class="w"> </span><span class="kn">import</span> <span class="n">DelegationError</span><span class="p">,</span> <span class="n">StructException</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">CTX_STREAM</span><span class="p">,</span> <span class="n">CTX_FIELD</span><span class="p">,</span> <span class="n">CTX_ARCH</span><span class="p">,</span> <span class="n">CTX_SEQ</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.options</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flag</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">override</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar._common</span><span class="w"> </span><span class="kn">import</span> <span class="n">WithoutContextVar</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">_IT</span><span class="p">,</span> <span class="n">ContextLambda</span><span class="p">,</span> <span class="n">ContextLike</span><span class="p">,</span> <span class="n">StructLike</span><span class="p">,</span> <span class="n">_StreamType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.byteorder</span><span class="w"> </span><span class="kn">import</span> <span class="n">Arch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">CTX_ARCH</span><span class="p">,</span> <span class="n">CTX_FIELD</span><span class="p">,</span> <span class="n">CTX_SEQ</span><span class="p">,</span> <span class="n">CTX_STREAM</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.exception</span><span class="w"> </span><span class="kn">import</span> <span class="n">DelegationError</span><span class="p">,</span> <span class="n">StructException</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.options</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flag</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.shared</span><span class="w"> </span><span class="kn">import</span> <span class="n">getstruct</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">_ContextLambda</span><span class="p">,</span> <span class="n">_ContextLike</span><span class="p">,</span> <span class="n">_StructLike</span><span class="p">,</span> <span class="n">_StreamType</span><span class="p">,</span> <span class="n">_IT</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">._mixin</span><span class="w"> </span><span class="kn">import</span> <span class="n">FieldStruct</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">uint16</span><span class="p">,</span> <span class="n">uint24</span><span class="p">,</span> <span class="n">uint32</span><span class="p">,</span> <span class="n">uint64</span><span class="p">,</span> <span class="n">uint8</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">int16</span><span class="p">,</span> <span class="n">int32</span><span class="p">,</span> <span class="n">int64</span><span class="p">,</span> <span class="n">int24</span><span class="p">,</span> <span class="n">int8</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">UInt</span><span class="p">,</span> <span class="n">Int</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.common</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Int</span><span class="p">,</span>
+    <span class="n">UInt</span><span class="p">,</span>
+    <span class="n">int8</span><span class="p">,</span>
+    <span class="n">int16</span><span class="p">,</span>
+    <span class="n">int24</span><span class="p">,</span>
+    <span class="n">int32</span><span class="p">,</span>
+    <span class="n">int64</span><span class="p">,</span>
+    <span class="n">uint8</span><span class="p">,</span>
+    <span class="n">uint16</span><span class="p">,</span>
+    <span class="n">uint24</span><span class="p">,</span>
+    <span class="n">uint32</span><span class="p">,</span>
+    <span class="n">uint64</span><span class="p">,</span>
+<span class="p">)</span>
 
-<span class="n">_PtrValueT</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;_PtrValueT&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">_PtrValueT</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"_PtrValueT"</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 
 
-<span class="n">PTR_STRICT</span><span class="p">:</span> <span class="n">Flag</span><span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">Flag</span><span class="p">(</span><span class="s2">&quot;pointer.strict-mode&quot;</span><span class="p">)</span>
+<span class="n">PTR_STRICT</span><span class="p">:</span> <span class="n">Flag</span><span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">Flag</span><span class="p">(</span><span class="s2">"pointer.strict-mode"</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="pointer">
 <a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.pointer">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">pointer</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">_PtrValueT</span><span class="p">],</span> <span class="nb">int</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">pointer</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">_PtrValueT</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    A custom integer subclass representing a pointer to another struct within the stream.</span>
 
 <span class="sd">    :ivar Any obj: The associated object, if any.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">obj</span><span class="p">:</span> <span class="n">_PtrValueT</span> <span class="o">|</span> <span class="kc">None</span>  <span class="c1"># pyright: ignore[reportUninitializedInstanceVariable]</span>
 
@@ -447,66 +459,66 @@
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="n">result</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">result</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&lt;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">* </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s2">&gt;&quot;</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"&lt;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">* </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s2">&gt;"</span>
         <span class="k">return</span> <span class="n">result</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span></div>
 
 
-<span class="n">_PtrT</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;_PtrT&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">pointer</span><span class="p">)</span>
+
+<span class="n">_PtrT</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"_PtrT"</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">pointer</span><span class="p">)</span>
+
 
 <div class="viewcode-block" id="Pointer">
 <a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Pointer">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">Pointer</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">_PtrT</span><span class="p">,</span> <span class="n">_PtrValueT</span><span class="p">],</span> <span class="n">FieldStruct</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">_PtrT</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Pointer</span><span class="p">(</span><span class="n">FieldStruct</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">_PtrT</span><span class="p">],</span> <span class="n">Generic</span><span class="p">[</span><span class="n">_PtrT</span><span class="p">,</span> <span class="n">_PtrValueT</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    A struct that represents a pointer to another struct within the stream.</span>
 
 <span class="sd">    :ivar model: An optional configurable model to parse at the offset position.</span>
 <span class="sd">    :ivar struct: The configured struct to use.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
-    <span class="vm">__slots__</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="s2">&quot;struct&quot;</span><span class="p">)</span>
+    <span class="vm">__slots__</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"model"</span><span class="p">,</span> <span class="s2">"struct"</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">struct</span><span class="p">:</span> <span class="n">_StructLike</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="n">_ContextLambda</span><span class="p">[</span><span class="n">_StructLike</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span>
-        <span class="n">model</span><span class="p">:</span> <span class="n">_StructLike</span><span class="p">[</span><span class="n">_PtrValueT</span><span class="p">,</span> <span class="n">_PtrValueT</span><span class="p">]</span> <span class="o">|</span> <span class="nb">type</span><span class="p">[</span><span class="n">_PtrValueT</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">struct</span><span class="p">:</span> <span class="n">StructLike</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="n">ContextLambda</span><span class="p">[</span><span class="n">StructLike</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span>
+        <span class="n">model</span><span class="p">:</span> <span class="n">StructLike</span><span class="p">[</span><span class="n">_PtrValueT</span><span class="p">,</span> <span class="n">_PtrValueT</span><span class="p">]</span> <span class="o">|</span> <span class="nb">type</span><span class="p">[</span><span class="n">_PtrValueT</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">struct</span><span class="p">:</span> <span class="n">_StructLike</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="n">_ContextLambda</span><span class="p">[</span><span class="n">_StructLike</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">struct</span>
-        <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">:</span> <span class="n">_StructLike</span><span class="p">[</span><span class="n">_PtrValueT</span><span class="p">,</span> <span class="n">_PtrValueT</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">struct</span><span class="p">:</span> <span class="n">StructLike</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="n">ContextLambda</span><span class="p">[</span><span class="n">StructLike</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="n">struct</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">:</span> <span class="n">StructLike</span><span class="p">[</span><span class="n">_PtrValueT</span><span class="p">,</span> <span class="n">_PtrValueT</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">getstruct</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span> <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
         <span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">_StructLike</span><span class="p">[</span><span class="n">_IT</span><span class="p">,</span> <span class="n">_IT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">&quot;Pointer[_IT]&quot;</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">StructLike</span><span class="p">[</span><span class="n">_IT</span><span class="p">,</span> <span class="n">_IT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">"Pointer[_IT]"</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Create a new Pointer with a specified model.</span>
 
 <span class="sd">        :param model: The model to use.</span>
 <span class="sd">        :return: A new Pointer with the specified model.</span>
 <span class="sd">        :rtype: Pointer</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">struct</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>  <span class="c1"># pyright: ignore[reportReturnType]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__type__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">_PtrT</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Get the type associated with the Pointer.</span>
 
 <span class="sd">        :return: The type associated with the Pointer.</span>
 <span class="sd">        :rtype: type</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">pointer</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__size__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__size__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Get the size of the Pointer struct.</span>
 
 <span class="sd">        :param context: The context for size calculation.</span>
 <span class="sd">        :return: The size of the Pointer struct.</span>
 <span class="sd">        :rtype: int</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">struct</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">struct</span>
         <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">struct</span><span class="p">):</span>
             <span class="n">struct</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">struct</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
@@ -515,13 +527,13 @@
 <div class="viewcode-block" id="Pointer.unpack_single">
 <a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Pointer.unpack_single">[docs]</a>
     <span class="nd">@override</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">unpack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_PtrT</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">unpack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_PtrT</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Unpack a single value using the Pointer struct.</span>
 
 <span class="sd">        :param context: The context for unpacking.</span>
 <span class="sd">        :return: The unpacked value.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># fmt: off</span>
         <span class="n">struct</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">struct</span>
         <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">struct</span><span class="p">):</span>
@@ -529,10 +541,13 @@
 
         <span class="n">stream</span><span class="p">:</span> <span class="n">_StreamType</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_STREAM</span><span class="p">]</span>  <span class="c1"># pyright: ignore[reportAny]</span>
         <span class="n">start</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
+        <span class="n">outer_field</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">CTX_FIELD</span><span class="p">)</span>
         <span class="k">with</span> <span class="n">WithoutContextVar</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">CTX_SEQ</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
             <span class="n">value</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">__unpack__</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
             <span class="c1"># cleanup before further parsing</span>
             <span class="n">value</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clean</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+            <span class="n">context</span><span class="p">[</span><span class="n">CTX_FIELD</span><span class="p">]</span> <span class="o">=</span> <span class="n">outer_field</span>
+            <span class="n">context</span><span class="p">[</span><span class="n">CTX_SEQ</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
@@ -548,45 +563,48 @@
                     <span class="n">stream</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">offset</span><span class="p">)</span>
                 <span class="k">except</span> <span class="p">(</span><span class="ne">OSError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">)</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="n">StructException</span><span class="p">(</span>
-                        <span class="s2">&quot;Could not seek to pointer target!&quot;</span><span class="p">,</span> <span class="n">context</span>
+                        <span class="s2">"Could not seek to pointer target!"</span><span class="p">,</span> <span class="n">context</span>
                     <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">model_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">__unpack__</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
                 <span class="k">except</span> <span class="n">StructException</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-                    <span class="n">field</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">CTX_FIELD</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">field</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">field</span><span class="o">.</span><span class="n">has_flag</span><span class="p">(</span><span class="n">PTR_STRICT</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">outer_field</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">outer_field</span><span class="o">.</span><span class="n">has_flag</span><span class="p">(</span><span class="n">PTR_STRICT</span><span class="p">):</span>
                         <span class="k">raise</span> <span class="n">DelegationError</span><span class="p">(</span>
-                            <span class="s2">&quot;Could not parse model!&quot;</span><span class="p">,</span> <span class="n">context</span>
+                            <span class="s2">"Could not parse model!"</span><span class="p">,</span> <span class="n">context</span>
                         <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
-                <span class="n">stream</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">fallback</span><span class="p">)</span>
+                <span class="k">finally</span><span class="p">:</span>
+                    <span class="n">stream</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">fallback</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">model_obj</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Pointer.pack_single">
 <a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.Pointer.pack_single">[docs]</a>
     <span class="nd">@override</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">pack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Pack a single value using the Pointer struct.</span>
 
 <span class="sd">        :param obj: The value to pack.</span>
 <span class="sd">        :param context: The context for packing.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># fmt: off</span>
         <span class="n">struct</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">struct</span>
         <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">struct</span><span class="p">):</span>
             <span class="n">struct</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">struct</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>  <span class="c1"># pyright: ignore[reportCallIssue]</span>
 
+        <span class="n">outer_field</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">CTX_FIELD</span><span class="p">)</span>
         <span class="k">with</span> <span class="n">WithoutContextVar</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">CTX_SEQ</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
             <span class="n">value</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
             <span class="n">model_obj</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">value</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">model_obj</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;obj&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="n">model_obj</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">"obj"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">model_obj</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">stream</span><span class="p">:</span> <span class="n">_StreamType</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_STREAM</span><span class="p">]</span>  <span class="c1"># pyright: ignore[reportAny]</span>
                     <span class="n">start</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
 
             <span class="n">struct</span><span class="o">.</span><span class="n">__pack__</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+            <span class="n">context</span><span class="p">[</span><span class="n">CTX_FIELD</span><span class="p">]</span> <span class="o">=</span> <span class="n">outer_field</span>
+            <span class="n">context</span><span class="p">[</span><span class="n">CTX_SEQ</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="k">if</span> <span class="n">model_obj</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">return</span>
 
@@ -596,7 +614,7 @@
                 <span class="n">stream</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">offset</span><span class="p">)</span>
             <span class="k">except</span> <span class="p">(</span><span class="ne">OSError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">)</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">StructException</span><span class="p">(</span>
-                    <span class="s2">&quot;Could not seek to pointer target!&quot;</span><span class="p">,</span> <span class="n">context</span>
+                    <span class="s2">"Could not seek to pointer target!"</span><span class="p">,</span> <span class="n">context</span>
                 <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">__pack__</span><span class="p">(</span><span class="n">model_obj</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
@@ -604,8 +622,8 @@
                 <span class="n">stream</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">fallback</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_to_offset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_to_offset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Convert the pointer value to an offset.</span>
 
 <span class="sd">        :param value: The pointer value.</span>
@@ -613,17 +631,17 @@
 <span class="sd">        :param context: The context for the conversion.</span>
 <span class="sd">        :return: The offset value.</span>
 <span class="sd">        :rtype: int</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">value</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_clean</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_clean</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Clean the pointer value.</span>
 
 <span class="sd">        :param value: The pointer value.</span>
 <span class="sd">        :param context: The context for cleaning.</span>
 <span class="sd">        :return: The cleaned pointer value.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">value</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_create</span><span class="p">(</span>
@@ -631,9 +649,9 @@
         <span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">model_obj</span><span class="p">:</span> <span class="n">_PtrValueT</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">,</span>
+        <span class="n">context</span><span class="p">:</span> <span class="n">ContextLike</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pointer</span><span class="p">[</span><span class="n">_PtrValueT</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Create a new pointer object.</span>
 
 <span class="sd">        :param value: The pointer value.</span>
@@ -641,32 +659,32 @@
 <span class="sd">        :param model_obj: The object parsed from the model.</span>
 <span class="sd">        :param context: The context for creation.</span>
 <span class="sd">        :return: The created pointer object.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">ptr</span><span class="p">:</span> <span class="n">pointer</span><span class="p">[</span><span class="n">_PtrValueT</span><span class="p">]</span> <span class="o">=</span> <span class="n">pointer</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-        <span class="nb">setattr</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="s2">&quot;obj&quot;</span><span class="p">,</span> <span class="n">model_obj</span><span class="p">)</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="s2">"obj"</span><span class="p">,</span> <span class="n">model_obj</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">ptr</span></div>
 
 
 
-<span class="n">UNSIGNED_POINTER_TYS</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">_StructLike</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
+<span class="n">UNSIGNED_POINTER_TYS</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">StructLike</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
     <span class="n">x</span><span class="o">.</span><span class="n">__bits__</span><span class="p">:</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="n">uint8</span><span class="p">,</span> <span class="n">uint16</span><span class="p">,</span> <span class="n">uint24</span><span class="p">,</span> <span class="n">uint32</span><span class="p">,</span> <span class="n">uint64</span><span class="p">]</span>
 <span class="p">}</span>
-<span class="n">SIGNED_POINTER_TYS</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">_StructLike</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
+<span class="n">SIGNED_POINTER_TYS</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">StructLike</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
     <span class="n">x</span><span class="o">.</span><span class="n">__bits__</span><span class="p">:</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="n">int8</span><span class="p">,</span> <span class="n">int16</span><span class="p">,</span> <span class="n">int24</span><span class="p">,</span> <span class="n">int32</span><span class="p">,</span> <span class="n">int64</span><span class="p">]</span>
 <span class="p">}</span>
 
 
 <div class="viewcode-block" id="uintptr_fn">
 <a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.uintptr_fn">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">uintptr_fn</span><span class="p">(</span><span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_StructLike</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">uintptr_fn</span><span class="p">(</span><span class="n">context</span><span class="p">:</span> <span class="n">ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StructLike</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Generator function to decide which struct to use as the pointer type based</span>
 <span class="sd">    on the current architecture.</span>
 
-<span class="sd">    :param _ContextLike context: The input context.</span>
+<span class="sd">    :param ContextLike context: The input context.</span>
 <span class="sd">    :return: The struct to use.</span>
-<span class="sd">    :rtype: _StructLike</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    :rtype: StructLike</span>
+<span class="sd">    """</span>
     <span class="n">field</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_FIELD</span><span class="p">]</span>
     <span class="n">arch</span><span class="p">:</span> <span class="n">Arch</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">field</span><span class="o">.</span><span class="n">arch</span> <span class="k">if</span> <span class="n">field</span><span class="o">.</span><span class="n">has_arch</span><span class="p">()</span> <span class="k">else</span> <span class="n">context</span><span class="o">.</span><span class="n">_root</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">CTX_ARCH</span><span class="p">,</span> <span class="n">field</span><span class="o">.</span><span class="n">arch</span><span class="p">)</span>
@@ -677,15 +695,15 @@
 
 <div class="viewcode-block" id="intptr_fn">
 <a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.intptr_fn">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">intptr_fn</span><span class="p">(</span><span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_StructLike</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">intptr_fn</span><span class="p">(</span><span class="n">context</span><span class="p">:</span> <span class="n">ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StructLike</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Generator function to decide which struct to use as the pointer type based</span>
 <span class="sd">    on the current architecture.</span>
 
-<span class="sd">    :param _ContextLike context: The input context.</span>
+<span class="sd">    :param ContextLike context: The input context.</span>
 <span class="sd">    :return: The struct to use.</span>
-<span class="sd">    :rtype: _StructLike</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    :rtype: StructLike</span>
+<span class="sd">    """</span>
     <span class="n">field</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_FIELD</span><span class="p">]</span>
     <span class="n">arch</span><span class="p">:</span> <span class="n">Arch</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">field</span><span class="o">.</span><span class="n">arch</span> <span class="k">if</span> <span class="n">field</span><span class="o">.</span><span class="n">has_arch</span><span class="p">()</span> <span class="k">else</span> <span class="n">context</span><span class="o">.</span><span class="n">_root</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">CTX_ARCH</span><span class="p">,</span> <span class="n">field</span><span class="o">.</span><span class="n">arch</span><span class="p">)</span>
@@ -701,24 +719,24 @@
 <div class="viewcode-block" id="relative_pointer">
 <a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.relative_pointer">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">relative_pointer</span><span class="p">(</span><span class="n">pointer</span><span class="p">[</span><span class="n">_PtrValueT</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    A custom integer subclass representing a relative pointer to another struct within the stream.</span>
 
 <span class="sd">    :ivar obj: The associated object, if any.</span>
 <span class="sd">    :ivar base: The base offset.</span>
 <span class="sd">    :ivar absolute: The absolute offset.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">base</span><span class="p">:</span> <span class="nb">int</span>  <span class="c1"># pyright: ignore[reportUninitializedInstanceVariable]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">absolute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Get the absolute offset.</span>
 
 <span class="sd">        :return: The absolute offset.</span>
 <span class="sd">        :rtype: int</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">base</span></div>
 
 
@@ -726,26 +744,26 @@
 <div class="viewcode-block" id="RelativePointer">
 <a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.RelativePointer">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">RelativePointer</span><span class="p">(</span><span class="n">Pointer</span><span class="p">[</span><span class="n">relative_pointer</span><span class="p">[</span><span class="n">_PtrValueT</span><span class="p">],</span> <span class="n">_PtrValueT</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    A struct that represents a relative pointer to another struct within the stream.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">__type__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Get the type associated with the RelativePointer.</span>
 
 <span class="sd">        :return: The type associated with the RelativePointer.</span>
 <span class="sd">        :rtype: type</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;relative_pointer[</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">__type__</span><span class="p">()</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">]&quot;</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">"relative_pointer[</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">__type__</span><span class="p">()</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">]"</span>
 
         <span class="k">return</span> <span class="n">relative_pointer</span>
 
     <span class="nd">@override</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">_to_offset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_to_offset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Convert the relative pointer value to an offset.</span>
 
 <span class="sd">        :param value: The relative pointer value.</span>
@@ -753,7 +771,7 @@
 <span class="sd">        :param context: The context for the conversion.</span>
 <span class="sd">        :return: The offset value.</span>
 <span class="sd">        :rtype: int</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">start</span> <span class="o">+</span> <span class="n">value</span>
 
     <span class="nd">@override</span>
@@ -762,9 +780,9 @@
         <span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">model_obj</span><span class="p">:</span> <span class="n">_PtrValueT</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">,</span>
+        <span class="n">context</span><span class="p">:</span> <span class="n">ContextLike</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pointer</span><span class="p">[</span><span class="n">_PtrValueT</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Create a new relative pointer object.</span>
 
 <span class="sd">        :param value: The relative pointer value.</span>
@@ -772,10 +790,10 @@
 <span class="sd">        :param model_obj: The object parsed from the model.</span>
 <span class="sd">        :param context: The context for creation.</span>
 <span class="sd">        :return: The created relative pointer object.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">ptr</span><span class="p">:</span> <span class="n">relative_pointer</span><span class="p">[</span><span class="n">_PtrValueT</span><span class="p">]</span> <span class="o">=</span> <span class="n">relative_pointer</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-        <span class="nb">setattr</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="s2">&quot;obj&quot;</span><span class="p">,</span> <span class="n">model_obj</span><span class="p">)</span>
-        <span class="nb">setattr</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="s2">&quot;base&quot;</span><span class="p">,</span> <span class="n">start</span><span class="p">)</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="s2">"obj"</span><span class="p">,</span> <span class="n">model_obj</span><span class="p">)</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="s2">"base"</span><span class="p">,</span> <span class="n">start</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">ptr</span></div>
 
 

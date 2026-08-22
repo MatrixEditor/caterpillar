@@ -410,7 +410,7 @@
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
 <span class="c1"># pyright: reportPrivateUsage=false, reportAny=false, reportExplicitAny=false</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 <span class="sd">Module containing shared constants and utility functions for managing</span>
 <span class="sd">and processing structs.</span>
 
@@ -419,7 +419,7 @@
 <span class="sd">key attributes for managing struct definitions, mode constants for packing</span>
 <span class="sd">/unpacking operations, and action handling for custom processing.</span>
 
-<span class="sd">The module introduces the concept of &quot;Actions&quot;, which are used to define</span>
+<span class="sd">The module introduces the concept of "Actions", which are used to define</span>
 <span class="sd">custom behavior that should be executed before parsing a struct field (e.g.,</span>
 <span class="sd">installing IO hooks for checksums or hash calculations). Actions are</span>
 <span class="sd">represented by classes with `__action_XX` methods.</span>
@@ -436,23 +436,24 @@
 <span class="sd">  &gt;&gt;&gt;     any_name: MyAction()</span>
 
 <span class="sd">In this case, the action will be executed before parsing any subsequent fields</span>
-<span class="sd">and won&#39;t be stored as part of the struct model.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">and won't be stored as part of the struct model.</span>
+<span class="sd">"""</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">overload</span><span class="p">,</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">Any</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Final</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">override</span><span class="p">,</span> <span class="n">TypeIs</span><span class="p">,</span> <span class="n">Buffer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">overload</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Buffer</span><span class="p">,</span> <span class="n">Final</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">TypeIs</span><span class="p">,</span> <span class="n">override</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.abc</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">_ContextLambda</span><span class="p">,</span>
-    <span class="n">_StructLike</span><span class="p">,</span>
     <span class="n">_IT</span><span class="p">,</span>
     <span class="n">_OT</span><span class="p">,</span>
-    <span class="n">_SupportsType</span><span class="p">,</span>
-    <span class="n">_ContainsStruct</span><span class="p">,</span>
     <span class="n">_ActionLike</span><span class="p">,</span>
     <span class="n">_ArchLike</span><span class="p">,</span>
+    <span class="n">_ContainsStruct</span><span class="p">,</span>
+    <span class="n">_ContextLambda</span><span class="p">,</span>
     <span class="n">_EndianLike</span><span class="p">,</span>
     <span class="n">_StreamType</span><span class="p">,</span>
+    <span class="n">_StructLike</span><span class="p">,</span>
+    <span class="n">_SupportsType</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
@@ -463,13 +464,13 @@
 
 <span class="c1"># Constants defining packing/unpacking modes</span>
 <span class="n">MODE_PACK</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="sd">&quot;&quot;&quot;Constant representing packing mode.&quot;&quot;&quot;</span>
+<span class="sd">"""Constant representing packing mode."""</span>
 <span class="n">MODE_UNPACK</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="sd">&quot;&quot;&quot;Constant representing unpacking mode.&quot;&quot;&quot;</span>
+<span class="sd">"""Constant representing unpacking mode."""</span>
 
 <span class="c1"># Constants defining struct-related attributes</span>
-<span class="n">ATTR_STRUCT</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;__struct__&quot;</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">ATTR_STRUCT</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"__struct__"</span>
+<span class="sd">"""</span>
 <span class="sd">All models annotated with either ``@struct`` or ``@bitfield`` are struct</span>
 <span class="sd">containers. Thus, they store the additional class attribute :code:`__struct__`.</span>
 
@@ -479,95 +480,95 @@
 
 <span class="sd">.. versionchanged:: 2.5.0</span>
 <span class="sd">    This attribute is now used when callung :func:`getstruct` or :func:`hasstruct`.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
-<span class="n">ATTR_BYTEORDER</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;__byteorder__&quot;</span>
-<span class="sd">&quot;&quot;&quot;Attribute representing the byte order of a struct.</span>
+<span class="n">ATTR_BYTEORDER</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"__byteorder__"</span>
+<span class="sd">"""Attribute representing the byte order of a struct.</span>
 
 <span class="sd">.. versionadded:: 2.5.0</span>
 <span class="sd">    Moved from *caterpillar.byteorder*.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
-<span class="n">ATTR_TYPE</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;__type__&quot;</span>
-<span class="sd">&quot;&quot;&quot;Attribute that stores the type of the struct.</span>
-
-<span class="sd">.. versionadded:: 2.5.0</span>
-<span class="sd">&quot;&quot;&quot;</span>
-
-<span class="n">ATTR_BITS</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;__bits__&quot;</span>
-<span class="sd">&quot;&quot;&quot;Attribute representing the number of bits in a struct.</span>
+<span class="n">ATTR_TYPE</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"__type__"</span>
+<span class="sd">"""Attribute that stores the type of the struct.</span>
 
 <span class="sd">.. versionadded:: 2.5.0</span>
-<span class="sd">    Moved from *caterpillar.model._bitfield*.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
-<span class="n">ATTR_SIGNED</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;__signed__&quot;</span>
-<span class="sd">&quot;&quot;&quot;Attribute that marks a struct as signed.</span>
+<span class="n">ATTR_BITS</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"__bits__"</span>
+<span class="sd">"""Attribute representing the number of bits in a struct.</span>
 
 <span class="sd">.. versionadded:: 2.5.0</span>
 <span class="sd">    Moved from *caterpillar.model._bitfield*.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
-<span class="n">ATTR_TEMPLATE</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;__template__&quot;</span>
-<span class="sd">&quot;&quot;&quot;Attribute that provides the template for the struct.</span>
+<span class="n">ATTR_SIGNED</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"__signed__"</span>
+<span class="sd">"""Attribute that marks a struct as signed.</span>
+
+<span class="sd">.. versionadded:: 2.5.0</span>
+<span class="sd">    Moved from *caterpillar.model._bitfield*.</span>
+<span class="sd">"""</span>
+
+<span class="n">ATTR_TEMPLATE</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"__template__"</span>
+<span class="sd">"""Attribute that provides the template for the struct.</span>
 
 <span class="sd">.. versionadded:: 2.5.0</span>
 <span class="sd">    Moved from *caterpillar.model._template*.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
-<span class="n">ATTR_PACK</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;__pack__&quot;</span>
-<span class="sd">&quot;&quot;&quot;Attribute that defines packing behavior for the struct.</span>
-
-<span class="sd">.. versionadded:: 2.8.0</span>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="n">ATTR_UNPACK</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;__unpack__&quot;</span>
-<span class="sd">&quot;&quot;&quot;Attribute that defines unpacking behavior for the struct.</span>
+<span class="n">ATTR_PACK</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"__pack__"</span>
+<span class="sd">"""Attribute that defines packing behavior for the struct.</span>
 
 <span class="sd">.. versionadded:: 2.8.0</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
+<span class="n">ATTR_UNPACK</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"__unpack__"</span>
+<span class="sd">"""Attribute that defines unpacking behavior for the struct.</span>
+
+<span class="sd">.. versionadded:: 2.8.0</span>
+<span class="sd">"""</span>
 
 <span class="c1"># Constants for actions during packing and unpacking</span>
-<span class="n">ATTR_ACTION_PACK</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;__action_pack__&quot;</span>
-<span class="sd">&quot;&quot;&quot;Attribute indicating an action to be executed during packing.</span>
+<span class="n">ATTR_ACTION_PACK</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"__action_pack__"</span>
+<span class="sd">"""Attribute indicating an action to be executed during packing.</span>
 
 <span class="sd">.. versionadded:: 2.4.0</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
-<span class="n">ATTR_ACTION_UNPACK</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;__action_unpack__&quot;</span>
-<span class="sd">&quot;&quot;&quot;Attribute indicating an action to be executed during unpacking.</span>
+<span class="n">ATTR_ACTION_UNPACK</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"__action_unpack__"</span>
+<span class="sd">"""Attribute indicating an action to be executed during unpacking.</span>
 
 <span class="sd">.. versionadded:: 2.4.0</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
-<span class="n">ATTR_CONDITIONAL</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;__conditional__&quot;</span>
-<span class="sd">&quot;&quot;&quot;Attribute indicating a conditional object.</span>
-
-<span class="sd">.. versionadded:: 2.9.0</span>
-<span class="sd">&quot;&quot;&quot;</span>
-
-<span class="n">ATTR_CONDITIONAL_START</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;__conditional_start__&quot;</span>
-<span class="sd">&quot;&quot;&quot;Attribute indicating the start of a conditional block.</span>
+<span class="n">ATTR_CONDITIONAL</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"__conditional__"</span>
+<span class="sd">"""Attribute indicating a conditional object.</span>
 
 <span class="sd">.. versionadded:: 2.9.0</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
-<span class="n">ATTR_CONDITIONAL_END</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;__conditional_end__&quot;</span>
-<span class="sd">&quot;&quot;&quot;Attribute indicating then end of a conditional block.</span>
+<span class="n">ATTR_CONDITIONAL_START</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"__conditional_start__"</span>
+<span class="sd">"""Attribute indicating the start of a conditional block.</span>
 
 <span class="sd">.. versionadded:: 2.9.0</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
+
+<span class="n">ATTR_CONDITIONAL_END</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"__conditional_end__"</span>
+<span class="sd">"""Attribute indicating then end of a conditional block.</span>
+
+<span class="sd">.. versionadded:: 2.9.0</span>
+<span class="sd">"""</span>
 
 
 <div class="viewcode-block" id="constval">
 <a class="viewcode-back" href="../../library/shared.html#caterpillar.shared.constval">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">constval</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">_OT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;_ContextLambda[_OT]&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns a lambda that returns a constant value when invoked.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">constval</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">_OT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"_ContextLambda[_OT]"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Returns a lambda that returns a constant value when invoked.</span>
 
 <span class="sd">    :param value: The constant value to be returned by the lambda.</span>
 <span class="sd">    :type value: _OT</span>
 <span class="sd">    :return: A lambda function that, when called, returns the given constant value.</span>
 <span class="sd">    :rtype: _ContextLambda[_OT]</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="k">lambda</span> <span class="n">context</span><span class="p">:</span> <span class="n">value</span></div>
 
 
@@ -575,7 +576,7 @@
 <div class="viewcode-block" id="Action">
 <a class="viewcode-back" href="../../library/shared.html#caterpillar.shared.Action">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Action</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    A class representing an action to be executed during the parsing or processing</span>
 <span class="sd">    of a struct. This is used for cases where a field requires an operation to be</span>
 <span class="sd">    performed instead of directly storing data.</span>
@@ -603,14 +604,14 @@
 <span class="sd">    In this example, the `checksum` field is an action, and the `checksum_action`</span>
 <span class="sd">    will be invoked before the `some_field` field is parsed.</span>
 
-<span class="sd">    The action itself is not stored as part of the struct&#39;s model; it merely runs</span>
+<span class="sd">    The action itself is not stored as part of the struct's model; it merely runs</span>
 <span class="sd">    during struct processing.</span>
 
 <span class="sd">    :param pack: The callable that will be executed before packing the struct (optional).</span>
 <span class="sd">    :type pack: _ContextLambda | None</span>
 <span class="sd">    :param unpack: The callable that will be executed before unpacking the struct (optional).</span>
 <span class="sd">    :type unpack: _ContextLambda | None</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="vm">__slots__</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">ATTR_ACTION_PACK</span><span class="p">,</span> <span class="n">ATTR_ACTION_UNPACK</span><span class="p">)</span>
 
@@ -627,7 +628,7 @@
 
     <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Return a string representation of the action, showing its callable name</span>
 <span class="sd">        and location.</span>
 
@@ -636,29 +637,29 @@
 
 <span class="sd">        :return: A string representation of the action.</span>
 <span class="sd">        :rtype: str</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Action&quot;</span>
+<span class="sd">        """</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="s2">"Action"</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__action_pack__</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__action_unpack__</span><span class="p">:</span>
-            <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;PackAction&quot;</span>
-            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__action_pack__</span><span class="o">.</span><span class="vm">__qualname__</span><span class="si">}</span><span class="s2">)&quot;</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s2">"PackAction"</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__action_pack__</span><span class="o">.</span><span class="vm">__qualname__</span><span class="si">}</span><span class="s2">)"</span>
 
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">__action_unpack__</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__action_pack__</span><span class="p">:</span>
-            <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;UnpackAction&quot;</span>
-            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__action_unpack__</span><span class="o">.</span><span class="vm">__qualname__</span><span class="si">}</span><span class="s2">)&quot;</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s2">"UnpackAction"</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__action_unpack__</span><span class="o">.</span><span class="vm">__qualname__</span><span class="si">}</span><span class="s2">)"</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__action_pack__</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__action_unpack__</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">name</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__action_pack__</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">__action_unpack__</span><span class="p">:</span>
-            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__action_pack__</span><span class="o">.</span><span class="vm">__qualname__</span><span class="si">}</span><span class="s2">)&quot;</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__action_pack__</span><span class="o">.</span><span class="vm">__qualname__</span><span class="si">}</span><span class="s2">)"</span>
 
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__action_pack__</span><span class="o">.</span><span class="vm">__qualname__</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__action_unpack__</span><span class="o">.</span><span class="vm">__qualname__</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__action_pack__</span><span class="o">.</span><span class="vm">__qualname__</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__action_unpack__</span><span class="o">.</span><span class="vm">__qualname__</span><span class="si">}</span><span class="s2">)"</span>
 
 <div class="viewcode-block" id="Action.is_action">
 <a class="viewcode-back" href="../../library/shared.html#caterpillar.shared.Action.is_action">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">is_action</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TypeIs</span><span class="p">[</span><span class="n">_ActionLike</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Checks if the given object is an instance of an `Action` class,</span>
 <span class="sd">        based on the presence of the `__action_pack__` or `__action_unpack__` attributes.</span>
 
@@ -666,7 +667,7 @@
 <span class="sd">        :type obj: Any</span>
 <span class="sd">        :return: True if the object has either a `__action_pack__` or `__action_unpack__` attribute, indicating it is an action.</span>
 <span class="sd">        :rtype: bool</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span>
             <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">ATTR_ACTION_PACK</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
             <span class="ow">or</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">ATTR_ACTION_UNPACK</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
@@ -678,12 +679,12 @@
 <div class="viewcode-block" id="hasstruct">
 <a class="viewcode-back" href="../../library/shared.html#caterpillar.shared.hasstruct">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">hasstruct</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TypeIs</span><span class="p">[</span><span class="n">_ContainsStruct</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Check if the given object has a structure attribute.</span>
 
 <span class="sd">    :param obj: The object to check.</span>
 <span class="sd">    :return: True if the object has a structure attribute, else False.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="vm">__class__</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="k">else</span> <span class="n">obj</span><span class="p">,</span> <span class="n">ATTR_STRUCT</span><span class="p">)</span></div>
 
 
@@ -705,7 +706,7 @@
     <span class="n">obj</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">_IT</span><span class="p">],</span>
     <span class="o">/</span><span class="p">,</span>
     <span class="n">__default</span><span class="p">:</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;FieldStruct[_IT, _IT]&quot;</span><span class="p">:</span> <span class="o">...</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"FieldStruct[_IT, _IT]"</span><span class="p">:</span> <span class="o">...</span>
 <span class="nd">@overload</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">getstruct</span><span class="p">(</span>
     <span class="n">obj</span><span class="p">:</span> <span class="n">_ContainsStruct</span><span class="p">[</span><span class="n">_IT</span><span class="p">,</span> <span class="n">_OT</span><span class="p">],</span>
@@ -717,18 +718,18 @@
     <span class="n">obj</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span>
     <span class="o">/</span><span class="p">,</span>
     <span class="n">__default</span><span class="p">:</span> <span class="n">_StructLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;_StructLike | FieldStruct | None&quot;</span><span class="p">:</span> <span class="o">...</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"_StructLike | FieldStruct | None"</span><span class="p">:</span> <span class="o">...</span>
 <div class="viewcode-block" id="getstruct">
 <a class="viewcode-back" href="../../library/shared.html#caterpillar.shared.getstruct">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">getstruct</span><span class="p">(</span>
     <span class="n">obj</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="o">/</span><span class="p">,</span> <span class="n">__default</span><span class="p">:</span> <span class="n">_StructLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;_StructLike | FieldStruct | None&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"_StructLike | FieldStruct | None"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Get the structure attribute of the given object.</span>
 
 <span class="sd">    :param obj: The object to get the structure attribute from.</span>
 <span class="sd">    :return: The structure attribute of the object.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">obj</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__class__</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="k">else</span> <span class="n">obj</span>
     <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">ATTR_STRUCT</span><span class="p">,</span> <span class="n">__default</span><span class="p">)</span></div>
 
@@ -737,17 +738,17 @@
 <div class="viewcode-block" id="typeof">
 <a class="viewcode-back" href="../../library/shared.html#caterpillar.shared.typeof">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">typeof</span><span class="p">(</span><span class="n">struct</span><span class="p">:</span> <span class="n">_StructLike</span> <span class="o">|</span> <span class="n">_SupportsType</span> <span class="o">|</span> <span class="n">_ContainsStruct</span> <span class="o">|</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the type of a given struct or object, checking for a custom type annotation.</span>
+<span class="w">    </span><span class="sd">"""Returns the type of a given struct or object, checking for a custom type annotation.</span>
 
 <span class="sd">    If the given object has a `__type__` attribute, this function returns that type. If not, it</span>
-<span class="sd">    returns the object&#39;s default type. If the type cannot be resolved, the function defaults to</span>
+<span class="sd">    returns the object's default type. If the type cannot be resolved, the function defaults to</span>
 <span class="sd">    returning `object`.</span>
 
 <span class="sd">    :param struct: The struct or object whose type is to be resolved.</span>
 <span class="sd">    :type struct: _StructLike | _SupportsType | _ContainsStruct | object</span>
 <span class="sd">    :return: The resolved type of the struct or object.</span>
 <span class="sd">    :rtype: type</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">hasstruct</span><span class="p">(</span><span class="n">struct</span><span class="p">):</span>
         <span class="n">struct</span> <span class="o">=</span> <span class="n">getstruct</span><span class="p">(</span><span class="n">struct</span><span class="p">)</span> <span class="ow">or</span> <span class="n">struct</span>
 
@@ -768,14 +769,14 @@
 <div class="viewcode-block" id="PackMixin">
 <a class="viewcode-back" href="../../library/shared.html#caterpillar.shared.PackMixin">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">PackMixin</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">_IT</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mixin providing serialization helpers for packing objects into binary</span>
+<span class="w">    </span><span class="sd">"""Mixin providing serialization helpers for packing objects into binary</span>
 <span class="sd">    representations.</span>
 
 <span class="sd">    This mixin exposes a unified ``to_bytes`` interface that can either return</span>
 <span class="sd">    serialized bytes directly or write them into a provided writable stream.</span>
 
 <span class="sd">    .. versionadded:: 2.8.1</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="nd">@overload</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">to_bytes</span><span class="p">(</span>
@@ -811,7 +812,7 @@
         <span class="n">use_tempfile</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Serialize the object into its binary representation.</span>
+<span class="w">        </span><span class="sd">"""Serialize the object into its binary representation.</span>
 
 <span class="sd">        If ``fp`` is provided, the binary data is written directly into the</span>
 <span class="sd">        given stream using ``pack_into``. Otherwise, the binary data is</span>
@@ -833,9 +834,9 @@
 <span class="sd">            packing implementation</span>
 <span class="sd">        :return: Serialized bytes if ``fp`` is None, otherwise None</span>
 <span class="sd">        :rtype: bytes | None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># fmt: off</span>
-        <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.model</span><span class="w"> </span><span class="kn">import</span> <span class="n">pack_into</span><span class="p">,</span> <span class="n">pack</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.model</span><span class="w"> </span><span class="kn">import</span> <span class="n">pack</span><span class="p">,</span> <span class="n">pack_into</span>
         <span class="k">if</span> <span class="n">fp</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">pack_into</span><span class="p">(</span>  <span class="c1"># pyright: ignore[reportCallIssue]</span>
                 <span class="n">obj</span><span class="p">,</span>
@@ -862,17 +863,17 @@
 <div class="viewcode-block" id="UnpackMixin">
 <a class="viewcode-back" href="../../library/shared.html#caterpillar.shared.UnpackMixin">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">UnpackMixin</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">_OT</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mixin providing deserialization helpers for constructing objects from</span>
+<span class="w">    </span><span class="sd">"""Mixin providing deserialization helpers for constructing objects from</span>
 <span class="sd">    binary data sources.</span>
 
 <span class="sd">    This mixin supports unpacking from raw bytes, streams, or files, and also</span>
 <span class="sd">    defines a convenience left-shift operator for inline unpacking.</span>
 
 <span class="sd">    .. versionadded:: 2.8.1</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__lshift__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Buffer</span> <span class="o">|</span> <span class="n">_StreamType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_OT</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Unpack binary data using the left-shift operator.</span>
+<span class="w">        </span><span class="sd">"""Unpack binary data using the left-shift operator.</span>
 
 <span class="sd">        This operator is a shorthand for calling :meth:`from_bytes`, enabling</span>
 <span class="sd">        concise inline unpacking from a bytes-like object or a readable stream.</span>
@@ -881,7 +882,7 @@
 <span class="sd">        :type data: Buffer | _StreamType</span>
 <span class="sd">        :return: Parsed associated type instance</span>
 <span class="sd">        :rtype: _OT</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
 <div class="viewcode-block" id="UnpackMixin.from_bytes">
@@ -894,7 +895,7 @@
         <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_OT</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct an object from raw binary data or a stream.</span>
+<span class="w">        </span><span class="sd">"""Construct an object from raw binary data or a stream.</span>
 
 <span class="sd">        This is a convenience wrapper around the underlying ``unpack``</span>
 <span class="sd">        function, allowing associated types to be instantiated directly from</span>
@@ -910,7 +911,7 @@
 <span class="sd">            unpacking implementation</span>
 <span class="sd">        :return: Parsed associated type instance</span>
 <span class="sd">        :rtype: _OT</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.model</span><span class="w"> </span><span class="kn">import</span> <span class="n">unpack</span>
 
         <span class="k">return</span> <span class="n">unpack</span><span class="p">(</span>  <span class="c1"># pyright: ignore[reportCallIssue, reportUnknownVariableType]</span>
@@ -932,7 +933,7 @@
         <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_OT</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct an instance from a binary file on disk.</span>
+<span class="w">        </span><span class="sd">"""Construct an instance from a binary file on disk.</span>
 
 <span class="sd">        This is a convenience wrapper around ``unpack_file`` for reading and</span>
 <span class="sd">        parsing structured data directly from a file path.</span>
@@ -947,17 +948,15 @@
 <span class="sd">            file-unpacking implementation</span>
 <span class="sd">        :return: Parsed associated type instance</span>
 <span class="sd">        :rtype: _OT</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.model</span><span class="w"> </span><span class="kn">import</span> <span class="n">unpack_file</span>
 
-        <span class="k">return</span> <span class="p">(</span>
-            <span class="n">unpack_file</span><span class="p">(</span>  <span class="c1"># pyright: ignore[reportCallIssue, reportUnknownVariableType]</span>
-                <span class="bp">self</span><span class="p">,</span>  <span class="c1"># pyright: ignore[reportArgumentType]</span>
-                <span class="n">filename</span><span class="p">,</span>
-                <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span>
-                <span class="n">arch</span><span class="o">=</span><span class="n">arch</span><span class="p">,</span>
-                <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">unpack_file</span><span class="p">(</span>  <span class="c1"># pyright: ignore[reportCallIssue, reportUnknownVariableType]</span>
+            <span class="bp">self</span><span class="p">,</span>  <span class="c1"># pyright: ignore[reportArgumentType]</span>
+            <span class="n">filename</span><span class="p">,</span>
+            <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span>
+            <span class="n">arch</span><span class="o">=</span><span class="n">arch</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
         <span class="p">)</span></div>
 </div>
 

@@ -495,10 +495,10 @@ configuration:</p>
 <span class="linenos"> 8</span><span class="w">    </span><span class="s">REQUIRED</span><span class="p">)</span>
 <span class="linenos"> 9</span>
 <span class="linenos">10</span><span class="c"># Either setup the include directory manually or use caterpillar directly</span>
-<span class="linenos">11</span><span class="nb">set</span><span class="p">(</span><span class="s">CP_INCLUDE_DIR</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">)</span>
+<span class="linenos">11</span><span class="nb">set</span><span class="p">(</span><span class="s">CP_INCLUDE_DIR</span><span class="w"> </span><span class="s2">"..."</span><span class="p">)</span>
 <span class="linenos">12</span><span class="c"># or</span>
 <span class="linenos">13</span><span class="nb">execute_process</span><span class="p">(</span>
-<span class="linenos">14</span><span class="w">    </span><span class="s">COMMAND</span><span class="w"> </span><span class="s2">&quot;${Python_EXECUTABLE}&quot;</span><span class="w"> </span><span class="s">-m</span><span class="w"> </span><span class="s">caterpillar</span><span class="w"> </span><span class="s">--include-dir</span>
+<span class="linenos">14</span><span class="w">    </span><span class="s">COMMAND</span><span class="w"> </span><span class="s2">"${Python_EXECUTABLE}"</span><span class="w"> </span><span class="s">-m</span><span class="w"> </span><span class="s">caterpillar</span><span class="w"> </span><span class="s">--include-dir</span>
 <span class="linenos">15</span><span class="w">    </span><span class="s">OUTPUT_STRIP_TRAILING_WHITESPACE</span><span class="w"> </span><span class="s">OUTPUT_VARIABLE</span><span class="w"> </span><span class="s">CP_INCLUDE_DIR</span>
 <span class="linenos">16</span><span class="p">)</span>
 <span class="linenos">17</span>
@@ -522,14 +522,14 @@ configuration:</p>
 <span class="linenos">35</span><span class="c"># install extension</span>
 <span class="linenos">36</span><span class="nb">install</span><span class="p">(</span>
 <span class="linenos">37</span><span class="w">    </span><span class="s">TARGETS</span><span class="w"> </span><span class="s">_example</span>
-<span class="linenos">38</span><span class="w">    </span><span class="s">DESTINATION</span><span class="w"> </span><span class="s">example</span><span class="w"> </span><span class="c"># use &#39;.&#39; to install directly without parent package</span>
+<span class="linenos">38</span><span class="w">    </span><span class="s">DESTINATION</span><span class="w"> </span><span class="s">example</span><span class="w"> </span><span class="c"># use '.' to install directly without parent package</span>
 <span class="linenos">39</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The <code class="code docutils literal notranslate"><span class="pre">src/_example.c</span></code> file contains the implementation of the C extension module.
 To define a custom CAtom, please refer to <em>work in progress</em>. There will be only one
 important line when creating the custom module:</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;caterpillar/caterpillar.h&quot;</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">"caterpillar/caterpillar.h"</span>
 
 <span class="n">PyMODINIT_FUNC</span>
 <span class="nf">PyInit__example</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>

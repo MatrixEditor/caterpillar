@@ -410,70 +410,70 @@
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
 <span class="c1"># pyright: reportAny=false, reportExplicitAny=false, reportPrivateUsage=false</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dc</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">io</span><span class="w"> </span><span class="kn">import</span> <span class="n">BytesIO</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Collection</span><span class="p">,</span> <span class="n">Iterable</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">ParamSpec</span><span class="p">,</span> <span class="n">TypeVar</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">io</span><span class="w"> </span><span class="kn">import</span> <span class="n">BytesIO</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">types</span><span class="w"> </span><span class="kn">import</span> <span class="n">TracebackType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">ParamSpec</span><span class="p">,</span> <span class="n">TypeVar</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Buffer</span><span class="p">,</span>
     <span class="n">ClassVar</span><span class="p">,</span>
     <span class="n">Self</span><span class="p">,</span>
     <span class="n">dataclass_transform</span><span class="p">,</span>
-    <span class="n">override</span><span class="p">,</span>
     <span class="n">overload</span><span class="p">,</span>
-    <span class="n">Buffer</span><span class="p">,</span>
+    <span class="n">override</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.fields.conditional</span><span class="w"> </span><span class="kn">import</span> <span class="n">apply_conditional_markers</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.shared</span><span class="w"> </span><span class="kn">import</span> <span class="n">getstruct</span><span class="p">,</span> <span class="n">hasstruct</span><span class="p">,</span> <span class="n">ATTR_STRUCT</span><span class="p">,</span> <span class="n">iscond</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.exception</span><span class="w"> </span><span class="kn">import</span> <span class="n">InvalidValueError</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.options</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">S_EVAL_ANNOTATIONS</span><span class="p">,</span>
-    <span class="n">S_UNION</span><span class="p">,</span>
-    <span class="n">S_ADD_BYTES</span><span class="p">,</span>
-    <span class="n">S_SLOTS</span><span class="p">,</span>
-    <span class="n">GLOBAL_STRUCT_OPTIONS</span><span class="p">,</span>
-    <span class="n">GLOBAL_UNION_OPTIONS</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.fields</span><span class="w"> </span><span class="kn">import</span> <span class="n">Field</span><span class="p">,</span> <span class="n">INVALID_DEFAULT</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar</span><span class="w"> </span><span class="kn">import</span> <span class="n">registry</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.abc</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">_StreamType</span><span class="p">,</span>
-    <span class="n">_ContextLike</span><span class="p">,</span>
-    <span class="n">_StructLike</span><span class="p">,</span>
-    <span class="n">_OptionLike</span><span class="p">,</span>
-    <span class="n">_EndianLike</span><span class="p">,</span>
     <span class="n">_ArchLike</span><span class="p">,</span>
+    <span class="n">_ContextLike</span><span class="p">,</span>
+    <span class="n">_EndianLike</span><span class="p">,</span>
     <span class="n">_LengthT</span><span class="p">,</span>
+    <span class="n">_OptionLike</span><span class="p">,</span>
+    <span class="n">_StreamType</span><span class="p">,</span>
+    <span class="n">_StructLike</span><span class="p">,</span> <span class="n">EndianLike</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.provider</span><span class="w"> </span><span class="kn">import</span> <span class="n">unpack</span><span class="p">,</span> <span class="n">pack</span><span class="p">,</span> <span class="n">unpack_file</span><span class="p">,</span> <span class="n">pack_into</span><span class="p">,</span> <span class="n">sizeof</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.exception</span><span class="w"> </span><span class="kn">import</span> <span class="n">InvalidValueError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.fields</span><span class="w"> </span><span class="kn">import</span> <span class="n">INVALID_DEFAULT</span><span class="p">,</span> <span class="n">Field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.fields.conditional</span><span class="w"> </span><span class="kn">import</span> <span class="n">apply_conditional_markers</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.options</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">GLOBAL_STRUCT_OPTIONS</span><span class="p">,</span>
+    <span class="n">GLOBAL_UNION_OPTIONS</span><span class="p">,</span>
+    <span class="n">S_ADD_BYTES</span><span class="p">,</span>
+    <span class="n">S_EVAL_ANNOTATIONS</span><span class="p">,</span>
+    <span class="n">S_SLOTS</span><span class="p">,</span>
+    <span class="n">S_UNION</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.shared</span><span class="w"> </span><span class="kn">import</span> <span class="n">ATTR_STRUCT</span><span class="p">,</span> <span class="n">getstruct</span><span class="p">,</span> <span class="n">hasstruct</span><span class="p">,</span> <span class="n">iscond</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">._base</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.provider</span><span class="w"> </span><span class="kn">import</span> <span class="n">pack</span><span class="p">,</span> <span class="n">pack_into</span><span class="p">,</span> <span class="n">sizeof</span><span class="p">,</span> <span class="n">unpack</span><span class="p">,</span> <span class="n">unpack_file</span>
 
-
-<span class="n">_ModelT</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;_ModelT&quot;</span><span class="p">)</span>
+<span class="n">_ModelT</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"_ModelT"</span><span class="p">)</span>
 
 
 <span class="c1"># REVISIT: remove dataclasses dependency</span>
 <div class="viewcode-block" id="Struct">
 <a class="viewcode-back" href="../../../library/model/struct.html#caterpillar.model.Struct">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Struct</span><span class="p">(</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">_ModelT</span><span class="p">],</span> <span class="n">_ModelT</span><span class="p">,</span> <span class="n">_ModelT</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Represents a structured data model for serialization and deserialization.</span>
 
 <span class="sd">    :param model: The target class used as the base model.</span>
 <span class="sd">    :param order: Optional byte order for the fields in the structure.</span>
 <span class="sd">    :param arch: Global architecture definition (will be inferred on all fields).</span>
 <span class="sd">    :param options: Additional options specifying what to include in the final class.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="c1">#!! NOT PRESENT !!</span>
     <span class="c1"># _member_map_: dict</span>
     <span class="c1"># An internal field that maps the field names of all class attributes to their</span>
     <span class="c1"># corresponding struct fields.</span>
 
-    <span class="vm">__slots__</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;kw_only&quot;</span><span class="p">,</span> <span class="s2">&quot;_union_hook&quot;</span><span class="p">,</span> <span class="s2">&quot;_hidden_field_names&quot;</span><span class="p">)</span>
+    <span class="vm">__slots__</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"kw_only"</span><span class="p">,</span> <span class="s2">"_union_hook"</span><span class="p">,</span> <span class="s2">"_hidden_field_names"</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -483,7 +483,7 @@
         <span class="n">options</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">_OptionLike</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">field_options</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">_OptionLike</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">kw_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">hook_cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="s2">&quot;UnionHook[_ModelT]&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">hook_cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="s2">"UnionHook[_ModelT]"</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">kw_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">kw_only</span>
         <span class="c1"># Cache of init=False field names (e.g. via Invisible); computed lazily</span>
@@ -501,20 +501,25 @@
             <span class="n">field_options</span><span class="o">=</span><span class="n">field_options</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">ATTR_STRUCT</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
-        <span class="c1"># Add additional options based on the struct&#39;s type</span>
+        <span class="c1"># Add additional options based on the struct's type</span>
         <span class="n">slots</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_option</span><span class="p">(</span><span class="n">S_SLOTS</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">_ModelT</span><span class="p">]</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">dataclass</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">kw_only</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kw_only</span><span class="p">,</span> <span class="n">slots</span><span class="o">=</span><span class="n">slots</span>
         <span class="p">)</span>
 
-        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;__class_getitem__&quot;</span><span class="p">,</span> <span class="n">_struct_getitem</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="s2">"__class_getitem__"</span><span class="p">,</span> <span class="n">_struct_getitem</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+        <span class="nb">setattr</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
+            <span class="s2">"__set_byteorder__"</span><span class="p">,</span>
+            <span class="nb">classmethod</span><span class="p">(</span><span class="n">_struct_set_byteorder</span><span class="p">(</span><span class="bp">self</span><span class="p">)),</span>
+        <span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_union</span><span class="p">:</span>
             <span class="c1"># install a hook</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_union_hook</span><span class="p">:</span> <span class="n">UnionHook</span><span class="p">[</span><span class="n">_ModelT</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">hook_cls</span> <span class="ow">or</span> <span class="n">UnionHook</span><span class="p">)(</span><span class="bp">self</span><span class="p">)</span>
-            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;__init__&quot;</span><span class="p">,</span> <span class="n">_union_init</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_union_hook</span><span class="p">))</span>
-            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;__setattr__&quot;</span><span class="p">,</span> <span class="n">_union_setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_union_hook</span><span class="p">))</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="s2">"__init__"</span><span class="p">,</span> <span class="n">_union_init</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_union_hook</span><span class="p">))</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="s2">"__setattr__"</span><span class="p">,</span> <span class="n">_union_setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_union_hook</span><span class="p">))</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_option</span><span class="p">(</span><span class="n">S_ADD_BYTES</span><span class="p">):</span>
-            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;__bytes__&quot;</span><span class="p">,</span> <span class="n">_struct_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="s2">"__bytes__"</span><span class="p">,</span> <span class="n">_struct_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
 
     <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">__type__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">_ModelT</span><span class="p">]:</span>
@@ -578,13 +583,13 @@
         <span class="c1"># Invisible adds a dataclass.Field to the class definition. We have</span>
         <span class="c1"># to remove in order to prevent errors</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">default</span><span class="p">,</span> <span class="n">dc</span><span class="o">.</span><span class="n">Field</span><span class="p">):</span>
-            <span class="c1"># mitigation for: TypeError: &#39;XXX&#39; is a field but has no type annotation</span>
+            <span class="c1"># mitigation for: TypeError: 'XXX' is a field but has no type annotation</span>
             <span class="nb">delattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_compute_hidden_field_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">frozenset</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="n">names</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(</span>
             <span class="n">name</span>
-            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;__dataclass_fields__&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="s2">"__dataclass_fields__"</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">f</span><span class="o">.</span><span class="n">init</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_hidden_field_names</span> <span class="o">=</span> <span class="n">names</span>
@@ -618,7 +623,7 @@
             <span class="k">if</span> <span class="n">field</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">field</span><span class="o">.</span><span class="n">_has_cond</span><span class="p">:</span>
                 <span class="k">return</span> <span class="kc">None</span>
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">!r}</span><span class="s2"> object has no attribute </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> required for packing&quot;</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">!r}</span><span class="s2"> object has no attribute </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> required for packing"</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">value</span></div>
 
@@ -649,7 +654,7 @@
     <span class="k">return</span> <span class="n">to_bytes</span>
 
 
-<span class="n">P</span> <span class="o">=</span> <span class="n">ParamSpec</span><span class="p">(</span><span class="s2">&quot;P&quot;</span><span class="p">)</span>
+<span class="n">P</span> <span class="o">=</span> <span class="n">ParamSpec</span><span class="p">(</span><span class="s2">"P"</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_struct_getitem</span><span class="p">(</span>
@@ -664,18 +669,29 @@
             <span class="k">case</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="p">(</span><span class="n">dim</span><span class="p">,)</span> <span class="o">=</span> <span class="n">args</span>  <span class="c1"># pyright: ignore[reportAssignmentType]</span>
             <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">InvalidValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected only one paremeter, got: </span><span class="si">{</span><span class="n">args</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">InvalidValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Expected only one paremeter, got: </span><span class="si">{</span><span class="n">args</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">Field</span><span class="p">(</span><span class="n">model</span><span class="p">)[</span><span class="n">dim</span><span class="p">]</span>
 
     <span class="k">return</span> <span class="n">class_getitem</span>
 
 
+<span class="k">def</span><span class="w"> </span><span class="nf">_struct_set_byteorder</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">:</span> <span class="n">Struct</span><span class="p">[</span><span class="n">_ModelT</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">type</span><span class="p">[</span><span class="n">_ModelT</span><span class="p">],</span> <span class="n">_EndianLike</span><span class="p">],</span> <span class="n">Field</span><span class="p">[</span><span class="n">_ModelT</span><span class="p">,</span> <span class="n">_ModelT</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_byteorder</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">_ModelT</span><span class="p">],</span> <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Field</span><span class="p">[</span><span class="n">_ModelT</span><span class="p">,</span> <span class="n">_ModelT</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">Field</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">set_byteorder</span>
+
+
 <span class="c1"># TODO: docs</span>
 <div class="viewcode-block" id="Invisible">
 <a class="viewcode-back" href="../../../library/model/struct.html#caterpillar.model.Invisible">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">Invisible</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">init</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a dataclass field that is hidden from the generated constructor.</span>
+<span class="w">    </span><span class="sd">"""Create a dataclass field that is hidden from the generated constructor.</span>
 
 <span class="sd">    This helper returns a ``dataclasses.field`` configured so that the</span>
 <span class="sd">    associated attribute is not exposed as a parameter in the dataclass</span>
@@ -685,13 +701,13 @@
 <span class="sd">    user-provided during instantiation.</span>
 
 <span class="sd">    When used, type checkers and IDEs will treat the field as non-existent</span>
-<span class="sd">    from the constructor&#39;s perspective, while the field still participates in</span>
+<span class="sd">    from the constructor's perspective, while the field still participates in</span>
 <span class="sd">    the dataclass definition and underlying structure handling.</span>
 
 <span class="sd">    &gt;&gt;&gt; @struct</span>
 <span class="sd">    ... class Format:</span>
 <span class="sd">    ...     a: uint32_t</span>
-<span class="sd">    ...     b: f[bytes, b&quot;const value&quot;] = Invisible()</span>
+<span class="sd">    ...     b: f[bytes, b"const value"] = Invisible()</span>
 
 <span class="sd">    In this example, field ``b`` is part of the structure definition but is</span>
 <span class="sd">    not visible as an argument when constructing ``Format``.</span>
@@ -706,7 +722,7 @@
 <span class="sd">    :return: A configured ``dataclasses.field`` instance with ``kw_only=True``</span>
 <span class="sd">        and the specified visibility settings</span>
 <span class="sd">    :rtype: Any</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">dc</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="n">init</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">default</span><span class="p">,</span> <span class="n">kw_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 
@@ -714,7 +730,7 @@
 <div class="viewcode-block" id="StructDefMixin">
 <a class="viewcode-back" href="../../../library/model/struct.html#caterpillar.model.StructDefMixin">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">StructDefMixin</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mixin providing convenience methods and typing support for ``@struct`` models.</span>
+<span class="w">    </span><span class="sd">"""Mixin providing convenience methods and typing support for ``@struct`` models.</span>
 
 <span class="sd">    This mixin centralizes common wrapper functionality required by structure</span>
 <span class="sd">    definitions so that individual model classes do not need to import or</span>
@@ -732,15 +748,15 @@
 <span class="sd">    The primary purpose of this mixin is to improve ergonomics and satisfy</span>
 <span class="sd">    static type checkers by exposing these behaviors directly on the model</span>
 <span class="sd">    class rather than requiring explicit imports of ``pack``/``unpack`` helpers.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">__struct__</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="n">Struct</span><span class="p">[</span><span class="n">Self</span><span class="p">]]</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A reference to the struct model of this class&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""A reference to the struct model of this class"""</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__class_getitem__</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">_ModelT</span><span class="p">],</span> <span class="n">dim</span><span class="p">:</span> <span class="n">_LengthT</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Field</span><span class="p">[</span><span class="n">Collection</span><span class="p">[</span><span class="n">_ModelT</span><span class="p">],</span> <span class="n">Collection</span><span class="p">[</span><span class="n">_ModelT</span><span class="p">]]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Enable ``cls[dim]`` syntax for defining repeated structure fields.</span>
+        <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span> <span class="n">dim</span><span class="p">:</span> <span class="n">_LengthT</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Field</span><span class="p">[</span><span class="n">Collection</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span> <span class="n">Collection</span><span class="p">[</span><span class="n">Self</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">"""Enable ``cls[dim]`` syntax for defining repeated structure fields.</span>
 
 <span class="sd">        This method allows structure classes to be indexed using the ``[]``</span>
 <span class="sd">        operator in order to declare collections of that structure within</span>
@@ -749,22 +765,26 @@
 <span class="sd">        :param dim: The length or dimension of the collection</span>
 <span class="sd">        :type dim: _LengthT</span>
 <span class="sd">        :return: A field descriptor representing a collection of the structure</span>
-<span class="sd">        :rtype: Field[Collection[_ModelT], Collection[_ModelT]]</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        :rtype: Field[Collection[Self], Collection[Self]]</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">getstruct</span><span class="p">(</span><span class="bp">cls</span><span class="p">)[</span><span class="n">dim</span><span class="p">]</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__set_byteorder__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">order</span><span class="p">:</span> <span class="n">EndianLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Field</span><span class="p">[</span><span class="n">Self</span><span class="p">,</span> <span class="n">Self</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">Field</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">)</span>
 
 <div class="viewcode-block" id="StructDefMixin.from_bytes">
 <a class="viewcode-back" href="../../../library/model/struct.html#caterpillar.model.StructDefMixin.from_bytes">[docs]</a>
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">from_bytes</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">_ModelT</span><span class="p">],</span>
+        <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">data</span><span class="p">:</span> <span class="n">Buffer</span> <span class="o">|</span> <span class="n">_StreamType</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_ModelT</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct an instance from raw binary data or a stream.</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Construct an instance from raw binary data or a stream.</span>
 
 <span class="sd">        This is a convenience wrapper around the underlying ``unpack``</span>
 <span class="sd">        function, allowing models to be instantiated directly from bytes</span>
@@ -777,8 +797,8 @@
 <span class="sd">        :param arch: Architecture override for parsing, defaults to None</span>
 <span class="sd">        :type arch: _ArchLike | None, optional</span>
 <span class="sd">        :return: Parsed model instance</span>
-<span class="sd">        :rtype: _ModelT</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        :rtype: Self</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">unpack</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span> <span class="n">arch</span><span class="o">=</span><span class="n">arch</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
@@ -786,14 +806,14 @@
 <a class="viewcode-back" href="../../../library/model/struct.html#caterpillar.model.StructDefMixin.from_file">[docs]</a>
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">from_file</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">_ModelT</span><span class="p">],</span>
+        <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_ModelT</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct an instance from a binary file on disk.</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Construct an instance from a binary file on disk.</span>
 
 <span class="sd">        This is a convenience wrapper around ``unpack_file`` for reading and</span>
 <span class="sd">        parsing structured data directly from a file path.</span>
@@ -805,8 +825,8 @@
 <span class="sd">        :param arch: Architecture override for parsing, defaults to None</span>
 <span class="sd">        :type arch: _ArchLike | None, optional</span>
 <span class="sd">        :return: Parsed model instance</span>
-<span class="sd">        :rtype: _ModelT</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        :rtype: Self</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">unpack_file</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span> <span class="n">arch</span><span class="o">=</span><span class="n">arch</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
@@ -841,7 +861,7 @@
         <span class="n">use_tempfile</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Serialize the instance into its binary representation.</span>
+<span class="w">        </span><span class="sd">"""Serialize the instance into its binary representation.</span>
 
 <span class="sd">        If ``fp`` is provided, the binary data is written directly into the</span>
 <span class="sd">        given stream using ``pack_into``. Otherwise, the binary data is</span>
@@ -859,7 +879,7 @@
 <span class="sd">        :type use_tempfile: bool, optional</span>
 <span class="sd">        :return: Serialized bytes if ``fp`` is None, otherwise None</span>
 <span class="sd">        :rtype: bytes | None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">fp</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">pack_into</span><span class="p">(</span>
                 <span class="bp">self</span><span class="p">,</span>
@@ -880,7 +900,7 @@
 
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__bytes__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Helper for direct bytes(...) conversion&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Helper for direct bytes(...) conversion"""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">()</span></div>
 
 
@@ -888,7 +908,7 @@
 <div class="viewcode-block" id="struct_factory">
 <a class="viewcode-back" href="../../../library/model/struct.html#caterpillar.model.struct_factory">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">struct_factory</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Factory responsible for converting plain classes into ``@struct`` models.</span>
+<span class="w">    </span><span class="sd">"""Factory responsible for converting plain classes into ``@struct`` models.</span>
 
 <span class="sd">    This factory provides decorator-style and direct-call APIs for transforming</span>
 <span class="sd">    a regular class definition into a fully configured ``Struct`` model. The</span>
@@ -899,7 +919,7 @@
 <span class="sd">        The use of ``@dataclass_transform`` ensures that static type checkers</span>
 <span class="sd">        understand the transformation and correctly interpret field specifiers</span>
 <span class="sd">        such as ``dataclasses.field`` and :func:`Invisible`.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">mixin</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">StructDefMixin</span><span class="p">]</span> <span class="o">=</span> <span class="n">StructDefMixin</span>
 
@@ -959,7 +979,7 @@
         <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">field_options</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">_OptionLike</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">_ModelT</span><span class="p">]</span> <span class="o">|</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">_ModelT</span><span class="p">],</span> <span class="nb">type</span><span class="p">[</span><span class="n">_ModelT</span><span class="p">]]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Decorator or direct constructor for creating a ``Struct`` model.</span>
+<span class="w">        </span><span class="sd">"""Decorator or direct constructor for creating a ``Struct`` model.</span>
 
 <span class="sd">        This method can be used either as:</span>
 
@@ -994,7 +1014,7 @@
 <span class="sd">        :type field_options: Iterable[_OptionLike] | None, optional</span>
 <span class="sd">        :return: A transformed Struct model class, or a decorator if ``ty`` is None</span>
 <span class="sd">        :rtype: type[_ModelT] | Callable[[_ModelT], type[_ModelT]]</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="k">def</span><span class="w"> </span><span class="nf">wrap</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">_ModelT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">_ModelT</span><span class="p">]:</span>
             <span class="k">return</span> <span class="n">struct_factory</span><span class="o">.</span><span class="n">make_struct</span><span class="p">(</span>
@@ -1030,9 +1050,9 @@
         <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">field_options</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">_OptionLike</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">kw_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">hook_cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="s2">&quot;UnionHook[_ModelT]&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">hook_cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="s2">"UnionHook[_ModelT]"</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">_ModelT</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Internal helper that performs the actual Struct model creation.</span>
+<span class="w">        </span><span class="sd">"""Internal helper that performs the actual Struct model creation.</span>
 
 <span class="sd">        This method instantiates a :class:`Struct` object using the provided</span>
 <span class="sd">        configuration and returns the generated model class.</span>
@@ -1055,10 +1075,10 @@
 <span class="sd">            defaults to False</span>
 <span class="sd">        :type kw_only: bool, optional</span>
 <span class="sd">        :param hook_cls: Optional hook class for union handling, defaults to None</span>
-<span class="sd">        :type hook_cls: type[&quot;UnionHook[_ModelT]&quot;] | None, optional</span>
+<span class="sd">        :type hook_cls: type["UnionHook[_ModelT]"] | None, optional</span>
 <span class="sd">        :return: The generated Struct model class</span>
 <span class="sd">        :rtype: type[_ModelT]</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">s</span> <span class="o">=</span> <span class="n">Struct</span><span class="p">(</span>
             <span class="n">ty</span><span class="p">,</span>
             <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span>
@@ -1079,7 +1099,7 @@
 <div class="viewcode-block" id="UnionHook">
 <a class="viewcode-back" href="../../../library/model/struct.html#caterpillar.model.UnionHook">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">UnionHook</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">_ModelT</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Implementation of a hook to simulate union types.</span>
+<span class="w">    </span><span class="sd">"""Implementation of a hook to simulate union types.</span>
 
 <span class="sd">    It will hook two methods of the target model type: :code:`__init__` and</span>
 <span class="sd">    :code:`__setattr__`. Because the constructor calls *setattr* for each</span>
@@ -1089,13 +1109,13 @@
 <span class="sd">    Internally, these two methods will be translated into :meth:`~UnionHook.__model_init__`</span>
 <span class="sd">    and :meth:`~UnionHook.__model_setattr__`. Therefore, any class that implements</span>
 <span class="sd">    these two methods can be used as a union hook.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">struct</span><span class="p">:</span> <span class="n">Struct</span><span class="p">[</span><span class="n">_ModelT</span><span class="p">]</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;The struct reference&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""The struct reference"""</span>
 
     <span class="n">max_size</span><span class="p">:</span> <span class="nb">int</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;The static (cached) maximum size of the union&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""The static (cached) maximum size of the union"""</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">struct_</span><span class="p">:</span> <span class="n">Struct</span><span class="p">[</span><span class="n">_ModelT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">struct</span> <span class="o">=</span> <span class="n">struct_</span>
@@ -1126,7 +1146,7 @@
 
         <span class="n">members</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">struct</span><span class="o">.</span><span class="n">get_members</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_processing_</span> <span class="ow">or</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">members</span><span class="p">:</span>
-            <span class="c1"># Refresh can&#39;t be done if:</span>
+            <span class="c1"># Refresh can't be done if:</span>
             <span class="c1">#   1) the current instance is alredy being processed</span>
             <span class="c1">#   2) the member is not in the internal model</span>
             <span class="k">return</span>
@@ -1143,9 +1163,9 @@
         <span class="n">data</span> <span class="o">=</span> <span class="n">pack</span><span class="p">(</span><span class="n">new_value</span><span class="p">,</span> <span class="n">field</span><span class="p">)</span>
 
         <span class="c1"># Apply a padding to the retrieved data</span>
-        <span class="n">stream</span> <span class="o">=</span> <span class="n">BytesIO</span><span class="p">(</span><span class="n">data</span> <span class="o">+</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\0</span><span class="s2">&quot;</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_size</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)))</span>
+        <span class="n">stream</span> <span class="o">=</span> <span class="n">BytesIO</span><span class="p">(</span><span class="n">data</span> <span class="o">+</span> <span class="sa">b</span><span class="s2">"</span><span class="se">\0</span><span class="s2">"</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_size</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)))</span>
         <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">members</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="c1"># this field shouldn&#39;t be updated as it already was</span>
+            <span class="c1"># this field shouldn't be updated as it already was</span>
             <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="n">key</span><span class="p">:</span>
                 <span class="k">continue</span>
 
@@ -1211,7 +1231,7 @@
     <span class="n">kw_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">hook_cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">UnionHook</span><span class="p">[</span><span class="n">_ModelT</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">_ModelT</span><span class="p">]</span> <span class="o">|</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">type</span><span class="p">[</span><span class="n">_ModelT</span><span class="p">]],</span> <span class="nb">type</span><span class="p">[</span><span class="n">_ModelT</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Decorator to create a Union class.</span>
 
 <span class="sd">    :param cls: The target class used as the base model.</span>
@@ -1220,7 +1240,7 @@
 <span class="sd">    :param arch: Global architecture definition (will be inferred on all fields).</span>
 
 <span class="sd">    :return: The created Union class or a wrapper function if cls is not provided.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">options</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">options</span> <span class="ow">or</span> <span class="p">[])</span> <span class="o">+</span> <span class="p">[</span><span class="n">S_UNION</span><span class="p">])</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">wrap</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">_ModelT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">_ModelT</span><span class="p">]:</span>

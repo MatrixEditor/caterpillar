@@ -521,15 +521,15 @@ into the given options to retrieve the final struct.</p>
 there is no possibility of packing an object back to binary data because the initial value is not
 known.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">foo</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="p">{</span>
-<span class="gp">... </span>    <span class="s2">&quot;bar&quot;</span><span class="p">:</span> <span class="n">uint16</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="s2">&quot;baz&quot;</span><span class="p">:</span> <span class="n">uint32</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">"bar"</span><span class="p">:</span> <span class="n">uint16</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">"baz"</span><span class="p">:</span> <span class="n">uint32</span><span class="p">,</span>
 <span class="gp">... </span><span class="p">}</span>
 </pre></div>
 </div>
 <p>You can also include a default option using <code class="xref py py-attr docutils literal notranslate"><span class="pre">DEFAULT_OPTION</span></code> from within the
 <code class="code docutils literal notranslate"><span class="pre">fields</span></code> submodule.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">foo</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="p">{</span>
-<span class="gp">... </span>    <span class="s2">&quot;bar&quot;</span><span class="p">:</span> <span class="n">uint16</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">"bar"</span><span class="p">:</span> <span class="n">uint16</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">DEFAULT_OPTION</span><span class="p">:</span> <span class="n">ctx</span><span class="o">.</span><span class="n">_value</span>
 <span class="gp">... </span><span class="p">}</span>
 </pre></div>
@@ -652,7 +652,7 @@ functionality as well.</p>
 <span class="sig-prename descclassname"><span class="pre">sequence.</span></span><span class="sig-name descname"><span class="pre">__iadd__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sequence.__iadd__" title="Link to this definition">#</a></dt>
 <dd><p>Called to <em>import</em> all fields from the given sequence into this instance. This mutates the
 left-hand sequence and adds non-duplicate fields to the <em>end</em> of the current field list.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">seq</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">({</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="n">uint8</span><span class="p">})</span> <span class="o">+</span> <span class="n">Sequence</span><span class="p">({</span><span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="n">uint8</span><span class="p">})</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">seq</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">({</span><span class="s2">"a"</span><span class="p">:</span> <span class="n">uint8</span><span class="p">})</span> <span class="o">+</span> <span class="n">Sequence</span><span class="p">({</span><span class="s2">"b"</span><span class="p">:</span> <span class="n">uint8</span><span class="p">})</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -665,7 +665,7 @@ left-hand sequence and adds non-duplicate fields to the <em>end</em> of the curr
 <dd><p>Invoked to remove all fields in this sequence with names that are also stored in the given
 sequence. This mutates the left-hand sequence. The original model object is not rewritten;
 only the processed internal representation is changed.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">seq</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">({</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="n">uint8</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="n">uint8</span><span class="p">})</span> <span class="o">-</span> <span class="n">Sequence</span><span class="p">({</span><span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="n">uint8</span><span class="p">})</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">seq</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">({</span><span class="s2">"a"</span><span class="p">:</span> <span class="n">uint8</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">:</span> <span class="n">uint8</span><span class="p">})</span> <span class="o">-</span> <span class="n">Sequence</span><span class="p">({</span><span class="s2">"b"</span><span class="p">:</span> <span class="n">uint8</span><span class="p">})</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -677,7 +677,7 @@ only the processed internal representation is changed.</p>
 from this sequence and all provided sequences. Unlike <code class="docutils literal notranslate"><span class="pre">+</span></code>, this does not
 mutate any operand. Duplicate field names from later sequences replace
 earlier ones in-place in the returned sequence.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">seq</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">({</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="n">uint8</span><span class="p">})</span><span class="o">.</span><span class="n">merged</span><span class="p">(</span><span class="n">Sequence</span><span class="p">({</span><span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="n">uint8</span><span class="p">}))</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">seq</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">({</span><span class="s2">"a"</span><span class="p">:</span> <span class="n">uint8</span><span class="p">})</span><span class="o">.</span><span class="n">merged</span><span class="p">(</span><span class="n">Sequence</span><span class="p">({</span><span class="s2">"b"</span><span class="p">:</span> <span class="n">uint8</span><span class="p">}))</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -687,7 +687,7 @@ earlier ones in-place in the returned sequence.</p>
 <span class="sig-prename descclassname"><span class="pre">sequence.</span></span><span class="sig-name descname"><span class="pre">without</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">sequences</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sequence.without" title="Link to this definition">#</a></dt>
 <dd><p>Returns a new <a class="reference internal" href="../library/model/sequence.html#caterpillar.model.Sequence" title="caterpillar.model.Sequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a> with fields removed by
 name, leaving the original sequence unchanged.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">seq</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">({</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="n">uint8</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="n">uint8</span><span class="p">})</span><span class="o">.</span><span class="n">without</span><span class="p">(</span><span class="n">Sequence</span><span class="p">({</span><span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="n">uint8</span><span class="p">}))</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">seq</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">({</span><span class="s2">"a"</span><span class="p">:</span> <span class="n">uint8</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">:</span> <span class="n">uint8</span><span class="p">})</span><span class="o">.</span><span class="n">without</span><span class="p">(</span><span class="n">Sequence</span><span class="p">({</span><span class="s2">"b"</span><span class="p">:</span> <span class="n">uint8</span><span class="p">}))</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -705,8 +705,8 @@ special operations.</p>
 <h3><span class="section-number">3.3.4.1. </span>Context path<a class="headerlink" href="#context-path" title="Link to this heading">#</a></h3>
 <p>The context path takes a special place, as it can provide lazy execution of almost all operators
 on definition. Its attribute-access model results in a new <code class="xref py py-class docutils literal notranslate"><span class="pre">ContextPath</span></code> instance.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">ContextPath</span><span class="p">(</span><span class="s2">&quot;foo&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">bar</span><span class="o">.</span><span class="n">baz</span>
-<span class="go">Path(&#39;foo.bar.baz&#39;)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">ContextPath</span><span class="p">(</span><span class="s2">"foo"</span><span class="p">)</span><span class="o">.</span><span class="n">bar</span><span class="o">.</span><span class="n">baz</span>
+<span class="go">Path('foo.bar.baz')</span>
 </pre></div>
 </div>
 <p>To enable list-like access and function calls, there are special methods:</p>
@@ -717,7 +717,7 @@ on definition. Its attribute-access model results in a new <code class="xref py 
 itself, while <code class="docutils literal notranslate"><span class="pre">this</span></code> starts at the current object stored under <code class="docutils literal notranslate"><span class="pre">_obj</span></code>.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">this</span><span class="o">.</span><span class="n">foo</span><span class="o">.</span><span class="n">bar</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">path</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
-<span class="go"># equivalent to context.__context_getattr__(&quot;_obj.foo.bar&quot;)</span>
+<span class="go"># equivalent to context.__context_getattr__("_obj.foo.bar")</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -728,7 +728,7 @@ itself, while <code class="docutils literal notranslate"><span class="pre">this<
 <dd><p>Stores a trailing <code class="docutils literal notranslate"><span class="pre">__getitem__</span></code> operation that is executed after the base
 path is resolved.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">this</span><span class="o">.</span><span class="n">foo</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">19</span><span class="p">)[</span><span class="mi">10</span><span class="p">]</span>
-<span class="go">Path(&#39;_obj.foo.bar&#39;, call(x=19), getitem(10))</span>
+<span class="go">Path('_obj.foo.bar', call(x=19), getitem(10))</span>
 </pre></div>
 </div>
 </dd></dl>

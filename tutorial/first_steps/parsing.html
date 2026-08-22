@@ -475,8 +475,8 @@ override them.</p>
 This is similar to Python’s <a class="reference external" href="https://docs.python.org/3/library/struct.html">struct</a>
 module, but with the added benefit of working directly with Python classes and attributes.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span> <span class="o">=</span> <span class="n">RGB</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="c1"># equivalent to pack(obj, RGB), reads as &#39;pack obj from RGB&#39;</span>
-<span class="go">b&#39;\x01\x02\x03&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="c1"># equivalent to pack(obj, RGB), reads as 'pack obj from RGB'</span>
+<span class="go">b'\x01\x02\x03'</span>
 </pre></div>
 </div>
 <p>Notice that in the Python version, you don’t need to explicitly provide the struct (i.e., <code class="code docutils literal notranslate"><span class="pre">RGB</span></code>)
@@ -487,7 +487,7 @@ because <em>Caterpillar</em> handles it automatically.</p>
 <p>Recreating data from binary streams is as easy as serializing objects. You just
 need to specify the struct that corresponds to the binary data you’re working
 with.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">RGB</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x01\x02\x03</span><span class="s2">&quot;</span><span class="p">)</span> <span class="c1"># reads as &#39;unpack RGB from data&#39;</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">RGB</span><span class="p">,</span> <span class="sa">b</span><span class="s2">"</span><span class="se">\x01\x02\x03</span><span class="s2">"</span><span class="p">)</span> <span class="c1"># reads as 'unpack RGB from data'</span>
 <span class="go">RGB(r=1, g=2, b=3)</span>
 </pre></div>
 </div>
@@ -509,18 +509,18 @@ class:</p>
 <p>It will then be possible to use the type directly instead of importing
 <a class="reference internal" href="../../library/model/struct.html#caterpillar.model.pack" title="caterpillar.model.pack"><code class="xref py py-func docutils literal notranslate"><span class="pre">pack()</span></code></a> or <a class="reference internal" href="../../library/model/struct.html#caterpillar.model.unpack" title="caterpillar.model.unpack"><code class="xref py py-func docutils literal notranslate"><span class="pre">unpack()</span></code></a>
 every time.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span> <span class="o">=</span> <span class="n">RGB</span><span class="o">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x01\x02\x03</span><span class="s2">&quot;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span> <span class="o">=</span> <span class="n">RGB</span><span class="o">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="sa">b</span><span class="s2">"</span><span class="se">\x01\x02\x03</span><span class="s2">"</span><span class="p">)</span>
 <span class="go">RGB(r=1, g=2, b=3)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">()</span>
-<span class="go">b&quot;\x01\x02\x03&quot;</span>
+<span class="go">b"\x01\x02\x03"</span>
 </pre></div>
 </div>
 <p>The same applies to all common structs mentioned in the next chapter
 and <a class="reference internal" href="../../library/fields/field_model.html#caterpillar.fields.Field" title="caterpillar.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a> objects.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">uint8</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x01\x02\x03</span><span class="s2">&quot;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">uint8</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="sa">b</span><span class="s2">"</span><span class="se">\x01\x02\x03</span><span class="s2">"</span><span class="p">)</span>
 <span class="go">[1,2,3]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">uint8</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
-<span class="go">b&quot;\x01\x02\x03&quot;</span>
+<span class="go">b"\x01\x02\x03"</span>
 </pre></div>
 </div>
 </div>

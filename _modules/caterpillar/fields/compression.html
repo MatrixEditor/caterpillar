@@ -411,31 +411,27 @@
 <span class="c1"># along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
 <span class="c1"># pyright: reportPrivateUsage=false, reportAny=false, reportExplicitAny=false</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Protocol</span><span class="p">,</span> <span class="n">runtime_checkable</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">override</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.abc</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">_ContainsStruct</span><span class="p">,</span>
-    <span class="n">_ContextLike</span><span class="p">,</span>
-    <span class="n">_StructLike</span><span class="p">,</span>
-    <span class="n">_LengthT</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.shared</span><span class="w"> </span><span class="kn">import</span> <span class="n">getstruct</span><span class="p">,</span> <span class="n">hasstruct</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">_ContainsStruct</span><span class="p">,</span> <span class="n">_ContextLike</span><span class="p">,</span> <span class="n">_LengthT</span><span class="p">,</span> <span class="n">_StructLike</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.fields._mixin</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_kwargs</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.fields.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">Transformer</span><span class="p">,</span> <span class="n">Bytes</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.fields.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">Bytes</span><span class="p">,</span> <span class="n">Transformer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.shared</span><span class="w"> </span><span class="kn">import</span> <span class="n">getstruct</span><span class="p">,</span> <span class="n">hasstruct</span>
 
 
 <span class="nd">@runtime_checkable</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">_Compressor</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    A protocol for compression algorithms, requiring two methods:</span>
 <span class="sd">    - compress: to compress data</span>
 <span class="sd">    - decompress: to decompress data</span>
 
 <span class="sd">    Any class implementing this protocol must define these methods.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">compress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Compress the provided data.</span>
 
 <span class="sd">        :param data: The data to be compressed.</span>
@@ -443,11 +439,11 @@
 <span class="sd">        :param kwds: Additional keyword arguments specific to the compression method.</span>
 <span class="sd">        :return: The compressed data.</span>
 <span class="sd">        :rtype: bytes</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="o">...</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">decompress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Decompress the provided data.</span>
 
 <span class="sd">        :param data: The compressed data to be decompressed.</span>
@@ -455,14 +451,14 @@
 <span class="sd">        :param kwds: Additional keyword arguments specific to the decompression method.</span>
 <span class="sd">        :return: The decompressed data.</span>
 <span class="sd">        :rtype: bytes</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="o">...</span>
 
 
 <div class="viewcode-block" id="Compressed">
 <a class="viewcode-back" href="../../../library/fields/compression.html#caterpillar.fields.Compressed">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Compressed</span><span class="p">(</span><span class="n">Transformer</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    A transformer class for handling compression and decompression of data.</span>
 
 <span class="sd">    This class takes a compression algorithm that implements the `_Compressor` protocol and</span>
@@ -477,7 +473,7 @@
 <span class="sd">    :type comp_kwargs: Optional[dict]</span>
 <span class="sd">    :param decomp_kwargs: Optional keyword arguments for the decompression method.</span>
 <span class="sd">    :type decomp_kwargs: Optional[dict]</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -497,7 +493,7 @@
 <a class="viewcode-back" href="../../../library/fields/compression.html#caterpillar.fields.Compressed.encode">[docs]</a>
     <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Compress the input data using the provided compressor.</span>
 
 <span class="sd">        :param obj: The data to be compressed.</span>
@@ -506,7 +502,7 @@
 <span class="sd">        :type context: _ContextLike</span>
 <span class="sd">        :return: The compressed data.</span>
 <span class="sd">        :rtype: bytes</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">compressor</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span>
             <span class="n">obj</span><span class="p">,</span> <span class="o">**</span><span class="n">get_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">comp_args</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">context</span><span class="p">)</span>
         <span class="p">)</span></div>
@@ -516,7 +512,7 @@
 <a class="viewcode-back" href="../../../library/fields/compression.html#caterpillar.fields.Compressed.decode">[docs]</a>
     <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Decompress the input data using the provided compressor.</span>
 
 <span class="sd">        :param parsed: The compressed data to be decompressed.</span>
@@ -525,7 +521,7 @@
 <span class="sd">        :type context: _ContextLike</span>
 <span class="sd">        :return: The decompressed data.</span>
 <span class="sd">        :rtype: bytes</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">compressor</span><span class="o">.</span><span class="n">decompress</span><span class="p">(</span>
             <span class="n">parsed</span><span class="p">,</span> <span class="o">**</span><span class="n">get_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">decomp_args</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">context</span><span class="p">)</span>
         <span class="p">)</span></div>
@@ -554,15 +550,15 @@
     <span class="n">comp_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">decomp_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_StructLike</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Create a struct representing zlib compression.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">zlib</span>
 
         <span class="k">return</span> <span class="n">compressed</span><span class="p">(</span><span class="n">zlib</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">comp_kwargs</span><span class="p">,</span> <span class="n">decomp_kwargs</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Could not import zlib!&quot;</span><span class="p">)</span></div>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">"Could not import zlib!"</span><span class="p">)</span></div>
 
 
 
@@ -573,15 +569,15 @@
     <span class="n">comp_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">decomp_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_StructLike</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Create a struct representing bz2 compression.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">bz2</span>
 
         <span class="k">return</span> <span class="n">compressed</span><span class="p">(</span><span class="n">bz2</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">comp_kwargs</span><span class="p">,</span> <span class="n">decomp_kwargs</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Could not import bz2!&quot;</span><span class="p">)</span></div>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">"Could not import bz2!"</span><span class="p">)</span></div>
 
 
 
@@ -592,15 +588,15 @@
     <span class="n">comp_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">decomp_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_StructLike</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Create a struct representing lzma compression.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">lzma</span>
 
         <span class="k">return</span> <span class="n">compressed</span><span class="p">(</span><span class="n">lzma</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">comp_kwargs</span><span class="p">,</span> <span class="n">decomp_kwargs</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Could not import lzma!&quot;</span><span class="p">)</span></div>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">"Could not import lzma!"</span><span class="p">)</span></div>
 
 
 
@@ -611,16 +607,16 @@
     <span class="n">comp_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">decomp_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_StructLike</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Create a struct representing LZO compression.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="c1"># install package manually with pip install lzallright</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">lzallright</span>
 
         <span class="k">return</span> <span class="n">compressed</span><span class="p">(</span><span class="n">lzallright</span><span class="o">.</span><span class="n">LZOCompressor</span><span class="p">(),</span> <span class="n">obj</span><span class="p">,</span> <span class="n">comp_kwargs</span><span class="p">,</span> <span class="n">decomp_kwargs</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Could not import lzallright!&quot;</span><span class="p">)</span></div>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">"Could not import lzallright!"</span><span class="p">)</span></div>
 
 </pre></div>
 

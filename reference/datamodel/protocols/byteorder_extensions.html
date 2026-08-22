@@ -490,6 +490,20 @@ the byteorder applied. Note the use of another operator here.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">BigEndian</span> <span class="o">+</span> <span class="n">struct</span>
 </pre></div>
 </div>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.10.0: </span>Classes created via <a class="reference internal" href="../../../library/model/struct.html#caterpillar.model.struct" title="caterpillar.model.struct"><code class="xref py py-func docutils literal notranslate"><span class="pre">struct()</span></code></a> or <a class="reference internal" href="../../../library/model/bitfield.html#caterpillar.model.bitfield" title="caterpillar.model.bitfield"><code class="xref py py-func docutils literal notranslate"><span class="pre">bitfield()</span></code></a>
+also implement <a class="reference internal" href="#object.__set_byteorder__" title="object.__set_byteorder__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__set_byteorder__()</span></code></a> (installed as a
+<code class="docutils literal notranslate"><span class="pre">classmethod</span></code>), so the very same operator syntax works directly on
+a struct <em>class</em> rather than only on field/atom instances:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">Inherit</span><span class="p">)</span>
+<span class="gp">... </span><span class="k">class</span><span class="w"> </span><span class="nc">Inner</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">value</span><span class="p">:</span> <span class="n">uint32</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">LittleEndian</span> <span class="o">+</span> <span class="n">Inner</span>  <span class="c1"># Field(Inner, order=LittleEndian)</span>
+</pre></div>
+</div>
+<p>See <a class="reference internal" href="../../../tutorial/advanced/byteorder.html#tutorial-dyn-byteorder"><span class="std std-ref">the byte order tutorial</span></a> for more details.</p>
+</div>
 </dd></dl>
 
 </section>

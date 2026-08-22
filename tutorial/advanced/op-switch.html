@@ -485,19 +485,19 @@ Default Syntax</label><div class="sd-tab-content docutils">
    <span class="n">length</span><span class="p">:</span> <span class="n">uint32</span>          <span class="c1"># length of the data field (1)</span>
    <span class="nb">type</span><span class="p">:</span> <span class="n">Bytes</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
    <span class="n">data</span><span class="p">:</span> <span class="n">F</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">type</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="p">{</span> <span class="c1"># just use right shift (2)</span>
-         <span class="sa">b</span><span class="s2">&quot;IHDR&quot;</span><span class="p">:</span> <span class="n">IHDRChunk</span><span class="p">,</span>
-         <span class="sa">b</span><span class="s2">&quot;PLTE&quot;</span><span class="p">:</span> <span class="n">PLTEChunk</span><span class="p">,</span> <span class="c1"># the key must be comparable to this.type</span>
-         <span class="sa">b</span><span class="s2">&quot;pHYs&quot;</span><span class="p">:</span> <span class="n">PHYSChunk</span><span class="p">,</span>
-         <span class="sa">b</span><span class="s2">&quot;iTXt&quot;</span><span class="p">:</span> <span class="n">ITXTChunk</span><span class="p">,</span>
-         <span class="sa">b</span><span class="s2">&quot;tIME&quot;</span><span class="p">:</span> <span class="n">TIMEChunk</span><span class="p">,</span>
-         <span class="sa">b</span><span class="s2">&quot;tEXt&quot;</span><span class="p">:</span> <span class="n">TEXTChunk</span><span class="p">,</span>
-         <span class="sa">b</span><span class="s2">&quot;iTXt&quot;</span><span class="p">:</span> <span class="n">ITXTChunk</span><span class="p">,</span>
-         <span class="sa">b</span><span class="s2">&quot;fDAT&quot;</span><span class="p">:</span> <span class="n">FDATChunk</span><span class="p">,</span>
-         <span class="sa">b</span><span class="s2">&quot;zTXt&quot;</span><span class="p">:</span> <span class="n">ZTXTChunk</span><span class="p">,</span>
-         <span class="sa">b</span><span class="s2">&quot;gAMA&quot;</span><span class="p">:</span> <span class="n">GAMAChunk</span><span class="p">,</span>
+         <span class="sa">b</span><span class="s2">"IHDR"</span><span class="p">:</span> <span class="n">IHDRChunk</span><span class="p">,</span>
+         <span class="sa">b</span><span class="s2">"PLTE"</span><span class="p">:</span> <span class="n">PLTEChunk</span><span class="p">,</span> <span class="c1"># the key must be comparable to this.type</span>
+         <span class="sa">b</span><span class="s2">"pHYs"</span><span class="p">:</span> <span class="n">PHYSChunk</span><span class="p">,</span>
+         <span class="sa">b</span><span class="s2">"iTXt"</span><span class="p">:</span> <span class="n">ITXTChunk</span><span class="p">,</span>
+         <span class="sa">b</span><span class="s2">"tIME"</span><span class="p">:</span> <span class="n">TIMEChunk</span><span class="p">,</span>
+         <span class="sa">b</span><span class="s2">"tEXt"</span><span class="p">:</span> <span class="n">TEXTChunk</span><span class="p">,</span>
+         <span class="sa">b</span><span class="s2">"iTXt"</span><span class="p">:</span> <span class="n">ITXTChunk</span><span class="p">,</span>
+         <span class="sa">b</span><span class="s2">"fDAT"</span><span class="p">:</span> <span class="n">FDATChunk</span><span class="p">,</span>
+         <span class="sa">b</span><span class="s2">"zTXt"</span><span class="p">:</span> <span class="n">ZTXTChunk</span><span class="p">,</span>
+         <span class="sa">b</span><span class="s2">"gAMA"</span><span class="p">:</span> <span class="n">GAMAChunk</span><span class="p">,</span>
          <span class="c1"># Special case: IEND chunk, which doesn’t need to parse any data</span>
-         <span class="sa">b</span><span class="s2">&quot;IEND&quot;</span><span class="p">:</span> <span class="n">Pass</span> <span class="c1"># (4)</span>
-         <span class="c1"># As we don&#39;t define all chunks here for now, a default</span>
+         <span class="sa">b</span><span class="s2">"IEND"</span><span class="p">:</span> <span class="n">Pass</span> <span class="c1"># (4)</span>
+         <span class="c1"># As we don't define all chunks here for now, a default</span>
          <span class="c1"># option must be provided</span>
          <span class="n">DEFAULT_OPTION</span><span class="p">:</span> <span class="n">Memory</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">length</span><span class="p">)</span> <span class="c1"># (3)</span>
    <span class="p">}</span>
@@ -532,19 +532,19 @@ Extended Syntax (&gt;=2.8.0)</label><div class="sd-tab-content docutils">
    <span class="nb">type</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">Bytes</span><span class="p">(</span><span class="mi">4</span><span class="p">)]</span>
    <span class="n">data</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="n">ChunkT</span><span class="p">,</span>
       <span class="n">F</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">type</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="p">{</span> <span class="c1"># just use right shift (2)</span>
-         <span class="sa">b</span><span class="s2">&quot;IHDR&quot;</span><span class="p">:</span> <span class="n">IHDRChunk</span><span class="p">,</span>
-         <span class="sa">b</span><span class="s2">&quot;PLTE&quot;</span><span class="p">:</span> <span class="n">PLTEChunk</span><span class="p">,</span> <span class="c1"># the key must be comparable to this.type</span>
-         <span class="sa">b</span><span class="s2">&quot;pHYs&quot;</span><span class="p">:</span> <span class="n">PHYSChunk</span><span class="p">,</span>
-         <span class="sa">b</span><span class="s2">&quot;iTXt&quot;</span><span class="p">:</span> <span class="n">ITXTChunk</span><span class="p">,</span>
-         <span class="sa">b</span><span class="s2">&quot;tIME&quot;</span><span class="p">:</span> <span class="n">TIMEChunk</span><span class="p">,</span>
-         <span class="sa">b</span><span class="s2">&quot;tEXt&quot;</span><span class="p">:</span> <span class="n">TEXTChunk</span><span class="p">,</span>
-         <span class="sa">b</span><span class="s2">&quot;iTXt&quot;</span><span class="p">:</span> <span class="n">ITXTChunk</span><span class="p">,</span>
-         <span class="sa">b</span><span class="s2">&quot;fDAT&quot;</span><span class="p">:</span> <span class="n">FDATChunk</span><span class="p">,</span>
-         <span class="sa">b</span><span class="s2">&quot;zTXt&quot;</span><span class="p">:</span> <span class="n">ZTXTChunk</span><span class="p">,</span>
-         <span class="sa">b</span><span class="s2">&quot;gAMA&quot;</span><span class="p">:</span> <span class="n">GAMAChunk</span><span class="p">,</span>
+         <span class="sa">b</span><span class="s2">"IHDR"</span><span class="p">:</span> <span class="n">IHDRChunk</span><span class="p">,</span>
+         <span class="sa">b</span><span class="s2">"PLTE"</span><span class="p">:</span> <span class="n">PLTEChunk</span><span class="p">,</span> <span class="c1"># the key must be comparable to this.type</span>
+         <span class="sa">b</span><span class="s2">"pHYs"</span><span class="p">:</span> <span class="n">PHYSChunk</span><span class="p">,</span>
+         <span class="sa">b</span><span class="s2">"iTXt"</span><span class="p">:</span> <span class="n">ITXTChunk</span><span class="p">,</span>
+         <span class="sa">b</span><span class="s2">"tIME"</span><span class="p">:</span> <span class="n">TIMEChunk</span><span class="p">,</span>
+         <span class="sa">b</span><span class="s2">"tEXt"</span><span class="p">:</span> <span class="n">TEXTChunk</span><span class="p">,</span>
+         <span class="sa">b</span><span class="s2">"iTXt"</span><span class="p">:</span> <span class="n">ITXTChunk</span><span class="p">,</span>
+         <span class="sa">b</span><span class="s2">"fDAT"</span><span class="p">:</span> <span class="n">FDATChunk</span><span class="p">,</span>
+         <span class="sa">b</span><span class="s2">"zTXt"</span><span class="p">:</span> <span class="n">ZTXTChunk</span><span class="p">,</span>
+         <span class="sa">b</span><span class="s2">"gAMA"</span><span class="p">:</span> <span class="n">GAMAChunk</span><span class="p">,</span>
          <span class="c1"># Special case: IEND chunk, which doesn’t need to parse any data</span>
-         <span class="sa">b</span><span class="s2">&quot;IEND&quot;</span><span class="p">:</span> <span class="n">Pass</span> <span class="c1"># (4)</span>
-         <span class="c1"># As we don&#39;t define all chunks here for now, a default</span>
+         <span class="sa">b</span><span class="s2">"IEND"</span><span class="p">:</span> <span class="n">Pass</span> <span class="c1"># (4)</span>
+         <span class="c1"># As we don't define all chunks here for now, a default</span>
          <span class="c1"># option must be provided</span>
          <span class="n">DEFAULT_OPTION</span><span class="p">:</span> <span class="n">Memory</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">length</span><span class="p">)</span> <span class="c1"># (3)</span>
       <span class="p">}</span>

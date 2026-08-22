@@ -528,7 +528,7 @@ this chunk during unpacking, the in-memory size can be smaller than the original
 <span class="sig-prename descclassname"><span class="pre">caterpillar.options.</span></span><span class="sig-name descname"><span class="pre">S_DISCARD_UNNAMED</span></span><a class="headerlink" href="#caterpillar.options.S_DISCARD_UNNAMED" title="Link to this definition">#</a></dt>
 <dd><p>When enabled, this option discards all <em>unnamed</em> fields from the final unpacked result.
 An <em>unnamed</em> field must follow the convention:</p>
-<div class="highlight-bnf notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nc">unnamed</span><span class="p">&gt;</span> := &#39;_&#39; [0-9]*
+<div class="highlight-bnf notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nc">unnamed</span><span class="p">&gt;</span> := '_' [0-9]*
 </pre></div>
 </div>
 <p>This allows you to include padding or other non-essential fields without polluting
@@ -536,14 +536,14 @@ the output. For example:</p>
 <div class="literal-block-wrapper docutils container" id="id4">
 <div class="code-block-caption"><span class="caption-text">Sequence with an unnamed field</span><a class="headerlink" href="#id4" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">({</span>
-<span class="gp">... </span>    <span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="n">uint8</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="s2">&quot;_&quot;</span><span class="p">:</span> <span class="n">padding</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span>
+<span class="gp">... </span>    <span class="s2">"a"</span><span class="p">:</span> <span class="n">uint8</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">"_"</span><span class="p">:</span> <span class="n">padding</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span>
 <span class="gp">... </span><span class="p">},</span> <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="n">opt</span><span class="o">.</span><span class="n">S_DISCARD_UNNAMED</span><span class="p">})</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\xFF</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="nb">bytes</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">"</span><span class="se">\xFF</span><span class="s2">"</span> <span class="o">+</span> <span class="nb">bytes</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">schema</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-<span class="go">{&#39;a&#39;: 255}</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">({</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="mi">255</span><span class="p">},</span> <span class="n">schema</span><span class="p">)</span>
-<span class="go">b&#39;\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00&#39;</span>
+<span class="go">{'a': 255}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">({</span><span class="s2">"a"</span><span class="p">:</span> <span class="mi">255</span><span class="p">},</span> <span class="n">schema</span><span class="p">)</span>
+<span class="go">b'\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'</span>
 </pre></div>
 </div>
 </div>
@@ -633,9 +633,9 @@ This option is primarily intended for documentation purposes. It removes all
 </div>
 <p>Comparison of annotations:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Format</span><span class="o">.</span><span class="vm">__annotations__</span> <span class="c1"># Without replacement</span>
-<span class="go">{&#39;a&#39;: &lt;FormatField(int) &#39;B&#39;&gt;, &#39;b&#39;: &lt;String&gt;, &#39;c&#39;: &lt;Uuid&gt;}</span>
+<span class="go">{'a': &lt;FormatField(int) 'B'&gt;, 'b': &lt;String&gt;, 'c': &lt;Uuid&gt;}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Format</span><span class="o">.</span><span class="vm">__annotations__</span> <span class="c1"># With replacement</span>
-<span class="go">{&#39;a&#39;: &lt;class &#39;int&#39;&gt;, &#39;b&#39;: &lt;class &#39;str&#39;&gt;, &#39;c&#39;: &lt;class &#39;uuid.UUID&#39;&gt;}</span>
+<span class="go">{'a': &lt;class 'int'&gt;, 'b': &lt;class 'str'&gt;, 'c': &lt;class 'uuid.UUID'&gt;}</span>
 </pre></div>
 </div>
 </dd></dl>

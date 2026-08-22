@@ -457,9 +457,9 @@
 which are often used in Python’s <cite>struct</cite> module. Each field is associated with a format character
 (like ‘x’ for padding or ‘i’ for a signed integer), and it determines how data is packed and unpacked.</p>
 <p>Example usage:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">PyStructFormattedField</span><span class="p">(</span><span class="s1">&#39;i&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">PyStructFormattedField</span><span class="p">(</span><span class="s1">'i'</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">field</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span>
-<span class="go">&quot;&lt;int32&gt;&quot;</span>
+<span class="go">"&lt;int32&gt;"</span>
 </pre></div>
 </div>
 <dl class="field-list simple">
@@ -544,8 +544,8 @@ values and arrays require exact reads during unpacking; short streams raise
 <dd><p>Unsigned 8-bit integer field. Range: <code class="docutils literal notranslate"><span class="pre">0</span></code> to <code class="docutils literal notranslate"><span class="pre">255</span></code>.</p>
 <dl>
 <dt>Usage Example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="mi">250</span><span class="p">,</span> <span class="n">uint8</span><span class="p">)</span>
-<span class="go">b&quot;\\xfa&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">uint8</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">xfa&quot;</span><span class="p">)</span>
+<span class="go">b"\\xfa"</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">uint8</span><span class="p">,</span> <span class="sa">b</span><span class="s2">"</span><span class="se">\\</span><span class="s2">xfa"</span><span class="p">)</span>
 <span class="go">250</span>
 </pre></div>
 </div>
@@ -559,8 +559,8 @@ values and arrays require exact reads during unpacking; short streams raise
 <dd><p>Signed 8-bit integer field. Range: <code class="docutils literal notranslate"><span class="pre">-128</span></code> to <code class="docutils literal notranslate"><span class="pre">127</span></code>.</p>
 <dl>
 <dt>Usage Example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="n">int8</span><span class="p">)</span>
-<span class="go">b&quot;\\xfb&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">int8</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">xfb&quot;</span><span class="p">)</span>
+<span class="go">b"\\xfb"</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">int8</span><span class="p">,</span> <span class="sa">b</span><span class="s2">"</span><span class="se">\\</span><span class="s2">xfb"</span><span class="p">)</span>
 <span class="go">-5</span>
 </pre></div>
 </div>
@@ -574,8 +574,8 @@ values and arrays require exact reads during unpacking; short streams raise
 <dd><p>Unsigned 16-bit integer field. Range: <code class="docutils literal notranslate"><span class="pre">0</span></code> to <code class="docutils literal notranslate"><span class="pre">65535</span></code>.</p>
 <dl>
 <dt>Usage Example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="mi">65535</span><span class="p">,</span> <span class="n">uint16</span><span class="p">)</span>
-<span class="go">b&quot;\\xff\\xff&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">uint16</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">xff</span><span class="se">\\</span><span class="s2">xff&quot;</span><span class="p">)</span>
+<span class="go">b"\\xff\\xff"</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">uint16</span><span class="p">,</span> <span class="sa">b</span><span class="s2">"</span><span class="se">\\</span><span class="s2">xff</span><span class="se">\\</span><span class="s2">xff"</span><span class="p">)</span>
 <span class="go">65535</span>
 </pre></div>
 </div>
@@ -589,8 +589,8 @@ values and arrays require exact reads during unpacking; short streams raise
 <dd><p>Signed 16-bit integer field. Range: <code class="docutils literal notranslate"><span class="pre">-32768</span></code> to <code class="docutils literal notranslate"><span class="pre">32767</span></code>.</p>
 <dl>
 <dt>Usage Example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="n">int16</span><span class="p">)</span>
-<span class="go">b&quot;\\x00\\x04&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">int16</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">x00</span><span class="se">\\</span><span class="s2">x04&quot;</span><span class="p">)</span>
+<span class="go">b"\\x00\\x04"</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">int16</span><span class="p">,</span> <span class="sa">b</span><span class="s2">"</span><span class="se">\\</span><span class="s2">x00</span><span class="se">\\</span><span class="s2">x04"</span><span class="p">)</span>
 <span class="go">1024</span>
 </pre></div>
 </div>
@@ -616,8 +616,8 @@ values and arrays require exact reads during unpacking; short streams raise
 <dd><p>Unsigned 32-bit integer field.</p>
 <dl>
 <dt>Usage Example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="mi">123456</span><span class="p">,</span> <span class="n">uint32</span><span class="p">)</span>
-<span class="go">b&quot;@\\xe2\\x01\\x00&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">uint32</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;@</span><span class="se">\\</span><span class="s2">xe2</span><span class="se">\\</span><span class="s2">x01</span><span class="se">\\</span><span class="s2">x00&quot;</span><span class="p">)</span>
+<span class="go">b"@\\xe2\\x01\\x00"</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">uint32</span><span class="p">,</span> <span class="sa">b</span><span class="s2">"@</span><span class="se">\\</span><span class="s2">xe2</span><span class="se">\\</span><span class="s2">x01</span><span class="se">\\</span><span class="s2">x00"</span><span class="p">)</span>
 <span class="go">123456</span>
 </pre></div>
 </div>
@@ -631,8 +631,8 @@ values and arrays require exact reads during unpacking; short streams raise
 <dd><p>Signed 32-bit integer field.</p>
 <dl>
 <dt>Usage Example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="mi">123456</span><span class="p">,</span> <span class="n">int32</span><span class="p">)</span>
-<span class="go">b&quot;@\\xe2\\x01\\x00&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">int32</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;@</span><span class="se">\\</span><span class="s2">xe2</span><span class="se">\\</span><span class="s2">x01</span><span class="se">\\</span><span class="s2">x00&quot;</span><span class="p">)</span>
+<span class="go">b"@\\xe2\\x01\\x00"</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">int32</span><span class="p">,</span> <span class="sa">b</span><span class="s2">"@</span><span class="se">\\</span><span class="s2">xe2</span><span class="se">\\</span><span class="s2">x01</span><span class="se">\\</span><span class="s2">x00"</span><span class="p">)</span>
 <span class="go">123456</span>
 </pre></div>
 </div>
@@ -646,8 +646,8 @@ values and arrays require exact reads during unpacking; short streams raise
 <dd><p>Unsigned 64-bit integer field.</p>
 <dl>
 <dt>Usage Example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">uint64</span><span class="p">)</span>
-<span class="go">b&quot;\\x01\\x00\\x00\\x00\\x00\\x00\\x00\\x00&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">uint64</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">x01</span><span class="se">\\</span><span class="s2">x00</span><span class="se">\\</span><span class="s2">x00</span><span class="se">\\</span><span class="s2">x00</span><span class="se">\\</span><span class="s2">x00</span><span class="se">\\</span><span class="s2">x00</span><span class="se">\\</span><span class="s2">x00</span><span class="se">\\</span><span class="s2">x00&quot;</span><span class="p">)</span>
+<span class="go">b"\\x01\\x00\\x00\\x00\\x00\\x00\\x00\\x00"</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">uint64</span><span class="p">,</span> <span class="sa">b</span><span class="s2">"</span><span class="se">\\</span><span class="s2">x01</span><span class="se">\\</span><span class="s2">x00</span><span class="se">\\</span><span class="s2">x00</span><span class="se">\\</span><span class="s2">x00</span><span class="se">\\</span><span class="s2">x00</span><span class="se">\\</span><span class="s2">x00</span><span class="se">\\</span><span class="s2">x00</span><span class="se">\\</span><span class="s2">x00"</span><span class="p">)</span>
 <span class="go">1</span>
 </pre></div>
 </div>
@@ -661,8 +661,8 @@ values and arrays require exact reads during unpacking; short streams raise
 <dd><p>Signed 64-bit integer field.</p>
 <dl>
 <dt>Usage Example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">int64</span><span class="p">)</span>
-<span class="go">b&quot;\\xff\\xff\\xff\\xff\\xff\\xff\\xff\\xff&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">int64</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">xff</span><span class="se">\\</span><span class="s2">xff</span><span class="se">\\</span><span class="s2">xff</span><span class="se">\\</span><span class="s2">xff</span><span class="se">\\</span><span class="s2">xff</span><span class="se">\\</span><span class="s2">xff</span><span class="se">\\</span><span class="s2">xff</span><span class="se">\\</span><span class="s2">xff&quot;</span><span class="p">)</span>
+<span class="go">b"\\xff\\xff\\xff\\xff\\xff\\xff\\xff\\xff"</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">int64</span><span class="p">,</span> <span class="sa">b</span><span class="s2">"</span><span class="se">\\</span><span class="s2">xff</span><span class="se">\\</span><span class="s2">xff</span><span class="se">\\</span><span class="s2">xff</span><span class="se">\\</span><span class="s2">xff</span><span class="se">\\</span><span class="s2">xff</span><span class="se">\\</span><span class="s2">xff</span><span class="se">\\</span><span class="s2">xff</span><span class="se">\\</span><span class="s2">xff"</span><span class="p">)</span>
 <span class="go">-1</span>
 </pre></div>
 </div>
@@ -694,8 +694,8 @@ The typing alias is available as <a class="reference internal" href="../ext_type
 <dd><p>Half-precision (16-bit) floating point field.</p>
 <dl>
 <dt>Usage Example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">float16</span><span class="p">)</span>
-<span class="go">b&quot;...&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">float16</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;...&quot;</span><span class="p">)</span>
+<span class="go">b"..."</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">float16</span><span class="p">,</span> <span class="sa">b</span><span class="s2">"..."</span><span class="p">)</span>
 <span class="go">1.5</span>
 </pre></div>
 </div>
@@ -709,8 +709,8 @@ The typing alias is available as <a class="reference internal" href="../ext_type
 <dd><p>Single-precision (32-bit) floating point field.</p>
 <dl>
 <dt>Usage Example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="mf">3.14</span><span class="p">,</span> <span class="n">float32</span><span class="p">)</span>
-<span class="go">b&quot;...&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">float32</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;...&quot;</span><span class="p">)</span>
+<span class="go">b"..."</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">float32</span><span class="p">,</span> <span class="sa">b</span><span class="s2">"..."</span><span class="p">)</span>
 <span class="go">3.14</span>
 </pre></div>
 </div>
@@ -724,8 +724,8 @@ The typing alias is available as <a class="reference internal" href="../ext_type
 <dd><p>Double-precision (64-bit) floating point field.</p>
 <dl>
 <dt>Usage Example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="mf">3.14</span><span class="p">,</span> <span class="n">float64</span><span class="p">)</span>
-<span class="go">b&quot;...&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">float64</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;...&quot;</span><span class="p">)</span>
+<span class="go">b"..."</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">float64</span><span class="p">,</span> <span class="sa">b</span><span class="s2">"..."</span><span class="p">)</span>
 <span class="go">3.14</span>
 </pre></div>
 </div>
@@ -739,8 +739,8 @@ The typing alias is available as <a class="reference internal" href="../ext_type
 <dd><p>Void pointer field represented as an integer memory address.</p>
 <dl>
 <dt>Usage Example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="mh">0x1000</span><span class="p">,</span> <span class="n">void_ptr</span><span class="p">)</span>
-<span class="go">b&quot;...&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">void_ptr</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;...&quot;</span><span class="p">)</span>
+<span class="go">b"..."</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">void_ptr</span><span class="p">,</span> <span class="sa">b</span><span class="s2">"..."</span><span class="p">)</span>
 <span class="go">4096</span>
 </pre></div>
 </div>
@@ -754,10 +754,10 @@ The typing alias is available as <a class="reference internal" href="../ext_type
 <dd><p>Represents exactly one byte using Python’s <code class="docutils literal notranslate"><span class="pre">struct</span></code> <code class="docutils literal notranslate"><span class="pre">&quot;c&quot;</span></code> format.
 Values packed with this field must be one-byte <code class="docutils literal notranslate"><span class="pre">bytes</span></code> objects.</p>
 <dl>
-<dt>Usage Example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="n">char</span><span class="p">)</span>
-<span class="go">b&quot;A&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">char</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;A&quot;</span><span class="p">)</span>
-<span class="go">b&#39;A&#39;</span>
+<dt>Usage Example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="sa">b</span><span class="s2">"A"</span><span class="p">,</span> <span class="n">char</span><span class="p">)</span>
+<span class="go">b"A"</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">char</span><span class="p">,</span> <span class="sa">b</span><span class="s2">"A"</span><span class="p">)</span>
+<span class="go">b'A'</span>
 </pre></div>
 </div>
 </dd>
@@ -770,8 +770,8 @@ Values packed with this field must be one-byte <code class="docutils literal not
 <dd><p>Boolean field stored as a single byte. Encoded as <code class="docutils literal notranslate"><span class="pre">0x00</span></code> for <code class="docutils literal notranslate"><span class="pre">False</span></code> and <code class="docutils literal notranslate"><span class="pre">0x01</span></code> for <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
 <dl>
 <dt>Usage Example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">boolean</span><span class="p">)</span>
-<span class="go">b&quot;\\x01&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">boolean</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">x00&quot;</span><span class="p">)</span>
+<span class="go">b"\\x01"</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">boolean</span><span class="p">,</span> <span class="sa">b</span><span class="s2">"</span><span class="se">\\</span><span class="s2">x00"</span><span class="p">)</span>
 <span class="go">False</span>
 </pre></div>
 </div>
@@ -857,13 +857,13 @@ has an additional flag that can be configured globally or once per field.</p>
 identify the end of the varint. Otherwise, zero will be used (which is the
 default setting). The following configurations are therefore possible:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">be</span> <span class="o">+</span> <span class="n">vint</span><span class="p">;</span> <span class="nb">print</span><span class="p">(</span><span class="n">pack</span><span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="n">field</span><span class="p">))</span>
-<span class="go">b&#39;\x88\x00&#39;</span>
+<span class="go">b'\x88\x00'</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">be</span> <span class="o">+</span> <span class="n">vint</span> <span class="o">|</span> <span class="n">VARINT_LSB</span><span class="p">;</span> <span class="nb">print</span><span class="p">(</span><span class="n">pack</span><span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="n">field</span><span class="p">))</span>
-<span class="go">b&#39;\x08\x80&#39;</span>
+<span class="go">b'\x08\x80'</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">le</span> <span class="o">+</span> <span class="n">vint</span><span class="p">;</span> <span class="nb">print</span><span class="p">(</span><span class="n">pack</span><span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="n">field</span><span class="p">))</span>
-<span class="go">b&#39;\x80\x08&#39;</span>
+<span class="go">b'\x80\x08'</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">le</span> <span class="o">+</span> <span class="n">vint</span> <span class="o">|</span> <span class="n">VARINT_LSB</span><span class="p">;</span> <span class="nb">print</span><span class="p">(</span><span class="n">pack</span><span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="n">field</span><span class="p">))</span>
-<span class="go">b&#39;\x00\x88&#39;</span>
+<span class="go">b'\x00\x88'</span>
 </pre></div>
 </div>
 <dl class="py method">
@@ -996,13 +996,13 @@ default setting). The following configurations are therefore possible:</p>
 on the current architecture.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>context</strong> (<a class="reference internal" href="../../reference/datamodel/protocols/contextlike.html#ContextLike" title="_ContextLike"><em>_ContextLike</em></a>) – The input context.</p>
+<dd class="field-odd"><p><strong>context</strong> (<em>ContextLike</em>) – The input context.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The struct to use.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="../../reference/datamodel/protocols/structlike.html#StructLike" title="_StructLike">_StructLike</a></p>
+<dd class="field-odd"><p>StructLike</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1014,13 +1014,13 @@ on the current architecture.</p>
 on the current architecture.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>context</strong> (<a class="reference internal" href="../../reference/datamodel/protocols/contextlike.html#ContextLike" title="_ContextLike"><em>_ContextLike</em></a>) – The input context.</p>
+<dd class="field-odd"><p><strong>context</strong> (<em>ContextLike</em>) – The input context.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The struct to use.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="../../reference/datamodel/protocols/structlike.html#StructLike" title="_StructLike">_StructLike</a></p>
+<dd class="field-odd"><p>StructLike</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1053,12 +1053,12 @@ the stream is read.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">memory</span> <span class="o">=</span> <span class="n">Memory</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">memory_dynamic</span> <span class="o">=</span> <span class="n">Memory</span><span class="p">(</span><span class="k">lambda</span> <span class="n">ctx</span><span class="p">:</span> <span class="n">ctx</span><span class="o">.</span><span class="n">_root</span><span class="o">.</span><span class="n">length</span><span class="p">)</span> <span class="c1"># dynamic length based on context</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">memory_greedy</span> <span class="o">=</span> <span class="n">Memory</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;1234567890&quot;</span><span class="p">,</span> <span class="n">memory</span><span class="p">,</span> <span class="n">as_field</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="go">b&quot;1234567890&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;1234567890&quot;</span><span class="p">,</span> <span class="n">memory_dynamic</span><span class="p">,</span> <span class="n">as_field</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-<span class="go">b&quot;1234567890&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;1234567890&quot;</span><span class="p">,</span> <span class="n">memory_greedy</span><span class="p">,</span> <span class="n">as_field</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="go">b&quot;1234567890&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="sa">b</span><span class="s2">"1234567890"</span><span class="p">,</span> <span class="n">memory</span><span class="p">,</span> <span class="n">as_field</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">b"1234567890"</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="sa">b</span><span class="s2">"1234567890"</span><span class="p">,</span> <span class="n">memory_dynamic</span><span class="p">,</span> <span class="n">as_field</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="go">b"1234567890"</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="sa">b</span><span class="s2">"1234567890"</span><span class="p">,</span> <span class="n">memory_greedy</span><span class="p">,</span> <span class="n">as_field</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">b"1234567890"</span>
 </pre></div>
 </div>
 <dl class="field-list simple">
@@ -1083,9 +1083,9 @@ validation is performed to ensure that the length of the <cite>obj</cite> matche
 the expected size.</p>
 <p>Examples:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">memory</span> <span class="o">=</span> <span class="n">Memory</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;1234567890&quot;</span><span class="p">,</span> <span class="n">memory</span><span class="p">,</span> <span class="n">as_field</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="c1"># Packs exactly 10 bytes into the stream</span>
-<span class="go">b&quot;1234567890&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="n">memory</span><span class="p">,</span> <span class="n">as_field</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="sa">b</span><span class="s2">"1234567890"</span><span class="p">,</span> <span class="n">memory</span><span class="p">,</span> <span class="n">as_field</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="c1"># Packs exactly 10 bytes into the stream</span>
+<span class="go">b"1234567890"</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="sa">b</span><span class="s2">"1"</span><span class="p">,</span> <span class="n">memory</span><span class="p">,</span> <span class="n">as_field</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gt">Traceback (most recent call last):</span>
 <span class="c">...</span>
 <span class="gr">ValidationError</span>: <span class="n">Memory field expected 10 bytes, but got 1 bytes instead</span>
@@ -1199,10 +1199,10 @@ on the presence of the <cite>struct</cite> argument. However, the returned prefi
 an integer.</p>
 <p>Example usage:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prefixed</span> <span class="o">=</span> <span class="n">Prefixed</span><span class="p">(</span><span class="n">uint32</span><span class="p">,</span> <span class="n">Bytes</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;abcd&quot;</span><span class="p">,</span> <span class="n">prefixed</span><span class="p">,</span> <span class="n">as_field</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="go">b&quot;\x00\x00\x00\x04abcd&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">prefixed</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x00\x00\x00\x04</span><span class="s2">abcd&quot;</span><span class="p">,</span> <span class="n">as_field</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="go">b&quot;abcd&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="sa">b</span><span class="s2">"abcd"</span><span class="p">,</span> <span class="n">prefixed</span><span class="p">,</span> <span class="n">as_field</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">b"\x00\x00\x00\x04abcd"</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">prefixed</span><span class="p">,</span> <span class="sa">b</span><span class="s2">"</span><span class="se">\x00\x00\x00\x04</span><span class="s2">abcd"</span><span class="p">,</span> <span class="n">as_field</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">b"abcd"</span>
 </pre></div>
 </div>
 <p>The prefix is packed and unpacked independently and is used to determine the size of the
@@ -1265,11 +1265,11 @@ through the specified structure for further unpacking.</p>
 padded with a single byte. Fixed lengths are measured after encoding, so
 multibyte characters consume multiple bytes of the configured capacity.</p>
 <p>Example usage:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cstring</span> <span class="o">=</span> <span class="n">CString</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="c1"># encoding is optional</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="s2">&quot;Hello&quot;</span><span class="p">,</span> <span class="n">cstring</span><span class="p">,</span> <span class="n">as_field</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="go">b&quot;Hello\x00&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">cstring</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;Hello</span><span class="se">\x00</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">as_field</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="go">&#39;Hello&#39;</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cstring</span> <span class="o">=</span> <span class="n">CString</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="c1"># encoding is optional</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="s2">"Hello"</span><span class="p">,</span> <span class="n">cstring</span><span class="p">,</span> <span class="n">as_field</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">b"Hello\x00"</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">cstring</span><span class="p">,</span> <span class="sa">b</span><span class="s2">"Hello</span><span class="se">\x00</span><span class="s2">"</span><span class="p">,</span> <span class="n">as_field</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">'Hello'</span>
 </pre></div>
 </div>
 <p>This class also supports direct getitem access to create a list:</p>
@@ -1295,12 +1295,12 @@ characters. During packing, the encoded byte sequence must fit in the
 configured length and is padded with the configured single-byte padding
 value. During unpacking, exactly that many bytes are read and trailing
 padding bytes are stripped before decoding.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="s2">&quot;ä&quot;</span><span class="p">,</span> <span class="n">CString</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">),</span> <span class="n">as_field</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="go">b&#39;\\xc3\\xa4&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="s2">&quot;ä&quot;</span><span class="p">,</span> <span class="n">CString</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">),</span> <span class="n">as_field</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="s2">"ä"</span><span class="p">,</span> <span class="n">CString</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">),</span> <span class="n">as_field</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">b'\\xc3\\xa4'</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="s2">"ä"</span><span class="p">,</span> <span class="n">CString</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">),</span> <span class="n">as_field</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gt">Traceback (most recent call last):</span>
 <span class="c">...</span>
-<span class="gr">ValidationError</span>: <span class="n">String &#39;ä&#39; is too long for the fixed length of 1 bytes. Got 2 bytes.</span>
+<span class="gr">ValidationError</span>: <span class="n">String 'ä' is too long for the fixed length of 1 bytes. Got 2 bytes.</span>
 </pre></div>
 </div>
 <dl class="py method">
@@ -1357,18 +1357,18 @@ The string can optionally be encoded in a specific encoding.</p>
 to convert a string annotation to a <cite>ConstString</cite> field.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@struct</span>
 <span class="gp">... </span><span class="k">class</span><span class="w"> </span><span class="nc">MyStruct</span><span class="p">:</span>
-<span class="gp">... </span>    <span class="n">value</span><span class="p">:</span> <span class="s2">&quot;const str&quot;</span> <span class="c1"># &lt;-- will be converted to ConstString</span>
+<span class="gp">... </span>    <span class="n">value</span><span class="p">:</span> <span class="s2">"const str"</span> <span class="c1"># &lt;-- will be converted to ConstString</span>
 </pre></div>
 </div>
 <p>Note that the type declaration above won’t work if you enable
 annotation evaluation.</p>
 <p>Examples:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Define a constant string value to enforce during encoding/decoding</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">const_str</span> <span class="o">=</span> <span class="n">ConstString</span><span class="p">(</span><span class="s2">&quot;Hello, World!&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">const_str</span> <span class="o">=</span> <span class="n">ConstString</span><span class="p">(</span><span class="s2">"Hello, World!"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">const_str</span><span class="p">,</span> <span class="n">as_field</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="go">b&quot;Hello, World!&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">const_str</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;Hello, World!&quot;</span><span class="p">,</span> <span class="n">as_field</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="go">&quot;Hello, World!&quot;</span>
+<span class="go">b"Hello, World!"</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">const_str</span><span class="p">,</span> <span class="sa">b</span><span class="s2">"Hello, World!"</span><span class="p">,</span> <span class="n">as_field</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">"Hello, World!"</span>
 </pre></div>
 </div>
 <dl class="field-list simple">
@@ -1394,7 +1394,7 @@ preserved.</p>
 a bytes annotation to a <cite>ConstBytes</cite> field.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@struct</span>
 <span class="gp">... </span><span class="k">class</span><span class="w"> </span><span class="nc">MyStruct</span><span class="p">:</span>
-<span class="gp">... </span>    <span class="n">value</span><span class="p">:</span> <span class="sa">b</span><span class="s2">&quot;const bytes&quot;</span> <span class="c1"># &lt;-- will be converted to ConstBytes</span>
+<span class="gp">... </span>    <span class="n">value</span><span class="p">:</span> <span class="sa">b</span><span class="s2">"const bytes"</span> <span class="c1"># &lt;-- will be converted to ConstBytes</span>
 </pre></div>
 </div>
 <dl class="field-list simple">
@@ -1421,8 +1421,8 @@ a bytes annotation to a <cite>ConstBytes</cite> field.</p>
 generate a predetermined byte sequence during packing or unpacking.
 It can be used both as a standalone field and as part of a larger
 field specification where a <em>length</em> is applied.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">padding</span><span class="p">)</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x00</span><span class="s2">&quot;</span>
-<span class="go">b&quot;\x00&quot;</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">padding</span><span class="p">)</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">"</span><span class="se">\x00</span><span class="s2">"</span>
+<span class="go">b"\x00"</span>
 </pre></div>
 </div>
 <dl class="field-list simple">
@@ -1532,10 +1532,10 @@ perform any operations during packing.</p>
 <span class="gp">... </span><span class="k">class</span><span class="w"> </span><span class="nc">MyStruct</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="n">abc</span><span class="p">:</span> <span class="n">Pass</span>
 <span class="gp">...</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span> <span class="o">=</span> <span class="n">unpack</span><span class="p">(</span><span class="n">MyStruct</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x00\x01</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span> <span class="o">=</span> <span class="n">unpack</span><span class="p">(</span><span class="n">MyStruct</span><span class="p">,</span> <span class="sa">b</span><span class="s2">"</span><span class="se">\x00\x01</span><span class="s2">"</span><span class="p">)</span>
 <span class="go">MyStruct(abc=None)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="n">MyStruct</span><span class="p">(</span><span class="n">abc</span><span class="o">=</span><span class="kc">None</span><span class="p">))</span>
-<span class="go">b&quot;&quot;</span>
+<span class="go">b""</span>
 </pre></div>
 </div>
 <p>See source code for details</p>
@@ -1554,11 +1554,11 @@ that the field starts or ends at a memory address that is a multiple of the alig
 <span class="gp">... </span>    <span class="n">a</span><span class="p">:</span> <span class="n">Aligned</span><span class="p">(</span><span class="n">int16</span><span class="p">,</span> <span class="n">alignment</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">after</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">... </span>    <span class="n">b</span><span class="p">:</span> <span class="n">uint8</span>
 <span class="gp">...</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">Format</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x00\x01\xFF\xFF\x01</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">Format</span><span class="p">,</span> <span class="sa">b</span><span class="s2">"</span><span class="se">\x00\x01\xFF\xFF\x01</span><span class="s2">"</span><span class="p">)</span>
 <span class="gt">Traceback (most recent call last):</span>
 <span class="c">...</span>
 <span class="gr">ValueError</span>: <span class="n">Expected 2 bytes of padding (value=0), got 0</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">Format</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x00\x01\x00\x00\x01</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">Format</span><span class="p">,</span> <span class="sa">b</span><span class="s2">"</span><span class="se">\x00\x01\x00\x00\x01</span><span class="s2">"</span><span class="p">)</span>
 <span class="go">Format(a=256, b=1)</span>
 </pre></div>
 </div>
@@ -1664,7 +1664,7 @@ or a context lambda that computes the alignment dynamically based on the current
 <span class="gp">... </span>    <span class="n">a</span><span class="p">:</span> <span class="n">uint8</span>
 <span class="gp">... </span>    <span class="n">b</span><span class="p">:</span> <span class="n">padding</span><span class="p">[</span><span class="n">align</span><span class="p">(</span><span class="mi">4</span><span class="p">)]</span>
 <span class="gp">...</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">Format</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x01\x00\x00\x00</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">Format</span><span class="p">,</span> <span class="sa">b</span><span class="s2">"</span><span class="se">\x01\x00\x00\x00</span><span class="s2">"</span><span class="p">)</span>
 <span class="go">Format(a=1, b=None)</span>
 </pre></div>
 </div>
@@ -1697,10 +1697,10 @@ the provided lambda function or constant value during encoding and decoding.</p>
 <p>Examples:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Define a computed field with a constant value</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">computed</span> <span class="o">=</span> <span class="n">Computed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">computed</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x00\x01</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">as_field</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">computed</span><span class="p">,</span> <span class="sa">b</span><span class="s2">"</span><span class="se">\x00\x01</span><span class="s2">"</span><span class="p">,</span> <span class="n">as_field</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="go">42</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">computed</span><span class="p">,</span> <span class="n">as_field</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="go">b&quot;&quot; # won&#39;t affect the stream</span>
+<span class="go">b"" # won't affect the stream</span>
 </pre></div>
 </div>
 <dl class="field-list simple">
@@ -1824,8 +1824,8 @@ a default value in case an invalid or unrecognized value is encountered during d
 <span class="gp">...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cp_enum</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="n">Color</span><span class="p">,</span> <span class="n">uint8</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="n">Color</span><span class="o">.</span><span class="n">RED</span><span class="p">,</span> <span class="n">cp_enum</span><span class="p">,</span> <span class="n">as_field</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="go">b&quot;\x01&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">cp_enum</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x01</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">as_field</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">b"\x01"</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">cp_enum</span><span class="p">,</span> <span class="sa">b</span><span class="s2">"</span><span class="se">\x01</span><span class="s2">"</span><span class="p">,</span> <span class="n">as_field</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="go">Color.RED</span>
 </pre></div>
 </div>
@@ -1906,11 +1906,11 @@ is raised.</p>
 <p>Example usage:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Define a constant value to enforce during encoding/decoding</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">const_value</span> <span class="o">=</span> <span class="mi">42</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span> <span class="o">=</span> <span class="n">SomeStruct</span><span class="p">()</span> <span class="c1"># must parse &#39;const_value`</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span> <span class="o">=</span> <span class="n">SomeStruct</span><span class="p">()</span> <span class="c1"># must parse 'const_value`</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">Const</span><span class="p">(</span><span class="n">const_value</span><span class="p">,</span> <span class="n">struct</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">field</span><span class="p">)</span>
-<span class="go">b&quot;\x2a&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x2a</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="go">b"\x2a"</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="sa">b</span><span class="s2">"</span><span class="se">\x2a</span><span class="s2">"</span><span class="p">)</span>
 <span class="go">42</span>
 </pre></div>
 </div>
@@ -2001,7 +2001,7 @@ The <cite>struct_fn</cite> function is invoked to generate the struct when the f
 <span class="gp">... </span><span class="k">class</span><span class="w"> </span><span class="nc">SecondFormat</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="n">a</span><span class="p">:</span> <span class="n">uint8</span>
 <span class="gp">...</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">Format</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x01\x02\xFF</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">Format</span><span class="p">,</span> <span class="sa">b</span><span class="s2">"</span><span class="se">\x01\x02\xFF</span><span class="s2">"</span><span class="p">)</span>
 <span class="go">Format(a=SecondFormat(a=1), b=255)</span>
 </pre></div>
 </div>
@@ -2064,8 +2064,8 @@ when the field is accessed.</p>
 from their binary representation. The UUID is represented as a 16-byte
 field (128 bits) and supports both little-endian and big-endian formats.</p>
 <p>Example usage:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">Uuid</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;e3215476e89b12d3&#39;</span><span class="p">,</span> <span class="n">as_field</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="go">UUID(&#39;65333231-3534-3736-6538-396231326433&#39;)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">Uuid</span><span class="p">,</span> <span class="sa">b</span><span class="s1">'e3215476e89b12d3'</span><span class="p">,</span> <span class="n">as_field</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">UUID('65333231-3534-3736-6538-396231326433')</span>
 </pre></div>
 </div>
 <dl class="field-list simple">
@@ -2096,12 +2096,12 @@ unpacked value is used as the length of the target field.</p>
 <p>Example usage:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@struct</span>
 <span class="gp">... </span><span class="k">class</span><span class="w"> </span><span class="nc">MyStruct</span><span class="p">:</span>
-<span class="gp">... </span>    <span class="n">length</span><span class="p">:</span> <span class="n">AsLengthRef</span><span class="p">(</span><span class="s2">&quot;length&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">uint16</span><span class="p">)</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="gp">... </span>    <span class="n">length</span><span class="p">:</span> <span class="n">AsLengthRef</span><span class="p">(</span><span class="s2">"length"</span><span class="p">,</span> <span class="s2">"data"</span><span class="p">,</span> <span class="n">uint16</span><span class="p">)</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="gp">... </span>    <span class="n">a</span><span class="p">:</span> <span class="n">uint8</span>
 <span class="gp">... </span>    <span class="n">data</span><span class="p">:</span> <span class="n">Bytes</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">length</span><span class="p">)</span>
 <span class="gp">...</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="n">MyStruct</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="sa">b</span><span class="s2">&quot;Hello, world!&quot;</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
-<span class="go">b&#39;\x00\x0c\x01Hello, world!&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="n">MyStruct</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="sa">b</span><span class="s2">"Hello, world!"</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+<span class="go">b'\x00\x0c\x01Hello, world!'</span>
 </pre></div>
 </div>
 <dl class="field-list simple">
@@ -2128,7 +2128,7 @@ timestamp during decoding. The timestamp may be represented as either a
 floating-point or integer value depending on the provided configuration.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">Timestamp</span><span class="p">(</span><span class="n">float64</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span> <span class="n">field</span><span class="p">)</span>
-<span class="go">b&#39;...&#39;</span>
+<span class="go">b'...'</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span>
 <span class="go">datetime.datetime(1990, 1, 1, 0, 0, 0, 0)</span>
 </pre></div>
@@ -2159,7 +2159,7 @@ integer value depending on the <code class="docutils literal notranslate"><span 
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>obj</strong> (<em>datetime.datetime</em>) – Datetime object to be encoded</p></li>
-<li><p><strong>context</strong> (<a class="reference internal" href="../../reference/datamodel/protocols/contextlike.html#ContextLike" title="_ContextLike"><em>_ContextLike</em></a>) – Transformation context used during encoding</p></li>
+<li><p><strong>context</strong> (<em>ContextLike</em>) – Transformation context used during encoding</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -2181,7 +2181,7 @@ instance. The configured timezone is applied if provided.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>parsed</strong> (<em>_TimestampT</em>) – Parsed timestamp value</p></li>
-<li><p><strong>context</strong> (<a class="reference internal" href="../../reference/datamodel/protocols/contextlike.html#ContextLike" title="_ContextLike"><em>_ContextLike</em></a>) – Transformation context used during decoding</p></li>
+<li><p><strong>context</strong> (<em>ContextLike</em>) – Transformation context used during decoding</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

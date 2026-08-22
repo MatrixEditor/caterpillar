@@ -411,32 +411,33 @@
 <span class="c1"># along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
 <span class="c1"># pyright: reportPrivateUsage=false</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">sys</span><span class="w"> </span><span class="kn">import</span> <span class="n">maxsize</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">platform</span><span class="w"> </span><span class="kn">import</span> <span class="n">machine</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Final</span><span class="p">,</span> <span class="n">override</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">platform</span><span class="w"> </span><span class="kn">import</span> <span class="n">machine</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sys</span><span class="w"> </span><span class="kn">import</span> <span class="n">maxsize</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Final</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">override</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.abc</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">_EndianLike</span><span class="p">,</span>
-    <span class="n">_SupportsSetEndian</span><span class="p">,</span>
     <span class="n">_OT</span><span class="p">,</span>
-    <span class="n">_ContextLambda</span><span class="p">,</span>
-    <span class="n">_ContextLike</span><span class="p">,</span>
-    <span class="n">_ArchLike</span><span class="p">,</span>
+    <span class="n">ArchLike</span><span class="p">,</span>
+    <span class="n">ContextLambda</span><span class="p">,</span>
+    <span class="n">ContextLike</span><span class="p">,</span>
+    <span class="n">EndianLike</span><span class="p">,</span>
+    <span class="n">SupportsSetEndian</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.shared</span><span class="w"> </span><span class="kn">import</span> <span class="n">ATTR_BYTEORDER</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">CTX_ORDER</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.options</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flag</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.shared</span><span class="w"> </span><span class="kn">import</span> <span class="n">ATTR_BYTEORDER</span>
 
 
 <div class="viewcode-block" id="ByteOrder">
 <a class="viewcode-back" href="../../library/byteorder.html#caterpillar.byteorder.ByteOrder">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ByteOrder</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Represents byte order information, including alignment and size.</span>
 
 <span class="sd">    :param name: A string representing the name of the byte order.</span>
@@ -446,7 +447,7 @@
 <span class="sd">                      is `Alignment.NONE`).</span>
 <span class="sd">    :param size: An enumeration representing the size (default is</span>
 <span class="sd">                 `Size.STANDARD`).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">ch</span><span class="p">:</span> <span class="nb">str</span>
@@ -472,31 +473,31 @@
 <div class="viewcode-block" id="ByteOrder.apply">
 <a class="viewcode-back" href="../../library/byteorder.html#caterpillar.byteorder.ByteOrder.apply">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Applies the byte order information to another object.</span>
 
 <span class="sd">        :param other: The object to which the byte order information should be applied.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="nb">setattr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">ATTR_BYTEORDER</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_SupportsSetEndian</span><span class="p">[</span><span class="n">_OT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">_OT</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">SupportsSetEndian</span><span class="p">[</span><span class="n">_OT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">_OT</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Adds the byte order information to another object using the</span>
 <span class="sd">        `__set_byteorder__` method.</span>
 
 <span class="sd">        :param other: The object to which the byte order information should be added.</span>
 <span class="sd">        :return: The modified object.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">other</span><span class="o">.</span><span class="n">__set_byteorder__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__or__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_OT</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Applies the byte order information to another object using the `apply` method.</span>
 
 <span class="sd">        :param other: The object to which the byte order information should be applied.</span>
 <span class="sd">        :return: The modified object.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">other</span></div>
 
@@ -505,7 +506,7 @@
 <div class="viewcode-block" id="DynByteOrder">
 <a class="viewcode-back" href="../../library/byteorder.html#caterpillar.byteorder.DynByteOrder">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">DynByteOrder</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents a dynamic byte order resolved at runtime.</span>
+<span class="w">    </span><span class="sd">"""Represents a dynamic byte order resolved at runtime.</span>
 
 <span class="sd">    A dynamic byte order defers endian resolution until pack or unpack</span>
 <span class="sd">    execution. Resolution may depend on the active context, a field</span>
@@ -558,42 +559,42 @@
 <span class="sd">    :type func: callable, optional</span>
 <span class="sd">    :param init_ch: Initial format character, defaults to None</span>
 <span class="sd">    :type init_ch: str, optional</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">_ContextLambda</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">_EndianLike</span><span class="p">]</span> <span class="o">|</span> <span class="n">_ContextLambda</span><span class="p">[</span><span class="n">_EndianLike</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">ContextLambda</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">EndianLike</span><span class="p">]</span> <span class="o">|</span> <span class="n">ContextLambda</span><span class="p">[</span><span class="n">EndianLike</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">init_ch</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">name</span> <span class="ow">or</span> <span class="s2">&quot;&lt;Dynamic&gt;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">name</span> <span class="ow">or</span> <span class="s2">"&lt;Dynamic&gt;"</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__ch</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">init_ch</span> <span class="ow">or</span> <span class="n">LITTLE_ENDIAN_FMT</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">_EndianLike</span><span class="p">]</span> <span class="o">|</span> <span class="n">_ContextLambda</span><span class="p">[</span><span class="n">_EndianLike</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">func</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">EndianLike</span><span class="p">]</span> <span class="o">|</span> <span class="n">ContextLambda</span><span class="p">[</span><span class="n">EndianLike</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">func</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ctx_func</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="n">func</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">spec</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getfullargspec</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_ctx_func</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">_ContextLambda</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">ContextLambda</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">key</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__key_str</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">_ContextLambda</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="nb">bool</span><span class="p">]</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;DynByteOrder&quot;</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a derived dynamic byte order bound to a new key.</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">ContextLambda</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="nb">bool</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"DynByteOrder"</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Create a derived dynamic byte order bound to a new key.</span>
 
 <span class="sd">        :param key: Context key or callable used for byte order lookup</span>
 <span class="sd">        :type key: str or callable</span>
 <span class="sd">        :return: A new dynamic byte order instance</span>
 <span class="sd">        :rtype: DynByteOrder</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">DynByteOrder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ch</span><span class="p">)</span>
 
 <div class="viewcode-block" id="DynByteOrder.getch">
 <a class="viewcode-back" href="../../library/byteorder.html#caterpillar.byteorder.DynByteOrder.getch">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">getch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve the byte order format character from a context.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">getch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Resolve the byte order format character from a context.</span>
 
 <span class="sd">        Resolution order:</span>
 
@@ -608,7 +609,7 @@
 <span class="sd">        :type context: object</span>
 <span class="sd">        :return: Struct format character representing byte order</span>
 <span class="sd">        :rtype: str</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># fmt: off</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ctx_func</span><span class="p">:</span>
@@ -621,12 +622,12 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__key_str</span><span class="p">:</span>
                 <span class="n">byte_order</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">__context_getattr__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">)</span>  <span class="c1"># pyright: ignore[reportArgumentType]</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">byte_order</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="nb">bool</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>  <span class="c1"># pyright: ignore[reportCallIssue]</span>
+                <span class="n">byte_order</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="nb">bool</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>  <span class="c1"># pyright: ignore[reportCallIssue]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">root_context</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">_root</span>
             <span class="n">byte_order</span> <span class="o">=</span> <span class="p">(</span><span class="n">root_context</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">CTX_ORDER</span><span class="p">,</span> <span class="n">SysNative</span><span class="p">)</span>
 
-        <span class="n">ch</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">byte_order</span><span class="p">,</span> <span class="s2">&quot;ch&quot;</span><span class="p">,</span> <span class="n">byte_order</span><span class="p">)</span>
+        <span class="n">ch</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">byte_order</span><span class="p">,</span> <span class="s2">"ch"</span><span class="p">,</span> <span class="n">byte_order</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">ch</span> <span class="o">=</span> <span class="n">LITTLE_ENDIAN_FMT</span> <span class="k">if</span> <span class="nb">bool</span><span class="p">(</span><span class="n">byte_order</span><span class="p">)</span> <span class="k">else</span> <span class="n">BigEndian</span><span class="o">.</span><span class="n">ch</span>
 
@@ -635,94 +636,145 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">ch</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the active byte order character.</span>
+<span class="w">        </span><span class="sd">"""Return the active byte order character.</span>
 
 <span class="sd">        The value may change dynamically by inspecting the caller frame</span>
 <span class="sd">        and extracting a local variable named context.</span>
 
 <span class="sd">        :return: Struct format character for byte order</span>
 <span class="sd">        :rtype: str</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">frame</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">currentframe</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">frame</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">frame</span><span class="o">.</span><span class="n">f_back</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">ctx_frame</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">f_back</span>
-            <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">ctx_frame</span><span class="o">.</span><span class="n">f_locals</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;context&quot;</span><span class="p">)</span>
+            <span class="n">context</span><span class="p">:</span> <span class="n">ContextLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">ctx_frame</span><span class="o">.</span><span class="n">f_locals</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"context"</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">context</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__ch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getch</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ch</span>
 
     <span class="nd">@ch</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">ch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the byte order format character explicitly.</span>
+<span class="w">        </span><span class="sd">"""Set the byte order format character explicitly.</span>
 
 <span class="sd">        :param value: Struct format character to assign</span>
 <span class="sd">        :type value: str</span>
 <span class="sd">        :return: None</span>
 <span class="sd">        :rtype: None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__ch</span> <span class="o">=</span> <span class="n">value</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_SupportsSetEndian</span><span class="p">[</span><span class="n">_OT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">_OT</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply this byte order to another object.</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">SupportsSetEndian</span><span class="p">[</span><span class="n">_OT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">_OT</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Apply this byte order to another object.</span>
 
-<span class="sd">        Delegates to the other object&#39;s byte order assignment method.</span>
+<span class="sd">        Delegates to the other object's byte order assignment method.</span>
 
 <span class="sd">        :param other: Object supporting byte order assignment</span>
 <span class="sd">        :type other: object</span>
 <span class="sd">        :return: Result of the byte order assignment</span>
 <span class="sd">        :rtype: object</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">other</span><span class="o">.</span><span class="n">__set_byteorder__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
     <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;DynByteOrder little=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ch</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">LITTLE_ENDIAN_FMT</span><span class="si">}</span><span class="s2">&gt;&quot;</span></div>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"&lt;DynByteOrder little=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ch</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">LITTLE_ENDIAN_FMT</span><span class="si">}</span><span class="s2">&gt;"</span></div>
 
 
 
-<span class="n">LITTLE_ENDIAN_FMT</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&lt;&quot;</span>
-<span class="sd">&quot;&quot;&quot;Struct format character representing little-endian byte order.&quot;&quot;&quot;</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_InheritByteOrder</span><span class="p">(</span><span class="n">DynByteOrder</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Byte order that resolves to the byte order of the enclosing struct.</span>
+
+<span class="sd">    Unlike :data:`Dynamic`, which always resolves against the *root*</span>
+<span class="sd">    context (see :meth:`DynByteOrder.getch`), this endian type resolves</span>
+<span class="sd">    against the *immediate* enclosing context. This allows a struct to</span>
+<span class="sd">    inherit the byte order of whichever struct embeds it, regardless of</span>
+<span class="sd">    nesting depth, instead of always deferring to the top-level order::</span>
+
+<span class="sd">        @struct(order=Inherit)</span>
+<span class="sd">        class Inner:</span>
+<span class="sd">            value: uint32</span>
+
+<span class="sd">        @struct(order=BigEndian)</span>
+<span class="sd">        class Outer:</span>
+<span class="sd">            inner: Inner  # inner.value uses BigEndian</span>
+
+<span class="sd">    A struct declared with ``order=Inherit`` that has no enclosing struct</span>
+<span class="sd">    (e.g. used standalone, or passed directly to :func:`pack`/</span>
+<span class="sd">    :func:`unpack`) falls back to the regular default byte order</span>
+<span class="sd">    resolution (``O_DEFAULT_ENDIAN`` or :data:`LittleEndian`), exactly</span>
+<span class="sd">    like a struct with ``order=None``.</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">        Only structs explicitly declared with ``order=Inherit`` opt into</span>
+<span class="sd">        this behavior. The default (``order=None``) is unaffected and</span>
+<span class="sd">        keeps resolving to :data:`LittleEndian`/``O_DEFAULT_ENDIAN``</span>
+<span class="sd">        regardless of the enclosing struct's byte order.</span>
+<span class="sd">    """</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"&lt;Inherit&gt;"</span><span class="p">)</span>
+
+    <span class="nd">@override</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">getch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">order</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">CTX_ORDER</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">order</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">order</span> <span class="ow">is</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="c1"># No byte order was propagated from an enclosing struct (e.g.</span>
+            <span class="c1"># standalone/top-level usage).</span>
+            <span class="n">order</span> <span class="o">=</span> <span class="n">O_DEFAULT_ENDIAN</span><span class="o">.</span><span class="n">value</span> <span class="ow">or</span> <span class="n">LittleEndian</span>
+
+        <span class="n">ch</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="s2">"ch"</span><span class="p">,</span> <span class="n">order</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ch</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">LITTLE_ENDIAN_FMT</span>
+
+
+<span class="n">LITTLE_ENDIAN_FMT</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"&lt;"</span>
+<span class="sd">"""Struct format character representing little-endian byte order."""</span>
 
 <span class="c1"># Instances representing commonly used byte orders</span>
-<span class="n">Native</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">ByteOrder</span><span class="p">]</span> <span class="o">=</span> <span class="n">ByteOrder</span><span class="p">(</span><span class="s2">&quot;Native&quot;</span><span class="p">,</span> <span class="s2">&quot;=&quot;</span><span class="p">)</span>
-<span class="sd">&quot;&quot;&quot;Predefined :class:`ByteOrder` instance representing native platform byte order.&quot;&quot;&quot;</span>
+<span class="n">Native</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">ByteOrder</span><span class="p">]</span> <span class="o">=</span> <span class="n">ByteOrder</span><span class="p">(</span><span class="s2">"Native"</span><span class="p">,</span> <span class="s2">"="</span><span class="p">)</span>
+<span class="sd">"""Predefined :class:`ByteOrder` instance representing native platform byte order."""</span>
 
-<span class="n">BigEndian</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">ByteOrder</span><span class="p">]</span> <span class="o">=</span> <span class="n">ByteOrder</span><span class="p">(</span><span class="s2">&quot;Big Endian&quot;</span><span class="p">,</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">)</span>
-<span class="sd">&quot;&quot;&quot;Predefined :class:`ByteOrder` instance representing big-endian byte order.&quot;&quot;&quot;</span>
+<span class="n">BigEndian</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">ByteOrder</span><span class="p">]</span> <span class="o">=</span> <span class="n">ByteOrder</span><span class="p">(</span><span class="s2">"Big Endian"</span><span class="p">,</span> <span class="s2">"&gt;"</span><span class="p">)</span>
+<span class="sd">"""Predefined :class:`ByteOrder` instance representing big-endian byte order."""</span>
 
-<span class="n">LittleEndian</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">ByteOrder</span><span class="p">]</span> <span class="o">=</span> <span class="n">ByteOrder</span><span class="p">(</span><span class="s2">&quot;Little Endian&quot;</span><span class="p">,</span> <span class="n">LITTLE_ENDIAN_FMT</span><span class="p">)</span>
-<span class="sd">&quot;&quot;&quot;Predefined :class:`ByteOrder` instance representing little-endian byte order.&quot;&quot;&quot;</span>
+<span class="n">LittleEndian</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">ByteOrder</span><span class="p">]</span> <span class="o">=</span> <span class="n">ByteOrder</span><span class="p">(</span><span class="s2">"Little Endian"</span><span class="p">,</span> <span class="n">LITTLE_ENDIAN_FMT</span><span class="p">)</span>
+<span class="sd">"""Predefined :class:`ByteOrder` instance representing little-endian byte order."""</span>
 
-<span class="n">NetEndian</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">ByteOrder</span><span class="p">]</span> <span class="o">=</span> <span class="n">ByteOrder</span><span class="p">(</span><span class="s2">&quot;Network&quot;</span><span class="p">,</span> <span class="s2">&quot;!&quot;</span><span class="p">)</span>
-<span class="sd">&quot;&quot;&quot;Predefined :class:`ByteOrder` instance representing network byte order.&quot;&quot;&quot;</span>
+<span class="n">NetEndian</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">ByteOrder</span><span class="p">]</span> <span class="o">=</span> <span class="n">ByteOrder</span><span class="p">(</span><span class="s2">"Network"</span><span class="p">,</span> <span class="s2">"!"</span><span class="p">)</span>
+<span class="sd">"""Predefined :class:`ByteOrder` instance representing network byte order."""</span>
 
 <span class="n">SysNative</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">ByteOrder</span><span class="p">]</span> <span class="o">=</span> <span class="n">ByteOrder</span><span class="p">(</span>
-    <span class="s2">&quot;SysNative&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;@&quot;</span><span class="p">,</span>
+    <span class="s2">"SysNative"</span><span class="p">,</span>
+    <span class="s2">"@"</span><span class="p">,</span>
     <span class="n">ByteOrder</span><span class="o">.</span><span class="n">Alignment</span><span class="o">.</span><span class="n">NATIVE</span><span class="p">,</span>
     <span class="n">ByteOrder</span><span class="o">.</span><span class="n">Size</span><span class="o">.</span><span class="n">NATIVE</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="sd">&quot;&quot;&quot;Predefined :class:`ByteOrder` instance representing system-native byte order</span>
+<span class="sd">"""Predefined :class:`ByteOrder` instance representing system-native byte order</span>
 <span class="sd">with native alignment and size rules.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="n">Dynamic</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">DynByteOrder</span><span class="p">]</span> <span class="o">=</span> <span class="n">DynByteOrder</span><span class="p">()</span>
-<span class="sd">&quot;&quot;&quot;Predefined :class:`DynByteOrder` instance for runtime-determined byte order.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""Predefined :class:`DynByteOrder` instance for runtime-determined byte order.</span>
+<span class="sd">"""</span>
 
-<span class="n">O_DEFAULT_ENDIAN</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">Flag</span><span class="p">[</span><span class="n">_EndianLike</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Flag</span><span class="p">(</span><span class="s2">&quot;option.endian&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-<span class="sd">&quot;&quot;&quot;Default flag option representing an unspecified byte order.&quot;&quot;&quot;</span>
+<span class="n">Inherit</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">_InheritByteOrder</span><span class="p">]</span> <span class="o">=</span> <span class="n">_InheritByteOrder</span><span class="p">()</span>
+<span class="sd">""":class:`DynByteOrder` instance that makes a struct inherit its</span>
+<span class="sd">byte order from the struct that embeds it (see :class:`_InheritByteOrder`),</span>
+<span class="sd">instead of using a fixed byte order.</span>
+<span class="sd">"""</span>
+
+<span class="n">O_DEFAULT_ENDIAN</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">Flag</span><span class="p">[</span><span class="n">EndianLike</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Flag</span><span class="p">(</span><span class="s2">"option.endian"</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="sd">"""Default flag option representing an unspecified byte order."""</span>
 
 
 <div class="viewcode-block" id="byteorder">
 <a class="viewcode-back" href="../../library/byteorder.html#caterpillar.byteorder.byteorder">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">byteorder</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">default</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_EndianLike</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">byteorder</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">default</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EndianLike</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Get the byte order of an object, defaulting to SysNative if not explicitly set.</span>
 
 <span class="sd">    :param obj: The object to retrieve the byte order from.</span>
 <span class="sd">    :return: The byte order of the object.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">ATTR_BYTEORDER</span><span class="p">,</span> <span class="n">default</span> <span class="ow">or</span> <span class="n">SysNative</span><span class="p">)</span></div>
 
 
@@ -730,10 +782,10 @@
 <div class="viewcode-block" id="byteorder_is_little">
 <a class="viewcode-back" href="../../library/byteorder.html#caterpillar.byteorder.byteorder_is_little">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">byteorder_is_little</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Check if the byte order of an object is little-endian.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;ch&quot;</span><span class="p">,</span> <span class="n">LITTLE_ENDIAN_FMT</span><span class="p">)</span> <span class="o">==</span> <span class="n">LITTLE_ENDIAN_FMT</span></div>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">"ch"</span><span class="p">,</span> <span class="n">LITTLE_ENDIAN_FMT</span><span class="p">)</span> <span class="o">==</span> <span class="n">LITTLE_ENDIAN_FMT</span></div>
 
 
 
@@ -741,12 +793,12 @@
 <a class="viewcode-back" href="../../library/byteorder.html#caterpillar.byteorder.Arch">[docs]</a>
 <span class="nd">@dataclass</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">Arch</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Represents a system architecture with a name and an indication of whether it is 64-bit.</span>
 
 <span class="sd">    :param name: The name of the architecture.</span>
 <span class="sd">    :param ptr_size: the amount of bits one pointer takes</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">ptr_size</span><span class="p">:</span> <span class="nb">int</span></div>
@@ -756,23 +808,23 @@
 <span class="n">system_arch</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">Arch</span><span class="p">]</span> <span class="o">=</span> <span class="n">Arch</span><span class="p">(</span><span class="n">machine</span><span class="p">(),</span> <span class="mi">64</span> <span class="k">if</span> <span class="n">maxsize</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="o">**</span><span class="mi">32</span> <span class="k">else</span> <span class="mi">32</span><span class="p">)</span>
 
 <span class="c1"># common architectures</span>
-<span class="n">x86</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">Arch</span><span class="p">]</span> <span class="o">=</span> <span class="n">Arch</span><span class="p">(</span><span class="s2">&quot;x86&quot;</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span>
-<span class="n">x86_64</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">Arch</span><span class="p">]</span> <span class="o">=</span> <span class="n">Arch</span><span class="p">(</span><span class="s2">&quot;x86-64&quot;</span><span class="p">,</span> <span class="mi">64</span><span class="p">)</span>
-<span class="n">ARM</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">Arch</span><span class="p">]</span> <span class="o">=</span> <span class="n">Arch</span><span class="p">(</span><span class="s2">&quot;ARM&quot;</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span>
-<span class="n">ARM64</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">Arch</span><span class="p">]</span> <span class="o">=</span> <span class="n">Arch</span><span class="p">(</span><span class="s2">&quot;ARM64&quot;</span><span class="p">,</span> <span class="mi">64</span><span class="p">)</span>
+<span class="n">x86</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">Arch</span><span class="p">]</span> <span class="o">=</span> <span class="n">Arch</span><span class="p">(</span><span class="s2">"x86"</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span>
+<span class="n">x86_64</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">Arch</span><span class="p">]</span> <span class="o">=</span> <span class="n">Arch</span><span class="p">(</span><span class="s2">"x86-64"</span><span class="p">,</span> <span class="mi">64</span><span class="p">)</span>
+<span class="n">ARM</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">Arch</span><span class="p">]</span> <span class="o">=</span> <span class="n">Arch</span><span class="p">(</span><span class="s2">"ARM"</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span>
+<span class="n">ARM64</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">Arch</span><span class="p">]</span> <span class="o">=</span> <span class="n">Arch</span><span class="p">(</span><span class="s2">"ARM64"</span><span class="p">,</span> <span class="mi">64</span><span class="p">)</span>
 <span class="n">AARCH64</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">Arch</span><span class="p">]</span> <span class="o">=</span> <span class="n">ARM64</span>
-<span class="n">PowerPC</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">Arch</span><span class="p">]</span> <span class="o">=</span> <span class="n">Arch</span><span class="p">(</span><span class="s2">&quot;PowerPC&quot;</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span>
-<span class="n">PowerPC64</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">Arch</span><span class="p">]</span> <span class="o">=</span> <span class="n">Arch</span><span class="p">(</span><span class="s2">&quot;PowerPC64&quot;</span><span class="p">,</span> <span class="mi">64</span><span class="p">)</span>
-<span class="n">MIPS</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">Arch</span><span class="p">]</span> <span class="o">=</span> <span class="n">Arch</span><span class="p">(</span><span class="s2">&quot;MIPS&quot;</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span>
-<span class="n">MIPS64</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">Arch</span><span class="p">]</span> <span class="o">=</span> <span class="n">Arch</span><span class="p">(</span><span class="s2">&quot;MIPS64&quot;</span><span class="p">,</span> <span class="mi">64</span><span class="p">)</span>
-<span class="n">SPARC</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">Arch</span><span class="p">]</span> <span class="o">=</span> <span class="n">Arch</span><span class="p">(</span><span class="s2">&quot;SPARC&quot;</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span>
-<span class="n">SPARC64</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">Arch</span><span class="p">]</span> <span class="o">=</span> <span class="n">Arch</span><span class="p">(</span><span class="s2">&quot;SPARC64&quot;</span><span class="p">,</span> <span class="mi">64</span><span class="p">)</span>
-<span class="n">RISC_V64</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">Arch</span><span class="p">]</span> <span class="o">=</span> <span class="n">Arch</span><span class="p">(</span><span class="s2">&quot;RISK-V64&quot;</span><span class="p">,</span> <span class="mi">64</span><span class="p">)</span>
-<span class="n">RISC_V</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">Arch</span><span class="p">]</span> <span class="o">=</span> <span class="n">Arch</span><span class="p">(</span><span class="s2">&quot;RISK-V&quot;</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span>
-<span class="n">AMD</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">Arch</span><span class="p">]</span> <span class="o">=</span> <span class="n">Arch</span><span class="p">(</span><span class="s2">&quot;AMD&quot;</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span>
-<span class="n">AMD64</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">Arch</span><span class="p">]</span> <span class="o">=</span> <span class="n">Arch</span><span class="p">(</span><span class="s2">&quot;AMD64&quot;</span><span class="p">,</span> <span class="mi">64</span><span class="p">)</span>
+<span class="n">PowerPC</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">Arch</span><span class="p">]</span> <span class="o">=</span> <span class="n">Arch</span><span class="p">(</span><span class="s2">"PowerPC"</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span>
+<span class="n">PowerPC64</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">Arch</span><span class="p">]</span> <span class="o">=</span> <span class="n">Arch</span><span class="p">(</span><span class="s2">"PowerPC64"</span><span class="p">,</span> <span class="mi">64</span><span class="p">)</span>
+<span class="n">MIPS</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">Arch</span><span class="p">]</span> <span class="o">=</span> <span class="n">Arch</span><span class="p">(</span><span class="s2">"MIPS"</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span>
+<span class="n">MIPS64</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">Arch</span><span class="p">]</span> <span class="o">=</span> <span class="n">Arch</span><span class="p">(</span><span class="s2">"MIPS64"</span><span class="p">,</span> <span class="mi">64</span><span class="p">)</span>
+<span class="n">SPARC</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">Arch</span><span class="p">]</span> <span class="o">=</span> <span class="n">Arch</span><span class="p">(</span><span class="s2">"SPARC"</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span>
+<span class="n">SPARC64</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">Arch</span><span class="p">]</span> <span class="o">=</span> <span class="n">Arch</span><span class="p">(</span><span class="s2">"SPARC64"</span><span class="p">,</span> <span class="mi">64</span><span class="p">)</span>
+<span class="n">RISC_V64</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">Arch</span><span class="p">]</span> <span class="o">=</span> <span class="n">Arch</span><span class="p">(</span><span class="s2">"RISK-V64"</span><span class="p">,</span> <span class="mi">64</span><span class="p">)</span>
+<span class="n">RISC_V</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">Arch</span><span class="p">]</span> <span class="o">=</span> <span class="n">Arch</span><span class="p">(</span><span class="s2">"RISK-V"</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span>
+<span class="n">AMD</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">Arch</span><span class="p">]</span> <span class="o">=</span> <span class="n">Arch</span><span class="p">(</span><span class="s2">"AMD"</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span>
+<span class="n">AMD64</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">Arch</span><span class="p">]</span> <span class="o">=</span> <span class="n">Arch</span><span class="p">(</span><span class="s2">"AMD64"</span><span class="p">,</span> <span class="mi">64</span><span class="p">)</span>
 
-<span class="n">O_DEFAULT_ARCH</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">Flag</span><span class="p">[</span><span class="n">_ArchLike</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Flag</span><span class="p">(</span><span class="s2">&quot;option.arch&quot;</span><span class="p">,</span> <span class="n">system_arch</span><span class="p">)</span>
+<span class="n">O_DEFAULT_ARCH</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">Flag</span><span class="p">[</span><span class="n">ArchLike</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Flag</span><span class="p">(</span><span class="s2">"option.arch"</span><span class="p">,</span> <span class="n">system_arch</span><span class="p">)</span>
 </pre></div>
 
                 </article>

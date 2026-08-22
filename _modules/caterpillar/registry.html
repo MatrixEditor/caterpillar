@@ -410,7 +410,7 @@
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
 <span class="c1"># pyright: reportPrivateUsage=false, reportExplicitAny=false</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 <span class="sd">Module for managing and performing type conversions using custom handlers.</span>
 
 <span class="sd">This module provides the :class:`TypeConverter` class, which is designed to</span>
@@ -437,9 +437,10 @@
 <span class="sd">  &gt;&gt;&gt; @TypeConverter(int)</span>
 <span class="sd">  ... def int_converter(annotation, kwargs):</span>
 <span class="sd">  ...     return Const(annotation, uint16)</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">override</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">_StructLike</span>
@@ -449,7 +450,7 @@
 <div class="viewcode-block" id="TypeConverter">
 <a class="viewcode-back" href="../../library/registry.html#caterpillar.registry.TypeConverter">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">TypeConverter</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    A utility class to define and manage type conversion handlers for annotations.</span>
 
 <span class="sd">    Type converters take the placed annotation and convert it into</span>
@@ -470,12 +471,12 @@
 <span class="sd">    :type target: Type, optional</span>
 <span class="sd">    :param delegate: optional delegation function, defaults to None</span>
 <span class="sd">    :type delegate: Callable[[Any, dict], _StructLike], optional</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">delegate</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">_StructLike</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    optional delegation function</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -488,20 +489,20 @@
 <div class="viewcode-block" id="TypeConverter.matches">
 <a class="viewcode-back" href="../../library/registry.html#caterpillar.registry.TypeConverter.matches">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">matches</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">annotation</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if this converter matches the given annotation type.</span>
+<span class="w">        </span><span class="sd">"""Check if this converter matches the given annotation type.</span>
 
 <span class="sd">        :param annotation: he type or object to match against the target.</span>
 <span class="sd">        :type annotation: Any</span>
 <span class="sd">        :return: True if the annotation matches the target type; otherwise False.</span>
 <span class="sd">        :rtype: bool</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="kc">False</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">annotation</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="TypeConverter.convert">
 <a class="viewcode-back" href="../../library/registry.html#caterpillar.registry.TypeConverter.convert">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">convert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">annotation</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">_StructLike</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert the given annotation (uses the delegate function by default).</span>
+<span class="w">        </span><span class="sd">"""Convert the given annotation (uses the delegate function by default).</span>
 
 <span class="sd">        :param annotation: The object to be converted.</span>
 <span class="sd">        :type annotation: Any</span>
@@ -510,27 +511,27 @@
 <span class="sd">        :raises NotImplementedError: If no delegate is defined for the converter.</span>
 <span class="sd">        :return: The converted object.</span>
 <span class="sd">        :rtype: _StructLike</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">delegate</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;NOT IMPLEMENTED&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">"NOT IMPLEMENTED"</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">delegate</span><span class="p">(</span><span class="n">annotation</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">delegate</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">_StructLike</span><span class="p">]</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;TypeConverter&quot;</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the delegate function for this converter and return the instance.&quot;&quot;&quot;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"TypeConverter"</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Sets the delegate function for this converter and return the instance."""</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">delegate</span> <span class="o">=</span> <span class="n">delegate</span>
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a string representation of the TypeConverter instance.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Returns a string representation of the TypeConverter instance."""</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">:</span>
-            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&gt;&quot;</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">"&lt;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&gt;"</span>
 
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&gt;&quot;</span></div>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"&lt;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&gt;"</span></div>
 
 
 
@@ -541,7 +542,7 @@
 <div class="viewcode-block" id="to_struct">
 <a class="viewcode-back" href="../../library/registry.html#caterpillar.registry.to_struct">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">to_struct</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_StructLike</span><span class="p">:</span>  <span class="c1"># pyright: ignore[reportAny]</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert an object to a :code:`_StruckLike` object using registered type converters.</span>
+<span class="w">    </span><span class="sd">"""Convert an object to a :code:`_StruckLike` object using registered type converters.</span>
 
 <span class="sd">    This function will not convert any objects that are already</span>
 <span class="sd">    implementing the functions of :code:`_StructLike`.</span>
@@ -552,7 +553,7 @@
 <span class="sd">    :raises ValidationError: If no matching type converter is found for the object.</span>
 <span class="sd">    :return: the converted object</span>
 <span class="sd">    :rtype: _StructLike</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="c1"># If the object is already a structured-like instance, return it.</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">_StructLike</span><span class="p">):</span>
@@ -560,13 +561,13 @@
 
     <span class="k">global</span> <span class="n">annotation_registry</span>
 
-    <span class="c1"># Find and use only the first registered converter that matches the object&#39;s type.</span>
+    <span class="c1"># Find and use only the first registered converter that matches the object's type.</span>
     <span class="n">handler</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">matches</span><span class="p">(</span><span class="n">obj</span><span class="p">),</span> <span class="n">annotation_registry</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">handler</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;The object of type &#39;</span><span class="si">{</span><span class="n">obj</span><span class="o">.</span><span class="vm">__class__</span><span class="si">}</span><span class="s2">&#39; could not be converted to a struct, because &quot;</span>
-            <span class="s2">&quot;the placed annotation does not have a corresponding handler:</span><span class="se">\n</span><span class="s2"> &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="si">}</span><span class="s2">,</span><span class="se">\n</span><span class="s2"> annotation: </span><span class="si">{</span><span class="n">obj</span><span class="si">!r}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">"The object of type '</span><span class="si">{</span><span class="n">obj</span><span class="o">.</span><span class="vm">__class__</span><span class="si">}</span><span class="s2">' could not be converted to a struct, because "</span>
+            <span class="s2">"the placed annotation does not have a corresponding handler:</span><span class="se">\n</span><span class="s2"> "</span>
+            <span class="sa">f</span><span class="s2">"type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="si">}</span><span class="s2">,</span><span class="se">\n</span><span class="s2"> annotation: </span><span class="si">{</span><span class="n">obj</span><span class="si">!r}</span><span class="s2">"</span>
         <span class="p">)</span>
         <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 

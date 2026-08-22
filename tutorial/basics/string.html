@@ -493,12 +493,12 @@ Default Syntax</label><div class="sd-tab-content docutils">
 <span class="nd">@struct</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">TEXTChunk</span><span class="p">:</span>
     <span class="c1"># dynamic sized string that ends with a null-byte</span>
-    <span class="n">keyword</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;ISO-8859-1&quot;</span><span class="p">]</span>
+    <span class="n">keyword</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"ISO-8859-1"</span><span class="p">]</span>
     <span class="c1"># static sized string based on the current context. some notes:</span>
-    <span class="c1">#   - parent.length is the current chunkt&#39;s length</span>
+    <span class="c1">#   - parent.length is the current chunkt's length</span>
     <span class="c1">#   - lenof(...) is the runtime length of the context variable</span>
     <span class="c1">#   - 1 because of the extra null-byte that is stripped from keyword</span>
-    <span class="n">text</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;ISO-8859-1&quot;</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="n">parent</span><span class="o">.</span><span class="n">length</span> <span class="o">-</span> <span class="n">lenof</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">keword</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">text</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"ISO-8859-1"</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="n">parent</span><span class="o">.</span><span class="n">length</span> <span class="o">-</span> <span class="n">lenof</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">keword</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -514,14 +514,14 @@ Extended Syntax (&gt;=2.8.0)</label><div class="sd-tab-content docutils">
 <span class="nd">@struct</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">TEXTChunk</span><span class="p">:</span>
     <span class="c1"># dynamic sized string that ends with a null-byte</span>
-    <span class="n">keyword</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">CString</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;ISO-8859-1&quot;</span><span class="p">))</span>
+    <span class="n">keyword</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">CString</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"ISO-8859-1"</span><span class="p">))</span>
     <span class="c1"># static sized string based on the current context. some notes:</span>
-    <span class="c1">#   - parent.length is the current chunkt&#39;s length</span>
+    <span class="c1">#   - parent.length is the current chunkt's length</span>
     <span class="c1">#   - lenof(...) is the runtime length of the context variable</span>
     <span class="c1">#   - 1 because of the extra null-byte that is stripped from keyword</span>
     <span class="n">text</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span>
         <span class="n">CString</span><span class="p">(</span>
-            <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;ISO-8859-1&quot;</span><span class="p">,</span>
+            <span class="n">encoding</span><span class="o">=</span><span class="s2">"ISO-8859-1"</span><span class="p">,</span>
             <span class="n">length</span><span class="o">=</span><span class="n">parent</span><span class="o">.</span><span class="n">length</span> <span class="o">-</span> <span class="n">lenof</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">keword</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="p">]</span>
@@ -544,15 +544,15 @@ This chunk uses a combination of strings and fixed-length fields. Here’s a pos
 Default Syntax</label><div class="sd-tab-content docutils">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nd">@struct</span>
 <span class="linenos"> 2</span><span class="k">class</span><span class="w"> </span><span class="nc">ITXTChunk</span><span class="p">:</span>
-<span class="linenos"> 3</span>    <span class="n">keyword</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+<span class="linenos"> 3</span>    <span class="n">keyword</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
 <span class="linenos"> 4</span>    <span class="n">compression_flag</span><span class="p">:</span> <span class="n">uint8</span>
-<span class="linenos"> 5</span>    <span class="c1"># we actually don&#39;t need an Enum here</span>
+<span class="linenos"> 5</span>    <span class="c1"># we actually don't need an Enum here</span>
 <span class="linenos"> 6</span>    <span class="n">compression_method</span><span class="p">:</span> <span class="n">uint8</span>
-<span class="linenos"> 7</span>    <span class="n">language_tag</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;ASCII&quot;</span><span class="p">)</span>
-<span class="linenos"> 8</span>    <span class="n">translated_keyword</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
-<span class="linenos"> 9</span>    <span class="c1"># length is calculated with parent.length - len(keyword)+len(b&quot;\x00&quot;) - ...</span>
+<span class="linenos"> 7</span>    <span class="n">language_tag</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"ASCII"</span><span class="p">)</span>
+<span class="linenos"> 8</span>    <span class="n">translated_keyword</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
+<span class="linenos"> 9</span>    <span class="c1"># length is calculated with parent.length - len(keyword)+len(b"\x00") - ...</span>
 <span class="linenos">10</span>    <span class="n">text</span><span class="p">:</span> <span class="n">CString</span><span class="p">(</span>
-<span class="linenos">11</span>        <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span>
+<span class="linenos">11</span>        <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">,</span>
 <span class="linenos">12</span>        <span class="n">length</span><span class="o">=</span><span class="n">parent</span><span class="o">.</span><span class="n">length</span> <span class="o">-</span> <span class="n">lenof</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">translated_keyword</span><span class="p">)</span> <span class="o">-</span> <span class="n">lenof</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">keyword</span><span class="p">)</span> <span class="o">-</span> <span class="mi">5</span><span class="p">,</span>
 <span class="linenos">13</span>    <span class="p">)</span>
 </pre></div>
@@ -567,15 +567,15 @@ Extended Syntax (&gt;=2.8.0)</label><div class="sd-tab-content docutils">
 <span class="linenos"> 4</span><span class="k">class</span><span class="w"> </span><span class="nc">ITXTChunk</span><span class="p">:</span>
 <span class="linenos"> 5</span>    <span class="n">keyword</span><span class="p">:</span> <span class="n">cstr_t</span>
 <span class="linenos"> 6</span>    <span class="n">compression_flag</span><span class="p">:</span> <span class="n">uint8_t</span>
-<span class="linenos"> 7</span>    <span class="c1"># we actually don&#39;t need an Enum here</span>
+<span class="linenos"> 7</span>    <span class="c1"># we actually don't need an Enum here</span>
 <span class="linenos"> 8</span>    <span class="n">compression_method</span><span class="p">:</span> <span class="n">uint8_t</span>
-<span class="linenos"> 9</span>    <span class="n">language_tag</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">CString</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;ASCII&quot;</span><span class="p">)]</span>
+<span class="linenos"> 9</span>    <span class="n">language_tag</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">CString</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"ASCII"</span><span class="p">)]</span>
 <span class="linenos">10</span>    <span class="n">translated_keyword</span><span class="p">:</span> <span class="n">cstr_t</span>
-<span class="linenos">11</span>    <span class="c1"># length is calculated with parent.length - len(keyword)+len(b&quot;\x00&quot;) - ...</span>
+<span class="linenos">11</span>    <span class="c1"># length is calculated with parent.length - len(keyword)+len(b"\x00") - ...</span>
 <span class="linenos">12</span>    <span class="n">text</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span>
 <span class="linenos">13</span>        <span class="nb">str</span><span class="p">,</span>
 <span class="linenos">14</span>        <span class="n">CString</span><span class="p">(</span>
-<span class="linenos">15</span>            <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span>
+<span class="linenos">15</span>            <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">,</span>
 <span class="linenos">16</span>            <span class="n">length</span><span class="o">=</span><span class="n">parent</span><span class="o">.</span><span class="n">length</span> <span class="o">-</span> <span class="n">lenof</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">translated_keyword</span><span class="p">)</span> <span class="o">-</span> <span class="n">lenof</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">keyword</span><span class="p">)</span> <span class="o">-</span> <span class="mi">5</span><span class="p">,</span>
 <span class="linenos">17</span>        <span class="p">)</span>
 <span class="linenos">18</span>    <span class="p">]</span>
@@ -586,7 +586,7 @@ Extended Syntax (&gt;=2.8.0)</label><div class="sd-tab-content docutils">
 </div>
 </details></div>
 <p>You can also customize the string’s termination character if needed:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span> <span class="o">=</span> <span class="n">CString</span><span class="p">(</span><span class="n">pad</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\x0A</span><span class="s2">&quot;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span> <span class="o">=</span> <span class="n">CString</span><span class="p">(</span><span class="n">pad</span><span class="o">=</span><span class="s2">"</span><span class="se">\x0A</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -595,11 +595,11 @@ Extended Syntax (&gt;=2.8.0)</label><div class="sd-tab-content docutils">
 <p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">Prefixed</span></code> class implements Pascal strings, where the
 length of the string is prefixed to the actual data. This is useful when dealing
 with raw bytes or strings with a length indicator.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">Prefixed</span><span class="p">(</span><span class="n">uint8</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="s2">&quot;Hello, World!&quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
-<span class="go">b&#39;\rHello, World!&#39;</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">Prefixed</span><span class="p">(</span><span class="n">uint8</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="s2">"Hello, World!"</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+<span class="go">b'\rHello, World!'</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span>
-<span class="go">&#39;Hello, World!&#39;</span>
+<span class="go">'Hello, World!'</span>
 </pre></div>
 </div>
 </section>

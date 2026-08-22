@@ -469,13 +469,17 @@ based on the current pack or unpack context.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">Added in version 2.6.4: </span>This feature is available in starting from version <code class="docutils literal notranslate"><span class="pre">2.6.4</span></code></p>
 </div>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.10.0: </span>Added the <code class="docutils literal notranslate"><span class="pre">Inherit</span></code> byteorder type.</p>
+</div>
 <p>There are various use-cases that require a struct to handle both big-endian and
 little-endian. In order to reduce the amount of code for these structs, <em>caterpillar</em>
 introduces a special byte order type: <a class="reference internal" href="../../library/byteorder.html#caterpillar.byteorder.DynByteOrder" title="caterpillar.byteorder.DynByteOrder"><code class="xref py py-class docutils literal notranslate"><span class="pre">DynByteOrder</span></code></a>. It
 supports two different configuration levels:</p>
 <ol class="arabic simple">
-<li><p>struct-wide: endianess is configured when calling <a class="reference internal" href="../../library/model/struct.html#caterpillar.model.pack" title="caterpillar.model.pack"><code class="xref py py-func docutils literal notranslate"><span class="pre">pack()</span></code></a> or
+<li><p>global: endianess is configured when calling <a class="reference internal" href="../../library/model/struct.html#caterpillar.model.pack" title="caterpillar.model.pack"><code class="xref py py-func docutils literal notranslate"><span class="pre">pack()</span></code></a> or
 <a class="reference internal" href="../../library/model/struct.html#caterpillar.model.unpack" title="caterpillar.model.unpack"><code class="xref py py-func docutils literal notranslate"><span class="pre">unpack()</span></code></a>.</p></li>
+<li><p>struct-level: byte order is applied per struct (handed down to all fields)</p></li>
 <li><p>field-level: byte order is applied per field</p></li>
 </ol>
 <p>Each of these configuration levels support various methods of selecting the target endian:</p>
@@ -575,7 +579,7 @@ so called <em>context key</em> can be specified, which can take one of the follo
 Default Syntax</label><div class="sd-tab-content docutils">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># ...</span>
 <span class="n">spec</span><span class="p">:</span> <span class="n">uint8</span>
-<span class="n">number</span><span class="p">:</span> <span class="n">Dynamic</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="s2">&quot;spec&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">uint32</span>
+<span class="n">number</span><span class="p">:</span> <span class="n">Dynamic</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="s2">"spec"</span><span class="p">)</span> <span class="o">+</span> <span class="n">uint32</span>
 <span class="c1"># ...</span>
 </pre></div>
 </div>
@@ -585,7 +589,7 @@ Default Syntax</label><div class="sd-tab-content docutils">
 Extended Syntax (&gt;=2.8.0)</label><div class="sd-tab-content docutils">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># ...</span>
 <span class="n">spec</span><span class="p">:</span> <span class="n">uint8_t</span>
-<span class="n">number</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dynamic</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="s2">&quot;spec&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">uint32</span><span class="p">]</span>
+<span class="n">number</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dynamic</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="s2">"spec"</span><span class="p">)</span> <span class="o">+</span> <span class="n">uint32</span><span class="p">]</span>
 <span class="c1"># ...</span>
 </pre></div>
 </div>
@@ -677,6 +681,186 @@ Extended Syntax (&gt;=2.8.0)</label><div class="sd-tab-content docutils">
 </div>
 </div>
 </section>
+<section id="example-byte-order-selected-by-an-ancestor">
+<h2><span class="section-number">2.3.2.4. </span>Example: byte order selected by an ancestor<a class="headerlink" href="#example-byte-order-selected-by-an-ancestor" title="Link to this heading">#</a></h2>
+<p>A nested model can select its byte order from an enclosing model by chaining
+the <a class="reference internal" href="../../library/context.html#caterpillar.context.parent" title="caterpillar.context.parent"><code class="xref py py-data docutils literal notranslate"><span class="pre">parent</span></code></a> context path. In this example,
+<code class="docutils literal notranslate"><span class="pre">Inner</span></code> is nested through <code class="docutils literal notranslate"><span class="pre">Middle</span></code>, so
+<code class="docutils literal notranslate"><span class="pre">parent.parent.byte_order</span></code> resolves <code class="docutils literal notranslate"><span class="pre">Outer.byte_order</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">Dynamic</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">byte_order</span><span class="p">))</span>
+<span class="linenos"> 2</span><span class="k">class</span><span class="w"> </span><span class="nc">Inner</span><span class="p">:</span>
+<span class="linenos"> 3</span>    <span class="n">value</span><span class="p">:</span> <span class="n">uint32</span>
+<span class="linenos"> 4</span>
+<span class="linenos"> 5</span><span class="nd">@struct</span>
+<span class="linenos"> 6</span><span class="k">class</span><span class="w"> </span><span class="nc">Middle</span><span class="p">:</span>
+<span class="linenos"> 7</span>    <span class="n">inner</span><span class="p">:</span> <span class="n">Inner</span>
+<span class="linenos"> 8</span>
+<span class="linenos"> 9</span><span class="nd">@struct</span>
+<span class="linenos">10</span><span class="k">class</span><span class="w"> </span><span class="nc">Outer</span><span class="p">:</span>
+<span class="linenos">11</span>    <span class="n">byte_order</span><span class="p">:</span> <span class="n">uint8</span>  <span class="c1"># 0 selects BigEndian; 1 selects LittleEndian</span>
+<span class="linenos">12</span>    <span class="n">middle</span><span class="p">:</span> <span class="n">Middle</span>
+</pre></div>
+</div>
+<p>When unpacking, declare <code class="docutils literal notranslate"><span class="pre">byte_order</span></code> before <code class="docutils literal notranslate"><span class="pre">middle</span></code> so its value is
+available when <code class="docutils literal notranslate"><span class="pre">Inner</span></code> resolves its dynamic byte order.</p>
+</section>
+<section id="inheriting-the-enclosing-struct-s-byte-order">
+<h2><span class="section-number">2.3.2.5. </span>Inheriting the enclosing struct’s byte order<a class="headerlink" href="#inheriting-the-enclosing-struct-s-byte-order" title="Link to this heading">#</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.10.0.</span></p>
+</div>
+<p>A struct that is reused in multiple places (e.g. a shared header or record
+type) sometimes needs to be decoded using whatever byte order the <em>embedding</em>
+struct declares, rather than a byte order fixed at its own definition site.
+The global <a class="reference internal" href="../../library/byteorder.html#caterpillar.byteorder.Inherit" title="caterpillar.byteorder.Inherit"><code class="xref py py-data docutils literal notranslate"><span class="pre">Inherit</span></code></a> enables exactly this:</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-10" name="sd-tab-set-5" type="radio">
+<label class="sd-tab-label" data-sync-group="syntax" data-sync-id="default" for="sd-tab-item-10">
+Default Syntax</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">Inherit</span><span class="p">)</span>
+<span class="linenos"> 2</span><span class="k">class</span><span class="w"> </span><span class="nc">Inner</span><span class="p">:</span>
+<span class="linenos"> 3</span>    <span class="n">value</span><span class="p">:</span> <span class="n">uint32</span>
+<span class="linenos"> 4</span>
+<span class="linenos"> 5</span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span>
+<span class="linenos"> 6</span><span class="k">class</span><span class="w"> </span><span class="nc">Outer</span><span class="p">:</span>
+<span class="linenos"> 7</span>    <span class="n">inner</span><span class="p">:</span> <span class="n">Inner</span>  <span class="c1"># value decoded using BigEndian</span>
+<span class="linenos"> 8</span>
+<span class="linenos"> 9</span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">LittleEndian</span><span class="p">)</span>
+<span class="linenos">10</span><span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
+<span class="linenos">11</span>    <span class="n">inner</span><span class="p">:</span> <span class="n">Inner</span>  <span class="c1"># value decoded using LittleEndian</span>
+</pre></div>
+</div>
+</div>
+<input id="sd-tab-item-11" name="sd-tab-set-5" type="radio">
+<label class="sd-tab-label" data-sync-group="syntax" data-sync-id="extended" for="sd-tab-item-11">
+Extended Syntax (&gt;=2.8.0)</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">Inherit</span><span class="p">)</span>
+<span class="linenos"> 2</span><span class="k">class</span><span class="w"> </span><span class="nc">Inner</span><span class="p">:</span>
+<span class="linenos"> 3</span>    <span class="n">value</span><span class="p">:</span> <span class="n">uint32_t</span>
+<span class="linenos"> 4</span>
+<span class="linenos"> 5</span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span>
+<span class="linenos"> 6</span><span class="k">class</span><span class="w"> </span><span class="nc">Outer</span><span class="p">:</span>
+<span class="linenos"> 7</span>    <span class="n">inner</span><span class="p">:</span> <span class="n">Inner</span>  <span class="c1"># value decoded using BigEndian</span>
+<span class="linenos"> 8</span>
+<span class="linenos"> 9</span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">LittleEndian</span><span class="p">)</span>
+<span class="linenos">10</span><span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
+<span class="linenos">11</span>    <span class="n">inner</span><span class="p">:</span> <span class="n">Inner</span>  <span class="c1"># value decoded using LittleEndian</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>A struct declared with <code class="docutils literal notranslate"><span class="pre">order=Inherit</span></code> resolves its byte order from the
+field that embeds it, at any nesting depth (including arrays and chains of
+<code class="docutils literal notranslate"><span class="pre">Inherit</span></code> structs). If there is no enclosing struct - e.g. the struct is
+used standalone or passed directly to <a class="reference internal" href="../../library/model/struct.html#caterpillar.model.pack" title="caterpillar.model.pack"><code class="xref py py-func docutils literal notranslate"><span class="pre">pack()</span></code></a> /
+<a class="reference internal" href="../../library/model/struct.html#caterpillar.model.unpack" title="caterpillar.model.unpack"><code class="xref py py-func docutils literal notranslate"><span class="pre">unpack()</span></code></a> - it falls back to the regular default
+byte order, exactly like a struct declared with <code class="docutils literal notranslate"><span class="pre">order=None</span></code>.</p>
+<p>Wrappers can use an independently ordered metadata field without changing the
+order inherited by their payload. For example, this frame has a little-endian
+length prefix but a big-endian inner value:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span>
+<span class="linenos">2</span><span class="k">class</span><span class="w"> </span><span class="nc">Outer</span><span class="p">:</span>
+<span class="linenos">3</span>    <span class="n">inner</span><span class="p">:</span> <span class="n">Prefixed</span><span class="p">(</span><span class="n">LittleEndian</span> <span class="o">+</span> <span class="n">uint16</span><span class="p">,</span> <span class="n">Inner</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">inner.value</span></code> is decoded using <code class="docutils literal notranslate"><span class="pre">BigEndian</span></code>; the explicit
+<code class="docutils literal notranslate"><span class="pre">LittleEndian</span></code> applies only to the prefix.</p>
+<p>To override the byte order for a single embedding site instead of changing
+<code class="docutils literal notranslate"><span class="pre">Inner</span></code> itself, combine <code class="docutils literal notranslate"><span class="pre">order=Inherit</span></code> with the <code class="docutils literal notranslate"><span class="pre">ByteOrder</span> <span class="pre">+</span> <span class="pre">Struct</span></code>
+operator, mirroring the existing per-field <code class="docutils literal notranslate"><span class="pre">ByteOrder</span> <span class="pre">+</span> <span class="pre">&lt;atom&gt;</span></code> syntax:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nd">@struct</span>
+<span class="linenos">2</span><span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
+<span class="linenos">3</span>    <span class="n">inner</span><span class="p">:</span> <span class="n">LittleEndian</span> <span class="o">+</span> <span class="n">Inner</span>  <span class="c1"># value decoded using LittleEndian</span>
+</pre></div>
+</div>
+<p>This also lets sibling fields referencing the same <code class="docutils literal notranslate"><span class="pre">Inherit</span></code>-enabled struct
+type resolve to different byte orders independently of one another - including
+a plain (non-overridden) reference that keeps inheriting from the enclosing
+struct alongside two explicitly-pinned siblings:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span>
+<span class="linenos">2</span><span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
+<span class="linenos">3</span>    <span class="n">little</span><span class="p">:</span> <span class="n">LittleEndian</span> <span class="o">+</span> <span class="n">Inner</span>  <span class="c1"># always little</span>
+<span class="linenos">4</span>    <span class="n">big</span><span class="p">:</span> <span class="n">BigEndian</span> <span class="o">+</span> <span class="n">Inner</span>        <span class="c1"># always big</span>
+<span class="linenos">5</span>    <span class="n">inherited</span><span class="p">:</span> <span class="n">Inner</span>              <span class="c1"># follows Format's BigEndian</span>
+</pre></div>
+</div>
+<p>Changing <code class="docutils literal notranslate"><span class="pre">Format</span></code>’s own order (e.g. to <code class="docutils literal notranslate"><span class="pre">LittleEndian</span></code>) only affects the
+<code class="docutils literal notranslate"><span class="pre">inherited</span></code> field; <code class="docutils literal notranslate"><span class="pre">little</span></code> and <code class="docutils literal notranslate"><span class="pre">big</span></code> stay pinned to their explicit
+override since they no longer carry <code class="docutils literal notranslate"><span class="pre">Inherit</span></code> at that embedding site.</p>
+<p>As with <a class="reference internal" href="../../library/byteorder.html#caterpillar.byteorder.Dynamic" title="caterpillar.byteorder.Dynamic"><code class="xref py py-data docutils literal notranslate"><span class="pre">Dynamic</span></code></a>, this can be composed with the
+extended annotation syntax, e.g.
+<code class="docutils literal notranslate"><span class="pre">f[Inner,</span> <span class="pre">Inner,</span> <span class="pre">LittleEndian]</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This feature is unrelated to the struct <em>class</em> inheritance described in
+<a class="reference internal" href="../../reference/datamodel/struct.html#datamodel-standard-struct"><span class="std std-ref">Struct</span></a> (subclassing a <code class="docutils literal notranslate"><span class="pre">&#64;struct</span></code>-decorated class via
+normal Python MRO). <code class="docutils literal notranslate"><span class="pre">order=Inherit</span></code> is about how a struct picks its byte
+order when it is <em>embedded as a field</em> in another struct, regardless of
+whether either struct participates in Python class inheritance at all.</p>
+</div>
+</section>
+<section id="nesting-depth-and-mixed-byte-orders">
+<h2><span class="section-number">2.3.2.6. </span>Nesting depth and mixed byte orders<a class="headerlink" href="#nesting-depth-and-mixed-byte-orders" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">order=Inherit</span></code> resolves through arbitrarily deep nesting, and struct chains
+may freely mix explicit byte orders with <code class="docutils literal notranslate"><span class="pre">Inherit</span></code> at different levels. Each
+<code class="docutils literal notranslate"><span class="pre">Inherit</span></code> struct resolves against the <strong>nearest enclosing struct that has a
+concrete (non-``Inherit``) byte order</strong> - not necessarily its immediate parent
+and not necessarily the outermost struct:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">Inherit</span><span class="p">)</span>
+<span class="linenos"> 2</span><span class="k">class</span><span class="w"> </span><span class="nc">Inner</span><span class="p">:</span>
+<span class="linenos"> 3</span>    <span class="n">value</span><span class="p">:</span> <span class="n">uint32</span>
+<span class="linenos"> 4</span>
+<span class="linenos"> 5</span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">LittleEndian</span><span class="p">)</span>  <span class="c1"># concrete order - breaks the chain here</span>
+<span class="linenos"> 6</span><span class="k">class</span><span class="w"> </span><span class="nc">Middle</span><span class="p">:</span>
+<span class="linenos"> 7</span>    <span class="n">inner</span><span class="p">:</span> <span class="n">Inner</span>
+<span class="linenos"> 8</span>
+<span class="linenos"> 9</span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span>
+<span class="linenos">10</span><span class="k">class</span><span class="w"> </span><span class="nc">Outer</span><span class="p">:</span>
+<span class="linenos">11</span>    <span class="n">middle</span><span class="p">:</span> <span class="n">Middle</span>
+<span class="linenos">12</span>
+<span class="linenos">13</span><span class="c1"># Inner.value is decoded using Middle's LittleEndian, not Outer's</span>
+<span class="linenos">14</span><span class="c1"># BigEndian, because Middle already provides</span>
+<span class="linenos">15</span><span class="c1"># a concrete order for anything it embeds.</span>
+</pre></div>
+</div>
+<p>This also means a chain of several <code class="docutils literal notranslate"><span class="pre">Inherit</span></code> structs in a row correctly
+propagates the <em>first</em> concrete order found further up the chain, however deep:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">Inherit</span><span class="p">)</span>
+<span class="linenos"> 2</span><span class="k">class</span><span class="w"> </span><span class="nc">Inner</span><span class="p">:</span>
+<span class="linenos"> 3</span>    <span class="n">value</span><span class="p">:</span> <span class="n">uint32</span>
+<span class="linenos"> 4</span>
+<span class="linenos"> 5</span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">Inherit</span><span class="p">)</span>
+<span class="linenos"> 6</span><span class="k">class</span><span class="w"> </span><span class="nc">Middle</span><span class="p">:</span>
+<span class="linenos"> 7</span>    <span class="n">inner</span><span class="p">:</span> <span class="n">Inner</span>
+<span class="linenos"> 8</span>
+<span class="linenos"> 9</span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">Inherit</span><span class="p">)</span>
+<span class="linenos">10</span><span class="k">class</span><span class="w"> </span><span class="nc">Outer</span><span class="p">:</span>
+<span class="linenos">11</span>    <span class="n">middle</span><span class="p">:</span> <span class="n">Middle</span>
+<span class="linenos">12</span>
+<span class="linenos">13</span><span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">BigEndian</span><span class="p">)</span>
+<span class="linenos">14</span><span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
+<span class="linenos">15</span>    <span class="n">outer</span><span class="p">:</span> <span class="n">Outer</span>
+<span class="linenos">16</span>
+<span class="linenos">17</span><span class="c1"># Format.outer.middle.inner.value is decoded using BigEndian, propagated</span>
+<span class="linenos">18</span><span class="c1"># through two intermediate Inherit levels.</span>
+</pre></div>
+</div>
+<p>The same resolution rule applies uniformly regardless of <em>how</em> a struct is
+nested, which has been verified for:</p>
+<ul class="simple">
+<li><p><strong>Arrays</strong>, including arrays nested inside other <code class="docutils literal notranslate"><span class="pre">Inherit</span></code> structs
+(<code class="docutils literal notranslate"><span class="pre">items:</span> <span class="pre">Inner[2]</span></code>, or an array of a struct that itself contains an
+array of <code class="docutils literal notranslate"><span class="pre">Inherit</span></code> structs).</p></li>
+<li><p><a class="reference internal" href="../../library/model/bitfield.html#caterpillar.model.bitfield" title="caterpillar.model.bitfield"><code class="xref py py-func docutils literal notranslate"><span class="pre">bitfield()</span></code></a>, which supports <code class="docutils literal notranslate"><span class="pre">order=Inherit</span></code> the
+same way regular structs do, whether used as a scalar member, an array
+member, or nested multiple levels deep.</p></li>
+<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Prefixed</span></code>, since it delegates directly to the
+wrapped struct using the same context rather than introducing its own
+field wrapper.</p></li>
+<li><p><a class="reference internal" href="union.html#tutorial-union"><span class="std std-ref">Unions</span></a> structs, both as a container holding an
+<code class="docutils literal notranslate"><span class="pre">Inherit</span></code>-enabled member and as the <code class="docutils literal notranslate"><span class="pre">Inherit</span></code>-enabled struct itself.</p></li>
+</ul>
+</section>
 </section>
 
 
@@ -729,6 +913,9 @@ Extended Syntax (&gt;=2.8.0)</label><div class="sd-tab-content docutils">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example-struct-wide-dynamic-byte-order">2.3.2.1. Example: struct-wide dynamic byte order</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example-field-level-dynamic-byte-order">2.3.2.2. Example: field-level dynamic byte order</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example-context-key-reference">2.3.2.3. Example: context key reference</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example-byte-order-selected-by-an-ancestor">2.3.2.4. Example: byte order selected by an ancestor</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#inheriting-the-enclosing-struct-s-byte-order">2.3.2.5. Inheriting the enclosing struct’s byte order</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#nesting-depth-and-mixed-byte-orders">2.3.2.6. Nesting depth and mixed byte orders</a></li>
 </ul>
   </nav></div>
 

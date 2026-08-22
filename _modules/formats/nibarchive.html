@@ -425,7 +425,7 @@
     <span class="n">LittleEndian</span><span class="p">,</span>
     <span class="n">ctx</span><span class="p">,</span>
     <span class="n">pack_file</span><span class="p">,</span>
-    <span class="n">f</span>
+    <span class="n">f</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="k">try</span><span class="p">:</span>
@@ -450,16 +450,16 @@
 <a class="viewcode-back" href="../../tutorial/first_steps/documentation.html#formats.nibarchive.NIBHeader">[docs]</a>
 <span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">LittleEndian</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">NIBHeader</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Example class doc comment&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Example class doc comment"""</span>
 
     <span class="c1"># Here we define a constant value, which will raise an exception</span>
     <span class="c1"># upon a different parsed value.</span>
-    <span class="n">magic</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;NIBArchive&quot;</span><span class="p">]</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;example field doc comment&quot;&quot;&quot;</span>
+    <span class="n">magic</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="sa">b</span><span class="s2">"NIBArchive"</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">"""example field doc comment"""</span>
 
     <span class="c1"># Primitive types can be used just like this</span>
     <span class="n">unknown_1</span><span class="p">:</span> <span class="n">int32</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;second field doc comment&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""second field doc comment"""</span>
 
     <span class="n">unknown_2</span><span class="p">:</span> <span class="n">int32</span>
     <span class="n">object_count</span><span class="p">:</span> <span class="n">int32</span>
@@ -475,7 +475,7 @@
 
 <span class="nd">@struct</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">LittleEndian</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">NIBClassName</span><span class="p">:</span>
-    <span class="c1"># NOTE: the custom class &#39;vint&#39; is marked as a singleton class. Therefore,</span>
+    <span class="c1"># NOTE: the custom class 'vint' is marked as a singleton class. Therefore,</span>
     <span class="c1"># we can use it directly. Otherwise, we have to create an instance first,</span>
     <span class="c1"># before we can use the struct class.</span>
     <span class="n">length</span><span class="p">:</span> <span class="n">vint</span>
@@ -488,7 +488,7 @@
 
 <span class="c1"># Note that the returned string instance here may contain extra null-bytes</span>
 <span class="c1"># at the end.</span>
-<span class="n">NIBKey</span> <span class="o">=</span> <span class="n">Prefixed</span><span class="p">(</span><span class="n">vint</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+<span class="n">NIBKey</span> <span class="o">=</span> <span class="n">Prefixed</span><span class="p">(</span><span class="n">vint</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">ValueType</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
@@ -506,7 +506,7 @@
     <span class="n">OBJECT_REF</span> <span class="o">=</span> <span class="mi">10</span>
 
 
-<span class="c1"># The raw data is just copied from the stream. If we don&#39;t specify an</span>
+<span class="c1"># The raw data is just copied from the stream. If we don't specify an</span>
 <span class="c1"># encoding, the raw bytes or copied.</span>
 <span class="n">NIBData</span> <span class="o">=</span> <span class="n">Prefixed</span><span class="p">(</span><span class="n">vint</span><span class="p">)</span>
 
@@ -552,22 +552,22 @@
     <span class="c1"># Nested structs can be defined as simle as this:</span>
     <span class="n">header</span><span class="p">:</span> <span class="n">NIBHeader</span>
 
-    <span class="c1"># All following fields are marked with &#39;@&#39;: The parser will jump temporarily</span>
+    <span class="c1"># All following fields are marked with '@': The parser will jump temporarily</span>
     <span class="c1"># to the position specified after the operator. Use | F_KEEP_POSITION to</span>
     <span class="c1"># continue parsing at the resulting position</span>
     <span class="n">objects</span><span class="p">:</span> <span class="n">NIBObject</span><span class="p">[</span><span class="n">this</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">object_count</span><span class="p">]</span> <span class="o">@</span> <span class="n">this</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">offset_objects</span>
     <span class="n">keys</span><span class="p">:</span> <span class="n">NIBKey</span><span class="p">[</span><span class="n">this</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">key_count</span><span class="p">]</span> <span class="o">@</span> <span class="n">this</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">offset_keys</span>
     <span class="n">values</span><span class="p">:</span> <span class="n">NIBValue</span><span class="p">[</span><span class="n">this</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">value_count</span><span class="p">]</span> <span class="o">@</span> <span class="n">this</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">offset_values</span>
 
-    <span class="c1"># NOTE: we can reference parsed values using &#39;this.foo&#39; but methods or properties</span>
-    <span class="c1"># can&#39;t be used.</span>
-    <span class="n">class_names</span><span class="p">:</span> <span class="n">NIBClassName</span><span class="p">[</span>
-        <span class="n">this</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">class_name_count</span>
-    <span class="p">]</span> <span class="o">@</span> <span class="n">this</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">offset_class_names</span>
+    <span class="c1"># NOTE: we can reference parsed values using 'this.foo' but methods or properties</span>
+    <span class="c1"># can't be used.</span>
+    <span class="n">class_names</span><span class="p">:</span> <span class="p">(</span>
+        <span class="n">NIBClassName</span><span class="p">[</span><span class="n">this</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">class_name_count</span><span class="p">]</span> <span class="o">@</span> <span class="n">this</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">offset_class_names</span>
+    <span class="p">)</span>
 
 
 <span class="c1"># print(NIBArchive.__struct__.fields)</span>
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="n">obj</span> <span class="o">=</span> <span class="n">unpack_file</span><span class="p">(</span><span class="n">NIBArchive</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
     <span class="n">pack_file</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">use_tempfile</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>

@@ -22,3 +22,19 @@ Byteorder Extensions
     the byteorder applied. Note the use of another operator here.
 
     >>> field = BigEndian + struct
+
+    .. versionadded:: 2.10.0
+
+        Classes created via :func:`~caterpillar.model.struct` or :func:`~caterpillar.model.bitfield`
+        also implement :meth:`~object.__set_byteorder__` (installed as a
+        ``classmethod``), so the very same operator syntax works directly on
+        a struct *class* rather than only on field/atom instances:
+
+        >>> @struct(order=Inherit)
+        ... class Inner:
+        ...     value: uint32
+        ...
+        >>> field = LittleEndian + Inner  # Field(Inner, order=LittleEndian)
+
+        See :ref:`the byte order tutorial <tutorial-dyn_byteorder>` for more details.
+

@@ -478,6 +478,9 @@ create and manipulate your own custom struct classes in Python.</p>
 <li class="toctree-l2"><a class="reference internal" href="byteorder.html#example-struct-wide-dynamic-byte-order">2.3.2.1. Example: struct-wide dynamic byte order</a></li>
 <li class="toctree-l2"><a class="reference internal" href="byteorder.html#example-field-level-dynamic-byte-order">2.3.2.2. Example: field-level dynamic byte order</a></li>
 <li class="toctree-l2"><a class="reference internal" href="byteorder.html#example-context-key-reference">2.3.2.3. Example: context key reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="byteorder.html#example-byte-order-selected-by-an-ancestor">2.3.2.4. Example: byte order selected by an ancestor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="byteorder.html#inheriting-the-enclosing-struct-s-byte-order">2.3.2.5. Inheriting the enclosing struct’s byte order</a></li>
+<li class="toctree-l2"><a class="reference internal" href="byteorder.html#nesting-depth-and-mixed-byte-orders">2.3.2.6. Nesting depth and mixed byte orders</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="pointers.html">2.3.3. Pointers</a></li>
@@ -529,8 +532,8 @@ Default Syntax</label><div class="sd-tab-content docutils">
 <div class="code-block-caption"><span class="caption-text">Final PNG implementation</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">PNG</span><span class="p">:</span>
-    <span class="n">magic</span><span class="p">:</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x89</span><span class="s2">PNG</span><span class="se">\x0D\x0A\x1A\x0A</span><span class="s2">&quot;</span>
-    <span class="c1"># We don&#39;t know the length, therefore we need greedy parsing</span>
+    <span class="n">magic</span><span class="p">:</span> <span class="sa">b</span><span class="s2">"</span><span class="se">\x89</span><span class="s2">PNG</span><span class="se">\x0D\x0A\x1A\x0A</span><span class="s2">"</span>
+    <span class="c1"># We don't know the length, therefore we need greedy parsing</span>
     <span class="n">chunks</span><span class="p">:</span> <span class="n">PNGChunk</span><span class="p">[</span><span class="o">...</span><span class="p">]</span>
 </pre></div>
 </div>
@@ -543,8 +546,8 @@ Extended Syntax (&gt;=2.8.0)</label><div class="sd-tab-content docutils">
 <div class="code-block-caption"><span class="caption-text">Final PNG implementation</span><a class="headerlink" href="#id3" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">PNG</span><span class="p">:</span>
-    <span class="n">magic</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x89</span><span class="s2">PNG</span><span class="se">\x0D\x0A\x1A\x0A</span><span class="s2">&quot;</span><span class="p">]</span>
-    <span class="c1"># We don&#39;t know the length, therefore we need greedy parsing</span>
+    <span class="n">magic</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="sa">b</span><span class="s2">"</span><span class="se">\x89</span><span class="s2">PNG</span><span class="se">\x0D\x0A\x1A\x0A</span><span class="s2">"</span><span class="p">]</span>
+    <span class="c1"># We don't know the length, therefore we need greedy parsing</span>
     <span class="n">chunks</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">PNGChunk</span><span class="p">],</span> <span class="n">PNGChunk</span><span class="p">[</span><span class="o">...</span><span class="p">]]</span>
 </pre></div>
 </div>
@@ -555,10 +558,10 @@ Extended Syntax (&gt;=2.8.0)</label><div class="sd-tab-content docutils">
 Python class definitions.</p>
 <div class="literal-block-wrapper docutils container" id="id4">
 <div class="code-block-caption"><span class="caption-text">Sample usage of the PNG struct</span><a class="headerlink" href="#id4" title="Link to this code">#</a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">image</span> <span class="o">=</span> <span class="n">unpack_file</span><span class="p">(</span><span class="n">PNG</span><span class="p">,</span> <span class="s2">&quot;/path/to/image.png&quot;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">image</span> <span class="o">=</span> <span class="n">unpack_file</span><span class="p">(</span><span class="n">PNG</span><span class="p">,</span> <span class="s2">"/path/to/image.png"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">image</span>
-<span class="go">PNG(magic=b&#39;\x89PNG\r\n\x1a\n&#39;, chunks=[PNGChunk(length=13,type=&#39;IHDR&#39;, body=..., crc=258163462), ...])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pack_file</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="s2">&quot;/path/to/destination&quot;</span><span class="p">)</span>
+<span class="go">PNG(magic=b'\x89PNG\r\n\x1a\n', chunks=[PNGChunk(length=13,type='IHDR', body=..., crc=258163462), ...])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pack_file</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="s2">"/path/to/destination"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>

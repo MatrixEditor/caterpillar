@@ -409,68 +409,71 @@
 <span class="c1">#</span>
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">ipaddress</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">binascii</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ipaddress</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
-
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Final</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">override</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">_ContextLike</span>  <span class="c1"># pyright: ignore[reportPrivateUsage]</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">Transformer</span><span class="p">,</span> <span class="n">Bytes</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">._base</span><span class="w"> </span><span class="kn">import</span> <span class="n">singleton</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">Bytes</span><span class="p">,</span> <span class="n">Transformer</span>
 
 
 <div class="viewcode-block" id="IPv4Address">
 <a class="viewcode-back" href="../../../library/fields/net.html#caterpillar.fields.IPv4Address">[docs]</a>
 <span class="nd">@singleton</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">IPv4Address</span><span class="p">(</span>
-    <span class="n">Transformer</span><span class="p">[</span><span class="n">ipaddress</span><span class="o">.</span><span class="n">IPv4Address</span><span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">ipaddress</span><span class="o">.</span><span class="n">IPv4Address</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">]</span>
+    <span class="n">Transformer</span><span class="p">[</span><span class="n">ipaddress</span><span class="o">.</span><span class="n">IPv4Address</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">ipaddress</span><span class="o">.</span><span class="n">IPv4Address</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">]</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    A transformer for encoding and decoding IPv4 addresses.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="vm">__slots__</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[()]</span> <span class="o">=</span> <span class="p">()</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Initialize the IPv4Address transformer.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">Bytes</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
 
     <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">__type__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Get the type associated with the transformer.</span>
 
 <span class="sd">        :return: The type associated with the transformer.</span>
 <span class="sd">        :rtype: type</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">ipaddress</span><span class="o">.</span><span class="n">IPv4Address</span>
 
     <span class="nd">@override</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">ipaddress</span><span class="o">.</span><span class="n">IPv4Address</span><span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">encode</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">ipaddress</span><span class="o">.</span><span class="n">IPv4Address</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Encode an IPv4Address object.</span>
 
 <span class="sd">        :param ipaddress.IPv4Address obj: The IPv4Address object to encode.</span>
 <span class="sd">        :param _ContextLike context: The context for encoding.</span>
 <span class="sd">        :return: The encoded value.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">ipaddress</span><span class="o">.</span><span class="n">IPv4Address</span><span class="p">):</span>
             <span class="n">obj</span> <span class="o">=</span> <span class="n">ipaddress</span><span class="o">.</span><span class="n">IPv4Address</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">packed</span>
 
     <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ipaddress</span><span class="o">.</span><span class="n">IPv4Address</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Decode an encoded IPv4 address.</span>
 
 <span class="sd">        :param int parsed: The parsed integer value representing the IPv4 address.</span>
 <span class="sd">        :param _ContextLike context: The context for decoding.</span>
 <span class="sd">        :return: The decoded IPv4 address.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">ipaddress</span><span class="o">.</span><span class="n">IPv4Address</span><span class="p">(</span><span class="n">parsed</span><span class="p">)</span></div>
 
 
@@ -481,50 +484,52 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">IPv6Address</span><span class="p">(</span>
     <span class="n">Transformer</span><span class="p">[</span><span class="n">ipaddress</span><span class="o">.</span><span class="n">IPv6Address</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">ipaddress</span><span class="o">.</span><span class="n">IPv6Address</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">]</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    A transformer for encoding and decoding IPv6 addresses.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="vm">__slots__</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[()]</span> <span class="o">=</span> <span class="p">()</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Initialize the IPv6Address transformer.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">Bytes</span><span class="p">(</span><span class="n">ipaddress</span><span class="o">.</span><span class="n">IPV6LENGTH</span> <span class="o">//</span> <span class="mi">8</span><span class="p">))</span>
 
     <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">__type__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Get the type associated with the transformer.</span>
 
 <span class="sd">        :return: The type associated with the transformer.</span>
 <span class="sd">        :rtype: type</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">ipaddress</span><span class="o">.</span><span class="n">IPv6Address</span>
 
     <span class="nd">@override</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">ipaddress</span><span class="o">.</span><span class="n">IPv6Address</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">encode</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">ipaddress</span><span class="o">.</span><span class="n">IPv6Address</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Encode an IPv6Address object.</span>
 
 <span class="sd">        :param ipaddress.IPv6Address obj: The IPv6Address object to encode.</span>
 <span class="sd">        :param _ContextLike context: The context for encoding.</span>
 <span class="sd">        :return: The encoded value.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">ipaddress</span><span class="o">.</span><span class="n">IPv6Address</span><span class="p">):</span>
             <span class="n">obj</span> <span class="o">=</span> <span class="n">ipaddress</span><span class="o">.</span><span class="n">IPv6Address</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">packed</span>
 
     <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ipaddress</span><span class="o">.</span><span class="n">IPv6Address</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Decode an encoded IPv6 address.</span>
 
 <span class="sd">        :param int parsed: The parsed integer value representing the IPv6 address.</span>
 <span class="sd">        :param _ContextLike context: The context for decoding.</span>
 <span class="sd">        :return: The decoded IPv6 address.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">ipaddress</span><span class="o">.</span><span class="n">IPv6Address</span><span class="p">(</span><span class="n">parsed</span><span class="p">)</span></div>
 
 
@@ -532,40 +537,40 @@
 <div class="viewcode-block" id="MACAddress">
 <a class="viewcode-back" href="../../../library/fields/net.html#caterpillar.fields.MACAddress">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">MACAddress</span><span class="p">(</span><span class="n">Transformer</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    A transformer for encoding and decoding MAC addresses.</span>
 
 <span class="sd">    :param Optional[str] sep: The separator to use in the MAC address representation.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
-    <span class="n">DELIMITERS</span><span class="p">:</span> <span class="n">re</span><span class="o">.</span><span class="n">Pattern</span><span class="p">[</span><span class="nb">bytes</span><span class="p">]</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">rb</span><span class="s2">&quot;[-:.]&quot;</span><span class="p">)</span>
+    <span class="n">DELIMITERS</span><span class="p">:</span> <span class="n">re</span><span class="o">.</span><span class="n">Pattern</span><span class="p">[</span><span class="nb">bytes</span><span class="p">]</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">rb</span><span class="s2">"[-:.]"</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sep</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Initialize the MACAddress transformer.</span>
 
 <span class="sd">        :param Optional[str] sep: The separator to use in the MAC address representation.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">Bytes</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sep</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">sep</span> <span class="ow">or</span> <span class="s2">&quot;:&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">encoding</span> <span class="ow">or</span> <span class="s2">&quot;utf-8&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sep</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">sep</span> <span class="ow">or</span> <span class="s2">":"</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">encoding</span> <span class="ow">or</span> <span class="s2">"utf-8"</span>
 
 <div class="viewcode-block" id="MACAddress.encode">
 <a class="viewcode-back" href="../../../library/fields/net.html#caterpillar.fields.MACAddress.encode">[docs]</a>
     <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Encode a MAC address.</span>
 
 <span class="sd">        :param Union[str, bytes] obj: The MAC address to encode.</span>
 <span class="sd">        :param _ContextLike context: The context for encoding.</span>
 <span class="sd">        :return: The encoded value.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">obj</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">encoding</span><span class="p">)</span>
 
         <span class="c1"># replace unnecessary characters</span>
-        <span class="n">mac</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">MACAddress</span><span class="o">.</span><span class="n">DELIMITERS</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="n">mac</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">MACAddress</span><span class="o">.</span><span class="n">DELIMITERS</span><span class="p">,</span> <span class="sa">b</span><span class="s2">""</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="c1"># a raw six-byte address is already in wire form; only hex-text</span>
         <span class="c1"># representations (12 hex digits) need to be unhexlified.</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">mac</span><span class="p">)</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>
@@ -577,13 +582,13 @@
 <a class="viewcode-back" href="../../../library/fields/net.html#caterpillar.fields.MACAddress.decode">[docs]</a>
     <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Decode an encoded MAC address.</span>
 
 <span class="sd">        :param bytes parsed: The parsed bytes representing the MAC address.</span>
 <span class="sd">        :param _ContextLike context: The context for decoding.</span>
 <span class="sd">        :return: The decoded MAC address.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span><span class="n">parsed</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sep</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span></div>
 </div>
 

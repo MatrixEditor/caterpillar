@@ -410,96 +410,95 @@
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
 <span class="c1"># pyright: reportPrivateUsage=false, reportExplicitAny=false, reportAny=false</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">io</span><span class="w"> </span><span class="kn">import</span> <span class="n">BytesIO</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Collection</span><span class="p">,</span> <span class="n">Iterable</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">io</span><span class="w"> </span><span class="kn">import</span> <span class="n">BytesIO</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Generic</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">overload</span><span class="p">,</span> <span class="n">override</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.byteorder</span><span class="w"> </span><span class="kn">import</span> <span class="n">byteorder</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.options</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flag</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">CTX_SEQ</span><span class="p">,</span> <span class="n">CTX_STREAM</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar._common</span><span class="w"> </span><span class="kn">import</span> <span class="n">unpack_seq</span><span class="p">,</span> <span class="n">pack_seq</span><span class="p">,</span> <span class="n">WithoutContextVar</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.shared</span><span class="w"> </span><span class="kn">import</span> <span class="n">PackMixin</span><span class="p">,</span> <span class="n">UnpackMixin</span><span class="p">,</span> <span class="n">getstruct</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar._common</span><span class="w"> </span><span class="kn">import</span> <span class="n">WithoutContextVar</span><span class="p">,</span> <span class="n">pack_seq</span><span class="p">,</span> <span class="n">unpack_seq</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.abc</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">_ContextLambda</span><span class="p">,</span>
-    <span class="n">_ContextLike</span><span class="p">,</span>
-    <span class="n">_StructLike</span><span class="p">,</span>
-    <span class="n">_LengthT</span><span class="p">,</span>
     <span class="n">_IT</span><span class="p">,</span>
     <span class="n">_OT</span><span class="p">,</span>
-    <span class="n">_OptionLike</span><span class="p">,</span>
-    <span class="n">_EndianLike</span><span class="p">,</span>
-    <span class="n">_SwitchOptionsT</span><span class="p">,</span>
     <span class="n">_ArgType</span><span class="p">,</span>
+    <span class="n">_ContextLambda</span><span class="p">,</span>
+    <span class="n">_ContextLike</span><span class="p">,</span>
+    <span class="n">_EndianLike</span><span class="p">,</span>
+    <span class="n">_LengthT</span><span class="p">,</span>
+    <span class="n">_OptionLike</span><span class="p">,</span>
+    <span class="n">_StructLike</span><span class="p">,</span>
+    <span class="n">_SwitchOptionsT</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.byteorder</span><span class="w"> </span><span class="kn">import</span> <span class="n">byteorder</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">CTX_SEQ</span><span class="p">,</span> <span class="n">CTX_STREAM</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.options</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flag</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.shared</span><span class="w"> </span><span class="kn">import</span> <span class="n">PackMixin</span><span class="p">,</span> <span class="n">UnpackMixin</span><span class="p">,</span> <span class="n">getstruct</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">._base</span><span class="w"> </span><span class="kn">import</span> <span class="n">Field</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">ByteOrderMixin</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">_IT</span><span class="p">,</span> <span class="n">_OT</span><span class="p">]):</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">__set_byteorder__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Field</span><span class="p">[</span><span class="n">_IT</span><span class="p">,</span> <span class="n">_OT</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a field with the given byteorder&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Returns a field with the given byteorder"""</span>
         <span class="k">return</span> <span class="n">Field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">)</span>  <span class="c1"># pyright: ignore[reportArgumentType]</span>
 
 
 <div class="viewcode-block" id="FieldMixin">
 <a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.FieldMixin">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">FieldMixin</span><span class="p">(</span><span class="n">ByteOrderMixin</span><span class="p">[</span><span class="n">_IT</span><span class="p">,</span> <span class="n">_OT</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A simple mixin to support operators used to create :class:`Field` instances.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""A simple mixin to support operators used to create :class:`Field` instances."""</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__or__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flag</span><span class="p">:</span> <span class="n">_OptionLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Field</span><span class="p">[</span><span class="n">_IT</span><span class="p">,</span> <span class="n">_OT</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates a field *with* the given flag.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Creates a field *with* the given flag."""</span>
         <span class="c1"># fmt: off</span>
         <span class="k">return</span> <span class="n">Field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">byteorder</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span> <span class="o">|</span> <span class="n">flag</span> <span class="c1"># pyright: ignore[reportArgumentType]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__xor__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flag</span><span class="p">:</span> <span class="n">_OptionLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Field</span><span class="p">[</span><span class="n">_IT</span><span class="p">,</span> <span class="n">_OT</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates a field *without* the given flag.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Creates a field *without* the given flag."""</span>
         <span class="c1"># fmt: off</span>
         <span class="k">return</span> <span class="n">Field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">byteorder</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span> <span class="o">^</span> <span class="n">flag</span> <span class="c1"># pyright: ignore[reportArgumentType]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__matmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">offset</span><span class="p">:</span> <span class="n">_ContextLambda</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Field</span><span class="p">[</span><span class="n">_IT</span><span class="p">,</span> <span class="n">_OT</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates a field that should start at the given offset.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Creates a field that should start at the given offset."""</span>
         <span class="c1"># fmt: off</span>
         <span class="k">return</span> <span class="n">Field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">byteorder</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span> <span class="o">@</span> <span class="n">offset</span> <span class="c1"># pyright: ignore[reportArgumentType]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="n">_LengthT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Field</span><span class="p">[</span><span class="n">Collection</span><span class="p">[</span><span class="n">_IT</span><span class="p">],</span> <span class="n">Collection</span><span class="p">[</span><span class="n">_OT</span><span class="p">]]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a sequenced field.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Returns a sequenced field."""</span>
         <span class="c1"># fmt: off</span>
         <span class="k">return</span> <span class="n">Field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">byteorder</span><span class="p">(</span><span class="bp">self</span><span class="p">))[</span><span class="n">dim</span><span class="p">]</span> <span class="c1"># pyright: ignore[reportArgumentType]</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__rshift__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">switch</span><span class="p">:</span> <span class="n">_SwitchOptionsT</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Field</span><span class="p">[</span><span class="n">_IT</span><span class="p">,</span> <span class="n">_OT</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Inserts switch options into the new field&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__rshift__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">switch</span><span class="p">:</span> <span class="n">_SwitchOptionsT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Field</span><span class="p">[</span><span class="n">_IT</span><span class="p">,</span> <span class="n">_OT</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Inserts switch options into the new field"""</span>
         <span class="c1"># fmt: off</span>
         <span class="k">return</span> <span class="n">Field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">byteorder</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span> <span class="o">&gt;&gt;</span> <span class="n">switch</span> <span class="c1"># pyright: ignore[reportArgumentType]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__floordiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">condition</span><span class="p">:</span> <span class="n">_ContextLambda</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Field</span><span class="p">[</span><span class="n">_IT</span><span class="p">,</span> <span class="n">_OT</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a field with the given condition&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Returns a field with the given condition"""</span>
         <span class="c1"># fmt: off</span>
         <span class="k">return</span> <span class="n">Field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">byteorder</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span> <span class="o">//</span> <span class="n">condition</span> <span class="c1"># pyright: ignore[reportArgumentType]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__rsub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bits</span><span class="p">:</span> <span class="n">_ContextLambda</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Field</span><span class="p">[</span><span class="n">_IT</span><span class="p">,</span> <span class="n">_OT</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a field with the given bit count&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Returns a field with the given bit count"""</span>
         <span class="c1"># fmt: off</span>
         <span class="k">return</span> <span class="n">Field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">byteorder</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="n">bits</span><span class="o">=</span><span class="n">bits</span><span class="p">)</span> <span class="c1"># pyright: ignore[reportArgumentType]</span>
 
     <span class="nd">@overload</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__and__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;_StructLike[_OT, _ChainTailT]&quot;</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Chain[_IT, _ChainTailT]&quot;</span><span class="p">:</span> <span class="o">...</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">"_StructLike[_OT, _ChainTailT]"</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"Chain[_IT, _ChainTailT]"</span><span class="p">:</span> <span class="o">...</span>
+    <span class="nd">@overload</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__and__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">"type[_ChainTailT]"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"Chain[_IT, _ChainTailT]"</span><span class="p">:</span> <span class="o">...</span>
     <span class="nd">@overload</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__and__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;type[_ChainTailT]&quot;</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Chain[_IT, _ChainTailT]&quot;</span><span class="p">:</span> <span class="o">...</span>
-    <span class="nd">@overload</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">"Chain[_OT, _ChainTailT]"</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"Chain[_IT, _ChainTailT]"</span><span class="p">:</span> <span class="o">...</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__and__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;Chain[_OT, _ChainTailT]&quot;</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Chain[_IT, _ChainTailT]&quot;</span><span class="p">:</span> <span class="o">...</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__and__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;Chain[_OT, _ChainTailT] | _StructLike[_OT, _ChainTailT] | type[_OT]&quot;</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Chain&quot;</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a chain joining this structure before the next element or chain.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">other</span><span class="p">:</span> <span class="s2">"Chain[_OT, _ChainTailT] | _StructLike[_OT, _ChainTailT] | type[_OT]"</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"Chain"</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Returns a chain joining this structure before the next element or chain."""</span>
         <span class="c1"># fmt: off</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Chain</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">other</span><span class="o">.</span><span class="fm">__rand__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>  <span class="c1"># pyright: ignore[reportArgumentType]</span>
@@ -510,20 +509,20 @@
 <div class="viewcode-block" id="FieldStruct">
 <a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.FieldStruct">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">FieldStruct</span><span class="p">(</span><span class="n">FieldMixin</span><span class="p">[</span><span class="n">_IT</span><span class="p">,</span> <span class="n">_OT</span><span class="p">],</span> <span class="n">PackMixin</span><span class="p">[</span><span class="n">_IT</span><span class="p">],</span> <span class="n">UnpackMixin</span><span class="p">[</span><span class="n">_OT</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    A mix-in class combining the behavior of _StructLike with additional</span>
 <span class="sd">    functionality for packing and unpacking structured data.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="c1">#!! Removed in 2.8.0</span>
-    <span class="c1"># __slots__: tuple[str, ...] = (&quot;__byteorder__&quot;, &quot;__bits__&quot;)</span>
+    <span class="c1"># __slots__: tuple[str, ...] = ("__byteorder__", "__bits__")</span>
     <span class="c1"># __byteorder__: _EndianLike | None</span>
     <span class="c1"># __bits__: int | _ContextLambda[int] | None</span>
 
 <div class="viewcode-block" id="FieldStruct.pack_single">
 <a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.FieldStruct.pack_single">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">pack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">_IT</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Abstract method to pack a single element.</span>
 
 <span class="sd">        :param obj: The element to pack.</span>
@@ -531,62 +530,62 @@
 <span class="sd">        :param context: The current operation context.</span>
 <span class="sd">        :type context: _ContextLike</span>
 <span class="sd">        :raises NotImplementedError: This method must be implemented by subclasses.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 
 <div class="viewcode-block" id="FieldStruct.unpack_single">
 <a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.FieldStruct.unpack_single">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">unpack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_OT</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Abstract method to unpack a single element.</span>
 
 <span class="sd">        :param context: The current operation context.</span>
 <span class="sd">        :type context: _ContextLike</span>
 <span class="sd">        :raises NotImplementedError: This method must be implemented by subclasses.</span>
 <span class="sd">        :return: The unpacked element.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 
 <div class="viewcode-block" id="FieldStruct.pack_seq">
 <a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.FieldStruct.pack_seq">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">pack_seq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seq</span><span class="p">:</span> <span class="n">Collection</span><span class="p">[</span><span class="n">_IT</span><span class="p">],</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Pack a sequence of elements using the provided context.</span>
 
 <span class="sd">        :param seq: The sequence of elements to pack.</span>
 <span class="sd">        :type seq: Iterable</span>
 <span class="sd">        :param context: The current operation context.</span>
 <span class="sd">        :type context: _ContextLike</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">pack_seq</span><span class="p">(</span><span class="n">seq</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pack_single</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="FieldStruct.unpack_seq">
 <a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.FieldStruct.unpack_seq">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">unpack_seq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Collection</span><span class="p">[</span><span class="n">_OT</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Unpack a sequence of elements using the provided context.</span>
 
 <span class="sd">        :param context: The current operation context.</span>
 <span class="sd">        :type context: _ContextLike</span>
 <span class="sd">        :return: The list of unpacked elements.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">unpack_seq</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unpack_single</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="FieldStruct.__pack__">
 <a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.FieldStruct.__pack__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">__pack__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">_IT</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Pack data based on whether the field is sequential or not.</span>
 
 <span class="sd">        :param obj: The data to pack.</span>
 <span class="sd">        :type obj: Any</span>
 <span class="sd">        :param context: The current operation context.</span>
 <span class="sd">        :type context: _ContextLike</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># fmt: off</span>
         <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pack_single</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_SEQ</span><span class="p">]</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">pack_seq</span><span class="p">)(</span><span class="n">obj</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>  <span class="c1"># pyright: ignore[reportArgumentType]</span></div>
 
@@ -594,13 +593,13 @@
 <div class="viewcode-block" id="FieldStruct.__unpack__">
 <a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.FieldStruct.__unpack__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">__unpack__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_OT</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Unpack data based on whether the field is sequential or not.</span>
 
 <span class="sd">        :param context: The current operation context.</span>
 <span class="sd">        :type context: _ContextLike</span>
 <span class="sd">        :return: The unpacked data.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># fmt: off</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unpack_seq</span> <span class="k">if</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_SEQ</span><span class="p">]</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">unpack_single</span><span class="p">)(</span><span class="n">context</span><span class="p">)</span>  <span class="c1"># pyright: ignore[reportReturnType]</span></div>
 
@@ -609,24 +608,24 @@
 <a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.FieldStruct.__repr__">[docs]</a>
     <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        String representation of the FieldStruct instance.</span>
 
 <span class="sd">        :return: A string representation.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&gt;&quot;</span></div>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"&lt;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&gt;"</span></div>
 </div>
 
 
 
-<span class="n">_ChainHeadT</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;_ChainHeadT&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">Any</span><span class="p">)</span>
-<span class="n">_ChainTailT</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;_ChainTailT&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">Any</span><span class="p">)</span>
+<span class="n">_ChainHeadT</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"_ChainHeadT"</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">Any</span><span class="p">)</span>
+<span class="n">_ChainTailT</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"_ChainTailT"</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">Any</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="Chain">
 <a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.Chain">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Chain</span><span class="p">(</span><span class="n">FieldStruct</span><span class="p">[</span><span class="n">_ChainHeadT</span><span class="p">,</span> <span class="n">_ChainTailT</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Represents a chain of structures where each structure in the chain is linked</span>
 <span class="sd">    to the next one, forming a sequence.</span>
 
@@ -638,9 +637,9 @@
 <span class="sd">    .. note::</span>
 <span class="sd">        - Unpacking travels from the head to the tail.</span>
 <span class="sd">        - Packing travels from the tail to the head.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
-    <span class="vm">__slots__</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;_elements&quot;</span><span class="p">,)</span>
+    <span class="vm">__slots__</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"_elements"</span><span class="p">,)</span>
 
 <div class="viewcode-block" id="Chain.__init__">
 <a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.Chain.__init__">[docs]</a>
@@ -662,48 +661,48 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">head</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_StructLike</span><span class="p">[</span><span class="n">_ChainHeadT</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Get the head of the chain, i.e., the first structure.</span>
 
 <span class="sd">        :return: The head of the chain.</span>
 <span class="sd">        :rtype: _StructLike</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_elements</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">tail</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_StructLike</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">_ChainTailT</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Get the tail of the chain, i.e., the last structure.</span>
 
 <span class="sd">        :return: The tail of the chain.</span>
 <span class="sd">        :rtype: _StructLike</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_elements</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
 <div class="viewcode-block" id="Chain.__size__">
 <a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.Chain.__size__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">__size__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Calculate the size of the chain in bytes.</span>
 
 <span class="sd">        :param context: The context for the calculation.</span>
 <span class="sd">        :type context: _ContextLike</span>
 <span class="sd">        :return: The size of the chain.</span>
 <span class="sd">        :rtype: int</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">__size__</span><span class="p">(</span><span class="n">context</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Chain.__type__">
 <a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.Chain.__type__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">__type__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Get the type of the tail structure in the chain.</span>
 
 <span class="sd">        :return: The type of the tail structure.</span>
 <span class="sd">        :rtype: type</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tail</span><span class="o">.</span><span class="n">__type__</span><span class="p">()</span></div>
 
 
@@ -712,15 +711,15 @@
     <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__and__</span><span class="p">(</span>  <span class="c1"># pyright: ignore[reportIncompatibleMethodOverride]</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_StructLike</span><span class="p">[</span><span class="n">_IT</span><span class="p">,</span> <span class="n">_OT</span><span class="p">]</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Chain[_ChainHeadT, _OT]&quot;</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"Chain[_ChainHeadT, _OT]"</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Concatenate another structure to the end of the chain.</span>
 
 <span class="sd">        :param other: The structure to concatenate.</span>
 <span class="sd">        :type other: _StructLike</span>
 <span class="sd">        :return: The updated chain.</span>
 <span class="sd">        :rtype: Chain</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># fmt: off</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_elements</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">getstruct</span><span class="p">(</span><span class="n">other</span><span class="p">)</span> <span class="ow">or</span> <span class="n">other</span><span class="p">)</span>  <span class="c1"># pyright: ignore[reportArgumentType]</span>
         <span class="k">return</span> <span class="bp">self</span>  <span class="c1"># pyright: ignore[reportReturnType]</span></div>
@@ -730,15 +729,15 @@
 <a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.Chain.__rand__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__rand__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_StructLike</span><span class="p">[</span><span class="n">_IT</span><span class="p">,</span> <span class="n">_ChainHeadT</span><span class="p">]</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Chain[_IT, _ChainTailT]&quot;</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"Chain[_IT, _ChainTailT]"</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Concatenate another structure to the beginning of the chain.</span>
 
 <span class="sd">        :param other: The structure to concatenate.</span>
 <span class="sd">        :type other: _StructLike</span>
 <span class="sd">        :return: The updated chain.</span>
 <span class="sd">        :rtype: Chain</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># fmt: off</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_elements</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">getstruct</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">other</span><span class="p">))</span>  <span class="c1"># pyright: ignore[reportArgumentType]</span>
         <span class="k">return</span> <span class="bp">self</span>  <span class="c1"># pyright: ignore[reportReturnType]</span></div>
@@ -748,14 +747,14 @@
 <a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.Chain.unpack_single">[docs]</a>
     <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">unpack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_ChainTailT</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Unpack a single data instance from the chain.</span>
 
 <span class="sd">        :param context: The context for the unpacking operation.</span>
 <span class="sd">        :type context: _ContextLike</span>
 <span class="sd">        :return: A memory view representing the unpacked data.</span>
 <span class="sd">        :rtype: memoryview</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">data</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">struct</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_elements</span><span class="p">):</span>
             <span class="n">stream</span> <span class="o">=</span> <span class="n">BytesIO</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">context</span><span class="p">[</span><span class="n">CTX_STREAM</span><span class="p">]</span>
@@ -772,13 +771,13 @@
 <a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.Chain.pack_single">[docs]</a>
     <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">pack_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">_IT</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Pack a single data instance into the chain.</span>
 
 <span class="sd">        :param Any obj: The data to pack into the chain.</span>
 <span class="sd">        :param context: The context for the packing operation.</span>
 <span class="sd">        :type context: _ContextLike</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_elements</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">struct</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_elements</span><span class="p">)):</span>
             <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">count</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
@@ -798,7 +797,7 @@
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">Operator</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">_IT</span><span class="p">,</span> <span class="n">_OT</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Defines a custom opearator (user-defined)</span>
+<span class="w">    </span><span class="sd">"""Defines a custom opearator (user-defined)</span>
 
 <span class="sd">    It operates _infix_ between two statements and takes them as</span>
 <span class="sd">    agruments. For instance, the following example will return</span>
@@ -826,7 +825,7 @@
 
 <span class="sd">    :param func: The function to be applied.</span>
 <span class="sd">    :type func: Callable[[Any, Any], _StructLike]</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">_StructLike</span><span class="p">[</span><span class="n">_IT</span><span class="p">,</span> <span class="n">_OT</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">_StructLike</span><span class="p">[</span><span class="n">_IT</span><span class="p">,</span> <span class="n">_OT</span><span class="p">]]</span> <span class="o">=</span> <span class="n">func</span>
@@ -834,7 +833,7 @@
     <span class="k">def</span><span class="w"> </span><span class="fm">__truediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg2</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_StructLike</span><span class="p">[</span><span class="n">_IT</span><span class="p">,</span> <span class="n">_OT</span><span class="p">]:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="n">arg2</span><span class="p">)</span>  <span class="c1"># pyright: ignore[reportCallIssue]</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__rtruediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg1</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Operator[_IT, _OT]&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__rtruediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg1</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"Operator[_IT, _OT]"</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">Operator</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">,</span> <span class="n">arg1</span><span class="p">))</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg1</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">arg2</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_StructLike</span><span class="p">[</span><span class="n">_IT</span><span class="p">,</span> <span class="n">_OT</span><span class="p">]:</span>
@@ -848,7 +847,7 @@
     <span class="n">args</span><span class="p">:</span> <span class="n">_ArgType</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">_ArgType</span><span class="p">],</span>
     <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Get arguments for an instance.</span>
 
 <span class="sd">    :param args: Input arguments.</span>
@@ -857,7 +856,7 @@
 <span class="sd">    :type context: _ContextLike</span>
 <span class="sd">    :return: A list of processed arguments.</span>
 <span class="sd">    :rtype: list</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">args</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="n">args</span><span class="p">]</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">argument</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">argument</span><span class="p">):</span>
@@ -869,7 +868,7 @@
 <div class="viewcode-block" id="get_kwargs">
 <a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.get_kwargs">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_kwargs</span><span class="p">(</span><span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">_ArgType</span><span class="p">],</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Process a dictionary of keyword arguments, replacing callable values with their</span>
 <span class="sd">    results.</span>
 
@@ -879,7 +878,7 @@
 <span class="sd">    :type context: _ContextLike</span>
 <span class="sd">    :return: A new dictionary with processed keyword arguments.</span>
 <span class="sd">    :rtype: dict</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>

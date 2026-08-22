@@ -477,7 +477,7 @@ the distinctions between a <em>Sequence</em> and a <em>Struct</em> regarding the
 indicating the model to use. Inheritance poses a challenge with sequences, as they are not
 designed to operate on a type hierarchy. The default instantiation with all default options
 involves passing the dictionary with all fields directly:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Format</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">({</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="n">uint8</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="n">uint32</span><span class="p">})</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Format</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">({</span><span class="s2">"a"</span><span class="p">:</span> <span class="n">uint8</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">:</span> <span class="n">uint32</span><span class="p">})</span>
 </pre></div>
 </div>
 <div class="admonition-programmers-note admonition">
@@ -499,13 +499,13 @@ of elements and has no Python type hierarchy. The legacy <code class="docutils l
 left-hand sequence by importing or removing fields in its internal representation. They are kept
 for compatibility and can be useful for one-off transformations, but they are not safe base-sequence
 composition helpers. For instance:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">BaseFormat</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">({</span><span class="s2">&quot;magic&quot;</span><span class="p">:</span> <span class="sa">b</span><span class="s2">&quot;MAGIC&quot;</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="n">uint8</span><span class="p">})</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">Format</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">({</span><span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="n">uint32</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">:</span> <span class="n">uint16</span><span class="p">})</span> <span class="o">+</span> <span class="n">BaseFormat</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">BaseFormat</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">({</span><span class="s2">"magic"</span><span class="p">:</span> <span class="sa">b</span><span class="s2">"MAGIC"</span><span class="p">,</span> <span class="s2">"a"</span><span class="p">:</span> <span class="n">uint8</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Format</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">({</span><span class="s2">"b"</span><span class="p">:</span> <span class="n">uint32</span><span class="p">,</span> <span class="s2">"c"</span><span class="p">:</span> <span class="n">uint16</span><span class="p">})</span> <span class="o">+</span> <span class="n">BaseFormat</span>
 </pre></div>
 </div>
 <p>will result in the following field order:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">Format</span><span class="o">.</span><span class="n">get_members</span><span class="p">())</span>
-<span class="go">[&#39;b&#39;, &#39;c&#39;, &#39;magic&#39;, &#39;a&#39;]</span>
+<span class="go">['b', 'c', 'magic', 'a']</span>
 </pre></div>
 </div>
 <p>which is not the intended order. The correct order should be <code class="code docutils literal notranslate"><span class="pre">['magic',</span> <span class="pre">'a',</span> <span class="pre">'b',</span> <span class="pre">'c']</span></code>.
@@ -520,13 +520,13 @@ naturally follows a type hierarchy.</p>
 <p>For non-mutating composition, use <code class="xref py py-meth docutils literal notranslate"><span class="pre">merged()</span></code>
 and <code class="xref py py-meth docutils literal notranslate"><span class="pre">without()</span></code>. These helpers clone imported
 field wrappers and leave the original sequences unchanged:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">BaseFormat</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">({</span><span class="s2">&quot;magic&quot;</span><span class="p">:</span> <span class="sa">b</span><span class="s2">&quot;MAGIC&quot;</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="n">uint8</span><span class="p">})</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">Extension</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">({</span><span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="n">uint32</span><span class="p">})</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">BaseFormat</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">({</span><span class="s2">"magic"</span><span class="p">:</span> <span class="sa">b</span><span class="s2">"MAGIC"</span><span class="p">,</span> <span class="s2">"a"</span><span class="p">:</span> <span class="n">uint8</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Extension</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">({</span><span class="s2">"b"</span><span class="p">:</span> <span class="n">uint32</span><span class="p">})</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Format</span> <span class="o">=</span> <span class="n">BaseFormat</span><span class="o">.</span><span class="n">merged</span><span class="p">(</span><span class="n">Extension</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">BaseFormat</span><span class="o">.</span><span class="n">get_members</span><span class="p">())</span>
-<span class="go">[&#39;magic&#39;, &#39;a&#39;]</span>
+<span class="go">['magic', 'a']</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">Format</span><span class="o">.</span><span class="n">get_members</span><span class="p">())</span>
-<span class="go">[&#39;magic&#39;, &#39;a&#39;, &#39;b&#39;]</span>
+<span class="go">['magic', 'a', 'b']</span>
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">merged</span></code> starts with a clone of the receiver and imports clones from each
@@ -536,7 +536,7 @@ receiver and removes fields by name, again leaving all source sequences intact.<
 <p>Nesting sequences is allowed by default and can be achieved by incorporating another
 <a class="reference internal" href="../../library/model/sequence.html#caterpillar.model.Sequence" title="caterpillar.model.Sequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a> into the model. It is important to note that <em>nesting</em> is distinct from
 <em>inheritance</em>, adding an additional layer of packing and unpacking.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Format</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">({</span><span class="s2">&quot;other&quot;</span><span class="p">:</span> <span class="n">BaseFormat</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="n">uint32</span><span class="p">})</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Format</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">({</span><span class="s2">"other"</span><span class="p">:</span> <span class="n">BaseFormat</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">:</span> <span class="n">uint32</span><span class="p">})</span>
 </pre></div>
 </div>
 </section>

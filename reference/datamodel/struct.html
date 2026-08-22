@@ -535,7 +535,7 @@ evaluates all strings, introducing a potential security risk. Exercise with caut
 <p>Specifying structs is as simple as defining <a class="reference external" href="https://docs.python.org/3/reference/compound_stmts.html#class">Python Classes</a>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@struct</span>
 <span class="gp">... </span><span class="k">class</span><span class="w"> </span><span class="nc">BaseFormat</span><span class="p">:</span>
-<span class="gp">... </span>    <span class="n">magic</span><span class="p">:</span> <span class="sa">b</span><span class="s2">&quot;MAGIC&quot;</span>
+<span class="gp">... </span>    <span class="n">magic</span><span class="p">:</span> <span class="sa">b</span><span class="s2">"MAGIC"</span>
 <span class="gp">... </span>    <span class="n">a</span><span class="p">:</span> <span class="n">uint8</span>
 <span class="gp">...</span>
 </pre></div>
@@ -551,7 +551,7 @@ resolution order of Python:</p>
 <span class="gp">... </span>    <span class="n">c</span><span class="p">:</span> <span class="n">uint16</span>
 <span class="gp">...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">Format</span><span class="o">.</span><span class="n">__struct__</span><span class="o">.</span><span class="n">get_members</span><span class="p">())</span>
-<span class="go">[&#39;magic&#39;, &#39;a&#39;, &#39;b&#39;, &#39;c&#39;]</span>
+<span class="go">['magic', 'a', 'b', 'c']</span>
 </pre></div>
 </div>
 <p>Inherited fields are copied into the derived structure as new field wrappers.
@@ -584,7 +584,7 @@ definition.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@struct</span>
 <span class="gp">... </span><span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="n">a</span><span class="p">:</span> <span class="n">uint32</span>
-<span class="gp">... </span>    <span class="n">b</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;c&quot;</span><span class="p">:</span> <span class="n">uint8</span><span class="p">}</span>
+<span class="gp">... </span>    <span class="n">b</span><span class="p">:</span> <span class="p">{</span><span class="s2">"c"</span><span class="p">:</span> <span class="n">uint8</span><span class="p">}</span>
 <span class="gp">...</span>
 </pre></div>
 </div>

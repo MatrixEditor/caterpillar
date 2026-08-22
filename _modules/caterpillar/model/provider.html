@@ -410,37 +410,35 @@
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
 <span class="c1"># pyright: reportAny=false, reportExplicitAny=false, reportPrivateUsage=false</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">tempfile</span><span class="w"> </span><span class="kn">import</span> <span class="n">TemporaryFile</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">io</span><span class="w"> </span><span class="kn">import</span> <span class="n">BytesIO</span><span class="p">,</span> <span class="n">IOBase</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">io</span><span class="w"> </span><span class="kn">import</span> <span class="n">BytesIO</span><span class="p">,</span> <span class="n">IOBase</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">shutil</span><span class="w"> </span><span class="kn">import</span> <span class="n">copyfileobj</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tempfile</span><span class="w"> </span><span class="kn">import</span> <span class="n">TemporaryFile</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">overload</span><span class="p">,</span>
-    <span class="n">Buffer</span><span class="p">,</span>
-<span class="p">)</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Buffer</span><span class="p">,</span> <span class="n">overload</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.abc</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">_IT</span><span class="p">,</span>
+    <span class="n">_OT</span><span class="p">,</span>
+    <span class="n">ArchLike</span><span class="p">,</span>
+    <span class="n">_ContainsStruct</span><span class="p">,</span>
+    <span class="n">EndianLike</span><span class="p">,</span>
+    <span class="n">_StreamType</span><span class="p">,</span>
+    <span class="n">_SupportsPack</span><span class="p">,</span>
+    <span class="n">_SupportsSize</span><span class="p">,</span>
+    <span class="n">_SupportsUnpack</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.byteorder</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">O_DEFAULT_ARCH</span><span class="p">,</span>
     <span class="n">O_DEFAULT_ENDIAN</span><span class="p">,</span>
     <span class="n">LittleEndian</span><span class="p">,</span>
     <span class="n">system_arch</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.shared</span><span class="w"> </span><span class="kn">import</span> <span class="n">ATTR_PACK</span><span class="p">,</span> <span class="n">getstruct</span><span class="p">,</span> <span class="n">hasstruct</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">O_CONTEXT_FACTORY</span><span class="p">,</span> <span class="n">CTX_STREAM</span><span class="p">,</span> <span class="n">Context</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">CTX_STREAM</span><span class="p">,</span> <span class="n">O_CONTEXT_FACTORY</span><span class="p">,</span> <span class="n">Context</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.exception</span><span class="w"> </span><span class="kn">import</span> <span class="n">DynamicSizeError</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.shared</span><span class="w"> </span><span class="kn">import</span> <span class="n">MODE_PACK</span><span class="p">,</span> <span class="n">MODE_UNPACK</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.abc</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">_ContainsStruct</span><span class="p">,</span>
-    <span class="n">_OT</span><span class="p">,</span>
-    <span class="n">_IT</span><span class="p">,</span>
-    <span class="n">_SupportsPack</span><span class="p">,</span>
-    <span class="n">_StreamType</span><span class="p">,</span>
-    <span class="n">_SupportsUnpack</span><span class="p">,</span>
-    <span class="n">_SupportsSize</span><span class="p">,</span>
-    <span class="n">_EndianLike</span><span class="p">,</span>
-    <span class="n">_ArchLike</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.options</span><span class="w"> </span><span class="kn">import</span> <span class="n">O_DEFAULT_STRUCT_ENDIAN</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.shared</span><span class="w"> </span><span class="kn">import</span> <span class="n">ATTR_PACK</span><span class="p">,</span> <span class="n">MODE_PACK</span><span class="p">,</span> <span class="n">MODE_UNPACK</span><span class="p">,</span> <span class="n">getstruct</span><span class="p">,</span> <span class="n">hasstruct</span>
 
 
 <span class="nd">@overload</span>
@@ -451,9 +449,10 @@
     <span class="o">*</span><span class="p">,</span>
     <span class="n">use_tempfile</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">as_field</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">arch</span><span class="p">:</span> <span class="n">ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">fill</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">bytes</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">default_struct_order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span> <span class="o">...</span>
 <span class="nd">@overload</span>
@@ -465,9 +464,10 @@
     <span class="o">*</span><span class="p">,</span>
     <span class="n">use_tempfile</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">as_field</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">arch</span><span class="p">:</span> <span class="n">ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">fill</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">bytes</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">default_struct_order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span> <span class="o">...</span>
 <span class="nd">@overload</span>
@@ -478,9 +478,10 @@
     <span class="o">*</span><span class="p">,</span>
     <span class="n">use_tempfile</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">as_field</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">arch</span><span class="p">:</span> <span class="n">ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">fill</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">bytes</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">default_struct_order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span> <span class="o">...</span>
 <span class="nd">@overload</span>
@@ -492,9 +493,10 @@
     <span class="o">*</span><span class="p">,</span>
     <span class="n">use_tempfile</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">as_field</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">arch</span><span class="p">:</span> <span class="n">ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">fill</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">bytes</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">default_struct_order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span> <span class="o">...</span>
 <div class="viewcode-block" id="pack">
@@ -506,12 +508,13 @@
     <span class="o">*</span><span class="p">,</span>
     <span class="n">use_tempfile</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">as_field</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">arch</span><span class="p">:</span> <span class="n">ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">fill</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">bytes</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">default_struct_order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Pack an object into a bytes buffer using the specified struct.</span>
 
 <span class="sd">    :param obj: The object to pack.</span>
@@ -527,7 +530,7 @@
 
 <span class="sd">    .. versionchanged:: 2.8.1</span>
 <span class="sd">        Added ``fill`` parameter.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">buffer</span> <span class="o">=</span> <span class="n">BytesIO</span><span class="p">()</span>
     <span class="n">pack_into</span><span class="p">(</span>  <span class="c1"># pyright: ignore[reportCallIssue]</span>
         <span class="n">obj</span><span class="p">,</span>
@@ -538,6 +541,7 @@
         <span class="n">use_tempfile</span><span class="o">=</span><span class="n">use_tempfile</span><span class="p">,</span>
         <span class="n">as_field</span><span class="o">=</span><span class="n">as_field</span><span class="p">,</span>
         <span class="n">fill</span><span class="o">=</span><span class="n">fill</span><span class="p">,</span>
+        <span class="n">default_struct_order</span><span class="o">=</span><span class="n">default_struct_order</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="k">return</span> <span class="n">buffer</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span></div>
@@ -553,9 +557,10 @@
     <span class="o">*</span><span class="p">,</span>
     <span class="n">use_tempfile</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">as_field</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">arch</span><span class="p">:</span> <span class="n">ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">fill</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">bytes</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">default_struct_order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
 <span class="nd">@overload</span>
@@ -567,9 +572,10 @@
     <span class="o">*</span><span class="p">,</span>
     <span class="n">use_tempfile</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">as_field</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">arch</span><span class="p">:</span> <span class="n">ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">fill</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">bytes</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">default_struct_order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
 <span class="nd">@overload</span>
@@ -581,9 +587,10 @@
     <span class="o">*</span><span class="p">,</span>
     <span class="n">use_tempfile</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">as_field</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">arch</span><span class="p">:</span> <span class="n">ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">fill</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">bytes</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">default_struct_order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
 <span class="nd">@overload</span>
@@ -595,9 +602,10 @@
     <span class="o">*</span><span class="p">,</span>
     <span class="n">use_tempfile</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">as_field</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">arch</span><span class="p">:</span> <span class="n">ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">fill</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">bytes</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">default_struct_order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
 <span class="nd">@overload</span>
@@ -609,9 +617,10 @@
     <span class="o">*</span><span class="p">,</span>
     <span class="n">use_tempfile</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">as_field</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">arch</span><span class="p">:</span> <span class="n">ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">fill</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">bytes</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">default_struct_order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
 <div class="viewcode-block" id="pack_into">
@@ -624,12 +633,13 @@
     <span class="o">*</span><span class="p">,</span>
     <span class="n">use_tempfile</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">as_field</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">arch</span><span class="p">:</span> <span class="n">ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">fill</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">bytes</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">default_struct_order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Pack an object into the specified buffer using the specified struct.</span>
 
 <span class="sd">    This function serializes an object (`obj`) into a given buffer, using</span>
@@ -644,11 +654,11 @@
 <span class="sd">    &gt;&gt;&gt; my_obj = SomeObject()  # Assume SomeObject is a valid object to be packed</span>
 <span class="sd">    &gt;&gt;&gt; pack_into(my_obj, buffer, struct=SomeStruct())  # Using a specific struct</span>
 <span class="sd">    &gt;&gt;&gt; buffer.getvalue()</span>
-<span class="sd">    b&quot;...&quot;</span>
+<span class="sd">    b"..."</span>
 
 <span class="sd">    Example 2: Packing into a file-like stream (e.g., file)</span>
 
-<span class="sd">    &gt;&gt;&gt; with open(&#39;packed_data.bin&#39;, &#39;wb&#39;) as f:</span>
+<span class="sd">    &gt;&gt;&gt; with open('packed_data.bin', 'wb') as f:</span>
 <span class="sd">    ...     pack_into(my_obj, f, struct=SomeStruct())  # Pack into a file</span>
 
 <span class="sd">    Example 3: Using `as_field` to wrap the struct in a Field before packing</span>
@@ -656,7 +666,7 @@
 <span class="sd">    &gt;&gt;&gt; buffer = BytesIO()</span>
 <span class="sd">    &gt;&gt;&gt; pack_into(42, buffer, struct=uint8, as_field=True)</span>
 <span class="sd">    &gt;&gt;&gt; buffer.getvalue()</span>
-<span class="sd">    b&quot;\\x2a&quot;</span>
+<span class="sd">    b"\\x2a"</span>
 
 <span class="sd">    :param obj: The object to pack (could be a plain object or a structure-like object).</span>
 <span class="sd">    :param buffer: The buffer to pack the object into (a writable stream such as `BytesIO` or a file).</span>
@@ -672,14 +682,14 @@
 
 <span class="sd">    .. versionchanged:: 2.8.1</span>
 <span class="sd">        Added ``fill`` parameter.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># fmt: off</span>
     <span class="n">offsets</span><span class="p">:</span> <span class="n">OrderedDict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">]</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
-    <span class="c1"># NOTE: we don&#39;t have to set _root here because the default root context</span>
+    <span class="c1"># NOTE: we don't have to set _root here because the default root context</span>
     <span class="c1"># will be this instance.</span>
     <span class="n">context</span> <span class="o">=</span> <span class="p">(</span><span class="n">O_CONTEXT_FACTORY</span><span class="o">.</span><span class="n">value</span> <span class="ow">or</span> <span class="n">Context</span><span class="p">)(</span>
         <span class="n">_parent</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">_path</span><span class="o">=</span><span class="s2">&quot;&lt;root&gt;&quot;</span><span class="p">,</span>
+        <span class="n">_path</span><span class="o">=</span><span class="s2">"&lt;root&gt;"</span><span class="p">,</span>
         <span class="n">_pos</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
         <span class="n">_offsets</span><span class="o">=</span><span class="n">offsets</span><span class="p">,</span>
         <span class="n">_is_seq</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -697,23 +707,27 @@
         <span class="n">struct</span> <span class="o">=</span> <span class="n">getstruct</span><span class="p">(</span><span class="n">struct</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">struct</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;struct must be specified&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"struct must be specified"</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">ATTR_PACK</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;pack* called with an unknown struct type (</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">struct</span><span class="p">)</span><span class="si">}</span><span class="s2">) - &quot;</span>
-            <span class="o">+</span> <span class="s2">&quot;no __pack__ defined!&quot;</span>
+            <span class="sa">f</span><span class="s2">"pack* called with an unknown struct type (</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">struct</span><span class="p">)</span><span class="si">}</span><span class="s2">) - "</span>
+            <span class="o">+</span> <span class="s2">"no __pack__ defined!"</span>
         <span class="p">)</span>
 
     <span class="n">prev_order</span> <span class="o">=</span> <span class="n">O_DEFAULT_ENDIAN</span><span class="o">.</span><span class="n">value</span>
     <span class="n">prev_arch</span> <span class="o">=</span> <span class="n">O_DEFAULT_ARCH</span><span class="o">.</span><span class="n">value</span>
+    <span class="n">prev_sorder</span> <span class="o">=</span> <span class="n">O_DEFAULT_STRUCT_ENDIAN</span><span class="o">.</span><span class="n">value</span>
     <span class="k">if</span> <span class="n">order</span><span class="p">:</span>
         <span class="n">O_DEFAULT_ENDIAN</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">order</span>
     <span class="k">if</span> <span class="n">arch</span><span class="p">:</span>
-        <span class="n">O_DEFAULT_ARCH</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">prev_arch</span>
+        <span class="n">O_DEFAULT_ARCH</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">arch</span>
+    <span class="k">if</span> <span class="n">default_struct_order</span><span class="p">:</span>
+        <span class="n">O_DEFAULT_STRUCT_ENDIAN</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">default_struct_order</span>
+
     <span class="k">try</span><span class="p">:</span>
         <span class="n">start</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">fill_pat</span><span class="p">:</span> <span class="nb">bytes</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x00</span><span class="s2">&quot;</span>
+        <span class="n">fill_pat</span><span class="p">:</span> <span class="nb">bytes</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">"</span><span class="se">\x00</span><span class="s2">"</span>
         <span class="k">match</span> <span class="n">fill</span><span class="p">:</span>
             <span class="k">case</span> <span class="nb">str</span><span class="p">():</span>
                 <span class="n">fill_pat</span> <span class="o">=</span> <span class="n">fill</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span>
@@ -722,9 +736,9 @@
             <span class="k">case</span> <span class="nb">int</span><span class="p">():</span>
                 <span class="n">fill_pat</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">([</span><span class="n">fill</span><span class="p">])</span>
             <span class="k">case</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">fill_pat</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x00</span><span class="s2">&quot;</span>
+                <span class="n">fill_pat</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">"</span><span class="se">\x00</span><span class="s2">"</span>
             <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Invalid fill type!&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"Invalid fill type!"</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">use_tempfile</span><span class="p">:</span>
             <span class="c1"># NOTE: this implementation is exprimental - use this option with caution.</span>
@@ -752,7 +766,7 @@
                     <span class="k">if</span> <span class="n">start</span> <span class="o">&lt;</span> <span class="n">offset</span><span class="p">:</span>
                         <span class="n">pad_length</span> <span class="o">=</span> <span class="n">offset</span> <span class="o">-</span> <span class="n">start</span>
                         <span class="k">if</span> <span class="n">pad_length</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">fill_pat</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-                            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;invalid pattern length. Fill pattern does not fit into </span><span class="si">{</span><span class="n">pad_length</span><span class="si">}</span><span class="s2"> bytes&quot;</span><span class="p">)</span>
+                            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"invalid pattern length. Fill pattern does not fit into </span><span class="si">{</span><span class="n">pad_length</span><span class="si">}</span><span class="s2"> bytes"</span><span class="p">)</span>
 
                         <span class="n">count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">pad_length</span> <span class="o">//</span> <span class="nb">len</span><span class="p">(</span><span class="n">fill_pat</span><span class="p">)</span>
                         <span class="n">buffer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fill_pat</span> <span class="o">*</span> <span class="n">count</span><span class="p">)</span>
@@ -764,7 +778,8 @@
                 <span class="n">copyfileobj</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">buffer</span><span class="p">)</span>
     <span class="k">finally</span><span class="p">:</span>
         <span class="n">O_DEFAULT_ENDIAN</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">prev_order</span>
-        <span class="n">O_DEFAULT_ARCH</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">prev_arch</span></div>
+        <span class="n">O_DEFAULT_ARCH</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">prev_arch</span>
+        <span class="n">O_DEFAULT_STRUCT_ENDIAN</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">prev_sorder</span></div>
 
 
 
@@ -777,9 +792,10 @@
     <span class="o">*</span><span class="p">,</span>
     <span class="n">use_tempfile</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">as_field</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">arch</span><span class="p">:</span> <span class="n">ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">fill</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">bytes</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">default_struct_order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
 <span class="nd">@overload</span>
@@ -791,9 +807,10 @@
     <span class="o">*</span><span class="p">,</span>
     <span class="n">use_tempfile</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">as_field</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">arch</span><span class="p">:</span> <span class="n">ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">fill</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">bytes</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">default_struct_order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
 <span class="nd">@overload</span>
@@ -805,9 +822,10 @@
     <span class="o">*</span><span class="p">,</span>
     <span class="n">use_tempfile</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">as_field</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">arch</span><span class="p">:</span> <span class="n">ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">fill</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">bytes</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">default_struct_order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
 <span class="nd">@overload</span>
@@ -819,9 +837,10 @@
     <span class="o">*</span><span class="p">,</span>
     <span class="n">use_tempfile</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">as_field</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">arch</span><span class="p">:</span> <span class="n">ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">fill</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">bytes</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">default_struct_order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
 <span class="nd">@overload</span>
@@ -833,9 +852,10 @@
     <span class="o">*</span><span class="p">,</span>
     <span class="n">use_tempfile</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">as_field</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">arch</span><span class="p">:</span> <span class="n">ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">fill</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">bytes</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">default_struct_order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
 <div class="viewcode-block" id="pack_file">
@@ -848,12 +868,13 @@
     <span class="o">*</span><span class="p">,</span>
     <span class="n">use_tempfile</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">as_field</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">arch</span><span class="p">:</span> <span class="n">ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">fill</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">bytes</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">default_struct_order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Pack an object into a file using the specified struct.</span>
 
 <span class="sd">    :param obj: The object to pack.</span>
@@ -870,8 +891,8 @@
 
 <span class="sd">    .. versionchanged:: 2.8.1</span>
 <span class="sd">        Added ``fill`` parameter.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;w+b&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+<span class="sd">    """</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">"w+b"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
         <span class="n">pack_into</span><span class="p">(</span>  <span class="c1"># pyright: ignore[reportCallIssue]</span>
             <span class="n">obj</span><span class="p">,</span>
             <span class="n">fp</span><span class="p">,</span>
@@ -881,6 +902,7 @@
             <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span>
             <span class="n">arch</span><span class="o">=</span><span class="n">arch</span><span class="p">,</span>
             <span class="n">fill</span><span class="o">=</span><span class="n">fill</span><span class="p">,</span>
+            <span class="n">default_struct_order</span><span class="o">=</span><span class="n">default_struct_order</span><span class="p">,</span>
             <span class="o">**</span><span class="n">kwds</span><span class="p">,</span>
         <span class="p">)</span></div>
 
@@ -893,8 +915,9 @@
     <span class="o">/</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">as_field</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">arch</span><span class="p">:</span> <span class="n">ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">default_struct_order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_OT</span><span class="p">:</span> <span class="o">...</span>
 <span class="nd">@overload</span>
@@ -904,8 +927,9 @@
     <span class="o">/</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">as_field</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">arch</span><span class="p">:</span> <span class="n">ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">default_struct_order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_OT</span><span class="p">:</span> <span class="o">...</span>
 <span class="nd">@overload</span>
@@ -915,8 +939,9 @@
     <span class="o">/</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">as_field</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">arch</span><span class="p">:</span> <span class="n">ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">default_struct_order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_OT</span><span class="p">:</span> <span class="o">...</span>
 <div class="viewcode-block" id="unpack">
@@ -926,11 +951,12 @@
     <span class="n">buffer</span><span class="p">:</span> <span class="n">Buffer</span> <span class="o">|</span> <span class="n">_StreamType</span><span class="p">,</span>
     <span class="o">/</span><span class="p">,</span>
     <span class="n">as_field</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">arch</span><span class="p">:</span> <span class="n">ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">default_struct_order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_OT</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Unpack an object from a bytes buffer or stream using the specified struct.</span>
 
 <span class="sd">    This function takes a `struct` that defines how data should be unpacked,</span>
@@ -941,7 +967,7 @@
 
 <span class="sd">    Example:</span>
 
-<span class="sd">    &gt;&gt;&gt; buffer = b&#39;\\x00\\x01\\x02\\x03&#39;</span>
+<span class="sd">    &gt;&gt;&gt; buffer = b'\\x00\\x01\\x02\\x03'</span>
 <span class="sd">    &gt;&gt;&gt; struct = SomeStruct()</span>
 <span class="sd">    &gt;&gt;&gt; unpack(struct, buffer)</span>
 <span class="sd">    ...</span>
@@ -954,12 +980,12 @@
 <span class="sd">    :return: The unpacked object, which is the result of calling `struct.__unpack__(context)`.</span>
 
 <span class="sd">    :raises TypeError: If the `struct` is not a valid struct instance.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># fmt: off</span>
     <span class="c1"># prepare the data stream</span>
     <span class="n">stream</span> <span class="o">=</span> <span class="n">buffer</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="n">IOBase</span><span class="p">)</span> <span class="k">else</span> <span class="n">BytesIO</span><span class="p">(</span><span class="n">buffer</span><span class="p">)</span>
     <span class="n">context</span> <span class="o">=</span> <span class="p">(</span><span class="n">O_CONTEXT_FACTORY</span><span class="o">.</span><span class="n">value</span> <span class="ow">or</span> <span class="n">Context</span><span class="p">)(</span>
-        <span class="n">_path</span><span class="o">=</span><span class="s2">&quot;&lt;root&gt;&quot;</span><span class="p">,</span>
+        <span class="n">_path</span><span class="o">=</span><span class="s2">"&lt;root&gt;"</span><span class="p">,</span>
         <span class="n">_parent</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">_io</span><span class="o">=</span><span class="n">stream</span><span class="p">,</span>
         <span class="n">_pos</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
@@ -976,20 +1002,24 @@
         <span class="n">struct</span> <span class="o">=</span> <span class="n">getstruct</span><span class="p">(</span><span class="n">struct</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">_SupportsUnpack</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">struct</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> is not a valid struct instance!&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">struct</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> is not a valid struct instance!"</span><span class="p">)</span>
 
     <span class="n">prev_order</span> <span class="o">=</span> <span class="n">O_DEFAULT_ENDIAN</span><span class="o">.</span><span class="n">value</span>
     <span class="n">prev_arch</span> <span class="o">=</span> <span class="n">O_DEFAULT_ARCH</span><span class="o">.</span><span class="n">value</span>
+    <span class="n">prev_sorder</span> <span class="o">=</span> <span class="n">O_DEFAULT_STRUCT_ENDIAN</span><span class="o">.</span><span class="n">value</span>
     <span class="k">if</span> <span class="n">order</span><span class="p">:</span>
         <span class="n">O_DEFAULT_ENDIAN</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">order</span>
     <span class="k">if</span> <span class="n">arch</span><span class="p">:</span>
         <span class="n">O_DEFAULT_ARCH</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">arch</span>
+    <span class="k">if</span> <span class="n">default_struct_order</span><span class="p">:</span>
+        <span class="n">O_DEFAULT_STRUCT_ENDIAN</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">default_struct_order</span>
 
     <span class="k">try</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">struct</span><span class="o">.</span><span class="n">__unpack__</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
     <span class="k">finally</span><span class="p">:</span>
         <span class="n">O_DEFAULT_ARCH</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">prev_arch</span>
-        <span class="n">O_DEFAULT_ENDIAN</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">prev_order</span></div>
+        <span class="n">O_DEFAULT_ENDIAN</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">prev_order</span>
+        <span class="n">O_DEFAULT_STRUCT_ENDIAN</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">prev_sorder</span></div>
 
 
 
@@ -1000,8 +1030,9 @@
     <span class="o">/</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">as_field</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">arch</span><span class="p">:</span> <span class="n">ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">default_struct_order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_OT</span><span class="p">:</span> <span class="o">...</span>
 <span class="nd">@overload</span>
@@ -1011,8 +1042,9 @@
     <span class="o">/</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">as_field</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">arch</span><span class="p">:</span> <span class="n">ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">default_struct_order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_OT</span><span class="p">:</span> <span class="o">...</span>
 <span class="nd">@overload</span>
@@ -1022,8 +1054,9 @@
     <span class="o">/</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">as_field</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">arch</span><span class="p">:</span> <span class="n">ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">default_struct_order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_OT</span><span class="p">:</span> <span class="o">...</span>
 <div class="viewcode-block" id="unpack_file">
@@ -1034,11 +1067,12 @@
     <span class="o">/</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">as_field</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">arch</span><span class="p">:</span> <span class="n">ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">default_struct_order</span><span class="p">:</span> <span class="n">EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Unpack an object from a file using the specified struct.</span>
 
 <span class="sd">    :param struct: The struct to use for unpacking.</span>
@@ -1046,9 +1080,17 @@
 <span class="sd">    :param kwds: Additional keyword arguments to pass to the unpack function.</span>
 
 <span class="sd">    :return: The unpacked object.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">unpack</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">fp</span><span class="p">,</span> <span class="n">as_field</span><span class="o">=</span><span class="n">as_field</span><span class="p">,</span> <span class="n">arch</span><span class="o">=</span><span class="n">arch</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span></div>
+<span class="sd">    """</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">"rb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">unpack</span><span class="p">(</span>
+            <span class="n">struct</span><span class="p">,</span>
+            <span class="n">fp</span><span class="p">,</span>
+            <span class="n">as_field</span><span class="o">=</span><span class="n">as_field</span><span class="p">,</span>
+            <span class="n">arch</span><span class="o">=</span><span class="n">arch</span><span class="p">,</span>
+            <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span>
+            <span class="n">default_struct_order</span><span class="o">=</span><span class="n">default_struct_order</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwds</span><span class="p">,</span>
+        <span class="p">)</span></div>
 
 
 
@@ -1061,17 +1103,17 @@
 <div class="viewcode-block" id="sizeof">
 <a class="viewcode-back" href="../../../library/model/struct.html#caterpillar.model.sizeof">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">sizeof</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">_SupportsSize</span> <span class="o">|</span> <span class="n">_ContainsStruct</span> <span class="o">|</span> <span class="nb">type</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-    <span class="n">context</span> <span class="o">=</span> <span class="p">(</span><span class="n">O_CONTEXT_FACTORY</span><span class="o">.</span><span class="n">value</span> <span class="ow">or</span> <span class="n">Context</span><span class="p">)(</span><span class="n">_parent</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">_path</span><span class="o">=</span><span class="s2">&quot;&lt;root&gt;&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span>
+    <span class="n">context</span> <span class="o">=</span> <span class="p">(</span><span class="n">O_CONTEXT_FACTORY</span><span class="o">.</span><span class="n">value</span> <span class="ow">or</span> <span class="n">Context</span><span class="p">)(</span><span class="n">_parent</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">_path</span><span class="o">=</span><span class="s2">"&lt;root&gt;"</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span>
     <span class="n">struct_</span> <span class="o">=</span> <span class="n">obj</span>
     <span class="k">if</span> <span class="n">hasstruct</span><span class="p">(</span><span class="n">struct_</span><span class="p">):</span>
         <span class="n">struct_</span> <span class="o">=</span> <span class="n">getstruct</span><span class="p">(</span><span class="n">struct_</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">struct_</span><span class="p">,</span> <span class="n">_SupportsSize</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">struct_</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> does not support size calculation!&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">struct_</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> does not support size calculation!"</span><span class="p">)</span>
 
     <span class="n">size</span> <span class="o">=</span> <span class="n">struct_</span><span class="o">.</span><span class="n">__size__</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>  <span class="c1"># pyright: ignore[reportUnnecessaryIsInstance]</span>
-        <span class="k">raise</span> <span class="n">DynamicSizeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Struct </span><span class="si">{</span><span class="n">struct_</span><span class="si">}</span><span class="s2"> is using a dynamic size &quot;</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">DynamicSizeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Struct </span><span class="si">{</span><span class="n">struct_</span><span class="si">}</span><span class="s2"> is using a dynamic size "</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">size</span></div>
 
 </pre></div>

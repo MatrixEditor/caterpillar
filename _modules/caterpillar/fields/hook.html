@@ -412,10 +412,11 @@
 <span class="c1"># pyright: reportPrivateUsage=false</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">io</span><span class="w"> </span><span class="kn">import</span> <span class="n">RawIOBase</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">override</span><span class="p">,</span> <span class="n">Buffer</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Buffer</span><span class="p">,</span> <span class="n">override</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">_ContextLambda</span><span class="p">,</span> <span class="n">_ContextLike</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">CTX_STREAM</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">_ContextLike</span><span class="p">,</span> <span class="n">_ContextLambda</span>
 
 <span class="n">HookInit</span> <span class="o">=</span> <span class="n">_ContextLambda</span><span class="p">[</span><span class="kc">None</span><span class="p">]</span>
 <span class="n">HookUpdate</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">_ContextLike</span><span class="p">],</span> <span class="nb">bytes</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span>
@@ -427,7 +428,7 @@
 <div class="viewcode-block" id="IOHook">
 <a class="viewcode-back" href="../../../library/hooks.html#caterpillar.fields.hook.IOHook">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">IOHook</span><span class="p">(</span><span class="n">RawIOBase</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    A custom I/O stream wrapper that allows hooks to be installed for various</span>
 <span class="sd">    stages of stream interaction, such as initialization, reading and writing.</span>
 
@@ -447,7 +448,7 @@
 <span class="sd">    :type write: Optional[HookWrite]</span>
 <span class="sd">    :param finish: Optional hook function to be called when the stream is finished.</span>
 <span class="sd">    :type finish: Optional[HookFinish]</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -471,25 +472,25 @@
 <div class="viewcode-block" id="IOHook.assert_context_set">
 <a class="viewcode-back" href="../../../library/hooks.html#caterpillar.fields.hook.IOHook.assert_context_set">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">assert_context_set</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Ensures that the context has been set before any I/O operations are performed.</span>
 
 <span class="sd">        :raises ValueError: If the context is not set.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_context</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Context is not set&quot;</span><span class="p">)</span></div>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Context is not set"</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="IOHook.init">
 <a class="viewcode-back" href="../../../library/hooks.html#caterpillar.fields.hook.IOHook.init">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Initialize the I/O hook with the provided context. This triggers the</span>
 <span class="sd">        `init` hook, if available, and sets up the context for subsequent operations.</span>
 
 <span class="sd">        :param context: The context to be used for initializing the stream.</span>
 <span class="sd">        :type context: _ContextLike</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_init</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_init</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_context</span> <span class="o">=</span> <span class="n">context</span>
@@ -500,13 +501,13 @@
 <div class="viewcode-block" id="IOHook.finish">
 <a class="viewcode-back" href="../../../library/hooks.html#caterpillar.fields.hook.IOHook.finish">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">finish</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Finalize the I/O hook by calling the `finish` hook (if provided) and</span>
 <span class="sd">        restoring the original I/O stream in the context.</span>
 
 <span class="sd">        :param context: The context used during the finalization.</span>
 <span class="sd">        :type context: _ContextLike</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_finish</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_finish</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
 
@@ -518,12 +519,12 @@
 <a class="viewcode-back" href="../../../library/hooks.html#caterpillar.fields.hook.IOHook.seekable">[docs]</a>
     <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">seekable</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Checks if the underlying I/O stream is seekable.</span>
 
 <span class="sd">        :return: True if the stream supports seeking, otherwise False.</span>
 <span class="sd">        :rtype: bool</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_io</span><span class="o">.</span><span class="n">seekable</span><span class="p">()</span>  <span class="c1"># pyright: ignore[reportOptionalMemberAccess]</span></div>
 
 
@@ -531,12 +532,12 @@
 <a class="viewcode-back" href="../../../library/hooks.html#caterpillar.fields.hook.IOHook.readable">[docs]</a>
     <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">readable</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Checks if the underlying I/O stream is readable.</span>
 
 <span class="sd">        :return: True if the stream supports reading, otherwise False.</span>
 <span class="sd">        :rtype: bool</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_io</span><span class="o">.</span><span class="n">readable</span><span class="p">()</span>  <span class="c1"># pyright: ignore[reportOptionalMemberAccess]</span></div>
 
 
@@ -544,7 +545,7 @@
 <a class="viewcode-back" href="../../../library/hooks.html#caterpillar.fields.hook.IOHook.read">[docs]</a>
     <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Read data from the stream, applying the optional hooks (if any).</span>
 
 <span class="sd">        - The `update` hook, if provided, will be called to modify the data.</span>
@@ -554,7 +555,7 @@
 <span class="sd">        :type size: int</span>
 <span class="sd">        :return: The read data, possibly modified by the hooks.</span>
 <span class="sd">        :rtype: Union[bytes, None]</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># fmt: off</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_context_set</span><span class="p">()</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_io</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>  <span class="c1"># pyright: ignore[reportOptionalMemberAccess]</span>
@@ -574,7 +575,7 @@
 <a class="viewcode-back" href="../../../library/hooks.html#caterpillar.fields.hook.IOHook.write">[docs]</a>
     <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">Buffer</span><span class="p">,</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Write data to the stream, applying the optional hooks (if any).</span>
 
 <span class="sd">        - The `update` hook, if provided, will be called to modify the data before writing.</span>
@@ -584,7 +585,7 @@
 <span class="sd">        :type b: bytes</span>
 <span class="sd">        :return: The number of bytes written to the underlying stream.</span>
 <span class="sd">        :rtype: Union[int, None]</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_context_set</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_update</span><span class="p">:</span>
             <span class="n">b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_context</span><span class="p">)</span> <span class="ow">or</span> <span class="n">b</span>
@@ -599,12 +600,12 @@
 <a class="viewcode-back" href="../../../library/hooks.html#caterpillar.fields.hook.IOHook.writable">[docs]</a>
     <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">writable</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Checks if the underlying I/O stream is writable.</span>
 
 <span class="sd">        :return: True if the stream supports writing, otherwise False.</span>
 <span class="sd">        :rtype: bool</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_io</span><span class="o">.</span><span class="n">writable</span><span class="p">()</span></div>
 
 
@@ -612,12 +613,12 @@
 <a class="viewcode-back" href="../../../library/hooks.html#caterpillar.fields.hook.IOHook.tell">[docs]</a>
     <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">tell</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Returns the current position of the underlying stream.</span>
 
 <span class="sd">        :return: The current position in the stream.</span>
 <span class="sd">        :rtype: int</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_io</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span></div>
 
 
@@ -625,14 +626,14 @@
 <a class="viewcode-back" href="../../../library/hooks.html#caterpillar.fields.hook.IOHook.seek">[docs]</a>
     <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">seek</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">offset</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">whence</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Move the cursor to a new position in the underlying stream.</span>
 
 <span class="sd">        :param offset: The offset to move.</span>
 <span class="sd">        :param whence: The reference point for the offset (default is 0, SEEK_SET).</span>
 <span class="sd">        :return: The new position in the stream.</span>
 <span class="sd">        :rtype: int</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_io</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">offset</span><span class="p">,</span> <span class="n">whence</span><span class="p">)</span></div>
 </div>
 

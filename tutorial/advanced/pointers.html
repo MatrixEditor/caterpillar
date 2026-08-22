@@ -496,11 +496,11 @@ Extended Syntax (&gt;=2.8.0)</label><div class="sd-tab-content docutils">
 <p>The behavior of a pointer depends on the architecture it is being unpacked on. For
 example, on an x86 architecture, the pointer will be interpreted accordingly based
 on how pointers are represented in memory for that platform.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x00\x00\x00\x04</span><span class="s2">Hello, World!</span><span class="se">\x00</span><span class="s2">&quot;</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">"</span><span class="se">\x00\x00\x00\x04</span><span class="s2">Hello, World!</span><span class="se">\x00</span><span class="s2">"</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">o</span> <span class="o">=</span> <span class="n">unpack</span><span class="p">(</span><span class="n">Format</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">_arch</span><span class="o">=</span><span class="n">x86</span><span class="p">)</span>
 <span class="go">Format(name=&lt;str* 0x4&gt;)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">o</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">obj</span>
-<span class="go">&#39;Hello, World!&#39;</span>
+<span class="go">'Hello, World!'</span>
 </pre></div>
 </div>
 <p>The pointer behavior is facilitated by the <code class="code docutils literal notranslate"><span class="pre">pointer</span></code> class in <em>Caterpillar</em>. This

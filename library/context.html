@@ -493,7 +493,7 @@ relationships, and tracks contextual state. Conforms to the
 
 <dl class="py method">
 <dt class="sig sig-object py" id="caterpillar.context.ContextPath.__getattribute__">
-<span class="sig-name descname"><span class="pre">__getattribute__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'_field'</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#caterpillar.context.ContextPath" title="caterpillar.context.ContextPath"><span class="pre">ContextPath</span></a><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'Field[_IT,</span> <span class="pre">_OT]</span> <span class="pre">|</span> <span class="pre">None'</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/caterpillar/context.html#ContextPath.__getattribute__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.context.ContextPath.__getattribute__" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">__getattribute__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'_field'</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#caterpillar.context.ContextPath" title="caterpillar.context.ContextPath"><span class="pre">ContextPath</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="fields/field_model.html#caterpillar.fields.Field" title="caterpillar.fields.Field"><span class="pre">Field</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_IT</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">_OT</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/caterpillar/context.html#ContextPath.__getattribute__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.context.ContextPath.__getattribute__" title="Link to this definition">#</a></dt>
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">__getattribute__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'_parent'</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#caterpillar.context.ContextPath" title="caterpillar.context.ContextPath"><span class="pre">ContextPath</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ContextLike</span><span class="p"><span class="pre">]</span></span></span></span></dt>
 <dt class="sig sig-object py">
@@ -541,6 +541,14 @@ relationships, and tracks contextual state. Conforms to the
 </dd></dl>
 
 <dl class="py property">
+<dt class="sig sig-object py" id="caterpillar.context.ContextPath.parent">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">parent</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#caterpillar.context.ContextPath" title="caterpillar.context.ContextPath"><span class="pre">ContextPath</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ContextLike</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#caterpillar.context.ContextPath.parent" title="Link to this definition">#</a></dt>
+<dd><div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 2.9.2: </span>Always resolves to the parent context object instead the parent context.</p>
+</div>
+</dd></dl>
+
+<dl class="py property">
 <dt class="sig sig-object py" id="caterpillar.context.ContextPath.parentctx">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">parentctx</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#caterpillar.context.ContextPath" title="caterpillar.context.ContextPath"><span class="pre">ContextPath</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ContextLike</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#caterpillar.context.ContextPath.parentctx" title="Link to this definition">#</a></dt>
 <dd><div class="versionadded">
@@ -566,7 +574,7 @@ field definitions. Note that this class will only work if it
 has access to the parent stack frame.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@struct</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
-    <span class="n">magic</span><span class="p">:</span> <span class="sa">b</span><span class="s2">&quot;MGK&quot;</span>
+    <span class="n">magic</span><span class="p">:</span> <span class="sa">b</span><span class="s2">"MGK"</span>
     <span class="n">length</span><span class="p">:</span> <span class="n">uint32</span>
 
     <span class="k">with</span> <span class="n">this</span><span class="o">.</span><span class="n">length</span> <span class="o">&gt;</span> <span class="mi">32</span><span class="p">:</span>
@@ -648,7 +656,7 @@ implementation for a 10% speed caveat, use:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">O_CONTEXT_FACTORY</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.c</span><span class="w"> </span><span class="kn">import</span> <span class="n">c_Context</span>
 
-<span class="c1"># that&#39;s all you have to do</span>
+<span class="c1"># that's all you have to do</span>
 <span class="n">O_CONTEXT_FACTORY</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">c_Context</span>
 </pre></div>
 </div>
@@ -891,6 +899,7 @@ context hierarchy.</p>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.context.ContextPath.__call__"><code class="docutils literal notranslate"><span class="pre">ContextPath.__call__()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.context.ContextPath.__getattribute__"><code class="docutils literal notranslate"><span class="pre">ContextPath.__getattribute__()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.context.ContextPath.__repr__"><code class="docutils literal notranslate"><span class="pre">ContextPath.__repr__()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.context.ContextPath.parent"><code class="docutils literal notranslate"><span class="pre">ContextPath.parent</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.context.ContextPath.parentctx"><code class="docutils literal notranslate"><span class="pre">ContextPath.parentctx</span></code></a></li>
 </ul>
 </li>

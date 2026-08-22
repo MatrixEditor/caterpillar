@@ -410,40 +410,39 @@
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
 <span class="c1"># pyright: reportPrivateUsage=false, reportExplicitAny=false, reportAny=false</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
-
 <span class="kn">import</span><span class="w"> </span><span class="nn">operator</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">typing</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Annotated</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">Protocol</span><span class="p">,</span> <span class="n">get_args</span><span class="p">,</span> <span class="n">get_origin</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">Buffer</span><span class="p">,</span>
-    <span class="n">Final</span><span class="p">,</span>
-    <span class="n">Literal</span><span class="p">,</span>
-    <span class="n">Self</span><span class="p">,</span>
-    <span class="n">Sized</span><span class="p">,</span>
-    <span class="n">overload</span><span class="p">,</span>
-    <span class="n">override</span><span class="p">,</span>
-    <span class="n">TypeVar</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">types</span><span class="w"> </span><span class="kn">import</span> <span class="n">FrameType</span><span class="p">,</span> <span class="n">TracebackType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Sized</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.exception</span><span class="w"> </span><span class="kn">import</span> <span class="n">StructException</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_struct</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.options</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flag</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.abc</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">_ContextLike</span><span class="p">,</span>
-    <span class="n">_ContextLambda</span><span class="p">,</span>
-    <span class="n">_IT</span><span class="p">,</span>
-    <span class="n">_ContextFactoryLike</span><span class="p">,</span>
-    <span class="n">_OT</span><span class="p">,</span>
-    <span class="n">_StreamType</span><span class="p">,</span>
-    <span class="n">_EndianLike</span><span class="p">,</span>
-    <span class="n">_ArchLike</span><span class="p">,</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">types</span><span class="w"> </span><span class="kn">import</span> <span class="n">FrameType</span><span class="p">,</span> <span class="n">TracebackType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Annotated</span><span class="p">,</span>
+    <span class="n">Any</span><span class="p">,</span>
+    <span class="n">Final</span><span class="p">,</span>
+    <span class="n">Generic</span><span class="p">,</span>
+    <span class="n">Literal</span><span class="p">,</span>
+    <span class="n">Protocol</span><span class="p">,</span>
+    <span class="n">get_args</span><span class="p">,</span>
+    <span class="n">get_origin</span><span class="p">,</span>
 <span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Buffer</span><span class="p">,</span> <span class="n">Self</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">overload</span><span class="p">,</span> <span class="n">override</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.abc</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">_IT</span><span class="p">,</span>
+    <span class="n">_OT</span><span class="p">,</span>
+    <span class="n">_ArchLike</span><span class="p">,</span>
+    <span class="n">_ContextFactoryLike</span><span class="p">,</span>
+    <span class="n">_ContextLambda</span><span class="p">,</span>
+    <span class="n">_ContextLike</span><span class="p">,</span>
+    <span class="n">_EndianLike</span><span class="p">,</span>
+    <span class="n">_StreamType</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.exception</span><span class="w"> </span><span class="kn">import</span> <span class="n">StructException</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.options</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flag</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_struct</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.shared</span><span class="w"> </span><span class="kn">import</span> <span class="n">iscond</span>
 
 <span class="k">if</span> <span class="n">typing</span><span class="o">.</span><span class="n">TYPE_CHECKING</span><span class="p">:</span>
@@ -452,95 +451,95 @@
 <span class="c1">###############################################################################</span>
 <span class="c1"># Default defined context items</span>
 <span class="c1">###############################################################################</span>
-<span class="n">CTX_PARENT</span> <span class="o">=</span> <span class="s2">&quot;_parent&quot;</span>
-<span class="sd">&quot;&quot;&quot;Identifies the parent object within the context tree.&quot;&quot;&quot;</span>
+<span class="n">CTX_PARENT</span> <span class="o">=</span> <span class="s2">"_parent"</span>
+<span class="sd">"""Identifies the parent object within the context tree."""</span>
 
-<span class="n">CTX_OBJECT</span> <span class="o">=</span> <span class="s2">&quot;_obj&quot;</span>
-<span class="sd">&quot;&quot;&quot;Refers to the current object associated with the context.&quot;&quot;&quot;</span>
+<span class="n">CTX_OBJECT</span> <span class="o">=</span> <span class="s2">"_obj"</span>
+<span class="sd">"""Refers to the current object associated with the context."""</span>
 
-<span class="n">CTX_OFFSETS</span> <span class="o">=</span> <span class="s2">&quot;_offsets&quot;</span>
-<span class="sd">&quot;&quot;&quot;Stores offset information used during stream parsing or generation.&quot;&quot;&quot;</span>
+<span class="n">CTX_OFFSETS</span> <span class="o">=</span> <span class="s2">"_offsets"</span>
+<span class="sd">"""Stores offset information used during stream parsing or generation."""</span>
 
-<span class="n">CTX_STREAM</span> <span class="o">=</span> <span class="s2">&quot;_io&quot;</span>
-<span class="sd">&quot;&quot;&quot;References the data stream associated with the packing or unpacking operation.&quot;&quot;&quot;</span>
+<span class="n">CTX_STREAM</span> <span class="o">=</span> <span class="s2">"_io"</span>
+<span class="sd">"""References the data stream associated with the packing or unpacking operation."""</span>
 
-<span class="n">CTX_FIELD</span> <span class="o">=</span> <span class="s2">&quot;_field&quot;</span>
-<span class="sd">&quot;&quot;&quot;Indicates the current field being processed within the structure.&quot;&quot;&quot;</span>
+<span class="n">CTX_FIELD</span> <span class="o">=</span> <span class="s2">"_field"</span>
+<span class="sd">"""Indicates the current field being processed within the structure."""</span>
 
-<span class="n">CTX_VALUE</span> <span class="o">=</span> <span class="s2">&quot;_value&quot;</span>
-<span class="sd">&quot;&quot;&quot;Stores the value associated with the current context node.&quot;&quot;&quot;</span>
+<span class="n">CTX_VALUE</span> <span class="o">=</span> <span class="s2">"_value"</span>
+<span class="sd">"""Stores the value associated with the current context node."""</span>
 
-<span class="n">CTX_POS</span> <span class="o">=</span> <span class="s2">&quot;_pos&quot;</span>
-<span class="sd">&quot;&quot;&quot;Represents the current position within the stream or structure.&quot;&quot;&quot;</span>
+<span class="n">CTX_POS</span> <span class="o">=</span> <span class="s2">"_pos"</span>
+<span class="sd">"""Represents the current position within the stream or structure."""</span>
 
-<span class="n">CTX_INDEX</span> <span class="o">=</span> <span class="s2">&quot;_index&quot;</span>
-<span class="sd">&quot;&quot;&quot;Maintains the index for sequence or array-based context elements.&quot;&quot;&quot;</span>
+<span class="n">CTX_INDEX</span> <span class="o">=</span> <span class="s2">"_index"</span>
+<span class="sd">"""Maintains the index for sequence or array-based context elements."""</span>
 
-<span class="n">CTX_PATH</span> <span class="o">=</span> <span class="s2">&quot;_path&quot;</span>
-<span class="sd">&quot;&quot;&quot;Provides the full path to the current context object.&quot;&quot;&quot;</span>
+<span class="n">CTX_PATH</span> <span class="o">=</span> <span class="s2">"_path"</span>
+<span class="sd">"""Provides the full path to the current context object."""</span>
 
-<span class="n">CTX_SEQ</span> <span class="o">=</span> <span class="s2">&quot;_is_seq&quot;</span>
-<span class="sd">&quot;&quot;&quot;Holds a reference to the sequence object, if applicable.&quot;&quot;&quot;</span>
+<span class="n">CTX_SEQ</span> <span class="o">=</span> <span class="s2">"_is_seq"</span>
+<span class="sd">"""Holds a reference to the sequence object, if applicable."""</span>
 
-<span class="n">CTX_ROOT</span> <span class="o">=</span> <span class="s2">&quot;_root&quot;</span>
-<span class="sd">&quot;&quot;&quot;Points to the root of the entire context hierarchy.&quot;&quot;&quot;</span>
+<span class="n">CTX_ROOT</span> <span class="o">=</span> <span class="s2">"_root"</span>
+<span class="sd">"""Points to the root of the entire context hierarchy."""</span>
 
-<span class="n">CTX_ORDER</span> <span class="o">=</span> <span class="s2">&quot;_order&quot;</span>
-<span class="sd">&quot;&quot;&quot;Stores the currently used endianess (only in root context).&quot;&quot;&quot;</span>
+<span class="n">CTX_ORDER</span> <span class="o">=</span> <span class="s2">"_order"</span>
+<span class="sd">"""Stores the currently used endianess (only in root context)."""</span>
 
-<span class="n">CTX_ARCH</span> <span class="o">=</span> <span class="s2">&quot;_arch&quot;</span>
-<span class="sd">&quot;&quot;&quot;Stores the currently used architecture (only in root context).&quot;&quot;&quot;</span>
+<span class="n">CTX_ARCH</span> <span class="o">=</span> <span class="s2">"_arch"</span>
+<span class="sd">"""Stores the currently used architecture (only in root context)."""</span>
 
 
 <div class="viewcode-block" id="Context">
 <a class="viewcode-back" href="../../library/context.html#caterpillar.context.Context">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Context</span><span class="p">(</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents a context object with attribute-style access.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Represents a context object with attribute-style access."""</span>
 
     <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Sets an attribute in the context.</span>
 
 <span class="sd">        :param key: The attribute key.</span>
 <span class="sd">        :param value: The value to be set.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="nd">@overload</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;_field&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">&quot;Field[_IT, _OT] | None&quot;</span><span class="p">:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"_field"</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">"Field[_IT, _OT] | None"</span><span class="p">:</span> <span class="o">...</span>
     <span class="nd">@overload</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;_parent&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">_ContextLike</span><span class="p">:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"_parent"</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">_ContextLike</span><span class="p">:</span> <span class="o">...</span>
     <span class="nd">@overload</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;_obj&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">_ContextLike</span><span class="p">:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"_obj"</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">_ContextLike</span><span class="p">:</span> <span class="o">...</span>
     <span class="nd">@overload</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;_offsets&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Buffer</span><span class="p">]:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"_offsets"</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Buffer</span><span class="p">]:</span> <span class="o">...</span>
     <span class="nd">@overload</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;_io&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">_StreamType</span><span class="p">:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"_io"</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">_StreamType</span><span class="p">:</span> <span class="o">...</span>
     <span class="nd">@overload</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;_pos&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"_pos"</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span> <span class="o">...</span>
     <span class="nd">@overload</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;_index&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"_index"</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span> <span class="o">...</span>
     <span class="nd">@overload</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;_path&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"_path"</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span> <span class="o">...</span>
     <span class="nd">@overload</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;_is_seq&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"_is_seq"</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span> <span class="o">...</span>
     <span class="nd">@overload</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;_root&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">_ContextLike</span><span class="p">:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"_root"</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">_ContextLike</span><span class="p">:</span> <span class="o">...</span>
     <span class="nd">@overload</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;_order&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">_EndianLike</span><span class="p">:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"_order"</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">_EndianLike</span><span class="p">:</span> <span class="o">...</span>
     <span class="nd">@overload</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;_arch&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">_ArchLike</span><span class="p">:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"_arch"</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">_ArchLike</span><span class="p">:</span> <span class="o">...</span>
     <span class="nd">@overload</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span> <span class="o">...</span>
     <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Retrieves an attribute from the context.</span>
 
 <span class="sd">        :param key: The attribute key.</span>
 <span class="sd">        :return: The value associated with the key.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">object</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
@@ -549,23 +548,23 @@
 <div class="viewcode-block" id="Context.__context_getattr__">
 <a class="viewcode-back" href="../../library/context.html#caterpillar.context.Context.__context_getattr__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">__context_getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Retrieves an attribute from the context.</span>
 
 <span class="sd">        :param key: The attribute key.</span>
 <span class="sd">        :return: The value associated with the key.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">nodes</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+<span class="sd">        """</span>
+        <span class="n">nodes</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"."</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__context_getattr_tokens__</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__context_getattr_tokens__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nodes</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Retrieves an attribute from pre-tokenized context path nodes.</span>
 
 <span class="sd">        :param nodes: The path nodes to resolve.</span>
 <span class="sd">        :return: The value associated with the path.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="p">(</span>
             <span class="bp">self</span><span class="p">[</span><span class="n">nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
             <span class="k">if</span> <span class="n">nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="bp">self</span>
@@ -578,7 +577,7 @@
         <span class="k">return</span> <span class="n">obj</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__context_setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">nodes</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">nodes</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s2">"."</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="bp">self</span><span class="p">[</span><span class="n">path</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
         <span class="k">else</span><span class="p">:</span>
@@ -587,30 +586,30 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_root</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_ContextLike</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;_root&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"_root"</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
 
     <span class="nd">@overload</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;_field&quot;</span><span class="p">],</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Field[_IT, _OT]&quot;</span><span class="p">:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"_field"</span><span class="p">],</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"Field[_IT, _OT]"</span><span class="p">:</span> <span class="o">...</span>
     <span class="nd">@overload</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;_order&quot;</span><span class="p">],</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_EndianLike</span><span class="p">:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"_order"</span><span class="p">],</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_EndianLike</span><span class="p">:</span> <span class="o">...</span>
     <span class="nd">@overload</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;_arch&quot;</span><span class="p">],</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_ArchLike</span><span class="p">:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"_arch"</span><span class="p">],</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_ArchLike</span><span class="p">:</span> <span class="o">...</span>
     <span class="nd">@overload</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;_parent&quot;</span><span class="p">],</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_ContextLike</span><span class="p">:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"_parent"</span><span class="p">],</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_ContextLike</span><span class="p">:</span> <span class="o">...</span>
     <span class="nd">@overload</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;_root&quot;</span><span class="p">],</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_ContextLike</span><span class="p">:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"_root"</span><span class="p">],</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_ContextLike</span><span class="p">:</span> <span class="o">...</span>
     <span class="nd">@overload</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;_io&quot;</span><span class="p">],</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_StreamType</span><span class="p">:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"_io"</span><span class="p">],</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_StreamType</span><span class="p">:</span> <span class="o">...</span>
     <span class="nd">@overload</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;_offsets&quot;</span><span class="p">],</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Buffer</span><span class="p">]:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"_offsets"</span><span class="p">],</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Buffer</span><span class="p">]:</span> <span class="o">...</span>
     <span class="nd">@overload</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;_index&quot;</span><span class="p">],</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"_index"</span><span class="p">],</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span> <span class="o">...</span>
     <span class="nd">@overload</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;_path&quot;</span><span class="p">],</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"_path"</span><span class="p">],</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span> <span class="o">...</span>
     <span class="nd">@overload</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;_is_seq&quot;</span><span class="p">],</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"_is_seq"</span><span class="p">],</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span> <span class="o">...</span>
     <span class="nd">@overload</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;_pos&quot;</span><span class="p">],</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"_pos"</span><span class="p">],</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span> <span class="o">...</span>
     <span class="nd">@overload</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span> <span class="o">...</span>
 
@@ -619,25 +618,25 @@
 
 
 <span class="n">O_CONTEXT_FACTORY</span><span class="p">:</span> <span class="n">Flag</span><span class="p">[</span><span class="n">_ContextFactoryLike</span><span class="p">]</span> <span class="o">=</span> <span class="n">Flag</span><span class="p">(</span>
-    <span class="s2">&quot;option.context_factory&quot;</span><span class="p">,</span>
+    <span class="s2">"option.context_factory"</span><span class="p">,</span>
     <span class="n">value</span><span class="o">=</span><span class="n">Context</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 <span class="sd">Defines the default factory used to instantiate context objects during the</span>
 <span class="sd">packing and unpacking process. To use the C-extension :code:`Context`</span>
 <span class="sd">implementation for lower context access overhead,, use:</span>
 
 <span class="sd">&gt;&gt;&gt; from caterpillar.context import O_CONTEXT_FACTORY</span>
 <span class="sd">&gt;&gt;&gt; from caterpillar.c import c_Context</span>
-<span class="sd">&gt;&gt;&gt; # that&#39;s all you have to do</span>
+<span class="sd">&gt;&gt;&gt; # that's all you have to do</span>
 <span class="sd">&gt;&gt;&gt; O_CONTEXT_FACTORY.value = c_Context</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 
 <div class="viewcode-block" id="SetContextVar">
 <a class="viewcode-back" href="../../library/context.html#caterpillar.context.SetContextVar">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">SetContextVar</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">_IT</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Defines an action that sets a context variable during pack or unpack.</span>
+<span class="w">    </span><span class="sd">"""Defines an action that sets a context variable during pack or unpack.</span>
 
 <span class="sd">    The value assigned to the context key is computed dynamically using</span>
 <span class="sd">    a user-provided callable evaluated at runtime.</span>
@@ -646,7 +645,7 @@
 <span class="sd">    :type key: str</span>
 <span class="sd">    :param func: Callable used to compute the context value</span>
 <span class="sd">    :type func: callable</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">func</span><span class="p">:</span> <span class="n">_ContextLambda</span><span class="p">[</span><span class="n">_IT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">key</span>
@@ -655,7 +654,7 @@
 <div class="viewcode-block" id="SetContextVar.__action_pack__">
 <a class="viewcode-back" href="../../library/context.html#caterpillar.context.SetContextVar.__action_pack__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">__action_pack__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply the context variable assignment during packing.</span>
+<span class="w">        </span><span class="sd">"""Apply the context variable assignment during packing.</span>
 
 <span class="sd">        The callable is evaluated and its result is stored in the</span>
 <span class="sd">        context under the configured key.</span>
@@ -664,14 +663,14 @@
 <span class="sd">        :type context: object</span>
 <span class="sd">        :return: None</span>
 <span class="sd">        :rtype: None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">context</span><span class="o">.</span><span class="n">__context_setattr__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="n">context</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="SetContextVar.__action_unpack__">
 <a class="viewcode-back" href="../../library/context.html#caterpillar.context.SetContextVar.__action_unpack__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">__action_unpack__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply the context variable assignment during unpacking.</span>
+<span class="w">        </span><span class="sd">"""Apply the context variable assignment during unpacking.</span>
 
 <span class="sd">        The callable is evaluated and its result is stored in the</span>
 <span class="sd">        context under the configured key.</span>
@@ -680,7 +679,7 @@
 <span class="sd">        :type context: object</span>
 <span class="sd">        :return: None</span>
 <span class="sd">        :rtype: None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">context</span><span class="o">.</span><span class="n">__context_setattr__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="n">context</span><span class="p">))</span></div>
 </div>
 
@@ -689,118 +688,118 @@
 <div class="viewcode-block" id="ExprMixin">
 <a class="viewcode-back" href="../../library/context.html#caterpillar.context.ExprMixin">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ExprMixin</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    A mixin class providing methods for creating binary and unary expressions.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BinaryExpression</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"BinaryExpression"</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">BinaryExpression</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">add</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BinaryExpression</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"BinaryExpression"</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">BinaryExpression</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">sub</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BinaryExpression</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"BinaryExpression"</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">BinaryExpression</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">mul</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__floordiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BinaryExpression</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__floordiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"BinaryExpression"</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">BinaryExpression</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">floordiv</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__truediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BinaryExpression</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__truediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"BinaryExpression"</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">BinaryExpression</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">truediv</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__mod__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BinaryExpression</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__mod__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"BinaryExpression"</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">BinaryExpression</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">mod</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__pow__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BinaryExpression</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__pow__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"BinaryExpression"</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">BinaryExpression</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">pow</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__xor__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BinaryExpression</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__xor__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"BinaryExpression"</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">BinaryExpression</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">xor</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__and__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BinaryExpression</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__and__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"BinaryExpression"</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">BinaryExpression</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">and_</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__or__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BinaryExpression</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__or__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"BinaryExpression"</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">BinaryExpression</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">or_</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__rshift__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BinaryExpression</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__rshift__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"BinaryExpression"</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">BinaryExpression</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">rshift</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__lshift__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BinaryExpression</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__lshift__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"BinaryExpression"</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">BinaryExpression</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">lshift</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
 
     <span class="n">__div__</span> <span class="o">=</span> <span class="fm">__truediv__</span>  <span class="c1"># pyright: ignore[reportUnannotatedClassAttribute]</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__radd__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BinaryExpression</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__radd__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"BinaryExpression"</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">BinaryExpression</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">add</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__rsub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BinaryExpression</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__rsub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"BinaryExpression"</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">BinaryExpression</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">sub</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BinaryExpression</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"BinaryExpression"</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">BinaryExpression</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">mul</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__rfloordiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BinaryExpression</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__rfloordiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"BinaryExpression"</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">BinaryExpression</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">floordiv</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__rtruediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BinaryExpression</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__rtruediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"BinaryExpression"</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">BinaryExpression</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">truediv</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__rmod__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BinaryExpression</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__rmod__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"BinaryExpression"</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">BinaryExpression</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">mod</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__rpow__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BinaryExpression</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__rpow__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"BinaryExpression"</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">BinaryExpression</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">pow</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__rxor__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BinaryExpression</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__rxor__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"BinaryExpression"</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">BinaryExpression</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">xor</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__rand__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BinaryExpression</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__rand__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"BinaryExpression"</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">BinaryExpression</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">and_</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__ror__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BinaryExpression</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__ror__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"BinaryExpression"</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">BinaryExpression</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">or_</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__rrshift__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BinaryExpression</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__rrshift__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"BinaryExpression"</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">BinaryExpression</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">rshift</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__rlshift__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BinaryExpression</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__rlshift__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"BinaryExpression"</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">BinaryExpression</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">lshift</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__neg__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">UnaryExpression</span><span class="p">(</span><span class="s2">&quot;neg&quot;</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">neg</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">UnaryExpression</span><span class="p">(</span><span class="s2">"neg"</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">neg</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__pos__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">UnaryExpression</span><span class="p">(</span><span class="s2">&quot;pos&quot;</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">pos</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">UnaryExpression</span><span class="p">(</span><span class="s2">"pos"</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">pos</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__invert__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">UnaryExpression</span><span class="p">(</span><span class="s2">&quot;invert&quot;</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">invert</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">UnaryExpression</span><span class="p">(</span><span class="s2">"invert"</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">invert</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BinaryExpression</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"BinaryExpression"</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">BinaryExpression</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">contains</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__gt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BinaryExpression</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__gt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"BinaryExpression"</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">BinaryExpression</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">gt</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__ge__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BinaryExpression</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__ge__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"BinaryExpression"</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">BinaryExpression</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">ge</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__lt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BinaryExpression</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__lt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"BinaryExpression"</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">BinaryExpression</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">lt</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__le__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BinaryExpression</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__le__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"BinaryExpression"</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">BinaryExpression</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">le</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
 
     <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span>  <span class="c1"># pyright: ignore[reportIncompatibleMethodOverride]</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BinaryExpression</span><span class="p">:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"BinaryExpression"</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">BinaryExpression</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">eq</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
 
     <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__ne__</span><span class="p">(</span>  <span class="c1"># pyright: ignore[reportIncompatibleMethodOverride]</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BinaryExpression</span><span class="p">:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"BinaryExpression"</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">BinaryExpression</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">ne</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span></div>
 
 
@@ -808,7 +807,7 @@
 <div class="viewcode-block" id="ConditionContext">
 <a class="viewcode-back" href="../../library/context.html#caterpillar.context.ConditionContext">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ConditionContext</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class implementation of an inline condition.</span>
+<span class="w">    </span><span class="sd">"""Class implementation of an inline condition.</span>
 
 <span class="sd">    Use this class to automatically apply a condition to multiple</span>
 <span class="sd">    field definitions. Note that this class will only work if it</span>
@@ -818,7 +817,7 @@
 
 <span class="sd">        @struct</span>
 <span class="sd">        class Format:</span>
-<span class="sd">            magic: b&quot;MGK&quot;</span>
+<span class="sd">            magic: b"MGK"</span>
 <span class="sd">            length: uint32</span>
 
 <span class="sd">            with this.length &gt; 32:</span>
@@ -829,13 +828,13 @@
 
 <span class="sd">    :param condition: a context lambda or constant boolean value</span>
 <span class="sd">    :type condition: Union[_ContextLambda, bool]</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="vm">__slots__</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s2">&quot;func&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;annotations&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;namelist&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;depth&quot;</span><span class="p">,</span>
+        <span class="s2">"annotations"</span><span class="p">,</span>
+        <span class="s2">"depth"</span><span class="p">,</span>
+        <span class="s2">"func"</span><span class="p">,</span>
+        <span class="s2">"namelist"</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">condition</span><span class="p">:</span> <span class="n">_ContextLambda</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">):</span>
@@ -853,17 +852,17 @@
     <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="o">.</span><span class="n">major</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="o">.</span><span class="n">minor</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">14</span><span class="p">):</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="s2">&quot;Python3.14 breaks support for Contitional fields. Conditional &quot;</span>
-                <span class="o">+</span> <span class="s2">&quot;statements must be defined manually until a fix has been released.&quot;</span>
+                <span class="s2">"Python3.14 breaks support for Contitional fields. Conditional "</span>
+                <span class="o">+</span> <span class="s2">"statements must be defined manually until a fix has been released."</span>
             <span class="p">)</span>
-        <span class="n">frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getframe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">depth</span><span class="p">,</span> <span class="s2">&quot;Could not enter condition context!&quot;</span><span class="p">)</span>
+        <span class="n">frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getframe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">depth</span><span class="p">,</span> <span class="s2">"Could not enter condition context!"</span><span class="p">)</span>
         <span class="c1"># keep track of all annotations</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">annotations</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">f_locals</span><span class="p">[</span><span class="s2">&quot;__annotations__&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">annotations</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">f_locals</span><span class="p">[</span><span class="s2">"__annotations__"</span><span class="p">]</span>
         <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-            <span class="n">module</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">f_locals</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;__module__&quot;</span><span class="p">)</span>
-            <span class="n">qualname</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">f_locals</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;__qualname__&quot;</span><span class="p">)</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Could not get annotations in </span><span class="si">{</span><span class="n">module</span><span class="si">}</span><span class="s2"> (context=</span><span class="si">{</span><span class="n">qualname</span><span class="si">!r}</span><span class="s2">)&quot;</span>
+            <span class="n">module</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">f_locals</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"__module__"</span><span class="p">)</span>
+            <span class="n">qualname</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">f_locals</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"__qualname__"</span><span class="p">)</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"Could not get annotations in </span><span class="si">{</span><span class="n">module</span><span class="si">}</span><span class="s2"> (context=</span><span class="si">{</span><span class="n">qualname</span><span class="si">!r}</span><span class="s2">)"</span>
             <span class="k">raise</span> <span class="n">StructException</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
 
         <span class="c1"># store names before new fields are added</span>
@@ -906,7 +905,7 @@
 
             <span class="c1"># field already defined/created -&gt; check for condition</span>
             <span class="k">if</span> <span class="n">field</span><span class="o">.</span><span class="n">has_condition</span><span class="p">():</span>
-                <span class="c1"># the field&#39;s condition AND this one must be true</span>
+                <span class="c1"># the field's condition AND this one must be true</span>
                 <span class="n">field</span><span class="o">.</span><span class="n">condition</span> <span class="o">=</span> <span class="n">BinaryExpression</span><span class="p">(</span>
                     <span class="n">operator</span><span class="o">.</span><span class="n">and_</span><span class="p">,</span> <span class="n">field</span><span class="o">.</span><span class="n">condition</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span>
                 <span class="p">)</span>
@@ -930,13 +929,13 @@
 <a class="viewcode-back" href="../../library/context.html#caterpillar.context.BinaryExpression">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">BinaryExpression</span><span class="p">(</span><span class="n">ExprMixin</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Represents a binary expression.</span>
 
 <span class="sd">    :param operand: The binary operator function.</span>
 <span class="sd">    :param left: The left operand.</span>
 <span class="sd">    :param right: The right operand.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">operand</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]</span>
     <span class="n">left</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="n">_ContextLambda</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span>
@@ -953,7 +952,7 @@
 
     <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">operand</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="se">{{</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="si">!r}</span><span class="s2">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="si">!r}</span><span class="se">}}</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">operand</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="se">{{</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="si">!r}</span><span class="s2">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="si">!r}</span><span class="se">}}</span><span class="s2">"</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># fmt: off</span>
@@ -971,13 +970,13 @@
 <a class="viewcode-back" href="../../library/context.html#caterpillar.context.UnaryExpression">[docs]</a>
 <span class="nd">@dataclass</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">UnaryExpression</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Represents a unary expression.</span>
 
 <span class="sd">    :param name: The name of the unary operator.</span>
 <span class="sd">    :param operand: The unary operator function.</span>
 <span class="sd">    :param value: The operand.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">operand</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">]</span>
@@ -992,7 +991,7 @@
 
     <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">operand</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="se">{{</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="si">!r}</span><span class="se">}}</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">operand</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="se">{{</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="si">!r}</span><span class="se">}}</span><span class="s2">"</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># fmt: off</span>
@@ -1012,27 +1011,27 @@
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span> <span class="o">...</span>
 
 
-<span class="n">_T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;_T&quot;</span><span class="p">)</span>
+<span class="n">_T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"_T"</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="ContextPath">
 <a class="viewcode-back" href="../../library/context.html#caterpillar.context.ContextPath">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ContextPath</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">_T</span><span class="p">],</span> <span class="n">ExprMixin</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Represents a lambda function for retrieving a value from a Context based on a specified path.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="c1"># internal set of operations to apply</span>
     <span class="n">_ops_</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">_ContextPathOp</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Initializes a ContextPath instance with an optional path.</span>
 
 <span class="sd">        :param path: The path to use when retrieving a value from a Context.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">path</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_tokens</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">))</span> <span class="k">if</span> <span class="n">path</span> <span class="k">else</span> <span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tokens</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"."</span><span class="p">))</span> <span class="k">if</span> <span class="n">path</span> <span class="k">else</span> <span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ops_</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">call_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">getitem_args</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
@@ -1040,13 +1039,13 @@
 <div class="viewcode-block" id="ContextPath.__call__">
 <a class="viewcode-back" href="../../library/context.html#caterpillar.context.ContextPath.__call__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Calls the lambda function to retrieve a value from a Context.</span>
 
 <span class="sd">        :param context: The Context from which to retrieve the value.</span>
 <span class="sd">        :param kwds: Additional keyword arguments.</span>
 <span class="sd">        :return: The value retrieved from the Context based on the path.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># REVISIT: find a way to implement calls</span>
         <span class="c1"># if context is None:</span>
         <span class="c1">#     self._ops_.append((operator.call, [], kwds))</span>
@@ -1058,7 +1057,7 @@
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">context</span><span class="p">)</span> <span class="ow">is</span> <span class="n">Context</span><span class="p">:</span>
             <span class="n">value</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">__context_getattr_tokens__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tokens</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">value</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">__context_getattr__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">__context_getattr__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">operation</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ops_</span><span class="p">:</span>
             <span class="n">value</span> <span class="o">=</span> <span class="n">operation</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">value</span></div>
@@ -1078,100 +1077,112 @@
     <span class="c1"># overloads to support the default paths</span>
     <span class="nd">@overload</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;_field&quot;</span><span class="p">]</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ContextPath</span><span class="p">[</span><span class="s2">&quot;Field[_IT, _OT] | None&quot;</span><span class="p">]:</span> <span class="o">...</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"_field"</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"ContextPath[Field[_IT, _OT] | None]"</span><span class="p">:</span> <span class="o">...</span>
     <span class="nd">@overload</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;_parent&quot;</span><span class="p">]</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ContextPath</span><span class="p">[</span><span class="n">_ContextLike</span><span class="p">]:</span> <span class="o">...</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"_parent"</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"ContextPath[_ContextLike]"</span><span class="p">:</span> <span class="o">...</span>
     <span class="nd">@overload</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;_obj&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">ContextPath</span><span class="p">[</span><span class="n">_ContextLike</span><span class="p">]:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"_obj"</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">"ContextPath[_ContextLike]"</span><span class="p">:</span> <span class="o">...</span>
     <span class="nd">@overload</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;_offsets&quot;</span><span class="p">]</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ContextPath</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Buffer</span><span class="p">]]:</span> <span class="o">...</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"_offsets"</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"ContextPath[dict[int, Buffer]]"</span><span class="p">:</span> <span class="o">...</span>
     <span class="nd">@overload</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;_io&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">ContextPath</span><span class="p">[</span><span class="n">_StreamType</span><span class="p">]:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"_io"</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">"ContextPath[_StreamType]"</span><span class="p">:</span> <span class="o">...</span>
     <span class="nd">@overload</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;_pos&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">ContextPath</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"_pos"</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">"ContextPath[int]"</span><span class="p">:</span> <span class="o">...</span>
     <span class="nd">@overload</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;_index&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">ContextPath</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"_index"</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">"ContextPath[int]"</span><span class="p">:</span> <span class="o">...</span>
     <span class="nd">@overload</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;_path&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">ContextPath</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"_path"</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">"ContextPath[str]"</span><span class="p">:</span> <span class="o">...</span>
     <span class="nd">@overload</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;_is_seq&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">ContextPath</span><span class="p">[</span><span class="nb">bool</span><span class="p">]:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"_is_seq"</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">"ContextPath[bool]"</span><span class="p">:</span> <span class="o">...</span>
     <span class="nd">@overload</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;_root&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">ContextPath</span><span class="p">[</span><span class="n">_ContextLike</span><span class="p">]:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"_root"</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"ContextPath[_ContextLike]"</span><span class="p">:</span> <span class="o">...</span>
     <span class="nd">@overload</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;_order&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">ContextPath</span><span class="p">[</span><span class="n">_EndianLike</span><span class="p">]:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"_order"</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"ContextPath[_EndianLike]"</span><span class="p">:</span> <span class="o">...</span>
     <span class="nd">@overload</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;_arch&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">ContextPath</span><span class="p">[</span><span class="n">_ArchLike</span><span class="p">]:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"_arch"</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">"ContextPath[_ArchLike]"</span><span class="p">:</span> <span class="o">...</span>
     <span class="nd">@overload</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ContextPath</span><span class="p">[</span><span class="n">_IT</span><span class="p">]:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"ContextPath[_IT]"</span><span class="p">:</span> <span class="o">...</span>
 <div class="viewcode-block" id="ContextPath.__getattribute__">
 <a class="viewcode-back" href="../../library/context.html#caterpillar.context.ContextPath.__getattribute__">[docs]</a>
     <span class="nd">@override</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ContextPath</span><span class="p">[</span><span class="n">_IT</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"ContextPath[_IT]"</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Gets an attribute from the ContextPath, creating a new instance if needed.</span>
 
 <span class="sd">        :param key: The attribute key.</span>
 <span class="sd">        :return: A new ContextPath instance with an updated path.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">ContextPath</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">ContextPath</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">key</span><span class="p">]))</span></div>
+            <span class="k">return</span> <span class="n">ContextPath</span><span class="p">(</span><span class="s2">"."</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">key</span><span class="p">]))</span></div>
 
 
 <div class="viewcode-block" id="ContextPath.__repr__">
 <a class="viewcode-back" href="../../library/context.html#caterpillar.context.ContextPath.__repr__">[docs]</a>
     <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Returns a string representation of the ContextPath.</span>
 
 <span class="sd">        :return: A string representation.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">extra</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">operation</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ops_</span><span class="p">:</span>
             <span class="n">data</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="o">*</span><span class="nb">map</span><span class="p">(</span><span class="nb">repr</span><span class="p">,</span> <span class="n">args</span><span class="p">))</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">y</span><span class="si">!r}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
-            <span class="n">extra</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">operation</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+                <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">y</span><span class="si">!r}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
+            <span class="n">extra</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">operation</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">extra</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Path(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="si">!r}</span><span class="s2">)&quot;</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">"Path(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="si">!r}</span><span class="s2">)"</span>
 
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Path(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="si">!r}</span><span class="s2">, </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">extra</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span></div>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"Path(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="si">!r}</span><span class="s2">, </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">extra</span><span class="p">)</span><span class="si">}</span><span class="s2">)"</span></div>
 
 
     <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Returns a string representation of the path.</span>
 
 <span class="sd">        :return: A string representation of the path.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="ow">or</span> <span class="s2">""</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">parent</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ContextPath</span><span class="p">[</span><span class="n">_ContextLike</span><span class="p">]:</span>
-        <span class="n">path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">CTX_PARENT</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">CTX_OBJECT</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">ContextPath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">ContextPath</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">path</span><span class="p">]))</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">parent</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"ContextPath[_ContextLike]"</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        .. versionchanged:: 2.9.2</span>
+<span class="sd">            Always resolves to the parent context object instead the parent context.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">==</span> <span class="n">CTX_OBJECT</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ContextPath</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">CTX_PARENT</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">CTX_OBJECT</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+        <span class="n">context_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="sa">f</span><span class="s2">".</span><span class="si">{</span><span class="n">CTX_OBJECT</span><span class="si">}</span><span class="s2">"</span><span class="p">):</span>
+            <span class="n">context_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">[:</span> <span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">CTX_OBJECT</span><span class="p">)]</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">"."</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">ContextPath</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">context_path</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">CTX_PARENT</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">CTX_OBJECT</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">parentctx</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ContextPath</span><span class="p">[</span><span class="n">_ContextLike</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">parentctx</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"ContextPath[_ContextLike]"</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        .. versionadded:: 2.8.0</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">path</span> <span class="o">=</span> <span class="n">CTX_PARENT</span> <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">CTX_PARENT</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="sd">        """</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">CTX_PARENT</span> <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">CTX_PARENT</span><span class="si">}</span><span class="s2">"</span>
         <span class="k">return</span> <span class="n">ContextPath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
 
 
@@ -1183,60 +1194,60 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">:</span> <span class="n">ContextPath</span><span class="p">[</span><span class="n">Sized</span><span class="p">]</span> <span class="o">=</span> <span class="n">path</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Calls the lambda function to retrieve a value from a Context.</span>
 
 <span class="sd">        :param context: The Context from which to retrieve the value.</span>
 <span class="sd">        :param kwds: Additional keyword arguments (ignored in this implementation).</span>
 <span class="sd">        :return: The value retrieved from the Context based on the path.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="n">context</span><span class="p">))</span>
 
     <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;len(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="si">!r}</span><span class="s2">)&quot;</span></div>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"len(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="si">!r}</span><span class="s2">)"</span></div>
 
 
 
 <span class="c1"># fmt: off</span>
 <span class="n">this</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">ContextPath</span><span class="p">[</span><span class="n">_ContextLike</span><span class="p">]]</span> <span class="o">=</span> <span class="n">ContextPath</span><span class="p">(</span><span class="n">CTX_OBJECT</span><span class="p">)</span>
-<span class="sd">&quot;&quot;&quot;Context path pointing to the current object in the evaluation context.</span>
+<span class="sd">"""Context path pointing to the current object in the evaluation context.</span>
 
 <span class="sd">This context path is used to reference the active object being processed when</span>
 <span class="sd">navigating or resolving nested structures using context paths.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="n">ctx</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">ContextPath</span><span class="p">[</span><span class="n">_ContextLike</span><span class="p">]]</span> <span class="o">=</span> <span class="n">ContextPath</span><span class="p">()</span>
-<span class="sd">&quot;&quot;&quot;Context path pointing to the current evaluation context.</span>
+<span class="sd">"""Context path pointing to the current evaluation context.</span>
 
 <span class="sd">This context path allows access to the full context dictionary rather than a</span>
 <span class="sd">specific object within it.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
-<span class="n">parent</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">ContextPath</span><span class="p">[</span><span class="n">_ContextLike</span><span class="p">]]</span> <span class="o">=</span> <span class="n">ContextPath</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">CTX_PARENT</span><span class="p">,</span> <span class="n">CTX_OBJECT</span><span class="p">]))</span>
-<span class="sd">&quot;&quot;&quot;Context path pointing to the parent object&#39;s current object.</span>
+<span class="n">parent</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">ContextPath</span><span class="p">[</span><span class="n">_ContextLike</span><span class="p">]]</span> <span class="o">=</span> <span class="n">ContextPath</span><span class="p">(</span><span class="s2">"."</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">CTX_PARENT</span><span class="p">,</span> <span class="n">CTX_OBJECT</span><span class="p">]))</span>
+<span class="sd">"""Context path pointing to the parent object's current object.</span>
 
 <span class="sd">This context path is used to reference the object belonging to the parent</span>
 <span class="sd">context level when navigating nested context structures.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="n">parentctx</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">ContextPath</span><span class="p">[</span><span class="n">_ContextLike</span><span class="p">]]</span> <span class="o">=</span> <span class="n">ContextPath</span><span class="p">(</span><span class="n">CTX_PARENT</span><span class="p">)</span>
-<span class="sd">&quot;&quot;&quot;Context path pointing to the parent evaluation context.</span>
+<span class="sd">"""Context path pointing to the parent evaluation context.</span>
 
 <span class="sd">This context path allows access to the full parent context dictionary rather</span>
 <span class="sd">than only its object.</span>
 
 <span class="sd">.. versionadded:: 2.8.0</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="n">root</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">ContextPath</span><span class="p">[</span><span class="n">_ContextLike</span><span class="p">]]</span> <span class="o">=</span> <span class="n">ContextPath</span><span class="p">(</span><span class="n">CTX_ROOT</span><span class="p">)</span>
-<span class="sd">&quot;&quot;&quot;Context path pointing to the root evaluation context.</span>
+<span class="sd">"""Context path pointing to the root evaluation context.</span>
 
 <span class="sd">This context path is used to reference the top-level context in a nested</span>
 <span class="sd">context hierarchy.</span>
 
 <span class="sd">.. versionadded:: 2.6.0</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 </pre></div>
 
                 </article>

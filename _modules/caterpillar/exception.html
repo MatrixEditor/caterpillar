@@ -418,91 +418,91 @@
 <div class="viewcode-block" id="StructException">
 <a class="viewcode-back" href="../../library/exceptions.html#caterpillar.exception.StructException">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">StructException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for all struct-related exceptions&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Base class for all struct-related exceptions"""</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">:</span> <span class="n">_ContextLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">context</span>
         <span class="k">if</span> <span class="n">context</span> <span class="ow">and</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">12</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">add_note</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Context-Path: </span><span class="si">{</span><span class="n">context</span><span class="o">.</span><span class="n">__context_getattr__</span><span class="p">(</span><span class="s1">&#39;_path&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_note</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Context-Path: </span><span class="si">{</span><span class="n">context</span><span class="o">.</span><span class="n">__context_getattr__</span><span class="p">(</span><span class="s1">'_path'</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="DynamicSizeError">
 <a class="viewcode-back" href="../../library/exceptions.html#caterpillar.exception.DynamicSizeError">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">DynamicSizeError</span><span class="p">(</span><span class="n">StructException</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Exception raised for errors related to dynamic sizes in structs.</span>
 
 <span class="sd">    This can be used when there are issues with determining the size of a struct element at runtime.</span>
-<span class="sd">    &quot;&quot;&quot;</span></div>
+<span class="sd">    """</span></div>
 
 
 
 <div class="viewcode-block" id="OptionError">
 <a class="viewcode-back" href="../../library/exceptions.html#caterpillar.exception.OptionError">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">OptionError</span><span class="p">(</span><span class="n">StructException</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Exception raised for errors related to options in structs.</span>
 
 <span class="sd">    This can be used when there are issues with handling options or choices within a struct.</span>
-<span class="sd">    &quot;&quot;&quot;</span></div>
+<span class="sd">    """</span></div>
 
 
 
 <div class="viewcode-block" id="ValidationError">
 <a class="viewcode-back" href="../../library/exceptions.html#caterpillar.exception.ValidationError">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ValidationError</span><span class="p">(</span><span class="n">StructException</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Exception raised for errors related to validation in structs.</span>
 
 <span class="sd">    This can be used when there are issues with validating the structure or content of a struct.</span>
-<span class="sd">    &quot;&quot;&quot;</span></div>
+<span class="sd">    """</span></div>
 
 
 
 <div class="viewcode-block" id="UnsupportedOperation">
 <a class="viewcode-back" href="../../library/exceptions.html#caterpillar.exception.UnsupportedOperation">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">UnsupportedOperation</span><span class="p">(</span><span class="n">StructException</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Exception raised for unsupported operations in structs.</span>
 
 <span class="sd">    This can be used when attempting an operation that is not supported or allowed in the context of structs.</span>
-<span class="sd">    &quot;&quot;&quot;</span></div>
+<span class="sd">    """</span></div>
 
 
 
 <div class="viewcode-block" id="InvalidValueError">
 <a class="viewcode-back" href="../../library/exceptions.html#caterpillar.exception.InvalidValueError">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">InvalidValueError</span><span class="p">(</span><span class="n">StructException</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    An exception raised for invalid configuration values.</span>
-<span class="sd">    &quot;&quot;&quot;</span></div>
+<span class="sd">    """</span></div>
 
 
 
 <div class="viewcode-block" id="StreamError">
 <a class="viewcode-back" href="../../library/exceptions.html#caterpillar.exception.StreamError">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">StreamError</span><span class="p">(</span><span class="n">StructException</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    An exception raised for read and write issues.</span>
-<span class="sd">    &quot;&quot;&quot;</span></div>
+<span class="sd">    """</span></div>
 
 
 
 <div class="viewcode-block" id="DelegationError">
 <a class="viewcode-back" href="../../library/exceptions.html#caterpillar.exception.DelegationError">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">DelegationError</span><span class="p">(</span><span class="n">StructException</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    An exception used if underlying calls fail.</span>
-<span class="sd">    &quot;&quot;&quot;</span></div>
+<span class="sd">    """</span></div>
 
 
 
 <div class="viewcode-block" id="Stop">
 <a class="viewcode-back" href="../../library/exceptions.html#caterpillar.exception.Stop">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Stop</span><span class="p">(</span><span class="n">StructException</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Stops the current parsing process&quot;&quot;&quot;</span></div>
+<span class="w">    </span><span class="sd">"""Stops the current parsing process"""</span></div>
 
 </pre></div>
 

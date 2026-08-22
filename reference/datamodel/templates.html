@@ -487,7 +487,7 @@ and does not store <code class="docutils literal notranslate"><span class="pre">
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.py</span><span class="w"> </span><span class="kn">import</span> <span class="n">template</span><span class="p">,</span> <span class="n">uint8</span>
 
-<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"T"</span><span class="p">)</span>
 
 
 <span class="nd">@template</span>
@@ -526,7 +526,7 @@ when the Python value type and the binary layout metadata must both be present.<
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.py</span><span class="w"> </span><span class="kn">import</span> <span class="n">f</span><span class="p">,</span> <span class="n">field_of</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">uint8</span>
 
-<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"T"</span><span class="p">)</span>
 
 
 <span class="nd">@template</span>
@@ -565,8 +565,8 @@ the result as a template.</p>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.py</span><span class="w"> </span><span class="kn">import</span> <span class="n">template</span><span class="p">,</span> <span class="n">uint8</span><span class="p">,</span> <span class="n">uint16</span>
 
-<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>
-<span class="n">U</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;U&quot;</span><span class="p">)</span>
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"T"</span><span class="p">)</span>
+<span class="n">U</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"U"</span><span class="p">)</span>
 
 
 <span class="nd">@template</span>
@@ -587,10 +587,10 @@ the result as a template.</p>
 names in the decorator.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.py</span><span class="w"> </span><span class="kn">import</span> <span class="n">TemplateTypeVar</span><span class="p">,</span> <span class="n">derive</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">uint8</span><span class="p">,</span> <span class="n">uint16</span>
 
-<span class="n">A</span> <span class="o">=</span> <span class="n">TemplateTypeVar</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">)</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">TemplateTypeVar</span><span class="p">(</span><span class="s2">"A"</span><span class="p">)</span>
 
 
-<span class="nd">@template</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">)</span>
+<span class="nd">@template</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="s2">"B"</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">FormatTemplate</span><span class="p">:</span>
     <span class="n">foo</span><span class="p">:</span> <span class="n">A</span>
     <span class="n">bar</span><span class="p">:</span> <span class="n">B</span>
@@ -616,7 +616,7 @@ with deferred annotation evaluation.</p>
 <p>For legacy templates, <code class="docutils literal notranslate"><span class="pre">derive()</span></code> is the primary specialization API. For
 generic templates, direct subscript syntax is preferred, but <code class="docutils literal notranslate"><span class="pre">derive()</span></code> can be
 used when a name or union option must be supplied explicitly.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">NamedByteBox</span> <span class="o">=</span> <span class="n">derive</span><span class="p">(</span><span class="n">Box</span><span class="p">,</span> <span class="n">uint8</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;NamedByteBox&quot;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">NamedByteBox</span> <span class="o">=</span> <span class="n">derive</span><span class="p">(</span><span class="n">Box</span><span class="p">,</span> <span class="n">uint8</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"NamedByteBox"</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Passing an already materialized struct class to <code class="docutils literal notranslate"><span class="pre">derive()</span></code> without additional

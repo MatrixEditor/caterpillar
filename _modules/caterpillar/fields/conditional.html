@@ -413,24 +413,24 @@
 <span class="c1"># pyright: reportAny=false</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">operator</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
-
 <span class="kn">from</span><span class="w"> </span><span class="nn">types</span><span class="w"> </span><span class="kn">import</span> <span class="n">TracebackType</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Annotated</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">get_args</span><span class="p">,</span> <span class="n">get_origin</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Final</span><span class="p">,</span> <span class="n">override</span><span class="p">,</span> <span class="n">Self</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">BinaryExpression</span><span class="p">,</span> <span class="n">ConditionContext</span><span class="p">,</span> <span class="n">UnaryExpression</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.exception</span><span class="w"> </span><span class="kn">import</span> <span class="n">StructException</span><span class="p">,</span> <span class="n">ValidationError</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_struct</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.shared</span><span class="w"> </span><span class="kn">import</span> <span class="n">iscond</span><span class="p">,</span> <span class="n">iscondend</span><span class="p">,</span> <span class="n">iscondstart</span><span class="p">,</span> <span class="n">typeof</span><span class="p">,</span> <span class="n">constval</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Final</span><span class="p">,</span> <span class="n">Self</span><span class="p">,</span> <span class="n">override</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.abc</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">_AnnotationT</span><span class="p">,</span>
     <span class="n">_ArchLike</span><span class="p">,</span>
     <span class="n">_ContextLambda</span><span class="p">,</span>
     <span class="n">_ContextLike</span><span class="p">,</span>
     <span class="n">_EndianLike</span><span class="p">,</span>
     <span class="n">_OptionLike</span><span class="p">,</span>
     <span class="n">_StructLike</span><span class="p">,</span>
-    <span class="n">_AnnotationT</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">BinaryExpression</span><span class="p">,</span> <span class="n">ConditionContext</span><span class="p">,</span> <span class="n">UnaryExpression</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.exception</span><span class="w"> </span><span class="kn">import</span> <span class="n">StructException</span><span class="p">,</span> <span class="n">ValidationError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_struct</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.shared</span><span class="w"> </span><span class="kn">import</span> <span class="n">constval</span><span class="p">,</span> <span class="n">iscond</span><span class="p">,</span> <span class="n">iscondend</span><span class="p">,</span> <span class="n">iscondstart</span><span class="p">,</span> <span class="n">typeof</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">._base</span><span class="w"> </span><span class="kn">import</span> <span class="n">Field</span>
 
@@ -438,19 +438,19 @@
 <div class="viewcode-block" id="ConditionalChain">
 <a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.ConditionalChain">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ConditionalChain</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Simplistic conditional chain that represents if-else statements.</span>
+<span class="w">    </span><span class="sd">"""Simplistic conditional chain that represents if-else statements.</span>
 
 <span class="sd">    Using this class we can introduce conditional statements into our</span>
-<span class="sd">    class definition. While this class can&#39;t be used in class definitions,</span>
+<span class="sd">    class definition. While this class can't be used in class definitions,</span>
 <span class="sd">    it may be used outside of them.</span>
 
 <span class="sd">    For conditional statements in class definitions, see</span>
 <span class="sd">    :class:`~caterpillar.fields.conditional.If`,</span>
 <span class="sd">    :class:`~caterpillar.fields.conditional.ElseIf` or</span>
 <span class="sd">    :class:`~caterpillar.fields.conditional.Else`.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
-    <span class="vm">__slots__</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;chain&quot;</span><span class="p">,</span> <span class="s2">&quot;conditions&quot;</span>
+    <span class="vm">__slots__</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"chain"</span><span class="p">,</span> <span class="s2">"conditions"</span>
 
 <div class="viewcode-block" id="ConditionalChain.__init__">
 <a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.ConditionalChain.__init__">[docs]</a>
@@ -479,11 +479,11 @@
             <span class="n">func_idx</span><span class="p">,</span> <span class="n">struct</span> <span class="o">=</span> <span class="n">entry</span>
             <span class="n">func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conditions</span><span class="p">[</span><span class="n">func_idx</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">count</span> <span class="o">-</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">func</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">annotation</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">struct</span><span class="o">.</span><span class="n">__type__</span><span class="p">()</span><span class="si">}</span><span class="s2"> if </span><span class="si">{</span><span class="n">func</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">annotation</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">struct</span><span class="o">.</span><span class="n">__type__</span><span class="p">()</span><span class="si">}</span><span class="s2"> if </span><span class="si">{</span><span class="n">func</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">annotation</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;else </span><span class="si">{</span><span class="n">struct</span><span class="o">.</span><span class="n">__type__</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">annotation</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"else </span><span class="si">{</span><span class="n">struct</span><span class="o">.</span><span class="n">__type__</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;Chain </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">annotation</span><span class="p">)</span><span class="si">}</span><span class="s2">&gt;&quot;</span></div>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"&lt;Chain </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">annotation</span><span class="p">)</span><span class="si">}</span><span class="s2">&gt;"</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">struct</span><span class="p">:</span> <span class="n">_StructLike</span><span class="p">,</span> <span class="n">func</span><span class="p">:</span> <span class="n">_ContextLambda</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -517,7 +517,7 @@
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">_ConditionalAnnotation</span><span class="p">:</span>
-    <span class="vm">__slots__</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;condition&quot;</span><span class="p">,</span> <span class="s2">&quot;branch_conditions&quot;</span><span class="p">,</span> <span class="s2">&quot;is_last&quot;</span><span class="p">)</span>
+    <span class="vm">__slots__</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"condition"</span><span class="p">,</span> <span class="s2">"branch_conditions"</span><span class="p">,</span> <span class="s2">"is_last"</span><span class="p">)</span>
 
     <span class="n">__conditional__</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
 
@@ -571,7 +571,7 @@
 <div class="viewcode-block" id="Start">
 <a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.Start">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Start</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Start marker for an inline explicit conditional block.</span>
+<span class="w">    </span><span class="sd">"""Start marker for an inline explicit conditional block.</span>
 
 <span class="sd">    Use this as metadata on the first real field in a Python 3.14+ conditional</span>
 <span class="sd">    block:</span>
@@ -587,32 +587,32 @@
 <span class="sd">    synthetic field to the class body.</span>
 
 <span class="sd">    .. versionadded: 2.9.0</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
-    <span class="vm">__slots__</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;marker&quot;</span><span class="p">,</span> <span class="s2">&quot;condition&quot;</span><span class="p">,</span> <span class="s2">&quot;branch_conditions&quot;</span><span class="p">,</span> <span class="s2">&quot;is_last&quot;</span><span class="p">)</span>
+    <span class="vm">__slots__</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"marker"</span><span class="p">,</span> <span class="s2">"condition"</span><span class="p">,</span> <span class="s2">"branch_conditions"</span><span class="p">,</span> <span class="s2">"is_last"</span><span class="p">)</span>
 
     <span class="n">__conditional__</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">__conditional_start__</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">marker</span><span class="p">:</span> <span class="s2">&quot;_MarkerT&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">condition</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">marker</span><span class="p">,</span> <span class="s2">&quot;condition&quot;</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">marker</span><span class="p">,</span> <span class="s2">&quot;func&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">marker</span><span class="p">:</span> <span class="s2">"_MarkerT"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">condition</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">marker</span><span class="p">,</span> <span class="s2">"condition"</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">marker</span><span class="p">,</span> <span class="s2">"func"</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">condition</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">StructException</span><span class="p">(</span>
-                <span class="s2">&quot;Start() requires a conditional marker returned by If.&quot;</span>
+                <span class="s2">"Start() requires a conditional marker returned by If."</span>
             <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">marker</span><span class="p">:</span> <span class="n">_MarkerT</span> <span class="o">=</span> <span class="n">marker</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">condition</span><span class="p">:</span> <span class="n">_ContextLambda</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">condition</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">branch_conditions</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">_ContextLambda</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="nb">bool</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span>
-            <span class="n">marker</span><span class="p">,</span> <span class="s2">&quot;branch_conditions&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">condition</span><span class="p">,)</span>
+            <span class="n">marker</span><span class="p">,</span> <span class="s2">"branch_conditions"</span><span class="p">,</span> <span class="p">(</span><span class="n">condition</span><span class="p">,)</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">is_last</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">marker</span><span class="p">,</span> <span class="s2">&quot;is_last&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_last</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">marker</span><span class="p">,</span> <span class="s2">"is_last"</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="End">
 <a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.End">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">End</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;End marker for an explicit conditional block.</span>
+<span class="w">    </span><span class="sd">"""End marker for an explicit conditional block.</span>
 
 <span class="sd">    Use this as metadata on the last real field in a Python 3.14+ inline marker</span>
 <span class="sd">    block:</span>
@@ -636,17 +636,17 @@
 <span class="sd">    Invisible marker fields are removed from the final struct model.</span>
 
 <span class="sd">    .. versionadded: 2.9.0</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
-    <span class="vm">__slots__</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;marker&quot;</span><span class="p">,</span> <span class="s2">&quot;condition&quot;</span><span class="p">)</span>
+    <span class="vm">__slots__</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"marker"</span><span class="p">,</span> <span class="s2">"condition"</span><span class="p">)</span>
 
     <span class="n">__conditional__</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">__conditional_end__</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">marker</span><span class="p">:</span> <span class="s2">&quot;_MarkerT&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">condition</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">marker</span><span class="p">,</span> <span class="s2">&quot;condition&quot;</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">marker</span><span class="p">,</span> <span class="s2">&quot;func&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">marker</span><span class="p">:</span> <span class="s2">"_MarkerT"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">condition</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">marker</span><span class="p">,</span> <span class="s2">"condition"</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">marker</span><span class="p">,</span> <span class="s2">"func"</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">condition</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">StructException</span><span class="p">(</span><span class="s2">&quot;End() requires a conditional marker returned by If.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">StructException</span><span class="p">(</span><span class="s2">"End() requires a conditional marker returned by If."</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">marker</span><span class="p">:</span> <span class="n">_MarkerT</span> <span class="o">=</span> <span class="n">marker</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">condition</span><span class="p">:</span> <span class="n">_ContextLambda</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">condition</span></div>
 
@@ -686,7 +686,7 @@
         <span class="k">return</span> <span class="kc">False</span>
     <span class="k">if</span> <span class="n">condition</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">True</span>
-    <span class="k">return</span> <span class="n">UnaryExpression</span><span class="p">(</span><span class="s2">&quot;not&quot;</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">not_</span><span class="p">,</span> <span class="n">condition</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">UnaryExpression</span><span class="p">(</span><span class="s2">"not"</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">not_</span><span class="p">,</span> <span class="n">condition</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">any_cond</span><span class="p">(</span>
@@ -703,12 +703,12 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">_ContextLambda</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="nb">bool</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
     <span class="k">if</span> <span class="n">iscondend</span><span class="p">(</span><span class="n">marker</span><span class="p">):</span>
         <span class="k">raise</span> <span class="n">StructException</span><span class="p">(</span>
-            <span class="s2">&quot;Conditional branch requires a start marker, not End(...).&quot;</span>
+            <span class="s2">"Conditional branch requires a start marker, not End(...)."</span>
         <span class="p">)</span>
-    <span class="n">conditions</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">marker</span><span class="p">,</span> <span class="s2">&quot;branch_conditions&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">conditions</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">marker</span><span class="p">,</span> <span class="s2">"branch_conditions"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">conditions</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">StructException</span><span class="p">(</span>
-            <span class="s2">&quot;Conditional branch requires a marker returned by &#39;with If(...) as name&#39;.&quot;</span>
+            <span class="s2">"Conditional branch requires a marker returned by 'with If(...) as name'."</span>
         <span class="p">)</span>
     <span class="k">return</span> <span class="n">conditions</span>
 
@@ -716,14 +716,14 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">ensure_not_last</span><span class="p">(</span>
     <span class="n">marker</span><span class="p">:</span> <span class="n">ConditionContext</span> <span class="o">|</span> <span class="n">_ConditionalAnnotation</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">str</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">marker</span><span class="p">,</span> <span class="s2">&quot;is_last&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="n">StructException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2"> cannot be added after Else.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">marker</span><span class="p">,</span> <span class="s2">"is_last"</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">StructException</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2"> cannot be added after Else."</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">chain_cond</span><span class="p">(</span>
     <span class="n">previous</span><span class="p">:</span> <span class="n">ConditionContext</span><span class="p">,</span> <span class="n">condition</span><span class="p">:</span> <span class="n">_ContextLambda</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="nb">bool</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">_ContextLambda</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">_ContextLambda</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="nb">bool</span><span class="p">,</span> <span class="o">...</span><span class="p">]]:</span>
-    <span class="n">ensure_not_last</span><span class="p">(</span><span class="n">previous</span><span class="p">,</span> <span class="s2">&quot;ElseIf&quot;</span><span class="p">)</span>
+    <span class="n">ensure_not_last</span><span class="p">(</span><span class="n">previous</span><span class="p">,</span> <span class="s2">"ElseIf"</span><span class="p">)</span>
     <span class="n">previous_conditions</span> <span class="o">=</span> <span class="n">_previous_branch_conditions</span><span class="p">(</span><span class="n">previous</span><span class="p">)</span>
     <span class="n">effective</span> <span class="o">=</span> <span class="n">and_cond</span><span class="p">(</span><span class="n">not_cond</span><span class="p">(</span><span class="n">any_cond</span><span class="p">(</span><span class="n">previous_conditions</span><span class="p">)),</span> <span class="n">condition</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">effective</span><span class="p">,</span> <span class="p">(</span><span class="o">*</span><span class="n">previous_conditions</span><span class="p">,</span> <span class="n">condition</span><span class="p">)</span>
@@ -732,7 +732,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">else_cond</span><span class="p">(</span>
     <span class="n">previous</span><span class="p">:</span> <span class="n">ConditionContext</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">_ContextLambda</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">_ContextLambda</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="nb">bool</span><span class="p">,</span> <span class="o">...</span><span class="p">]]:</span>
-    <span class="n">ensure_not_last</span><span class="p">(</span><span class="n">previous</span><span class="p">,</span> <span class="s2">&quot;Else&quot;</span><span class="p">)</span>
+    <span class="n">ensure_not_last</span><span class="p">(</span><span class="n">previous</span><span class="p">,</span> <span class="s2">"Else"</span><span class="p">)</span>
     <span class="n">previous_conditions</span> <span class="o">=</span> <span class="n">_previous_branch_conditions</span><span class="p">(</span><span class="n">previous</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">not_cond</span><span class="p">(</span><span class="n">any_cond</span><span class="p">(</span><span class="n">previous_conditions</span><span class="p">)),</span> <span class="n">previous_conditions</span>
 
@@ -767,12 +767,12 @@
     <span class="n">active</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span>
     <span class="n">seen_starts</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="n">target</span><span class="p">:</span> <span class="n">_MarkerT</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">marker</span><span class="p">,</span> <span class="s2">&quot;marker&quot;</span><span class="p">,</span> <span class="n">marker</span><span class="p">)</span>
+    <span class="n">target</span><span class="p">:</span> <span class="n">_MarkerT</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">marker</span><span class="p">,</span> <span class="s2">"marker"</span><span class="p">,</span> <span class="n">marker</span><span class="p">)</span>
     <span class="n">marker_id</span> <span class="o">=</span> <span class="nb">id</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">14</span><span class="p">)</span> <span class="ow">and</span> <span class="n">marker_id</span> <span class="ow">in</span> <span class="n">seen_starts</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">StructException</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Conditional marker </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> in </span><span class="si">{</span><span class="n">model</span><span class="si">!r}</span><span class="s2"> reuses a marker &quot;</span>
-            <span class="o">+</span> <span class="s2">&quot;alias. Use a unique alias for each Python 3.14 marker block.&quot;</span>
+            <span class="sa">f</span><span class="s2">"Conditional marker </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> in </span><span class="si">{</span><span class="n">model</span><span class="si">!r}</span><span class="s2"> reuses a marker "</span>
+            <span class="o">+</span> <span class="s2">"alias. Use a unique alias for each Python 3.14 marker block."</span>
         <span class="p">)</span>
     <span class="n">seen_starts</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">marker_id</span><span class="p">)</span>
     <span class="n">active</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">target</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
@@ -783,22 +783,22 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">active</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">StructException</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Conditional end marker </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> in </span><span class="si">{</span><span class="n">model</span><span class="si">!r}</span><span class="s2"> has no &quot;</span>
-            <span class="o">+</span> <span class="s2">&quot;matching start marker.&quot;</span>
+            <span class="sa">f</span><span class="s2">"Conditional end marker </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> in </span><span class="si">{</span><span class="n">model</span><span class="si">!r}</span><span class="s2"> has no "</span>
+            <span class="o">+</span> <span class="s2">"matching start marker."</span>
         <span class="p">)</span>
-    <span class="n">expected</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">marker</span><span class="p">,</span> <span class="s2">&quot;marker&quot;</span><span class="p">,</span> <span class="n">marker</span><span class="p">)</span>
+    <span class="n">expected</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">marker</span><span class="p">,</span> <span class="s2">"marker"</span><span class="p">,</span> <span class="n">marker</span><span class="p">)</span>
     <span class="n">current</span><span class="p">,</span> <span class="n">field_count</span> <span class="o">=</span> <span class="n">active</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">current</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">expected</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">StructException</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Conditional end marker </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> in </span><span class="si">{</span><span class="n">model</span><span class="si">!r}</span><span class="s2"> does not &quot;</span>
-            <span class="o">+</span> <span class="s2">&quot;match the active conditional marker.&quot;</span>
+            <span class="sa">f</span><span class="s2">"Conditional end marker </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> in </span><span class="si">{</span><span class="n">model</span><span class="si">!r}</span><span class="s2"> does not "</span>
+            <span class="o">+</span> <span class="s2">"match the active conditional marker."</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="n">field_count</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">StructException</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Conditional marker ending at </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> in </span><span class="si">{</span><span class="n">model</span><span class="si">!r}</span><span class="s2"> does &quot;</span>
-            <span class="o">+</span> <span class="s2">&quot;not contain any fields. Repeated field names in marker &quot;</span>
-            <span class="o">+</span> <span class="s2">&quot;branches are not supported; use Branch(...) for same-field &quot;</span>
-            <span class="o">+</span> <span class="s2">&quot;conditional chains.&quot;</span>
+            <span class="sa">f</span><span class="s2">"Conditional marker ending at </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> in </span><span class="si">{</span><span class="n">model</span><span class="si">!r}</span><span class="s2"> does "</span>
+            <span class="o">+</span> <span class="s2">"not contain any fields. Repeated field names in marker "</span>
+            <span class="o">+</span> <span class="s2">"branches are not supported; use Branch(...) for same-field "</span>
+            <span class="o">+</span> <span class="s2">"conditional chains."</span>
         <span class="p">)</span>
     <span class="n">_</span> <span class="o">=</span> <span class="n">active</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
 
@@ -852,7 +852,7 @@
 
     <span class="k">if</span> <span class="n">active</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">StructException</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Conditional marker in </span><span class="si">{</span><span class="n">model</span><span class="si">!r}</span><span class="s2"> is missing an End(when) marker.&quot;</span>
+            <span class="sa">f</span><span class="s2">"Conditional marker in </span><span class="si">{</span><span class="n">model</span><span class="si">!r}</span><span class="s2"> is missing an End(when) marker."</span>
         <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">updated</span><span class="p">,</span> <span class="n">removed</span>
@@ -861,16 +861,16 @@
 <div class="viewcode-block" id="When">
 <a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.When">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">When</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;One conditional arm for :class:`Branch`.</span>
+<span class="w">    </span><span class="sd">"""One conditional arm for :class:`Branch`.</span>
 
 <span class="sd">    :param condition: Context expression controlling this arm.</span>
 <span class="sd">    :param annotation: Field annotation or struct selected when the condition</span>
 <span class="sd">        evaluates to true.</span>
 
 <span class="sd">    .. versionadded:: 2.9.0</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
-    <span class="vm">__slots__</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;condition&quot;</span><span class="p">,</span> <span class="s2">&quot;annotation&quot;</span><span class="p">)</span>
+    <span class="vm">__slots__</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"condition"</span><span class="p">,</span> <span class="s2">"annotation"</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">condition</span><span class="p">:</span> <span class="n">_ContextLambda</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">annotation</span><span class="p">:</span> <span class="n">_AnnotationT</span>
@@ -883,15 +883,15 @@
 <div class="viewcode-block" id="Otherwise">
 <a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.Otherwise">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Otherwise</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fallback arm for :class:`Branch`.</span>
+<span class="w">    </span><span class="sd">"""Fallback arm for :class:`Branch`.</span>
 
 <span class="sd">    The fallback arm is selected when no earlier :class:`When` condition matched.</span>
 <span class="sd">    A branch can contain at most one fallback arm, and it must appear last.</span>
 
 <span class="sd">    .. versionadded:: 2.9.0</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
-    <span class="vm">__slots__</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;annotation&quot;</span><span class="p">,)</span>
+    <span class="vm">__slots__</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"annotation"</span><span class="p">,)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">annotation</span><span class="p">:</span> <span class="n">_AnnotationT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">annotation</span><span class="p">:</span> <span class="n">_AnnotationT</span> <span class="o">=</span> <span class="n">annotation</span></div>
@@ -901,7 +901,7 @@
 <div class="viewcode-block" id="Branch">
 <a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.Branch">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Branch</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Conditional field chain for one attribute.</span>
+<span class="w">    </span><span class="sd">"""Conditional field chain for one attribute.</span>
 
 <span class="sd">    Use this when several conditions should decode or encode the same Python</span>
 <span class="sd">    attribute with different field definitions.</span>
@@ -923,16 +923,16 @@
 <span class="sd">    Arm annotations can use ``f[...]`` to carry local options such as byte order.</span>
 
 <span class="sd">    .. versionadded:: 2.9.0</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
-    <span class="vm">__slots__</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;chain&quot;</span><span class="p">,)</span>
+    <span class="vm">__slots__</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"chain"</span><span class="p">,)</span>
 
 <div class="viewcode-block" id="Branch.__init__">
 <a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.Branch.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">arms</span><span class="p">:</span> <span class="n">When</span> <span class="o">|</span> <span class="n">Otherwise</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">arms</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">StructException</span><span class="p">(</span>
-                <span class="s2">&quot;Branch() requires at least one When or Otherwise arm.&quot;</span>
+                <span class="s2">"Branch() requires at least one When or Otherwise arm."</span>
             <span class="p">)</span>
 
         <span class="n">chain</span><span class="p">:</span> <span class="n">ConditionalChain</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
@@ -942,21 +942,21 @@
                 <span class="k">case</span> <span class="n">When</span><span class="p">():</span>
                     <span class="k">if</span> <span class="n">seen_otherwise</span><span class="p">:</span>
                         <span class="k">raise</span> <span class="n">StructException</span><span class="p">(</span>
-                            <span class="s2">&quot;When(...) cannot appear after Otherwise(...).&quot;</span>
+                            <span class="s2">"When(...) cannot appear after Otherwise(...)."</span>
                         <span class="p">)</span>
                     <span class="n">condition</span> <span class="o">=</span> <span class="n">arm</span><span class="o">.</span><span class="n">condition</span>
                     <span class="n">annotation</span> <span class="o">=</span> <span class="n">arm</span><span class="o">.</span><span class="n">annotation</span>
                 <span class="k">case</span> <span class="n">Otherwise</span><span class="p">():</span>
                     <span class="k">if</span> <span class="n">seen_otherwise</span><span class="p">:</span>
                         <span class="k">raise</span> <span class="n">StructException</span><span class="p">(</span>
-                            <span class="s2">&quot;Branch() can only contain one Otherwise(...).&quot;</span>
+                            <span class="s2">"Branch() can only contain one Otherwise(...)."</span>
                         <span class="p">)</span>
                     <span class="n">seen_otherwise</span> <span class="o">=</span> <span class="kc">True</span>
                     <span class="n">condition</span> <span class="o">=</span> <span class="kc">None</span>
                     <span class="n">annotation</span> <span class="o">=</span> <span class="n">arm</span><span class="o">.</span><span class="n">annotation</span>
                 <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>  <span class="c1"># pyright: ignore[reportUnnecessaryComparison]</span>
                     <span class="k">raise</span> <span class="n">StructException</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s2">&quot;Unsupported Branch arm </span><span class="si">{</span><span class="n">arm</span><span class="si">!r}</span><span class="s2">; expected When or Otherwise.&quot;</span>
+                        <span class="sa">f</span><span class="s2">"Unsupported Branch arm </span><span class="si">{</span><span class="n">arm</span><span class="si">!r}</span><span class="s2">; expected When or Otherwise."</span>
                     <span class="p">)</span>
 
             <span class="c1"># create the struct</span>
@@ -982,7 +982,7 @@
                             <span class="n">struct_obj</span><span class="o">.</span><span class="n">add_flag</span><span class="p">(</span><span class="n">option</span><span class="p">)</span>
                         <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>  <span class="c1"># pyright: ignore[reportUnnecessaryComparison]</span>
                             <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span>
-                                <span class="sa">f</span><span class="s2">&quot;Could not add branch option: unsupported type (</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">option</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span>
+                                <span class="sa">f</span><span class="s2">"Could not add branch option: unsupported type (</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">option</span><span class="p">)</span><span class="si">}</span><span class="s2">)"</span>
                             <span class="p">)</span>
 
             <span class="k">if</span> <span class="n">chain</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -995,7 +995,7 @@
                 <span class="n">chain</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">struct_obj</span><span class="p">,</span> <span class="n">condition</span><span class="p">)</span>  <span class="c1"># pyright: ignore[reportArgumentType]</span>
 
         <span class="k">if</span> <span class="n">chain</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid number of arguments provided&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Invalid number of arguments provided"</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">chain</span><span class="p">:</span> <span class="n">ConditionalChain</span> <span class="o">=</span> <span class="n">chain</span></div>
 
@@ -1017,7 +1017,7 @@
 <div class="viewcode-block" id="If">
 <a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.If">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">If</span><span class="p">(</span><span class="n">ConditionContext</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;If-statement implementation for class definitions.</span>
+<span class="w">    </span><span class="sd">"""If-statement implementation for class definitions.</span>
 
 <span class="sd">    .. versionchanged:: 2.9.0</span>
 
@@ -1065,9 +1065,9 @@
 
 <span class="sd">    .. note::</span>
 <span class="sd">        This class is **not** a struct, but a simple context manager.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
-    <span class="vm">__slots__</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;_proxy&quot;</span><span class="p">,)</span>
+    <span class="vm">__slots__</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"_proxy"</span><span class="p">,)</span>
     <span class="n">__conditional__</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">condition</span><span class="p">:</span> <span class="n">_ContextLambda</span><span class="p">[</span><span class="nb">bool</span><span class="p">],</span> <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">):</span>
@@ -1110,13 +1110,13 @@
         <span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">:</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">traceback</span><span class="p">:</span> <span class="n">TracebackType</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">14</span><span class="p">):</span>
-            <span class="n">frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getframe</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;Could not exit condition context!&quot;</span><span class="p">)</span>
+            <span class="n">frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getframe</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s2">"Could not exit condition context!"</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">value</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">_proxy</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">frame</span><span class="o">.</span><span class="n">f_locals</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
                 <span class="k">raise</span> <span class="n">StructException</span><span class="p">(</span>
-                    <span class="s2">&quot;Implicit &#39;with If(condition):&#39; blocks are not supported on &quot;</span>
-                    <span class="o">+</span> <span class="s2">&quot;Python 3.14+. Use &#39;with If(condition) as when:&#39; with &quot;</span>
-                    <span class="o">+</span> <span class="s2">&quot;&#39;field: f[type, field, when]&#39; for one field, or &quot;</span>
-                    <span class="o">+</span> <span class="s2">&quot;&#39;Start(when)&#39; / &#39;End(when)&#39; metadata for a block.&quot;</span>
+                    <span class="s2">"Implicit 'with If(condition):' blocks are not supported on "</span>
+                    <span class="o">+</span> <span class="s2">"Python 3.14+. Use 'with If(condition) as when:' with "</span>
+                    <span class="o">+</span> <span class="s2">"'field: f[type, field, when]' for one field, or "</span>
+                    <span class="o">+</span> <span class="s2">"'Start(when)' / 'End(when)' metadata for a block."</span>
                 <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_proxy</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">return</span> <span class="kc">None</span>
@@ -1133,7 +1133,7 @@
 <div class="viewcode-block" id="ElseIf">
 <a class="viewcode-back" href="../../../library/fields/field_model.html#caterpillar.fields.ElseIf">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ElseIf</span><span class="p">(</span><span class="n">ConditionContext</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;ElseIf-statement implementation for class definitions.</span>
+<span class="w">    </span><span class="sd">"""ElseIf-statement implementation for class definitions.</span>
 
 <span class="sd">    Python &lt;= 3.13 supports the legacy implicit form:</span>
 
@@ -1162,13 +1162,13 @@
 
 <span class="sd">            with ElseIf(first, this.a == 34) as second:</span>
 <span class="sd">                two: f[int, uint8, second]</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="vm">__slots__</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s2">&quot;_branch_conditions&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;is_last&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;_marker_mode&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;_proxy&quot;</span><span class="p">,</span>
+        <span class="s2">"_branch_conditions"</span><span class="p">,</span>
+        <span class="s2">"is_last"</span><span class="p">,</span>
+        <span class="s2">"_marker_mode"</span><span class="p">,</span>
+        <span class="s2">"_proxy"</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">ConditionContext</span> <span class="o">|</span> <span class="n">_ContextLambda</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -1176,7 +1176,7 @@
         <span class="k">match</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
             <span class="k">case</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ConditionContext</span><span class="p">):</span>
-                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;ElseIf requires a condition!&quot;</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"ElseIf requires a condition!"</span><span class="p">)</span>
 
                 <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_branch_conditions</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">,)</span>
@@ -1184,7 +1184,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_marker_mode</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="k">case</span> <span class="mi">2</span><span class="p">:</span>
                 <span class="n">previous</span><span class="p">,</span> <span class="n">condition</span> <span class="o">=</span> <span class="n">args</span>
-                <span class="n">ensure_not_last</span><span class="p">(</span><span class="n">previous</span><span class="p">,</span> <span class="s2">&quot;ElseIf&quot;</span><span class="p">)</span>
+                <span class="n">ensure_not_last</span><span class="p">(</span><span class="n">previous</span><span class="p">,</span> <span class="s2">"ElseIf"</span><span class="p">)</span>
                 <span class="n">previous_conditions</span> <span class="o">=</span> <span class="n">_previous_branch_conditions</span><span class="p">(</span><span class="n">previous</span><span class="p">)</span>
                 <span class="n">effective</span> <span class="o">=</span> <span class="n">and_cond</span><span class="p">(</span><span class="n">not_cond</span><span class="p">(</span><span class="n">any_cond</span><span class="p">(</span><span class="n">previous_conditions</span><span class="p">)),</span> <span class="n">condition</span><span class="p">)</span>
                 <span class="n">branch_conditions</span> <span class="o">=</span> <span class="p">(</span><span class="o">*</span><span class="n">previous_conditions</span><span class="p">,</span> <span class="n">condition</span><span class="p">)</span>
@@ -1196,7 +1196,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_marker_mode</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                    <span class="s2">&quot;ElseIf expects either ElseIf(condition) or ElseIf(previous, condition).&quot;</span>
+                    <span class="s2">"ElseIf expects either ElseIf(condition) or ElseIf(previous, condition)."</span>
                 <span class="p">)</span>
 
     <span class="nd">@property</span>
@@ -1222,9 +1222,9 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_proxy</span>
         <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">14</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">StructException</span><span class="p">(</span>
-                <span class="s2">&quot;Implicit &#39;with ElseIf(condition):&#39; blocks are not supported on &quot;</span>
-                <span class="o">+</span> <span class="s2">&quot;Python 3.14+. Use &#39;with ElseIf(previous, condition) as when:&#39; &quot;</span>
-                <span class="o">+</span> <span class="s2">&quot;alongside &#39;f[..., when]&#39; for one field or Start/End metadata for a block.&quot;</span>
+                <span class="s2">"Implicit 'with ElseIf(condition):' blocks are not supported on "</span>
+                <span class="o">+</span> <span class="s2">"Python 3.14+. Use 'with ElseIf(previous, condition) as when:' "</span>
+                <span class="o">+</span> <span class="s2">"alongside 'f[..., when]' for one field or Start/End metadata for a block."</span>
             <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__enter__</span><span class="p">()</span>  <span class="c1"># pyright: ignore[reportUnusedCallResult]</span>
@@ -1237,20 +1237,20 @@
     <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">:</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">traceback</span><span class="p">:</span> <span class="n">TracebackType</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_marker_mode</span><span class="p">:</span>
-            <span class="n">frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getframe</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;Could not exit condition context!&quot;</span><span class="p">)</span>
+            <span class="n">frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getframe</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s2">"Could not exit condition context!"</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">value</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">_proxy</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">frame</span><span class="o">.</span><span class="n">f_locals</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
                 <span class="k">raise</span> <span class="n">StructException</span><span class="p">(</span>
-                    <span class="s2">&quot;Python 3.14+ ElseIf blocks require &quot;</span>
-                    <span class="o">+</span> <span class="s2">&quot;&#39;with ElseIf(previous, condition) as when:&#39; with &quot;</span>
-                    <span class="o">+</span> <span class="s2">&quot;&#39;f[..., when]&#39; for one field or Start/End metadata for a block.&quot;</span>
+                    <span class="s2">"Python 3.14+ ElseIf blocks require "</span>
+                    <span class="o">+</span> <span class="s2">"'with ElseIf(previous, condition) as when:' with "</span>
+                    <span class="o">+</span> <span class="s2">"'f[..., when]' for one field or Start/End metadata for a block."</span>
                 <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_proxy</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">return</span> <span class="kc">None</span>
 
         <span class="c1"># fmt: off</span>
         <span class="c1"># we have to inspect no only new names but also defined ones</span>
-        <span class="n">frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getframe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">depth</span><span class="p">,</span> <span class="s2">&quot;Could not enter condition context!&quot;</span><span class="p">)</span>
-        <span class="n">annotations</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">_StructLike</span><span class="p">]</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">f_locals</span><span class="p">[</span><span class="s2">&quot;__annotations__&quot;</span><span class="p">]</span>  <span class="c1"># pyright: ignore[reportAny]</span>
+        <span class="n">frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getframe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">depth</span><span class="p">,</span> <span class="s2">"Could not enter condition context!"</span><span class="p">)</span>
+        <span class="n">annotations</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">_StructLike</span><span class="p">]</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">f_locals</span><span class="p">[</span><span class="s2">"__annotations__"</span><span class="p">]</span>  <span class="c1"># pyright: ignore[reportAny]</span>
 
         <span class="c1"># inspect defined fields</span>
         <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">annotations</span><span class="p">)</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">namelist</span><span class="p">):</span>
@@ -1268,21 +1268,21 @@
                 <span class="c1"># the previous condition.</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="p">(</span><span class="n">Field</span><span class="p">,</span> <span class="n">ConditionalChain</span><span class="p">)):</span>
                     <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
-                        <span class="sa">f</span><span class="s2">&quot;The field </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> does not appear to be defined in a &quot;</span>
-                        <span class="s2">&quot;previous condition context. It can&#39;t be defined twice!&quot;</span>
+                        <span class="sa">f</span><span class="s2">"The field </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> does not appear to be defined in a "</span>
+                        <span class="s2">"previous condition context. It can't be defined twice!"</span>
                     <span class="p">)</span>
                     <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">ConditionalChain</span><span class="p">):</span>
                     <span class="c1"># it MUST store a condition</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">field</span><span class="o">.</span><span class="n">has_condition</span><span class="p">():</span>
                         <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
-                            <span class="s2">&quot;A field defined outside a condition context can&#39;t be &quot;</span>
-                            <span class="sa">f</span><span class="s2">&quot;overridden in such. (field=</span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">)&quot;</span>
+                            <span class="s2">"A field defined outside a condition context can't be "</span>
+                            <span class="sa">f</span><span class="s2">"overridden in such. (field=</span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">)"</span>
                         <span class="p">)</span>
                         <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
                     <span class="n">new_struct</span> <span class="o">=</span> <span class="n">ConditionalChain</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">field</span><span class="o">.</span><span class="n">condition</span><span class="p">)</span>
-                    <span class="c1"># Reset field&#39;s condition</span>
+                    <span class="c1"># Reset field's condition</span>
                     <span class="n">field</span><span class="o">.</span><span class="n">condition</span> <span class="o">=</span> <span class="kc">True</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">new_struct</span> <span class="o">=</span> <span class="n">field</span>
@@ -1295,11 +1295,11 @@
 
 
 
-<span class="c1"># REVISIT: There is one case where &#39;ELSE&#39; is not applicable and will cause</span>
+<span class="c1"># REVISIT: There is one case where 'ELSE' is not applicable and will cause</span>
 <span class="c1"># a field to be present at all times. This problem exists if we add fields</span>
 <span class="c1"># into an else-branch without a previously defined field.</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">_ElseBranch</span><span class="p">(</span><span class="n">ConditionContext</span><span class="p">):</span>
-    <span class="vm">__slots__</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;_branch_conditions&quot;</span><span class="p">,</span> <span class="s2">&quot;_is_last&quot;</span><span class="p">,</span> <span class="s2">&quot;_proxy&quot;</span><span class="p">)</span>
+    <span class="vm">__slots__</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"_branch_conditions"</span><span class="p">,</span> <span class="s2">"_is_last"</span><span class="p">,</span> <span class="s2">"_proxy"</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">previous</span><span class="p">:</span> <span class="n">ConditionContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">effective</span><span class="p">,</span> <span class="n">branch_conditions</span> <span class="o">=</span> <span class="n">else_cond</span><span class="p">(</span><span class="n">previous</span><span class="p">)</span>
@@ -1333,26 +1333,26 @@
     <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">:</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">traceback</span><span class="p">:</span> <span class="n">TracebackType</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getframe</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;Could not exit condition context!&quot;</span><span class="p">)</span>
+        <span class="n">frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getframe</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s2">"Could not exit condition context!"</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">value</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">_proxy</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">frame</span><span class="o">.</span><span class="n">f_locals</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
             <span class="k">raise</span> <span class="n">StructException</span><span class="p">(</span>
-                <span class="s2">&quot;Python 3.14+ Else blocks require &#39;with Else(previous) as when:&#39; &quot;</span>
-                <span class="o">+</span> <span class="s2">&quot;with &#39;f[..., when]&#39; for one field or Start/End metadata for a block.&quot;</span>
+                <span class="s2">"Python 3.14+ Else blocks require 'with Else(previous) as when:' "</span>
+                <span class="o">+</span> <span class="s2">"with 'f[..., when]' for one field or Start/End metadata for a block."</span>
             <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_proxy</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="kc">None</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">_Else</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Else marker factory.</span>
+<span class="w">    </span><span class="sd">"""Else marker factory.</span>
 
 <span class="sd">    .. versionchanged:: 2.9.0</span>
 <span class="sd">        Python &lt;= 3.13 supports ``with Else:`` for legacy condition blocks. Python</span>
 <span class="sd">        3.14+ requires ``with Else(previous) as when:`` with ``f[..., when]`` for</span>
 <span class="sd">        one field or ``Start(when)`` / ``End(when)`` metadata for a block.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
-    <span class="vm">__slots__</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;_legacy&quot;</span><span class="p">,)</span>
+    <span class="vm">__slots__</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"_legacy"</span><span class="p">,)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_legacy</span><span class="p">:</span> <span class="n">ConditionContext</span> <span class="o">=</span> <span class="n">ElseIf</span><span class="p">(</span><span class="k">lambda</span> <span class="n">context</span><span class="p">:</span> <span class="kc">True</span><span class="p">)</span>
@@ -1363,9 +1363,9 @@
     <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ElseIf</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">14</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">StructException</span><span class="p">(</span>
-                <span class="s2">&quot;Implicit &#39;with Else:&#39; blocks are not supported on Python 3.14+. &quot;</span>
-                <span class="o">+</span> <span class="s2">&quot;Use &#39;with Else(previous) as when:&#39; with &#39;f[..., when]&#39; for one &quot;</span>
-                <span class="o">+</span> <span class="s2">&quot;field or Start/End metadata for a block.&quot;</span>
+                <span class="s2">"Implicit 'with Else:' blocks are not supported on Python 3.14+. "</span>
+                <span class="o">+</span> <span class="s2">"Use 'with Else(previous) as when:' with 'f[..., when]' for one "</span>
+                <span class="o">+</span> <span class="s2">"field or Start/End metadata for a block."</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_legacy</span><span class="o">.</span><span class="fm">__enter__</span><span class="p">()</span>  <span class="c1"># pyright: ignore[reportReturnType]</span>
 
