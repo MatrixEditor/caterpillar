@@ -349,8 +349,8 @@ class StructDefMixin:
     """A reference to the struct model of this class"""
 
     def __class_getitem__(
-        cls: type[_ModelT], dim: _LengthT
-    ) -> Field[Collection[_ModelT], Collection[_ModelT]]:
+        cls: type[Self], dim: _LengthT
+    ) -> Field[Collection[Self], Collection[Self]]:
         """Enable ``cls[dim]`` syntax for defining repeated structure fields.
 
         This method allows structure classes to be indexed using the ``[]``
@@ -360,7 +360,7 @@ class StructDefMixin:
         :param dim: The length or dimension of the collection
         :type dim: _LengthT
         :return: A field descriptor representing a collection of the structure
-        :rtype: Field[Collection[_ModelT], Collection[_ModelT]]
+        :rtype: Field[Collection[Self], Collection[Self]]
         """
         return getstruct(cls)[dim]
 
@@ -370,13 +370,13 @@ class StructDefMixin:
 
     @classmethod
     def from_bytes(
-        cls: type[_ModelT],
+        cls: type[Self],
         data: Buffer | _StreamType,
         *,
         order: _EndianLike | None = None,
         arch: _ArchLike | None = None,
         **kwargs: Any,
-    ) -> _ModelT:
+    ) -> Self:
         """Construct an instance from raw binary data or a stream.
 
         This is a convenience wrapper around the underlying ``unpack``
@@ -390,19 +390,19 @@ class StructDefMixin:
         :param arch: Architecture override for parsing, defaults to None
         :type arch: _ArchLike | None, optional
         :return: Parsed model instance
-        :rtype: _ModelT
+        :rtype: Self
         """
         return unpack(cls, data, order=order, arch=arch, **kwargs)
 
     @classmethod
     def from_file(
-        cls: type[_ModelT],
+        cls: type[Self],
         filename: str,
         *,
         order: _EndianLike | None = None,
         arch: _ArchLike | None = None,
         **kwargs: Any,
-    ) -> _ModelT:
+    ) -> Self:
         """Construct an instance from a binary file on disk.
 
         This is a convenience wrapper around ``unpack_file`` for reading and
@@ -415,7 +415,7 @@ class StructDefMixin:
         :param arch: Architecture override for parsing, defaults to None
         :type arch: _ArchLike | None, optional
         :return: Parsed model instance
-        :rtype: _ModelT
+        :rtype: Self
         """
         return unpack_file(cls, filename, order=order, arch=arch, **kwargs)
 
