@@ -12,6 +12,7 @@ compatibility with older versions of the library, making them particularly impor
     sequence.rst
     struct
     union
+    unnamed
     bitfield
     templates
 
