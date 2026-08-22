@@ -22,6 +22,7 @@ create and manipulate your own custom struct classes in Python.
     actions
     bitfield
     union
+    unnamed
     templates
 
 

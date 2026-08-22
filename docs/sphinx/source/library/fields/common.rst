@@ -294,6 +294,20 @@ Special Structs
 
     .. versionadded:: 2.9.0
 
+.. autoclass:: caterpillar.fields.Unnamed
+    :members:
+
+    .. versionadded:: 2.10.0
+
+.. autoclass:: caterpillar.fields.sized
+    :members:
+
+    Inline alternative to ``.sized(length)``, given as the last argument of
+    ``Unnamed``'s subscript instead: ``Unnamed[TypeA, TypeB, sized[length]]``.
+
+    At most one may be given, and it must be the last argument.
+
+    .. versionadded:: 2.10.0
 
 .. autodata:: caterpillar.fields.Pass
 

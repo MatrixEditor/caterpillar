@@ -15,6 +15,8 @@
 # pyright: reportPrivateUsage=false, reportAny=false, reportExplicitAny=false
 from caterpillar.byteorder import Inherit
 import re
+import dataclasses as dc
+
 from collections.abc import Iterable
 from typing import Annotated, Any, Generic, get_args, get_origin
 
@@ -55,6 +57,7 @@ from caterpillar.options import (
 )
 from caterpillar.shared import ATTR_ACTION_PACK, ATTR_ACTION_UNPACK, Action
 
+from caterpillar.fields._base import has_default, IGNORED_DEFAULT
 
 class _Member:
     def __init__(
@@ -269,15 +272,10 @@ class Sequence(Generic[_SeqModelT, _SeqIT, _SeqOT], FieldMixin[_SeqIT, _SeqOT]):
         :param default: The default value of the field.
         :return: True if the field should be included, else False.
         """
-        if self.has_option(S_DISCARD_UNNAMED):
-            if re.match(r"^_[0-9]*$", name):
-                return False
+        if self.has_option(S_DISCARD_UNNAMED) and re.match(r"^_[0-9]*$", name):
+            return False
 
-        if self.has_option(S_DISCARD_CONST):
-            if default != INVALID_DEFAULT:
-                return False
-
-        return True
+        return not (self.has_option(S_DISCARD_CONST) and has_default(default))
 
     def _set_default(self, name: str, value: object) -> None:
         pass
@@ -286,6 +284,7 @@ class Sequence(Generic[_SeqModelT, _SeqIT, _SeqOT], FieldMixin[_SeqIT, _SeqOT]):
         self, name: str, annotation: _AnnotationT, had_default: bool = False
     ) -> Any:
         default: Any = getattr(self.model, name, INVALID_DEFAULT)
+        raw_default = default
         # constant values that are not in the form of fields, structs or types should
         # be wrapped into constant values. For more information, see _process_field
         if isinstance(annotation, Field):
@@ -304,6 +303,15 @@ class Sequence(Generic[_SeqModelT, _SeqIT, _SeqOT], FieldMixin[_SeqIT, _SeqOT]):
         if self.is_union:
             # Unions will get none as default value for all fields
             default = None
+
+        if default is raw_default and isinstance(raw_default, dc.Field):
+            # The class attribute is still an untouched dataclasses.field(...)
+            return (
+                IGNORED_DEFAULT
+                if raw_default.default is not dc.MISSING
+                or raw_default.default_factory is not dc.MISSING
+                else INVALID_DEFAULT
+            )
 
         if default != INVALID_DEFAULT:
             self._set_default(name, default)
@@ -663,7 +671,7 @@ class Sequence(Generic[_SeqModelT, _SeqIT, _SeqOT], FieldMixin[_SeqIT, _SeqOT]):
                 )
 
             name = union_field.get_name()
-            context[ctx_path] = ".".join([base_path, "<value>"])
+            context[ctx_path] = f"{base_path}.<value>"
             # REVISIT: are constant values allowed here? + name validation?
             value = self.get_value(obj, name, union_field)
             union_field.__pack__(value, context)
