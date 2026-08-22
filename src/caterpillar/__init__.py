@@ -23,7 +23,8 @@ def native_support() -> bool:
     """Return True if native support is available."""
     try:
         # fmt: off
-        from caterpillar import _C  # pyright: ignore[reportMissingModuleSource, reportUnusedImport]
+        from caterpillar import \
+            _C  # pyright: ignore[reportMissingModuleSource, reportUnusedImport]
 
         return True
     except Exception:

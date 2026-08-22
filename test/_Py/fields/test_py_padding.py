@@ -5,20 +5,20 @@ import pytest
 from caterpillar.py import (
     DynamicSizeError,
     Padded,
+    Padding,
     PostPad,
     PrePad,
     ValidationError,
     constval,
     f,
-    padding,
     pack,
+    padding,
     sizeof,
     struct,
     this,
     uint8,
     uint16,
     unpack,
-    Padding,
 )
 from caterpillar.types import uint8_t
 

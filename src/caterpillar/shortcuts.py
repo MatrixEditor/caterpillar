@@ -13,40 +13,45 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from typing import Annotated as f
+
+from . import options as opt
 from .byteorder import (
     AARCH64,
     AMD,
     AMD64,
     ARM,
     ARM64,
-    BigEndian,
-    LittleEndian,
-    Dynamic,
-    PowerPC,
-    PowerPC64,
     RISC_V,
     RISC_V64,
+    BigEndian,
+    Dynamic,
+    Inherit,
+    LittleEndian,
+    PowerPC,
+    PowerPC64,
     x86,
     x86_64,
 )
-from .context import ContextPath, ctx, parent, this, ContextLength as lenof
-from .context import ctx as C, parent as P, root as G
+from .context import ContextLength as lenof
+from .context import ContextPath, ctx, parent, this
+from .context import ctx as C
+from .context import parent as P
+from .context import root as G
+from .fields import Field as F
+from .model import Sequence as Seq
 from .model import (
     bitfield,
     pack,
     pack_file,
     pack_into,
+    sizeof,
     struct,
     union,
     unpack,
     unpack_file,
-    sizeof,
-    Sequence as Seq,
 )
-from .shared import typeof, getstruct, hasstruct
 from .registry import to_struct
-from . import options as opt
-from .fields import Field as F
+from .shared import getstruct, hasstruct, typeof
 
 __all__ = [
     "AARCH64",
@@ -54,38 +59,39 @@ __all__ = [
     "AMD64",
     "ARM",
     "ARM64",
-    "BigEndian",
-    "LittleEndian",
-    "PowerPC",
-    "PowerPC64",
     "RISC_V",
     "RISC_V64",
-    "x86",
-    "x86_64",
+    "BigEndian",
+    "C",
+    "ContextPath",
+    "Dynamic",
+    "F",
+    "G",
+    "Inherit",
+    "LittleEndian",
+    "P",
+    "PowerPC",
+    "PowerPC64",
+    "Seq",
     "bitfield",
+    "ctx",
+    "f",
+    "getstruct",
+    "hasstruct",
+    "lenof",
+    "opt",
     "pack",
     "pack_file",
     "pack_into",
+    "parent",
+    "sizeof",
     "struct",
+    "this",
+    "to_struct",
+    "typeof",
     "union",
     "unpack",
     "unpack_file",
-    "sizeof",
-    "Seq",
-    "typeof",
-    "getstruct",
-    "hasstruct",
-    "ContextPath",
-    "ctx",
-    "parent",
-    "this",
-    "lenof",
-    "to_struct",
-    "F",
-    "opt",
-    "C",
-    "P",
-    "G",
-    "Dynamic",
-    "f",
+    "x86",
+    "x86_64",
 ]

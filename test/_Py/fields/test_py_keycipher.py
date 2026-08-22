@@ -1,7 +1,7 @@
 import pytest
 
-from caterpillar.py import InvalidValueError, pack, root, unpack
 from caterpillar.fields.crypto import KeyCipher
+from caterpillar.py import InvalidValueError, pack, root, unpack
 
 
 class ToyXor(KeyCipher):

@@ -153,7 +153,7 @@ ChunkTypes = (
 
 
 @struct(order=BigEndian)
-class CAFChunk():
+class CAFChunk:
     chunk_header: CAFChunkHeader
     # this is another simple switch-case structure, but this time we define a
     # default option. NOTE: not all chunk types are implemented
@@ -174,7 +174,9 @@ class CAFChunk():
         },
     ]
 
+
 CAFChunk_t = f[list[CAFChunk], getstruct(CAFChunk)[...]]
+
 
 @struct(order=BigEndian)
 class CAF:

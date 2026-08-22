@@ -15,10 +15,11 @@
 # pyright: reportPrivateUsage=false
 from io import RawIOBase
 from typing import Callable
-from typing_extensions import override, Buffer
 
+from typing_extensions import Buffer, override
+
+from caterpillar.abc import _ContextLambda, _ContextLike
 from caterpillar.context import CTX_STREAM
-from caterpillar.abc import _ContextLike, _ContextLambda
 
 HookInit = _ContextLambda[None]
 HookUpdate = Callable[[bytes, _ContextLike], bytes | None]

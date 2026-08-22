@@ -75,22 +75,32 @@ def test_fixed_array_uses_requested_endianness():
 def test_float_formats():
     assert pack(1.5, float16, order=LittleEndian) == pystruct.pack("<e", 1.5)
     assert pack(1.5, float16, order=BigEndian) == pystruct.pack(">e", 1.5)
-    assert unpack(float16, pystruct.pack("<e", 1.5), order=LittleEndian) == pytest.approx(1.5)
+    assert unpack(
+        float16, pystruct.pack("<e", 1.5), order=LittleEndian
+    ) == pytest.approx(1.5)
 
     assert pack(3.25, float32, order=LittleEndian) == pystruct.pack("<f", 3.25)
     assert pack(3.25, float32, order=BigEndian) == pystruct.pack(">f", 3.25)
-    assert unpack(float32, pystruct.pack("<f", 3.25), order=LittleEndian) == pytest.approx(3.25)
+    assert unpack(
+        float32, pystruct.pack("<f", 3.25), order=LittleEndian
+    ) == pytest.approx(3.25)
 
     assert pack(3.25, float64, order=LittleEndian) == pystruct.pack("<d", 3.25)
     assert pack(3.25, float64, order=BigEndian) == pystruct.pack(">d", 3.25)
-    assert unpack(float64, pystruct.pack(">d", 3.25), order=BigEndian) == pytest.approx(3.25)
+    assert unpack(float64, pystruct.pack(">d", 3.25), order=BigEndian) == pytest.approx(
+        3.25
+    )
 
 
 # --------------------------------------------------------------------------- #
 # validation and native-only formats
 # --------------------------------------------------------------------------- #
 def test_packing_wrong_types_raises():
-    for field, value in ((uint16, "not an int"), (float32, "not a float"), (char, b"too long")):
+    for field, value in (
+        (uint16, "not an int"),
+        (float32, "not a float"),
+        (char, b"too long"),
+    ):
         with pytest.raises(pystruct.error):
             pack(value, field)
 
@@ -108,5 +118,3 @@ def test_native_only_formats_force_native_endian():
     assert pack(42, pssize) == pystruct.pack("@n", 42)
     assert pack(42, psize) == pystruct.pack("@N", 42)
     assert pack(0x1000, void_ptr) == pystruct.pack("@P", 0x1000)
-
-

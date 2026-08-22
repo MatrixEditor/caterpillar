@@ -2,7 +2,9 @@ from types import SimpleNamespace
 
 import pytest
 
-from caterpillar.py import Context, ctx as context_path, f, parent, pack, root, struct, this, uint8, unpack
+from caterpillar.py import Context
+from caterpillar.py import ctx as context_path
+from caterpillar.py import f, pack, parent, root, struct, this, uint8, unpack
 
 
 def sample_context():

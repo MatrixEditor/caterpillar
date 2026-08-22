@@ -5,4 +5,4 @@ from example._example import ExampleCAtom
 # show any additional implementation of packing or unpacking
 # data.
 obj = ExampleCAtom(5)
-print(obj) # <ExampleCAtom 5>
+print(obj)  # <ExampleCAtom 5>

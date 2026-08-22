@@ -10,8 +10,8 @@ from caterpillar.py import (
     struct,
     system_arch,
     uint8,
-    unpack,
     uintptr,
+    unpack,
     x86,
     x86_64,
 )

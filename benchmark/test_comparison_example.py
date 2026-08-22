@@ -13,19 +13,22 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # pyright: basic
+import sys
+from pathlib import Path
+
 import pytest
 
 import caterpillar
 from caterpillar.context import O_CONTEXT_FACTORY
 
 try:
+    sys.path.insert(0, str(Path(__file__).parent.parent))
+
     from examples.comparison import comparison_1_caterpillar as caterpillar_default
-
-    pytestmark = pytest.mark.benchmark
-
 except ImportError:
     caterpillar_default = None
 
+pytestmark = pytest.mark.benchmark
 
 NATIVE_ONLY = pytest.mark.skipif(
     not caterpillar.native_support(), reason="native extension unavailable"

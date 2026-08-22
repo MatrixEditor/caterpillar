@@ -13,47 +13,47 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # pyright: reportAny=false, reportExplicitAny=false, reportPrivateUsage=false
-import inspect
 import dataclasses as dc
-
-from io import BytesIO
+import inspect
 from collections.abc import Collection, Iterable
-from typing import Any, Callable, Generic, Literal, ParamSpec, TypeVar
+from io import BytesIO
 from types import TracebackType
+from typing import Any, Callable, Generic, Literal, ParamSpec, TypeVar
+
 from typing_extensions import (
+    Buffer,
     ClassVar,
     Self,
     dataclass_transform,
-    override,
     overload,
-    Buffer,
+    override,
 )
 
-from caterpillar.fields.conditional import apply_conditional_markers
-from caterpillar.shared import getstruct, hasstruct, ATTR_STRUCT, iscond
-from caterpillar.exception import InvalidValueError
-from caterpillar.options import (
-    S_EVAL_ANNOTATIONS,
-    S_UNION,
-    S_ADD_BYTES,
-    S_SLOTS,
-    GLOBAL_STRUCT_OPTIONS,
-    GLOBAL_UNION_OPTIONS,
-)
-from caterpillar.fields import Field, INVALID_DEFAULT
 from caterpillar import registry
 from caterpillar.abc import (
-    _StreamType,
-    _ContextLike,
-    _StructLike,
-    _OptionLike,
-    _EndianLike,
     _ArchLike,
+    _ContextLike,
+    _EndianLike,
     _LengthT,
+    _OptionLike,
+    _StreamType,
+    _StructLike, EndianLike,
 )
-from .provider import unpack, pack, unpack_file, pack_into, sizeof
-from ._base import Sequence
+from caterpillar.exception import InvalidValueError
+from caterpillar.fields import INVALID_DEFAULT, Field
+from caterpillar.fields.conditional import apply_conditional_markers
+from caterpillar.options import (
+    GLOBAL_STRUCT_OPTIONS,
+    GLOBAL_UNION_OPTIONS,
+    S_ADD_BYTES,
+    S_EVAL_ANNOTATIONS,
+    S_SLOTS,
+    S_UNION,
+)
+from caterpillar.shared import ATTR_STRUCT, getstruct, hasstruct, iscond
 
+from ._base import Sequence
+from .provider import pack, pack_into, sizeof, unpack, unpack_file
 
 _ModelT = TypeVar("_ModelT")
 
@@ -109,6 +109,11 @@ class Struct(Sequence[type[_ModelT], _ModelT, _ModelT]):
         )
 
         setattr(self.model, "__class_getitem__", _struct_getitem(self))
+        setattr(
+            self.model,
+            "__set_byteorder__",
+            classmethod(_struct_set_byteorder(self)),
+        )
         if self.is_union:
             # install a hook
             self._union_hook: UnionHook[_ModelT] = (hook_cls or UnionHook)(self)
@@ -271,6 +276,17 @@ def _struct_getitem(
     return class_getitem
 
 
+def _struct_set_byteorder(
+    model: Struct[_ModelT],
+) -> Callable[[type[_ModelT], _EndianLike], Field[_ModelT, _ModelT]]:
+    def set_byteorder(
+        cls: type[_ModelT], order: _EndianLike
+    ) -> Field[_ModelT, _ModelT]:
+        return Field(model, order=order)
+
+    return set_byteorder
+
+
 # TODO: docs
 def Invisible(*, init: bool = False, default: Any = None) -> Any:
     """Create a dataclass field that is hidden from the generated constructor.
@@ -333,8 +349,8 @@ class StructDefMixin:
     """A reference to the struct model of this class"""
 
     def __class_getitem__(
-        cls: type[_ModelT], dim: _LengthT
-    ) -> Field[Collection[_ModelT], Collection[_ModelT]]:
+        cls: type[Self], dim: _LengthT
+    ) -> Field[Collection[Self], Collection[Self]]:
         """Enable ``cls[dim]`` syntax for defining repeated structure fields.
 
         This method allows structure classes to be indexed using the ``[]``
@@ -344,19 +360,23 @@ class StructDefMixin:
         :param dim: The length or dimension of the collection
         :type dim: _LengthT
         :return: A field descriptor representing a collection of the structure
-        :rtype: Field[Collection[_ModelT], Collection[_ModelT]]
+        :rtype: Field[Collection[Self], Collection[Self]]
         """
         return getstruct(cls)[dim]
 
     @classmethod
+    def __set_byteorder__(cls, order: EndianLike) -> Field[Self, Self]:
+        return Field(cls, order=order)
+
+    @classmethod
     def from_bytes(
-        cls: type[_ModelT],
+        cls: type[Self],
         data: Buffer | _StreamType,
         *,
         order: _EndianLike | None = None,
         arch: _ArchLike | None = None,
         **kwargs: Any,
-    ) -> _ModelT:
+    ) -> Self:
         """Construct an instance from raw binary data or a stream.
 
         This is a convenience wrapper around the underlying ``unpack``
@@ -370,19 +390,19 @@ class StructDefMixin:
         :param arch: Architecture override for parsing, defaults to None
         :type arch: _ArchLike | None, optional
         :return: Parsed model instance
-        :rtype: _ModelT
+        :rtype: Self
         """
         return unpack(cls, data, order=order, arch=arch, **kwargs)
 
     @classmethod
     def from_file(
-        cls: type[_ModelT],
+        cls: type[Self],
         filename: str,
         *,
         order: _EndianLike | None = None,
         arch: _ArchLike | None = None,
         **kwargs: Any,
-    ) -> _ModelT:
+    ) -> Self:
         """Construct an instance from a binary file on disk.
 
         This is a convenience wrapper around ``unpack_file`` for reading and
@@ -395,7 +415,7 @@ class StructDefMixin:
         :param arch: Architecture override for parsing, defaults to None
         :type arch: _ArchLike | None, optional
         :return: Parsed model instance
-        :rtype: _ModelT
+        :rtype: Self
         """
         return unpack_file(cls, filename, order=order, arch=arch, **kwargs)
 

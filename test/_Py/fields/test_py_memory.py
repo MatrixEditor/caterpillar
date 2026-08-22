@@ -3,11 +3,11 @@ import pytest
 from caterpillar.py import (
     DynamicSizeError,
     Memory,
+    ValidationError,
     pack,
     root,
     sizeof,
     unpack,
-    ValidationError,
 )
 
 

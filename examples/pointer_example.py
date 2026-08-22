@@ -7,11 +7,12 @@ from caterpillar.py import (
     S_REPLACE_TYPES,
     unpack,
     struct,
-    x86
+    x86,
 )
 from caterpillar.shortcuts import f
 
 set_struct_flags(S_REPLACE_TYPES)
+
 
 @struct(kw_only=False, order=BigEndian)
 class Format:

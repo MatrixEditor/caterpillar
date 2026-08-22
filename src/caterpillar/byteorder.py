@@ -14,25 +14,26 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # pyright: reportPrivateUsage=false
 import inspect
-
-from sys import maxsize
-from platform import machine
+from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum
-from typing import Callable
-from typing_extensions import Final, override
+from platform import machine
+from sys import maxsize
+from typing import Final
+
+from typing_extensions import override
 
 from caterpillar.abc import (
-    _EndianLike,
-    _SupportsSetEndian,
     _OT,
-    _ContextLambda,
-    _ContextLike,
-    _ArchLike,
+    ArchLike,
+    ContextLambda,
+    ContextLike,
+    EndianLike,
+    SupportsSetEndian,
 )
-from caterpillar.shared import ATTR_BYTEORDER
 from caterpillar.context import CTX_ORDER
 from caterpillar.options import Flag
+from caterpillar.shared import ATTR_BYTEORDER
 
 
 @dataclass(frozen=True)
@@ -72,7 +73,7 @@ class ByteOrder:
         """
         setattr(other, ATTR_BYTEORDER, self)
 
-    def __add__(self, other: _SupportsSetEndian[_OT]) -> _OT:
+    def __add__(self, other: SupportsSetEndian[_OT]) -> _OT:
         """
         Adds the byte order information to another object using the
         `__set_byteorder__` method.
@@ -152,23 +153,23 @@ class DynByteOrder:
     def __init__(
         self,
         name: str | None = None,
-        key: str | _ContextLambda[str | _EndianLike | bool] | None = None,
-        func: Callable[[], _EndianLike] | _ContextLambda[_EndianLike] | None = None,
+        key: str | ContextLambda[str | EndianLike | bool] | None = None,
+        func: Callable[[], EndianLike] | ContextLambda[EndianLike] | None = None,
         init_ch: str | None = None,
     ) -> None:
         self.name: str = name or "<Dynamic>"
         self.__ch: str = init_ch or LITTLE_ENDIAN_FMT
-        self.func: Callable[[], _EndianLike] | _ContextLambda[_EndianLike] | None = func
+        self.func: Callable[[], EndianLike] | ContextLambda[EndianLike] | None = func
         self._ctx_func: bool = False
         if func is not None:
             spec = inspect.getfullargspec(func)
             if len(spec.args) == 1:
                 self._ctx_func = True
-        self.key: str | _ContextLambda[str | _EndianLike | bool] | None = key
+        self.key: str | ContextLambda[str | EndianLike | bool] | None = key
         self.__key_str: bool = isinstance(self.key, str)
 
     def __call__(
-        self, key: str | _ContextLambda[str | _EndianLike | bool]
+        self, key: str | ContextLambda[str | EndianLike | bool]
     ) -> "DynByteOrder":
         """Create a derived dynamic byte order bound to a new key.
 
@@ -179,7 +180,7 @@ class DynByteOrder:
         """
         return DynByteOrder(self.name, key, self.func, self.__ch)
 
-    def getch(self, context: _ContextLike) -> str:
+    def getch(self, context: ContextLike) -> str:
         """Resolve the byte order format character from a context.
 
         Resolution order:
@@ -208,7 +209,7 @@ class DynByteOrder:
             if self.__key_str:
                 byte_order = context.__context_getattr__(self.key)  # pyright: ignore[reportArgumentType]
             else:
-                byte_order: str | _EndianLike | bool = self.key(context)  # pyright: ignore[reportCallIssue]
+                byte_order: str | EndianLike | bool = self.key(context)  # pyright: ignore[reportCallIssue]
         else:
             root_context = context._root
             byte_order = (root_context or {}).get(CTX_ORDER, SysNative)
@@ -232,7 +233,7 @@ class DynByteOrder:
         frame = inspect.currentframe()
         if frame is not None and frame.f_back is not None:
             ctx_frame = frame.f_back
-            context: _ContextLike | None = ctx_frame.f_locals.get("context")
+            context: ContextLike | None = ctx_frame.f_locals.get("context")
             if context is not None:
                 self.__ch = self.getch(context)
         return self.__ch
@@ -248,7 +249,7 @@ class DynByteOrder:
         """
         self.__ch = value
 
-    def __add__(self, other: _SupportsSetEndian[_OT]) -> _OT:
+    def __add__(self, other: SupportsSetEndian[_OT]) -> _OT:
         """Apply this byte order to another object.
 
         Delegates to the other object's byte order assignment method.
@@ -263,6 +264,51 @@ class DynByteOrder:
     @override
     def __repr__(self) -> str:
         return f"<DynByteOrder little={self.ch == LITTLE_ENDIAN_FMT}>"
+
+
+class _InheritByteOrder(DynByteOrder):
+    """Byte order that resolves to the byte order of the enclosing struct.
+
+    Unlike :data:`Dynamic`, which always resolves against the *root*
+    context (see :meth:`DynByteOrder.getch`), this endian type resolves
+    against the *immediate* enclosing context. This allows a struct to
+    inherit the byte order of whichever struct embeds it, regardless of
+    nesting depth, instead of always deferring to the top-level order::
+
+        @struct(order=Inherit)
+        class Inner:
+            value: uint32
+
+        @struct(order=BigEndian)
+        class Outer:
+            inner: Inner  # inner.value uses BigEndian
+
+    A struct declared with ``order=Inherit`` that has no enclosing struct
+    (e.g. used standalone, or passed directly to :func:`pack`/
+    :func:`unpack`) falls back to the regular default byte order
+    resolution (``O_DEFAULT_ENDIAN`` or :data:`LittleEndian`), exactly
+    like a struct with ``order=None``.
+
+    .. note::
+        Only structs explicitly declared with ``order=Inherit`` opt into
+        this behavior. The default (``order=None``) is unaffected and
+        keeps resolving to :data:`LittleEndian`/``O_DEFAULT_ENDIAN``
+        regardless of the enclosing struct's byte order.
+    """
+
+    def __init__(self) -> None:
+        super().__init__(name="<Inherit>")
+
+    @override
+    def getch(self, context: ContextLike) -> str:
+        order = context.get(CTX_ORDER)
+        if order is None or order is self:
+            # No byte order was propagated from an enclosing struct (e.g.
+            # standalone/top-level usage).
+            order = O_DEFAULT_ENDIAN.value or LittleEndian
+
+        ch = getattr(order, "ch", order)
+        return ch if isinstance(ch, str) else LITTLE_ENDIAN_FMT
 
 
 LITTLE_ENDIAN_FMT: Final[str] = "<"
@@ -295,11 +341,17 @@ Dynamic: Final[DynByteOrder] = DynByteOrder()
 """Predefined :class:`DynByteOrder` instance for runtime-determined byte order.
 """
 
-O_DEFAULT_ENDIAN: Final[Flag[_EndianLike]] = Flag("option.endian", value=None)
+Inherit: Final[_InheritByteOrder] = _InheritByteOrder()
+""":class:`DynByteOrder` instance that makes a struct inherit its
+byte order from the struct that embeds it (see :class:`_InheritByteOrder`),
+instead of using a fixed byte order.
+"""
+
+O_DEFAULT_ENDIAN: Final[Flag[EndianLike]] = Flag("option.endian", value=None)
 """Default flag option representing an unspecified byte order."""
 
 
-def byteorder(obj: object, default: _EndianLike | None = None) -> _EndianLike:
+def byteorder(obj: object, default: EndianLike | None = None) -> EndianLike:
     """
     Get the byte order of an object, defaulting to SysNative if not explicitly set.
 
@@ -348,4 +400,4 @@ RISC_V: Final[Arch] = Arch("RISK-V", 32)
 AMD: Final[Arch] = Arch("AMD", 32)
 AMD64: Final[Arch] = Arch("AMD64", 64)
 
-O_DEFAULT_ARCH: Final[Flag[_ArchLike]] = Flag("option.arch", system_arch)
+O_DEFAULT_ARCH: Final[Flag[ArchLike]] = Flag("option.arch", system_arch)

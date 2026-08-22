@@ -28,7 +28,7 @@ from caterpillar.shortcuts import (
     LittleEndian,
     ctx,
     pack_file,
-    f
+    f,
 )
 
 try:
@@ -161,9 +161,9 @@ class NIBArchive:
 
     # NOTE: we can reference parsed values using 'this.foo' but methods or properties
     # can't be used.
-    class_names: NIBClassName[
-        this.header.class_name_count
-    ] @ this.header.offset_class_names
+    class_names: (
+        NIBClassName[this.header.class_name_count] @ this.header.offset_class_names
+    )
 
 
 # print(NIBArchive.__struct__.fields)

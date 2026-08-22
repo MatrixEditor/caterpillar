@@ -11,6 +11,7 @@ BMP_MAGIC = b"BMP"
 # reusable types can be defined using the f[...] shortcut
 magic_t = f[bytes, BMP_MAGIC]
 
+
 @struct(order=BigEndian, kw_only=True)
 class Format(struct_factory.mixin):
     magic: magic_t = BMP_MAGIC

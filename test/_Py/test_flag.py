@@ -1,7 +1,7 @@
 from caterpillar.options import (
+    GLOBAL_STRUCT_OPTIONS,
     Flag,
     configure,
-    GLOBAL_STRUCT_OPTIONS,
     get_flag,
     get_flags,
 )

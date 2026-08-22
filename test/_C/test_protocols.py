@@ -1,28 +1,28 @@
 # pyright: reportPrivateUsage=false
 import pytest
+
 import caterpillar
 
 if caterpillar.native_support():
+    from caterpillar.abc import (
+        _ArchLike,
+        _ContextLike,
+        _EndianLike,
+        _OptionLike,
+        _StructLike,
+    )
     from caterpillar.c import (
-        c_Arch,
-        c_Context,
-        c_Endian,
-        c_Option,
         AtOffset,
         Atom,
         BuiltinAtom,
         Conditional,
         Repeated,
-        Switch
+        Switch,
+        c_Arch,
+        c_Context,
+        c_Endian,
+        c_Option,
     )
-    from caterpillar.abc import (
-        _StructLike,
-        _OptionLike,
-        _EndianLike,
-        _ArchLike,
-        _ContextLike,
-    )
-
 
     # === PROTOCOL COMPLIANCE ===
     # All tests below should verify the protocol compliance of all classes
@@ -48,6 +48,6 @@ if caterpillar.native_support():
         ],
     )
     def test_py_protocol(obj: type, proto_ty: type) -> None:
-        assert isinstance(
-            obj, proto_ty
-        ), f"Class {obj.__name__} does not conform to the {proto_ty.__name__} protocol"
+        assert isinstance(obj, proto_ty), (
+            f"Class {obj.__name__} does not conform to the {proto_ty.__name__} protocol"
+        )
