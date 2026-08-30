@@ -13,10 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # pyright: reportPrivateUsage=false, reportAny=false, reportExplicitAny=false
-from caterpillar.byteorder import Inherit
-import re
 import dataclasses as dc
-
+import re
 from collections.abc import Iterable
 from typing import Annotated, Any, Generic, get_args, get_origin
 
@@ -34,30 +32,31 @@ from caterpillar.abc import (
     _StreamType,
     _StructLike,
 )
+from caterpillar.byteorder import Inherit
 from caterpillar.context import (
     CTX_FIELD,
     CTX_OBJECT,
+    CTX_ORDER,
+    CTX_PARENT,
     CTX_PATH,
     CTX_ROOT,
     CTX_SEQ,
     CTX_STREAM,
     O_CONTEXT_FACTORY,
     Context,
-    CTX_PARENT,
-    CTX_ORDER,
 )
-from caterpillar.exception import StructException, ValidationError
-from caterpillar.fields import INVALID_DEFAULT, Const, Field, FieldMixin
+from caterpillar.exception import StructException, ValidationError, DynamicSizeError
+from caterpillar.fields import INVALID_DEFAULT, Const, Field, FieldMixin, AlignTo
+from caterpillar.fields._base import IGNORED_DEFAULT, has_default
 from caterpillar.options import (
+    O_DEFAULT_STRUCT_ENDIAN,
     S_DISCARD_CONST,
     S_DISCARD_UNNAMED,
     S_REPLACE_TYPES,
     S_UNION,
-    O_DEFAULT_STRUCT_ENDIAN,
 )
 from caterpillar.shared import ATTR_ACTION_PACK, ATTR_ACTION_UNPACK, Action
 
-from caterpillar.fields._base import has_default, IGNORED_DEFAULT
 
 class _Member:
     def __init__(
@@ -139,14 +138,15 @@ class Sequence(Generic[_SeqModelT, _SeqIT, _SeqOT], FieldMixin[_SeqIT, _SeqOT]):
     """
 
     __slots__: tuple[str, ...] = (
-        "model",
-        "fields",
-        "order",
-        "arch",
-        "options",
-        "field_options",
         "_members",
+        "align_to",
+        "arch",
+        "field_options",
+        "fields",
         "is_union",
+        "model",
+        "options",
+        "order",
     )
 
     def __init__(
@@ -156,12 +156,18 @@ class Sequence(Generic[_SeqModelT, _SeqIT, _SeqOT], FieldMixin[_SeqIT, _SeqOT]):
         arch: _ArchLike | None = None,
         options: Iterable[_OptionLike] | None = None,
         field_options: Iterable[_OptionLike] | None = None,
+        align_to: int | _ContextLambda[int] | AlignTo | None = None,
     ) -> None:
         self.model: _SeqModelT = model
         self.arch: _ArchLike | None = arch
         self.order: _EndianLike | None = order
         self.options: set[_OptionLike] = set(options or [])
         self.field_options: set[_OptionLike] = set(field_options or [])
+        self.align_to: AlignTo | None = (
+            align_to
+            if align_to is None or isinstance(align_to, AlignTo)
+            else AlignTo(align_to)
+        )
 
         # these fields will be set or used while processing the model type
         self._members: dict[str, Field] = {}
@@ -503,13 +509,20 @@ class Sequence(Generic[_SeqModelT, _SeqIT, _SeqOT], FieldMixin[_SeqIT, _SeqOT]):
             context[CTX_PATH] = f"{base_path}.{member.name}"
             size = field.__size__(context)
             if self.is_union:
-                if size > max_size:
-                    max_size = size
+                max_size = max(max_size, size)
             else:
                 total += size
 
         context[CTX_PATH] = base_path
-        return max_size if self.is_union else total
+        size = max_size if self.is_union else total
+        if self.align_to is not None:
+            if callable(self.align_to.value):
+                raise DynamicSizeError(
+                    "Structs with a dynamic align_to value don't have a fixed size",
+                    context,
+                )
+            size += self.align_to.padding(size, context)
+        return size
 
     def _resolve_order(self, context: _ContextLike) -> _EndianLike | None:
         resolved = None
@@ -557,9 +570,8 @@ class Sequence(Generic[_SeqModelT, _SeqIT, _SeqOT], FieldMixin[_SeqIT, _SeqOT]):
         context[ctx_object] = factory(_parent=context)
         base_path: str = context[ctx_path]
         stream: _StreamType = context[CTX_STREAM]
-        start = pos = max_size = 0
-        if self.is_union:
-            start: int = stream.tell()
+        start: int = stream.tell() if self.is_union or self.align_to is not None else 0
+        pos = max_size = 0
 
         for member in fields:
             if member.is_action:
@@ -589,6 +601,19 @@ class Sequence(Generic[_SeqModelT, _SeqIT, _SeqOT], FieldMixin[_SeqIT, _SeqOT]):
         if self.is_union:
             # Reset the stream position
             stream.seek(start + max_size)
+
+        if self.align_to is not None:
+            consumed = stream.tell() - start
+            pad = self.align_to.padding(consumed, context)
+            if pad:
+                data = stream.read(pad)
+                expected = self.align_to.fill_bytes(pad)
+                if self.align_to.strict and data != expected:
+                    raise ValueError(
+                        f"Expected {pad} bytes of padding (fill={expected!r}), "
+                        + f"got {data!r}"
+                    )
+
         context[ctx_path] = base_path
         return obj  # pyright: ignore[reportReturnType]
 
@@ -611,9 +636,7 @@ class Sequence(Generic[_SeqModelT, _SeqIT, _SeqOT], FieldMixin[_SeqIT, _SeqOT]):
         # See __pack__ for more information
         field = context.get("_field")
         if field and context[CTX_SEQ]:
-            return unpack_seq(
-                context, self.unpack_one
-            )  # pyright: ignore[reportReturnType]
+            return unpack_seq(context, self.unpack_one)  # pyright: ignore[reportReturnType]
         return self.unpack_one(this_context)
 
     def get_value(self, obj: _SeqIT, name: str, field: Field) -> Any | None:
@@ -637,6 +660,8 @@ class Sequence(Generic[_SeqModelT, _SeqIT, _SeqOT], FieldMixin[_SeqIT, _SeqOT]):
         fields = self.fields
         base_path: str = context[CTX_PATH]
         ctx_path = CTX_PATH
+        stream: _StreamType = context[CTX_STREAM]
+        start: int = stream.tell() if self.is_union or self.align_to is not None else 0
 
         for member in fields:
             if member.is_action:
@@ -661,7 +686,7 @@ class Sequence(Generic[_SeqModelT, _SeqIT, _SeqOT], FieldMixin[_SeqIT, _SeqOT]):
                 else:
                     # REVISIT: this line might not be necessary if const fields already
                     # use their internal value.
-                    value = field.default if field.default != INVALID_DEFAULT else None
+                    value = field.default if has_default(field.default) else None
                 field.__pack__(value, context)
 
         if self.is_union:
@@ -675,6 +700,13 @@ class Sequence(Generic[_SeqModelT, _SeqIT, _SeqOT], FieldMixin[_SeqIT, _SeqOT]):
             # REVISIT: are constant values allowed here? + name validation?
             value = self.get_value(obj, name, union_field)
             union_field.__pack__(value, context)
+
+        if self.align_to is not None:
+            written = stream.tell() - start
+            pad = self.align_to.padding(written, context)
+            if pad:
+                stream.write(self.align_to.fill_bytes(pad))
+
         context[ctx_path] = base_path
 
     def __pack__(self, obj: _SeqIT, context: _ContextLike) -> None:

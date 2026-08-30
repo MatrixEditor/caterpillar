@@ -89,6 +89,11 @@ Main Interface
     .. versionchanged:: 2.5.0
         Added the ``alignment`` parameter.
 
+    .. versionchanged:: 2.10.0
+        Added the ``align_to`` parameter for whole-bitfield trailing byte
+        alignment (distinct from the bit-group ``alignment`` parameter
+        above). See :ref:`tutorial-align_to`.
+
 Default Factory Classes
 -----------------------
 

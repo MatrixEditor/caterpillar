@@ -1075,9 +1075,7 @@ class Memory(Generic[_MemoryIT, _MemoryOT], FieldStruct[_MemoryIT, _MemoryOT]):
         if size is Ellipsis:
             return memoryview(stream.read())
 
-        return memoryview(
-            read_exact(context, size, "Memory field")
-        )  # pyright: ignore[reportReturnType]
+        return memoryview(read_exact(context, size, "Memory field"))  # pyright: ignore[reportReturnType]
 
 
 class Bytes(Memory[bytes, bytes]):
@@ -1711,9 +1709,7 @@ class Prefixed(Generic[_PrefixIOT], FieldStruct[_PrefixIOT, _PrefixIOT]):
             self.prefix.pack_single(len(obj), context)
         else:
             try:
-                self.prefix.__pack__(
-                    len(obj), context
-                )  # pyright: ignore[reportArgumentType]
+                self.prefix.__pack__(len(obj), context)  # pyright: ignore[reportArgumentType]
             finally:
                 context[CTX_FIELD] = outer_field
                 context[CTX_SEQ] = outer_seq
@@ -2521,9 +2517,7 @@ class Padded(FieldStruct[_IT, _OT]):
         fill: Buffer | int = 0x00,
         strict: bool = False,
     ) -> None:
-        self.struct: _StructLike[_IT, _OT] = (
-            getstruct(struct) or struct
-        )  # pyright: ignore[reportAttributeAccessIssue]
+        self.struct: _StructLike[_IT, _OT] = getstruct(struct) or struct  # pyright: ignore[reportAttributeAccessIssue]
         self.before: int | ContextLambda[int] = before
         self.after: int | ContextLambda[int] = after
         fill_bytes = _normalize_fill(fill)
@@ -2706,3 +2700,89 @@ def PostPad(
     slash syntax, e.g. ``PostPad(2)(uint8)`` or ``uint8 / PostPad(2)``.
     """
     return _PadSpec("after", length, fill=fill, strict=strict)
+
+
+class AlignTo:
+    """
+    A trailing alignment spec for ``@struct``, ``@union`` and
+    ``@bitfield`` classes (``align_to=`` keyword argument).
+
+    Unlike :class:`Aligned`, which pads a wrapped field relative to the
+    *absolute* stream position, ``AlignTo`` pads the *model itself* so that the
+    number of bytes it consumes (on unpacking) or writes (on packing) is always
+    a multiple of :attr:`value` - regardless of where the model happens to be
+    embedded in a larger stream.
+
+    Example usage:
+
+    >>> @struct(align_to=4)
+    ... class Format:
+    ...     a: uint8
+    ...
+    >>> sizeof(Format)
+    4
+    >>> unpack(Format, b"\\x01\\x00\\x00\\x00")
+    Format(a=1)
+    >>> unpack(Format, b"\\x01\\xff\\xff\\xff")
+    Traceback (most recent call last):
+    ...
+    ValueError: Expected 3 bytes of padding (fill=b'\\x00\\x00\\x00'), got b'\\xff\\xff\\xff'
+
+    Use the class directly to customize the fill pattern or disable verification:
+
+    >>> @struct(align_to=AlignTo(4, fill=0xFF, strict=False))
+    ... class Format:
+    ...     a: uint8
+
+    :param value: The alignment in bytes, which must be a power of 2. Can be a
+                  plain integer or a context lambda for dynamic alignment.
+    :param fill: The fill pattern used for padding. Accepts a single integer
+                 (0-255) or a bytes-like pattern, which is repeated/truncated
+                 to the required padding length. Defaults to zero-padding.
+    :param strict: When `True` (default), unpacking verifies that the parsed
+                   padding bytes actually match `fill` and raises `ValueError`
+                   if they don't. When `False`, padding bytes are consumed
+                   without verification.
+    :raises ValueError: If `value` is not a power of 2, or (when `strict`) if
+                        parsed padding doesn't match `fill`.
+    :raises DynamicSizeError: If a dynamic `value` is used and the size is
+                              requested statically (e.g. via `sizeof`).
+    """
+
+    __slots__: tuple[str, ...] = ("fill", "strict", "value")
+
+    def __init__(
+        self,
+        value: int | ContextLambda[int],
+        fill: Buffer | int = 0x00,
+        strict: bool = True,
+    ) -> None:
+        if not callable(value):
+            _validate_alignment(value)
+        self.value: int | ContextLambda[int] = value
+        self.fill: bytes = _normalize_fill(fill)
+        self.strict: bool = strict
+
+    def resolve(self, context: ContextLike) -> int:
+        """
+        Resolve (and validate) the configured alignment value against `context`.
+        """
+        value = self.value(context) if callable(self.value) else self.value
+        _validate_alignment(value)
+        return value
+
+    def padding(self, size: int, context: ContextLike) -> int:
+        """
+        Compute the number of padding bytes needed for `size` bytes to become
+        a multiple of the resolved alignment.
+        """
+        return _align_padding(size, self.resolve(context))
+
+    def fill_bytes(self, length: int) -> bytes:
+        """
+        Expand (repeat and truncate) the configured fill pattern to `length` bytes.
+        """
+        if length == 0:
+            return b""
+        fill = self.fill
+        return (fill * ((length + len(fill) - 1) // len(fill)))[:length]
