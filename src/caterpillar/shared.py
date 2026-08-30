@@ -42,9 +42,9 @@ In this case, the action will be executed before parsing any subsequent fields
 and won't be stored as part of the struct model.
 """
 
-from typing import TYPE_CHECKING, Any, Generic, overload
+from typing import TYPE_CHECKING, Any, Final, Generic, Literal, overload
 
-from typing_extensions import Buffer, Final, Literal, TypeIs, override
+from typing_extensions import Buffer, TypeIs, override
 
 from caterpillar.abc import (
     _IT,
@@ -61,6 +61,7 @@ from caterpillar.abc import (
 
 if TYPE_CHECKING:
     from caterpillar.fields import FieldStruct
+    from caterpillar.model import Struct
 
 # --- Shared Concepts ---
 # TODO: This section needs some docs
@@ -297,7 +298,7 @@ def getstruct(
     obj: type[_IT],
     /,
     __default: None = None,
-) -> "FieldStruct[_IT, _IT]": ...
+) -> "Struct[_IT]": ...
 @overload
 def getstruct(
     obj: _ContainsStruct[_IT, _OT],
@@ -309,10 +310,10 @@ def getstruct(
     obj: object,
     /,
     __default: _StructLike | None = None,
-) -> "_StructLike | FieldStruct | None": ...
+) -> "_StructLike | Struct[_IT] | None": ...
 def getstruct(
     obj: object, /, __default: _StructLike | None = None
-) -> "_StructLike | FieldStruct | None":
+) -> "_StructLike | Struct[_IT] | None":
     """
     Get the structure attribute of the given object.
 
