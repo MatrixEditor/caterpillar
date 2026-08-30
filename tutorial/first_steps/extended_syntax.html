@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>2.1.2. Extended Syntax &#8212; Caterpillar 2.9.1 documentation</title>
+    <title>2.1.2. Extended Syntax &#8212; Caterpillar 2.10.0 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
 
-    <script src="../../_static/documentation_options.js?v=bc52e0b9"></script>
+    <script src="../../_static/documentation_options.js?v=67920a36"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -55,7 +55,7 @@
     <link rel="prev" title="2.1.1. Defining Structs" href="structdef.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.9.1" />
+  <meta name="docsearch:version" content="2.10.0" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -123,7 +123,7 @@
   
   
   
-    <p class="title logo__title">Caterpillar 2.9.1</p>
+    <p class="title logo__title">Caterpillar 2.10.0</p>
   
 </a></div>
     
@@ -511,6 +511,23 @@ from the type checker’s perspective:</p>
 packing and verified automatically when unpacking, yet it does not appear as a constructor
 parameter and is ignored by type checkers when instantiating the class.</p>
 </section>
+<section id="defaults-via-dataclasses-field">
+<h2><span class="section-number">2.1.2.3. </span>Defaults via <code class="docutils literal notranslate"><span class="pre">dataclasses.field()</span></code><a class="headerlink" href="#defaults-via-dataclasses-field" title="Link to this heading">#</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.10.0.</span></p>
+</div>
+<p>Because every <code class="docutils literal notranslate"><span class="pre">&#64;struct</span></code> and <code class="docutils literal notranslate"><span class="pre">&#64;bitfield</span></code> class is a regular
+<code class="xref py py-func docutils literal notranslate"><span class="pre">dataclasses.dataclass()</span></code> under the hood, you can also assign a raw
+<code class="xref py py-func docutils literal notranslate"><span class="pre">dataclasses.field()</span></code> directly as a class attribute:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dc</span>
+
+<span class="nd">@struct</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
+    <span class="n">count</span> <span class="p">:</span> <span class="n">uint32_t</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">tags</span>  <span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">String</span><span class="p">(</span><span class="mi">10</span><span class="p">)[</span><span class="n">this</span><span class="o">.</span><span class="n">count</span><span class="p">]]</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
 </section>
 
 
@@ -562,6 +579,7 @@ parameter and is ignored by type checkers when instantiating the class.</p>
     <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-role-of-the-field-descriptor">2.1.2.1. The role of the field descriptor</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#invisible-fields">2.1.2.2. Invisible Fields</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#defaults-via-dataclasses-field">2.1.2.3. Defaults via <code class="docutils literal notranslate"><span class="pre">dataclasses.field()</span></code></a></li>
 </ul>
   </nav></div>
 
