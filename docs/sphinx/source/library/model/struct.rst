@@ -29,6 +29,12 @@ Standard Interface
 
 .. autofunction:: caterpillar.model.struct
 
+    .. versionchanged:: 2.10.0
+        Added the ``align_to`` parameter (also accepted by :func:`union`
+        above) for whole-model trailing byte alignment. See
+        :ref:`tutorial-align_to`.
+
+
 .. autofunction:: caterpillar.model.pack
 
 .. autofunction:: caterpillar.model.pack_into
