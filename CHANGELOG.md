@@ -1,5 +1,42 @@
 # Changelog
 
+## [2.10.0] - Inherit, Unnamed, AlignTo and Bug fixes
+
+### Added
+
+- New `Inherit` byte order (`@struct(order=Inherit)`, also supported on
+  `@bitfield`): a struct declared this way resolves its byte order from
+  whichever struct embeds it (any nesting depth, including arrays), instead of
+  a fixed order. Falls back to the regular default when used standalone.
+  Purely opt-in: structs that don't use `Inherit` are unaffected.
+- New `Unnamed` field (`Unnamed[TypeA, TypeB, ...]`), a fixed-size,
+  positionally-typed C-union-style field
+- New `align_to=` keyword on `@struct`, `@union` and `@bitfield`: pads the
+  model's own trailing bytes so its total packed size is always a multiple
+  of the given alignment.
+
+
+### Changes
+
+- All protocols now have public, non-underscored aliases in `caterpillar.abc`
+  and `caterpillar.py`, including `ContextLike`, `ContextLambda`, `StructLike`,
+  and `EndianLike`. The underscored names remain available as compatibility
+  aliases.
+- A class attribute may now be a raw `dataclasses.field(...)` instance (e.g.
+  for a mutable `default_factory`). Its `default`/`default_factory` is
+  resolved exclusively by Python's own dataclass machinery and is never
+  inspected or reused by `@struct`/`@bitfield` packing or unpacking
+  fallbacks. `Invisible()` is implemented the same way internally and is
+  fixed by this as well (its default was previously not always honored
+  correctly by those same fallbacks).
+
+### Fixes
+
+- Nested `Inherit` and `Dynamic` byte-order resolution through prefixed
+  fields, pointers, switches, lazy `Unnamed` overlays, arrays, and bitfields.
+  Chained paths such as `parent.parent.value` now correctly resolve ancestor
+  context values for dynamic byte-order callbacks.
+
 ## [2.9.1] - Typing fixes
 
 - `Prefixed` now supports struct types directly

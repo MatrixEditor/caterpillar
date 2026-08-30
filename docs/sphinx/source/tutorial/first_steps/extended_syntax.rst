@@ -59,3 +59,21 @@ from the type checker's perspective:
 This field is always present in the binary representation. It is written automatically when
 packing and verified automatically when unpacking, yet it does not appear as a constructor
 parameter and is ignored by type checkers when instantiating the class.
+
+Defaults via ``dataclasses.field()``
+-------------------------------------
+
+.. versionadded:: 2.10.0
+
+Because every ``@struct`` and ``@bitfield`` class is a regular
+:func:`dataclasses.dataclass` under the hood, you can also assign a raw
+:func:`dataclasses.field` directly as a class attribute:
+
+.. code-block:: python
+
+    import dataclasses as dc
+
+    @struct
+    class Format:
+        count : uint32_t = 0
+        tags  : f[list[str], String(10)[this.count]] = dc.field(default_factory=list)
