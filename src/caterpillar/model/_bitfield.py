@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # pyright: reportPrivateUsage=false
+from caterpillar.fields._base import has_default
 import dataclasses
 import enum
 from collections.abc import Iterable
@@ -34,8 +35,14 @@ from caterpillar.abc import (
     _EndianLike,
     _OptionLike,
     _StructLike,
+    ContextLambda,
 )
-from caterpillar.byteorder import LITTLE_ENDIAN_FMT, O_DEFAULT_ENDIAN, LittleEndian, Inherit
+from caterpillar.byteorder import (
+    LITTLE_ENDIAN_FMT,
+    O_DEFAULT_ENDIAN,
+    LittleEndian,
+    Inherit,
+)
 from caterpillar.context import (
     CTX_FIELD,
     CTX_OBJECT,
@@ -44,8 +51,8 @@ from caterpillar.context import (
     O_CONTEXT_FACTORY,
     Context,
 )
-from caterpillar.exception import StructException, ValidationError
-from caterpillar.fields import INVALID_DEFAULT, Field, Pass
+from caterpillar.exception import StructException, ValidationError, DynamicSizeError
+from caterpillar.fields import INVALID_DEFAULT, Field, Pass, AlignTo
 from caterpillar.fields.common import Int
 from caterpillar.options import (
     B_GROUP_END,
@@ -395,13 +402,13 @@ class BitfieldEntry:
     """
 
     __slots__: tuple[str, ...] = (
-        "bit",
-        "width",
-        "name",
-        "factory",
         "action",
+        "bit",
+        "factory",
         "low_mask",
+        "name",
         "signed",
+        "width",
     )
 
     def __init__(
@@ -610,8 +617,8 @@ class Bitfield(Struct[_VT]):
     """
 
     __slots__: tuple[str, ...] = (
-        "groups",
         "alignment",
+        "groups",
     )
 
     def __init__(
@@ -622,6 +629,7 @@ class Bitfield(Struct[_VT]):
         options: Iterable[_OptionLike] | None = None,
         field_options: Iterable[_OptionLike] | None = None,
         alignment: int | None = None,
+        align_to: int | ContextLambda[int] | AlignTo | None = None,
     ) -> None:
         self.alignment: int = alignment or DEFAULT_ALIGNMENT
         # These fields remain private and will be deleted after processing
@@ -636,6 +644,7 @@ class Bitfield(Struct[_VT]):
             arch=arch,
             options=options,
             field_options=field_options,
+            align_to=align_to,
         )
         # Add additional options based on the struct's type
         self.options.difference_update(GLOBAL_STRUCT_OPTIONS, GLOBAL_UNION_OPTIONS)
@@ -879,9 +888,7 @@ class Bitfield(Struct[_VT]):
         return False
 
     @override
-    def _process_field(
-        self, name: str, annotation: _AnnotationT, default: Any
-    ) -> Field:
+    def _process_field(self, name: str, annotation: Any, default: Any) -> Field:
         arch: _ArchLike | None = self.arch
         order: _EndianLike | None = (
             self.order
@@ -1001,7 +1008,15 @@ class Bitfield(Struct[_VT]):
         :rtype: int
         """
         # size is different as our model includes correct padding
-        return sum(group.get_size(context) for group in self.groups)
+        size = sum(group.get_size(context) for group in self.groups)
+        if self.align_to is not None:
+            if callable(self.align_to.value):
+                raise DynamicSizeError(
+                    "Bitfields with a dynamic align_to value don't have a fixed size",
+                    context,
+                )
+            size += self.align_to.padding(size, context)
+        return size
 
     def __bits__(self) -> int:
         """
@@ -1025,6 +1040,9 @@ class Bitfield(Struct[_VT]):
         field: Field | None = context.get(CTX_FIELD)
         base_path: str = context[CTX_PATH]
         members = self._members
+        stream = context[CTX_STREAM]
+        start = stream.tell() if self.align_to is not None else 0
+
         # REVISIT
         order: _EndianLike = (
             field.order
@@ -1044,7 +1062,7 @@ class Bitfield(Struct[_VT]):
                     init_data[name] = value
 
             else:
-                raw_data = context[CTX_STREAM].read(group.get_size())
+                raw_data = stream.read(group.bit_count // 8)
                 if not raw_data:
                     # set context path to next entry for debugging
                     context[CTX_PATH] = f"{base_path}.{group.entries[0].name}"
@@ -1056,7 +1074,7 @@ class Bitfield(Struct[_VT]):
                 for entry in group.entries:
                     # each entry may be an action
                     context[CTX_PATH] = f"{base_path}.{entry.name}"
-                    if entry.is_action():
+                    if entry.action is not None:
                         func = getattr(entry.action, ATTR_ACTION_UNPACK, None)
                         if func:
                             func(context)
@@ -1065,13 +1083,27 @@ class Bitfield(Struct[_VT]):
                     if entry.name not in members:
                         continue
 
-                    value = (raw_value >> entry.shift(group.bit_count)) & entry.low_mask
+                    shift = max(group.bit_count - entry.bit - entry.width, 0)
+                    value = (raw_value >> shift) & entry.low_mask
+                    # value = (raw_value >> entry.shift(group.bit_count)) & entry.low_mask
                     if entry.factory:
                         value = entry.factory.from_int(value)
                     if entry.signed and value >= 1 << (entry.width - 1):
                         value -= 1 << entry.width
                     init_data[entry.name] = value
                     context[CTX_OBJECT][entry.name] = value
+
+        if self.align_to is not None:
+            consumed = stream.tell() - start
+            pad = self.align_to.padding(consumed, context)
+            if pad:
+                data = stream.read(pad)
+                expected = self.align_to.fill_bytes(pad)
+                if self.align_to.strict and data != expected:
+                    raise ValueError(
+                        f"Expected {pad} bytes of padding (fill={expected!r}), "
+                        + f"got {data!r}"
+                    )
 
         return self.model(**init_data)  # pyright: ignore[reportCallIssue]
 
@@ -1085,6 +1117,8 @@ class Bitfield(Struct[_VT]):
         base_path = context[CTX_PATH]
         field: Field | None = context.get(CTX_FIELD)
         members = self._members
+        stream = context[CTX_STREAM]
+        start = stream.tell() if self.align_to is not None else 0
         # REVISIT
         order: _EndianLike = (
             field.order
@@ -1100,7 +1134,7 @@ class Bitfield(Struct[_VT]):
                 if name in members:
                     value = self.get_value(obj, name, field)
                 else:
-                    value = field.default if field.default != INVALID_DEFAULT else None
+                    value = field.default if has_default(field.default) else None
 
                 field.__pack__(value, context)
             else:
@@ -1135,10 +1169,15 @@ class Bitfield(Struct[_VT]):
                             context,
                         )
 
-                    value |= (entry_value & entry.low_mask) << entry.shift(
-                        group.bit_count
-                    )
-                context[CTX_STREAM].write(value.to_bytes(group.bit_count // 8, endian))
+                    shift = max(group.bit_count - entry.bit - entry.width, 0)
+                    value |= (entry_value & entry.low_mask) << shift
+                stream.write(value.to_bytes(group.bit_count // 8, endian))
+
+        if self.align_to is not None:
+            written = stream.tell() - start
+            pad = self.align_to.padding(written, context)
+            if pad:
+                stream.write(self.align_to.fill_bytes(pad))
 
     @override
     def add_action(self, action: _ActionLike) -> None:
@@ -1198,6 +1237,7 @@ class bitfield_factory:
         options: Iterable[_OptionLike] | None = None,
         field_options: Iterable[_OptionLike] | None = None,
         alignment: int | None = None,
+        align_to: int | ContextLambda[int] | AlignTo | None = None,
     ) -> type:
         """Create a ``Bitfield`` model from a class definition.
 
@@ -1219,6 +1259,10 @@ class bitfield_factory:
         :type field_options: Iterable[_OptionLike] | None, optional
         :param alignment: Optional bit alignment constraint, defaults to None
         :type alignment: int | None, optional
+        :param align_to: Optional trailing byte alignment applied to the
+            whole bitfield after all groups have been processed, defaults
+            to None
+        :type align_to: int | ContextLambda[int] | AlignTo | None, optional
         :return: The generated Bitfield model class
         :rtype: type
         """
@@ -1229,6 +1273,7 @@ class bitfield_factory:
             options=options,
             field_options=field_options,
             alignment=alignment,
+            align_to=align_to,
         )
         return b.model
 
@@ -1246,6 +1291,7 @@ class bitfield_factory:
         options: Iterable[_OptionLike] | None = None,
         field_options: Iterable[_OptionLike] | None = None,
         alignment: int | None = None,
+        align_to: int | ContextLambda[int] | AlignTo | None = None,
     ) -> type[_VT]: ...
     @overload
     @dataclass_transform(
@@ -1261,6 +1307,7 @@ class bitfield_factory:
         options: Iterable[_OptionLike] | None = None,
         field_options: Iterable[_OptionLike] | None = None,
         alignment: int | None = None,
+        align_to: int | ContextLambda[int] | AlignTo | None = None,
     ) -> Callable[[type[_VT]], type[_VT]]: ...
     @dataclass_transform(
         kw_only_default=True, field_specifiers=(dataclasses.field, Invisible)
@@ -1275,6 +1322,7 @@ class bitfield_factory:
         options: Iterable[_OptionLike] | None = None,
         field_options: Iterable[_OptionLike] | None = None,
         alignment: int | None = None,
+        align_to: int | ContextLambda[int] | AlignTo | None = None,
     ) -> type[_VT] | Callable[[type[_VT]], type[_VT]]:
         """Decorator or direct transformer for creating a ``Bitfield`` model.
 
@@ -1316,6 +1364,9 @@ class bitfield_factory:
         :type field_options: Iterable[_OptionLike] | None, optional
         :param alignment: Optional bit alignment constraint, defaults to None
         :type alignment: int | None, optional
+        :param align_to: Optional trailing byte alignment applied to the
+            whole bitfield after all groups have been processed
+        :type align_to: int | ContextLambda[int] | AlignTo | None, optional
         :return: The decorated Bitfield model class or a decorator function
         :rtype: type[_VT] | Callable[[type[_VT]], type[_VT]]
         """
@@ -1328,6 +1379,7 @@ class bitfield_factory:
                 arch=arch,
                 field_options=field_options,
                 alignment=alignment,
+                align_to=align_to,
             )
 
         if ty is not None:
@@ -1338,6 +1390,7 @@ class bitfield_factory:
                 arch=arch,
                 field_options=field_options,
                 alignment=alignment,
+                align_to=align_to,
             )
 
         return wrap

@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # pyright: reportAny=false, reportExplicitAny=false, reportPrivateUsage=false
+from caterpillar.fields._base import has_default
 import dataclasses as dc
 import inspect
 from collections.abc import Collection, Iterable
@@ -37,10 +38,12 @@ from caterpillar.abc import (
     _LengthT,
     _OptionLike,
     _StreamType,
-    _StructLike, EndianLike,
+    _StructLike,
+    EndianLike,
+    ContextLambda,
 )
 from caterpillar.exception import InvalidValueError
-from caterpillar.fields import INVALID_DEFAULT, Field
+from caterpillar.fields import INVALID_DEFAULT, Field, AlignTo
 from caterpillar.fields.conditional import apply_conditional_markers
 from caterpillar.options import (
     GLOBAL_STRUCT_OPTIONS,
@@ -85,6 +88,7 @@ class Struct(Sequence[type[_ModelT], _ModelT, _ModelT]):
         field_options: Iterable[_OptionLike] | None = None,
         kw_only: bool = False,
         hook_cls: type["UnionHook[_ModelT]"] | None = None,
+        align_to: int | ContextLambda[int] | AlignTo | None = None,
     ) -> None:
         self.kw_only: bool = kw_only
         # Cache of init=False field names (e.g. via Invisible); computed lazily
@@ -100,6 +104,7 @@ class Struct(Sequence[type[_ModelT], _ModelT, _ModelT]):
             arch=arch,
             options=options,
             field_options=field_options,
+            align_to=align_to,
         )
         setattr(self.model, ATTR_STRUCT, self)
         # Add additional options based on the struct's type
@@ -219,7 +224,7 @@ class Struct(Sequence[type[_ModelT], _ModelT, _ModelT]):
     def get_value(self, obj: _ModelT, name: str, field: Field) -> Any | None:
         value = getattr(obj, name, INVALID_DEFAULT)
         if value is INVALID_DEFAULT:
-            if field is not None and field.default is not INVALID_DEFAULT:
+            if field is not None and has_default(field.default):
                 return field.default
             if field is not None and field._has_cond:
                 return None
@@ -516,6 +521,7 @@ class struct_factory:
         order: _EndianLike | None = None,
         arch: _ArchLike | None = None,
         field_options: Iterable[_OptionLike] | None = None,
+        align_to: int | ContextLambda[int] | AlignTo | None = None,
     ) -> type[_ModelT]: ...
     @overload
     @dataclass_transform(kw_only_default=True, field_specifiers=(dc.field, Invisible))
@@ -527,6 +533,7 @@ class struct_factory:
         order: _EndianLike | None = None,
         arch: _ArchLike | None = None,
         field_options: Iterable[_OptionLike] | None = None,
+        align_to: int | ContextLambda[int] | AlignTo | None = None,
     ) -> type[_ModelT]: ...
     @overload
     @dataclass_transform(field_specifiers=(dc.field, Invisible))
@@ -538,6 +545,7 @@ class struct_factory:
         order: _EndianLike | None = None,
         arch: _ArchLike | None = None,
         field_options: Iterable[_OptionLike] | None = None,
+        align_to: int | ContextLambda[int] | AlignTo | None = None,
     ) -> Callable[[_ModelT], type[_ModelT]]: ...
     @overload
     @dataclass_transform(kw_only_default=True, field_specifiers=(dc.field, Invisible))
@@ -549,6 +557,7 @@ class struct_factory:
         order: _EndianLike | None = None,
         arch: _ArchLike | None = None,
         field_options: Iterable[_OptionLike] | None = None,
+        align_to: int | ContextLambda[int] | AlignTo | None = None,
     ) -> Callable[[_ModelT], type[_ModelT]]: ...
     @dataclass_transform(field_specifiers=(dc.field, Invisible))
     @staticmethod
@@ -559,6 +568,7 @@ class struct_factory:
         order: _EndianLike | None = None,
         arch: _ArchLike | None = None,
         field_options: Iterable[_OptionLike] | None = None,
+        align_to: int | ContextLambda[int] | AlignTo | None = None,
     ) -> type[_ModelT] | Callable[[_ModelT], type[_ModelT]]:
         """Decorator or direct constructor for creating a ``Struct`` model.
 
@@ -593,6 +603,9 @@ class struct_factory:
         :param field_options: Additional options applied at the field level,
             defaults to None
         :type field_options: Iterable[_OptionLike] | None, optional
+        :param align_to: Optional trailing alignment applied to the whole
+            struct after all fields have been processed.
+        :type align_to: int | ContextLambda[int] | AlignTo | None, optional
         :return: A transformed Struct model class, or a decorator if ``ty`` is None
         :rtype: type[_ModelT] | Callable[[_ModelT], type[_ModelT]]
         """
@@ -605,6 +618,7 @@ class struct_factory:
                 options=options,
                 field_options=field_options,
                 kw_only=kw_only,
+                align_to=align_to,
             )
 
         if ty is not None:
@@ -615,6 +629,7 @@ class struct_factory:
                 options=options,
                 field_options=field_options,
                 kw_only=kw_only,
+                align_to=align_to,
             )
 
         return wrap  # pyright: ignore[reportReturnType]
@@ -629,6 +644,7 @@ class struct_factory:
         field_options: Iterable[_OptionLike] | None = None,
         kw_only: bool = False,
         hook_cls: type["UnionHook[_ModelT]"] | None = None,
+        align_to: int | ContextLambda[int] | AlignTo | None = None,
     ) -> type[_ModelT]:
         """Internal helper that performs the actual Struct model creation.
 
@@ -654,6 +670,9 @@ class struct_factory:
         :type kw_only: bool, optional
         :param hook_cls: Optional hook class for union handling, defaults to None
         :type hook_cls: type["UnionHook[_ModelT]"] | None, optional
+        :param align_to: Optional trailing alignment applied to the whole
+            struct after all fields have been processed, defaults to None
+        :type align_to: int | ContextLambda[int] | AlignTo | None, optional
         :return: The generated Struct model class
         :rtype: type[_ModelT]
         """
@@ -665,6 +684,7 @@ class struct_factory:
             field_options=field_options,
             kw_only=kw_only,
             hook_cls=hook_cls,
+            align_to=align_to,
         )
         return s.model
 
@@ -776,6 +796,7 @@ def union(
     field_options: Iterable[_OptionLike] | None = None,
     kw_only: bool = False,
     hook_cls: type[UnionHook[_ModelT]] | None = None,
+    align_to: int | ContextLambda[int] | AlignTo | None = None,
 ) -> Callable[[type[_ModelT]], type[_ModelT]]: ...
 @overload
 @dataclass_transform(field_specifiers=(dc.field, Invisible))
@@ -789,6 +810,7 @@ def union(
     field_options: Iterable[_OptionLike] | None = None,
     kw_only: bool = False,
     hook_cls: type[UnionHook[_ModelT]] | None = None,
+    align_to: int | ContextLambda[int] | AlignTo | None = None,
 ) -> type[_ModelT]: ...
 @dataclass_transform(field_specifiers=(dc.field, Invisible))
 def union(
@@ -801,6 +823,7 @@ def union(
     field_options: Iterable[_OptionLike] | None = None,
     kw_only: bool = False,
     hook_cls: type[UnionHook[_ModelT]] | None = None,
+    align_to: int | ContextLambda[int] | AlignTo | None = None,
 ) -> type[_ModelT] | Callable[[type[_ModelT]], type[_ModelT]]:
     """
     Decorator to create a Union class.
@@ -809,6 +832,8 @@ def union(
     :param options: Additional options specifying what to include in the final class.
     :param order: Optional configuration value for the byte order of a field.
     :param arch: Global architecture definition (will be inferred on all fields).
+    :param align_to: Optional trailing alignment applied to the whole union
+        after its (largest) member has been processed
 
     :return: The created Union class or a wrapper function if cls is not provided.
     """
@@ -823,6 +848,7 @@ def union(
             field_options=field_options,
             kw_only=kw_only,
             hook_cls=hook_cls,
+            align_to=align_to,
         )
 
     if cls is not None:
@@ -834,6 +860,7 @@ def union(
             field_options=field_options,
             kw_only=kw_only,
             hook_cls=hook_cls,
+            align_to=align_to,
         )
 
     return wrap
