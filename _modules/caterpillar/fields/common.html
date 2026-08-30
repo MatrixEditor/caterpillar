@@ -26,8 +26,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -35,10 +35,10 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css?v=c1cc8b61" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/fontawesome.js?digest=cb8930eaaf36d9849b67"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
 
     <script src="../../../_static/documentation_options.js?v=bc52e0b9"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
@@ -1530,9 +1530,7 @@
         <span class="k">if</span> <span class="n">size</span> <span class="ow">is</span> <span class="bp">Ellipsis</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">memoryview</span><span class="p">(</span><span class="n">stream</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
 
-        <span class="k">return</span> <span class="nb">memoryview</span><span class="p">(</span>
-            <span class="n">read_exact</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="s2">"Memory field"</span><span class="p">)</span>
-        <span class="p">)</span>  <span class="c1"># pyright: ignore[reportReturnType]</span></div>
+        <span class="k">return</span> <span class="nb">memoryview</span><span class="p">(</span><span class="n">read_exact</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="s2">"Memory field"</span><span class="p">))</span>  <span class="c1"># pyright: ignore[reportReturnType]</span></div>
 </div>
 
 
@@ -2214,9 +2212,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">prefix</span><span class="o">.</span><span class="n">pack_single</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="p">),</span> <span class="n">context</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">prefix</span><span class="o">.</span><span class="n">__pack__</span><span class="p">(</span>
-                    <span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="p">),</span> <span class="n">context</span>
-                <span class="p">)</span>  <span class="c1"># pyright: ignore[reportArgumentType]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">prefix</span><span class="o">.</span><span class="n">__pack__</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="p">),</span> <span class="n">context</span><span class="p">)</span>  <span class="c1"># pyright: ignore[reportArgumentType]</span>
             <span class="k">finally</span><span class="p">:</span>
                 <span class="n">context</span><span class="p">[</span><span class="n">CTX_FIELD</span><span class="p">]</span> <span class="o">=</span> <span class="n">outer_field</span>
                 <span class="n">context</span><span class="p">[</span><span class="n">CTX_SEQ</span><span class="p">]</span> <span class="o">=</span> <span class="n">outer_seq</span>
@@ -3085,9 +3081,7 @@
         <span class="n">fill</span><span class="p">:</span> <span class="n">Buffer</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">=</span> <span class="mh">0x00</span><span class="p">,</span>
         <span class="n">strict</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">struct</span><span class="p">:</span> <span class="n">_StructLike</span><span class="p">[</span><span class="n">_IT</span><span class="p">,</span> <span class="n">_OT</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">getstruct</span><span class="p">(</span><span class="n">struct</span><span class="p">)</span> <span class="ow">or</span> <span class="n">struct</span>
-        <span class="p">)</span>  <span class="c1"># pyright: ignore[reportAttributeAccessIssue]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">struct</span><span class="p">:</span> <span class="n">_StructLike</span><span class="p">[</span><span class="n">_IT</span><span class="p">,</span> <span class="n">_OT</span><span class="p">]</span> <span class="o">=</span> <span class="n">getstruct</span><span class="p">(</span><span class="n">struct</span><span class="p">)</span> <span class="ow">or</span> <span class="n">struct</span>  <span class="c1"># pyright: ignore[reportAttributeAccessIssue]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">before</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">ContextLambda</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">before</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">after</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">ContextLambda</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">after</span>
         <span class="n">fill_bytes</span> <span class="o">=</span> <span class="n">_normalize_fill</span><span class="p">(</span><span class="n">fill</span><span class="p">)</span>
@@ -3283,6 +3277,104 @@
 <span class="sd">    """</span>
     <span class="k">return</span> <span class="n">_PadSpec</span><span class="p">(</span><span class="s2">"after"</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="n">fill</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="n">strict</span><span class="p">)</span></div>
 
+
+
+<div class="viewcode-block" id="AlignTo">
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.AlignTo">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AlignTo</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    A trailing alignment spec for ``@struct``, ``@union`` and</span>
+<span class="sd">    ``@bitfield`` classes (``align_to=`` keyword argument).</span>
+
+<span class="sd">    Unlike :class:`Aligned`, which pads a wrapped field relative to the</span>
+<span class="sd">    *absolute* stream position, ``AlignTo`` pads the *model itself* so that the</span>
+<span class="sd">    number of bytes it consumes (on unpacking) or writes (on packing) is always</span>
+<span class="sd">    a multiple of :attr:`value` - regardless of where the model happens to be</span>
+<span class="sd">    embedded in a larger stream.</span>
+
+<span class="sd">    Example usage:</span>
+
+<span class="sd">    &gt;&gt;&gt; @struct(align_to=4)</span>
+<span class="sd">    ... class Format:</span>
+<span class="sd">    ...     a: uint8</span>
+<span class="sd">    ...</span>
+<span class="sd">    &gt;&gt;&gt; sizeof(Format)</span>
+<span class="sd">    4</span>
+<span class="sd">    &gt;&gt;&gt; unpack(Format, b"\\x01\\x00\\x00\\x00")</span>
+<span class="sd">    Format(a=1)</span>
+<span class="sd">    &gt;&gt;&gt; unpack(Format, b"\\x01\\xff\\xff\\xff")</span>
+<span class="sd">    Traceback (most recent call last):</span>
+<span class="sd">    ...</span>
+<span class="sd">    ValueError: Expected 3 bytes of padding (fill=b'\\x00\\x00\\x00'), got b'\\xff\\xff\\xff'</span>
+
+<span class="sd">    Use the class directly to customize the fill pattern or disable verification:</span>
+
+<span class="sd">    &gt;&gt;&gt; @struct(align_to=AlignTo(4, fill=0xFF, strict=False))</span>
+<span class="sd">    ... class Format:</span>
+<span class="sd">    ...     a: uint8</span>
+
+<span class="sd">    :param value: The alignment in bytes, which must be a power of 2. Can be a</span>
+<span class="sd">                  plain integer or a context lambda for dynamic alignment.</span>
+<span class="sd">    :param fill: The fill pattern used for padding. Accepts a single integer</span>
+<span class="sd">                 (0-255) or a bytes-like pattern, which is repeated/truncated</span>
+<span class="sd">                 to the required padding length. Defaults to zero-padding.</span>
+<span class="sd">    :param strict: When `True` (default), unpacking verifies that the parsed</span>
+<span class="sd">                   padding bytes actually match `fill` and raises `ValueError`</span>
+<span class="sd">                   if they don't. When `False`, padding bytes are consumed</span>
+<span class="sd">                   without verification.</span>
+<span class="sd">    :raises ValueError: If `value` is not a power of 2, or (when `strict`) if</span>
+<span class="sd">                        parsed padding doesn't match `fill`.</span>
+<span class="sd">    :raises DynamicSizeError: If a dynamic `value` is used and the size is</span>
+<span class="sd">                              requested statically (e.g. via `sizeof`).</span>
+<span class="sd">    """</span>
+
+    <span class="vm">__slots__</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"fill"</span><span class="p">,</span> <span class="s2">"strict"</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">value</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">ContextLambda</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+        <span class="n">fill</span><span class="p">:</span> <span class="n">Buffer</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">=</span> <span class="mh">0x00</span><span class="p">,</span>
+        <span class="n">strict</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">callable</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+            <span class="n">_validate_alignment</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">ContextLambda</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fill</span><span class="p">:</span> <span class="nb">bytes</span> <span class="o">=</span> <span class="n">_normalize_fill</span><span class="p">(</span><span class="n">fill</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">strict</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">strict</span>
+
+<div class="viewcode-block" id="AlignTo.resolve">
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.AlignTo.resolve">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Resolve (and validate) the configured alignment value against `context`.</span>
+<span class="sd">        """</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">context</span><span class="p">)</span> <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">_validate_alignment</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">value</span></div>
+
+
+<div class="viewcode-block" id="AlignTo.padding">
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.AlignTo.padding">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">padding</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">ContextLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Compute the number of padding bytes needed for `size` bytes to become</span>
+<span class="sd">        a multiple of the resolved alignment.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="n">_align_padding</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">context</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="AlignTo.fill_bytes">
+<a class="viewcode-back" href="../../../library/fields/common.html#caterpillar.fields.AlignTo.fill_bytes">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fill_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Expand (repeat and truncate) the configured fill pattern to `length` bytes.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="n">length</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">b</span><span class="s2">""</span>
+        <span class="n">fill</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">fill</span> <span class="o">*</span> <span class="p">((</span><span class="n">length</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">fill</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="nb">len</span><span class="p">(</span><span class="n">fill</span><span class="p">)))[:</span><span class="n">length</span><span class="p">]</span></div>
+</div>
+
 </pre></div>
 
                 </article>
@@ -3312,8 +3404,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -3347,7 +3439,7 @@
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.21.0.
 </p></div>
       
     </div>

@@ -26,8 +26,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -35,10 +35,10 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css?v=c1cc8b61" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/fontawesome.js?digest=cb8930eaaf36d9849b67"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
 
     <script src="../../../_static/documentation_options.js?v=bc52e0b9"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
@@ -410,6 +410,7 @@
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
 <span class="c1"># pyright: reportAny=false, reportExplicitAny=false, reportPrivateUsage=false</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.fields._base</span><span class="w"> </span><span class="kn">import</span> <span class="n">has_default</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dc</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Collection</span><span class="p">,</span> <span class="n">Iterable</span>
@@ -434,10 +435,12 @@
     <span class="n">_LengthT</span><span class="p">,</span>
     <span class="n">_OptionLike</span><span class="p">,</span>
     <span class="n">_StreamType</span><span class="p">,</span>
-    <span class="n">_StructLike</span><span class="p">,</span> <span class="n">EndianLike</span><span class="p">,</span>
+    <span class="n">_StructLike</span><span class="p">,</span>
+    <span class="n">EndianLike</span><span class="p">,</span>
+    <span class="n">ContextLambda</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.exception</span><span class="w"> </span><span class="kn">import</span> <span class="n">InvalidValueError</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.fields</span><span class="w"> </span><span class="kn">import</span> <span class="n">INVALID_DEFAULT</span><span class="p">,</span> <span class="n">Field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.fields</span><span class="w"> </span><span class="kn">import</span> <span class="n">INVALID_DEFAULT</span><span class="p">,</span> <span class="n">Field</span><span class="p">,</span> <span class="n">AlignTo</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.fields.conditional</span><span class="w"> </span><span class="kn">import</span> <span class="n">apply_conditional_markers</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">caterpillar.options</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">GLOBAL_STRUCT_OPTIONS</span><span class="p">,</span>
@@ -484,6 +487,7 @@
         <span class="n">field_options</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">_OptionLike</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">kw_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">hook_cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="s2">"UnionHook[_ModelT]"</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">align_to</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">ContextLambda</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="n">AlignTo</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">kw_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">kw_only</span>
         <span class="c1"># Cache of init=False field names (e.g. via Invisible); computed lazily</span>
@@ -499,6 +503,7 @@
             <span class="n">arch</span><span class="o">=</span><span class="n">arch</span><span class="p">,</span>
             <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span>
             <span class="n">field_options</span><span class="o">=</span><span class="n">field_options</span><span class="p">,</span>
+            <span class="n">align_to</span><span class="o">=</span><span class="n">align_to</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">ATTR_STRUCT</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
         <span class="c1"># Add additional options based on the struct's type</span>
@@ -618,7 +623,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">get_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">_ModelT</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">field</span><span class="p">:</span> <span class="n">Field</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">INVALID_DEFAULT</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="n">INVALID_DEFAULT</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">field</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">field</span><span class="o">.</span><span class="n">default</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">INVALID_DEFAULT</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">field</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">has_default</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">default</span><span class="p">):</span>
                 <span class="k">return</span> <span class="n">field</span><span class="o">.</span><span class="n">default</span>
             <span class="k">if</span> <span class="n">field</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">field</span><span class="o">.</span><span class="n">_has_cond</span><span class="p">:</span>
                 <span class="k">return</span> <span class="kc">None</span>
@@ -933,6 +938,7 @@
         <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">field_options</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">_OptionLike</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">align_to</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">ContextLambda</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="n">AlignTo</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">_ModelT</span><span class="p">]:</span> <span class="o">...</span>
     <span class="nd">@overload</span>
     <span class="nd">@dataclass_transform</span><span class="p">(</span><span class="n">kw_only_default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">field_specifiers</span><span class="o">=</span><span class="p">(</span><span class="n">dc</span><span class="o">.</span><span class="n">field</span><span class="p">,</span> <span class="n">Invisible</span><span class="p">))</span>
@@ -944,6 +950,7 @@
         <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">field_options</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">_OptionLike</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">align_to</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">ContextLambda</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="n">AlignTo</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">_ModelT</span><span class="p">]:</span> <span class="o">...</span>
     <span class="nd">@overload</span>
     <span class="nd">@dataclass_transform</span><span class="p">(</span><span class="n">field_specifiers</span><span class="o">=</span><span class="p">(</span><span class="n">dc</span><span class="o">.</span><span class="n">field</span><span class="p">,</span> <span class="n">Invisible</span><span class="p">))</span>
@@ -955,6 +962,7 @@
         <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">field_options</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">_OptionLike</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">align_to</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">ContextLambda</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="n">AlignTo</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">_ModelT</span><span class="p">],</span> <span class="nb">type</span><span class="p">[</span><span class="n">_ModelT</span><span class="p">]]:</span> <span class="o">...</span>
     <span class="nd">@overload</span>
     <span class="nd">@dataclass_transform</span><span class="p">(</span><span class="n">kw_only_default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">field_specifiers</span><span class="o">=</span><span class="p">(</span><span class="n">dc</span><span class="o">.</span><span class="n">field</span><span class="p">,</span> <span class="n">Invisible</span><span class="p">))</span>
@@ -966,6 +974,7 @@
         <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">field_options</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">_OptionLike</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">align_to</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">ContextLambda</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="n">AlignTo</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">_ModelT</span><span class="p">],</span> <span class="nb">type</span><span class="p">[</span><span class="n">_ModelT</span><span class="p">]]:</span> <span class="o">...</span>
 <div class="viewcode-block" id="struct_factory.new">
 <a class="viewcode-back" href="../../../library/model/struct.html#caterpillar.model.struct_factory.new">[docs]</a>
@@ -978,6 +987,7 @@
         <span class="n">order</span><span class="p">:</span> <span class="n">_EndianLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">arch</span><span class="p">:</span> <span class="n">_ArchLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">field_options</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">_OptionLike</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">align_to</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">ContextLambda</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="n">AlignTo</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">_ModelT</span><span class="p">]</span> <span class="o">|</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">_ModelT</span><span class="p">],</span> <span class="nb">type</span><span class="p">[</span><span class="n">_ModelT</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">"""Decorator or direct constructor for creating a ``Struct`` model.</span>
 
@@ -1012,6 +1022,9 @@
 <span class="sd">        :param field_options: Additional options applied at the field level,</span>
 <span class="sd">            defaults to None</span>
 <span class="sd">        :type field_options: Iterable[_OptionLike] | None, optional</span>
+<span class="sd">        :param align_to: Optional trailing alignment applied to the whole</span>
+<span class="sd">            struct after all fields have been processed.</span>
+<span class="sd">        :type align_to: int | ContextLambda[int] | AlignTo | None, optional</span>
 <span class="sd">        :return: A transformed Struct model class, or a decorator if ``ty`` is None</span>
 <span class="sd">        :rtype: type[_ModelT] | Callable[[_ModelT], type[_ModelT]]</span>
 <span class="sd">        """</span>
@@ -1024,6 +1037,7 @@
                 <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span>
                 <span class="n">field_options</span><span class="o">=</span><span class="n">field_options</span><span class="p">,</span>
                 <span class="n">kw_only</span><span class="o">=</span><span class="n">kw_only</span><span class="p">,</span>
+                <span class="n">align_to</span><span class="o">=</span><span class="n">align_to</span><span class="p">,</span>
             <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">ty</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -1034,6 +1048,7 @@
                 <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span>
                 <span class="n">field_options</span><span class="o">=</span><span class="n">field_options</span><span class="p">,</span>
                 <span class="n">kw_only</span><span class="o">=</span><span class="n">kw_only</span><span class="p">,</span>
+                <span class="n">align_to</span><span class="o">=</span><span class="n">align_to</span><span class="p">,</span>
             <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">wrap</span>  <span class="c1"># pyright: ignore[reportReturnType]</span></div>
@@ -1051,6 +1066,7 @@
         <span class="n">field_options</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">_OptionLike</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">kw_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">hook_cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="s2">"UnionHook[_ModelT]"</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">align_to</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">ContextLambda</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="n">AlignTo</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">_ModelT</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">"""Internal helper that performs the actual Struct model creation.</span>
 
@@ -1076,6 +1092,9 @@
 <span class="sd">        :type kw_only: bool, optional</span>
 <span class="sd">        :param hook_cls: Optional hook class for union handling, defaults to None</span>
 <span class="sd">        :type hook_cls: type["UnionHook[_ModelT]"] | None, optional</span>
+<span class="sd">        :param align_to: Optional trailing alignment applied to the whole</span>
+<span class="sd">            struct after all fields have been processed, defaults to None</span>
+<span class="sd">        :type align_to: int | ContextLambda[int] | AlignTo | None, optional</span>
 <span class="sd">        :return: The generated Struct model class</span>
 <span class="sd">        :rtype: type[_ModelT]</span>
 <span class="sd">        """</span>
@@ -1087,6 +1106,7 @@
             <span class="n">field_options</span><span class="o">=</span><span class="n">field_options</span><span class="p">,</span>
             <span class="n">kw_only</span><span class="o">=</span><span class="n">kw_only</span><span class="p">,</span>
             <span class="n">hook_cls</span><span class="o">=</span><span class="n">hook_cls</span><span class="p">,</span>
+            <span class="n">align_to</span><span class="o">=</span><span class="n">align_to</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">model</span></div>
 </div>
@@ -1203,6 +1223,7 @@
     <span class="n">field_options</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">_OptionLike</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">kw_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">hook_cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">UnionHook</span><span class="p">[</span><span class="n">_ModelT</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">align_to</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">ContextLambda</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="n">AlignTo</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">type</span><span class="p">[</span><span class="n">_ModelT</span><span class="p">]],</span> <span class="nb">type</span><span class="p">[</span><span class="n">_ModelT</span><span class="p">]]:</span> <span class="o">...</span>
 <span class="nd">@overload</span>
 <span class="nd">@dataclass_transform</span><span class="p">(</span><span class="n">field_specifiers</span><span class="o">=</span><span class="p">(</span><span class="n">dc</span><span class="o">.</span><span class="n">field</span><span class="p">,</span> <span class="n">Invisible</span><span class="p">))</span>
@@ -1216,6 +1237,7 @@
     <span class="n">field_options</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">_OptionLike</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">kw_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">hook_cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">UnionHook</span><span class="p">[</span><span class="n">_ModelT</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">align_to</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">ContextLambda</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="n">AlignTo</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">_ModelT</span><span class="p">]:</span> <span class="o">...</span>
 <div class="viewcode-block" id="union">
 <a class="viewcode-back" href="../../../library/model/struct.html#caterpillar.model.union">[docs]</a>
@@ -1230,6 +1252,7 @@
     <span class="n">field_options</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">_OptionLike</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">kw_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">hook_cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">UnionHook</span><span class="p">[</span><span class="n">_ModelT</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">align_to</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">ContextLambda</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="n">AlignTo</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">_ModelT</span><span class="p">]</span> <span class="o">|</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">type</span><span class="p">[</span><span class="n">_ModelT</span><span class="p">]],</span> <span class="nb">type</span><span class="p">[</span><span class="n">_ModelT</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Decorator to create a Union class.</span>
@@ -1238,6 +1261,8 @@
 <span class="sd">    :param options: Additional options specifying what to include in the final class.</span>
 <span class="sd">    :param order: Optional configuration value for the byte order of a field.</span>
 <span class="sd">    :param arch: Global architecture definition (will be inferred on all fields).</span>
+<span class="sd">    :param align_to: Optional trailing alignment applied to the whole union</span>
+<span class="sd">        after its (largest) member has been processed</span>
 
 <span class="sd">    :return: The created Union class or a wrapper function if cls is not provided.</span>
 <span class="sd">    """</span>
@@ -1252,6 +1277,7 @@
             <span class="n">field_options</span><span class="o">=</span><span class="n">field_options</span><span class="p">,</span>
             <span class="n">kw_only</span><span class="o">=</span><span class="n">kw_only</span><span class="p">,</span>
             <span class="n">hook_cls</span><span class="o">=</span><span class="n">hook_cls</span><span class="p">,</span>
+            <span class="n">align_to</span><span class="o">=</span><span class="n">align_to</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="k">if</span> <span class="bp">cls</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -1263,6 +1289,7 @@
             <span class="n">field_options</span><span class="o">=</span><span class="n">field_options</span><span class="p">,</span>
             <span class="n">kw_only</span><span class="o">=</span><span class="n">kw_only</span><span class="p">,</span>
             <span class="n">hook_cls</span><span class="o">=</span><span class="n">hook_cls</span><span class="p">,</span>
+            <span class="n">align_to</span><span class="o">=</span><span class="n">align_to</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">wrap</span></div>
@@ -1296,8 +1323,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1331,7 +1358,7 @@
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.21.0.
 </p></div>
       
     </div>

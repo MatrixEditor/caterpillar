@@ -331,6 +331,18 @@ Special Structs
 
     .. versionadded:: 2.4.0
 
+.. autoclass:: caterpillar.fields.AlignTo
+    :members:
+
+    A trailing, self-contained alignment spec used via the ``align_to=``
+    keyword on :func:`~caterpillar.py.struct`, :func:`~caterpillar.py.union`
+    and :func:`~caterpillar.py.bitfield`. Unlike :class:`Aligned`, which pads
+    relative to the *absolute* stream position, ``align_to=`` pads the model
+    itself so its own packed size is always a multiple of the alignment -
+    regardless of where it is embedded. See :ref:`tutorial-align_to`.
+
+    .. versionadded:: 2.10.0
+
 .. autoclass:: caterpillar.fields.Computed
     :members:
 

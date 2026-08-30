@@ -27,8 +27,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -36,10 +36,10 @@
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=c1cc8b61" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../_static/scripts/fontawesome.js?digest=cb8930eaaf36d9849b67"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
 
     <script src="../../_static/documentation_options.js?v=bc52e0b9"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
@@ -1516,6 +1516,59 @@ slash syntax, e.g. <code class="docutils literal notranslate"><span class="pre">
 </div>
 </dd></dl>
 
+<dl class="py class">
+<dt class="sig sig-object py" id="caterpillar.fields.Unnamed">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">caterpillar.fields.</span></span><span class="sig-name descname"><span class="pre">Unnamed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/unnamed.html#Unnamed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Unnamed" title="Link to this definition">#</a></dt>
+<dd><p>A fixed-size, lazily-decoded, positional view over a shared byte window.</p>
+<p>Instances are normally produced by unpacking an <code class="docutils literal notranslate"><span class="pre">Unnamed[...]</span></code>-typed
+field. Individual members are decoded (and cached) on first access via
+<code class="docutils literal notranslate"><span class="pre">value[i]</span></code> or <code class="docutils literal notranslate"><span class="pre">value._i</span></code>.</p>
+<p>Fresh instances may also be constructed directly for packing purposes,
+without a prior unpack:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Unnamed</span><span class="p">()</span>                  <span class="c1"># nothing assigned yet</span>
+<span class="go">Unnamed()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Unnamed</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>           <span class="c1"># positional: index 0, 1, 2</span>
+<span class="go">Unnamed(1, 2, 3)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Unnamed</span><span class="p">(</span><span class="n">_3</span><span class="o">=</span><span class="mh">0xBEEF</span><span class="p">)</span>         <span class="c1"># keyword: only index 3 is set</span>
+<span class="go">Unnamed(?, ?, ?, 48879)</span>
+</pre></div>
+</div>
+<p>Since all members share the exact same bytes, only one member can ever
+be <em>packed</em>: whichever index was assigned last (in call order) is the
+one actually encoded. Assigning the same index twice in one call is
+an error.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.10.0.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="caterpillar.fields.sized">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">caterpillar.fields.</span></span><span class="sig-name descname"><span class="pre">sized</span></span><a class="reference internal" href="../../_modules/caterpillar/fields/unnamed.html#sized"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.sized" title="Link to this definition">#</a></dt>
+<dd><p>Inline marker for a fixed (or context-lambda) size, usable as the last
+argument of <a class="reference internal" href="#caterpillar.fields.Unnamed" title="caterpillar.fields.Unnamed"><code class="xref py py-class docutils literal notranslate"><span class="pre">Unnamed</span></code></a>’s subscript:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">payload</span><span class="p">:</span> <span class="n">Unnamed</span><span class="p">[</span><span class="n">uint8_t</span><span class="p">,</span> <span class="n">uint16_t</span><span class="p">,</span> <span class="n">sized</span><span class="p">[</span><span class="mi">10</span><span class="p">]]</span>
+</pre></div>
+</div>
+<p>which is a runtime-equivalent shorthand for:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">payload</span><span class="p">:</span> <span class="n">Unnamed</span><span class="p">[</span><span class="n">uint8_t</span><span class="p">,</span> <span class="n">uint16_t</span><span class="p">]</span><span class="o">.</span><span class="n">sized</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><code class="docutils literal notranslate"><span class="pre">sized[...]</span></code> occupies one of <code class="docutils literal notranslate"><span class="pre">Unnamed</span></code>’s generic positions, so
+static type checkers count it as an extra member type</p>
+</div>
+<p>At most one <code class="docutils literal notranslate"><span class="pre">sized[...]</span></code> marker may appear in <code class="docutils literal notranslate"><span class="pre">Unnamed[...]</span></code>, and it
+must be the last argument.</p>
+<p>Inline alternative to <code class="docutils literal notranslate"><span class="pre">.sized(length)</span></code>, given as the last argument of
+<code class="docutils literal notranslate"><span class="pre">Unnamed</span></code>’s subscript instead: <code class="docutils literal notranslate"><span class="pre">Unnamed[TypeA,</span> <span class="pre">TypeB,</span> <span class="pre">sized[length]]</span></code>.</p>
+<p>At most one may be given, and it must be the last argument.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.10.0.</span></p>
+</div>
+</dd></dl>
+
 <dl class="py data">
 <dt class="sig sig-object py" id="caterpillar.fields.Pass">
 <span class="sig-prename descclassname"><span class="pre">caterpillar.fields.</span></span><span class="sig-name descname"><span class="pre">Pass</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;Pass&gt;</span></span><a class="reference internal" href="../../_modules/caterpillar/fields/common.html#Pass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.Pass" title="Link to this definition">#</a></dt>
@@ -1683,6 +1736,90 @@ follows the same positive-power-of-two rule as <a class="reference internal" hre
 <div class="versionadded">
 <p><span class="versionmodified added">Added in version 2.4.0.</span></p>
 </div>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="caterpillar.fields.AlignTo">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">caterpillar.fields.</span></span><span class="sig-name descname"><span class="pre">AlignTo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_ContextLambda</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Buffer</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/caterpillar/fields/common.html#AlignTo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.AlignTo" title="Link to this definition">#</a></dt>
+<dd><p>A trailing alignment spec for <code class="docutils literal notranslate"><span class="pre">&#64;struct</span></code>, <code class="docutils literal notranslate"><span class="pre">&#64;union</span></code> and
+<code class="docutils literal notranslate"><span class="pre">&#64;bitfield</span></code> classes (<code class="docutils literal notranslate"><span class="pre">align_to=</span></code> keyword argument).</p>
+<p>Unlike <a class="reference internal" href="#caterpillar.fields.Aligned" title="caterpillar.fields.Aligned"><code class="xref py py-class docutils literal notranslate"><span class="pre">Aligned</span></code></a>, which pads a wrapped field relative to the
+<em>absolute</em> stream position, <code class="docutils literal notranslate"><span class="pre">AlignTo</span></code> pads the <em>model itself</em> so that the
+number of bytes it consumes (on unpacking) or writes (on packing) is always
+a multiple of <code class="xref py py-attr docutils literal notranslate"><span class="pre">value</span></code> - regardless of where the model happens to be
+embedded in a larger stream.</p>
+<p>Example usage:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@struct</span><span class="p">(</span><span class="n">align_to</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="gp">... </span><span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">a</span><span class="p">:</span> <span class="n">uint8</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sizeof</span><span class="p">(</span><span class="n">Format</span><span class="p">)</span>
+<span class="go">4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">Format</span><span class="p">,</span> <span class="sa">b</span><span class="s2">"</span><span class="se">\x01\x00\x00\x00</span><span class="s2">"</span><span class="p">)</span>
+<span class="go">Format(a=1)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="n">Format</span><span class="p">,</span> <span class="sa">b</span><span class="s2">"</span><span class="se">\x01\xff\xff\xff</span><span class="s2">"</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">ValueError</span>: <span class="n">Expected 3 bytes of padding (fill=b'\x00\x00\x00'), got b'\xff\xff\xff'</span>
+</pre></div>
+</div>
+<p>Use the class directly to customize the fill pattern or disable verification:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@struct</span><span class="p">(</span><span class="n">align_to</span><span class="o">=</span><span class="n">AlignTo</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="mh">0xFF</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+<span class="gp">... </span><span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">a</span><span class="p">:</span> <span class="n">uint8</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>value</strong> – The alignment in bytes, which must be a power of 2. Can be a
+plain integer or a context lambda for dynamic alignment.</p></li>
+<li><p><strong>fill</strong> – The fill pattern used for padding. Accepts a single integer
+(0-255) or a bytes-like pattern, which is repeated/truncated
+to the required padding length. Defaults to zero-padding.</p></li>
+<li><p><strong>strict</strong> – When <cite>True</cite> (default), unpacking verifies that the parsed
+padding bytes actually match <cite>fill</cite> and raises <cite>ValueError</cite>
+if they don’t. When <cite>False</cite>, padding bytes are consumed
+without verification.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If <cite>value</cite> is not a power of 2, or (when <cite>strict</cite>) if
+parsed padding doesn’t match <cite>fill</cite>.</p></li>
+<li><p><a class="reference internal" href="../exceptions.html#caterpillar.exception.DynamicSizeError" title="caterpillar.exception.DynamicSizeError"><strong>DynamicSizeError</strong></a> – If a dynamic <cite>value</cite> is used and the size is
+requested statically (e.g. via <cite>sizeof</cite>).</p></li>
+</ul>
+</dd>
+</dl>
+<p>A trailing, self-contained alignment spec used via the <code class="docutils literal notranslate"><span class="pre">align_to=</span></code>
+keyword on <code class="xref py py-func docutils literal notranslate"><span class="pre">struct()</span></code>, <code class="xref py py-func docutils literal notranslate"><span class="pre">union()</span></code>
+and <code class="xref py py-func docutils literal notranslate"><span class="pre">bitfield()</span></code>. Unlike <a class="reference internal" href="#caterpillar.fields.Aligned" title="caterpillar.fields.Aligned"><code class="xref py py-class docutils literal notranslate"><span class="pre">Aligned</span></code></a>, which pads
+relative to the <em>absolute</em> stream position, <code class="docutils literal notranslate"><span class="pre">align_to=</span></code> pads the model
+itself so its own packed size is always a multiple of the alignment -
+regardless of where it is embedded. See <a class="reference internal" href="../../tutorial/basics/padding.html#tutorial-align-to"><span class="std std-ref">Whole-model alignment</span></a>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.10.0.</span></p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="caterpillar.fields.AlignTo.resolve">
+<span class="sig-name descname"><span class="pre">resolve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ContextLike</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/common.html#AlignTo.resolve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.AlignTo.resolve" title="Link to this definition">#</a></dt>
+<dd><p>Resolve (and validate) the configured alignment value against <cite>context</cite>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caterpillar.fields.AlignTo.padding">
+<span class="sig-name descname"><span class="pre">padding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ContextLike</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/common.html#AlignTo.padding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.AlignTo.padding" title="Link to this definition">#</a></dt>
+<dd><p>Compute the number of padding bytes needed for <cite>size</cite> bytes to become
+a multiple of the resolved alignment.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caterpillar.fields.AlignTo.fill_bytes">
+<span class="sig-name descname"><span class="pre">fill_bytes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="reference internal" href="../../_modules/caterpillar/fields/common.html#AlignTo.fill_bytes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caterpillar.fields.AlignTo.fill_bytes" title="Link to this definition">#</a></dt>
+<dd><p>Expand (repeat and truncate) the configured fill pattern to <cite>length</cite> bytes.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
@@ -2340,6 +2477,8 @@ instance. The configured timezone is applied if provided.</p>
 </li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.PrePad"><code class="docutils literal notranslate"><span class="pre">PrePad()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.PostPad"><code class="docutils literal notranslate"><span class="pre">PostPad()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Unnamed"><code class="docutils literal notranslate"><span class="pre">Unnamed</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.sized"><code class="docutils literal notranslate"><span class="pre">sized</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Pass"><code class="docutils literal notranslate"><span class="pre">Pass</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Aligned"><code class="docutils literal notranslate"><span class="pre">Aligned</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Aligned.unpack_alignment"><code class="docutils literal notranslate"><span class="pre">Aligned.unpack_alignment()</span></code></a></li>
@@ -2349,6 +2488,12 @@ instance. The configured timezone is applied if provided.</p>
 </ul>
 </li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.align"><code class="docutils literal notranslate"><span class="pre">align()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.AlignTo"><code class="docutils literal notranslate"><span class="pre">AlignTo</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.AlignTo.resolve"><code class="docutils literal notranslate"><span class="pre">AlignTo.resolve()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.AlignTo.padding"><code class="docutils literal notranslate"><span class="pre">AlignTo.padding()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.AlignTo.fill_bytes"><code class="docutils literal notranslate"><span class="pre">AlignTo.fill_bytes()</span></code></a></li>
+</ul>
+</li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Computed"><code class="docutils literal notranslate"><span class="pre">Computed</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Computed.pack_single"><code class="docutils literal notranslate"><span class="pre">Computed.pack_single()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#caterpillar.fields.Computed.unpack_single"><code class="docutils literal notranslate"><span class="pre">Computed.unpack_single()</span></code></a></li>
@@ -2411,8 +2556,8 @@ instance. The configured timezone is applied if provided.</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -2446,7 +2591,7 @@ instance. The configured timezone is applied if provided.</p>
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.21.0.
 </p></div>
       
     </div>
